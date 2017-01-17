@@ -1,0 +1,95 @@
+@model ContentListModel
+@{
+    Layout = null;
+}
+<div class="sidebar-container">
+    <div class="sidebar-title">
+        <button type="button" class="close close-blade"><span>&times;</span></button>
+        <h3><i class="fa fa-thumb-tack"></i> Create new @Model.Type.TypeName.ToLower().</h3>
+        <small><i class="fa fa-plus-circle"></i> Add a new @Model.Type.TypeName.ToLower() to the website.</small>
+    </div>
+    <form id="create-content-form" asp-antiforgery="true" autocomplete="off">
+        <input type="hidden" id="cpType" name="cpType" value="@Model.Type.Type" />
+        <div class="setings-item">
+            <label for="Title" class="control-label">@Model.Type.TitleName</label>
+            <div>
+                <input id="cpTitle" name="cpTitle" class="form-control" />
+            </div>
+        </div>
+        <div class="setings-item">
+            <label for="Title" class="control-label">@Model.Type.ExcerptName</label>
+            <div>
+                <textarea id="cpExcept" name="cpExcept" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="setings-item">
+            <label for="cpCategory" class="control-label">Initial Category:</label>
+            <div>
+                <input id="cpCategory" name="cpCategory" class="form-control" />
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="row">
+                <div class="col-xs-6">
+                    <createField db-field="cpPublishDate" field-type="date" field-name="Date to publish" db-value="@DateTime.Now.ToShortDateString()" />
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label">Time</label>
+                        <div>
+                            <select id="cpPublishHour" name="cpPublishHour" class="form-control half">
+                                @for (int i = 0; i < 24; i++)
+                                {
+                                    if (i == DateTime.Now.Hour)
+                                    {
+                                        <option value="@i" selected>@i.ToString("00")</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i.ToString("00")</option>
+                                    }
+                                }
+                            </select>
+                            <select id="cpPublishMinute" name="cpPublishMinute" class="form-control half">
+                                @for (int i = 0; i < 60; i++)
+                                {
+                                    if (i == DateTime.Now.Minute)
+                                    {
+                                        <option value="@i" selected>@i.ToString("00")</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i.ToString("00")</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label">Create as</label>
+                <div class="">
+                    <select id="cpStatus" name="cpStatus" class="form-control">
+                        <option value="1">Draft</option>
+                        <option value="2">Published</option>
+                    </select>
+                </div>
+            </div>        
+        </div>
+        <div class="setings-item">
+            <button type="button" id="create-content-submit" class="btn btn-primary"><i class="fa fa-content-plus"></i> Create @Model.Type.TypeName.ToLower()</button>
+            <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
+        </div>
+        <div class="sidebar-content">
+            <h4>Creating a @Model.Type.TypeName.ToLower()</h4>
+            <div class="small">
+                <p>
+                    Use this to add a @Model.Type.TypeName.ToLower() to the website. Create as published or a draft. If you leave it as a draft, it will not publish on the given date. If published, it will not appear on the site until after the published date.
+                <p>
+            </div>
+        </div>
+    </form>
+</div>

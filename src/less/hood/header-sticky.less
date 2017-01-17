@@ -1,0 +1,192 @@
+// Add animations, and static heights to nav elements
+
+header#header,
+#header-wrap,
+#logo img {
+    height: @header-height-xs;
+    -webkit-transition: height .4s ease, opacity .3s ease;
+    -o-transition: height .4s ease, opacity .3s ease;
+    transition: height .4s ease, opacity .3s ease;
+
+    @media (min-width:768px) {
+        height: @header-height-sm;
+    }
+
+    @media (min-width:996px) {
+        height: @header-height-md;
+    }
+
+    @media (min-width:1200px) {
+        height: @header-height-lg;
+    }
+
+    @media (min-width:1800px) {
+        height: @header-height-xl;
+    }
+
+    @media (min-width:2200px) {
+        height: @header-height-xxl;
+    }
+}
+
+nav.primary > ul > li > ul,
+nav.primary > ul > li > .mega-menu-content,
+nav.primary > ul > li.mega-menu > .mega-menu-content {
+    -webkit-transition: top .4s ease;
+    -o-transition: top .4s ease;
+    transition: top .4s ease;
+}
+
+#header {
+    #header-wrap {
+        position: relative;
+        z-index: 199;
+        -webkit-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+        -webkit-perspective: 1000px;
+        -webkit-backface-visibility: hidden;
+    }
+
+    &.semi-transparent {
+        &.sticky-header {
+            #header-wrap {
+                background-color: rgba(255,255,255,0.8);
+            }
+        }
+    }
+
+    &.sticky-header {
+
+        @media (min-width:768px) {
+            height: @sticky-header-height-sm;
+        }
+
+        @media (min-width:996px) {
+            height: @sticky-header-height-md;
+        }
+
+        @media (min-width:1200px) {
+            height: @sticky-header-height-lg;
+        }
+
+        @media (min-width:1800px) {
+            height: @sticky-header-height-xl;
+        }
+
+        @media (min-width:2200px) {
+            height: @sticky-header-height-xxl;
+        }
+
+        &.semi-transparent {
+            background-color: transparent;
+        }
+
+        #header-wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: @sticky-header-height;
+
+            @media (min-width:768px) {
+                height: @sticky-header-height-sm;
+            }
+
+            @media (min-width:996px) {
+                height: @sticky-header-height-md;
+            }
+
+            @media (min-width:1200px) {
+                height: @sticky-header-height-lg;
+            }
+
+            @media (min-width:1800px) {
+                height: @sticky-header-height-xl;
+            }
+
+            @media (min-width:2200px) {
+                height: @sticky-header-height-xxl;
+            }
+        }
+
+        #logo img {
+            height: @sticky-header-height;
+
+            @media (min-width:768px) {
+                height: @sticky-header-height-sm;
+            }
+
+            @media (min-width:996px) {
+                height: @sticky-header-height-md;
+            }
+
+            @media (min-width:1200px) {
+                height: @sticky-header-height-lg;
+            }
+
+            @media (min-width:1800px) {
+                height: @sticky-header-height-xl;
+            }
+
+            @media (min-width:2200px) {
+                height: @sticky-header-height-xxl;
+            }
+        }
+
+        nav.primary {
+            > ul > li > a {
+                padding-top: @sticky-menu-padding-xs;
+                padding-bottom: @sticky-menu-padding-xs;
+
+                @media (min-width:768px) {
+                    padding-top: @sticky-menu-padding-sm;
+                    padding-bottom: @sticky-menu-padding-sm;
+                }
+
+                @media (min-width:996px) {
+                    padding-top: @sticky-menu-padding-md;
+                    padding-bottom: @sticky-menu-padding-md;
+                }
+
+                @media (min-width:1200px) {
+                    padding-top: @sticky-menu-padding-lg;
+                    padding-bottom: @sticky-menu-padding-lg;
+                }
+
+                @media (min-width:1800px) {
+                    padding-top: @sticky-menu-padding-xl;
+                    padding-bottom: @sticky-menu-padding-xl;
+                }
+
+                @media (min-width:2200px) {
+                    padding-top: @sticky-menu-padding-xxl;
+                    padding-bottom: @sticky-menu-padding-xxl;
+                }
+            }
+
+            &.sub-title {
+
+                > ul > li {
+                    background: none !important;
+                    margin-left: 2px;
+
+                    &:first-child {
+                        margin-left: 0;
+                    }
+
+                    > a {
+                        line-height: 22px;
+                        padding: 19px 15px;
+                        text-transform: none;
+                        font-size: 14px;
+                        border-top: 0;
+
+                        span {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

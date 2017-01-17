@@ -1,0 +1,138 @@
+﻿{
+    "Description": "A basic grid layout for columned content, up to 3 rows, and 1, 2, 3, 4 or 6 column layout.",
+    "IconUrl": "/lib/hood/images/no-image.jpg",
+    "Name": "Content Columns",
+    "Variables": [
+        {
+            "Name": "CSS Class",
+            "VariableName": "class",
+            "Type": "text",
+            "Values": [ ],
+            "Value": ""
+        },
+        {
+            "Name": "Heading Type",
+            "VariableName": "heading",
+            "Type": "select",
+            "Values": [
+                {
+                    "Key": "H1",
+                    "Value": "h1"
+                },
+                {
+                    "Key": "H2",
+                    "Value": "h2"
+                },
+                {
+                    "Key": "H3",
+                    "Value": "h3"
+                }
+            ],
+            "Value": "h2"
+        },
+        {
+            "Name": "Alignment",
+            "VariableName": "align",
+            "Type": "select",
+            "Values": [
+                {
+                    "Key": "Left",
+                    "Value": "text-align:left;"
+                },
+                {
+                    "Key": "Center",
+                    "Value": "text-align:center;"
+                },
+                {
+                    "Key": "Right",
+                    "Value": "text-align:right;"
+                },
+                {
+                    "Key": "Justify",
+                    "Value": "text-align:justify;"
+                }
+            ],
+            "Value": "text-align:left;"
+        },
+        {
+            "Name": "Buttons",
+            "VariableName": "buttons",
+            "Type": "select",
+            "Values": [
+                {
+                    "Key": "Show buttons",
+                    "Value": "true"
+                },
+                {
+                    "Key": "No buttons",
+                    "Value": "false"
+                }
+            ],
+            "Value": "true"
+        },
+        {
+            "Name": "Icons",
+            "VariableName": "icons",
+            "Type": "select",
+            "Values": [
+                {
+                    "Key": "Show icons",
+                    "Value": "true"
+                },
+                {
+                    "Key": "No icons",
+                    "Value": "false"
+                }
+            ],
+            "Value": "true"
+        },
+        {
+            "Name": "Rows",
+            "VariableName": "rows",
+            "Type": "select",
+            "Values": [
+                {
+                    "Key": "1",
+                    "Value": "1"
+                },
+                {
+                    "Key": "2",
+                    "Value": "2"
+                },
+                {
+                    "Key": "3",
+                    "Value": "3"
+                }
+            ],
+            "Value": "1"
+        },
+        {
+            "Name": "Columns",
+            "VariableName": "cols",
+            "Type": "select",
+            "Values": [
+                {
+                    "Key": "1",
+                    "Value": "1"
+                },
+                {
+                    "Key": "2",
+                    "Value": "2"
+                },
+                {
+                    "Key": "3",
+                    "Value": "3"
+                },
+                {
+                    "Key": "4",
+                    "Value": "4"
+                },
+                {
+                    "Key": "6",
+                    "Value": "6"
+                }
+            ],
+            "Value": "1"
+        }
+    ]
+}

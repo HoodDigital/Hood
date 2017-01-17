@@ -1,0 +1,80 @@
+@model AttachMediaModel
+@{
+    Layout = null;
+}
+<div class="modal fade inmodal hood-modal" id="attach-media-modal" tabindex="-1" role="dialog" aria-labelledby="attach-media-title">
+    <div class="modal-dialog modal-lg tabs-container" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="attach-media-title">Insert content block</h4>
+                <small class="font-bold">You can insert predefined content structures to your pages.</small>
+            </div>
+            <div class="modal-body tab-content">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div id="content-block-list" class="border-box-sizing block-list"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="content-block-pager m-lg text-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="insert-block-details"></div>
+                        <script id="content-block-insert-template" class="kendo-template" type="text/template">
+                            <h4>${ Name }</h4>
+                            <p>${ Description }</p>
+                            <form id="content-block-variables">
+                                #if (typeof Variables !== 'undefined' && Variables != null) {#
+                                    #for (var i = 0; i < Variables.length; i++) {#
+                                        <div class="form-group">
+                                            <label for="#= Variables[i].VariableName #">#= Variables[i].Name #</label>
+                                            #if (Variables[i].Type == "select"){#
+                                                <select class="form-control" id="#= Variables[i].VariableName #" name="#= Variables[i].VariableName #" placeholder="#= Variables[i].Name #" value="#= Variables[i].Value #">
+                                                    #if (typeof Variables[i].Values !== 'undefined' && Variables[i].Values != null) {#
+                                                        #for (var j = 0; j < Variables[i].Values.length; j++) {#
+                                                            <option value="#= Variables[i].Values[j].Value #">#= Variables[i].Values[j].Key #</option>
+                                                        #}#
+                                                    #}#
+                                                </select>
+                                            #} else if (Variables[i].Type == "text") {#
+                                                <input type="text" class="form-control" id="#= Variables[i].VariableName #" name="#= Variables[i].VariableName #" placeholder="#= Variables[i].Name #" value="#= Variables[i].Value #">
+                                            #}#
+                                        </div>
+                                    #}#
+                                #}#
+                            </form>
+                            <p class="text-right">
+                                <button class="insert-content-block action-button btn btn-success" data-url="${ Url }">
+                                    <i class="fa fa-clone m-r-xs"></i>
+                                    <span>
+                                        Insert this
+                                    </span>
+                                </button>
+                            </p>
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="content-block-template" class="kendo-template">
+        <div class="thumbnail m-b-sm">
+            <h4>${ Name }</h4>
+            <p>${ Description }</p>
+            <span class="pull-right m-sm">
+                <button class="choose-content-block action-button btn btn-xs btn-default" data-uid="#= uid #">
+                    <i class="fa fa-clone m-r-xs"></i>
+                    <span>
+                        Insert
+                    </span>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>

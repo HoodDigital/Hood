@@ -1,0 +1,80 @@
+@inject ISiteConfiguration _site
+@{
+    BasicSettings _info = _site.GetBasicSettings();
+    SeoSettings _meta = _site.GetSeo();
+    IntegrationSettings _plugins = _site.GetIntegrationSettings();
+    ContactSettings _settings = _site.GetContactSettings();
+    Layout = "_Layout";
+    ContentApi currentContent = ViewData["Content"] as ContentApi;
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section includes {
+    @RenderSection("includes", required: false)
+}
+@section scripts {
+    @RenderSection("scripts", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<div class="jumbotron">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        @if (currentContent != null)
+        {
+            <p>@currentContent.Excerpt</p>
+        }
+        else
+        {
+            <p>@ViewData["SubTitle"]</p>
+        }
+    </div>
+</div>
+<section class="container">
+    @RenderBody()
+</section>
+@if (_plugins.EnableGoogleMaps)
+{
+    <div id="map" class="img-lg img-full"></div>
+    <script>
+        function initMap() {
+            var myLatLng = { lat: @_info.Address?.Latitude, lng: @_info.Address?.Longitude };
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: myLatLng,
+                scrollwheel: false
+            });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: '@_site.GetSiteTitle()'
+            });
+        }
+    </script>
+    <script async defer
+    src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initMap", _plugins.GoogleMapsApiKey)">
+    </script>
+}
+@if (_settings != null && _settings.BusinessHours.IsSet())
+{
+    <div class="contact-box-left mb-45">
+        <div class="contact-icon-left"><i class="ion ion-ios-clock"></i></div>
+        <h6>Business Hours</h6>
+        <p class="user-text">@_settings.BusinessHours</p>
+    </div>
+}
+<div class="bg-color-light-grey" id="contact-form">
+    <div class="container">
+        <div class="m-t-lg m-b-lg">
+            <h3 class="no-margin">Send us a message</h3>
+            <h4>Someone will be in touch very soon...</h4>
+            @{ await Html.RenderPartialAsync("_ContactForm", new ContactFormModel(true, true)); }
+        </div>
+    </div>
+</div>
+
+

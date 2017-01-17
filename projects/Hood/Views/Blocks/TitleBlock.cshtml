@@ -1,0 +1,30 @@
+@{    
+    Layout = null;
+    var align = Context.Request.Query["align"];
+    var heading = Context.Request.Query["heading"];
+    var cssClass = Context.Request.Query["class"];
+}
+<div class="hood-block">
+    <div class="hood-block-title @cssClass">
+        @switch (heading)
+        {
+            case "h1":
+                <h1 class="tinymce-text" style="@align">Dummy content...</h1>
+                break;
+            case "h2":
+                <h2 class="tinymce-text" style="@align">Dummy content...</h2>
+                break;
+            case "h3":
+                <h3 class="tinymce-text" style="@align">Dummy content...</h3>
+                break;
+            case "h4":
+                <h4 class="tinymce-text" style="@align">Dummy content...</h4>
+                break;
+            case "h5":
+                <h5 class="tinymce-text" style="@align">Dummy content...</h5>
+                break;
+
+        }
+    </div>
+</div>
+

@@ -1,0 +1,55 @@
+@model ContentModel
+@inject ISiteConfiguration _site
+@{
+    ContentApi mapi = new ContentApi(Model.Content);
+    BasicSettings siteSettings = _site.GetBasicSettings();
+}
+<div class="m-b-lg">
+    @{ await Html.RenderPartialAsync("_NeighbourPosts"); }
+</div>
+<div class="row">
+    <div class="col-sm-8 col-lg-9">
+        <div class="blog-post mb-30">
+            @if (Model.Content.Author != null)
+            {
+                <div class="post-meta"><span>by <a href="@Url.Action("Author", "News", new { author = mapi.Author.UserName.ToLower() })">@mapi.Author.FullName</a>,</span> posted on <span>@Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span></div>
+            }
+            <div class="post-header">
+                <h2>@Model.Content.Title</h2>
+            </div>
+            @if (Model.Content.FeaturedImage != null)
+            {
+                <a href="@mapi.Url"><img src="@mapi.FeaturedImage.LargeUrl" class="full-content-image content-feature-@Model.Content.Id" /></a>
+            }
+            <div id="share"></div>
+            <div class="post-entry">
+                @Html.Raw(Model.Content.Body)
+            </div>
+        </div>
+        <hr />
+        @{ await Html.RenderPartialAsync("_Author"); }
+        <hr />
+        <div class="clearfix"></div>
+        <div id="disqus_thread"></div>
+        <script>
+            (function () { 
+                var d = document, s = d.createElement('script');
+
+                s.src = '@string.Format("//{0}.disqus.com/embed.js", siteSettings.DisqusId)';
+
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>
+            Please enable
+            JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+        </noscript>
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        @{ await Html.RenderPartialAsync("_Sidebar"); }
+    </div>
+</div>
+<div class="m-t-lg">
+    @{ await Html.RenderPartialAsync("_NeighbourPosts"); }
+</div>

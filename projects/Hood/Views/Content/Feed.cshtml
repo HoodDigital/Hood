@@ -1,0 +1,71 @@
+@model ContentListModel
+@inject ISiteConfiguration _site
+@{
+    string title =  Model.Type.MetaTitle.IsSet() ? Model.Type.MetaTitle : Model.Type.Title;
+    ViewData["Title"] = title;
+    var Feed = "_Feed";
+    Layout = "_Layout";
+
+    switch (Model.Type.Type)
+    {
+        case "news":
+        case "blog":
+            Feed = "_NewsFeed";
+            Layout = "_NewsLayout";
+            break;
+        case "event":
+            Feed = "_NewsFeed";
+            Layout = "_EventsLayout";
+            break;
+        case "product":
+            Feed = "_ProductFeed";
+            Layout = "_ProductLayout";
+            break;
+        case "rental":
+        case "portfolio":
+            Feed = "_PortfolioFeed";
+            Layout = "_PortfolioLayout";
+            break;
+        case "property":
+            Feed = "_PropertyFeed";
+            Layout = "_PropertyLayout";
+            break;
+        case "faq":
+            Feed = "_FaqFeed";
+            Layout = "_FaqLayout";
+            break;
+        case "team":
+            Feed = "_TeamFeed";
+            Layout = "_TeamLayout";
+            break;
+        case "job":
+            Feed = "_JobFeed";
+            Layout = "_JobLayout";
+            break;
+        case "testimonial":
+            Feed = "_TestimonialFeed";
+            Layout = "_TestimonialLayout";
+            break;
+    }
+
+    SeoSettings meta = _site.GetSeo();
+    BasicSettings info = _site.GetBasicSettings();
+    string url = Context.GetSiteUrl(true, true);
+    if (meta.CanonicalUrl.IsSet())
+    {
+        url = string.Format("{0}{1}", meta.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+    }
+
+}
+@section metas {
+    <meta name="description" content="@Model.Type.Description" />
+    <meta property="og:author" content="@meta.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@meta.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@meta.OgSecureImageUrl" />
+    <meta property="og:description" content="@Model.Type.Description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@Model.Type.Description" />
+    <meta name="twitter:image" content="@meta.TwitterCardImageUrl" />
+}
+@{ await Html.RenderPartialAsync(Feed); }

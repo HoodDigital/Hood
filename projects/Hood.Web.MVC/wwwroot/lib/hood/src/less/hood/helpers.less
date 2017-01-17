@@ -1,0 +1,168 @@
+﻿/* AUTOCOMPLETE BASE STYLES */
+.autocomplete-suggestions {
+    text-align: left;
+    cursor: default;
+    border: 1px solid #ccc;
+    border-top: 0;
+    background: #fff;
+    box-shadow: -1px 1px 3px rgba(0,0,0,.1);
+    /* core styles should not be changed */
+    position: absolute;
+    display: none;
+    z-index: 9999;
+    max-height: 254px;
+    overflow: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.autocomplete-suggestion {
+    position: relative;
+    padding: 0 .6em;
+    line-height: 23px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.02em;
+    color: #333;
+}
+
+.autocomplete-suggestion b {
+    font-weight: normal;
+    color: #1f8dd6;
+}
+
+.autocomplete-suggestion.selected {
+    background: #f0f0f0;
+}
+
+.no-wrap {
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bootstrap-tagsinput {
+    display: block;
+    border-radius: 0;
+}
+
+.strikethrough {
+    text-decoration: line-through;
+}
+
+.word-wrap, .pre-line, .user-text {
+    white-space: pre-line;
+}
+
+@media (max-width:767px) {
+    .text-center-mobile {
+        text-align: center;
+    }
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.form-control-message {
+    padding: 11px 17px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+a.full-box-link {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-indent: -10000px;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1;
+}
+
+figure.media-select {
+    width: 100%;
+    height: 100px !important;
+}
+
+.v-middle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    -ms-transition: translateY(-50%);
+}
+
+/* IMAGES */
+.hood-image {
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+.hood-avatar.loading:after,
+.hood-image.loading:after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: rgba(255,255,255,0.5);
+}
+
+.hood-image img {
+    display: none !important;
+}
+
+figure.img {
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.figure.img.contained {
+    background-size: cover;
+    background-position: top center;
+}
+
+figure.img img {
+    display: none;
+}
+
+.bg-img {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background-size: cover;
+}
+
+.bg-img img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.no-border {
+    border: 0px !important;
+}

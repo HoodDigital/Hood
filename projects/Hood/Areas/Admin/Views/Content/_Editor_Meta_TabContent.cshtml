@@ -1,0 +1,54 @@
+@model EditContentModel
+
+@if (Model.Type.BaseName != "Page" && Model.Type.BaseName != "Product" && Model.Type.BaseName != "Team" && Model.Type.BaseName != "Slider" &&
+                Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + ".")).Count() > 0)
+{
+    <div id="type" class="tab-pane">
+        <div class="panel-body">
+            @{await Html.RenderPartialAsync("_Editor_Type"); }
+        </div>
+    </div>
+}
+@if (Model.Type.Gallery)
+{
+    <div id="media" class="tab-pane">
+        <div class="panel-body">
+            @{await Html.RenderPartialAsync("_Editor_Media"); }
+        </div>
+    </div>
+}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
+{
+    <div id="seo" class="tab-pane">
+        <div class="panel-body">
+            @{await Html.RenderPartialAsync("_Editor_SEO"); }
+        </div>
+    </div>
+}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
+{
+    <div id="custom" class="tab-pane">
+        <div class="panel-body">
+            @{await Html.RenderPartialAsync("_Editor_CustomFields"); }
+        </div>
+    </div>
+}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0 || Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
+{
+    <div id="settings" class="tab-pane">
+        <div class="panel-body">
+            @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0)
+            { await Html.RenderPartialAsync("_Editor_Settings.Image"); }
+            @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
+            { await Html.RenderPartialAsync("_Editor_Settings.Security"); }
+        </div>
+    </div>
+}
+@if (Model.Type.Templates)
+{
+    <div id="template" class="tab-pane">
+        <div class="panel-body">
+            @{await Html.RenderPartialAsync("_Editor_Template"); }
+        </div>
+    </div>
+}

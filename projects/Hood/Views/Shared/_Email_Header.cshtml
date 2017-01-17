@@ -1,0 +1,27 @@
+@inject ISiteConfiguration _site
+@{
+    MailSettings _mail = _site.GetMailSettings();
+    BasicSettings _info = _site.GetBasicSettings();
+}
+<div class="header" style="margin-bottom: 20px; Margin-top: 10px; width: 100%;">
+    <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; min-width: 100%;" width="100%">
+        <tr>
+            <td class="align-center" style="font-family: sans-serif; font-size: 14px; vertical-align: top; text-align: center;" valign="top" align="center">
+                <a href="@Context.GetSiteUrl()" target="_blank" style="color: #3498db; text-decoration: underline;">
+                    @if (_mail.Logo.IsSet())
+                    {
+                        <h1 class="align-center" style="color: #222222; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; Margin-bottom: 30px; font-size: 35px; text-transform: capitalize; text-align: center; text-decoration:none; ">
+                            <img src="@_mail.Logo" height="41" alt="Logo" align="center" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%;">
+                        </h1>
+                    }
+                    else
+                    {
+                        <h1 class="align-center" style="color: #222222; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; Margin-bottom: 30px; font-size: 35px; text-transform: capitalize; text-align: center; text-decoration:none; ">
+                            @_info.SiteTitle
+                        </h1>
+                    }
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>

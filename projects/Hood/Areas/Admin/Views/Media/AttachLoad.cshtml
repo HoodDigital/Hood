@@ -1,0 +1,39 @@
+@model AttachMediaModel
+@{
+    Layout = null;
+}
+<div class="modal fade inmodal" id="attach-media-modal" tabindex="-1" role="dialog" aria-labelledby="attach-media-title">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="attach-media-title">Attach @Model.Type to @Model.Entity</h4>
+                <small class="font-bold">You can either select from existing site media, previously set versions, or upload a new file.</small>
+            </div>
+            <div class="modal-body tab-content">
+                <div class="panel-body">
+                    @{ await Html.RenderPartialAsync("_Filters"); }
+                </div>
+                <div class="panel-body">
+                    @{ await Html.RenderPartialAsync("_List"); }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="media-template" class="kendo-template">
+        <div class="col-xs-6 col-sm-4 col-lg-3">
+            <div class="thumbnail text-center">
+                <fixedImage src="${ LargeUrl }" class="img-md img-full m-b-sm attach-media-select" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="${ Id }" />
+                <p class="no-margin">
+                    <a class="attach-media-select action-button btn btn-xs btn-default" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="${ Id }">
+                        <i class="fa fa-clone m-r-xs"></i>
+                        <span>
+                            Attach
+                        </span>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

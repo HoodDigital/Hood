@@ -1,0 +1,51 @@
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+<div class="sidebar-container">
+    <div class="sidebar-title">
+        <button type="button" class="close close-blade"><span>&times;</span></button>
+        <h3><i class="fa fa-user-plus"></i> Create new user</h3>
+        <small><i class="fa fa-plus-circle"></i> Add a new user account to the website.</small>
+    </div>
+    <form id="create-user-form" asp-antiforgery="true" autocomplete="off">
+        <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+        <input style="display:none" type="text" name="fakeusernameremembered" />
+        <input style="display:none" type="password" name="fakepasswordremembered" />
+
+        <div class="setings-item">
+            <createField db-field="cuFirstName" field-type="text" field-name="First Name" db-value="" />
+        </div>
+        <div class="setings-item">
+            <createField db-field="cuLastName" field-type="text" field-name="Last Name" db-value="" />
+        </div>
+        <div class="setings-item">
+            <createField db-field="cuUserName" field-type="email" field-name="E-mail Address" db-value="" />
+        </div>
+        <div class="setings-item">
+            <createField db-field="cuGeneratePassword" field-type="switch" field-name="Generate password" db-value="" />
+            <div class="hr-line-dashed"></div>
+            <createField db-field="cuPassword" field-type="text" field-name="Temporary Password" db-value="" />
+        </div>
+        <div class="setings-item">
+            <createField db-field="cuNotifyUser" field-type="switch" field-name="Notify user" db-value="" />
+        </div>
+        <div class="setings-item">
+            <button type="button" id="create-user-submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create user</button>
+            <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
+        </div>
+        <div class="sidebar-content">
+            <h4>Creating a user</h4>
+            <div class="small">
+                <p>
+                    Use this to add a user to the website. The user will be able to log in with the email address and the temporary password provided here. They will be asked to change their password when they log in.
+                <p>
+                <p>
+                    <strong>Note:</strong> To send the user credentials to the user, set "Notify User" to on.
+                </p>
+            </div>
+        </div>
+    </form>
+</div>

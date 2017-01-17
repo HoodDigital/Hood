@@ -1,0 +1,30 @@
+﻿nav.mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: fade(@theme-color, 80%);
+    z-index: 9;
+    display: none;
+}
+
+.mobile-menu-trigger {
+    position: absolute;
+    right: 10px;
+    z-index: 999;
+
+    @media (min-width:996px) {
+        display: none;
+    }
+}
+
+@media (max-width:996px) {
+    body.mobile-menu-open {
+        overflow: hidden !important;
+
+        nav.mobile {
+            display: block;
+        }
+    }
+}

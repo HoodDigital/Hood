@@ -1,0 +1,27 @@
+@model ContentListModel
+<div div class="m-lg text-center">
+    <ul class="pagination">
+        @if (Model.Posts.CurrentPage > 1)
+        {
+            <li><a href="@string.Format("/{0}?page={1}&size={2}{3}",  Model.Type.Slug, Model.Posts.CurrentPage - 1, Model.Posts.PageSize, Model.Search.IsSet() ? "&search=" + Model.Search : "")" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+        }
+        @for (int i = Model.Posts.CurrentPage - 2; i <= Model.Posts.CurrentPage + 2; i++)
+        {
+            if (i > 0 && i <= Model.Posts.Pages)
+            {
+                if (i == Model.Posts.CurrentPage)
+                {                    
+                    <li class="active"><a href="@string.Format("/{0}?page={1}&size={2}{3}", Model.Type.Slug, i, Model.Posts.PageSize, Model.Search.IsSet() ? "&search=" + Model.Search : "")">@i</a></li>
+                }
+                else
+                {
+                    <li><a href="@string.Format("/{0}?page={1}&size={2}{3}", Model.Type.Slug, i, Model.Posts.PageSize, Model.Search.IsSet() ? "&search=" + Model.Search : "")">@i</a></li>
+                }
+            }
+        }
+        @if (Model.Posts.CurrentPage < Model.Posts.Pages)
+        {
+            <li><a href="@string.Format("/{0}?page={1}&size={2}{3}",  Model.Type.Slug, Model.Posts.CurrentPage + 1, Model.Posts.PageSize, Model.Search.IsSet() ? "&search=" + Model.Search : "")" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,236 @@
+/* KENDO OVERWRITES */
+.k-widget.border-box-sizing,
+.k-widget.border-box-sizing * {
+    box-sizing: border-box !important;
+}
+
+.k-listview, .k-gridview, .k-widget {
+    border: 0;
+}
+
+.k-listview {
+    /* min-height: 100px; */
+}
+
+.k-dropzone {
+    padding: .8em 0;
+}
+
+.k-dropzone em {
+    font-size: 10px;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.k-filename {
+    position: relative;
+    display: inline-block;
+    min-width: 50%;
+    max-width: 50%;
+    vertical-align: middle;
+    margin-left: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-container .k-dropzone em {
+    display: none;
+}
+
+.kendo-template {
+    display: none;
+}
+
+.k-widget .kendo-template {
+    display: inherit;
+}
+
+.k-upload {
+    color: #444;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.k-link:not(.k-state-disabled):hover > .k-i-calendar, .k-state-hover > .k-i-calendar, .k-state-hover > * > .k-i-calendar, .k-button:not(.k-state-disabled):hover .k-i-calendar, .k-textbox:hover .k-i-calendar, .k-button:active .k-i-calendar {
+    background-position: -32px -176px;
+}
+
+.k-state-default {
+    border-color: #E5E6E7 !important;
+    box-shadow: none !important;
+    padding: 2px 5px;
+    background: none !important;
+}
+
+span.k-icon.k-add {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    background-image: none;
+    vertical-align: middle !important;
+}
+
+span.k-icon.k-add:before {
+    content: "\f067";
+}
+
+.k-grid-toolbar {
+    background-color: #1AB394;
+}
+
+.k-grid .k-header .k-button, .k-scheduler .k-header .k-button, .k-scheduler .k-header li, .k-scheduler .k-header .k-link, .k-gantt > .k-header li, .k-gantt > .k-header .k-link, .k-gantt-toolbar .k-button, .km-pane-wrapper .k-header .k-button {
+    background-color: #209C83;
+    border-color: #10806A;
+}
+
+.k-grid .k-header .k-button:hover, .k-scheduler .k-header .k-button:hover, .km-pane-wrapper .k-header .k-button:hover {
+    background-color: #10806A;
+    border-color: #10806A;
+}
+
+.pac-container {
+    z-index: 9999;
+}
+
+/* CKEDITOR OVERWRITES */
+.cke_top, .cke_bottom {
+    background-color: #DFDEDB !important;
+}
+
+span.cke_button__hood-insertimage_label, .cke_button__hood-insertblock_label {
+    display: inline !important;
+    margin-left: 2px;
+}
+
+/* BOOTSTRAP MENU OVERWRITES */
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+}
+
+.dropdown-submenu.left .dropdown-menu {
+    top: 0;
+    left: auto;
+    right: 100%;
+    margin-top: -1px;
+}
+
+/* INSPINIA OVERWRITES */
+.help-block {
+    font-weight: bold;
+    font-size: smaller;
+}
+
+/* BOOTSTRAP CLOSE OVERWRITE */
+button.close {
+    padding: 0;
+    cursor: pointer;
+    background: #464747;
+    border: 0;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    color: white;
+    text-shadow: none;
+    opacity: 1;
+    font-size: 17px;
+    line-height: 0px;
+    position: relative;
+}
+
+button.close span {
+    display: block;
+    line-height: 0px;
+    margin-top: -1px;
+}
+
+.sidebar-title button.close {
+    margin-top: -9px;
+    margin-right: -10px;
+}
+
+button.close:hover {
+    opacity: 1;
+    color: #464747;
+    background: #d9b50b;
+}
+
+.accordion-title {
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+/* BOOTSTRAP MODAL OVERWRITES */
+.modal-tabbed .modal-header {
+    padding-bottom: 0px;
+}
+
+.modal-tabbed .modal-header ul.nav.nav-tabs {
+    margin-top: 15px;
+    border-bottom: 0;
+}
+
+@media (min-width: 992px) {
+    .modal-lg {
+        width: 900px;
+    }
+}
+
+/* MVC OVERWRITES */
+.validation-summary.validation-summary-errors {
+    border: 1px solid @brand-danger;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: lighten(@brand-danger, 15%);
+    border-radius: 3px;
+}
+
+.validation-summary.validation-summary-errors li {
+    color: #000;
+}
+
+.input-validation-error {
+    border: 1px solid @brand-danger;
+}
+
+
+/* HOOD OVERWRITES */
+.center-block {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.click-select {
+    cursor: pointer !important;
+}
+
+ul.nav li i {
+    width: 30px;
+    text-align: center;
+}
+
+.form-control.half {
+    width: 49%;
+    display: inline-block;
+}
+
+.pagination {
+    margin: 0;
+}
+
+span.rrssb-text {
+    font-family: 'Titillium Web', sans-serif;
+    font-size: 10px;
+}
+
+ul.rrssb-buttons {
+    margin: 20px 0 35px;
+}

@@ -1,0 +1,14 @@
+﻿{
+    "Description": "A full width separator, using an HR tag.",
+    "IconUrl": "/lib/hood/images/no-image.jpg",
+    "Name": "Separator",
+    "Variables": [
+        {
+            "Name": "CSS Class",
+            "VariableName": "class",
+            "Type": "text",
+            "Values": [ ],
+            "Value": ""
+        }
+    ]
+}

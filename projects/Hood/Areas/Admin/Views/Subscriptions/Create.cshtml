@@ -1,0 +1,106 @@
+@model CreateSubscriptionModel
+@inject IContentRepository _data
+@{
+    Layout = null;
+}
+<div class="sidebar-container">
+    <div class="sidebar-title">
+        <button type="button" class="close close-blade"><span>&times;</span></button>
+        <h3><i class="fa fa-thumb-tack"></i> Create new subscription.</h3>
+        <small><i class="fa fa-plus-circle"></i> Add a new subscription to the website.</small>
+    </div>
+    <form id="create-subscription-form" asp-antiforgery="true" autocomplete="off">
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="Name"></label>
+                <div class="m-b-xs">
+                    <input asp-for="Name" type="text" class="form-control" placeholder="Name" />
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="StripeId"></label>
+                <div class="m-b-xs">
+                    <input asp-for="StripeId" type="text" class="form-control" placeholder="Code" />
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="Description"></label>
+                <div class="m-b-xs">
+                    <textarea asp-for="Description" type="text" class="form-control" placeholder="Description"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="Currency"></label>
+                <div class="m-b-xs">
+                    <select asp-for="Currency" class="form-control" asp-items='_data.AllCountries().OrderBy(c => c.CurrencyName).Where(c => c.CurrencyName.IsSet()).Select(c => new SelectListItem() { Value = c.CurrencySymbol, Text = string.Format("{0} ({1})", c.CurrencyName, c.Name)  })'>
+                        <option value="">-- Choose a currency --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="Amount"></label>
+                <div>
+                    <input asp-for="Amount" type="number" step="0.01" min="0" class="form-control" placeholder="Price" />
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="Interval"></label>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <input asp-for="IntervalCount" type="number" step="1" min="0" class="form-control" placeholder="Interval Count" value="1" />
+                    </div>
+                    <div class="col-xs-6">
+                        <select asp-for="Interval" class="form-control">
+                            <option value="day">Days</option>
+                            <option value="week">Weeks</option>
+                            <option value="month" selected>Months</option>
+                            <option value="year">Years</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <div class="form-group">
+                <label class="control-label" asp-for="TrialPeriodDays"></label>
+                <div>
+                    <input asp-for="TrialPeriodDays" type="number" step="1" min="0" class="form-control" placeholder="Trial Period (Days)" />
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <createField db-field="Public" field-type="switch" field-name="Public" db-value="" />
+        </div>
+        <div class="setings-item">
+            <label class="control-label" asp-for="Level"></label>
+            <div>
+                <input asp-for="Level" type="number" step="1" min="0" class="form-control" placeholder="Subscription Level" />
+            </div>
+        </div>
+        <div class="setings-item">
+            <createField db-field="Addon" field-type="switch" field-name="Addon" db-value="" />
+        </div>
+        <div class="setings-item">
+            <button type="button" id="create-subscription-submit" class="btn btn-primary"><i class="fa fa-content-plus"></i> Create subscription</button>
+            <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
+        </div>
+        <div class="sidebar-content">
+            <h4>Creating a subscription</h4>
+            <div class="small">
+                <p>
+                    Use this to add a subscription to the website.
+                <p>
+            </div>
+        </div>
+    </form>
+</div>

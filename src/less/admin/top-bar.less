@@ -1,0 +1,95 @@
+body {
+    nav.top-bar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        background-color: white;
+        z-index: 50;
+        background-color: @hood-yellow;
+        border: 0;
+
+        @media (min-width:768px) {
+            border-bottom: 1px solid #ccc;
+            background-color: white;
+        }
+
+        @media (min-width:768px) {
+            left: @sidebar-width;
+        }
+
+        .welcome-message {
+            padding: 15px;
+            font-weight: bold;
+            color: #777;
+        }
+
+        a.sidebar-toggle {
+            background-color: #000000;
+            border-color: #000000;
+            color: #ffffff;
+            margin: 13px 15px;
+            border-radius: 3px;
+            display: none;
+
+            @media (min-width:768px) {
+                display: block;
+            }
+        }
+
+        ul.nav.navbar-right {
+            margin-right: 15px;
+            text-align: right;
+
+            li {
+                display: inline-block;
+
+                a {
+                    padding: 20px 15px;
+                    color: @hood-dark;
+
+                    @media (min-width:768px) {
+                        color: lighten(@hood-dark, 10%);
+                    }
+
+                    .nav-label {
+                        display: none;
+
+                        @media (min-width:768px) {
+                            display: inline-block;
+                        }
+                    }
+                }
+
+                &.welcome-message {
+                    display: none;
+
+                    @media (min-width:996px) {
+                        display: inline-block;
+                    }
+                }
+            }
+        }
+    }
+
+    &.mini-nav {
+        nav.top-bar {
+            left: 70px;
+
+            ul.nav.navbar-right {
+                li {
+                    a {
+                        .nav-label {
+                        }
+                    }
+
+                    &.welcome-message {
+                        @media (min-width:768px) {
+                            display: inline-block;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

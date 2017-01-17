@@ -1,0 +1,270 @@
+body {
+    nav.sidebar {
+        background-color: @hood-dark;
+        position: absolute;
+        left: 0;
+        width: 70px;
+        bottom: 0;
+        top: 0;
+        z-index: 100;
+
+        @media (min-width:768px) {
+            width: @sidebar-width;
+        }
+
+        .profile-element {
+            display: none;
+
+            @media (min-width:768px) {
+                display: block;
+            }
+
+            .big-logo-element {
+                background-color: @hood-yellow;
+                padding: 16px 0;
+                color: white;
+                text-align: center;
+                font-size: 18px;
+                font-weight: 600;
+
+                img {
+                    height: 26px;
+                }
+            }
+        }
+
+        .logo-element {
+            display: none;
+            background-color: @hood-yellow;
+            padding: 16px 0;
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+
+            img {
+                height: 27px;
+            }
+
+            @media (max-width:768px) {
+                display: block;
+            }
+        }
+
+        ul.side-menu {
+
+            li {
+                display: block;
+
+                a {
+                    color: @sidebar-link-color;
+                    color: #a7b1c2;
+                    font-weight: 600;
+                    font-size: 18px;
+                    cursor: pointer;
+                    padding: 10px 22px 0;
+                    height: 50px;
+
+                    @media (min-width:768px) {
+                        font-weight: 600;
+                        font-size: 13px;
+                        cursor: pointer;
+                        padding: 14px 20px 14px 25px;
+                    }
+
+                    i {
+                        margin-right: 10px;
+                        color: @hood-yellow;
+                        vertical-align: middle;
+
+                        @media (min-width:768px) {
+                            display: inline-block;
+                        }
+                    }
+
+                    &:hover {
+                        background-color: rgba(0,0,0,0.5);
+                    }
+
+                    span.nav-label {
+                        display: none;
+
+                        @media (min-width:768px) {
+                            display: inline-block;
+                        }
+                    }
+                }
+
+                &.landing-link {
+                    a {
+                        background: @brand-success;
+                        color: white;
+
+                        i {
+                            color: white;
+                        }
+
+                        &:hover {
+                            background: darken(@brand-success, 10%);
+                        }
+                    }
+                }
+
+                &.active {
+                    background-color: #111;
+
+                    @media (min-width:768px) {
+                        border-left: 3px solid @hood-yellow;
+                    }
+                }
+
+                ul.nav-second-level {
+                    position: absolute;
+                    left: 70px;
+                    top: 0;
+                    width: 200px;
+                    background-color: @hood-dark;
+
+                    @media (min-width:768px) {
+                        position: relative;
+                        width: auto;
+                        left: auto;
+                        top: auto;
+                        background-color: transparent;
+                    }
+
+                    li {
+                        a {
+                            font-size: 13px;
+                            padding: 8px;
+                            color: darken(@sidebar-link-color, 4%);
+                            height: auto;
+
+                            @media (min-width:768px) {
+                                padding: 8px 20px 8px 40px;
+                            }
+
+                            i {
+                                margin-right: 7px;
+                                color: @sidebar-link-color;
+                                vertical-align: middle;
+                            }
+                        }
+
+                        &.active {
+                            border-left: 0px;
+                            background-color: #0a0a0a;
+                        }
+                    }
+
+                    ul.nav-third-level {
+                        li {
+                            a {
+                                color: darken(@sidebar-link-color, 8%);
+
+                                @media (min-width:768px) {
+                                    padding: 11px 20px 11px 55px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    div.main-content {
+        position: absolute;
+        left: 70px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow: scroll;
+        overflow-x: hidden;
+        padding-top: 61px;
+        padding-bottom: 61px;
+
+        @media (min-width:768px) {
+            left: @sidebar-width;
+        }
+
+        div.content-body {
+            padding: 10px;
+
+            @media (min-width:768px) {
+                padding: 25px;
+            }
+        }
+    }
+
+    &.mini-nav {
+        nav.sidebar {
+            width: 70px;
+
+            .profile-element {
+                display: none;
+            }
+
+            .logo-element {
+                display: block;
+            }
+
+            ul.side-menu {
+
+                li {
+                    display: block;
+
+                    a {
+                        color: @sidebar-link-color;
+                        color: #a7b1c2;
+                        font-weight: 600;
+                        font-size: 18px;
+                        cursor: pointer;
+                        padding: 10px 22px 0;
+                        height: 50px;
+
+                        span.nav-label {
+                            display: none;
+                        }
+                    }
+
+                    ul.nav-second-level {
+                        position: absolute;
+                        left: 70px;
+                        top: 0;
+                        width: 200px;
+                        background-color: @hood-dark;
+
+                        li {
+                            a {
+                                font-size: 13px;
+                                padding: 8px;
+                                color: darken(@sidebar-link-color, 4%);
+                                height: auto;
+
+                                i {
+                                    margin-right: 7px;
+                                    color: @sidebar-link-color;
+                                    vertical-align: middle;
+                                }
+                            }
+
+                            &.active {
+                                border-left: 0px;
+                                background-color: #0a0a0a;
+                            }
+                        }
+                    }
+
+                    &.active {
+                        border-left: 0px;
+                    }
+                }
+            }
+        }
+
+        div.main-content {
+            left: 70px;
+        }
+    }
+}

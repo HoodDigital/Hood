@@ -1,0 +1,46 @@
+@model StripeWebhookTest
+@inject ISiteConfiguration _site;
+@{
+    ViewBag.Title = "Test Stripe Webhook";
+    string url = string.Format("{0}stripe/webhooks", Context.GetSiteUrl());
+}
+@section buttons {
+    <a class="btn btn-sm btn-warning" asp-action="Stripe"><i class="fa fa-cc-stripe m-r-sm"></i>Stripe Subscriptions</a>
+    <a class="btn btn-sm btn-primary create-subscription"><i class="fa fa-thumb-tack m-r-sm"></i>Create New</a>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="wrapper wrapper-content">
+            <div class="ibox">
+                <div class="ibox-title">
+                    Test the webhooks by sending dummy Stripe event data to the webhook receiver on this site. Located at: <strong><a href="@url">@url</a> [POST]</strong>
+                </div>
+                <div class="ibox-content">
+                    @Html.Raw(ViewBag.Message)
+                    <form method="post">
+                        <fieldset class="form-horizontal">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Webhook Body:</label>
+                                <div class="col-sm-8">
+                                    <textarea style="font-family:monospace;" asp-for="Body" class="form-control" rows="15"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Response:</label>
+                                <div class="col-sm-8">
+                                    <textarea style="font-family:monospace;" asp-for="Response" class="form-control" rows="3" disabled></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"></label>
+                                <div class="col-sm-8">
+                                    <input type="submit" value="Send Webhook" class="btn btn-primary" />
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

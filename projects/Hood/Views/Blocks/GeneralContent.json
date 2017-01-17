@@ -1,0 +1,14 @@
+﻿{
+    "Description": "A simple editable block, you can insert virtually any text/image/embed content into a General Content block.",
+    "IconUrl": "/lib/hood/images/no-image.jpg",
+    "Name": "General Content",
+    "Variables": [
+        {
+            "Name": "CSS Class",
+            "VariableName": "class",
+            "Type": "text",
+            "Values": [ ],
+            "Value": ""
+        }
+    ]
+}

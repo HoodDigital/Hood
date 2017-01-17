@@ -1,0 +1,64 @@
+@model ContentListModel
+<div class="row">
+    <div class="col-sm-8">
+        @if (Model.Posts.Count == 0)
+        {
+            await Html.RenderPartialAsync("_NoResults");
+        }
+        else
+        {
+            @foreach (var content in Model.Posts.Items)
+            {
+                var capi = new ContentApi(content);
+                <div class="col-md-12">
+                    @if (content.FeaturedImage != null)
+                    {
+                        <a href="@capi.Url">
+                            @if (content.GetMeta("Settings.Image.Featured.Fit").GetStringValue() == "100%")
+                            {
+                                <img src="@capi.FeaturedImage.LargeUrl" class="img-full content-feature-@content.Id" />
+                            }
+                            else
+                            {
+                                <fixedImage src="@capi.FeaturedImage.MediumUrl" class="img-lg img-full content-feature-@content.Id" style="@capi.GetImageStyle()" />
+                            }
+                        </a>
+                    }
+                    <h3><a href="@capi.Url">@content.Title</a></h3>
+                    <p>
+                        <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.Type.Type.ToLower(), content.Author.UserName)">@content.Author.FullName</a></span>
+                        <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
+                    </p>
+                    <p>@content.Excerpt</p>
+                    <p class="text-muted"><em>@content.TagString</em></p>
+                    <hr />
+                    <span class="pull-right"><a href="@capi.Url">Read More<i class="fa fa-long-arrow-right m-l-xs"></i></a></span>
+                    @if (Model.Type.ShowCategories)
+                    {
+                        @if (content.Categories != null && content.Categories.Count != 0)
+                        {
+                            foreach (var category in content.Categories)
+                            {
+                                <a class="label label-default" href="@string.Format("/{0}/category/{1}/", Model.Type.Type, category.Category.Slug)">@category.Category.DisplayName</a>
+                            }
+                        }
+                        else
+                        {
+                            <span>Uncategorised</span>
+                        }
+                        <hr />
+                    }
+                    else
+                    {
+                        <p>&nbsp;</p>
+                        <hr />
+                    }
+                </div>
+            }
+            await Html.RenderPartialAsync("_Pagination");
+        }
+    </div>
+    <div class="col-sm-4">
+        @{ await Html.RenderPartialAsync("_Sidebar"); }
+    </div>
+</div>

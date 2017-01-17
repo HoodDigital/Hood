@@ -1,0 +1,27 @@
+@model ExternalLoginConfirmationViewModel
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Register";
+}
+<div class="login-block-header">
+
+    <h2>Link your @ViewData["LoginProvider"] account.</h2>
+    <p class="text-info">
+        You've successfully authenticated with <strong>@ViewData["LoginProvider"]</strong>.
+        Please enter a user name for this site below and click the Register button to finish
+        logging in.
+    </p>
+</div>
+
+<form asp-controller="Account" asp-action="ExternalLoginConfirmation" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="" role="form">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="form-group">
+        <label for="Email" class="control-label">Enter your desired email address for THIS site:</label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <p><button type="submit" class="btn btn-block">Link Account</button></p>
+</form>

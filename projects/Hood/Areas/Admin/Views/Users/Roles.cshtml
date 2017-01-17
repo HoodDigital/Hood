@@ -1,0 +1,17 @@
+@model EditUserModel
+@{
+    Layout = null;
+}
+@foreach (string role in Model.Roles)
+{
+    <span class="label">
+        @role&nbsp;&nbsp;
+        <a class="remove-from-role" data-id="@Model.User.Id" data-role="@role">
+            <i class="fa fa-close"></i>
+        </a></span><span>&nbsp;</span>
+}
+@if (Model.Roles.Count == 0)
+{
+    <p><span class="label label-warning">The user has not been added to any roles yet.</span></p>
+
+}

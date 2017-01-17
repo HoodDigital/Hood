@@ -1,0 +1,197 @@
+@model BillingSettings
+@{
+    ViewData["Title"] = "Billing Settings";
+}
+<form method="post">
+    <div class="wrapper wrapper-content">
+        <div class="row">
+            <div class="col-md-4 col-md-push-8">
+                <div class="widget-head-color-box black-bg p-lg text-center">
+                    <div class="m-b-md">
+                        <h2 class="font-bold no-margins text-white">
+                            Billing Settings
+                        </h2>
+                    </div>
+                    <button type="submit" class="btn btn-success m-t-md"><i class="fa fa-save"></i> Save @ViewData["Title"]</button>
+                    <a asp-action="ResetBilling" class="btn btn-danger m-t-md warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-save"></i> Reset to Default</a>
+                </div>
+                <div class="ibox float-e-margins">
+                    <div>
+                        <div class="ibox-content">
+                            Enable or disable the payment systems on the site.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 col-md-pull-4">
+                <div class="tabs-container">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#paypal">PayPal</a></li>
+                        <li class=""><a data-toggle="tab" href="#stripe">Stripe</a></li>
+                        <li class=""><a data-toggle="tab" href="#subscriptions">Subscriptions</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="paypal" class="tab-pane active">
+                            <div class="panel-body">
+                                <strong>PayPal Settings</strong>
+                                <p>
+                                    Enable or disable the PayPal payment systems on the site.
+                                </p>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="EnablePayPal" class="styled">
+                                        <label asp-for="EnablePayPal"></label>
+                                    </div>
+                                    <small>Note: To enable paypal, you must also supply a Paypal Client Id and a Client Secret in your application settings (appsettings.json or Env variables).</small>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="PayPalSandboxMode" class="styled">
+                                        <label asp-for="PayPalSandboxMode"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="PayPalClientId"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="PayPalClientId" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="PayPalSecret"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="PayPalSecret" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="EnableCart" class="styled">
+                                        <label asp-for="EnableCart"></label>
+                                    </div>
+                                    <small>Note: To enable paypal, you must also enable PayPal and supply a Paypal Client Id and a Client Secret in your application settings (appsettings.json or Env variables).</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="stripe" class="tab-pane">
+                            <div class="panel-body">
+                                <strong>Stripe Payment Settings</strong>
+                                <p>
+                                    Enable or disable the stripe payment systems on the site.
+                                </p>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="EnableStripe" class="styled">
+                                        <label asp-for="EnableStripe"></label>
+                                    </div>
+                                    <small>Note: To enable stripe, you must also supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).</small>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="EnableStripeTestMode" class="styled">
+                                        <label asp-for="EnableStripeTestMode"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="StripeLiveKey"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="StripeLiveKey" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="StripeLivePublicKey"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="StripeLivePublicKey" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="StripeTestKey"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="StripeTestKey" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="StripeTestPublicKey"></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="StripeTestPublicKey" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label" asp-for="SubscriptionWebhookLogs"></label>
+                                        <div class="col-sm-10">
+                                            <select asp-for="SubscriptionWebhookLogs" class="form-control">
+                                                <option value="email">Send via email</option>
+                                                <option value="email-failures">Send only failures via email</option>
+                                                <option value="none">Do not log webhooks</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="EnableCart" class="styled">
+                                        <label asp-for="EnableCart"></label>
+                                    </div>
+                                    <small>Note: To enable paypal, you must also enable PayPal and supply a Paypal Client Id and a Client Secret in your application settings (appsettings.json or Env variables).</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="subscriptions" class="tab-pane">
+                            <div class="panel-body">
+                                <strong>Subcription Settings</strong>
+                                <p>
+                                    Enable or disable the stripe based subscription systems on the site.
+                                </p>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-group">
+                                    <div class="checkbox">
+                                        <input asp-for="EnableSubscriptions" class="styled">
+                                        <label asp-for="EnableSubscriptions"></label>
+                                        <p><small>Note: To enable subscriptions, you must also enable Stripe and supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Setup Page:</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="SubscriptionCreatePage" class="form-control" />
+                                        <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/get ] - <strong>Default: /subscriptions/get</strong></small></p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Upgrade Page:</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="SubscriptionUpgradePage" class="form-control" />
+                                        <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/change ] - <strong>Default: /subscriptions/change</strong></small></p>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Addon Page:</label>
+                                    <div class="col-sm-10">
+                                        <input asp-for="SubscriptionAddonPage" class="form-control" />
+                                        <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/addon ] - <strong>Default: /subscriptions/addon</strong></small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,134 @@
+@model EditContentModel
+@{
+    Product p = new Product(Model.Content);
+}
+<div class="tabs-container m-b-lg">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> Basics</a></li>
+        <li class=""><a data-toggle="tab" href="#price" aria-expanded="false"> Pricing</a></li>
+        <li class=""><a data-toggle="tab" href="#product" aria-expanded="false"> Product Settings</a></li>
+        @{await Html.RenderPartialAsync("_Editor_Meta_Tabs"); }
+    </ul>
+    <div class="tab-content">
+        <div id="info" class="tab-pane active">
+            <div class="panel-body">
+
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Title:</label>
+                        <div class="col-sm-10"><input id="Title" name="Title" value="@Model.Content.Title" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Short Description:</label>
+                        <div class="col-sm-10"><input id="Excerpt" name="Excerpt" value="@Model.Content.Excerpt" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Full Description:</label>
+                        <div class="col-sm-10">
+                            <textarea id="Body" name="Body" class="form-control" rows="5">@Model.Content.Body</textarea>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">SKU:</label>
+                        <div class="col-sm-10"><input id="Meta:SKU" name="Meta:SKU" value="@p.SKU" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Available:</label>
+                        <div class="col-sm-10">@{ await Html.RenderPartialAsync("_MetaEditor_Default", (object)Model.Content.GetMeta("Available")); }</div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Width (mm):</label>
+                        <div class="col-sm-10"><input id="Meta:Width" name="Meta:Width" value="@p.Width" type="number" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Height (mm):</label>
+                        <div class="col-sm-10"><input id="Meta:Height" name="Meta:Height" value="@p.Height" type="number" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Depth (mm):</label>
+                        <div class="col-sm-10"><input id="Meta:Depth" name="Meta:Depth" value="@p.Depth" type="number" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Weight (grams):</label>
+                        <div class="col-sm-10"><input id="Meta:Weight" name="Meta:Weight" value="@p.Weight" type="number" class="form-control" /></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="price" class="tab-pane">
+            <div class="panel-body">
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Price:</label>
+                        <div class="col-sm-10"><input id="Meta:Price" name="Meta:Price" value="@p.Price" type="number" step="0.01" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Tax (%):</label>
+                        <div class="col-sm-10">
+                            <select id="Meta:Tax" name="Meta:Tax" data-selected="@p.Tax" class="form-control">
+                                <option value="20" selected="selected">20% VAT (standard rate)</option>
+                                <option value="5">5% VAT (reduced rate)</option>
+                                <option value="0">0% VAT (zero rate)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Discount (%):</label>
+                        <div class="col-sm-10"><input id="Meta:Discount" name="Meta:Discount" value="@p.Discount" type="number" step="0" class="form-control" /></div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Purchase Price:</label>
+                        <div class="col-sm-10"><input id="Meta:ListPrice" name="Meta:ListPrice" value="@p.ListPrice" type="number" step="0.01" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">RRP:</label>
+                        <div class="col-sm-10"><input id="Meta:RecommendedPrice" name="Meta:RecommendedPrice" value="@p.RecommendedPrice" type="number" step="0.01" class="form-control" /></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="product" class="tab-pane">
+            <div class="panel-body">
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Supplier:</label>
+                        <div class="col-sm-10"><input id="Meta:Supplier" name="Meta:Supplier" value="@p.Supplier" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Track Stock:</label>
+                        <div class="col-sm-10">@{ await Html.RenderPartialAsync("_MetaEditor_Default", (object)Model.Content.GetMeta("TrackStock")); }</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Stock Level:</label>
+                        <div class="col-sm-10"><input id="Meta:StockLevel" name="Meta:StockLevel" value="@p.StockLevel" type="number" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Min. Cart Amount:</label>
+                        <div class="col-sm-10"><input id="Meta:MinCart" name="Meta:MinCart" value="@p.MinCart" type="number" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Max. Cart Amount:</label>
+                        <div class="col-sm-10"><input id="Meta:MaxCart" name="Meta:MaxCart" value="@p.MaxCart" type="number" class="form-control" /></div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Sell By Date:</label>
+                        <div class="col-sm-10">@{ await Html.RenderPartialAsync("_MetaEditor_Default", (object)Model.Content.GetMeta("SellByDate")); }</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Start Date:</label>
+                        <div class="col-sm-10">@{ await Html.RenderPartialAsync("_MetaEditor_Default", (object)Model.Content.GetMeta("SellStartDate")); }</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">End Date:</label>
+                        <div class="col-sm-10">@{ await Html.RenderPartialAsync("_MetaEditor_Default", (object)Model.Content.GetMeta("SellEndDate")); }</div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        @{await Html.RenderPartialAsync("_Editor_Meta_TabContent"); }
+    </div>
+</div>

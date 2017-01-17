@@ -1,0 +1,63 @@
+@model ContentListModel
+@inject ISiteConfiguration _site;
+@{
+    ViewBag.Title = "Export all Content";
+    PropertySettings settings = _site.GetPropertySettings();
+    BasicSettings _info = _site.GetBasicSettings();
+}
+@section buttons {
+}
+@section scripts {
+    <environment names="Development,Staging,ErrorTesting">
+        <script src="~/lib/hood/js/includes/io.reporter.js"></script>
+    </environment>
+    <environment names="Production,PreProduction">
+        <script src="~/lib/hood/js/includes/io.reporter.min.js"></script>
+    </environment>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="wrapper wrapper-content">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h4>Export all content to Zip file...</h4>
+                </div>
+                <div class="ibox-content">
+                    <p>You can prepare a downloadable file containing all content items and any associated images. This file can be used to import data to other sites/CMSs or versions of HoodCMS.</p>
+                    <button id="cancel" class="btn" value="">Cancel</button>
+                    <button id="runUpdate" class="btn btn-primary" data-start="/admin/content/export/start/" data-cancel="/admin/content/export/cancel/" data-update="/admin/content/export/status/">Prepare Export File</button>
+                    <p class="m-t-sm">
+                        Once you have prepared the file, by clicking 'Prepare Export File' and completing the export process, a download link will be provided here for you to download. It will expire 24 hours after it is created.<br />
+                        Once the file is prepared, a link will also be emailed to the site's default email address: <strong>@_info.Email</strong> [This can be changed in Admin > Settings > Basic Settings]
+                    </p>
+                    <div id="download" class="alert alert-success m-t-lg">
+                        <h3>Download your file...</h3>
+                        <p>Your file will expire on <span id="download-expire"></span></p>
+                        <p><a id="download-file" class="btn btn-success" target="_blank">Download the file...</a></p>
+                    </div>
+                    <div id="error"></div>
+                    <div id="update-progress" class="alert alert-info m-t-lg">
+                        <h3><span class="pc">0.0</span>% Complete</h3>
+                        <div id="progresscontainer" class="progress progress-striped">
+                            <div id="progressbar" class="progress-bar progress-bar-inverse" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox" id="update-info">
+                <div class="ibox-title">
+                    <h4>Activity</h4>
+                </div>
+                <div class="ibox-content">
+                    <div id="progress">
+                        <div class="well-lg">
+                            <p>Current Task: <strong id="pt"></strong></p>
+                            <p>Total: <strong class="tp"></strong></p>
+                            <p>Processed: <strong id="pp"></strong> of <strong class="tp"></strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

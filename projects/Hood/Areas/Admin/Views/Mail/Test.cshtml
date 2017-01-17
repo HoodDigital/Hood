@@ -1,0 +1,31 @@
+@model Response
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="wrapper wrapper-content">
+            <div class="ibox">
+                <div class="ibox-title">
+                    Send a test email...
+                </div>
+                <div class="ibox-content">
+                    @if (Model.Success)
+                    {
+                        <div class="alert alert-success">
+                            <h3>Success!</h3>
+                            <p>The test mail was successfully sent.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <h3>Uh oh!</h3>
+                            <p>@Model.Exception.Message</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

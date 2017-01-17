@@ -1,0 +1,13 @@
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Email confirmed";
+}
+<div class="login-block-header">
+    <h2>@ViewData["Title"]</h2>
+    <p class="text-info">
+        Thank you for confirming your email. 
+    </p>
+</div>
+<p class="text-center">
+    Please <a asp-controller="Account" asp-action="Login">click here to Log in</a>.
+</p>

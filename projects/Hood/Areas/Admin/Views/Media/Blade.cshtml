@@ -1,0 +1,88 @@
+@model SiteMedia
+@{
+    Layout = null;
+    MediaApi mapi = new MediaApi(Model);
+}
+<div class="sidebar-container">
+    <form id="edit-media-form" asp-antiforgery="true" autocomplete="off">
+        <div class="sidebar-title darkened" style="background-image:url(@Model.LargeUrl)">
+            <div>
+                <button type="button" class="close close-blade"><span>&times;</span></button>
+                <div class="m-b-md text-center">
+                    <h2 class="font-bold no-margins text-white">
+                        @Model.GeneralFileType File
+                    </h2>
+                    <small><i class="fa fa-file"></i> &nbsp;&nbsp;@Model.Filename</small>
+                </div>
+                <div class="text-center">
+                    @if (Model.GeneralFileType != "Directory")
+                    {
+                        if (Model.GeneralFileType == "Image")
+                        {
+                            <div class="btn-group">
+                                <button data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true">Download <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a target="_blank" href="@mapi.ThumbUrl"><i class="fa fa-save"></i> Download Thumbnail</a></li>
+                                    <li><a target="_blank" href="@mapi.SmallUrl"><i class="fa fa-save"></i> Download Small</a></li>
+                                    <li><a target="_blank" href="@mapi.MediumUrl"><i class="fa fa-save"></i> Download Medium</a></li>
+                                    <li><a target="_blank" href="@mapi.LargeUrl"><i class="fa fa-save"></i> Download Large</a></li>
+                                    <li class="divider"></li>
+                                    <li><a target="_blank" href="@mapi.DownloadUrlHttps"><i class="fa fa-save"></i> Download Original</a></li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a target="_blank" href="@mapi.DownloadUrlHttps" class="btn btn-xs btn-default"><i class="fa fa-save"></i> Download</a>
+                        }
+                    }
+                    <action hood-id="@Model.Id" hood-type="media" hood-action="delete" class="btn btn-xs btn-danger"></action>
+                </div>
+            </div>
+        </div>
+        <div class="setings-item">
+            <h4>URLs</h4>
+            @if (Model.GeneralFileType == "Image")
+            {
+                <showField db-field="cuFirstName" field-type="text" field-name="Thumbnail Url" db-value="@Model.ThumbUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Small Url" db-value="@Model.SmallUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Medium Url" db-value="@Model.MediumUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Large Url" db-value="@Model.LargeUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Original Url" db-value="@mapi.DownloadUrlHttps" />
+            }
+            else
+            {
+                <showField db-field="cuFirstName" field-type="text" field-name="Url" db-value="@mapi.DownloadUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Https Url" db-value="@mapi.DownloadUrlHttps" />
+            }
+        </div>
+        <div class="sidebar-content">
+            <h4>About this file...</h4>
+            <div class="small">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <span class="pull-right">@mapi.FormattedSize</span>
+                        <strong>File Size</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="pull-right">@mapi.Directory</span>
+                        <strong>Directory</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="pull-right">@mapi.BlobReference</span>
+                        <strong>Blob Reference</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="pull-right">@mapi.CreatedOn</span>
+                        <strong>Uploaded Date</strong>
+                    </li>
+                    <li class="list-group-item">
+                        <span class="pull-right">@mapi.UniqueId</span>
+                        <strong>Unique ID</strong>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </form>
+</div>
