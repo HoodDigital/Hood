@@ -20,7 +20,7 @@
     }
     @if (Model.Type.HasPage)
     {
-        <a class="btn btn-sm btn-warning" href="@mapi.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Go</a>
+        <a class="btn btn-sm btn-warning" href="@mapi.Url"><i class="fa fa-desktop m-r-xs"></i>Preview</a>
     }
     <a class="btn btn-sm btn-danger delete-content" data-id="@Model.Content.Id" data-type="@Model.Type.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a>
 }

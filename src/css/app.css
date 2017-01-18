@@ -9420,7 +9420,7 @@ button.close {
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: 0;
   color: white;
   text-shadow: none;
   opacity: 1;
@@ -9432,10 +9432,6 @@ button.close span {
   display: block;
   line-height: 0px;
   margin-top: -1px;
-}
-.sidebar-title button.close {
-  margin-top: -9px;
-  margin-right: -10px;
 }
 button.close:hover {
   opacity: 1;

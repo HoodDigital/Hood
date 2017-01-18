@@ -1,0 +1,40 @@
+@model ContactFormModel
+@if (Model != null && !string.IsNullOrEmpty(Model.Message))
+{
+    <div class="panel panel-success p-lg no-margin">
+        <h3>Thank you.</h3>
+        <p>@Model.Message</p>
+    </div>
+}
+else
+{
+    <form asp-controller="Home" asp-action="Contact" method="post" role="form" class="contact-form" id="contact">
+        <div asp-validation-summary="All" class="validation-summary"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" placeholder="Your name" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" placeholder="Your e-mail address" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="PhoneNumber" class="control-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" placeholder="Your phone number" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Enquiry" class="control-label"></label>
+            <textarea asp-for="Enquiry" class="form-control" placeholder="Your enquiry"></textarea>
+            <span asp-validation-for="Enquiry" class="text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <button class="btn btn-md btn-black form-full" type="submit" id="form-submit" name="submit">Send Message</button>
+            </div>
+        </div>
+    </form>
+}

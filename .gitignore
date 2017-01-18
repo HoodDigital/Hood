@@ -246,8 +246,10 @@ bower_components/
 /projects/Hood.Web.MVC/Properties/PublishProfiles
 
 # Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
-/projects/Hood.Web.MVC/Admin/
-/projects/Hood.Web.MVC/Views/
+/projects/Hood.Web.MVC/Areas/
+/projects/Hood.Web.MVC/Areas/*
+/projects/Hood.Web.MVC/Views
+/projects/Hood.Web.MVC/Views/*
 
 # Ignore all hood wwwroot gulp processed content.
 /projects/Hood.Web.MVC/wwwroot/hood/dist/

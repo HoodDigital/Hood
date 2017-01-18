@@ -1,0 +1,42 @@
+@using System.Security.Claims
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IConfiguration config
+@{
+    var loginProviders = SignInManager.GetExternalAuthenticationSchemes().ToList();
+    if (loginProviders.Count > 0 && (config.CheckSetup("Installed:Facebook") || config.CheckSetup("Installed:Google")))
+    {
+        <p class="text-center">
+            ...or sign in with
+        </p>
+        <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+            <div>
+                <p>
+                    @foreach (var provider in loginProviders)
+                    {
+                        switch (provider.AuthenticationScheme)
+                        {
+                            case "Facebook":
+                                if (config.CheckSetup("Installed:Facebook"))
+                                {
+                                    <button class="btn btn-block btn-facebook-inversed rounded" type="submit" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">
+                                        <i class="fa fa-facebook"></i> Facebook
+                                    </button>
+                                }
+                                break;
+                            case "Google":
+                                if (config.CheckSetup("Installed:Google"))
+                                {
+                                    <button class="btn btn-block btn-googleplus-inversed rounded" type="submit" name="provider" value="@provider.AuthenticationScheme" title="Log in using your @provider.DisplayName account">
+                                        <i class="fa fa-google-plus"></i> Google
+                                    </button>
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                </p>
+            </div>
+        </form>
+    }
+}

@@ -17846,8 +17846,8 @@ div.k-scheduler-marquee:after {
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
 /*!
- * Bootstrap Colorpicker v2.3.6
- * https://itsjavi.com/bootstrap-colorpicker/
+ * Bootstrap Colorpicker v2.3.5
+ * https://itsjaviaguilar.github.io/bootstrap-colorpicker/
  *
  * Originally written by (c) 2012 Stefan Petre
  * Licensed under the Apache License v2.0
@@ -18273,7 +18273,7 @@ button.close {
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: 0;
   color: white;
   text-shadow: none;
   opacity: 1;
@@ -18285,10 +18285,6 @@ button.close span {
   display: block;
   line-height: 0px;
   margin-top: -1px;
-}
-.sidebar-title button.close {
-  margin-top: -9px;
-  margin-right: -10px;
 }
 button.close:hover {
   opacity: 1;
@@ -20403,6 +20399,22 @@ body.stop-scrolling {
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
+h4,
+h5,
+h6 {
+  font-weight: 100;
+  font-size: 22px;
+  margin-top: 0;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #dddddd;
+}
+h5 {
+  font-size: 18px;
+}
+h6 {
+  font-size: 15px;
+  font-weight: bold;
+}
 .modal-lg {
   width: 90%;
 }
@@ -20940,13 +20952,11 @@ body nav.sidebar ul.side-menu li ul.nav-second-level ul.nav-third-level li a {
 body div.main-content {
   position: absolute;
   left: 70px;
-  top: 0;
   right: 0;
   bottom: 0;
   overflow: scroll;
   overflow-x: hidden;
-  padding-top: 61px;
-  padding-bottom: 61px;
+  top: 61px;
 }
 @media (min-width: 768px) {
   body div.main-content {
@@ -21129,25 +21139,110 @@ body .breadcrumb {
 }
 body footer.footer {
   background-color: white;
-  z-index: 50;
   border: 0;
   padding: 10px;
   border-top: 1px solid #ccc;
   position: relative;
 }
-@media (min-width: 768px) {
-  body footer.footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    left: 280px;
-  }
+body #right-sidebar {
+  background-color: #fff;
+  border-left: 1px solid #e7eaec;
+  overflow: hidden;
+  position: fixed;
+  top: 60px;
+  bottom: 0;
+  left: 100%;
+  right: -100%;
+  z-index: 50;
+  -webkit-animation-duration: .5s;
+  animation-duration: .5s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -webkit-transition: all 0.5s ease-in-out;
+}
+body #right-sidebar.sidebar-open {
+  left: 70px;
+  right: 0;
 }
 @media (min-width: 768px) {
-  body.mini-nav footer.footer {
-    left: 70px;
+  body #right-sidebar {
+    width: 500px;
+    right: -500px;
+    left: auto;
   }
+  body #right-sidebar.sidebar-open {
+    left: auto;
+    right: 0;
+  }
+}
+body #right-sidebar .sidebar-title {
+  background-color: #d9b50b;
+  padding: 15px 0px 15px 25px;
+}
+body #right-sidebar .sidebar-title button.close {
+  margin-right: 20px;
+}
+body #right-sidebar .sidebar-title h3 {
+  margin-top: 0;
+  font-size: 18px;
+}
+body #right-sidebar .sidebar-title p {
+  margin-bottom: 0;
+  font-size: 12px;
+}
+body #right-sidebar .sidebar-title.create,
+body #right-sidebar .sidebar-title.image {
+  background-color: #5cb85c;
+}
+body #right-sidebar .sidebar-title.create h3,
+body #right-sidebar .sidebar-title.image h3 {
+  color: white;
+}
+body #right-sidebar .sidebar-title.create p,
+body #right-sidebar .sidebar-title.image p {
+  color: white;
+}
+body #right-sidebar .sidebar-title.image {
+  background-color: black;
+  background-size: cover;
+  background-position: center;
+  padding: 100px 0px 100px 25px;
+  position: relative;
+}
+body #right-sidebar .sidebar-title.image > * {
+  position: relative;
+  z-index: 1;
+}
+body #right-sidebar .sidebar-title.image > button.close {
+  z-index: 2;
+}
+body #right-sidebar .sidebar-title.image p {
+  margin-bottom: 15px;
+}
+body #right-sidebar .sidebar-title.image:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+body #right-sidebar .blade-field {
+  padding: 15px;
+  border-bottom: 1px solid #e7eaec;
+}
+.right-column {
+  padding: 15px;
+  border: 1px solid #dddddd;
+  background-color: #f6f6f6;
+  margin-bottom: 25px;
+}
+.right-column .editor-box {
+  padding-bottom: 15px;
 }
 
 /*# sourceMappingURL=admin.css.map */

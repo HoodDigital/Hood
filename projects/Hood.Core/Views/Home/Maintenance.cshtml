@@ -1,0 +1,33 @@
+@inject ISiteConfiguration _site
+@{
+
+    BasicSettings _info = _site.GetBasicSettings();
+    SeoSettings _meta = _site.GetSeo();
+    string description = _info.Address.ToFormat(AddressFormat.SingleLine);
+    string title = _info.CompanyName.IsSet() ? "Home - " + _info.CompanyName : _info.SiteTitle.IsSet() ? "Home - " + _info.SiteTitle : "Home";
+    if (_meta.Home != null)
+    {
+        description = _meta.Home.Description.IsSet() ? _meta.Home.Description : _meta.Description.IsSet() ? _meta.Description : "Home - " + _info.Address.ToFormat(AddressFormat.SingleLine);
+        title = _meta.Home.Title.IsSet() ? _meta.Home.Title : _meta.Title.IsSet() ? _meta.Title : "Home - " + _info.CompanyName;
+    }
+    ViewData["Title"] = title;
+
+}
+
+@section metas {
+    <meta name="description" content="@description" />
+    <meta property="og:author" content="@_meta.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_meta.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_meta.OgSecureImageUrl" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@_meta.TwitterCardImageUrl" />
+}
+<div class="jumbotron">
+    <div class="container">
+        <h1>Holding Page</h1>
+        <p>This is the default holding page, this site is closed.</p>
+    </div>
+</div>

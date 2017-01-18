@@ -1,0 +1,38 @@
+@inject ISiteConfiguration _site
+@{ 
+    BasicSettings _info = _site.GetBasicSettings();
+    SeoSettings _seo = _site.GetSeo();
+}
+<!DOCTYPE html>
+<html lang="en-gb" xml:lang="en">
+<head>
+    @{ await Html.RenderPartialAsync("_BaseMetas"); }
+    <title>@ViewData["Title"]</title>
+    @if (!IsSectionDefined("metas"))
+    {
+        await Html.RenderPartialAsync("_Metas");
+    }
+    @RenderSection("metas", required: false)
+    @{ await Html.RenderPartialAsync("_Styles"); }
+    @RenderSection("styles", required: false)
+</head>
+<body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
+    @RenderSection("afterbody", required: false)
+    @{ await Html.RenderPartialAsync("_NoScript"); }
+    @{ await Html.RenderPartialAsync("_PreLoader"); }
+    @RenderSection("beforecontent", required: false)
+    <div class="wrapper" id="wrapper">
+        @await Component.InvokeAsync(typeof(Hood.ViewComponents.Header))
+        @RenderBody()
+    </div>
+    @RenderSection("beforefooter", required: false)
+    @{ await Html.RenderPartialAsync("_Footer"); }
+    @RenderSection("afterfooter", required: false)
+    @{ await Html.RenderPartialAsync("_AdminEditor"); }
+    @RenderSection("includes", required: false)
+    @{ await Html.RenderPartialAsync("_Scripts"); }
+    @RenderSection("scripts", required: false)
+    @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
+    @Html.Raw(_seo.GoogleAnalytics)
+</body>
+</html>

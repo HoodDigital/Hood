@@ -1,0 +1,54 @@
+@model PropertyListingApi
+@inject ISiteConfiguration _site
+@{
+    PropertySettings _settings = _site.GetPropertySettings();
+}
+<div class="col-md-4 col-sm-6 col-xs-12 mb-30">
+    <div class="thumbnail">
+        <a href="@Model.Url"><fixedImage src="@Model.FeaturedImage.MediumUrl" class="item-img content-feature-@Model.Id" /></a>
+        <div class="caption">
+            <a href="@Model.Url">
+                <h3>@Model.Title</h3>
+            </a>
+            <h4>@Model.Title</h4>
+            <p class="text-muted">@_settings.GetPlanningFromType(Model.Planning)</p>
+            @if (_settings.ShowAskingPrice)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@Model.FormattedAskingPrice</p>
+                    <p>
+                        Asking Price:
+                    </p>
+                </div>
+            }
+            @if (_settings.ShowRent)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@Model.FormattedRent</p>
+                    <p>
+                       aaa Rent:
+                    </p>
+                </div>
+            }
+            @if (_settings.ShowPremium)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@Model.FormattedPremium</p>
+                    <p>
+                        Premium:
+                    </p>
+                </div>
+            }
+            @if (_settings.ShowFees)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@Model.FormattedFees</p>
+                    <p>
+                        Fees:
+                    </p>
+                </div>
+            }
+            <p><a href="@Model.Url" class="btn btn-primary" role="button">Learn more...</a></p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,215 @@
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+@inject ISiteConfiguration _site;
+@model EditUserModel
+@{
+    ViewBag.Title = "Edit User: " + Model.User.UserName;
+    ApplicationUserApi uapi = new ApplicationUserApi(Model.User);
+    BasicSettings _info = _site.GetBasicSettings();
+}
+@section buttons {
+    <a class="btn btn-default reset-password"><i class="fa fa-lock"></i> Reset Password</a>
+    <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Users" asp-route-area="Admin">
+                <i class="fa fa-users"></i> Users
+            </a>
+        </li>
+        <li class="active">
+            <strong>@ViewBag.Title</strong>
+        </li>
+    </ol>
+}
+<form asp-action="Edit" asp-route-id="@Model.User.Id" method="post" id="edit-user-form" data-id="@Model.User.Id">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="tabs-container m-b-lg">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> Basics</a></li>
+                    <li><a data-toggle="tab" href="#socials"> Socials</a></li>
+                    <li><a data-toggle="tab" href="#bio"> Bio</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="info" class="tab-pane active">
+                        <div class="panel-body">
+                            <h5>Basic Profile &amp; Contact Info</h5>
+                            <fieldset class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.FirstName"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.FirstName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.LastName"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.LastName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.JobTitle"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.JobTitle">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.CompanyName"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.CompanyName">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <hr />
+                            <fieldset class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.Phone"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.Phone">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.Mobile"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.Mobile">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <hr />
+                            <fieldset class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.ClientCode"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.ClientCode">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.VATNumber"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.VATNumber">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div id="socials" class="tab-pane">
+                        <div class="panel-body">
+                            <h5>
+                                Social Media Accounts
+                            </h5>
+                            <fieldset class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.Facebook"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.Facebook">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.GooglePlus"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.GooglePlus">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.LinkedIn"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.LinkedIn">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.Twitter"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.Twitter">
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <hr />
+                            <fieldset class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.TwitterHandle"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.TwitterHandle">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.WebsiteUrl"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.WebsiteUrl">
+                                    </div>
+                                </div>
+                            </fieldset>
+                       </div>
+                    </div>
+                    <div id="bio" class="tab-pane">
+                        <div class="panel-body">
+                            <h5>
+                                Bio and Notes
+                            </h5>
+                            <div class="form-group">
+                                <label class="control-label" asp-for="User.Bio"></label>
+                                <div class="">
+                                    <textarea type="text" class="form-control" asp-for="User.Bio"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" asp-for="User.Notes"></label>
+                                <div class="">
+                                    <textarea type="text" class="form-control" asp-for="User.Notes"></textarea>
+                                </div>
+                            </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="right-column">
+                <div class="editor-box">
+                    <h5>Profile Image</h5>
+                    <fieldset class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Profile Image</label>
+                            <div class="col-sm-8">
+                                <fixedImage src="@uapi.Avatar.SmallUrl" class="img-xs img-circle m-r-sm @Model.User.Id" id="user-edit-avatar" />
+                                <attacher dataid="@Model.User.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.User.Id" class="btn btn-xs btn-primary">Choose profile image...</attacher>
+                                <a class="btn btn-xs btn-danger hood-inline-task" href="@Url.Action("ClearImage", "Users", new { area = "Admin", id = Model.User.Id, field = "AvatarId" })" data-complete="$.hood.Content.Edit.Refresh()"><i class="fa fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="editor-box">
+                    <h5>User Roles</h5>
+                    <p>
+                        The user is currently assigned to the following roles:
+                    </p>
+                    <p id="role-list">
+                        @{ await Html.RenderPartialAsync("Roles"); }
+                    </p>
+                    <p><em><small>Click the cross in the role badge to remove the user from the role.</small></em></p>
+                </div>
+                <div class="editor-box">
+                    <h5>Add user to role</h5>
+                    <p>
+                        Choose a role and click 'Add user to role' to add the user to the role:
+                    </p>
+                    <p>
+                        <select id="roleToAdd" name="roleToAdd" class="form-control">
+                            <option value="">--- Select a role to add ---</option>
+                            @foreach (IdentityRole role in Model.AllRoles)
+                            {
+                                <option value="@role.Name">@role.Name</option>
+                            }
+                        </select>
+                    </p>
+                    <p class="text-right">
+                        <button class="btn btn-primary btn-xs add-to-role" data-id="@Model.User.Id"><i class="fa fa-plus"></i>&nbsp;Add user to role</button>
+                    </p>
+                </div>
+                </div>
+        </div>
+    </div>
+</form>

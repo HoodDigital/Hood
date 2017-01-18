@@ -1,0 +1,140 @@
+@inject ISiteConfiguration _site
+@{
+    BasicSettings _info = _site.GetBasicSettings();
+    SeoSettings _meta = _site.GetSeo();
+    Layout = "_Layout";
+    string description = "Privacy Policy for this website.";
+    string title = "Privacy Policy - " + _info.CompanyName;
+    ViewData["Title"] = title;
+}
+@section metas {
+    <meta name="description" content="@description" />
+    <meta property="og:author" content="@_meta.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_meta.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_meta.OgSecureImageUrl" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@_meta.TwitterCardImageUrl" />
+}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 class="terms-head">Part 1: Personal information and privacy</h3>
+            <h4 class="terms-head"><span>1.</span>Introduction</h4>
+            <p class="terms-paragraph"><span>1.1</span>We are committed to safeguarding the privacy of our website visitors; this policy sets out how we will treat your personal information.</p>
+            <p class="terms-paragraph"><span>1.2</span>We will ask you to consent to our use of cookies in accordance with the terms of this policy when you first visit our website. / By using our website and agreeing to this policy, you consent to our use of cookies in accordance with the terms of this policy.</p>
+            <h4 class="terms-head"><span>2.</span>Collecting personal information</h4>
+            <p class="terms-paragraph"><span>2.1</span>We may collect, store and use the following kinds of personal information:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>information about your computer and about your visits to and use of this website (including your IP address, geographical location, browser type and version, operating system, referral source, length of visit, page views and website navigation paths);</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>information that you provide to us when registering with our website (including your email address);</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>information that you provide to us for the purpose of subscribing to our email notifications and/or newsletters (including your name and email address);</p>
+            <p class="terms-sub-paragraph"><span>(d)</span>information relating to any purchases you make of our goods (including your name, delivery address, payment address, telephone numbers, email address and card details;</p>
+            <p class="terms-sub-paragraph"><span>(e)</span>information that you post to our website for publication on the internet (including your user name, profile pictures and reviews);</p>
+            <p class="terms-sub-paragraph"><span>(f)</span>information contained in or relating to any communications that you send to us (including the communication content and meta data associated with the communication);</p>
+            <p class="terms-sub-paragraph"><span>(g)</span>any other personal information that you choose to send to us;</p>
+            <p class="terms-paragraph"><span>2.2</span>Before you disclose to us the personal information of another person, you must obtain that person's consent to both the disclosure and the processing of that personal information in accordance with the terms of this policy.</p>
+            <h4 class="terms-head"><span>3.</span>Using your personal information</h4>
+            <p class="terms-paragraph"><span>3.1</span>Personal information submitted to us through our website will be used for the purposes specified in this policy or on the relevant pages of the website.</p>
+            <p class="terms-paragraph"><span>3.2</span>We may use your personal information to:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>administer our website and business;</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>personalise our website for you;</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>enable your use of the services available on our website;</p>
+            <p class="terms-sub-paragraph"><span>(d)</span>send you goods purchased through our website;</p>
+            <p class="terms-sub-paragraph"><span>(e)</span>send statements, invoices and payment reminders to you, and collect payments from you;</p>
+            <p class="terms-sub-paragraph"><span>(f)</span>send you non-marketing commercial communications;</p>
+            <p class="terms-sub-paragraph"><span>(g)</span>send you email notifications that you have specifically requested;</p>
+            <p class="terms-sub-paragraph"><span>(h)</span>send you our email newsletter, if you have requested it (you can inform us at any time if you no longer require the newsletter);</p>
+            <p class="terms-sub-paragraph"><span>(i)</span>send you marketing communications relating to our business which we think may be of interest to you, by post or, where you have specifically agreed to this, by email or similar technology (you can inform us at any time if you no longer require marketing communications);</p>
+            <p class="terms-sub-paragraph"><span>(j)</span>provide third parties with statistical information about our users (but those third parties will not be able to identify any individual user from that information);</p>
+            <p class="terms-sub-paragraph"><span>(k)</span>deal with enquiries and complaints made by or about you relating to our website;</p>
+            <p class="terms-sub-paragraph"><span>(l)</span>keep our website secure and prevent fraud;</p>
+            <p class="terms-sub-paragraph"><span>(m)</span>verify compliance with the terms and conditions governing the use of our website; and</p>
+            <p class="terms-paragraph"><span>3.3</span>If you submit personal information for publication on our website, we will publish and otherwise use that information in accordance with the licence you grant to us.</p>
+            <p class="terms-paragraph"><span>3.4</span>We will not, without your express consent, supply your personal information to any third party for the purpose of their or any other third party's direct marketing.</p>
+            <p class="terms-paragraph"><span>3.5</span>All our website financial transactions are handled through our payment services provider, PayPal. You can review the provider's privacy policy at <a href="https://www.paypal.com/uk/webapps/mpp/ua/privacy-full" target="_blank">https://www.paypal.com/uk/webapps/mpp/ua/privacy-full</a>. We will share information with our payment services provider only to the extent necessary for the purposes of processing payments you make via our website, refunding such payments and dealing with complaints and queries relating to such payments and refunds.</p>
+            <h4 class="terms-head"><span>4.</span>Disclosing personal information</h4>
+            <p class="terms-paragraph"><span>4.1</span>We may disclose your personal information to any of our employees, officers, insurers, professional advisers, agents, suppliers or subcontractors insofar as reasonably necessary for the purposes set out in this policy.</p>
+            <p class="terms-paragraph"><span>4.2</span>We may disclose your personal information to any member of our group of companies (this means our subsidiaries, our ultimate holding company and all its subsidiaries) insofar as reasonably necessary for the purposes set out in this policy.</p>
+            <p class="terms-paragraph"><span>4.3</span>We may disclose your personal information:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>to the extent that we are required to do so by law;</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>in connection with any ongoing or prospective legal proceedings;</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>in order to establish, exercise or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk);</p>
+            <p class="terms-sub-paragraph"><span>(d)</span>to the purchaser (or prospective purchaser) of any business or asset that we are (or are contemplating) selling; and</p>
+            <p class="terms-sub-paragraph"><span>(e)</span>to any person who we reasonably believe may apply to a court or other competent authority for disclosure of that personal information where, in our reasonable opinion, such court or authority would be reasonably likely to order disclosure of that personal information.</p>
+            <p class="terms-paragraph"><span>4.4</span>Except as provided in this policy, we will not provide your personal information to third parties.</p>
+            <h4 class="terms-head"><span>5.</span>International data transfers</h4>
+            <p class="terms-paragraph"><span>5.1</span>Information that we collect may be stored and processed in and transferred between any of the countries in which we operate in order to enable us to use the information in accordance with this policy.</p>
+            <p class="terms-paragraph"><span>5.2</span>Information that we collect may be transferred to the following countries which do not have data protection laws equivalent to those in force in the European Economic Area: the United States of America, Russia, Japan, China and India.</p>
+            <p class="terms-paragraph"><span>5.3</span>Personal information that you publish on our website or submit for publication on our website may be available, via the internet, around the world. We cannot prevent the use or misuse of such information by others.</p>
+            <p class="terms-paragraph"><span>5.4</span>You expressly agree to the transfers of personal information described in this Section 5.</p>
+            <h4 class="terms-head"><span>6.</span>Retaining personal information</h4>
+            <p class="terms-paragraph"><span>6.1</span>This Section 6 sets out our data retention policies and procedure, which are designed to help ensure that we comply with our legal obligations in relation to the retention and deletion of personal information.</p>
+            <p class="terms-paragraph"><span>6.2</span>Personal information that we process for any purpose or purposes shall not be kept for longer than is necessary for that purpose or those purposes.</p>
+            <p class="terms-paragraph"><span>6.3</span>Notwithstanding the other provisions of this Section 6, we will retain documents (including electronic documents) containing personal data:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>to the extent that we are required to do so by law;</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>if we believe that the documents may be relevant to any ongoing or prospective legal proceedings; and</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>in order to establish, exercise or defend our legal rights (including providing information to others for the purposes of fraud prevention and reducing credit risk).</p>
+            <h4 class="terms-head"><span>7.</span>Security of your personal information</h4>
+            <p class="terms-paragraph"><span>7.1</span>We will take reasonable technical and organisational precautions to prevent the loss, misuse or alteration of your personal information.</p>
+            <p class="terms-paragraph"><span>7.2</span>We will store all the personal information you provide on our secure (password- and firewall-protected) servers.</p>
+            <p class="terms-paragraph"><span>7.3</span>All electronic financial transactions entered into through our website will be protected by encryption technology.</p>
+            <p class="terms-paragraph"><span>7.4</span>You acknowledge that the transmission of information over the internet is inherently insecure, and we cannot guarantee the security of data sent over the internet.</p>
+            <p class="terms-paragraph"><span>7.5</span>You are responsible for keeping the password you use for accessing our website confidential; we will not ask you for your password (except when you log in to our website).</p>
+            <h4 class="terms-head"><span>8.</span>Amendments</h4>
+            <p class="terms-paragraph"><span>8.1</span>We may update this policy from time to time by publishing a new version on our website.</p>
+            <p class="terms-paragraph"><span>8.2</span>You should check this page occasionally to ensure you are happy with any changes to this policy.</p>
+            <p class="terms-paragraph"><span>8.3</span>We may notify you of changes to this policy by email.</p>
+            <h4 class="terms-head"><span>9.</span>Your rights</h4>
+            <p class="terms-paragraph"><span>9.1</span>You may instruct us to provide you with any personal information we hold about you; provision of such information will be subject to:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>the payment of a fee (currently fixed at GBP 10); and</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>the supply of appropriate evidence of your identity (for this purpose, we will usually accept a photocopy of your passport certified by a solicitor or bank plus an original copy of a utility bill showing your current address).</p>
+            <p class="terms-paragraph"><span>9.2</span>We may withhold personal information that you request to the extent permitted by law.</p>
+            <p class="terms-paragraph"><span>9.3</span>You may instruct us at any time not to process your personal information for marketing purposes.</p>
+            <p class="terms-paragraph"><span>9.4</span>In practice, you will usually either expressly agree in advance to our use of your personal information for marketing purposes, or we will provide you with an opportunity to opt out of the use of your personal information for marketing purposes.</p>
+            <h4 class="terms-head"><span>10.</span>Third party websites</h4>
+            <p class="terms-paragraph"><span>10.1</span>Our website includes hyperlinks to, and details of, third party websites.</p>
+            <p class="terms-paragraph"><span>10.2</span>We have no control over, and are not responsible for, the privacy policies and practices of third parties.</p>
+            <h4 class="terms-head"><span>11.</span>Updating information</h4>
+            <p class="terms-paragraph"><span>11.1</span>Please let us know if the personal information that we hold about you needs to be corrected or updated.</p>
+            <h3 class="terms-head">Part 2: Cookies</h3>
+            <h4 class="terms-head"><span>1.</span>About cookies</h4>
+            <p class="terms-paragraph"><span>1.1</span>A cookie is a file containing an identifier (a string of letters and numbers) that is sent by a web server to a web browser and is stored by the browser. The identifier is then sent back to the server each time the browser requests a page from the server.</p>
+            <p class="terms-paragraph"><span>1.2</span>Cookies may be either "persistent" cookies or "session" cookies: a persistent cookie will be stored by a web browser and will remain valid until its set expiry date, unless deleted by the user before the expiry date; a session cookie, on the other hand, will expire at the end of the user session, when the web browser is closed.</p>
+            <p class="terms-paragraph"><span>1.3</span>Cookies do not typically contain any information that personally identifies a user, but personal information that we store about you may be linked to the information stored in and obtained from cookies.</p>
+            <p class="terms-paragraph"><span>1.4</span>Cookies can be used by web servers to identity and track users as they navigate different pages on a website and identify users returning to a website.</p>
+            <h4 class="terms-head"><span>2.</span>Our cookies</h4>
+            <p class="terms-paragraph"><span>2.1</span>We use both session and persistent cookies on our website.</p>
+            <p class="terms-paragraph"><span>2.2</span>The names of the cookies that we use on our website, and the purposes for which they are used, are set out below:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>Forms authentication cookie. Used for authenticating registered customers.</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>Customer cookie. Used to identifier guest customers.</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>Compare products cookie. Stores a list of products for 'compare products' page.</p>
+            <p class="terms-sub-paragraph"><span>(d)</span>Recently viewed products cookie. Stores a list of the recently viewed products</p>
+            <h4 class="terms-head"><span>3.</span>Analytics cookies</h4>
+            <p class="terms-paragraph"><span>3.1</span>We use Google Analytics to analyse the use of our website.</p>
+            <p class="terms-paragraph"><span>3.2</span>Our analytics service provider generates statistical and other information about website use by means of cookies.</p>
+            <p class="terms-paragraph"><span>3.3</span>The analytics cookies used by our website have the following names: _utma, _utmb, _utmc and _utmz</p>
+            <p class="terms-paragraph"><span>3.4</span>The information generated relating to our website is used to create reports about the use of our website.</p>
+            <p class="terms-paragraph"><span>3.5</span>Our analytics service provider's privacy policy is available at: <a href="http://www.google.com/policies/privacy/" target="_blank">http://www.google.com/policies/privacy/</a>.</p>
+            <h4 class="terms-head"><span>6.</span>Blocking cookies</h4>
+            <p class="terms-paragraph"><span>6.1</span>Most browsers allow you to refuse to accept cookies; for example:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>in Internet Explorer (version 10) you can block cookies using the cookie handling override settings available by clicking "Tools", "Internet Options", "Privacy" and then "Advanced";</p>
+            <p class="terms-sub-paragraph"><span>(b)</span>in Firefox (version 24) you can block all cookies by clicking "Tools", "Options", "Privacy", selecting "Use custom settings for history" from the drop-down menu, and unticking "Accept cookies from sites"; and</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>in Chrome (version 29), you can block all cookies by accessing the "Customise and control" menu, and clicking "Settings", "Show advanced settings" and "Content settings", and then selecting "Block sites from setting any data" under the "Cookies" heading.</p>
+            <p class="terms-paragraph"><span>6.2</span>Blocking all cookies will have a negative impact upon the usability of many websites.</p>
+            <p class="terms-paragraph"><span>6.3</span>If you block cookies, you will not be able to use all the features on our website.</p>
+            <h4 class="terms-head"><span>6.</span>Deleting cookies</h4>
+            <p class="terms-paragraph"><span>6.1</span>You can delete cookies already stored on your computer; for example:</p>
+            <p class="terms-sub-paragraph"><span>(a)</span>in Internet Explorer (version 10), you must manually delete cookie files (you can find instructions for doing so at <a href="http://support.microsoft.com/kb/278835" target="_blank">http://support.microsoft.com/kb/278835</a></p>
+            <p class="terms-sub-paragraph"><span>(b)</span>in Firefox (version 24), you can delete cookies by clicking "Tools", "Options" and "Privacy", then selecting "Use custom settings for history", clicking "Show Cookies", and then clicking "Remove All Cookies"; and</p>
+            <p class="terms-sub-paragraph"><span>(c)</span>in Chrome (version 29), you can delete all cookies by accessing the "Customise and control" menu, and clicking "Settings", "Show advanced settings" and "Clear browsing data", and then selecting "Delete cookies and other site and plug-in data" before clicking "Clear browsing data".</p>
+            <p class="terms-paragraph"><span>6.2</span>Deleting cookies will have a negative impact on the usability of many websites.</p>
+            <h3 class="terms-head">Part 3: Our details</h3>
+            <h4 class="terms-head"><span>7.</span>Our details</h4>
+            <p class="terms-paragraph"><span>7.1</span>This website is owned and operated by <strong>@_info.CompanyName</strong>.</p>
+            <p class="terms-paragraph"><span>7.3</span>Our principal place of business is at <strong>@_info.Address.ToFormat(AddressFormat.SingleLine)</strong>.</p>
+            <p class="terms-paragraph"><span>7.4</span>You can contact us by writing to the business address given above, by using our website contact form, by email to <strong>@_info.Email</strong> or by telephone on <strong>@_info.Phone</strong>.</p>
+        </div>
+    </div>
+</div>

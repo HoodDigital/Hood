@@ -1,0 +1,28 @@
+@model ContentListModel
+@if (string.IsNullOrEmpty(Model.Search))
+{
+    <div class="row text-center">
+        <div class="col-md-8 col-md-offset-2">
+            <h3 class="h4">
+                There is nothing to see
+                @if (!string.IsNullOrEmpty(Model.Category))
+                {
+                    <span>in the '@Model.Category' category</span>
+                }                    
+                just yet.
+            </h3>
+            <div class="spacer-15"></div>
+            <p class="lead">Please check back later.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row text-center">
+        <div class="col-md-8 col-md-offset-2">
+            <h3 class="h4">We couldn't find anything!</h3>
+            <div class="spacer-15"></div>
+            <p class="lead">Your search '@Model.Search' did not return any results. Please try searching for something else.</p>
+        </div>
+    </div>
+}

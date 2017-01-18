@@ -1,0 +1,100 @@
+@model IMetadata
+@switch (Model.Name)
+{
+    case "Settings.CSS.BodyClass":
+        <input id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" type="hidden" value="@Model.GetStringValue()" class="date-output" />
+        break;
+    case "Settings.Image.Align":
+    case "Settings.Image.Banner.Align":
+    case "Settings.Image.Featured.Align":
+        <select class="form-control" data-selected="@Model.GetStringValue()" id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)">
+            <option value="top left">Top Left</option>
+            <option value="top center">Top Center</option>
+            <option value="top right">Top Right</option>
+            <option value="center">Centered</option>
+            <option value="bottom left">Bottom Left</option>
+            <option value="bottom center">Bottom Centered</option>
+            <option value="bottom right">Bottom Right</option>
+        </select>
+        break;
+    case "Settings.Image.Fit":
+    case "Settings.Image.Banner.Fit":
+    case "Settings.Image.Featured.Fit":
+        <select class="form-control" data-selected="@Model.GetStringValue()" id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)">
+            <option value="100%">Full width, automatic height</option>
+            <option value="contain">Fit (Image will not overstep the edge)</option>
+            <option value="cover">Fill (Image will fill the space automatically)</option>
+            <option value="100% 100%">Stretch (Image will distort to fill the space)</option>
+        </select>
+        break;
+    case "Settings.Image.Background":
+    case "Settings.Image.Banner.Background":
+    case "Settings.Image.Featured.Background":
+        <div id="@string.Format("ColorPicker:{0}", Model.Name)" class="input-group colorpicker-component">
+            <input id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" value="@Model.GetStringValue()" type="text" class="form-control" />
+            <span class="input-group-addon">
+                <i></i>
+            </span>
+        </div>
+        break;
+    default:
+
+        switch (Model.Type)
+        {
+            case "System.DateTime":
+                DateTime val = DateTime.Now;
+                if (!DateTime.TryParse(Model.GetStringValue(), out val))
+                {
+                    val = DateTime.Now;
+                }
+                <div class="hood-date row">
+                    <input id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" type="hidden" value="@val.ToString()" class="date-output" />
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            <input type="text" value="@val.ToShortDateString()" class="form-control datepicker inline-date date-value" data-field="@string.Format("Meta:{0}", Model.Name)" />
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group time">
+                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                            <select data-selected="@val.Hour.ToString("00")" class="form-control inline-time hour-value" data-field="@string.Format("Meta:{0}", Model.Name)">
+                                @for (int i = 0; i < 24; i++)
+                                {
+                                    <option value="@i.ToString("00")">@i.ToString("00")</option>
+                                }
+                            </select>
+                            <select data-selected="@val.Minute.ToString("00")" class="form-control inline-time minute-value" data-field="@string.Format("Meta:{0}", Model.Name)">
+                                @for (int i = 0; i < 60; i++)
+                                {
+                                    <option value="@i.ToString("00")">@i.ToString("00")</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                break;
+
+            case "System.Boolean":
+                <select data-selected="@Model.GetStringValue()" class="form-control" id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                break;
+
+            case "Hood.MultiLineString":
+                <textarea id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" class="form-control">@Model.GetStringValue()</textarea>
+                break;
+
+
+            case "Hood.WYSIWYG":
+                <textarea id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" class="tinymce-simple">@Model.GetStringValue()</textarea>
+                break;
+
+            default:
+                <input id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" />
+                break;
+
+        }
+        break;
+}

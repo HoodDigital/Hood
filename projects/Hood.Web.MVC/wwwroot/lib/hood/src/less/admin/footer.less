@@ -1,26 +1,9 @@
 body {
     footer.footer {
         background-color: white;
-        z-index: 50;
         border: 0;
         padding: 10px;
         border-top: 1px solid #ccc;
         position: relative;
-
-        @media (min-width:768px) {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            left: @sidebar-width;
-        }
-    }
-
-    &.mini-nav {
-        footer.footer {
-            @media (min-width:768px) {
-                left: 70px;
-            }
-        }
     }
 }

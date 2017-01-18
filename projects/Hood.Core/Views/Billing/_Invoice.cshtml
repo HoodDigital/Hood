@@ -1,0 +1,44 @@
+@model Stripe.StripeInvoice
+<div class="panel panel-default no-margin accordion-section">
+    <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-{0}", Model.Id)">
+        <span class="pull-right">
+            @if (Model.Paid)
+            {
+                <span class="label label-success">PAID</span>
+            }
+            else
+            {
+                <span class="label label-warning">UNPAID</span>
+            }
+        </span>
+        Invoice -
+        @if (Model.Date.HasValue)
+        {
+            <span>@Model.Date.Value.ToShortDateString() at @Model.Date.Value.ToShortTimeString()</span>
+        }
+        - @Model.AmountDue.ToCurrencyFormat()
+    </div>
+    <div id="@string.Format("#collapse-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-{0}", Model.Id)">
+        <div class="panel-body">
+            <p>@Model.Description</p>
+            @if (Model.StripeInvoiceLineItems != null && Model.StripeInvoiceLineItems.Data.Count() != 0)
+            {
+                <table class="table">
+                    <tr>
+                        <th style="width:20%">Amount</th>
+                        <th style="width:30%">Description</th>
+                        <th style="width:20%">Period</th>
+                    </tr>
+                    @foreach (Stripe.StripeInvoiceLineItem item in Model.StripeInvoiceLineItems.Data)
+                {
+                        <tr>
+                            <td>@item.Amount.ToCurrencyFormat()</td>
+                            <td>@item.Description</td>
+                            <td>@item.StripePeriod.Start.Value.ToShortDateString() - @item.StripePeriod.End.Value.ToShortDateString() </td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
+    </div>
+</div>

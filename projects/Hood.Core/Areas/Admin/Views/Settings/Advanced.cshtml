@@ -1,0 +1,146 @@
+@inject IThemesService _theme
+@inject IConfiguration _config
+@inject IContentRepository _data
+@inject ISiteConfiguration _site
+@{
+    var theme = _theme.CurrentTheme;
+    ViewData["Title"] = "Administrator Tools";
+}
+<div class="row">
+    <div class="col-md-4 col-md-push-8">
+        <div class="right-column">
+            <div class="m-b-md">
+                <h5>
+                    @ViewData["Title"]
+                </h5>
+            </div>
+            <div>
+                <div class="ibox-content">
+                    <p>Advanced raw information and options for administration of the site.</p>
+                    <p>WARNING: Please be cautious when modifying anything in this area. There may be a drastic effect on the site.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8 col-md-pull-4">
+        <div class="tabs-container">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#basics">App Settings</a></li>
+                <li><a data-toggle="tab" href="#advanced">Advanced Editor</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="basics" class="tab-pane active">
+                    <div class="panel-body">
+                        <strong>View Site Setup</strong>
+                        <p>
+                            Here you can view the site's deep settings, these should NEVER be distributed or shown to anyone other than site administrators. To modify these settings you can edit the appSettings.json file in the site's root directory.
+                        </p>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="list-group settings-list clear-list m-t">
+                            <li class="list-group-item">
+                                @if (_config["Data:ConnectionString"].IsSet())
+                                {
+                                    <span class="pull-right">
+                                        @_config["Data:ConnectionString"]
+                                    </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
+                                }
+                                else
+                                {
+                                    <span class="pull-right">
+                                        -
+                                    </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
+                                }
+                            </li>
+                            <li class="list-group-item">
+                                @if (_config["ASPNETCORE_ENVIRONMENT"].IsSet())
+                                {
+                                    <span class="pull-right">
+                                        @_config["ASPNETCORE_ENVIRONMENT"]
+                                    </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
+                                }
+                                else
+                                {
+                                    <span class="pull-right">
+                                        -
+                                    </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
+                                }
+                            </li>
+                            <li class="list-group-item">
+                                <span class="pull-right">
+                                    @string.Join(",", (_data.GetAllowedTypes()).Select(c => c.Type))
+                                </span>
+                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Enabled Types</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="pull-right">
+                                    @string.Join(",", (_data.GetDisallowedTypes()).Select(c => c.Type))
+                                </span>
+                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Disabled Types</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="pull-right">
+                                    @string.Join(",", (_data.GetPublicTypes()).Select(c => c.Type))
+                                </span>
+                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Public Types</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="pull-right">
+                                    @string.Join(",", (_data.GetRestrictedTypes()).Select(c => c.Type))
+                                </span>
+                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Restricted Types</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="advanced" class="tab-pane">
+                    <div class="panel-body">
+                        <strong>System Settings (Advanced)</strong>
+                        <p>
+                            These settings can be modified directly. It is strongly recommended that you do not modify these settings, as the site may cease to function correctly.
+                        </p>
+                        <div class="row m-b-sm m-t-sm">
+                            <div class="col-md-4">
+                                <select class="form-control manage-options-change" name="manage-options-sort" id="manage-options-sort">
+                                    <option value="Key">By Key (A-Z)</option>
+                                    <option value="KeyDesc">By Key (Z-A)</option>
+                                    <option value="Value">By Value (A-Z)</option>
+                                    <option value="ValueDesc">By Value (Z-A)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-control manage-options-change" name="manage-options-type" id="manage-options-type">
+                                    <option value="">All Types</option>
+                                    <option value="7">Basic Settings</option>
+                                    <option value="6">System (Do not modify without expertise!)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input name="manage-options-search" id="manage-options-search" type="text" placeholder="Search" class="form-control">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary manage-options-click"> Search!</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body no-padding">
+                        <div id="manage-options-list" class="border-box-sizing media-list"></div>
+                        <div class="manage-options-pager"></div>
+                        <div class="cleafix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+
