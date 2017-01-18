@@ -290,6 +290,14 @@ namespace Hood.Services
         private TMediaObject ProcessImage(TMediaObject media)
         {
             ThumbSet thumbs = new ThumbSet();
+            if (!_hoodApiUrl.IsSet() || !_hoodApiKey.IsSet())
+            {
+                media.SmallUrl = media.Url;
+                media.MediumUrl = media.Url;
+                media.LargeUrl = media.Url;
+                media.ThumbUrl = media.Url;
+                return media;
+            }
             string thumbUrl = _hoodApiUrl + "?key={0}&url={1}&directory={2}&container={3}";
             thumbUrl = string.Format(thumbUrl, WebUtility.UrlEncode(_key), media.Url, media.Directory, _container);
             var json = "";
