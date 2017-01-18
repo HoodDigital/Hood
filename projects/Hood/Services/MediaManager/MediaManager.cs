@@ -22,9 +22,8 @@ namespace Hood.Services
         private CloudStorageAccount _storageAccount;
         private string _container;
         private string _key;
-        private const string HoodApiUrl = "http://api.hooddigital.com/v2/thumb";
-        //private const string HoodApiUrl = "http://localhost:63063/v2/thumb";
-        private const string HoodApiKey = "zq37M4exM7c8wFZD83tC5yQ74N5Z9oF2KzwJBn075IR4278v2Bi";
+        private string _hoodApiUrl;
+        private string _hoodApiKey;
         private readonly IConfiguration _config;
         private readonly ISiteConfiguration _site;
 
@@ -46,6 +45,8 @@ namespace Hood.Services
         {
             _container = _site.GetMediaSettings().ContainerName.ToSeoUrl();
             _key = _site.GetMediaSettings().AzureKey;
+            _hoodApiKey = _site.GetMediaSettings().HoodApiKey;
+            _hoodApiUrl = _site.GetMediaSettings().HoodApiUrl;
             try
             {
                 _storageAccount = CloudStorageAccount.Parse(_key);
@@ -289,18 +290,18 @@ namespace Hood.Services
         private TMediaObject ProcessImage(TMediaObject media)
         {
             ThumbSet thumbs = new ThumbSet();
-            string thumbUrl = HoodApiUrl + "?key={0}&url={1}&directory={2}&container={3}";
+            string thumbUrl = _hoodApiUrl + "?key={0}&url={1}&directory={2}&container={3}";
             thumbUrl = string.Format(thumbUrl, WebUtility.UrlEncode(_key), media.Url, media.Directory, _container);
             var json = "";
             using (WebClient client = new WebClient())
             {
                 var requestParams = new System.Collections.Specialized.NameValueCollection();
-                requestParams.Add("apiKey", HoodApiKey);
+                requestParams.Add("apiKey", _hoodApiKey);
                 requestParams.Add("azureKey", _key);
                 requestParams.Add("url", media.Url);
                 requestParams.Add("container", _container);
                 requestParams.Add("blobReference", media.BlobReference);
-                byte[] responsebytes = client.UploadValues(HoodApiUrl, "POST", requestParams);
+                byte[] responsebytes = client.UploadValues(_hoodApiUrl, "POST", requestParams);
                 json = Encoding.UTF8.GetString(responsebytes);
             }
             thumbs = JsonConvert.DeserializeObject<ThumbSet>(json);
