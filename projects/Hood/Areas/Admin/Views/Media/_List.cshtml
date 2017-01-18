@@ -1,8 +1,10 @@
 <div class="row">
     <div class="col-sm-3">
-        <input class="form-control media-change" type="hidden" name="media-directory" id="media-directory" />
-        <div class="hood-inline refresh directories" data-url="@Url.Action("Directories")">
-            @{ await Html.RenderPartialAsync("Directories"); }
+        <div class="right-column m-b-sm">
+            <input class="form-control media-change" type="hidden" name="media-directory" id="media-directory" />
+            <div class="hood-inline refresh directories" data-url="@Url.Action("Directories")">
+                @{ await Html.RenderPartialAsync("Directories"); }
+            </div>
             <button class="create-directory btn btn-success btn-block m-t-md" type="button"><i class="fa fa-plus"></i> Create new directory...</button>
         </div>
     </div>

@@ -50,61 +50,55 @@
         </div>
     </div>
     <div class="col-sm-4">
-        <div class="wrapper wrapper-content">
-            <div class="ibox">
-                @if (theme != null)
-                {
-                    <div class="ibox-title">
-                        <h2>Current theme: <strong>@theme["Name"]</strong></h2>
-                    </div>
-                    <div class="ibox-content">
-                        <p>@theme["ThemeFullName"]</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="ibox-title">
-                        <h2>There is no theme currently active.</h2>
-                    </div>
-                    <div class="ibox-content">
-                        <h4>Theme currently selected: @config["Hood.Settings.Theme"]</h4>
-                        <p>There is no active theme currently, this could be due to no theme being selected, or an issue with the installation of the currently selected theme.</p>
-                    </div>
-                }
-                @if (config != null)
-                {
-                    <div class="ibox-content">
-                        <h3>Holding Page</h3>
-                        <p>You can activate a holding page, which will show instead of the site, this is useful prelaunch.</p>
-                        <p class="text-warning">This feature is currently disabled. Please contact Hood for more information.</p>
-                        @*<p>
-                                @if (config["Settings.HoldingPage"] == "true")
-                                {
-                                    <a class="pull-right btn-danger btn-block btn btn-sm update-site-setting" data-name="Settings.HoldingPage" data-value="false">De-activate Holding Page</a>
-                                }
-                                else
-                                {
-                                    <a class="pull-right btn-primary btn-block btn btn-sm update-site-setting" data-name="Settings.HoldingPage" data-value="true">Activate Holding Page</a>
-                                }
-                            </p>*@
-                    </div>
-                    <div class="ibox-content">
-                        <h3>Under Construction Page</h3>
-                        <p>You can activate an Under Construction page, which will show instead of the site, this is useful during maintenance periods.</p>
-                        <p class="text-warning">This feature is currently disabled. Please contact Hood for more information.</p>
-                        @*<p>
-                                @if (config["Settings.MaintenancePage"] == "true")
-                                {
-                                    <a class="pull-right btn-danger btn-block btn btn-sm update-site-setting" data-name="Settings.MaintenancePage" data-value="false">De-activate Maintenance Page</a>
-                                }
-                                else
-                                {
-                                    <a class="pull-right btn-primary btn-block btn btn-sm update-site-setting" data-name="Settings.MaintenancePage" data-value="true">Activate Maintenance Page</a>
-                                }
-                            </p>*@
-                    </div>
-                }
-            </div>
+        <div class="right-column">
+            @if (theme != null)
+            {
+                <div class="editor-box">
+                    <h4>Current theme: <strong>@theme["Name"]</strong></h4>
+                    <p>@theme["ThemeFullName"]</p>
+                </div>
+            }
+            else
+            {
+                <div class="editor-box">
+                    <h4>There is no theme currently active.</h4>
+                    <h5>Theme currently selected: @config["Hood.Settings.Theme"]</h5>
+                    <p>There is no active theme currently, this could be due to no theme being selected, or an issue with the installation of the currently selected theme.</p>
+                </div>
+            }
+            @if (config != null)
+            {
+                <div class="editor-box">
+                    <h5>Holding Page</h5>
+                    <p>You can activate a holding page, which will show instead of the site, this is useful prelaunch.</p>
+                    <p class="text-warning">This feature is currently disabled. Please contact Hood for more information.</p>
+                    @*<p>
+                            @if (config["Settings.HoldingPage"] == "true")
+                            {
+                                <a class="pull-right btn-danger btn-block btn btn-sm update-site-setting" data-name="Settings.HoldingPage" data-value="false">De-activate Holding Page</a>
+                            }
+                            else
+                            {
+                                <a class="pull-right btn-primary btn-block btn btn-sm update-site-setting" data-name="Settings.HoldingPage" data-value="true">Activate Holding Page</a>
+                            }
+                        </p>*@
+                </div>
+                <div class="editor-box">
+                    <h5>Under Construction Page</h5>
+                    <p>You can activate an Under Construction page, which will show instead of the site, this is useful during maintenance periods.</p>
+                    <p class="text-warning">This feature is currently disabled. Please contact Hood for more information.</p>
+                    @*<p>
+                            @if (config["Settings.MaintenancePage"] == "true")
+                            {
+                                <a class="pull-right btn-danger btn-block btn btn-sm update-site-setting" data-name="Settings.MaintenancePage" data-value="false">De-activate Maintenance Page</a>
+                            }
+                            else
+                            {
+                                <a class="pull-right btn-primary btn-block btn btn-sm update-site-setting" data-name="Settings.MaintenancePage" data-value="true">Activate Maintenance Page</a>
+                            }
+                        </p>*@
+                </div>
+            }
         </div>
     </div>
 </div>

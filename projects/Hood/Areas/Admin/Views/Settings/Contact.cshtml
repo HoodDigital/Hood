@@ -1,85 +1,65 @@
 @model ContactSettings
 @{
+    Layout = "_SettingsLayout";
     ViewData["Title"] = "Contact Form & Page Settings";
 }
-<form method="post">
-    <div class="wrapper wrapper-content">
-        <div class="row">
-            <div class="col-md-4 col-md-push-8">
-                <div class="widget-head-color-box black-bg p-lg text-center">
-                    <div class="m-b-md">
-                        <h2 class="font-bold no-margins text-white">
-                           Contact Form &amp; Page Settings
-                        </h2>
-                    </div>
-                    <button type="submit" class="btn btn-success m-t-md"><i class="fa fa-save"></i> Save @ViewData["Title"]</button>
-                    <a asp-action="ResetContact" class="btn btn-danger m-t-md warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-save"></i> Reset to Default</a>
-              </div>
-                <div class="ibox float-e-margins">
+@section description {
+    <p>
+        Set up the contact forms for your site. You will need to have an active SendGrid Api key attached to the site in order for the forms to function, set this in your mail settings, Admin > Settings > Mail Settings.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#contact">Contact Forms</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="contact" class="tab-pane in active">
+            <div class="panel-body">
+                <strong>Contact Page Settings</strong>
+                <p>
+                    Here you can set up the contact pages and how the contact form works. Choose whether to forward to a thank you page or not, set up where your contact forms go and what appears on your contact page. Set up how your contact page behaves, where the contact form goes, what happens to the user after they submit it.
+                </p>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label" asp-for="Title"></label>
                     <div>
-                        <div class="ibox-content">
-                            Set up the contact forms for your site. You will need to have an active SendGrid Api key attached to the site in order for the forms to function, set this in your mail settings, Admin > Settings > Mail Settings.
-                        </div>
+                        <input asp-for="Title" class="form-control">
                     </div>
                 </div>
-            </div>
-            <div class="col-md-8 col-md-pull-4">
-                <div class="tabs-container">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#contact">Contact Forms</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div id="contact" class="tab-pane in active">
-                            <div class="panel-body">
-                                <strong>Contact Page Settings</strong>
-                                <p>
-                                    Here you can set up the contact pages and how the contact form works. Choose whether to forward to a thank you page or not, set up where your contact forms go and what appears on your contact page. Set up how your contact page behaves, where the contact form goes, what happens to the user after they submit it.
-                                </p>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-group">
-                                    <label class="control-label" asp-for="Title"></label>
-                                    <div>
-                                        <input asp-for="Title" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" asp-for="Email"></label>
-                                    <div>
-                                        <input asp-for="Email" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" asp-for="Message"></label>
-                                    <div>
-                                        <input asp-for="Message" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" asp-for="BusinessHours"></label>
-                                    <div>
-                                        <textarea asp-for="BusinessHours" class="form-control" rows="4"></textarea>
-                                    </div>
-                                    <small>These are displayed on your contact page, when using the standard contact template.</small>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" asp-for="ThankYouUrl"></label>
-                                    <div>
-                                        <input asp-for="ThankYouUrl" class="form-control">
-                                    </div>
-                                    <small>Use this to forward the user to a contact "Thank You" page after submitting an enquiry. To simply display the message below and not forward, leave this field blank.</small>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label" asp-for="ThankYouMessage"></label>
-                                    <div>
-                                        <textarea asp-for="ThankYouMessage" class="form-control"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="Email"></label>
+                    <div>
+                        <input asp-for="Email" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="Message"></label>
+                    <div>
+                        <input asp-for="Message" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="BusinessHours"></label>
+                    <div>
+                        <textarea asp-for="BusinessHours" class="form-control" rows="4"></textarea>
+                    </div>
+                    <small>These are displayed on your contact page, when using the standard contact template.</small>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="ThankYouUrl"></label>
+                    <div>
+                        <input asp-for="ThankYouUrl" class="form-control">
+                    </div>
+                    <small>Use this to forward the user to a contact "Thank You" page after submitting an enquiry. To simply display the message below and not forward, leave this field blank.</small>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="ThankYouMessage"></label>
+                    <div>
+                        <textarea asp-for="ThankYouMessage" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form>
+</div>

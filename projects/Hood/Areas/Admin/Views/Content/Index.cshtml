@@ -6,7 +6,6 @@
     var categories = _categories.TopLevel(Model.Type.Type);
 }
 @section buttons {
-    <button class="btn btn-success create-content" data-type="@Model.Type.Slug"><i class="fa fa-thumb-tack m-r-sm"></i>Create New</button>
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog m-r-sm"></i><span class="caret"></span></button> <ul class="dropdown-menu">
             @if (Model.Type.IsPublic)
@@ -18,9 +17,12 @@
                     </a>
                 </li>
             }
-            @if (User.IsInRole("Admin"))
+            @if (Model.Type.IsPublic && User.IsInRole("Admin"))
             {
                 <li class="divider"></li>
+            }
+            @if (User.IsInRole("Admin"))
+            {
                 <li>
                     <a class="warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!">
                         <i class="fa fa-trash m-r-sm"></i>
@@ -30,6 +32,7 @@
             }
         </ul>
     </div>
+    <button class="btn btn-success create-content" data-type="@Model.Type.Slug"><i class="fa fa-thumb-tack m-r-sm"></i>Create New</button>
 }
 @section breadcrumbs {
     <ol class="breadcrumb">
@@ -98,13 +101,13 @@
                             <h4>Add a category...</h4>
                             <hr />
                             <input id="Add-ContentType" name="ContentType" type="hidden" value="@Model.Type.Type" />
-                            <div class="setings-item">
+                            <div class="blade-field">
                                 <label class="control-label" for="Add-DisplayName">Category</label>
                                 <div>
                                     <input class="form-control" type="text" id="Add-DisplayName" name="DisplayName" />
                                 </div>
                             </div>
-                            <div class="setings-item">
+                            <div class="blade-field">
                                 <label class="control-label" for="Add-ParentCategoryId">Parent Category</label>
                                 <div>
                                     <select class="form-control" id="Add-ParentCategoryId" name="ParentCategoryId">
@@ -113,7 +116,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="setings-item">
+                            <div class="blade-field">
                                 <button type="button" class="btn btn-primary add-category"><i class="fa fa-save"></i> Add Category</button>
                             </div>
                         </form>

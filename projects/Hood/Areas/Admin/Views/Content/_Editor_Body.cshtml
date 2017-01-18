@@ -1,6 +1,7 @@
 @model EditContentModel
 @if (Model.Type.ShowEditor)
 {
+    <h5 class="m-t-lg">Content</h5>
     @if (Model.Type.ShowDesigner)
     {
         <div class="text-center">
@@ -18,6 +19,7 @@
     }
     else
     {
+
         switch (Model.Type.EditorType)
         {
             case "simple":

@@ -4,7 +4,7 @@
 }
 @foreach (string role in Model.Roles)
 {
-    <span class="label">
+    <span class="label label-info">
         @role&nbsp;&nbsp;
         <a class="remove-from-role" data-id="@Model.User.Id" data-role="@role">
             <i class="fa fa-close"></i>

@@ -35,13 +35,13 @@ gulp.task('update-views', function () {
     return gulp.src([
         './Views/**/*.cshtml'
     ], { base: './Views/' })
-    .pipe(gulp.dest('./../Hood.Core/Views/'));
+    .pipe(gulp.dest('./../Hood/Views/'));
 });
 gulp.task('update-admin-views', function () {
     return gulp.src([
         './Areas/Admin/Views/**/*.cshtml'
     ], { base: './Areas/Admin/Views/' })
-    .pipe(gulp.dest('./../Hood.Core/Areas/Admin/Views/'));
+    .pipe(gulp.dest('./../Hood/Areas/Admin/Views/'));
 });
 
 // Cleans all dist/src/images output folders, as well as the lib/hood/dev dist and lib/hood/src/css folders.

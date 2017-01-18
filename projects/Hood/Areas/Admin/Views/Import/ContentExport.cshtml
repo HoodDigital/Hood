@@ -9,10 +9,10 @@
 }
 @section scripts {
     <environment names="Development,Staging,ErrorTesting">
-        <script src="~/lib/hood/js/includes/io.reporter.js"></script>
+        <script src="~/lib/hood/src/js/includes/io.reporter.js"></script>
     </environment>
     <environment names="Production,PreProduction">
-        <script src="~/lib/hood/js/includes/io.reporter.min.js"></script>
+        <script src="~/lib/hood/dist/js/includes/io.reporter.min.js"></script>
     </environment>
 }
 <div class="row">
@@ -31,7 +31,7 @@
                         Once the file is prepared, a link will also be emailed to the site's default email address: <strong>@_info.Email</strong> [This can be changed in Admin > Settings > Basic Settings]
                     </p>
                     <div id="download" class="alert alert-success m-t-lg">
-                        <h3>Download your file...</h3>
+                        <h5>Download your file...</h5>
                         <p>Your file will expire on <span id="download-expire"></span></p>
                         <p><a id="download-file" class="btn btn-success" target="_blank">Download the file...</a></p>
                     </div>

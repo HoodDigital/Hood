@@ -2,28 +2,17 @@
 @{
     ViewBag.Title = "Website Media";
 }
-<div class="wrapper wrapper-content">
-    <div class="ibox float-e-margins">
-        <div class="ibox-title">
-            <h5>Website Media</h5>
-        </div>
-        <div>
-            <div class="ibox-content">
-                <div class="panel-body">
-                    <strong>Website Media</strong>
-                    <p>
-                        This shows all media uploaded to the site, organised by directory on the left. You can upload new media by selecting the "Upload" tab above...
-                    </p>
-                </div>
-                <div class="panel-body">
-                    @{ await Html.RenderPartialAsync("_Filters"); }
-                </div>
-                <div class="panel-body">
-                    @{ await Html.RenderPartialAsync("_List"); }
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="panel-body">
+    <strong>Website Media</strong>
+    <p>
+        This shows all media uploaded to the site, organised by directory on the left. You can upload new media by selecting the "Upload" tab above...
+    </p>
+</div>
+<div class="panel-body">
+    @{ await Html.RenderPartialAsync("_Filters"); }
+</div>
+<div class="panel-body">
+    @{ await Html.RenderPartialAsync("_List"); }
 </div>
 <script id="media-template" class="kendo-template" type="text/template">
     <div class="forum-item data-item">
@@ -54,7 +43,7 @@
                 </div>
             </div>
             <div class="col-md-2 action-buttons">
-                <a class="btn-danger btn btn-sm action-button delete-media" data-id="${ Id }"><i class="fa fa-trash-o"></i><span>&nbsp;Delete</span></a>           
+                <a class="btn-danger btn btn-sm action-button delete-media" data-id="${ Id }"><i class="fa fa-trash-o"></i><span>&nbsp;Delete</span></a>
             </div>
         </div>
     </div>

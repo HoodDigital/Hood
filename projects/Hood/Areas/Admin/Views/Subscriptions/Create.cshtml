@@ -4,13 +4,13 @@
     Layout = null;
 }
 <div class="sidebar-container">
-    <div class="sidebar-title">
+    <div class="sidebar-title create">
         <button type="button" class="close close-blade"><span>&times;</span></button>
         <h3><i class="fa fa-thumb-tack"></i> Create new subscription.</h3>
-        <small><i class="fa fa-plus-circle"></i> Add a new subscription to the website.</small>
+        <p><i class="fa fa-plus-circle"></i> Add a new subscription to the website.</p>
     </div>
     <form id="create-subscription-form" asp-antiforgery="true" autocomplete="off">
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="Name"></label>
                 <div class="m-b-xs">
@@ -18,7 +18,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="StripeId"></label>
                 <div class="m-b-xs">
@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="Description"></label>
                 <div class="m-b-xs">
@@ -34,7 +34,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="Currency"></label>
                 <div class="m-b-xs">
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="Amount"></label>
                 <div>
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="Interval"></label>
                 <div class="row">
@@ -70,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label" asp-for="TrialPeriodDays"></label>
                 <div>
@@ -78,29 +78,21 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <createField db-field="Public" field-type="switch" field-name="Public" db-value="" />
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <label class="control-label" asp-for="Level"></label>
             <div>
                 <input asp-for="Level" type="number" step="1" min="0" class="form-control" placeholder="Subscription Level" />
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <createField db-field="Addon" field-type="switch" field-name="Addon" db-value="" />
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <button type="button" id="create-subscription-submit" class="btn btn-primary"><i class="fa fa-content-plus"></i> Create subscription</button>
             <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
-        </div>
-        <div class="sidebar-content">
-            <h4>Creating a subscription</h4>
-            <div class="small">
-                <p>
-                    Use this to add a subscription to the website.
-                <p>
-            </div>
         </div>
     </form>
 </div>

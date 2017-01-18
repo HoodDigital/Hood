@@ -3,21 +3,21 @@
     Layout = null;
 }
 <div class="sidebar-container">
-    <div class="sidebar-title">
+    <div class="sidebar-title create">
         <button type="button" class="close close-blade"><span>&times;</span></button>
         <h3><i class="fa fa-thumb-tack"></i> Create new property.</h3>
-        <small><i class="fa fa-plus-circle"></i> Add a new property to the website.</small>
+        <p><i class="fa fa-plus-circle"></i> Add a new property to the website.</p>
     </div>
     <form id="create-property-form" asp-antiforgery="true" autocomplete="off">
         <input id="Latitude" name="cpLatitude" type="hidden">
         <input id="Longitude" name="cpLongitude" type="hidden">
-       <div class="setings-item">
+       <div class="blade-field">
             <createField db-field="cpTitle" field-type="text" field-name="Title" db-value="" />
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <input id="address-autocomplete" onfocus="$.hood.Handlers.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Enter an address..." />
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label">Address</label>
                 <div class="m-b-xs">
@@ -53,10 +53,10 @@
                 </div>
             </div>        
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <input id="Postcode" name="cpPostcode" type="text" class="form-control" value="" placeholder="Postcode">
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="row">
                 <div class="col-xs-6">
                     <createField db-field="cpPublishDate" field-type="date" field-name="Date to publish" db-value="@DateTime.Now.ToShortDateString()" />
@@ -96,7 +96,7 @@
                 </div>
             </div>
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <div class="form-group">
                 <label class="control-label">Create as</label>
                 <div class="">
@@ -107,17 +107,9 @@
                 </div>
             </div>        
         </div>
-        <div class="setings-item">
+        <div class="blade-field">
             <button type="button" id="create-property-submit" class="btn btn-primary"><i class="fa fa-content-plus"></i> Create property</button>
             <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
-        </div>
-        <div class="sidebar-content">
-            <h4>Creating a property</h4>
-            <div class="small">
-                <p>
-                    Use this to add a property to the website. Create as published or a draft. If you leave it as a draft, it will not publish on the given date. If published, it will not appear on the site until after the published date.
-                <p>
-            </div>
         </div>
     </form>
 </div>
