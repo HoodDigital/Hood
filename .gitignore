@@ -244,6 +244,8 @@ ModelManifest.xml
 # Project Ignores
 bower_components/
 /projects/Hood.Web.MVC/Properties/PublishProfiles
+/projects/Hood.Web.MVC/Temporary
+/projects/Hood.Web.MVC/Temporary/*
 
 # Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
 /projects/Hood.Web.MVC/Areas/
@@ -252,9 +254,12 @@ bower_components/
 /projects/Hood.Web.MVC/Views/*
 
 # Ignore all hood wwwroot gulp processed content.
-/projects/Hood.Web.MVC/wwwroot/hood/dist/
-/projects/Hood.Web.MVC/wwwroot/hood/src/
-/projects/Hood.Web.MVC/wwwroot/themes/
+/projects/Hood.Web.MVC/wwwroot/hood/dist
+/projects/Hood.Web.MVC/wwwroot/hood/src
+/projects/Hood.Web.MVC/wwwroot/themes
+/projects/Hood.Web.MVC/wwwroot/hood/dist/*
+/projects/Hood.Web.MVC/wwwroot/hood/src/*
+/projects/Hood.Web.MVC/wwwroot/themes/*
 
 # Ignore the lib directory, for bower_components
 /projects/Hood.Web.MVC/wwwroot/lib/*

@@ -70,7 +70,8 @@ namespace Hood
         /// </summary>
         /// <param name="config">The site's conficuration object. In a default ASP.NET application template this is called Configuration.</param>
         /// <param name="services">The IServiceCollection. Standard parameter of Startup.ConfigureServices().</param>
-        public static void ConfigureServices(IServiceCollection services, IConfigurationRoot config)
+        public static void ConfigureServices<TContext>(IServiceCollection services, IConfigurationRoot config)
+            where TContext : HoodDbContext
         {
             services.AddMvc();
 
@@ -83,7 +84,7 @@ namespace Hood
             // Add framework services.
             if (config.CheckSetup("Installed:DB"))
             {
-                services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
+                services.AddDbContext<TContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
             
 
                 services.AddSingleton<ContentCategoryCache>();
@@ -97,7 +98,7 @@ namespace Hood
                     o.Password.RequireNonAlphanumeric = config["Identity:Password:RequireNonAlphanumeric"].IsSet() ? bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]) : true;
                     o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
                 })
-                .AddEntityFrameworkStores<HoodDbContext>()
+                .AddEntityFrameworkStores<TContext>()
                 .AddDefaultTokenProviders();
 
                 services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
@@ -208,7 +209,8 @@ namespace Hood
         /// <param name="loggerFactory">The ILoggerFactory. Standard parameter of Startup.ConfigureServices().</param>
         /// <param name="config">The IConfigurationRoot. Standard parameter of Startup.ConfigureServices().</param>
         /// <param name="customRoutes">Routes to add to the sites route map. These will be added after the standard HoodCMS routes, but before the standard catch all route {area:exists}/{controller=Home}/{action=Index}/{id?}.</param>
-        public static void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot config, Action<IRouteBuilder> customRoutes = null)
+        public static void Configure<TContext>(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot config, Action<IRouteBuilder> customRoutes = null)
+            where TContext : HoodDbContext
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
@@ -234,10 +236,10 @@ namespace Hood
                 // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859
                 using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
-                    serviceScope.ServiceProvider.GetService<HoodDbContext>().Database.Migrate();
+                    serviceScope.ServiceProvider.GetService<TContext>().Database.Migrate();
                     var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>();
                     var roleManager = app.ApplicationServices.GetService<RoleManager<IdentityRole>>();
-                    serviceScope.ServiceProvider.GetService<HoodDbContext>().EnsureSetup(userManager, roleManager);
+                    serviceScope.ServiceProvider.GetService<TContext>().EnsureSetup(userManager, roleManager);
                 }
             }
 

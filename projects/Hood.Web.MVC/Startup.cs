@@ -18,13 +18,13 @@ namespace Hood.Web.MVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            HoodStartup.ConfigureServices(services, _config);
+            HoodStartup.ConfigureServices<ApplicationDbContext>(services, _config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            HoodStartup.Configure(app, env, loggerFactory, _config, customRoutes => { });
+            HoodStartup.Configure<ApplicationDbContext>(app, env, loggerFactory, _config, customRoutes => { });
         }
     }
 }

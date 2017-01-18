@@ -6,7 +6,7 @@ namespace Hood.Models
     public class HoodDbContext : IdentityDbContext<ApplicationUser>
     {
 
-        public HoodDbContext(DbContextOptions<HoodDbContext> options)
+        public HoodDbContext(DbContextOptions options)
             : base(options)
         {
         }
