@@ -69,7 +69,7 @@ namespace Hood.Services
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
         private AccountInfo Account { get; set; }
-        private HoodDbContext _db { get; set; }
+        private DefaultHoodDbContext _db { get; set; }
         private bool _killFlag;
 
         public bool RunUpdate(HttpContext context)
@@ -97,9 +97,9 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _settings = _site.GetPropertySettings();
                 // Get a new instance of the HoodDbContext for this import.
-                var options = new DbContextOptionsBuilder<HoodDbContext>();
+                var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
                 options.UseSqlServer(_config["Data:ConnectionString"]);
-                _db = new HoodDbContext(options.Options);
+                _db = new DefaultHoodDbContext(options.Options);
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(ImportFromFTP);

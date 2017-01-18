@@ -85,7 +85,7 @@ namespace Hood
             if (config.CheckSetup("Installed:DB"))
             {
                 services.AddDbContext<TContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
-            
+                services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
 
                 services.AddSingleton<ContentCategoryCache>();
 
@@ -98,7 +98,7 @@ namespace Hood
                     o.Password.RequireNonAlphanumeric = config["Identity:Password:RequireNonAlphanumeric"].IsSet() ? bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]) : true;
                     o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
                 })
-                .AddEntityFrameworkStores<TContext>()
+                .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
 
                 services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
@@ -158,7 +158,7 @@ namespace Hood
                             Location = ResponseCacheLocation.Client,
                             Duration = 2629000
                         });
-                    options.CacheProfiles.Add("Week", 
+                    options.CacheProfiles.Add("Week",
                         new CacheProfile
                         {
                             Location = ResponseCacheLocation.Client,
@@ -239,7 +239,10 @@ namespace Hood
                     serviceScope.ServiceProvider.GetService<TContext>().Database.Migrate();
                     var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>();
                     var roleManager = app.ApplicationServices.GetService<RoleManager<IdentityRole>>();
-                    serviceScope.ServiceProvider.GetService<TContext>().EnsureSetup(userManager, roleManager);
+                    var options = new DbContextOptionsBuilder<HoodDbContext>();
+                    options.UseSqlServer(config["Data:ConnectionString"]);
+                    var db = new HoodDbContext(options.Options);
+                    db.EnsureSetup(userManager, roleManager);
                 }
             }
 
@@ -270,14 +273,14 @@ namespace Hood
 
             if (!config.CheckSetup("Installed"))
             {
-               app.UseMvc(routes =>
-                {
-                    routes.MapRoute(
-                        name: "SiteNotInstalled",
-                        template: "{*url}",
-                        defaults: new { controller = "Install", action = "Install" }
-                    );
-                });
+                app.UseMvc(routes =>
+                 {
+                     routes.MapRoute(
+                         name: "SiteNotInstalled",
+                         template: "{*url}",
+                         defaults: new { controller = "Install", action = "Install" }
+                     );
+                 });
             }
             else
             {

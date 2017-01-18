@@ -38,9 +38,9 @@ namespace Hood.Models
 
         public void ResetCache()
         {
-            var options = new DbContextOptionsBuilder<HoodDbContext>();
+            var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
             options.UseSqlServer(_config["Data:ConnectionString"]);
-            var db = new HoodDbContext(options.Options);
+            var db = new DefaultHoodDbContext(options.Options);
             byKey = new Lazy<Dictionary<int, ContentCategory>>(() => db.ContentCategories.ToDictionary(c => c.ContentCategoryId));
 
             ContentSettings contentSettings = _settings.GetContentSettings();

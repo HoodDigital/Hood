@@ -1,6 +1,6 @@
 {
     "name": "Hood.Web.MVC",
-    "version": "1.0.0-preview3",
+    "version": "1.0.0-preview2",
     "userSecretsId": "Hood.Web.MVC",
     "dependencies": {
         "Hood": "1.0.0-preview2",

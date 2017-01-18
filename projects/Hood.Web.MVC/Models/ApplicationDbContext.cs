@@ -9,21 +9,21 @@ namespace Hood.Web.MVC
 {
     public class ApplicationDbContext : HoodDbContext
     {
-        public ApplicationDbContext(DbContextOptions options)
+        public ApplicationDbContext(DbContextOptions<HoodDbContext> options)
             : base(options)
         {
         }
 
-        // Application Specific Datasets go here
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
+            DbContextExtensions.ConfigureForHood(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            // Application Specific model setup goes here
+            DbContextExtensions.CreateHoodModels(builder);
         }
     }
 }
