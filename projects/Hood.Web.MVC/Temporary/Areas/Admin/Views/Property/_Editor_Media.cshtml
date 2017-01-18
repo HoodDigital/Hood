@@ -1,0 +1,54 @@
+@model PropertyListingApi
+@inject IContentRepository _data
+@inject ISiteConfiguration _site
+@{
+    PropertySettings _settings = _site.GetPropertySettings();
+}
+<div id="media" class="tab-pane">
+    <div class="panel-body">
+        <h5>Attached Images</h5>
+        <hr />
+        <div id="gallery-actions" class="row">
+            <div class="col-xs-12">
+                <span class="btn btn-success" id="property-gallery-add">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                </span>
+            </div>
+            <div class="col-xs-12">
+                <div class="fileupload-process m-t-sm">
+                    <div id="gallery-total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="opacity: 0;">
+                        <div class="progress-bar progress-bar-dark" style="width:0%;" data-dz-uploadprogress=""></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="property-gallery-upload" class="media-upload text-center" data-id="@Model.Id">
+        </div>
+        <div class="hood-inline refresh gallery" data-url="@Url.Action("EditorGallery")">
+            @{ await Html.RenderPartialAsync("EditorGallery"); }
+        </div>    
+        <h5>Attached FloorPlans</h5>
+        <hr />
+        <div id="floorplans-actions" class="row">
+            <div class="col-xs-12">
+                <span class="btn btn-success" id="property-floorplans-add">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                </span>
+            </div>
+            <div class="col-xs-12">
+                <div class="fileupload-process m-t-sm">
+                    <div id="floorplans-total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="opacity: 0;">
+                        <div class="progress-bar progress-bar-dark" style="width:0%;" data-dz-uploadprogress=""></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="property-floorplans-upload" class="media-upload text-center" data-id="@Model.Id">
+        </div>
+        <div class="hood-inline refresh floorplans" data-url="@Url.Action("EditorFloorplans")">
+            @{ await Html.RenderPartialAsync("EditorFloorplans"); }
+        </div>
+    </div>
+</div>

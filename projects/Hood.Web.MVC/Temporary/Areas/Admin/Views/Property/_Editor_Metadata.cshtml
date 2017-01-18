@@ -1,0 +1,48 @@
+@model PropertyListingApi
+@inject IContentRepository _data
+@inject ISiteConfiguration _site
+@{
+    PropertySettings _settings = _site.GetPropertySettings();
+}
+<div id="meta" class="tab-pane">
+    <div class="panel-body">
+        <h5>Attached Metadata (System use only)</h5>
+        <hr />
+        @if (Model.Meta != null)
+        {
+            <dl class="dl-horizontal">
+                @foreach (var meta in Model.Meta.Where(m => !m.Name.Contains("FloorPlan")).OrderBy(m => m.Name))
+                {
+                    <dt>@meta.Name</dt>
+                    switch (meta.Type)
+                    {
+                        case "System.DateTime":
+                            DateTime val = DateTime.Now;
+                            if (!DateTime.TryParse(meta.Value, out val))
+                            {
+                                val = DateTime.Now;
+                            }
+                            <dd>@val.ToLongDisplay()</dd>
+                            break;
+
+                        case "System.Boolean":
+                            @if (Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(meta.Value))
+                            {
+                                <dd>Yes</dd>
+                            }
+                            else
+                            {
+                                <dd>No</dd>
+                            }
+                            break;
+
+                        default:
+                            <dd>@meta.Value</dd>
+                            break;
+
+                    }
+                }
+            </dl>
+        }
+    </div>
+</div>

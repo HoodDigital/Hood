@@ -1,0 +1,12 @@
+@{ 
+    Layout = null;
+}
+<ul class="nav nav-pills nav-stacked">
+    <li role="presentation" class="active"><a class="click-select media-click" data-toggle="pill" data-target="media-directory" data-value="">All Directories</a></li>
+    @{
+        foreach (string s in Model.Directories)
+        {
+            <li><a class="click-select media-click" data-toggle="pill" data-target="media-directory" data-value="@s">@s</a></li>
+        }
+    }
+</ul>

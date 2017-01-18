@@ -1,0 +1,88 @@
+@{
+    ViewBag.Title = "Website Users";
+}
+@section buttons {
+    <button class="btn btn-primary create-user"><i class="fa fa-user-plus m-r-sm"></i>Create New User</button>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="wrapper wrapper-content">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-4">
+                            <select class="form-control manage-users-change" name="manage-users-sort" id="manage-users-sort">
+                                <option value="DateDesc">Newest First</option>
+                                <option value="Date">Oldest First</option>
+                                <option value="LastLogOn">By Log in time</option>
+                                <option value="UserName">By Username (A-Z)</option>
+                                <option value="UserNameDesc">By Username (Z-A)</option>
+                                <option value="Email">By Email (A-Z)</option>
+                                <option value="EmailDesc">By Email (Z-A)</option>
+                                <option value="LastName">By Last Name (A-Z)</option>
+                                <option value="LastNameDesc">By Last Name (Z-A)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control manage-users-change" name="manage-users-role" id="manage-users-role">
+                                <option value="">All Users</option>
+                                <option value="Admin">Administrator</option>
+                                <option value="CMS">CMS Access</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input name="manage-users-search" id="manage-users-search" type="text" placeholder="Search" class="form-control">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary manage-users-click"> Search!</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="project-list">
+                        <div id="manage-users-list" class="border-box-sizing"
+                             data-url="/admin/users/get"
+                             data-template="#manage-users-template"
+                             data-pagers=".manage-users-pager"
+                             data-filters="$.hood.Users.Manage.Filter()"
+                             data-onclick=".refresh-users"></div>
+                        <div class="manage-users-pager text-center m-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="manage-users-template" class="kendo-template">
+    <div class="forum-item data-item">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <figure class="img-xs media-${ Id } hood-image" style="background-image:url(${ Avatar.ThumbUrl });">
+                            <img src="${ Avatar.ThumbUrl }" alt="">
+                        </figure>
+                    </div>
+                    <div class="media-body">
+                        <a class="forum-item-title" href="/admin/users/edit/${ Id }">${ UserName } <small>${ FirstName } ${ LastName }</small></a>
+                        <small>Last logged in from <strong>${ LastLoginLocation }</strong> <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(LastLogOn), "ddd d, MMMM yyyy at hh:mm tt") #</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <span class="small font-bold">User Roles</span>
+                <div class="tag-list">
+                    <span class="tag-item">General</span>
+                    <span class="tag-item">License</span>
+                    <span class="tag-item">CC</span>
+                </div>
+            </div>
+            <div class="col-md-2 action-buttons">
+                <action hood-id="${ Id }" hood-type="users" hood-action="edit"></action>
+                <action hood-id="${ Id }" hood-type="user" hood-action="delete"></action>
+            </div>
+        </div>
+    </div>
+</div>

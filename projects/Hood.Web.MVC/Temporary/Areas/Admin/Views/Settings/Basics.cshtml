@@ -1,0 +1,172 @@
+@model BasicSettings
+@{
+    Layout = "_SettingsLayout";
+    ViewData["Title"] = "Site Basic Settings";
+}
+@section buttons {
+    <a asp-action="ResetBasics" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
+@section description {
+    <p>
+        Here you can set up the basic key settings for the site. NOTE: If you are using your site for commercial purposes it is a requirement that you include a contact address and phone number in your terms and conditions.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#basics">Basics</a></li>
+        <li><a data-toggle="tab" href="#address">Address</a></li>
+        <li><a data-toggle="tab" href="#owner">Owner</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="basics" class="tab-pane active">
+            <div class="panel-body">
+                <strong>Basic Information, Titles &amp; Site name</strong>
+                <p>
+                    If you use your website for commercial purposes, it is good practice to include a contact name and address in your terms and conditions. However this is not required, and if you leave it blank, this will not appear.
+                </p>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label" asp-for="SiteTitle"></label>
+                    <div>
+                        <input asp-for="SiteTitle" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="Description"></label>
+                    <div>
+                        <input asp-for="Description" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="CompanyName"></label>
+                    <div>
+                        <input asp-for="CompanyName" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Phone"></label>
+                            <div>
+                                <input asp-for="Phone" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Email"></label>
+                            <div>
+                                <input asp-for="Email" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="address" class="tab-pane">
+            <div class="panel-body">
+                <strong>Site Address</strong>
+                <p>
+                    If you use your website for commercial purposes, it is good practice to include a contact name and address in your terms and conditions. However this is not required, and if you leave it blank, this will not appear.
+                </p>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label" asp-for="Address.Address1"></label>
+                    <div>
+                        <input asp-for="Address.Address1" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="Address.Address2"></label>
+                    <div>
+                        <input asp-for="Address.Address2" class="form-control">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Address.City"></label>
+                            <div>
+                                <input asp-for="Address.City" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Address.County"></label>
+                            <div>
+                                <input asp-for="Address.County" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Address.Country"></label>
+                            <div>
+                                <input asp-for="Address.Country" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="Address.Postcode"></label>
+                            <div>
+                                <input asp-for="Address.Postcode" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="owner" class="tab-pane">
+            <div class="panel-body">
+                <strong>Site Owner</strong>
+                <p>
+                    If you use your website for commercial purposes, it is good practice to include a contact name and address in your terms and conditions. However this is not required, and if you leave it blank, this will not appear.
+                </p>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="OwnerFirstName"></label>
+                            <div>
+                                <input asp-for="OwnerFirstName" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="OwnerLastName"></label>
+                            <div>
+                                <input asp-for="OwnerLastName" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="OwnerPhone"></label>
+                            <div>
+                                <input asp-for="OwnerPhone" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" asp-for="OwnerMobile"></label>
+                            <div>
+                                <input asp-for="OwnerMobile" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

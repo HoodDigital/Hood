@@ -71,7 +71,7 @@ gulp.task('less', ['less:src'], function () {
 });
 
 // Processes less and saves the outputted css MINIFIED to the dist directories.
-gulp.task('less:src', function () {
+gulp.task('less:src', ['less:copy'], function () {
     return gulp
         .src(hood.less + '*.less', { base: hood.less })
         .pipe(sourcemaps.init({ largeFile: true }))

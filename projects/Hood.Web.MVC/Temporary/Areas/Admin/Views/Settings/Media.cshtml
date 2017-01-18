@@ -1,0 +1,39 @@
+@model MediaSettings
+@{
+    ViewData["Title"] = "Media Settings";
+    Layout = "_SettingsLayout";
+}
+@section buttons {
+    <a asp-action="ResetMedia" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
+@section description {
+    <p>
+        Settings for uploading media to the site.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#billing">Media Settings</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="billing" class="tab-pane active">
+            <div class="panel-body">
+                <strong>Media Settings</strong>
+                <p>
+                    Settings for uploading media to the site.
+                </p>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label asp-for="AzureKey"></label>
+                    <input asp-for="AzureKey" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label asp-for="ContainerName"></label>
+                    <input asp-for="ContainerName" class="form-control">
+                    <small>Note: This is the container (folder) name that the site will use to store media uploads on your Azure Storage account.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+@model IMetadata
+@{
+    string name = Model.Name.Split('.')[Model.Name.Split('.').Length - 2];
+    string type = Model.Name.Split('.')[Model.Name.Split('.').Length - 1];
+}
+<div class="form-group">
+    <label for="@string.Format("Meta:{0}", Model.Name)" class="col-sm-3 control-label">
+        @name.ToSentenceCase().ToTitleCase()<br /><em class="text-muted">@type.ToSentenceCase()</em>
+    </label>
+    <div class="col-sm-9">
+        @switch (type)
+        {
+
+            case "MultiLine":
+                <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control">@Model.GetStringValue()</textarea>
+                break;
+            case "Body":
+            case "WYSIWYG":
+                <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control tinymce-simple">@Model.GetStringValue()</textarea>
+                break;
+            case "Url":
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" />
+                break;
+            case "Email":
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="email" value="@Model.GetStringValue()" class="form-control" />
+                break;
+            case "Number":
+            case "Integer":
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="number" step="1" value="@Model.GetStringValue()" class="form-control" />
+                break;
+            case "Currency":
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="number" step="0.01" value="@Model.GetStringValue()" class="form-control" />
+                break;
+            case "AltText":
+            case "Title":
+            case "Text":
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" placeholder="" />
+                break;
+            case "Icon":
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" />
+                    break;
+            case "Avatar":
+            case "Image":
+            case "ImageUrl":
+            case "Picture":
+            case "PictureUrl":
+                <div class="row image-cell">
+                    <div class="col-xs-1">
+                        <img src="@(Model.GetStringValue().IsSet() ? Model.GetStringValue() : "/lib/hood/images/no-image.jpg")" class="img-xxs img-circle @string.Format("Meta-{0}", Model.Name).ToSeoUrl()" />
+                    </div>
+                    <div class="col-xs-11">
+                        <div class="input-group">
+                            <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="url" value="@Model.GetStringValue()" class="form-control @string.Format("Meta-{0}", Model.Name).ToSeoUrl()" placeholder="Enter a url..." />
+                            <span class="input-group-btn">
+                                <button class="btn btn-default hood-image-set" data-target=".@string.Format("Meta-{0}", Model.Name).ToSeoUrl()" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                break;
+            case "FileUrl":
+            case "MediaUrl":
+            case "File":
+            case "Media":
+                <div class="input-group">
+                    <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="url" value="@Model.GetStringValue()" class="form-control" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default hood-file" data-target="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" data-restrict="all" type="button"><i class="fa fa-file"></i></button>
+                    </span>
+                </div>
+                break;
+
+            case "DateTime":
+                DateTime val = DateTime.Now;
+                if (!DateTime.TryParse(Model.GetStringValue(), out val))
+                {
+                    val = DateTime.Now;
+                }
+                <div class="hood-date row">
+                    <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="hidden" value="@val.ToString()" class="date-output" />
+                    <div class="col-xs-6">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            <input type="text" value="@val.ToShortDateString()" class="form-control datepicker inline-date date-value" data-field="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" />
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="input-group time">
+                            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+                            <select data-selected="@val.Hour.ToString("00")" class="form-control inline-time hour-value" data-field="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()">
+                                @for (int i = 0; i < 24; i++)
+                                {
+                                    <option value="@i.ToString("00")">@i.ToString("00")</option>
+                                }
+                            </select>
+                            <select data-selected="@val.Minute.ToString("00")" class="form-control inline-time minute-value" data-field="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()">
+                                @for (int i = 0; i < 60; i++)
+                                {
+                                    <option value="@i.ToString("00")">@i.ToString("00")</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                break;
+
+            case "Boolean":
+                <select id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" data-selected="@Model.GetStringValue()" class="form-control">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                break;
+
+            default:
+                <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" />
+                break;
+
+        }
+    </div>
+</div>

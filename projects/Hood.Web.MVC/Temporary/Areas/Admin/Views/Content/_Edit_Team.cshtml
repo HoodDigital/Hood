@@ -1,0 +1,84 @@
+@model EditContentModel
+<div class="tabs-container m-b-lg">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> @Model.Content.ContentType.ToTitleCase() Info</a></li>
+        @{await Html.RenderPartialAsync("_Editor_Meta_Tabs"); }
+    </ul>
+    <div class="tab-content">
+        <div id="info" class="tab-pane active">
+            <div class="panel-body">
+                @{await Html.RenderPartialAsync("_Editor_Titles"); }
+                <h5>Contact &amp; Job Info</h5>
+                <div class="ibox-content">
+                    <fieldset class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">E-Mail Address:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.Email").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.Email")" type="text" value="@Model.Content.GetMeta("Content.Team.Email").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Job Title:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.JobTitle").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.JobTitle")" type="text" value="@Model.Content.GetMeta("Content.Team.JobTitle").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Phone:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.Phone").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.Phone")" type="text" value="@Model.Content.GetMeta("Content.Team.Phone").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Mobile:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.Mobile").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.Mobile")" type="text" value="@Model.Content.GetMeta("Content.Team.Mobile").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <h5>Social Media</h5>
+                <div class="ibox-content">
+                    <fieldset class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Twitter:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.Twitter").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.Twitter")" type="text" value="@Model.Content.GetMeta("Content.Team.Twitter").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">LinkedIn:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.LinkedIn").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.LinkedIn")" type="text" value="@Model.Content.GetMeta("Content.Team.LinkedIn").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Facebook:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.Facebook").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.Facebook")" type="text" value="@Model.Content.GetMeta("Content.Team.Facebook").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">GooglePlus:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.GooglePlus").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.GooglePlus")" type="text" value="@Model.Content.GetMeta("Content.Team.GooglePlus").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <h5>Settings</h5>
+                <div class="ibox-content">
+                    <fieldset class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Display Order:</label>
+                            <div class="col-sm-9">
+                                <input id="@string.Format("Meta:{0}", "Content.Team.DisplayOrder").ToSeoUrl()" name="@string.Format("Meta:{0}", "Content.Team.DisplayOrder")" type="number" step="1" value="@Model.Content.GetMeta("Content.Team.DisplayOrder").GetStringValue()" class="form-control" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        @{await Html.RenderPartialAsync("_Editor_Meta_TabContent"); }
+    </div>
+</div>
