@@ -270,3 +270,6 @@ bower_components/
 /projects/Hood.Web.MVC/wwwroot/lib/hood/dist/*
 /projects/Hood.Web.MVC/wwwroot/lib/hood/src/css/*
 
+/projects/Hood.Web.MVC/wwwroot/js/site.packaged.js
+/projects/Hood.Web.MVC/wwwroot/js/site.min.js
+/projects/Hood.Web.MVC/wwwroot/css

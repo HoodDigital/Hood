@@ -2,38 +2,23 @@
     $.hood = {};
 $.hood.App.Extensions = {
     Ready: function () {
-        $.hood.App.Init({
-            OwlCarousel: {
-                Enabled: true
-            }
-        });
+        // Init the hood js app with default settings.
+        $.hood.App.Init();
+
+        // Call the resize function.
         $.hood.App.Extensions.Resize();
-    },
-    InitCarousels: function () {
-        $('.property-mini-carousel').owlCarousel({
-            loop: true,
-            margin: 2,
-            nav: true,
-            responsive: {
-                0: {
-                    items: 1
-                },
-                600: {
-                    items: 3
-                },
-                1000: {
-                    items: 5
-                }
-            }
-        })
+
+        // Add further ready time functionality here.
     },
     Load: function () {
-        $.hood.App.Extensions.InitCarousels();
+        // Add any load time functionality here.
     },
-
     Resize: function () {
+        // Add any resize functionality here.
     }
 }
+
+// Variables for the $.hood.App
 $.window = $(window),
 $.wrapper = $('#wrapper'),
 $.header = $('#header'),
@@ -49,6 +34,8 @@ retinaLogoImg = retinaLogo.find('img').attr('src'),
 defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
 retinaDarkLogo = retinaLogo.attr('data-dark-logo');
 $.background = $('#site-background-image');
+
+// Initialise $.hood.App
 $(document).ready($.hood.App.Extensions.Ready);
 $(document).load($.hood.App.Extensions.Load);
 $(window).resize($.hood.App.Resize);

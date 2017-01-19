@@ -14,6 +14,7 @@ var gulp = require("gulp"),
     stripCss = require('gulp-strip-css-comments'),
     stripJs = require('gulp-strip-comments'),
     sourcemaps = require('gulp-sourcemaps'),
+    lib = './wwwroot/lib/',
     hood = {
         lib: './wwwroot/lib/hood/src/',
         js: './wwwroot/lib/hood/src/js/',
@@ -134,5 +135,159 @@ gulp.task('images', function () {
     .pipe(gulp.dest(output.images));
 });
 
+// Bundle the app into the packaged form, so sites can use the app.packaged.js file.
+gulp.task("js:package:app", function () {
+    l = uglify({});
+    l.on('error', function (e) {
+        console.log(e);
+        l.end();
+    });
+    return gulp.src([
+        lib + 'FitVids/jquery.fitvids.js',
+        hood.js + "includes/globals.js",
+        hood.js + "includes/stringhelpers.js",
+        hood.js + "includes/alerts.js",
+        hood.js + "includes/helpers.js",
+        hood.js + "includes/forms.js",
+        hood.js + "includes/handlers.js",
+        hood.js + "includes/pager.js",
+        hood.js + "includes/validator.js",
+        hood.js + "includes/modals.js",
+        hood.js + "includes/inline.js",
+        hood.js + "includes/addresses.js",
+        hood.js + "includes/cart.js",
+        hood.js + "app.js"
+    ], { base: '.' })
+    .pipe(concat('app.packaged.js'))
+    .pipe(l)
+    .pipe(gulp.dest(output.dist + 'js/'))
+    .pipe(gulp.dest(hood.dist + 'js/'));
+});
+
+// Package the login javascript
+gulp.task("js:package:login", function () {
+    l = uglify({});
+    l.on('error', function (e) {
+        console.log(e);
+        l.end();
+    });
+    return gulp.src([
+        lib + 'jquery/dist/jquery.min.js',
+        lib + 'jquery-validation/dist/jquery.validate.min.js',
+        lib + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
+        lib + 'bootstrap/dist/js/bootstrap.min.js',
+        hood.js + 'login.js'
+    ], { base: '.' })
+    .pipe(concat('login.packaged.js'))
+    .pipe(l)
+    .pipe(gulp.dest(output.dist + 'js/'))
+    .pipe(gulp.dest(hood.dist + 'js/'));
+});
+
+// Package the admin Javascript
+gulp.task("js:package:admin", function () {
+    l = uglify({});
+    l.on('error', function (e) {
+        console.log(e);
+        l.end();
+    });
+    return gulp.src([
+        hood.js + "includes/globals.js",
+        hood.js + "includes/stringhelpers.js",
+        hood.js + "includes/uploader.js",
+        hood.js + "includes/alerts.js",
+        hood.js + "includes/helpers.js",
+        hood.js + "includes/forms.js",
+        hood.js + "includes/handlers.js",
+        hood.js + "includes/datalist.js",
+        hood.js + "includes/fileupload.js",
+        hood.js + "includes/observable.js",
+        hood.js + "includes/pager.js",
+        hood.js + "includes/validator.js",
+        hood.js + "includes/skininit.js",
+        hood.js + "includes/blades.js",
+        hood.js + "includes/modals.js",
+        hood.js + "includes/inline.js",
+        hood.js + "includes/core.js",
+        hood.js + "includes/media.js",
+        hood.js + "includes/options.js",
+        hood.js + "includes/users.js",
+        hood.js + "includes/themes.js",
+        hood.js + "includes/property.js",
+        hood.js + "includes/subscriptions.js",
+        hood.js + "includes/content.js",
+        hood.js + "admin.js"
+    ], { base: '.' })
+    .pipe(concat('admin.packaged.js'))
+    .pipe(l)
+    .pipe(gulp.dest(output.dist + 'js/'))
+    .pipe(gulp.dest(hood.dist + 'js/'));
+});
+
 // The build function, copies all less, processes less, copies and processes js, files and images
-gulp.task("build", ['less', 'js', 'files', 'images']);
+gulp.task("package", ['js:package:admin', 'js:package:app', 'js:package:login']);
+gulp.task("build", ['less', 'js', 'files', 'images', 'package']);
+
+// Site gulpage
+jsFolder = './wwwroot/js/',
+cssFolder = './wwwroot/css/',
+lessFolder = './wwwroot/less/';
+libFolder = './wwwroot/lib/';
+hoodFolder = './wwwroot/lib/hood/';
+
+gulp.task('site:clean', function (cb) {
+    return gulp.src([
+        jsFolder + '*.min.js',
+        jsFolder + '*.packaged.js',
+        cssFolder
+    ], { read: false })
+    .pipe(rimraf({ force: true }));
+});
+gulp.task('site:less', ['site:less:src'], function () {
+    return gulp
+        .src(lessFolder + 'site.less')
+        .pipe(sourcemaps.init({ largeFile: true }))
+        .pipe(less({ relativeUrls: true }))
+        .pipe(stripCss({ preserve: false }))
+        .pipe(cssmin())
+        .pipe(rename({ suffix: ".min" }))
+        .pipe(sourcemaps.write("/"))
+        .pipe(gulp.dest(cssFolder));
+});
+gulp.task('site:less:src', function () {
+    return gulp
+        .src(lessFolder + 'site.less')
+        .pipe(sourcemaps.init({ largeFile: true }))
+        .pipe(less({ relativeUrls: true }))
+        .pipe(sourcemaps.write("/"))
+        .pipe(gulp.dest(cssFolder));
+});
+gulp.task('site:js', function () {
+    l = uglify({});
+    l.on('error', function (e) {
+        console.log(e);
+        l.end();
+    });
+    return gulp
+        .src(jsFolder + 'site.js')
+        .pipe(l)
+        .pipe(rename({ suffix: ".min" }))
+        .pipe(gulp.dest(jsFolder));
+});
+
+gulp.task('site:js:package', function () {
+    return gulp.src([
+        libFolder + 'jquery/dist/jquery.min.js',
+        libFolder + 'jquery-validation/dist/jquery.validate.min.js',
+        libFolder + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
+        libFolder + 'bootstrap/dist/js/bootstrap.min.js',
+        jsFolder + 'site.min.js',
+    ])
+    .pipe(concat('site.packaged.js'))
+    .pipe(gulp.dest(jsFolder))
+    .pipe(stripJs())
+    .pipe(gulp.dest(jsFolder));
+});
+// TODO: Add themes less/js processing.
+
+gulp.task("publish", ['site:less', 'site:js', 'site:js:package']);
