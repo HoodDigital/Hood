@@ -3,7 +3,7 @@
     "version": "1.0.0-preview3",
     "userSecretsId": "Hood.Web.MVC",
     "dependencies": {
-        "Hood": "1.0.0-preview2",
+        "Hood": "1.0.0-preview3",
         "Microsoft.AspNetCore.Diagnostics": "1.1.0",
         "Microsoft.AspNetCore.Server.IISIntegration": "1.1.0",
         "Microsoft.AspNetCore.Server.Kestrel": "1.1.0",

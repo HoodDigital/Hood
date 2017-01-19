@@ -732,7 +732,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             else
             {
-                template = EmbeddedFiles.ReadAllText("~/Core/Views/" + folder + "/" + templateName + ".cshtml");
+                template = EmbeddedFiles.ReadAllText("~/Views/" + folder + "/" + templateName + ".cshtml");
             }
 
             // pull out any instance of @TemplateData["XXX"]
@@ -802,7 +802,7 @@ namespace Hood.Areas.Admin.Controllers
             List<string> templates = new List<string>();
 
             // Add the base templates:
-            foreach (string temp in EmbeddedFiles.GetFiles("~/Core/Views/" + templateDirectory + "/"))
+            foreach (string temp in EmbeddedFiles.GetFiles("~/Views/" + templateDirectory + "/"))
             {
                 if (temp.EndsWith(".cshtml"))
                     templates.Add(Path.GetFileNameWithoutExtension(temp).TrimStart('_'));
