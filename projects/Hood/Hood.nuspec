@@ -11,8 +11,8 @@
     <iconUrl>https://hood.blob.core.windows.net/hood/nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>First release.</releaseNotes>
-    <copyright>Copyright 2017</copyright>
-    <tags>cms application app aspnet EntityFramework hood bootstrap jquery</tags>
+    <releaseNotes></releaseNotes>
+    <copyright>2017 Hood Digital</copyright>
+    <tags>ASP.NET MVC EntityFramework cms hood bootstrap jquery</tags>
   </metadata>
 </package>
