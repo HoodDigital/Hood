@@ -23,6 +23,8 @@ namespace Hood.Models
         // Site Address
         [Display(Name = "Site Title")]
         public string SiteTitle { get; set; }
+        [Display(Name = "Site Title")]
+        public int? Homepage { get; set; }
 
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; }

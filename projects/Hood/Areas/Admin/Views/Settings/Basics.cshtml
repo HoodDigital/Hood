@@ -1,4 +1,5 @@
 @model BasicSettings
+@inject IContentRepository _content
 @{
     Layout = "_SettingsLayout";
     ViewData["Title"] = "Site Basic Settings";
@@ -36,6 +37,21 @@
                     <label class="control-label" asp-for="Description"></label>
                     <div>
                         <input asp-for="Description" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="Homepage"></label>
+                    <div>
+                        <select asp-for="Homepage" class="form-control">
+                            <option value="">Default Homepage</option>
+                            @{ 
+                                var pages = _content.GetPages();
+                            }
+                            @foreach (var page in pages)
+                            {
+                                <option value="@page.PageId">@page.Title</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">

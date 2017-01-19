@@ -185,7 +185,7 @@ namespace Hood.Services
                     query = query.Where(c => c.Status == (int)Status.Published);
                 }
                 content = query.ToList();
-                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromSeconds(60)));
+                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
             }
             return content;
         }
@@ -325,7 +325,7 @@ namespace Hood.Services
                     query = query.Where(c => c.Categories.Any(cat => cat.Category.Slug == categorySlug));
                 }
                 content = query.OrderByDescending(p => p.PublishDate).Take(10).ToList();
-                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
         }
@@ -349,7 +349,7 @@ namespace Hood.Services
                     query = query.Where(c => c.Categories.Any(cat => cat.Category.Slug == categorySlug));
                 }
                 content = query.PickRandom(10).ToList();
-                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
         }
@@ -367,7 +367,7 @@ namespace Hood.Services
                 neighbours = new ContentNeighbours();
                 neighbours.Next = all.ElementAtOrDefault(index + 1);
                 neighbours.Previous = all.ElementAtOrDefault(index - 1);
-                _cache.Set(cacheKey, neighbours, new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Set(cacheKey, neighbours, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }
             return neighbours;
         }

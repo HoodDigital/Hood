@@ -300,13 +300,13 @@ namespace Hood
                     routes.MapRoute(
                         name: "ContentCheck",
                         template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
-                        defaults: new { controller = "Content", action = "Show" });
-
-                    customRoutes?.Invoke(routes);
+                        defaults: new { controller = "Home", action = "Show" });
 
                     routes.MapRoute(
                         name: "areaRoute",
                         template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+                    customRoutes?.Invoke(routes);
 
                     routes.MapRoute(
                         name: "default",

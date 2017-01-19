@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Hood.Services;
+using Hood.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -17,8 +19,12 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IAuthenticationRepository _auth;
         private readonly IRazorViewRenderer _renderer;
         private readonly IEmailSender _email;
+        private readonly ContentCategoryCache _categories;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public HomeController(IAuthenticationRepository auth,
+                              ContentCategoryCache categories,
+                              UserManager<ApplicationUser> userManager,
                               IConfiguration conf,
                               IHostingEnvironment env,
                               ISiteConfiguration site,
@@ -33,6 +39,8 @@ namespace Hood.Areas.Admin.Controllers
             _site = site;
             _renderer = renderer;
             _email = email;
+            _categories = categories;
+            _userManager = userManager;
         }
 
         [Route("admin/")]
