@@ -234,6 +234,10 @@ $.hood.App = {
                 $('body nav.primary > ul input, .top-links > ul input, body nav.primary > ul select, .top-links > ul select, body nav.primary > ul textarea, .top-links > ul input textarea, body nav.primary > ul .keep-open, .top-links > ul .keep-open').on('click', function (e) {
                     e.stopPropagation();
                 });
+                $('a.sf-with-ul[href]').click(function () {
+                    if ($(this).parents('.sfHover').length)
+                        window.location = $(this).attr('href');
+                })
             }
         },
         Invert: function () {
