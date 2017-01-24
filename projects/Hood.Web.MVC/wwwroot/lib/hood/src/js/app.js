@@ -515,7 +515,6 @@ $.hood.App = {
     Colorbox: function () {
         $.hood.App.Loader.AddItem('colorbox');
         $.getScript('/lib/colorbox/jquery.colorbox-min.js', $.proxy(function () {
-            $.loadCss('colorbox-css', '/lib/hood/css/colorbox.min.css');
             $(".colorbox").colorbox({
                 rel: 'gallery',
                 maxWidth: "95%",
