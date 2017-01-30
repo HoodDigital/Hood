@@ -78,7 +78,8 @@ $.hood.App = {
     Init: function (options) {
         $.hood.App.Options = $.extend($.hood.App.Options, options || {});
         $.hood.App.Loader.Init();
-        $.hood.App.Header.Init();
+        if ($.hood.App.Options.Header.Enabled)
+            $.hood.App.Header.Init();
         $.hood.App.Accordion();
         $.hood.App.Counters();
         $.hood.App.Scroll.Init();
@@ -436,11 +437,11 @@ $.hood.App = {
                 $form = $(this);
                 $.post($form.attr('action'), $form.serialize(), function (data) {
                     if (data.Success) {
-                        if ($form.attr('data-redirect').length > 0)
+                        if (typeof ($form.attr('data-redirect')) != 'undefined')
                             window.location = $form.attr('data-redirect');
 
-                        if ($form.attr('data-alert-message').length > 0)
-                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Thank You!", null, true);
+                        if (typeof ($form.attr('data-alert-message')) != 'undefined')
+                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Error", null, true);
 
                         $form.find('.form').hide();
                         $form.find('.thank-you').show();
