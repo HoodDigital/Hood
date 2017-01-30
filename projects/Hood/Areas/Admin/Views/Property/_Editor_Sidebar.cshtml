@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Edit " + Model.Property.Title;
     PropertySettings _settings = _site.GetPropertySettings();
-    PropertyListingApi mapi = new PropertyListingApi(Model.Property, _settings);
+    PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
 }
 <div class="widget-head-color-box black-bg p-lg image-heading">
     <div class="m-b-md text-center">
@@ -23,7 +23,7 @@
                     <div class="col-sm-8">
                         <fixedImage src="@mapi.FeaturedImage.SmallUrl" class="img-xs img-circle m-r-sm property-feature-@mapi.Id" id="property-blade-avatar" />
                         <attacher dataid="@mapi.Id" entity="PropertyListing" field="FeaturedImage" type="image" refresh="/admin/property/getmedia?type=FeaturedImage" tag="property-feature-@mapi.Id" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
-                        <a class="btn btn-xs btn-danger hood-inline-task" href="@Url.Action("ClearField", "Property", new { area = "Admin", id = mapi.Id, field = "FeaturedImage" })" data-complete="$.hood.Property.Edit.Refresh()"><i class="fa fa-trash"></i></a>
+                        <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearField" asp-controller="Property" asp-area="Admin" asp-route-id="@mapi.Id" data-complete="$.hood.Uploader.RefreshImage('.property-feature-@mapi.Id', '/admin/property/getmedia?type=FeaturedImage', @mapi.Id)"><i class="fa fa-trash"></i></a>
                     </div>
                 </div>
             </div>

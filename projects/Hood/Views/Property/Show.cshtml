@@ -17,7 +17,7 @@
         metaDesc = cmDesc.GetStringValue();
     }
     ViewBag.Title = metaTitle;
-    PropertyListingApi mapi = new PropertyListingApi(Model.Property, _site.GetPropertySettings());
+    PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
     ViewData["EditUrl"] = Url.Action("Edit", "Property", new { area = "Admin", id = Model.Property.Id });
 
     Layout = "_BlankLayout";

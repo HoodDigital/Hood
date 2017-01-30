@@ -2,7 +2,7 @@
 @inject ISiteConfiguration _site
 @{
     PropertySettings _settings = _site.GetPropertySettings();
-    PropertyListingApi p = new PropertyListingApi(Model.Property, _settings);
+    PropertyListingApi p = _site.ToPropertyListingApi(Model.Property);
 }
 <div class="jumbotron">
     <div class="container">
@@ -159,7 +159,7 @@
         <div class="row">
             <h4>Some of our other properties</h4>
             <div class="portfolio-carousel owl-carousel owl-theme">
-                @foreach (PropertyListingApi similar in Model.Similar.Select(similar => new PropertyListingApi(similar, _settings)))
+                @foreach (PropertyListingApi similar in Model.Similar.Select(similar => _site.ToPropertyListingApi(similar)))
                 {
                     await Html.RenderPartialAsync("_PropertyCard", similar);
                 }

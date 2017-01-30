@@ -159,7 +159,7 @@ namespace Hood.Areas.Admin.Controllers
             propertyFilters.PlanningType = planning;
 
             PagedList<PropertyListing> properties = await _property.GetPagedProperties(propertyFilters, published);
-            Response response = new Response(properties.Items.Select(p => new PropertyListingApi(p, _site.GetPropertySettings())).ToArray(), properties.Count);
+            Response response = new Response(properties.Items.Select(p => _site.ToPropertyListingApi(p)).ToArray(), properties.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,

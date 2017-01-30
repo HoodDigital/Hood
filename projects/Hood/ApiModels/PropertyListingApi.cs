@@ -156,7 +156,7 @@ namespace Hood.Models.Api
             if (post.InfoDownload != null)
                 InfoDownload = new MediaApi(post.InfoDownload);
             else
-                FeaturedImage = MediaApi.Blank(mediaSettings);
+                InfoDownload = MediaApi.Blank(mediaSettings);
 
             if (post.Metadata != null)
                 Meta = post.Metadata.Select(c => new MetaDataApi<PropertyMeta>(c)).ToList();
