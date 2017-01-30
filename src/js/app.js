@@ -436,11 +436,11 @@ $.hood.App = {
                 $form = $(this);
                 $.post($form.attr('action'), $form.serialize(), function (data) {
                     if (data.Success) {
-                        if (typeof ($form.attr('data-redirect')) != 'undefined')
+                        if ($form.attr('data-redirect').length > 0)
                             window.location = $form.attr('data-redirect');
 
-                        if (typeof ($form.attr('data-alert-message')) != 'undefined')
-                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Error", null, true);
+                        if ($form.attr('data-alert-message').length > 0)
+                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Thank You!", null, true);
 
                         $form.find('.form').hide();
                         $form.find('.thank-you').show();

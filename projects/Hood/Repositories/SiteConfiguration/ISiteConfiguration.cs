@@ -2,6 +2,7 @@
 using Hood.Models;
 using Microsoft.Extensions.Configuration;
 using Hood.Infrastructure;
+using Hood.Models.Api;
 
 namespace Hood.Services
 {
@@ -28,5 +29,9 @@ namespace Hood.Services
         OperationResult CartEnabled();
         OperationResult PropertyEnabled();
         OperationResult TypeEnabled(string type);
-    }
+
+        ContentApi ToContentApi(Content content);
+        PropertyListingApi ToPropertyListingApi(PropertyListing property);
+        ApplicationUserApi ToApplicationUserApi(ApplicationUser user);
+  }
 }

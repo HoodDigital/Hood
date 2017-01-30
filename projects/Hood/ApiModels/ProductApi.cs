@@ -71,7 +71,7 @@ namespace Hood.Models.Api
             if (contentBase == null)
                 return;
             contentBase.CopyProperties(this);
-            Api = new ContentApi(contentBase);
+            //Api = new ContentApi(contentBase);
             this.Metadata = contentBase.Metadata;
         }
     }

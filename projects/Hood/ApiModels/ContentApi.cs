@@ -57,7 +57,6 @@ namespace Hood.Models.Api
 
         public ApplicationUserApi Author { get; set; }
         public MediaApi FeaturedImage { get; set; }
-        public MediaApi BannerImage { get; set; }
         public string CreatedBy { get; set; }
         public string LastEditedBy { get; set; }
 
@@ -79,7 +78,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public ContentApi(Content post)
+        public ContentApi(Content post, MediaSettings mediaSettings = null)
         {
             if (post == null)
                 return;
@@ -88,10 +87,10 @@ namespace Hood.Models.Api
             if (post.FeaturedImage != null)
                 FeaturedImage = new MediaApi(post.FeaturedImage);
             else
-                FeaturedImage = MediaApi.Blank();
+                FeaturedImage = MediaApi.Blank(mediaSettings);
 
             if (post.Author != null)
-                Author = new ApplicationUserApi(post.Author);
+                Author = new ApplicationUserApi(post.Author, mediaSettings);
 
             if (post.CreatedBy != null)
                 CreatedBy = post.CreatedBy;
@@ -204,17 +203,6 @@ namespace Hood.Models.Api
                 !string.IsNullOrEmpty(fit) ? "background-size:" + fit + ";" : "", 
                 !string.IsNullOrEmpty(bg) ? "background-color:" + bg + ";" : "");
         }
-
-        public static List<ContentApi> ConvertAll(IEnumerable<Content> enumerable)
-        {
-            List<ContentApi> ret = new List<ContentApi>();
-            foreach (Content up in enumerable)
-            {
-                ret.Add(new ContentApi(up));
-            }
-            return ret;
-        }
-
     }
 
 }

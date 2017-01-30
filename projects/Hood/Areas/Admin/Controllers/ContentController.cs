@@ -84,7 +84,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult EditorGallery(int id)
         {
             var content = _content.GetContentByID(id);
-            var model = new ContentApi(content);
+            var model = _site.ToContentApi(content);
             return View(model);
         }
 
@@ -547,7 +547,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PagedList<Content> content = _content.GetPagedContent(request, type, category, null, null, published);
 
-            Response response = new Response(content.Items.Select(c => new ContentApi(c)).ToArray(), content.Count);
+            Response response = new Response(content.Items.Select(c => _site.ToContentApi(c)).ToArray(), content.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -560,7 +560,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             IList<Content> content = new List<Content>();
             content.Add(_content.GetContentByID(id));
-            var ups = ContentApi.ConvertAll(content);
+            var ups = content.Select(c => _site.ToContentApi(c));
             return Json(ups.ToArray());
         }
 
@@ -576,7 +576,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             {
-                return MediaApi.Blank();
+                return MediaApi.Blank(_site.GetMediaSettings());
             }
         }
 
@@ -592,15 +592,17 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             {
-                return MediaApi.Blank();
+                return MediaApi.Blank(_site.GetMediaSettings());
             }
         }
 
-        public Response ClearImage(int id, string field)
+        public Response ClearImage(int id)
         {
             try
             {
-                _content.ClearImage(id, field);
+                Content content = _content.GetContentByID(id);
+                content.FeaturedImage = null;
+                _content.Update(content);
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)

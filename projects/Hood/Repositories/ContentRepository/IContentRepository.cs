@@ -27,7 +27,6 @@ namespace Hood.Services
         ContentNeighbours GetNeighbourContent(int id, string type, string categorySlug = null);
 
         // Other Content functions
-        void ClearImage(int id, string field);
         void UpdateTemplateMetas(Content content, List<string> newMetas);
 
         // Content Types

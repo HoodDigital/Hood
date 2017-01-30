@@ -140,7 +140,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public PropertyListingApi(PropertyListing post, PropertySettings settings)
+        public PropertyListingApi(PropertyListing post, PropertySettings settings, MediaSettings mediaSettings = null)
         {
             if (post == null)
                 return;
@@ -151,12 +151,12 @@ namespace Hood.Models.Api
             if (post.FeaturedImage != null)
                 FeaturedImage = new MediaApi(post.FeaturedImage);
             else
-                FeaturedImage = MediaApi.Blank();
+                FeaturedImage = MediaApi.Blank(mediaSettings);
 
             if (post.InfoDownload != null)
                 InfoDownload = new MediaApi(post.InfoDownload);
             else
-                InfoDownload = MediaApi.Blank();
+                FeaturedImage = MediaApi.Blank(mediaSettings);
 
             if (post.Metadata != null)
                 Meta = post.Metadata.Select(c => new MetaDataApi<PropertyMeta>(c)).ToList();
@@ -173,7 +173,7 @@ namespace Hood.Models.Api
             else
                 FloorPlans = new List<MediaApi>();
 
-            Agent = new ApplicationUserApi(post.Agent);
+            Agent = new ApplicationUserApi(post.Agent, mediaSettings);
 
             PublishPending = false;
             PublishDatePart = PublishDate.ToShortDateString();

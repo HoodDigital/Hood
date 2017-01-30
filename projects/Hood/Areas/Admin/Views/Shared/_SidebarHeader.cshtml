@@ -3,7 +3,7 @@
 @inject IContentRepository _content
 @{
     AccountInfo account = Context.GetAccountInfo();
-    ApplicationUserApi uapi = new ApplicationUserApi(account.User);
+    ApplicationUserApi uapi = _site.ToApplicationUserApi(account.User);
     BasicSettings _info = _site.GetBasicSettings();
     Hood.Infrastructure.OperationResult subscriptions = _site.SubscriptionsEnabled();
     Layout = null;

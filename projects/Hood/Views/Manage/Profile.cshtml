@@ -1,7 +1,8 @@
 @model ApplicationUser
+@inject ISiteConfiguration _site
 @{
     ViewData["Title"] = "Your Profile";
-    ApplicationUserApi uapi = new ApplicationUserApi(Model);
+    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model);
 }
 <form asp-controller="Manage" asp-action="Profile" method="post" role="form" class="contact-form" id="contact">
     <div class="row">

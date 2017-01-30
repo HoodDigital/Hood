@@ -17,7 +17,7 @@
         metaDesc = cmDesc.GetStringValue();
     }
     ViewBag.Title = metaTitle;
-    ContentApi mapi = new ContentApi(Model.Content);
+    ContentApi mapi = _site.ToContentApi(Model.Content);
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
     ViewData["BodyClass"] = mapi.GetMetaValue("Settings.CSS.BodyClass");
     ViewData["Content"] = mapi;

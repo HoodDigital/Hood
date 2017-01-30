@@ -3,7 +3,7 @@
 @model EditContentModel
 @{
     ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Content.Title;
-    ContentApi mapi = new ContentApi(Model.Content);
+    var mapi = _site.ToContentApi(Model.Content);
 }
 @section buttons {
     <div class="btn-group">
@@ -19,11 +19,11 @@
             }
             @if (Model.Type.ShowPreview)
             {
-                <li><a href="#designer" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-edit m-r-xs"></i>Preview</a></li>
+                <li><a href="#designer" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-edit m-r-xs"></i>Quick Preview</a></li>
             }
             @if (Model.Type.HasPage)
             {
-                <li><a href="@mapi.Url"><i class="fa fa-desktop m-r-xs"></i>Preview</a></li>            
+                <li><a href="@mapi.Url"><i class="fa fa-desktop m-r-xs" target="_blank"></i>Preview</a></li>            
             }
             <li><a class="delete-content" data-id="@Model.Content.Id" data-type="@Model.Type.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a></li>
         </ul>

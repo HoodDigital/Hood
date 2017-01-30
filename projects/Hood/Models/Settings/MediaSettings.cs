@@ -18,6 +18,9 @@ namespace Hood.Models
         [Display(Name = "Container Name")]
         public string ContainerName { get; set; }
 
+        [Display(Name = "[No Image] File")]
+        public string NoImage { get; set; }
+
         public MediaSettings()
         {
             HoodApiUrl = "http://api.hooddigital.com/v2/thumb";

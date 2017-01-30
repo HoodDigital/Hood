@@ -1,14 +1,15 @@
 @model ContactFormModel
-@if (Model != null && !string.IsNullOrEmpty(Model.Message))
-{
-    <div class="panel panel-success p-lg no-margin">
-        <h3>Thank you.</h3>
-        <p>@Model.Message</p>
-    </div>
+@inject ISiteConfiguration _site
+@{ 
+    ContactSettings settings = _site.GetContactSettings();
 }
-else
-{
-    <form asp-controller="Home" asp-action="Contact" method="post" role="form" class="contact-form" id="contact">
+<form asp-controller="Home" asp-action="BasicContact" method="post" role="form" class="contact-form" id="contact" data-redirect="@settings.ThankYouUrl" data-alert-message="@settings.ThankYouMessage">
+    <div class="thank-you">
+        <div class="panel panel-success">
+            <p>@settings.ThankYouMessage</p>
+        </div>
+    </div>
+    <div class="form">
         <div asp-validation-summary="All" class="validation-summary"></div>
         <div class="form-group">
             <label asp-for="Name" class="control-label"></label>
@@ -35,11 +36,10 @@ else
             <textarea asp-for="Enquiry" class="form-control" placeholder="Your enquiry"></textarea>
             <span asp-validation-for="Enquiry" class="text-danger"></span>
         </div>
-
         <div class="row">
             <div class="col-xs-12 text-center">
                 <button class="btn btn-md btn-primary form-full" type="submit" id="form-submit" name="submit">Send Message</button>
             </div>
         </div>
-    </form>
-}
+    </div>
+</form>

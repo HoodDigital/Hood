@@ -1,7 +1,8 @@
 @model IndexViewModel
+@inject ISiteConfiguration _site
 @{
     ViewData["Title"] = "Manage your account";
-    ApplicationUserApi uapi = new ApplicationUserApi(Model.User);
+    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
 }
 @section scripts {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places" async defer></script>

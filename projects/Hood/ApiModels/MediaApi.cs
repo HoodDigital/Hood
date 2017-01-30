@@ -123,18 +123,22 @@ namespace Hood.Models.Api
         {
         }
 
-        public static MediaApi Blank()
+        public static MediaApi Blank(MediaSettings settings = null)
         {
             MediaApi ret = new MediaApi();
 
             // Formatted Members
             ret.FormattedSize = "0Kb";
 
-            ret.Icon = "/lib/hood/images/no-image.jpg";
-            ret.SmallUrl = "/lib/hood/images/no-image.jpg"; ;
-            ret.MediumUrl = "/lib/hood/images/no-image.jpg";
-            ret.LargeUrl = "/lib/hood/images/no-image.jpg";
-            ret.ThumbUrl = "/lib/hood/images/no-image.jpg";
+            var noImage = "/lib/hood/images/no-image.jpg";
+            if (settings.NoImage.IsSet())
+                noImage = settings.NoImage;
+
+            ret.Icon = noImage;
+            ret.SmallUrl = noImage;
+            ret.MediumUrl = noImage;
+            ret.LargeUrl = noImage;
+            ret.ThumbUrl = noImage;
             ret.DownloadUrl = "";
             ret.DownloadUrlHttps = "";
             ret.Container = "N/A";

@@ -1,6 +1,7 @@
 @model ContentModel
+@inject ISiteConfiguration _site
 @{
-    ContentApi capi = new ContentApi(Model.Content);
+    var capi = _site.ToContentApi(Model.Content);
 }
 <div class="m-b-lg">
     @{ await Html.RenderPartialAsync("_NeighbourPosts"); }

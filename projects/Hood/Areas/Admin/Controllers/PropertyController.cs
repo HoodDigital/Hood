@@ -398,14 +398,14 @@ namespace Hood.Areas.Admin.Controllers
                         case "InfoDownload":
                             return new MediaApi(property.InfoDownload);
                         default:
-                            return MediaApi.Blank();
+                            return MediaApi.Blank(_site.GetMediaSettings());
                     }
                 else
                     throw new Exception("No media found.");
             }
             catch (Exception)
             {
-                return MediaApi.Blank();
+                return MediaApi.Blank(_site.GetMediaSettings());
             }
         }
 

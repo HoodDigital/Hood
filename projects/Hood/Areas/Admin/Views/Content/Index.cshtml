@@ -7,7 +7,7 @@
 }
 @section buttons {
     <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog m-r-sm"></i><span class="caret"></span></button> <ul class="dropdown-menu">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button> <ul class="dropdown-menu">
             @if (Model.Type.IsPublic)
             {
                 <li>
@@ -24,7 +24,7 @@
             @if (User.IsInRole("Admin"))
             {
                 <li>
-                    <a class="warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!">
+                    <a class="warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.Type.TypeNamePlural.ToLower() from the site!">
                         <i class="fa fa-trash m-r-sm"></i>
                         Delete All
                     </a>
