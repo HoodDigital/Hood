@@ -38,15 +38,14 @@ $.hood.Handlers = {
 
             for (var component in $.hood.Handlers.Addresses.AddressForm) {
                 if ($('#' + component).doesExist()) {
-                    document.getElementById(component).value = '';
-                    document.getElementById(component).disabled = false;
+                    $('#' + component).val('');
                     newVal = $.hood.Handlers.Addresses.AddressForm[component];
                     placeholders = $.getPlaceholders(newVal);
                     for (var placeholder in placeholders) {
                         newVal = newVal.replace("{" + placeholders[placeholder] + "}", $.hood.Handlers.Addresses.GetValueFromAddressComponents(placeholders[placeholder]));
                     }
                     if (!newVal.contains('undefined'))
-                        document.getElementById(component).value = newVal;
+                        $('#' + component).val(newVal);
                 }
             }
             $('#Latitude').val($.hood.Handlers.Addresses.place.geometry.location.lat);

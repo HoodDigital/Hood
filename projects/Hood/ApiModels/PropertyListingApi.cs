@@ -1,5 +1,6 @@
 ﻿using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -140,13 +141,17 @@ namespace Hood.Models.Api
         {
         }
 
-        public PropertyListingApi(PropertyListing post, PropertySettings settings, MediaSettings mediaSettings = null)
+        public PropertyListingApi(PropertyListing post, ISiteConfiguration settings = null)
         {
+            var mediaSettings = settings.GetMediaSettings();
+            var propertySettings = settings.GetPropertySettings();
+
             if (post == null)
                 return;
             post.CopyProperties(this);
 
             SingleLineAddress = post.ToFormat(AddressFormat.SingleLine);
+
 
             if (post.FeaturedImage != null)
                 FeaturedImage = new MediaApi(post.FeaturedImage);
@@ -173,7 +178,7 @@ namespace Hood.Models.Api
             else
                 FloorPlans = new List<MediaApi>();
 
-            Agent = new ApplicationUserApi(post.Agent, mediaSettings);
+            Agent = new ApplicationUserApi(post.Agent, settings);
 
             PublishPending = false;
             PublishDatePart = PublishDate.ToShortDateString();
@@ -181,13 +186,13 @@ namespace Hood.Models.Api
             PublishMinute = PublishDate.Minute;
 
             if (post.Rent.HasValue)
-                FormattedRent = settings.ShowRentDecimals ? post.Rent.Value.ToString("C") : post.Rent.Value.ToString("C0");
+                FormattedRent = propertySettings.ShowRentDecimals ? post.Rent.Value.ToString("C") : post.Rent.Value.ToString("C0");
             if (post.AskingPrice.HasValue)
-                FormattedAskingPrice = settings.ShowAskingPriceDecimals ? post.AskingPrice.Value.ToString("C") : post.AskingPrice.Value.ToString("C0");
+                FormattedAskingPrice = propertySettings.ShowAskingPriceDecimals ? post.AskingPrice.Value.ToString("C") : post.AskingPrice.Value.ToString("C0");
             if (post.Premium.HasValue)
-                FormattedPremium = settings.ShowPremiumDecimals ? post.Premium.Value.ToString("C") : post.Premium.Value.ToString("C0");
+                FormattedPremium = propertySettings.ShowPremiumDecimals ? post.Premium.Value.ToString("C") : post.Premium.Value.ToString("C0");
             if (post.Fees.HasValue)
-                FormattedFees = settings.ShowFeesDecimals ? post.Fees.Value.ToString("C") : post.Fees.Value.ToString("C0");
+                FormattedFees = propertySettings.ShowFeesDecimals ? post.Fees.Value.ToString("C") : post.Fees.Value.ToString("C0");
 
 
             Url = string.Format("/property/{0}/{1}/{2}/{3}", post.Id, post.Address2.IsSet() ? post.Address2.ToSeoUrl() : post.City.ToSeoUrl(), post.Postcode.Split(' ').First().ToSeoUrl(), post.Title.ToSeoUrl());

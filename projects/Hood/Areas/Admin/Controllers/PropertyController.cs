@@ -59,14 +59,14 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/gallery/{id}/")]
         public IActionResult EditorGallery(int id)
         {
-            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _settings);
+            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _site);
             return View(model);
         }
 
         [Route("admin/property/floorplans/{id}/")]
         public IActionResult EditorFloorplans(int id)
         {
-            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _settings);
+            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _site);
             return View(model);
         }
 

@@ -441,17 +441,17 @@ namespace Hood.Services
         
         public ContentApi ToContentApi(Content content)
         {
-            return new ContentApi(content, GetMediaSettings());
+            return new ContentApi(content, this);
         }
 
         public PropertyListingApi ToPropertyListingApi(PropertyListing property)
         {
-            return new PropertyListingApi(property, GetPropertySettings(), GetMediaSettings());
+            return new PropertyListingApi(property, this);
         }
 
         public ApplicationUserApi ToApplicationUserApi(ApplicationUser user)
         {
-            return new ApplicationUserApi(user, GetMediaSettings());
+            return new ApplicationUserApi(user, this);
         }
     }
 }

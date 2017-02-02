@@ -1,6 +1,8 @@
 @model Address
 @inject IContentRepository _data
+@inject ISiteConfiguration _site
 @{
+    var integrations = _site.GetIntegrationSettings();
     Layout = null;
 }
 <div class="modal fade" role="dialog" id="add-address-modal">
@@ -17,11 +19,14 @@
                         <input type="hidden" asp-for="Latitude" />
                         <input type="hidden" asp-for="Longitude" />
                         <div asp-validation-summary="All" class="text-danger"></div>
-                        <div class="form-group">
-                            <div class="col-xs-12">
-                                <input id="address-autocomplete" onfocus="$.hood.Handlers.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Try typing in an address..." />
+                        @if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
+                        {
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <input id="address-autocomplete" onfocus="$.hood.Handlers.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Try typing in an address..." />
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div class="form-group">
                             <label asp-for="QuickName" class="col-md-4 control-label"></label>
                             <div class="col-md-6">

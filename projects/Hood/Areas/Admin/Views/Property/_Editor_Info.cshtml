@@ -3,6 +3,7 @@
 @inject ISiteConfiguration _site
 @{
     PropertySettings _settings = _site.GetPropertySettings();
+    var integrations = _site.GetIntegrationSettings();
 }
 <div id="info" class="tab-pane active">
     <div class="panel-body">
@@ -16,13 +17,16 @@
                 <div class="col-sm-8"><input asp-for="ShortDescription" type="text" class="form-control" /></div>
             </div>
             <hr />
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Lookup Address</label>
-                <div class="col-sm-8">
-                    <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." />
+            @if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
+            {
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Lookup Address</label>
+                    <div class="col-sm-8">
+                        <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." />
+                    </div>
                 </div>
-            </div>
-            <hr />
+                <hr />
+            }
             <div class="form-group">
                 <label class="col-sm-3 control-label" asp-for="Number"></label>
                 <div class="col-sm-8"><input asp-for="Number" type="text" class="form-control" /></div>
@@ -49,16 +53,16 @@
                     <select class="form-control" asp-for="Country">
                         <option value="">-- Choose a country --</option>
                         @foreach (var itm in _data.AllCountries())
-                                {
-                                    if (itm.Name == "United Kingdom")
-                                    {
+                        {
+                            if (itm.Name == "United Kingdom")
+                            {
                                 <option value="@itm.Name" selected>@itm.Name</option>
-                                    }
-                                    else
-                                    {
+                            }
+                            else
+                            {
                                 <option value="@itm.Name">@itm.Name</option>
-                                    }
-                                }
+                            }
+                        }
                     </select>
                 </div>
             </div>

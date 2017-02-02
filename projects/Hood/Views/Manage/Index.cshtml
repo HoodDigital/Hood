@@ -6,7 +6,7 @@
     var integrations = _site.GetIntegrationSettings();
 }
 @section scripts {
-    @if (integrations.EnableGoogleMaps && integrations.GoogleMapsApiKey.IsSet())
+    @if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
     {
         <script src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&libraries=places", integrations.GoogleMapsApiKey)" async defer></script>
     }

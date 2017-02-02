@@ -462,6 +462,22 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [Route("admin/content/{id}/sethomepage")]
+        public Response SetHomepage(int id)
+        {
+            try
+            { 
+                var model = _site.GetBasicSettings(false);
+                model.Homepage = id;
+                _site.Set("Hood.Settings.Basic", model);
+                return new Response(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
+        }
+
         /// <summary>
         /// This adds images to the club gallery.
         /// </summary>

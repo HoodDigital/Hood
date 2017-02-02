@@ -1,8 +1,12 @@
 @model ContentListModel
+@inject ISiteConfiguration _site
+@{ 
+    var _basics = _site.GetBasicSettings();
+}
 <script id="manage-content-template" type="text/template">
     <div class="forum-item data-item">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="media">
                     @if (Model.Type.ShowImage)
                     {
@@ -17,18 +21,21 @@
                     <div class="media-body">
                         <a class="forum-item-title" href="/admin/content/${ Id }/edit/">
                             ${ Title }
+                            #if (IsHomepage) {#
+                                <span class="label label-success">Homepage</span>
+                            #}#
                             #if (Status == 1) {#
-                            <small class="txt-color-magenta">#= StatusString #</small>
+                                <small class="txt-color-magenta">#= StatusString #</small>
                             #} else {#
-                            #if (Status == 3) {#
-                            <small class="txt-color-orangeDark">#= StatusString #</small>
-                            #} else {#
-                            #if (PublishPending) {#
-                            <small class="txt-color-orange">${ StatusString }</small>
-                            #} else {#
-                            <small class="txt-color-greenLight">${ StatusString }</small>
-                            #}#
-                            #}#
+                                #if (Status == 3) {#
+                                    <small class="txt-color-orangeDark">#= StatusString #</small>
+                                #} else {#
+                                    #if (PublishPending) {#
+                                        <small class="txt-color-orange">${ StatusString }</small>
+                                    #} else {#
+                                        <small class="txt-color-greenLight">${ StatusString }</small>
+                                    #}#
+                                #}#
                             #}#
                         </a>
                         <small>Created on <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(CreatedOn), "ddd d, MMMM yyyy at hh:mm tt") #</small><br />
@@ -57,7 +64,7 @@
                     <span class="tag-item">${ Author.FullName }</span>
                 </div>
             </div>
-            <div class="col-md-3 visible-lg">
+            <div class="col-md-2 visible-lg">
                 <span class="small font-bold">Categories</span>
                 <div class="tag-list">
                     #if (Categories.length==0) {#
@@ -68,7 +75,7 @@
                     #}#
                 </div>
             </div>
-            <div class="col-md-3 action-buttons">
+            <div class="col-md-2 action-buttons">
                 <div class="btn-group"> 
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
                     <ul class="dropdown-menu dropdown-menu-right">
@@ -94,6 +101,16 @@
                                 </a>
                             </li>
                         }
+                        #if (!IsHomepage) {#
+                        <li>
+                            <a class="hood-inline-task" href="/admin/content/${ Id }/sethomepage" data-complete="$.hood.Content.Manage.Refresh()">
+                                <i class="fa fa-home m-r-sm"></i>
+                                <span>
+                                    Set as Homepage
+                                </span>
+                            </a>
+                        </li>
+                        #}#
                         <li class="divider"></li>
                         <li>
                             <a class="delete-content" data-id="${ Id }">

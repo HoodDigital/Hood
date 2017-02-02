@@ -53,17 +53,21 @@
     <div class="forum-item data-item">
         <div class="row">
             <div class="col-md-4">
-                <div class="forum-icon">
-                    #if (FeaturedImageUrl.length > 0) {#
-                        <figure class="img-xs content-feature-1 hood-image " style="background-image:url(${ FeaturedImageUrl });"><img src="${ FeaturedImageUrl }" alt=""></figure>
-                    #}else{#
-                        <figure class="img-xs content-feature-1 hood-image " style="background-image:url(/lib/hood/images/no-image.jpg);"><img src="/lib/hood/images/no-image.jpg" alt=""></figure>
-                    #}#
+                <div class="media">
+                        <div class="media-left media-middle">
+                            #if (FeaturedImageUrl.length > 0) {#
+                            <figure class="img-xs content-feature-1 hood-image " style="background-image:url(${ FeaturedImageUrl });"><img src="${ FeaturedImageUrl }" alt=""></figure>
+                            #}else{#
+                            <figure class="img-xs content-feature-1 hood-image " style="background-image:url(/lib/hood/images/no-image.jpg);"><img src="/lib/hood/images/no-image.jpg" alt=""></figure>
+                            #}#
+                        </div>
+                    <div class="media-body">
+                        <a class="forum-item-title" href="/admin/subscriptions/edit/${ Id }">
+                            ${ Name }
+                        </a>
+                        <small><i class="fa fa-clock-o"></i> Created on #= kendo.toString(new Date(Created), "ddd d, MMMM yyyy at hh:mm tt") #</small><br />
+                    </div>
                 </div>
-                <a class="forum-item-title" href="/admin/subscriptions/edit/${ Id }">
-                    ${ Name }                   
-                </a>
-                <small><i class="fa fa-clock-o"></i> Created on #= kendo.toString(new Date(Created), "ddd d, MMMM yyyy at hh:mm tt") #</small><br />
             </div>
             <div class="col-md-1">
                 <span class="small font-bold">Stripe Id</span>

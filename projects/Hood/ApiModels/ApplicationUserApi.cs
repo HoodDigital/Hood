@@ -1,4 +1,5 @@
 ﻿using Hood.Extensions;
+using Hood.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -80,8 +81,10 @@ namespace Hood.Models.Api
         {
         }
 
-        public ApplicationUserApi(ApplicationUser user, MediaSettings mediaSettings = null)
+        public ApplicationUserApi(ApplicationUser user, ISiteConfiguration settings = null)
         {
+            var mediaSettings = settings.GetMediaSettings();
+
             if (user == null)
                 return;
 
@@ -95,7 +98,7 @@ namespace Hood.Models.Api
             Addresses = user.Addresses?.Select(s => new AddressApi(s)).ToList();
             DeliveryAddress = user.DeliveryAddress == null ? null : new AddressApi(user.DeliveryAddress);
             BillingAddress = user.BillingAddress == null ? null : new AddressApi(user.BillingAddress);
-            
+
             Subscriptions = user.Subscriptions?.Select(s => new UserSubscriptionApi(s)).ToList();
 
             if (string.IsNullOrEmpty(LastLoginLocation))

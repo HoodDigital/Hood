@@ -1,5 +1,6 @@
 ﻿using CodeComb.HtmlAgilityPack;
 using Hood.Extensions;
+using Hood.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -73,16 +74,21 @@ namespace Hood.Models.Api
         public bool PublishPending { get; set; }
         public string Url { get; set; }
         public List<MediaApi> Media { get; set; }
+        public bool IsHomepage { get; set; }
 
         public ContentApi()
         {
         }
 
-        public ContentApi(Content post, MediaSettings mediaSettings = null)
+        public ContentApi(Content post, ISiteConfiguration settings = null)
         {
             if (post == null)
                 return;
             post.CopyProperties(this);
+
+            var mediaSettings = settings.GetMediaSettings();
+
+            IsHomepage = Id == settings.GetBasicSettings().Homepage;
 
             if (post.FeaturedImage != null)
                 FeaturedImage = new MediaApi(post.FeaturedImage);
@@ -90,7 +96,7 @@ namespace Hood.Models.Api
                 FeaturedImage = MediaApi.Blank(mediaSettings);
 
             if (post.Author != null)
-                Author = new ApplicationUserApi(post.Author, mediaSettings);
+                Author = new ApplicationUserApi(post.Author, settings);
 
             if (post.CreatedBy != null)
                 CreatedBy = post.CreatedBy;

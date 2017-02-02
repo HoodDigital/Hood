@@ -35,7 +35,7 @@ $.hood.Inline = {
 
         }, tag))
         .fail(function (data) {
-            $.hood.Alerts.Error("There was an error loading the blade.<br/><br />" + data.status + " - " + data.statusText);
+            $.hood.Alerts.Error("There was an error loading the panel.<br/><br />" + data.status + " - " + data.statusText);
         })
         .always(function (data) {
             if (!$.hood.Helpers.IsNullOrUndefined($(tag).data('complete'))) {
@@ -65,7 +65,7 @@ $.hood.Inline = {
             }
         }, e.currentTarget))
         .fail(function (data) {
-            $.hood.Alerts.Error("There was an error loading the blade.<br/><br />" + data.status + " - " + data.statusText);
+            $.hood.Alerts.Error("There was an error during the operation.<br/><br />" + data.status + " - " + data.statusText);
         })
         .always(function (data) {
             $.hood.Modals.Loading = false;

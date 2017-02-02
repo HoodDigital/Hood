@@ -41,7 +41,7 @@
                         <div class="col-sm-8">
                             <div class="row image-cell">
                                 <div class="col-xs-1">
-                                    <img src="@(Model.FeaturedImageUrl.IsSet() ? Model.FeaturedImageUrl : "/lib/hood/images/no-image.jpg")" class="img-xs img-circle subscription-@Model.Id" />
+                                    <img src="@(Model.FeaturedImageUrl.IsSet() ? Model.FeaturedImageUrl : _site.GetMediaSettings().NoImage.IsSet() ? _site.GetMediaSettings().NoImage : "/lib/hood/images/no-image.jpg")" class="img-xxs img-circle subscription-@Model.Id" />
                                 </div>
                                 <div class="col-xs-11">
                                     <div class="input-group">

@@ -4,9 +4,13 @@
     ViewBag.Title = "Edit " + Model.Property.Title;
     PropertySettings _settings = _site.GetPropertySettings();
     PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
+    var integrations = _site.GetIntegrationSettings();
 }
 @section scripts {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places&callback=initGoogleMapsAutocomplete"></script>
+    @if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
+    {
+        <script src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&libraries=places&callback=initGoogleMapsAutocomplete", integrations.GoogleMapsApiKey)" async defer></script>
+    }
 }
 @section buttons {
     <a class="btn btn-sm btn-default" href="@mapi.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
