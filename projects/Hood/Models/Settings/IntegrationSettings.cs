@@ -24,9 +24,11 @@ namespace Hood.Models
         public string DisqusId { get; set; }
 
         // Google Maps Api
+        [Display(Name = "Enable Google Geocoding (Location finding for addresses)")]
+        public bool EnableGoogleGeocoding { get; set; }
         [Display(Name = "Enable Google Maps")]
         public bool EnableGoogleMaps { get; set; }
-        [Display(Name = "Disqus ID")]
+        [Display(Name = "Google API Key")]
         public string GoogleMapsApiKey { get; set; }
 
         // Google Analytics

@@ -3,9 +3,13 @@
 @{
     ViewData["Title"] = "Manage your account";
     ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
+    var integrations = _site.GetIntegrationSettings();
 }
 @section scripts {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places" async defer></script>
+    @if (integrations.EnableGoogleMaps && integrations.GoogleMapsApiKey.IsSet())
+    {
+        <script src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&libraries=places", integrations.GoogleMapsApiKey)" async defer></script>
+    }
 }
 @Html.Raw(ViewData["StatusMessage"])
 <div class="row">

@@ -23,7 +23,13 @@ namespace Hood.Services
         private PropertySettings _settings;
         private ISiteConfiguration _site;
 
-        public PropertyImporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<SiteMedia> media, ISiteConfiguration site)
+        public PropertyImporter(
+            IFTPService ftp, 
+            IHostingEnvironment env, 
+            IConfiguration config, 
+            IMediaManager<SiteMedia> media,
+            ISiteConfiguration site,
+            IAddressService address)
         {
             _ftp = ftp;
             _config = config;
@@ -47,6 +53,7 @@ namespace Hood.Services
             _site = site;
             _settings = site.GetPropertySettings();
             _media = media;
+            _address = address;
         }
 
         private ReaderWriterLock Lock { get; set; }
@@ -71,6 +78,7 @@ namespace Hood.Services
         private AccountInfo Account { get; set; }
         private DefaultHoodDbContext _db { get; set; }
         private bool _killFlag;
+        private readonly IAddressService _address;
 
         public bool RunUpdate(HttpContext context)
         {
@@ -668,9 +676,9 @@ namespace Hood.Services
             property.UserVars = "IMPORTED";
             property.Views = 0;
 
-            // Try to map the address (Only works with UK)
+            // Geocode
             if (!validatingOnly)
-                property.GetLatLongFromUKPostcode();
+                property.SetLocation(_address.GeocodeAddress(property));
 
             return property;
         }

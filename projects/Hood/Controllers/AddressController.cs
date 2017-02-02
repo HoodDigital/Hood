@@ -20,6 +20,7 @@ namespace Hood.Controllers
         private readonly ILogger _logger;
         private readonly IContentRepository _content;
         private readonly IAuthenticationRepository _auth;
+        private readonly IAddressService _address;
 
         public AddressController(
             IContentRepository content,
@@ -28,7 +29,8 @@ namespace Hood.Controllers
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IAddressService address)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -37,6 +39,7 @@ namespace Hood.Controllers
             _logger = loggerFactory.CreateLogger<AddressController>();
             _content = content;
             _auth = auth;
+            _address = address;
         }
 
         [Route("account/addresses/")]
@@ -60,8 +63,8 @@ namespace Hood.Controllers
         {
             try
             {
-                // Try to map the address (Only works with UK)
-                address.GetLatLongFromUKPostcode();
+                // Geocode
+                address.SetLocation(_address.GeocodeAddress(address));
 
                 var user = _auth.GetCurrentUser(false);
                 address.UserId = user.Id;
@@ -95,8 +98,8 @@ namespace Hood.Controllers
         {
             try
             {
-                // Try to map the address (Only works with UK)
-                address.GetLatLongFromUKPostcode();
+                // Geocode
+                address.SetLocation(_address.GeocodeAddress(address));
 
                 OperationResult result = _auth.UpdateAddress(address);
                 return Json(new Response(true));

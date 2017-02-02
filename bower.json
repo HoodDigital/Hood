@@ -1,6 +1,6 @@
 {
     "name": "hood",
-    "version": "1.0.0-preview5",
+    "version": "1.0.0-preview5-1",
     "main": [
         "./dist/css/admin.min.css",
         "./dist/css/app.min.css",

@@ -6,6 +6,7 @@ using Hood.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Html;
 using Hood.Infrastructure;
+using Geocoding;
 
 namespace Hood.Interfaces
 {
@@ -53,44 +54,12 @@ namespace Hood.Interfaces
             return to;
         }
 
-        /// <summary>
-        /// Validates the address part of the IAddress object. This will use postcodes.io in order to validate the address, 
-        /// while doing so it will update the latitude and longitude of the address object.
-        /// </summary>
-        /// <param name="address">The IAddresvs object.</param>
-        /// <returns>Valid</returns>
-        public static OperationResult GetLatLongFromUKPostcode(this IAddress address)
+        public static void SetLocation(this IAddress address, Location location)
         {
-            try
+            if (location != null)
             {
-                if (!string.IsNullOrEmpty(address.Postcode))
-                {
-                    address.Postcode = address.Postcode.ToUpperInvariant();
-                }
-                PostcodeValidation json;
-                using (WebClient wc = new WebClient())
-                {
-                    try
-                    {
-                        json = JsonConvert.DeserializeObject<PostcodeValidation>(wc.DownloadString("https://api.postcodes.io/postcodes/" + address.Postcode));
-                    }
-                    catch (Exception)
-                    {
-                        throw new Exception("Could not validate your postcode, the postcode does not exist.");
-                    }
-                }
-                if (json == null)
-                    throw new Exception("Could not validate your postcode, an error occurred, please try again.");
-                if (json.status != 200)
-                    throw new Exception("Could not validate your postcode, the postcode does not exist.");
-
-                address.Latitude = json.result.latitude;
-                address.Longitude = json.result.longitude;
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
+                address.Latitude = location.Latitude;
+                address.Longitude = location.Longitude;
             }
         }
 

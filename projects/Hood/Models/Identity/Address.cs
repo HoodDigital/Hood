@@ -10,13 +10,16 @@ namespace Hood.Models
         public string ContactName { get; set; }
         public string QuickName { get; set; }
 
-        [Required]
         [Display(Name = "Building Name/Number")]
+        [Required]
         public string Number { get; set; }
+
         [Display(Name = "Address 1")]
         public string Address1 { get; set; }
+
         [Display(Name = "Address 2")]
         public string Address2 { get; set; }
+
         [Required]
         public string City { get; set; }
         [Required]

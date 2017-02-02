@@ -24,6 +24,27 @@
                 </p>
             </div>
             <div class="panel-body">
+                <h5>Google API</h5>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableGoogleMaps" class="styled">
+                        <label asp-for="EnableGoogleMaps"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableGoogleGeocoding" class="styled">
+                        <label asp-for="EnableGoogleGeocoding"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="GoogleMapsApiKey"></label>
+                    <div>
+                        <input asp-for="GoogleMapsApiKey" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
                 <h5>Mail Chimp</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -83,21 +104,6 @@
                             <option value="loader-inner ball-grid-beat">ball-grid-beat</option>
                             <option value="loader-inner semi-circle-spin">semi-circle-spin</option>
                         </select>
-                    </div>
-                </div>
-            </div>
-            <div class="panel-body">
-                <h5>Google Maps API</h5>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <input asp-for="EnableGoogleMaps" class="styled">
-                        <label asp-for="EnableGoogleMaps"></label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" asp-for="GoogleMapsApiKey"></label>
-                    <div>
-                        <input asp-for="GoogleMapsApiKey" class="form-control">
                     </div>
                 </div>
             </div>

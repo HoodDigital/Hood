@@ -1,6 +1,6 @@
 {
   "name": "Hood",
-  "version": "1.0.0-preview5",
+  "version": "1.0.0-preview5-1",
   "authors": [
     "Hood Digital",
     "George Whysall",
@@ -60,7 +60,8 @@
     "Stripe.net": "7.0.2",
     "System.IO.Compression.ZipFile": "4.3.0",
     "WindowsAzure.Storage": "8.0.1",
-    "Microsoft.Extensions.FileProviders.Embedded": "1.0.0"
+    "Microsoft.Extensions.FileProviders.Embedded": "1.0.0",
+    "Geocoding.net": "3.6.0"
   },
   "tools": {
     "Microsoft.AspNetCore.Razor.Tools": "1.0.0-preview2-final",

@@ -40,6 +40,9 @@ $.hood.Addresses = {
         });
         $('#address-form').hoodValidator({
             validationRules: {
+                Number: {
+                    required: true
+                },
                 Address1: {
                     required: true
                 },
@@ -54,23 +57,6 @@ $.hood.Addresses = {
                 },
                 Country: {
                     required: true
-                }
-            },
-            validationMessages: {
-                Address1: {
-                    required: '<i class="fa fa-arrow-up"></i> Required'
-                },
-                City: {
-                    required: '<i class="fa fa-arrow-up"></i> Required'
-                },
-                County: {
-                    required: '<i class="fa fa-arrow-up"></i> Required'
-                },
-                Postcode: {
-                    required: '<i class="fa fa-arrow-up"></i> Required'
-                },
-                Country: {
-                    required: '<i class="fa fa-arrow-up"></i> Required'
                 }
             },
             submitButtonTag: $('#save-address'),

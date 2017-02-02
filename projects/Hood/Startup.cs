@@ -107,6 +107,7 @@ namespace Hood
                 services.AddSingleton<IPropertyExporter, PropertyExporter>();
                 services.AddSingleton<IContentExporter, ContentExporter>();
                 services.AddSingleton<IThemesService, ThemesService>();
+                services.AddSingleton<IAddressService, AddressService>();
                 services.AddScoped<ISiteConfiguration, SiteConfiguration>();
                 services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
                 services.AddScoped<IPropertyRepository, PropertyRepository>();

@@ -1,6 +1,6 @@
 @model Address
 @inject IContentRepository _data
-@{ 
+@{
     Layout = null;
 }
 <div class="modal fade" role="dialog" id="add-address-modal">
@@ -16,9 +16,11 @@
                         <input type="hidden" asp-for="UserId" value="@Model.UserId" />
                         <input type="hidden" asp-for="Latitude" />
                         <input type="hidden" asp-for="Longitude" />
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="All" class="text-danger"></div>
                         <div class="form-group">
-                            <input id="address-autocomplete" onfocus="$.hood.Handlers.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Enter an address..." />
+                            <div class="col-xs-12">
+                                <input id="address-autocomplete" onfocus="$.hood.Handlers.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Try typing in an address..." />
+                            </div>
                         </div>
                         <div class="form-group">
                             <label asp-for="QuickName" class="col-md-4 control-label"></label>
@@ -205,4 +207,3 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-

@@ -35,7 +35,7 @@
 <section class="container">
     @RenderBody()
 </section>
-@if (_plugins.EnableGoogleMaps)
+@if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet())
 {
     <div id="map" class="img-lg img-full"></div>
     <script>

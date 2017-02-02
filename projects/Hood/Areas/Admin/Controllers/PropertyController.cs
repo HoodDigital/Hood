@@ -29,6 +29,7 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
         private readonly IMediaManager<SiteMedia> _media;
+        private readonly IAddressService _address;
 
         public PropertyController(
             IPropertyRepository property,
@@ -36,7 +37,8 @@ namespace Hood.Areas.Admin.Controllers
             ISiteConfiguration site,
             IMediaManager<SiteMedia> media,
             IBillingService billing,
-            IHostingEnvironment env)
+            IHostingEnvironment env,
+            IAddressService address)
         {
             _userManager = userManager;
             _property = property;
@@ -45,6 +47,7 @@ namespace Hood.Areas.Admin.Controllers
             _env = env;
             _media = media;
             _settings = _site.GetPropertySettings();
+            _address = address;
         }
 
         [Route("admin/property/manage/")]
@@ -98,7 +101,7 @@ namespace Hood.Areas.Admin.Controllers
             post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
             // Try to map the address (Only works with UK)
             if (post.Postcode != property.Postcode)
-                post.GetLatLongFromUKPostcode();
+                post.SetLocation(_address.GeocodeAddress(post));
             post.CopyProperties(property);
             property.AgentId = post.AgentId;
             var type = _site.GetPropertySettings().GetPlanningFromType(post.Planning);
@@ -207,8 +210,10 @@ namespace Hood.Areas.Admin.Controllers
                     Latitude = model.cpLatitude,
                     Longitude = model.cpLongitude
                 };
-                // Try to map the address (Only works with UK)
-                property.GetLatLongFromUKPostcode();
+
+                // Geocode
+                property.SetLocation(_address.GeocodeAddress(property));
+
                 OperationResult result = _property.Add(property);
                 if (property.Metadata == null)
                     property.Metadata = new List<PropertyMeta>();
