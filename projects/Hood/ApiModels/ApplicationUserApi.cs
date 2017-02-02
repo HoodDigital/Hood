@@ -80,15 +80,16 @@ namespace Hood.Models.Api
         {
         }
 
-        public ApplicationUserApi(ApplicationUser user)
+        public ApplicationUserApi(ApplicationUser user, MediaSettings mediaSettings = null)
         {
-            this.Avatar = MediaApi.Blank();
             if (user == null)
                 return;
 
             user.CopyProperties(this);
             if (user.Avatar != null)
                 this.Avatar = new MediaApi(user.Avatar);
+            else
+                this.Avatar = MediaApi.Blank(mediaSettings);
 
 
             Addresses = user.Addresses?.Select(s => new AddressApi(s)).ToList();
@@ -105,17 +106,6 @@ namespace Hood.Models.Api
             {
                 LastLoginIP = "[No data]";
             }
-        }
-
-
-        public static List<ApplicationUserApi> ConvertAll(IEnumerable<ApplicationUser> enumerable)
-        {
-            List<ApplicationUserApi> ret = new List<ApplicationUserApi>();
-            foreach (ApplicationUser up in enumerable)
-            {
-                ret.Add(new ApplicationUserApi(up));
-            }
-            return ret;
         }
 
     }

@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "Edit " + Model.Property.Title;
     PropertySettings _settings = _site.GetPropertySettings();
-    PropertyListingApi mapi = new PropertyListingApi(Model.Property, _settings);
+    PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
 }
 @section scripts {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places&callback=initGoogleMapsAutocomplete"></script>

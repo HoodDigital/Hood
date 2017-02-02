@@ -93,7 +93,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<JsonResult> GetSubscribers(ListFilters request, int subscriptionId, string search, string sort)
         {
             PagedList<ApplicationUser> subs = await _subscriptions.GetPagedSubscribers(request, subscriptionId, search, sort);
-            Response response = new Response(subs.Items.Select(u => new ApplicationUserApi(u)).ToArray(), subs.Count);
+            Response response = new Response(subs.Items.Select(u => _site.ToApplicationUserApi(u)).ToArray(), subs.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,

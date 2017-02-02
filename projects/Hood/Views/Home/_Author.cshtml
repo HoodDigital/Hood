@@ -1,7 +1,7 @@
 @model ContentModel
 @inject ISiteConfiguration _site
 @{
-    ContentApi mapi = new ContentApi(Model.Content);
+    ContentApi mapi = _site.ToContentApi(Model.Content);
     BasicSettings siteSettings = _site.GetBasicSettings();
 }
 <div class="media">

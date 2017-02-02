@@ -1,8 +1,8 @@
 @model ContentModel
 @inject ISiteConfiguration _site
 @{
-    ContentApi mapi = new ContentApi(Model.Content);
-    BasicSettings siteSettings = _site.GetBasicSettings();
+    var mapi = _site.ToContentApi(Model.Content);
+    IntegrationSettings siteSettings = _site.GetIntegrationSettings();
 }
 <div class="m-b-lg">
     @{ await Html.RenderPartialAsync("_NeighbourPosts"); }

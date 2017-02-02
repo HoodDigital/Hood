@@ -1,6 +1,7 @@
 @model ContentModel
+@inject ISiteConfiguration _site
 @{
-    ContentApi mapi = new ContentApi(Model.Content);
+    var mapi = _site.ToContentApi(Model.Content);
 }
 <div class="row">
     <div class="col-sm-4">
@@ -11,7 +12,7 @@
         </div>
     </div>
     <div class="col-sm-8">
-        @if (Model.Content.FeaturedImageId.HasValue)
+        @if (Model.Content.FeaturedImage != null)
         {
             <div class="post-meta"><span>by <a href="@Url.Action("Author", "News", new { author = mapi.Author.UserName.ToLower() })">@mapi.Author.FullName</a>,</span> posted on <span>@Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span></div>
         }

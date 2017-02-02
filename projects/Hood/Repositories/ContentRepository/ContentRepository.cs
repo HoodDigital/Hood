@@ -372,16 +372,6 @@ namespace Hood.Services
             return neighbours;
         }
 
-        // Other Content functions
-        public void ClearImage(int id, string field)
-        {
-            string cacheKey = typeof(Content).ToString() + "-" + id;
-            _cache.Remove(cacheKey);
-            Content content = _db.Content.FirstOrDefault(c => c.Id == id);
-            _db.Entry(content).Property(field).CurrentValue = null;
-            _db.SaveChanges();
-        }
-
         // Content Types
         public ContentType GetContentType(string slug)
         {
@@ -554,7 +544,7 @@ namespace Hood.Services
                 {
                     foreach (var content in GetContentByType(type.Type).OrderByDescending(c => c.PublishDate))
                     {
-                        ContentApi c = new ContentApi(content);
+                        var c = _site.ToContentApi(content);
                         nodes.Add(new SitemapNode()
                         {
                             Url = urlHelper.AbsoluteUrl(c.Url.TrimStart('/')),

@@ -32,12 +32,12 @@ namespace Hood.Controllers
         public readonly IContentRepository _content;
         public readonly IMemoryCache _cache;
         public readonly ILogger _logger;
-        private readonly IRazorViewRenderer _renderer;
         private readonly IAuthenticationRepository _auth;
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
         private readonly ContentCategoryCache _categories;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IFormSenderService _forms;
 
         public HomeController(IAuthenticationRepository auth,
                               ContentCategoryCache categories,
@@ -46,19 +46,18 @@ namespace Hood.Controllers
                               IHostingEnvironment env,
                               ISiteConfiguration site,
                               IContentRepository content,
-                              IRazorViewRenderer renderer,
-                              IEmailSender email)
+                              IFormSenderService forms)
         {
             _auth = auth;
             _config = conf;
             _env = env;
             _content = content;
             _site = site;
-            _renderer = renderer;
-            _email = email;
             _categories = categories;
             _userManager = userManager;
+            _forms = forms;
         }
+
         #region "Content"
 
         [ResponseCache(CacheProfileName = "Day")]
@@ -111,7 +110,7 @@ namespace Hood.Controllers
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
             model.Search = filters.search;
-            model.Author = new ApplicationUserApi(_auth.GetUserById(author));
+            model.Author = _site.ToApplicationUserApi(_auth.GetUserById(author));
             return View("Feed", model);
         }
 
@@ -205,105 +204,14 @@ namespace Hood.Controllers
 
         #endregion
 
-
-
-        [ResponseCache(CacheProfileName = "Day")]
-        public IActionResult Holding()
-        {
-            return View(new ContactFormModel());
-        }
-
-        [ResponseCache(CacheProfileName = "Day")]
-        public IActionResult Maintenance()
-        {
-            return View();
-        }
-
-        [ResponseCache(CacheProfileName = "Month")]
-        [Route("terms/")]
-        public IActionResult Terms()
-        {
-            return View();
-        }
-
-        [ResponseCache(CacheProfileName = "Month")]
-        [Route("privacy/")]
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
         [HttpPost]
-        [Route("contact/")]
-        public async Task<Response> Contact(IContactFormModel model)
+        [Route("hood/basic-contact/")]
+        public async Task<Response> BasicContact(ContactFormModel model)
         {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    ContactSettings contactSettings = _site.GetContactSettings();
-
-                    try
-                    {
-                        MailObject message = new MailObject();
-
-                        string siteEmail = contactSettings.Email;
-                        if (!string.IsNullOrEmpty(siteEmail))
-                        {
-                            message.To = new SendGrid.Helpers.Mail.Email(siteEmail);
-                            message.PreHeader = "New enquiry via the " + _site.GetSiteTitle() + " website.";
-                            message.Subject = "New enquiry via the " + _site.GetSiteTitle() + " website.";
-                            message.AddH1("New enquiry!");
-                            message.AddParagraph("A new enquiry has been recieved via " + _site.GetSiteTitle() + " website.");
-                            message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
-                            message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
-                            message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
-                            message.AddParagraph("Subject: <strong>" + model.Subject + "</strong>");
-                            message.AddParagraph("Enquiry:");
-                            message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
-                            await _email.SendEmail(message);
-                        }
-
-                        string msg = contactSettings.ThankYouMessage;
-                        if (string.IsNullOrEmpty(msg))
-                            msg += "Thank you for contacting us! Your enquiry has been successfully sent, and we are currently digesting it. We will be in touch once we have had a read. Thanks!";
-
-                        message = new MailObject();
-                        message.To = new SendGrid.Helpers.Mail.Email(model.Email);
-                        message.PreHeader = "Your enquiry with " + _site.GetSiteTitle();
-                        message.Subject = "Your enquiry with " + _site.GetSiteTitle();
-                        message.AddH1("Your enquiry has been sent.");
-                        message.AddParagraph(msg);
-                        message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
-                        message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
-                        message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
-                        message.AddParagraph("Subject: <strong>" + model.Subject + "</strong>");
-                        message.AddParagraph("Enquiry:");
-                        message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
-                        await _email.SendEmail(message);
-
-                        return new Response(true);
-                    }
-                    catch (Exception sendEx)
-                    {
-                        _logger.LogWarning((int)ErrorEvent.Email, sendEx, "Problem sending email from HomeController.DoContact()");
-                        throw new Exception("There was a problem sending the message: " + sendEx.Message);
-                    }
-
-                }
-                else
-                {
-                    throw new Exception("There is something wrong with the information you have entered.");
-                }
-
-            }
-            catch (Exception ex)
-            {
-                return new Response(ex);
-            }
+            return await _forms.ProcessContactFormModel(model);
         }
 
-        [Route("signup/mailchimp/")]
+        [Route("hood/signup/mailchimp/")]
         public async Task<Response> Mailchimp(MailchimpFormModel model)
         {
             try
@@ -333,6 +241,20 @@ namespace Hood.Controllers
             }
         }
 
+
+        [ResponseCache(CacheProfileName = "Month")]
+        [Route("terms/")]
+        public IActionResult Terms()
+        {
+            return View();
+        }
+
+        [ResponseCache(CacheProfileName = "Month")]
+        [Route("privacy/")]
+        public IActionResult Privacy()
+        {
+            return View();
+        }
 
         [Route("robots.txt")]
         public IActionResult Robots()

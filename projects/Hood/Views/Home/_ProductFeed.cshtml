@@ -1,4 +1,5 @@
 @model ContentListModel
+@inject ISiteConfiguration _site
 <div class="row">
     <div class="col-sm-8">
         @if (Model.Posts.Count == 0)
@@ -9,7 +10,7 @@
         {
             @foreach (var content in Model.Posts.Items)
             {
-                var capi = new ContentApi(content);
+                var capi = _site.ToContentApi(content);
                 var product = new Product(content);
                 <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
                     <div class="thumbnail">

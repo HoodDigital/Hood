@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using System.Linq;
+using Hood.Models.Api;
 
 namespace Hood.Services
 {
@@ -39,7 +40,7 @@ namespace Hood.Services
         private const string AllSettingsKey = "all_settings";
         private const string BasicSettingsKey = "basic_settings";
         private const string SystemSettingsKey = "system_settings";
-
+        
 
         public SiteConfiguration(HoodDbContext db,
                                  IConfiguration config,
@@ -48,7 +49,7 @@ namespace Hood.Services
             _db = db;
             _config = config;
             _cache = memoryCache;
-        }
+       }
 
         public List<Option> AllSettings()
         {
@@ -436,6 +437,21 @@ namespace Hood.Services
             if (basics.CompanyName.IsSet())
                 return basics.CompanyName;
             return null;
+        }
+        
+        public ContentApi ToContentApi(Content content)
+        {
+            return new ContentApi(content, GetMediaSettings());
+        }
+
+        public PropertyListingApi ToPropertyListingApi(PropertyListing property)
+        {
+            return new PropertyListingApi(property, GetPropertySettings(), GetMediaSettings());
+        }
+
+        public ApplicationUserApi ToApplicationUserApi(ApplicationUser user)
+        {
+            return new ApplicationUserApi(user, GetMediaSettings());
         }
     }
 }

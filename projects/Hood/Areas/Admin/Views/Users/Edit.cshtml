@@ -3,7 +3,7 @@
 @model EditUserModel
 @{
     ViewBag.Title = "Edit User: " + Model.User.UserName;
-    ApplicationUserApi uapi = new ApplicationUserApi(Model.User);
+    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
     BasicSettings _info = _site.GetBasicSettings();
 }
 @section buttons {
@@ -176,7 +176,7 @@
                             <div class="col-sm-8">
                                 <fixedImage src="@uapi.Avatar.SmallUrl" class="img-xs img-circle m-r-sm @Model.User.Id" id="user-edit-avatar" />
                                 <attacher dataid="@Model.User.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.User.Id" class="btn btn-xs btn-primary">Choose profile image...</attacher>
-                                <a class="btn btn-xs btn-danger hood-inline-task" href="@Url.Action("ClearImage", "Users", new { area = "Admin", id = Model.User.Id, field = "AvatarId" })" data-complete="$.hood.Content.Edit.Refresh()"><i class="fa fa-trash"></i></a>
+                                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Users" asp-area="Admin" asp-route-id="@Model.User.Id" data-complete="$.hood.Uploader.RefreshImage('.@Model.User.Id', '/admin/users/getavatar', '@Model.User.Id')"><i class="fa fa-trash"></i></a>
                             </div>
                         </div>
                     </fieldset>

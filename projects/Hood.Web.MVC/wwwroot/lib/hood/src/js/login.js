@@ -5,7 +5,6 @@
 
 $.backstretch([
   "/lib/hood/images/bg/1.jpg",
-  "/lib/hood/images/bg/2.jpg",
   "/lib/hood/images/bg/3.jpg",
   "/lib/hood/images/bg/4.jpg",
   "/lib/hood/images/bg/5.jpg",

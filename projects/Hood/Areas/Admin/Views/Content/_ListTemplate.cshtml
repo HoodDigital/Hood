@@ -69,28 +69,9 @@
                 </div>
             </div>
             <div class="col-md-3 action-buttons">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog m-r-sm"></i><span class="caret"></span></button>
+                <div class="btn-group"> 
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
                     <ul class="dropdown-menu dropdown-menu-right">
-                        #if ((Status == 1) || (Status == 3)) {#
-                        <li>
-                            <a class="publish-content" data-id="${ Id }">
-                                <i class="fa fa-thumbs-up m-r-sm"></i>
-                                <span>
-                                    Publish
-                                </span>
-                            </a>
-                        </li>
-                        #} else if (Status == 2) {#
-                        <li>
-                            <a class="archive-content" data-id="${ Id }">
-                                <i class="fa fa-archive m-r-sm"></i>
-                                <span>
-                                    Archive
-                                </span>
-                            </a>
-                        </li>
-                        #}#
                         @if (Model.Type.ShowDesigner)
                         {
                             <li>
@@ -124,6 +105,21 @@
                         </li>
                     </ul>
                 </div>
+                #if ((Status == 1) || (Status == 3)) {#
+                    <a class="publish-content btn btn-primary" data-id="${ Id }">
+                        <i class="fa fa-thumbs-up m-r-xs"></i>
+                        <span>
+                            Publish
+                        </span>
+                    </a>
+                #} else if (Status == 2) {#
+                    <a class="archive-content btn btn-danger" data-id="${ Id }">
+                        <i class="fa fa-archive m-r-xs"></i>
+                        <span>
+                            Archive
+                        </span>
+                    </a>
+                #}#
                 <a class="btn-success btn action-button" href="/admin/content/${ Id }/edit"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
             </div>
         </div>

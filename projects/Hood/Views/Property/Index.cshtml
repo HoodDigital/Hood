@@ -80,7 +80,7 @@
     else
     {
         <div class="row">
-            @foreach (PropertyListingApi content in Model.Properties.Items.Select(c => new PropertyListingApi(c, _settings)))
+            @foreach (PropertyListingApi content in Model.Properties.Items.Select(p => _site.ToPropertyListingApi(p)))
             {
                 await Html.RenderPartialAsync("_PropertyCard", content);
             }

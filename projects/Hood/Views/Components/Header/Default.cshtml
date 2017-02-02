@@ -4,7 +4,7 @@
 @{
     BasicSettings _info = _site.GetBasicSettings();
     AccountInfo _account = Context.GetAccountInfo();
-    ApplicationUserApi uapi = new ApplicationUserApi(_account.User);
+    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
 }
 <header class="header">
     <nav class="navbar navbar-inverse navbar-fixed-top">

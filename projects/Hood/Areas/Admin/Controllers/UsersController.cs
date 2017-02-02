@@ -181,7 +181,7 @@ namespace Hood.Areas.Admin.Controllers
                     users = users.OrderBy(n => n.UserName).ToList();
                     break;
             }
-            var ps = ApplicationUserApi.ConvertAll(users.Skip(request.skip).Take(request.take));
+            var ps = users.Skip(request.skip).Take(request.take).Select(u => _site.ToApplicationUserApi(u));
             Response response = new Response(ps.ToArray(), users.Count());
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
@@ -215,13 +215,17 @@ namespace Hood.Areas.Admin.Controllers
             {
                 var user = _auth.GetUserById(id);
                 if (user != null)
+                {
+                    if (user.Avatar == null)
+                        return MediaApi.Blank(_site.GetMediaSettings());
                     return new MediaApi(user.Avatar);
+                }
                 else
                     throw new Exception("No avatar found");
             }
             catch (Exception)
             {
-                return MediaApi.Blank();
+                return MediaApi.Blank(_site.GetMediaSettings());
             }
         }
 
@@ -346,13 +350,13 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/users/clearimage/")]
         [HttpGet]
-        public async Task<Response> ClearImage(string id, string field)
+        public Response ClearImage(string id)
         {
             try
             {
-                ApplicationUser user = await _db.Users.FirstOrDefaultAsync(c => c.Id == id);
-                _db.Entry(user).Property(field).CurrentValue = null;
-                await _db.SaveChangesAsync();
+                var user = _auth.GetUserById(id);
+                user.Avatar = null;
+                _auth.UpdateUser(user);
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)

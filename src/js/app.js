@@ -78,7 +78,8 @@ $.hood.App = {
     Init: function (options) {
         $.hood.App.Options = $.extend($.hood.App.Options, options || {});
         $.hood.App.Loader.Init();
-        $.hood.App.Header.Init();
+        if ($.hood.App.Options.Header.Enabled)
+            $.hood.App.Header.Init();
         $.hood.App.Accordion();
         $.hood.App.Counters();
         $.hood.App.Scroll.Init();
