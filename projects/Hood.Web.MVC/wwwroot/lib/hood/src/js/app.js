@@ -158,7 +158,7 @@ $.hood.App = {
     Header: {
         Init: function () {
             $.hood.App.Loader.AddItem('hood-menus');
-            if ($.hood.App.Header.Type == 'hover') {
+            if ($.hood.App.Options.Header.Type == 'hover') {
                 if (!$().superfish && !$().superclick)
                     $.getScript('/lib/superclick/dist/js/superfish.min.js', function () {
                         $.hood.App.Header.Load();
@@ -175,7 +175,7 @@ $.hood.App = {
             }
         },
         Load: function (type) {
-            if ($.hood.App.Header.Type == 'hover' || $.hood.App.Header.Type == 'click') {
+            if ($.hood.App.Options.Header.Type == 'hover' || $.hood.App.Options.Header.Type == 'click') {
                 $.hood.App.Header.Setup();
                 $.hood.App.Header.MenuFunctions();
                 $.hood.App.Header.FullWidthMenu();
@@ -218,7 +218,7 @@ $.hood.App = {
                 }
             };
 
-            if ($.hood.App.Header.Type == 'hover') {
+            if ($.hood.App.Options.Header.Type == 'hover') {
                 $('body nav.primary > ul, .top-links > ul').superfish(opts);
             } else {
                 $('body nav.primary > ul, .top-links > ul').superclick(opts);
@@ -238,7 +238,7 @@ $.hood.App = {
                 $.body.addClass('device-touch');
             }
 
-            if ($.hood.App.Header.Type != 'hover') {
+            if ($.hood.App.Options.Header.Type != 'hover') {
                 $('body nav.primary > ul input, .top-links > ul input, body nav.primary > ul select, .top-links > ul select, body nav.primary > ul textarea, .top-links > ul input textarea, body nav.primary > ul .keep-open, .top-links > ul .keep-open').on('click', function (e) {
                     e.stopPropagation();
                 });
