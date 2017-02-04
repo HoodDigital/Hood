@@ -180,7 +180,6 @@ $.hood.App = {
             $.hood.App.Header.FullWidthMenu();
             $.hood.App.Header.OverlayMenu();
             $.hood.App.Header.StickyMenu();
-            $.hood.App.Header.SideHeader();
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
             $.hood.App.Header.Logo();
@@ -309,39 +308,26 @@ $.hood.App = {
         StickyMenu: function (headerOffset) {
             if ($.window.scrollTop() > headerOffset) {
                 if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                    $('body:not(.side-header) #header:not(.no-sticky)').addClass('sticky-header');
+                    $('body:not(.side-header) #header:not(.no-sticky)').addClass(stickyHeaderClass);
                     if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
-                } else if ($.body.hasClass('device-xs') || $.body.hasClass('device-xxs') || $.body.hasClass('device-sm')) {
-                    if ($.body.hasClass('sticky-responsive-menu')) {
-                        $('#header:not(.no-sticky)').addClass('responsive-sticky-header');
-                    }
-                }
+                } 
             } else {
                 $.hood.App.Header.RemoveStickyness();
             }
         },
         RemoveStickyness: function () {
-            if ($.header.hasClass('sticky-header')) {
-                $('body:not(.side-header) #header:not(.no-sticky)').removeClass('sticky-header');
+            if ($.header.hasClass(stickyHeaderClass)) {
+                $('body:not(.side-header) #header:not(.no-sticky)').removeClass(stickyHeaderClass);
                 if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
-            }
-            if ($.header.hasClass('responsive-sticky-header')) {
-                $('body.sticky-responsive-menu #header').removeClass('responsive-sticky-header');
             }
             if (($.body.hasClass('device-xs') || $.body.hasClass('device-xxs') || $.body.hasClass('device-sm')) && (typeof ResponsiveMenuClasses === 'undefined')) {
                 if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
             }
         },
-        SideHeader: function () {
-            $("#header-trigger").click(function () {
-                $('body.open-header').toggleClass("side-header-open");
-                return false;
-            });
-        },
         SidePanel: function () {
-            $(".side-panel-trigger").click(function () {
-                $.body.toggleClass("side-panel-open");
-                if ($.body.hasClass('device-touch') && $.body.hasClass('side-push-panel')) {
+            $.sideMenuTrigger.click(function () {
+                $.body.toggleClass(sidePushPanelOpenClass);
+                if ($.body.hasClass('device-touch') && $.body.hasClass(sidePushPanelClass)) {
                     $.body.toggleClass("ohidden");
                 }
                 return false;
@@ -349,10 +335,10 @@ $.hood.App = {
         },
         MobileMenu: function () {
             $.mobileMenuTrigger.click(function () {
-                if ($.body.hasClass('side-push-panel')) {
-                    $.body.removeClass("side-panel-open");
+                if ($.body.hasClass(sidePushPanelClass)) {
+                    $.body.removeClass(sidePushPanelClass);
                 }
-                $.body.toggleClass("mobile-menu-open");
+                $.body.toggleClass(mobileMenuOpenClass);
                 return false;
             });
         },
@@ -696,15 +682,25 @@ $.footer = $('#footer');
 $.mobileMenu = $('#mobile-menu');
 $.mobileMenuTrigger = $('.mobile-menu-trigger');
 $.background = $('#site-background-image');
-
+$.sideMenus = $('.side-push-panel');
+$.sideMenuTrigger = $(".side-panel-trigger");
 var windowWidth = $.window.width()
-defaultLogo = $('#logo').find('.standard-logo'),
-retinaLogo = $('#logo').find('.retina-logo'),
+
+stickyHeaderClass = 'sticky-header',
+mobileMenuOpenClass = 'mobile-menu-open',
+sidePushPanelClass = 'side-push-panel',
+sidePushPanelOpenClass = 'side-panel-open',
+
 defaultLogoWidth = defaultLogo.find('img').outerWidth(),
+
+defaultLogo = $('#logo').find('.standard-logo'),
 defaultLogoImg = defaultLogo.find('img').attr('src'),
 defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
 defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
+
+retinaLogo = $('#logo').find('.retina-logo'),
 retinaLogoImg = retinaLogo.find('img').attr('src'),
 retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
 retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
+
 owlCarousels = $('#content').find('.owl-carousel-basic');
