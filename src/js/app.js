@@ -18,10 +18,8 @@ $.hood.App = {
                 animation: { opacity: 'show' },
                 animationOut: { opacity: 'hide' },
                 cssArrows: false,
-                onShow: $.noop
-            },
-            FullWidthMenu: {
-                gutter: 30
+                onShow: $.noop,
+                fullWidthMenuGutter: 30
             }
         },
         Wow: {
@@ -40,7 +38,7 @@ $.hood.App = {
             CssFiles: [
                 '/lib/OwlCarousel2/dist/assets/owl.carousel.min.css'
             ],
-            DefaultSettings: {
+            Settings: {
                 loop: true,
                 margin: 10,
                 nav: true,
@@ -77,6 +75,14 @@ $.hood.App = {
     },
     Init: function (options) {
         $.hood.App.Options = $.extend($.hood.App.Options, options || {});
+        $.hood.App.Options.Header = $.extend($.hood.App.Options.Header, options.Header || {});
+        $.hood.App.Options.Header.Settings = $.extend($.hood.App.Options.Header.Settings, options.Header.Settings || {});
+        $.hood.App.Options.Wow = $.extend($.hood.App.Options.Wow, options.Wow || {});
+        $.hood.App.Options.Wow.Settings = $.extend($.hood.App.Options.Wow.Settings, options.Wow.Settings || {});
+        $.hood.App.Options.OwlCarousel = $.extend($.hood.App.Options.OwlCarousel, options.OwlCarousel || {});
+        $.hood.App.Options.OwlCarousel.Settings = $.extend($.hood.App.Options.OwlCarousel.Settings, options.OwlCarousel.Settings || {});
+        $.hood.App.Options.VideoBackgrounds = $.extend($.hood.App.Options.VideoBackgrounds, options.VideoBackgrounds || {});
+        $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
         $.hood.App.Loader.Init();
         if ($.hood.App.Options.Header.Enabled)
             $.hood.App.Header.Init();
@@ -288,7 +294,7 @@ $.hood.App = {
 
         },
         FullWidthMenu: function () {
-            $('.mega-menu .mega-menu-content').css({ 'width': $.wrapper.width() - 2 * $.hood.App.Options.Header.FullWidthMenu.gutter });
+            $('.mega-menu .mega-menu-content').css({ 'width': $.wrapper.width() - 2 * $.hood.App.Options.Header.fullWidthMenuGutter });
         },
         OverlayMenu: function () {
             if ($.body.hasClass('overlay-menu')) {
@@ -342,7 +348,7 @@ $.hood.App = {
             });
         },
         MobileMenu: function () {
-            $(".mobile-menu-trigger").click(function () {
+            $.mobileMenuTrigger.click(function () {
                 if ($.body.hasClass('side-push-panel')) {
                     $.body.removeClass("side-panel-open");
                 }
@@ -573,7 +579,7 @@ $.hood.App = {
             }
         }
         $.getScript('/lib/OwlCarousel2/dist/owl.carousel.min.js', function () {
-            owlCarousels.owlCarousel($.hood.App.Options.OwlCarousel.DefaultSettings);
+            owlCarousels.owlCarousel($.hood.App.Options.OwlCarousel.Settings);
             $.hood.App.Loader.ItemComplete('owl');
         });
     },
@@ -679,7 +685,17 @@ $.hood.App = {
         });
     }
 };
-$.window = $(window);
+
+// Variables for the $.hood.App
+$.window = $(window),
+$.wrapper = $('#wrapper'),
+$.header = $('#header'),
+$.headerWrap = $('#header-wrap'),
+$.content = $('#content'),
+$.footer = $('#footer');
+$.mobileMenu = $('#mobile-menu');
+$.mobileMenuTrigger = $('.mobile-menu-trigger');
+$.background = $('#site-background-image');
 
 var windowWidth = $.window.width()
 defaultLogo = $('#logo').find('.standard-logo'),
@@ -688,7 +704,4 @@ defaultLogoWidth = defaultLogo.find('img').outerWidth(),
 defaultLogoImg = defaultLogo.find('img').attr('src'),
 retinaLogoImg = retinaLogo.find('img').attr('src'),
 defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
-retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
-defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
-retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
-owlCarousels = $('#content').find('.owl-carousel-basic');
+retinaDarkLogo = retinaLogo.attr('data-dark-logo');
