@@ -1,6 +1,6 @@
 {
   "name": "Hood.Web.Tests",
-  "version": "1.0.0-preview5-6",
+  "version": "1.0.0-preview5-7",
   "testRunner": "xunit",
   "dependencies": {
     "xunit": "2.2.0-beta2-build3300",
