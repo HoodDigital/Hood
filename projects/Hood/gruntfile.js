@@ -37,20 +37,20 @@ module.exports = function (grunt) {
                     return semver.inc(old, releaseType);
                 }
             },
-            files: ['project.json', '../Hood.Tests/project.json', '../Hood.Web.MVC/project.json', '../../bower.json'],
+            files: ['project.json', 'pacakge.json', '../Hood.Tests/project.json', '../Hood.Web.MVC/project.json', '../../bower.json'],
         },
         bump: {
             options: {
-                files: ['project.json'],
+                files: ['package.json'],
                 updateConfigs: [],
                 add: true,
                 addFiles: ['.'], // '.' for all files except ingored files in .gitignore 
                 commit: true,
-                commitMessage: 'Release v%VERSION%',
+                commitMessage: 'Published tag v%VERSION%',
                 commitFiles: ['package.json'], // '-a' for all files 
                 createTag: true,
                 tagName: 'v%VERSION%',
-                tagMessage: 'Updated bower tag v%VERSION%',
+                tagMessage: 'Published tag v%VERSION%',
                 push: true,
                 pushTo: 'origin',
                 npm: false,
