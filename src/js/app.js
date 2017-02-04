@@ -157,7 +157,7 @@ $.hood.App = {
     },
     Header: {
         Init: function () {
-            $.hood.App.Loader.AddItem('supermenu');
+            $.hood.App.Loader.AddItem('hood-menus');
             if ($.hood.App.Header.Type == 'hover') {
                 if (!$().superfish && !$().superclick)
                     $.getScript('/lib/superclick/dist/js/superfish.min.js', function () {
@@ -175,15 +175,17 @@ $.hood.App = {
             }
         },
         Load: function (type) {
-            $.hood.App.Header.Setup();
-            $.hood.App.Header.MenuFunctions();
-            $.hood.App.Header.FullWidthMenu();
+            if ($.hood.App.Header.Type == 'hover' || $.hood.App.Header.Type == 'click') {
+                $.hood.App.Header.Setup();
+                $.hood.App.Header.MenuFunctions();
+                $.hood.App.Header.FullWidthMenu();
+            }
             $.hood.App.Header.OverlayMenu();
             $.hood.App.Header.StickyMenu();
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
             $.hood.App.Header.Logo();
-            $.hood.App.Loader.ItemComplete('supermenu');
+            $.hood.App.Loader.ItemComplete('hood-menus');
         },
         Setup: function () {
             if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
