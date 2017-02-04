@@ -28,17 +28,27 @@ $.footer = $('#footer');
 $.mobileMenu = $('#mobile-menu');
 $.mobileMenuTrigger = $('.mobile-menu-trigger');
 $.background = $('#site-background-image');
-
+$.sideMenus = $('.side-push-panel');
+$.sideMenuTrigger = $(".side-panel-trigger");
 var windowWidth = $.window.width()
+
+stickyHeaderClass = 'sticky-header',
+mobileMenuOpenClass = 'mobile-menu-open',
+sidePushPanelClass = 'side-push-panel',
+sidePushPanelOpenClass = 'side-panel-open',
+
 defaultLogo = $('#logo').find('.standard-logo'),
-retinaLogo = $('#logo').find('.retina-logo'),
-defaultLogoWidth = defaultLogo.find('img').outerWidth(),
 defaultLogoImg = defaultLogo.find('img').attr('src'),
 defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
 defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
+
+defaultLogoWidth = defaultLogo.find('img').outerWidth(),
+
+retinaLogo = $('#logo').find('.retina-logo'),
 retinaLogoImg = retinaLogo.find('img').attr('src'),
 retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
 retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
+
 owlCarousels = $('#content').find('.owl-carousel-basic');
 
 // Initialise $.hood.App

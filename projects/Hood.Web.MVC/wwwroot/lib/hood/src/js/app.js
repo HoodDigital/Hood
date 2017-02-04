@@ -310,7 +310,7 @@ $.hood.App = {
                 if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
                     $('body:not(.side-header) #header:not(.no-sticky)').addClass(stickyHeaderClass);
                     if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
-                } 
+                }
             } else {
                 $.hood.App.Header.RemoveStickyness();
             }
@@ -691,12 +691,12 @@ mobileMenuOpenClass = 'mobile-menu-open',
 sidePushPanelClass = 'side-push-panel',
 sidePushPanelOpenClass = 'side-panel-open',
 
-defaultLogoWidth = defaultLogo.find('img').outerWidth(),
-
 defaultLogo = $('#logo').find('.standard-logo'),
 defaultLogoImg = defaultLogo.find('img').attr('src'),
 defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
 defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
+
+defaultLogoWidth = defaultLogo.find('img').outerWidth(),
 
 retinaLogo = $('#logo').find('.retina-logo'),
 retinaLogoImg = retinaLogo.find('img').attr('src'),

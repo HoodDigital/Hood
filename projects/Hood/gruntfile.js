@@ -37,7 +37,7 @@ module.exports = function (grunt) {
                     return semver.inc(old, releaseType);
                 }
             },
-            files: ['project.json', 'pacakge.json', '../Hood.Tests/project.json', '../Hood.Web.MVC/project.json', '../../bower.json'],
+            files: ['project.json', 'package.json', '../Hood.Tests/project.json', '../Hood.Web.MVC/project.json', '../../bower.json'],
         },
         bump: {
             options: {
