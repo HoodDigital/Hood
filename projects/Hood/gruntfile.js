@@ -65,6 +65,7 @@ module.exports = function (grunt) {
     grunt.registerTask("major", ['bumpup:major']);
     grunt.registerTask("minor", ['bumpup:minor']);
     grunt.registerTask("prerelease", ['bumpup:prepatch']);
+    grunt.registerTask("prerelease-tag", ['bumpup:prepatch', 'push-commit']);
     grunt.registerTask("patch", ['bumpup:patch']);
     grunt.registerTask("patch-tag", ['bumpup:patch', 'push-commit']);
 };
