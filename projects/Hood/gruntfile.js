@@ -23,10 +23,30 @@ module.exports = function (grunt) {
                 }
             },
             files: ['project.json', '../Hood.Tests/project.json', '../Hood.Web.MVC/project.json', '../../bower.json'],
+        },
+        bump: {
+            options: {
+                files: ['project.json'],
+                updateConfigs: [],
+                add: true,
+                addFiles: ['.'], // '.' for all files except ingored files in .gitignore 
+                commit: true,
+                commitMessage: 'Release v%VERSION%',
+                commitFiles: ['package.json'], // '-a' for all files 
+                createTag: true,
+                tagName: 'v%VERSION%',
+                tagMessage: 'Updated bower tag v%VERSION%',
+                push: true,
+                pushTo: 'origin',
+                npm: false,
+                npmTag: 'Release v%VERSION%',
+                gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d' // options to use with '$ git describe' 
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-bumpup');
+    grunt.loadNpmTasks('grunt-push-release');
     grunt.registerTask("major", ['bumpup:major']);
     grunt.registerTask("minor", ['bumpup:minor']);
     grunt.registerTask("patch", ['bumpup:patch']);
