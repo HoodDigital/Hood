@@ -16,17 +16,20 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IContentRepository _content;
         private readonly ISiteConfiguration _site;
         private readonly IAuthenticationRepository _auth;
+        private readonly IAddressService _address;
 
         public SettingsController(IAuthenticationRepository auth,
                               IConfiguration conf,
                               IHostingEnvironment env,
                               ISiteConfiguration site,
-                              IContentRepository content)
+                              IContentRepository content,
+                              IAddressService address)
         {
             _auth = auth;
             _config = conf;
             _env = env;
             _content = content;
+            _address = address;
             _site = site;
         }
 
@@ -44,6 +47,12 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Basics(BasicSettings model)
         {
+            var location = _address.GeocodeAddress(model.Address);
+            if (location != null)
+            {
+                model.Address.Latitude = location.Latitude;
+                model.Address.Longitude = location.Longitude;
+            }
             _site.Set("Hood.Settings.Basic", model);
             return View(model);
         }

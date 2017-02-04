@@ -1,3 +1,8 @@
+@inject IThemesService _themes
+@inject ISiteConfiguration _site
+@{
+    IntegrationSettings _plugins = _site.GetIntegrationSettings();
+}
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="~/lib/kendo-ui-core/js/kendo.ui.core.min.js"></script>
@@ -42,3 +47,7 @@
 <environment names="Production,PreProduction">
     <script src="~/lib/hood/dist/js/admin.packaged.js" asp-append-version="true"></script>
 </environment>
+@if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
+{
+    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
+}

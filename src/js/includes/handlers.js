@@ -14,6 +14,23 @@ $.hood.Handlers = {
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
     },
+    Maps: function () {
+        $('.google-map').each(function () {
+            var myLatLng = { lat: $(this).data('lat'), lng: $(this).data('long') };
+
+            var map = new google.maps.Map(this, {
+                zoom:  $(this).data('zoom') || 15,
+                center: myLatLng,
+                scrollwheel: false
+            });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: $(this).data('marker')
+            });
+        });
+    },
     Addresses: {
         AddressForm: {
             QuickName: '{route}, {postal_town}, {postal_code}',
@@ -148,8 +165,9 @@ $.hood.Handlers = {
     }
 };
 $.hood.Handlers.Init();
-function initGoogleMapsAutocomplete() {
+function initGoogleMapsComplete() {
     if ($('#address-autocomplete').doesExist()) {
         $.hood.Handlers.Addresses.InitAutocomplete();
     }
+    $.hood.Handlers.Maps();
 }

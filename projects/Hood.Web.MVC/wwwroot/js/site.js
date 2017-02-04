@@ -3,7 +3,27 @@
 $.hood.App.Extensions = {
     Ready: function () {
         // Init the hood js app with default settings.
-        $.hood.App.Init();
+        $.hood.App.Init({
+            scrollOffset: 64,
+            LoaderHideDelay: 500,
+            ShowCookieMessage: !$('body').hasClass('disable-cookies'),
+            LoadTweets: $('body').hasClass('hood-tweets'),
+            Header: {
+                Enabled: true,
+                Type: 'click'
+            },
+            Wow: {
+                Enabled: $('.wow').length,
+                Settings: {
+                    live: true
+                }
+            },
+            VideoBackgrounds: {
+                Enabled: $('.vide, .video-panel, .video-bg').length
+            },
+            LoadSharers: $('#share').length,
+            SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"]
+        });
 
         // Call the resize function.
         $.hood.App.Extensions.Resize();

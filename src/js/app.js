@@ -76,13 +76,13 @@ $.hood.App = {
     Init: function (options) {
         $.hood.App.Options = $.extend($.hood.App.Options, options || {});
         $.hood.App.Options.Header = $.extend($.hood.App.Options.Header, options.Header || {});
-        $.hood.App.Options.Header.Settings = $.extend($.hood.App.Options.Header.Settings, options.Header.Settings || {});
+        if (options.Header) $.hood.App.Options.Header.Settings = $.extend($.hood.App.Options.Header.Settings, options.Header.Settings || {});
         $.hood.App.Options.Wow = $.extend($.hood.App.Options.Wow, options.Wow || {});
-        $.hood.App.Options.Wow.Settings = $.extend($.hood.App.Options.Wow.Settings, options.Wow.Settings || {});
+        if (options.Wow) $.hood.App.Options.Wow.Settings = $.extend($.hood.App.Options.Wow.Settings, options.Wow.Settings || {});
         $.hood.App.Options.OwlCarousel = $.extend($.hood.App.Options.OwlCarousel, options.OwlCarousel || {});
-        $.hood.App.Options.OwlCarousel.Settings = $.extend($.hood.App.Options.OwlCarousel.Settings, options.OwlCarousel.Settings || {});
+        if (options.OwlCarousel) $.hood.App.Options.OwlCarousel.Settings = $.extend($.hood.App.Options.OwlCarousel.Settings, options.OwlCarousel.Settings || {});
         $.hood.App.Options.VideoBackgrounds = $.extend($.hood.App.Options.VideoBackgrounds, options.VideoBackgrounds || {});
-        $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
+        if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
         $.hood.App.Loader.Init();
         if ($.hood.App.Options.Header.Enabled)
             $.hood.App.Header.Init();

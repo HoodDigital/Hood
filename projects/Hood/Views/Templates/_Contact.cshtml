@@ -37,27 +37,7 @@
 </section>
 @if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet())
 {
-    <div id="map" class="img-lg img-full"></div>
-    <script>
-        function initMap() {
-            var myLatLng = { lat: @_info.Address?.Latitude, lng: @_info.Address?.Longitude };
-
-            var map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 15,
-                center: myLatLng,
-                scrollwheel: false
-            });
-
-            var marker = new google.maps.Marker({
-                position: myLatLng,
-                map: map,
-                title: '@_site.GetSiteTitle()'
-            });
-        }
-    </script>
-    <script async defer
-    src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initMap", _plugins.GoogleMapsApiKey)">
-    </script>
+    <div class="img-lg img-full google-map" data-lat="@_info.Address?.Latitude" data-long="@_info.Address?.Longitude" data-marker="@_site.GetSiteTitle()" data-zoom="12"></div>
 }
 @if (_settings != null && _settings.BusinessHours.IsSet())
 {
