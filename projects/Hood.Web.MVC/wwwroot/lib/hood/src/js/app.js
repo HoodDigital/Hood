@@ -160,7 +160,7 @@ $.hood.App = {
             $.hood.App.Loader.AddItem('hood-menus');
             if ($.hood.App.Options.Header.Type == 'hover') {
                 if (!$().superfish && !$().superclick)
-                    $.getScript('/lib/superclick/dist/js/superfish.min.js', function () {
+                    $.getScript('/lib/superfish/dist/js/superfish.min.js', function () {
                         $.hood.App.Header.Load();
                     });
                 else
