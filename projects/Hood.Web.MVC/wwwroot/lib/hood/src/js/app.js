@@ -680,7 +680,8 @@ $.hood.App = {
         });
     }
 };
-$(window).load($.hood.App.Loader.WindowLoaded);
+$.hood.App.Loader.WindowLoaded;
+if ($.hood.Site && $.hood.Site.Init());
 $(window).resize($.hood.App.Resize);
 
 // Variables for the $.hood.App

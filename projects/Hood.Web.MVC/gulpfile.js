@@ -143,6 +143,9 @@ gulp.task("js:package:app", function () {
         l.end();
     });
     return gulp.src([
+        libFolder + 'jquery-validation/dist/jquery.validate.min.js',
+        libFolder + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
+        libFolder + 'bootstrap/dist/js/bootstrap.min.js',
         hood.js + "includes/production.js",
         lib + 'loaders.css/loaders.css.js',
         lib + 'FitVids/jquery.fitvids.js',
@@ -177,7 +180,6 @@ gulp.task("js:package:login", function () {
         lib + 'jquery/dist/jquery.min.js',
         lib + 'jquery-validation/dist/jquery.validate.min.js',
         lib + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
-        lib + 'bootstrap/dist/js/bootstrap.min.js',
         hood.js + "includes/production.js",
         hood.js + 'login.js'
     ], { base: '.' })
@@ -220,6 +222,7 @@ gulp.task("js:package:admin", function () {
         hood.js + "includes/property.js",
         hood.js + "includes/subscriptions.js",
         hood.js + "includes/content.js",
+        hood.js + "includes/google.js",
         hood.js + "admin.js"
     ], { base: '.' })
     .pipe(concat('admin.packaged.js'))
@@ -278,14 +281,10 @@ gulp.task('site:js', function () {
         .pipe(rename({ suffix: ".min" }))
         .pipe(gulp.dest(jsFolder));
 });
-
 gulp.task('site:js:package', ['site:js'], function () {
     return gulp.src([
         libFolder + 'jquery/dist/jquery.min.js',
-        libFolder + 'jquery-validation/dist/jquery.validate.min.js',
-        libFolder + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
-        libFolder + 'bootstrap/dist/js/bootstrap.min.js',
-        libFolder + 'hood/dist/js/app.packaged.js',
+        libFolder + 'hood/dist/js/includes/google.min.js',
         jsFolder + 'site.min.js',
     ])
     .pipe(concat('site.packaged.js'))

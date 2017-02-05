@@ -14,90 +14,6 @@ $.hood.Handlers = {
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
     },
-    Maps: function () {
-        $('.google-map').each(function () {
-            var myLatLng = { lat: $(this).data('lat'), lng: $(this).data('long') };
-
-            var map = new google.maps.Map(this, {
-                zoom:  $(this).data('zoom') || 15,
-                center: myLatLng,
-                scrollwheel: false
-            });
-
-            var marker = new google.maps.Marker({
-                position: myLatLng,
-                map: map,
-                title: $(this).data('marker')
-            });
-        });
-    },
-    Addresses: {
-        AddressForm: {
-            QuickName: '{route}, {postal_town}, {postal_code}',
-            Number: '{street_number}',
-            Address1: '{route}',
-            Address2: '{locality}',
-            City: '{postal_town}',
-            County: '{administrative_area_level_2}',
-            Country: '{country}',
-            Postcode: '{postal_code}'
-        },
-        placeSearch: null,
-        place: null,
-        autocomplete: null,
-        InitAutocomplete: function () {
-            this.autocomplete = new google.maps.places.Autocomplete(document.getElementById('address-autocomplete'), { types: ['geocode'] });
-            this.autocomplete.addListener('place_changed', $.hood.Handlers.Addresses.FillInAddress);
-        },
-        FillInAddress: function () {
-            // Get the place details from the autocomplete object.
-            $.hood.Handlers.Addresses.place = $.hood.Handlers.Addresses.autocomplete.getPlace();
-
-            for (var component in $.hood.Handlers.Addresses.AddressForm) {
-                if ($('#' + component).doesExist()) {
-                    $('#' + component).val('');
-                    newVal = $.hood.Handlers.Addresses.AddressForm[component];
-                    placeholders = $.getPlaceholders(newVal);
-                    for (var placeholder in placeholders) {
-                        newVal = newVal.replace("{" + placeholders[placeholder] + "}", $.hood.Handlers.Addresses.GetValueFromAddressComponents(placeholders[placeholder]));
-                    }
-                    if (!newVal.contains('undefined'))
-                        $('#' + component).val(newVal);
-                }
-            }
-            $('#Latitude').val($.hood.Handlers.Addresses.place.geometry.location.lat);
-            $('#Longitude').val($.hood.Handlers.Addresses.place.geometry.location.lng);
-        },
-        GetValueFromAddressComponents: function (key) {
-
-            // Get each component of the address from the place details
-            // and fill the corresponding field on the form.
-            for (var i = 0; i < $.hood.Handlers.Addresses.place.address_components.length; i++) {
-                var addressType = $.hood.Handlers.Addresses.place.address_components[i].types[0];
-                if (addressType == key) {
-                    return $.hood.Handlers.Addresses.place.address_components[i].long_name;
-                }
-            }
-
-        },
-        // Bias the autocomplete object to the user's geographical location,
-        // as supplied by the browser's 'navigator.geolocation' object. 
-        GeoLocate: function () {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    var geolocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    var circle = new google.maps.Circle({
-                        center: geolocation,
-                        radius: position.coords.accuracy
-                    });
-                    $.hood.Handlers.Addresses.autocomplete.setBounds(circle.getBounds());
-                });
-            }
-        }
-    },
     DateChange: function (e) {
         // update the date element attached to the field's attach
         $field = $(this).parents('.hood-date').find('.date-output');
@@ -165,9 +81,3 @@ $.hood.Handlers = {
     }
 };
 $.hood.Handlers.Init();
-function initGoogleMapsComplete() {
-    if ($('#address-autocomplete').doesExist()) {
-        $.hood.Handlers.Addresses.InitAutocomplete();
-    }
-    $.hood.Handlers.Maps();
-}
