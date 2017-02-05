@@ -1,4 +1,40 @@
-﻿if (!$.hood)
+﻿// Global variables for the $.hood.App
+// Overwrite these in your site.js to use different classes/elements etc.
+
+$.window = $(window),
+$.wrapper = $('#wrapper'),
+$.header = $('#header'),
+$.headerWrap = $('#header-wrap'),
+$.content = $('#content'),
+$.footer = $('#footer');
+$.mobileMenu = $('#mobile-menu');
+$.mobileMenuTrigger = $('.mobile-menu-trigger');
+$.background = $('#site-background-image');
+$.sideMenus = $('.side-push-panel');
+$.sideMenuTrigger = $(".side-panel-trigger");
+
+var windowWidth = $.window.width()
+
+stickyHeaderClass = 'sticky-header',
+mobileMenuOpenClass = 'mobile-menu-open',
+sidePushPanelClass = 'side-push-panel',
+sidePushPanelOpenClass = 'side-panel-open',
+
+defaultLogo = $('#logo').find('.standard-logo'),
+defaultLogoImg = defaultLogo.find('img').attr('src'),
+defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
+defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
+
+defaultLogoWidth = defaultLogo.find('img').outerWidth(),
+
+retinaLogo = $('#logo').find('.retina-logo'),
+retinaLogoImg = retinaLogo.find('img').attr('src'),
+retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
+retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
+
+owlCarousels = $('#content').find('.owl-carousel-basic');
+
+if (!$.hood)
     $.hood = {}
 $.hood.App = {
     Options: {
@@ -672,38 +708,6 @@ $.hood.App = {
         });
     }
 };
+
 if ($.hood.Site && $.hood.Site.Init());
 $(window).resize($.hood.App.Resize);
-
-// Variables for the $.hood.App
-$.window = $(window),
-$.wrapper = $('#wrapper'),
-$.header = $('#header'),
-$.headerWrap = $('#header-wrap'),
-$.content = $('#content'),
-$.footer = $('#footer');
-$.mobileMenu = $('#mobile-menu');
-$.mobileMenuTrigger = $('.mobile-menu-trigger');
-$.background = $('#site-background-image');
-$.sideMenus = $('.side-push-panel');
-$.sideMenuTrigger = $(".side-panel-trigger");
-var windowWidth = $.window.width()
-
-stickyHeaderClass = 'sticky-header',
-mobileMenuOpenClass = 'mobile-menu-open',
-sidePushPanelClass = 'side-push-panel',
-sidePushPanelOpenClass = 'side-panel-open',
-
-defaultLogo = $('#logo').find('.standard-logo'),
-defaultLogoImg = defaultLogo.find('img').attr('src'),
-defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
-defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
-
-defaultLogoWidth = defaultLogo.find('img').outerWidth(),
-
-retinaLogo = $('#logo').find('.retina-logo'),
-retinaLogoImg = retinaLogo.find('img').attr('src'),
-retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
-retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
-
-owlCarousels = $('#content').find('.owl-carousel-basic');
