@@ -4,6 +4,7 @@ $.hood.App = {
     Options: {
         scrollOffset: 64,
         Loader: {
+            Delay: 500,
             Complete: null,
             Items: [
 
@@ -129,14 +130,10 @@ $.hood.App = {
             for (i = 0; i < $.hood.App.Options.Loader.Items.length; i++) {
                 $.hood.App.Loader.AddItem($.hood.App.Options.Loader.Items[i]);
             }
-            // This hack prevents the preloader from disappearing before load is complete, 
-            // which can happen if some js or features load faster than the DOM completes.
-            $.hood.App.Loader.AddItem('window');
         },
         Complete: function () {
             $('#loader').fadeOut();
-            $('#preloader').delay($.hood.App.Options.LoaderHideDelay).slideUp('slow');
-            $('body').delay($.hood.App.Options.LoaderHideDelay + 250).css({ 'overflow-y': 'auto' });
+            $('#preloader').delay($.hood.App.Options.Loader.Delay).fadeOut('slow');
         },
         AddItem: function (name) {
             $.hood.App.Loader.LoadList.push({
@@ -160,11 +157,6 @@ $.hood.App = {
                     return false;
             }
             return true;
-        },
-        WindowLoaded: function () {
-            // This hack prevents the preloader from disappearing before load is complete, 
-            // which can happen if some js or features load faster than the DOM completes.
-            $.hood.App.Loader.ItemComplete('window');
         }
     },
     Header: {
@@ -680,7 +672,6 @@ $.hood.App = {
         });
     }
 };
-$.hood.App.Loader.WindowLoaded;
 if ($.hood.Site && $.hood.Site.Init());
 $(window).resize($.hood.App.Resize);
 

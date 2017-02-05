@@ -252,7 +252,7 @@ gulp.task('site:clean', function (cb) {
 });
 gulp.task('site:less', ['site:less:src'], function () {
     return gulp
-        .src(lessFolder + 'site.less')
+        .src(lessFolder + '*.less')
         .pipe(sourcemaps.init({ largeFile: true }))
         .pipe(less({ relativeUrls: true }))
         .pipe(stripCss({ preserve: false }))
@@ -263,7 +263,7 @@ gulp.task('site:less', ['site:less:src'], function () {
 });
 gulp.task('site:less:src', function () {
     return gulp
-        .src(lessFolder + 'site.less')
+        .src(lessFolder + '*.less')
         .pipe(sourcemaps.init({ largeFile: true }))
         .pipe(less({ relativeUrls: true }))
         .pipe(sourcemaps.write("/"))

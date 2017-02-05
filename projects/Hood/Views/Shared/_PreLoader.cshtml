@@ -1,16 +1,7 @@
 @inject ISiteConfiguration _site
-@{  
+@{
     IntegrationSettings _info = _site.GetIntegrationSettings();
 }
-@if (_info.LoadingAnimation)
-{
-    <div id="preloader">
-        <div>
-            <div class="load-animation loader">
-                <div class="loader-job">
-                    <div class="@_info.LoadingAnimationType"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+<div id="preloader">
+    <div id="loader"><img src="~/lib/hood/images/loading.svg" /></div>
+</div>

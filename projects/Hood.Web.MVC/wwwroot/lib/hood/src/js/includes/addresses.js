@@ -34,7 +34,7 @@ $.hood.Addresses = {
         });
     },
     PostLoad: function () {
-        $.hood.Handlers.Addresses.InitAutocomplete();
+        $.hood.Google.Addresses.InitAutocomplete();
         $('.btn-loading').each(function () {
             $(this).removeClass('btn-loading').html($(this).data('temp'));
         });

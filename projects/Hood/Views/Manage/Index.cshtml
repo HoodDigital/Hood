@@ -5,12 +5,6 @@
     ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
     var integrations = _site.GetIntegrationSettings();
 }
-@section scripts {
-    @if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
-    {
-        <script src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&libraries=places", integrations.GoogleMapsApiKey)" async defer></script>
-    }
-}
 @Html.Raw(ViewData["StatusMessage"])
 <div class="row">
     <div class="col-sm-4">

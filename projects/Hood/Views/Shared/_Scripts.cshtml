@@ -35,13 +35,13 @@
 <environment names="Production,PreProduction">
     @if (_themes.CurrentTheme == "default")
     {
-        <script async defer src="~/lib/hood/dist/js/app.packaged.js" asp-append-version="true"></script>
         <script src="~/js/site.packaged.js" asp-append-version="true"></script>
     }
     else
     {
         <script async defer src="@string.Format("~/themes/{0}/js/site.packaged.js", _themes.CurrentTheme)" asp-append-version="true"></script>
     }
+    <script async defer src="~/lib/hood/dist/js/app.packaged.js" asp-append-version="true"></script>
 </environment>
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {
