@@ -14,7 +14,13 @@ module.exports = function (grunt) {
                         if (old.includes('-preview')) {
                             pre = old.split('-preview')[1];
                             old = old.split('-preview')[0];
-                            return old + '-preview' + (Number(pre) + 1);
+                            if (pre.split('-').length > 0) {
+                                preMain = pre.split('-')[0];
+                                prePatch = pre.split('-')[1];
+                                return old + '-preview' + (Number(preMain) + 1);
+                            } else {
+                                return old + '-preview' + (Number(pre) + 1);
+                            }
                         } else {
                             return old + '-preview1';
                         }
