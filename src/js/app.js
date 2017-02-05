@@ -3,12 +3,16 @@ if (!$.hood)
 $.hood.App = {
     Options: {
         scrollOffset: 64,
-        LoaderHideDelay: 500,
+        Loader: {
+            Complete: null,
+            Items: [
+
+            ]
+        },
         ShowCookieMessage: !$('body').hasClass('disable-cookies'),
-        Colorbox: $('body').hasClass('colorbox'),
-        Parallax: $('body').hasClass('parallax'),
-        MegaMenu: $('body').hasClass('mega-menu'),
-        LoadTweets: $('body').hasClass('hood-tweets'),
+        Colorbox: true,
+        Parallax: true,
+        LoadTweets: true,
         Header: {
             Enabled: true,
             Type: 'hover',
@@ -23,7 +27,7 @@ $.hood.App = {
             }
         },
         Wow: {
-            Enabled: $('.wow').length,
+            Enabled: true,
             Settings: {
                 boxClass: 'wow',
                 animateClass: 'animated',
@@ -33,11 +37,8 @@ $.hood.App = {
             }
         },
         OwlCarousel: {
-            Enabled: $('body').hasClass('owl'),
+            Enabled: true,
             LoadCss: true,
-            CssFiles: [
-                '/lib/OwlCarousel2/dist/assets/owl.carousel.min.css'
-            ],
             Settings: {
                 loop: true,
                 margin: 10,
@@ -56,7 +57,7 @@ $.hood.App = {
             }
         },
         VideoBackgrounds: {
-            Enabled: $('.vide, .video-panel, .video-bg').length,
+            Enabled: true,
             Settings: {
                 volume: 1,
                 playbackRate: 1,
@@ -74,16 +75,22 @@ $.hood.App = {
         SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"]
     },
     Init: function (options) {
+
         $.hood.App.Options = $.extend($.hood.App.Options, options || {});
-        $.hood.App.Options.Header = $.extend($.hood.App.Options.Header, options.Header || {});
-        if (options.Header) $.hood.App.Options.Header.Settings = $.extend($.hood.App.Options.Header.Settings, options.Header.Settings || {});
-        $.hood.App.Options.Wow = $.extend($.hood.App.Options.Wow, options.Wow || {});
-        if (options.Wow) $.hood.App.Options.Wow.Settings = $.extend($.hood.App.Options.Wow.Settings, options.Wow.Settings || {});
-        $.hood.App.Options.OwlCarousel = $.extend($.hood.App.Options.OwlCarousel, options.OwlCarousel || {});
-        if (options.OwlCarousel) $.hood.App.Options.OwlCarousel.Settings = $.extend($.hood.App.Options.OwlCarousel.Settings, options.OwlCarousel.Settings || {});
-        $.hood.App.Options.VideoBackgrounds = $.extend($.hood.App.Options.VideoBackgrounds, options.VideoBackgrounds || {});
-        if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
+        if (options) {
+            if (options.Header) $.hood.App.Options.Header = $.extend($.hood.App.Options.Header, options.Header || {});
+            if (options.Header) $.hood.App.Options.Header.Settings = $.extend($.hood.App.Options.Header.Settings, options.Header.Settings || {});
+            if (options.Wow) $.hood.App.Options.Wow = $.extend($.hood.App.Options.Wow, options.Wow || {});
+            if (options.Wow) $.hood.App.Options.Wow.Settings = $.extend($.hood.App.Options.Wow.Settings, options.Wow.Settings || {});
+            if (options.OwlCarousel) $.hood.App.Options.OwlCarousel = $.extend($.hood.App.Options.OwlCarousel, options.OwlCarousel || {});
+            if (options.OwlCarousel) $.hood.App.Options.OwlCarousel.Settings = $.extend($.hood.App.Options.OwlCarousel.Settings, options.OwlCarousel.Settings || {});
+            if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds = $.extend($.hood.App.Options.VideoBackgrounds, options.VideoBackgrounds || {});
+            if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
+        }
         $.hood.App.Loader.Init();
+
+
+
         if ($.hood.App.Options.Header.Enabled)
             $.hood.App.Header.Init();
         $.hood.App.Accordion();
@@ -118,16 +125,15 @@ $.hood.App = {
         LoadList: new Array(),
         Init: function () {
             var event = new CustomEvent('load-completed');
-            $(document).on('load-completed', 'body', $.hood.App.Loader.Complete);
-            $.hood.App.Loader.AddItem('loaders');
-            $.getScript('/lib/loaders.css/loaders.css.js', $.proxy(function () {
-                $.loadCss('loaders-css', '/lib/loaders.css/loaders.min.css');
-                $('.loader-inner').loaders();
-                $.hood.App.Loader.ItemComplete('loaders');
-            }, this));
+            $(document).on('load-completed', 'body', $.hood.App.Options.Loader.Complete || $.hood.App.Loader.Complete);
+            for (i = 0; i < $.hood.App.Options.Loader.Items.length; i++) {
+                $.hood.App.Loader.AddItem($.hood.App.Options.Loader.Items[i]);
+            }
+            // This hack prevents the preloader from disappearing before load is complete, 
+            // which can happen if some js or features load faster than the DOM completes.
+            $.hood.App.Loader.AddItem('window');
         },
         Complete: function () {
-            $.hood.App.Extensions.Load();
             $('#loader').fadeOut();
             $('#preloader').delay($.hood.App.Options.LoaderHideDelay).slideUp('slow');
             $('body').delay($.hood.App.Options.LoaderHideDelay + 250).css({ 'overflow-y': 'auto' });
@@ -139,10 +145,11 @@ $.hood.App = {
             });
         },
         ItemComplete: function (name) {
-            console.log('Loaded: ' + name);
             for (cnt = 0; cnt < $.hood.App.Loader.LoadList.length; cnt++) {
-                if ($.hood.App.Loader.LoadList[cnt].Name == name)
+                if ($.hood.App.Loader.LoadList[cnt].Name == name) {
                     $.hood.App.Loader.LoadList[cnt].Complete = true;
+                    console.log('Loaded: ' + name);
+                }
             }
             if ($.hood.App.Loader.CheckLoaded())
                 $('body').trigger('load-completed');
@@ -153,6 +160,11 @@ $.hood.App = {
                     return false;
             }
             return true;
+        },
+        WindowLoaded: function () {
+            // This hack prevents the preloader from disappearing before load is complete, 
+            // which can happen if some js or features load faster than the DOM completes.
+            $.hood.App.Loader.ItemComplete('window');
         }
     },
     Header: {
@@ -561,11 +573,6 @@ $.hood.App = {
     },
     OwlCarousel: function () {
         $.hood.App.Loader.AddItem('owl');
-        if ($.hood.App.Options.OwlCarousel.LoadCss) {
-            for (i = 0; i < $.hood.App.Options.OwlCarousel.CssFiles.length; i++) {
-                $.loadCss('owl-css-' + i, $.hood.App.Options.OwlCarousel.CssFiles[i]);
-            }
-        }
         $.getScript('/lib/OwlCarousel2/dist/owl.carousel.min.js', function () {
             owlCarousels.owlCarousel($.hood.App.Options.OwlCarousel.Settings);
             $.hood.App.Loader.ItemComplete('owl');
@@ -673,6 +680,8 @@ $.hood.App = {
         });
     }
 };
+$(window).load($.hood.App.Loader.WindowLoaded);
+$(window).resize($.hood.App.Resize);
 
 // Variables for the $.hood.App
 $.window = $(window),

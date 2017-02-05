@@ -53,6 +53,5 @@ owlCarousels = $('#content').find('.owl-carousel-basic');
 
 // Initialise $.hood.App
 $(document).ready($.hood.App.Extensions.Ready);
-$(document).load($.hood.App.Extensions.Load);
-$(window).resize($.hood.App.Resize);
+$(window).load($.hood.App.Extensions.Load);
 $(window).resize($.hood.App.Extensions.Resize);
