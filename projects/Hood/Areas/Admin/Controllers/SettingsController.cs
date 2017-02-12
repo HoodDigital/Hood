@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Hood.Services;
 using Hood.Models;
+using System;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -47,13 +48,29 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Basics(BasicSettings model)
         {
-            var location = _address.GeocodeAddress(model.Address);
-            if (location != null)
+            try
             {
-                model.Address.Latitude = location.Latitude;
-                model.Address.Longitude = location.Longitude;
+                var location = _address.GeocodeAddress(model.Address);
+                if (location != null)
+                {
+                    model.Address.Latitude = location.Latitude;
+                    model.Address.Longitude = location.Longitude;
+                    _site.Set("Hood.Settings.Basic", model);
+                    model.SaveMessage = "Settings saved!";
+                    model.MessageType = Enums.AlertType.Success;
+                }
+                else
+                {
+                    _site.Set("Hood.Settings.Basic", model);
+                    model.SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
+                    model.MessageType = Enums.AlertType.Warning;
+                }
             }
-            _site.Set("Hood.Settings.Basic", model);
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/basics/reset/")]
@@ -80,7 +97,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Integrations(IntegrationSettings model)
         {
-            _site.Set("Hood.Settings.Integrations", model);
+            try
+            {
+                _site.Set("Hood.Settings.Integrations", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/integrations/reset/")]
@@ -107,7 +134,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Contact(ContactSettings model)
         {
-            _site.Set("Hood.Settings.Contact", model);
+            try
+            {
+                _site.Set("Hood.Settings.Contact", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/contact/reset/")]
@@ -134,7 +171,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Content(ContentSettings model)
         {
-            _site.Set("Hood.Settings.Content", model);
+            try
+            {
+                _site.Set("Hood.Settings.Content", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/content/reset/")]
@@ -161,7 +208,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Property(PropertySettings model)
         {
-            _site.Set("Hood.Settings.Property", model);
+            try
+            {
+                _site.Set("Hood.Settings.Property", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/property/reset/")]
@@ -188,7 +245,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Billing(BillingSettings model)
         {
-            _site.Set("Hood.Settings.Billing", model);
+            try
+            {
+                _site.Set("Hood.Settings.Billing", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/billing/reset/")]
@@ -215,8 +282,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager,SEO")]
         public IActionResult Seo(SeoSettings model)
         {
-            SeoSettings dbVersion = _site.GetSeo(true);
-            _site.Set("Hood.Settings.Seo", model);
+            try
+            {
+                _site.Set("Hood.Settings.Seo", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/seo/reset/")]
@@ -243,8 +319,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Editor,Manager")]
         public IActionResult Media(MediaSettings model)
         {
-            MediaSettings dbVersion = _site.GetMediaSettings(true);
-            _site.Set("Hood.Settings.Media", model);
+            try
+            {
+                _site.Set("Hood.Settings.Media", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/media/reset/")]
@@ -271,8 +356,17 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Editor,Manager")]
         public IActionResult Mail(MailSettings model)
         {
-            MailSettings dbVersion = _site.GetMailSettings(true);
-            _site.Set("Hood.Settings.Mail", model);
+            try
+            {
+                _site.Set("Hood.Settings.Mail", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
             return View(model);
         }
         [Route("admin/settings/mail/reset/")]

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Hood.BaseTypes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
     [Serializable]
-    public class BillingSettings
+    public class BillingSettings : SaveableModel
     {
         // Paypal
         [Display(Name = "Enable PayPal")]

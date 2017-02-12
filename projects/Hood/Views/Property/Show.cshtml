@@ -20,7 +20,7 @@
     PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
     ViewData["EditUrl"] = Url.Action("Edit", "Property", new { area = "Admin", id = Model.Property.Id });
 
-    Layout = "_BlankLayout";
+    Layout = "_Blank";
 
     string url = Context.GetSiteUrl(true, true);
     if (meta.CanonicalUrl.IsSet())

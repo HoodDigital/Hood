@@ -1,6 +1,7 @@
-﻿namespace Hood.Models
+﻿using Hood.BaseTypes;
+namespace Hood.Models
 {
-    public class ContentSettings
+    public class ContentSettings : SaveableModel
     {
         public ContentType[] Types { get; set; }
 

@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Hood.BaseTypes;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Collections.Generic;
 
 namespace Hood.Models
 {
-    public class EditUserModel
+    public class EditUserModel : SaveableModel
     {
         public ApplicationUser User { get; set; }
         public IList<string> Roles { get; set; }

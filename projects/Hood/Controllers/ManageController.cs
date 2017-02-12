@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Http;
+using System;
+using Hood.Extensions;
 
 namespace Hood.Controllers
 {
@@ -18,6 +21,7 @@ namespace Hood.Controllers
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly IAuthenticationRepository _auth;
+        private readonly IMediaManager<SiteMedia> _media;
 
         public ManageController(
         UserManager<ApplicationUser> userManager,
@@ -25,7 +29,8 @@ namespace Hood.Controllers
         IEmailSender emailSender,
         ISmsSender smsSender,
         IAuthenticationRepository auth,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IMediaManager<SiteMedia> media)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -33,6 +38,7 @@ namespace Hood.Controllers
             _smsSender = smsSender;
             _auth = auth;
             _logger = loggerFactory.CreateLogger<ManageController>();
+            _media = media;
         }
 
         //
@@ -72,6 +78,69 @@ namespace Hood.Controllers
             };
             return View(model);
         }
+
+        [HttpGet]
+        [Route("account/profile/")]
+        public async Task<IActionResult> Profile()
+        {
+            EditUserModel um = new EditUserModel();
+            um.User = _auth.GetUserById(_userManager.GetUserId(User));
+            um.Roles = await _userManager.GetRolesAsync(um.User);
+            um.AllRoles = _auth.GetAllRoles();
+            return View(um);
+        }
+
+        [HttpPost]
+        [Route("account/profile/")]
+        public IActionResult Profile(EditUserModel model)
+        {
+            EditUserModel um = new EditUserModel();
+            um.User = _auth.GetUserById(_userManager.GetUserId(User));
+            try
+            {
+                model.User.CopyProperties(um.User);
+                _auth.UpdateUser(um.User);
+                model.SaveMessage = "Saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
+            return View(model);
+        }
+
+        [Route("account/upload/avatar")]
+        public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
+        {
+            // User must have an organisation.
+            var user = _auth.GetUserById(userId);
+            if (user == null)
+                return NotFound();
+
+            try
+            {
+                SiteMedia mediaResult = null;
+                if (file != null)
+                {
+                    // If the club already has an avatar, delete it from the system.
+                    if (user.Avatar != null)
+                    {
+                        await _media.DeleteStoredMedia(user.Avatar);
+                    }
+                    mediaResult = await _media.ProcessUpload(file, new SiteMedia() { Directory = string.Format("users/{0}/", userId) });
+                    user.Avatar = mediaResult;
+                    _auth.UpdateUser(user);
+                }
+                return Json(new { Success = true, Image = mediaResult });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+            }
+        }
+
 
         //
         // POST: /Manage/RemoveLogin

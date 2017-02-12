@@ -16,7 +16,6 @@
             </div>
 
             <div class="collapse navbar-collapse" id="site-navbar">
-
                 <ul class="nav navbar-nav">
                     <li><a href="/">Home</a></li>
                     <li><a asp-action="Demo" asp-controller="Home">Demo</a></li>
@@ -53,11 +52,11 @@
                                 <li>
                                     <div class="media p-md">
                                         <div class="media-left">
-                                            <fixedImage src="@uapi.Avatar.SmallUrl" class="img-xs img-circle sidebar-avatar @uapi.Id" />
+                                            <fixedImage src="@uapi.Avatar.SmallUrl" class="img-xs img-circle sidebar-avatar @string.Format("avatar-{0}", uapi.Id)" />
                                         </div>
                                         <div class="media-body media-middle">
                                             Logged in as<br />
-                                            <strong class="font-bold">@uapi.UserName</strong>
+                                            <strong class="font-bold">@uapi.FullName</strong>
                                         </div>
                                     </div>
                                 </li>
@@ -74,6 +73,11 @@
                                         }
                                     }
                                 }
+                                <li>
+                                    <a asp-action="Profile" asp-controller="Manage">
+                                        <i class="fa fa-id-card m-r-xs"></i>Your Profile
+                                    </a>
+                                </li>
                                 <li>
                                     <a asp-action="Index" asp-controller="Manage">
                                         <i class="fa fa-cogs m-r-xs"></i>Manage Account

@@ -28,6 +28,7 @@ namespace Hood.Services
 
         // Other Content functions
         void UpdateTemplateMetas(Content content, List<string> newMetas);
+        void RefreshMetas(Content content);
 
         // Content Types
         ContentType GetContentType(string slug);

@@ -40,7 +40,7 @@ namespace Hood.Services
         private const string AllSettingsKey = "all_settings";
         private const string BasicSettingsKey = "basic_settings";
         private const string SystemSettingsKey = "system_settings";
-        
+
 
         public SiteConfiguration(HoodDbContext db,
                                  IConfiguration config,
@@ -49,7 +49,7 @@ namespace Hood.Services
             _db = db;
             _config = config;
             _cache = memoryCache;
-       }
+        }
 
         public List<Option> AllSettings()
         {
@@ -438,7 +438,7 @@ namespace Hood.Services
                 return basics.CompanyName;
             return null;
         }
-        
+
         public ContentApi ToContentApi(Content content)
         {
             return new ContentApi(content, this);
@@ -452,6 +452,12 @@ namespace Hood.Services
         public ApplicationUserApi ToApplicationUserApi(ApplicationUser user)
         {
             return new ApplicationUserApi(user, this);
+        }
+
+        public string ReplacePlaceholders(string text)
+        {
+            var basics = GetBasicSettings();
+            return text.Replace("{SITETITLE}", GetSiteTitle()).Replace("{COMPANYNAME}", basics.CompanyName).Replace("{SITEOWNERNAME}", basics.OwnerFullName).Replace("{SITEPHONE}", basics.Phone).Replace("{SITEEMAIL}", basics.Email);
         }
     }
 }

@@ -87,6 +87,16 @@
                 break;
 
 
+            case "Hood.Image":
+                <div class="input-group">
+                    <input id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" type="url" class="form-control @string.Format("Meta{0}", Model.Id)" placeholder="Enter a url..." />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default hood-image-set" data-target=".@string.Format("Meta{0}", Model.Id)" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                    </span>
+                </div>
+                break;
+
+
             case "Hood.WYSIWYG":
                 <textarea id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" class="tinymce-simple">@Model.GetStringValue()</textarea>
                 break;

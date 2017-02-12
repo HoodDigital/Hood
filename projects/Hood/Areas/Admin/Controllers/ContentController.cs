@@ -785,6 +785,8 @@ namespace Hood.Areas.Admin.Controllers
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
             model.Authors = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
 
+            _content.RefreshMetas(content);
+
             // Templates
             if (model.Type.Templates)
                 model = GetTemplates(model, model.Type.TemplateFolder);

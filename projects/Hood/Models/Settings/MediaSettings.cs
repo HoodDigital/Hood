@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Hood.BaseTypes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
     [Serializable]
-    public class MediaSettings
+    public class MediaSettings : SaveableModel
     {
         [Display(Name = "Azure Storage Key")]
         public string AzureKey { get; set; }

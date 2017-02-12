@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.BaseTypes;
+using Hood.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,7 +7,7 @@ namespace Hood.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     [Serializable]
-    public class SeoSettings
+    public class SeoSettings : SaveableModel
     {
         // Site Socials
         [Display(Name = "Twitter URL")]

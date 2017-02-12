@@ -8,6 +8,6 @@ namespace Hood.Models
         public int? PageSize { get; set; }
         public int Pages { get; set; }
         public int CurrentPage { get; set; }
-        public List<TObject> Items { get; set; }
+        public IEnumerable<TObject> Items { get; set; }
     }
 }

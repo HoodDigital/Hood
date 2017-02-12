@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Hood.BaseTypes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     [Serializable]
-    public class IntegrationSettings
+    public class IntegrationSettings : SaveableModel
     {
         // Loading Animations
         [Display(Name = "Enable Loading Animation")]

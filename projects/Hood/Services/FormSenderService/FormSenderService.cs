@@ -42,10 +42,10 @@ namespace Hood.Services
                     if (!string.IsNullOrEmpty(siteEmail))
                     {
                         message.To = new SendGrid.Helpers.Mail.Email(siteEmail);
-                        message.PreHeader = "New enquiry via the " + _site.GetSiteTitle() + " website.";
-                        message.Subject = "New enquiry via the " + _site.GetSiteTitle() + " website.";
-                        message.AddH1("New enquiry!");
-                        message.AddParagraph("A new enquiry has been recieved via " + _site.GetSiteTitle() + " website.");
+                        message.PreHeader = _site.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
+                        message.Subject = _site.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
+                        message.AddH1(_site.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
+                        message.AddParagraph(_site.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
                         message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
                         message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
                         message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
@@ -55,16 +55,12 @@ namespace Hood.Services
                         await _email.SendEmail(message);
                     }
 
-                    string msg = contactSettings.ThankYouMessage;
-                    if (string.IsNullOrEmpty(msg))
-                        msg += "Thank you for contacting us! Your enquiry has been successfully sent, and we are currently digesting it. We will be in touch once we have had a read. Thanks!";
-
                     message = new MailObject();
                     message.To = new SendGrid.Helpers.Mail.Email(model.Email);
-                    message.PreHeader = "Your enquiry with " + _site.GetSiteTitle();
-                    message.Subject = "Your enquiry with " + _site.GetSiteTitle();
-                    message.AddH1("Your enquiry has been sent.");
-                    message.AddParagraph(msg);
+                    message.PreHeader = _site.ReplacePlaceholders(contactSettings.Subject);
+                    message.Subject = _site.ReplacePlaceholders(contactSettings.Subject);
+                    message.AddH1(_site.ReplacePlaceholders(contactSettings.Title));
+                    message.AddParagraph(_site.ReplacePlaceholders(contactSettings.Message));
                     message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
                     message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
                     message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
@@ -86,5 +82,7 @@ namespace Hood.Services
                 return new Response(ex);
             }
         }
+
+
     }
 }

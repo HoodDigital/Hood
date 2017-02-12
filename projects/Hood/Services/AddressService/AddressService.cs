@@ -19,7 +19,7 @@ namespace Hood.Services
         public Location GeocodeAddress(IAddress address)
         {
             var key = _site.GetIntegrationSettings().GoogleMapsApiKey;
-            if (!key.IsSet() && _site.GetIntegrationSettings().EnableGoogleGeocoding)
+            if (!key.IsSet() || _site.GetIntegrationSettings().EnableGoogleGeocoding)
                 return null;
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };

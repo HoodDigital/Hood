@@ -10,6 +10,9 @@ $.hood.Uploader = {
 
         // SET FUNCTION - SETS THE VALUE OF THE TAGGED INPUT
         $('body').on('click', '.hood-image-set', $.hood.Uploader.Load.Set);
+
+        // SWITCH FUNCTION - REPLACES IMAGES IN THE DESIGNER
+        $('body').on('click', '.hood-image-switch', $.hood.Uploader.Load.Switch);
     },
     Switching: null,
     Load: {
@@ -62,7 +65,26 @@ $.hood.Uploader = {
                     $.hood.Designer.Loader.Hide();
                 } catch (ex) { }
             }, this));
-        }
+        },
+        Switch: function (e) {
+            try {
+                $.hood.Designer.Loader.Show();
+            } catch (ex) { }
+            $.hood.Uploader.Switching = $(this);
+            params = {
+                Tag: $(this).data('target'),
+                Restrict: $(this).data('restrict')
+            }
+            $.hood.Modals.Open('/admin/media/select/', params, '.hood-image-switch', $.proxy(function () {
+                $('#attach-media-title').html($(this).attr('title'))
+                $('body').on('click', '.media-select', $.hood.Uploader.Complete.Switch);
+                $.hood.Media.Manage.Init();
+                $.hood.Media.Upload.Init();
+                try {
+                    $.hood.Designer.Loader.Hide();
+                } catch (ex) { }
+            }, this));
+        },
     },
     Complete: {
         Attach: function (e) {
@@ -125,8 +147,18 @@ $.hood.Uploader = {
             })
             $.hood.Modals.Close('#attach-media-modal');
             $.hood.Alerts.Success("Attached!");
+        },
+        Switch: function (e) {
+            url = $(this).data('url');
+            tag = $.hood.Uploader.Switching;
+            $(tag).css({
+                'background-image': 'url(' + url + ')'
+            });
+            $(tag).find('img').attr('src', url);
+            $.hood.Modals.Close('#attach-media-modal');
+            $.hood.Alerts.Success("Attached!");
         }
-    }, 
+    },
     RefreshImage: function (tag, url, id) {
         var $image = $(tag);
         $image.addClass('loading');

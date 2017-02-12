@@ -1,4 +1,5 @@
-﻿// Global variables for the $.hood.App
+﻿/// <reference path="../../../dropzone/dist/min/dropzone.min.js" />
+// Global variables for the $.hood.App
 // Overwrite these in your site.js to use different classes/elements etc.
 
 $.window = $(window),
@@ -125,9 +126,6 @@ $.hood.App = {
             if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
         }
         $.hood.App.Loader.Init();
-
-
-
         if ($.hood.App.Options.Header.Enabled)
             $.hood.App.Header.Init();
         $.hood.App.Accordion();
@@ -139,6 +137,7 @@ $.hood.App = {
         $.hood.App.Mailchimp.Init();
         $.hood.App.ResizeVideos();
         $.hood.App.ContactForms.Init();
+        $.hood.App.Uploaders.Init();
         if ($.hood.App.Options.OwlCarousel.Enabled)
             $.hood.App.OwlCarousel();
         if ($.hood.App.Options.VideoBackgrounds.Enabled)
@@ -471,11 +470,11 @@ $.hood.App = {
                 $form = $(this);
                 $.post($form.attr('action'), $form.serialize(), function (data) {
                     if (data.Success) {
-                        if (typeof ($form.attr('data-redirect')) != 'undefined')
+                        if ($form.attr('data-redirect'))
                             window.location = $form.attr('data-redirect');
 
-                        if (typeof ($form.attr('data-alert-message')) != 'undefined')
-                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Error", null, true);
+                        if ($form.attr('data-alert-message'))
+                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Success", null, true);
 
                         $form.find('.form').hide();
                         $form.find('.thank-you').show();
@@ -486,6 +485,7 @@ $.hood.App = {
                         $.hood.Alerts.Error("There was an error sending the message", "Error", null, true);
                     }
                 });
+                return false;
             });
         }
     },
@@ -706,6 +706,132 @@ $.hood.App = {
             wow.init();
             $.hood.App.Loader.ItemComplete('wow');
         });
+    },
+    Uploaders: {
+        Init: function () {
+            if ($('#media-upload').doesExist() || $('#avatar-upload').doesExist()) {
+                $.hood.App.Loader.AddItem('uploaders');
+                $.getScript('/lib/dropzone/dist/min/dropzone.min.js', $.proxy(function () {
+                    if ($('#media-upload').doesExist())
+                        $.hood.App.Uploaders.Gallery();
+                    if ($('#avatar-upload').doesExist())
+                        $.hood.App.Uploaders.Avatar();
+                    $.hood.App.Loader.ItemComplete('uploaders');
+                }, this));
+            }
+        },
+        Gallery: function () {
+            Dropzone.autoDiscover = false;
+
+            var previewNode = document.querySelector("#media-upload-template");
+            previewNode.id = "";
+            var previewTemplate = previewNode.parentNode.innerHTML;
+            previewNode.parentNode.removeChild(previewNode);
+
+            var galleryDropzone = new Dropzone("#media-upload", {
+                url: $("#media-upload").data('url'),
+                thumbnailWidth: 80,
+                thumbnailHeight: 80,
+                parallelUploads: 5,
+                previewTemplate: previewTemplate,
+                paramName: 'files',
+                autoProcessQueue: true, // Make sure the files aren't queued until manually added
+                previewsContainer: "#previews", // Define the container to display the previews
+                clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
+                dictDefaultMessage: '<span><i class="fa fa-cloud-upload fa-4x"></i><br />Drag and drop files here, or simply click me!</div>',
+                dictResponseError: 'Error while uploading file!'
+            });
+            $("#media-upload .cancel").hide();
+
+            galleryDropzone.on("addedfile", function (file) {
+                $(file.previewElement.querySelector(".complete")).hide();
+                $(file.previewElement.querySelector(".cancel")).show();
+                $("#media-upload .cancel").show();
+            });
+
+            // Update the total progress bar
+            galleryDropzone.on("totaluploadprogress", function (progress) {
+                document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
+            });
+
+            galleryDropzone.on("sending", function (file) {
+                // Show the total progress bar when upload starts
+                document.querySelector("#total-progress").style.opacity = "1";
+                // And disable the start button
+            });
+
+            // Hide the total progress bar when nothing's uploading anymore
+            galleryDropzone.on("complete", function (file) {
+                $(file.previewElement.querySelector(".cancel")).hide();
+                $(file.previewElement.querySelector(".progress")).hide();
+                $(file.previewElement.querySelector(".complete")).show();
+                $.hood.Inline.Refresh('.gallery');
+            });
+
+            // Hide the total progress bar when nothing's uploading anymore
+            galleryDropzone.on("queuecomplete", function (progress) {
+                document.querySelector("#total-progress").style.opacity = "0";
+                $("#media-upload .cancel").hide();
+            });
+
+            galleryDropzone.on("success", function (file, response) {
+                $.hood.Inline.Refresh('.gallery');
+                if (response.Success) {
+                    $.hood.Alerts.Success("New images added!");
+                } else {
+                    $.hood.Alerts.Error("There was a problem adding the profile image: " + response.Error);
+                }
+            });
+
+            // Setup the buttons for all transfers
+            // The "add files" button doesn't need to be setup because the config
+            // `clickable` has already been specified.
+            document.querySelector(".actions .cancel").onclick = function () {
+                galleryDropzone.removeAllFiles(true);
+            };
+        },
+        Avatar: function () {
+            Dropzone.autoDiscover = false;
+            var avatarDropzone = new Dropzone("#avatar-upload", {
+                url: $("#avatar-upload").data('url'),
+                maxFiles: 1,
+                paramName: 'file',
+                parallelUploads: 1,
+                autoProcessQueue: true, // Make sure the files aren't queued until manually added
+                previewsContainer: false, // Define the container to display the previews
+                clickable: "#avatar-upload" // Define the element that should be used as click trigger to select files.
+            });
+            avatarDropzone.on("addedfile", function () {
+                if (this.files[1] != null) {
+                    this.removeFile(this.files[0]);
+                }
+            });
+            // Update the total progress bar
+            avatarDropzone.on("totaluploadprogress", function (progress) {
+                document.querySelector("#avatar-total-progress .progress-bar").style.width = progress + "%";
+            });
+            avatarDropzone.on("sending", function (file) {
+                // Show the total progress bar when upload starts
+                document.querySelector("#avatar-total-progress").style.opacity = "1";
+                $($("#avatar-upload").data('preview')).addClass('loading');
+            });
+            avatarDropzone.on("queuecomplete", function (progress) {
+                document.querySelector("#avatar-total-progress").style.opacity = "0";
+            });
+            avatarDropzone.on("success", function (file, response) {
+                if (response.Success) {
+                    $("#AvatarJson").val(JSON.stringify(response.Image));
+                    $($("#avatar-upload").data('preview')).css({
+                        'background-image': 'url(' + response.Image.SmallUrl + ')'
+                    });
+                    $($("#avatar-upload").data('preview')).find('img').attr('src', response.Image.SmallUrl);
+                    $.hood.Alerts.Success("New profile image added!");
+                } else {
+                    $.hood.Alerts.Error("There was a problem adding the profile image: " + response.Error);
+                }
+                $($("#avatar-upload").data('preview')).removeClass('loading');
+            });
+        }
     }
 };
 

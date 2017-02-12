@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Hood.Models
 {
@@ -234,7 +235,7 @@ namespace Hood.Models
                         TitleName = "Page Title",
                         ExcerptName = "Page Description",
                         MultiLineExcerpt = true,
-                        ShowDesigner = true,
+                        ShowDesigner = false,
                         ShowEditor = true,
                         ShowCategories = true,
                         ShowBanner = true,
@@ -405,7 +406,7 @@ namespace Hood.Models
             }
         }
 
-        internal static List<CustomField> BaseFields(List<CustomField> fields)
+        private static List<CustomField> BaseFields(List<CustomField> fields)
         {
             fields.AddRange(new List<CustomField>()
             {
@@ -416,11 +417,11 @@ namespace Hood.Models
 
                 new CustomField() {Name="SEO.Facebook.Title", Default = "", System = true, Type = "System.String" },
                 new CustomField() {Name="SEO.Facebook.Description", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Facebook.ImageUrl", Default = "", System = true, Type = "System.String" },
+                new CustomField() {Name="SEO.Facebook.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
 
                 new CustomField() {Name="SEO.Twitter.Title", Default = "", System = true, Type = "System.String" },
                 new CustomField() {Name="SEO.Twitter.Description", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Twitter.ImageUrl", Default = "", System = true, Type = "System.String" },
+                new CustomField() {Name="SEO.Twitter.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
                 new CustomField() {Name="SEO.Twitter.Creator", Default = "", System = true, Type = "System.String" },
 
                 new CustomField() {Name="Settings.Security.AdminOnly", Default = "false", System = true, Type = "System.Boolean" },
@@ -435,48 +436,6 @@ namespace Hood.Models
                 new CustomField() {Name="Settings.Image.Banner.Background", Default = "transparent", System = true, Type = "System.String" }
             });
             return fields;
-        }
-
-        public static bool InitializeContent(ref Content content, ContentType type)
-        {
-            var _requiredMetadata = new List<ContentMeta>();
-
-            foreach (CustomField field in type.CustomFields)
-            {
-                _requiredMetadata.Add(CreateContentMeta(content, field.Name, field.Default, field.Type));
-            }
-
-            List<string> addedMeta = new List<string>();
-            if (content.Metadata != null)
-            {
-                addedMeta = content.Metadata.Select(cm => cm.Name).ToList();
-            }
-            // go through each required type. 
-            bool dbUpdate = false;
-            var required = _requiredMetadata.Select(cm => cm.Name);
-            foreach (ContentMeta cm in _requiredMetadata)
-            {
-                // if it doesnt exist. add it to the content and flag for a db save, thus attach to this content item.
-                if (!addedMeta.Contains(cm.Name))
-                {
-                    content.Metadata.Add(cm);
-                    dbUpdate = true;
-                }
-            }
-            return dbUpdate;
-        }
-
-        public static ContentMeta CreateContentMeta(Content content, string name, string startValue, string type = "System.String")
-        {
-            if (!startValue.IsSet())
-                startValue = "";
-            return new ContentMeta()
-            {
-                ContentId = content.Id,
-                Name = name,
-                Type = type,
-                BaseValue = JsonConvert.SerializeObject(startValue)
-            };
         }
     }
 }

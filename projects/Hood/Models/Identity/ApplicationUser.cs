@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using Hood.Extensions;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
+using Hood.BaseTypes;
+using Hood.Enums;
 
 namespace Hood.Models
 {

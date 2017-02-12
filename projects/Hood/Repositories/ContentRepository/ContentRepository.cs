@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,8 +38,8 @@ namespace Hood.Services
         public PagedList<Content> GetPagedContent(ListFilters filters, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
         {
             PagedList<Content> content = new PagedList<Content>();
-            var contentQuery = GetContent(filters.search, filters.sort, type, category, filter, author, publishedOnly);
-            content.Items = contentQuery.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToList();
+            IOrderedQueryable<Content> contentQuery = GetContent(filters.search, filters.sort, type, category, filter, author, publishedOnly);
+            content.Items = contentQuery.ToList().Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize);
             content.Count = contentQuery.Count();
             content.Pages = content.Count / filters.pageSize;
             if (content.Pages < 1)
@@ -51,7 +52,7 @@ namespace Hood.Services
             content.PageSize = filters.pageSize;
             return content;
         }
-        private IQueryable<Content> GetContent(string search, string sort, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
+        private IOrderedQueryable<Content> GetContent(string search, string sort, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
         {
             IQueryable<Content> content = _db.Content.Include(p => p.Author)
                                                      .Include(p => p.Media)
@@ -112,53 +113,54 @@ namespace Hood.Services
             }
 
             // sort the collection and then content it.
+            IOrderedQueryable<Content> orderedContent = content.OrderByDescending(n => n.PublishDate).ThenBy(n => n.Id);
             if (!string.IsNullOrEmpty(sort))
             {
                 if (sort.StartsWith("Meta"))
                 {
                     var sortVal = sort.Replace("Meta:", "").Replace(":Desc", "");
                     if (sort.EndsWith("Desc"))
-                        content = content.OrderByDescending(n => n.Metadata.Where(m => m.Name == sortVal).FirstOrDefault().BaseValue);
+                        orderedContent = content.OrderByDescending(n => n.Metadata.Where(m => m.Name == sortVal).FirstOrDefault().BaseValue);
                     else
-                        content = content.OrderBy(n => n.Metadata.Where(m => m.Name == sortVal).FirstOrDefault().BaseValue);
+                        orderedContent = content.OrderBy(n => n.Metadata.Where(m => m.Name == sortVal).FirstOrDefault().BaseValue);
                 }
                 else
                 {
                     switch (sort)
                     {
                         case "Title":
-                            content = content.OrderBy(n => n.Title);
+                            orderedContent = content.OrderBy(n => n.Title);
                             break;
                         case "Date":
-                            content = content.OrderBy(n => n.CreatedOn);
+                            orderedContent = content.OrderBy(n => n.CreatedOn);
                             break;
                         case "PublishDate":
-                            content = content.OrderBy(n => n.PublishDate);
+                            orderedContent = content.OrderBy(n => n.PublishDate);
                             break;
                         case "Views":
-                            content = content.OrderBy(n => n.Views);
+                            orderedContent = content.OrderBy(n => n.Views);
                             break;
 
                         case "TitleDesc":
-                            content = content.OrderByDescending(n => n.Title);
+                            orderedContent = content.OrderByDescending(n => n.Title);
                             break;
                         case "DateDesc":
-                            content = content.OrderByDescending(n => n.CreatedOn);
+                            orderedContent = content.OrderByDescending(n => n.CreatedOn);
                             break;
                         case "PublishDateDesc":
-                            content = content.OrderByDescending(n => n.PublishDate);
+                            orderedContent = content.OrderByDescending(n => n.PublishDate);
                             break;
                         case "ViewsDesc":
-                            content = content.OrderByDescending(n => n.Views);
+                            orderedContent = content.OrderByDescending(n => n.Views);
                             break;
 
                         default:
-                            content = content.OrderByDescending(n => n.PublishDate).ThenBy(n => n.Id);
+                            orderedContent = content.OrderByDescending(n => n.PublishDate).ThenBy(n => n.Id);
                             break;
                     }
                 }
             }
-            return content;
+            return orderedContent;
         }
         public List<Content> GetContentByType(string type, string categorySlug = null, bool publishedOnly = true)
         {
@@ -200,8 +202,7 @@ namespace Hood.Services
                                 .FirstOrDefault(c => c.Id == id);
             if (content == null)
                 return content;
-            if (ContentTypes.InitializeContent(ref content, GetContentType(content.ContentType)))
-                _db.SaveChanges();
+            RefreshMetas(content);
             return content;
         }
         public OperationResult Add(Content content)
@@ -212,8 +213,7 @@ namespace Hood.Services
                 _db.Content.Add(content);
                 _db.SaveChanges();
                 content = GetContentByID(content.Id);
-                if (ContentTypes.InitializeContent(ref content, GetContentType(content.ContentType)))
-                    _db.SaveChanges();
+                RefreshMetas(content);
                 _cache.Remove(typeKey);
                 return new OperationResult(true);
             }
@@ -946,10 +946,41 @@ namespace Hood.Services
                 {
                     if (!content.HasMeta(meta))
                     {
-                        content.Metadata.Add(ContentTypes.CreateContentMeta(content, meta, ""));
+                        content.Metadata.Add(new ContentMeta()
+                        {
+                            ContentId = content.Id,
+                            Name = meta,
+                            Type = "System.String",
+                            BaseValue = JsonConvert.SerializeObject("")
+                        });
                     }
                 }
 
+        }
+        public void RefreshMetas(Content content)
+        {
+            foreach (CustomField field in GetContentType(content.ContentType).CustomFields)
+            {
+                if (content.HasMeta(field.Name))
+                {
+                    // ensure it has the correct type.
+                    var meta = content.GetMeta(field.Name);
+                    if (meta.Type != field.Type)
+                        meta.Type = field.Type;
+                }
+                else
+                {
+                    // Add it...
+                    content.AddMeta(new ContentMeta()
+                    {
+                        ContentId = content.Id,
+                        Name = field.Name,
+                        Type = field.Type,
+                        BaseValue = JsonConvert.SerializeObject(field.Default)
+                    });
+                }
+            }
+            _db.SaveChanges();
         }
     }
 }

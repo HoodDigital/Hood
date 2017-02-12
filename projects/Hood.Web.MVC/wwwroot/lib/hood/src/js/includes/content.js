@@ -402,6 +402,14 @@ $.hood.Content = {
                     }
                 }
             });
+            var xhr;
+            new autoComplete({
+                selector: 'input.autocomplete-category',
+                source: function (term, response) {
+                    try { xhr.abort(); } catch (e) { }
+                    xhr = $.getJSON('/admin/content/categorysuggestions/', { query: term }, function (data) { response(data); });
+                }
+            });
         }
     },
     Edit: {

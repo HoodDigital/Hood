@@ -1,12 +1,15 @@
-﻿using Hood.Interfaces;
+﻿using Hood.BaseTypes;
+using Hood.Extensions;
+using Hood.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     [Serializable]
-    public class BasicSettings
+    public class BasicSettings : SaveableModel
     {
         // Owner Info
         [Display(Name = "First name")]
@@ -44,8 +47,26 @@ namespace Hood.Models
         public BasicSettings()
         {
             // Set Defaults
-            SiteTitle = "Website.com";
+            SiteTitle = "My Hood Site";
+            OwnerFirstName = "Website.com";
+            OwnerLastName = "Website.com";
 
+        }
+
+        public string OwnerFullName
+        {
+            get
+            {
+                if (OwnerDisplayName.IsSet())
+                    return OwnerDisplayName;
+                if (OwnerFirstName.IsSet() && OwnerLastName.IsSet())
+                    return OwnerFirstName + " " + OwnerLastName;
+                else if (OwnerFirstName.IsSet() && !OwnerLastName.IsSet())
+                    return OwnerFirstName;
+                else if (!OwnerFirstName.IsSet() && OwnerLastName.IsSet())
+                    return OwnerLastName;
+                else return "";
+            }
         }
     }
 

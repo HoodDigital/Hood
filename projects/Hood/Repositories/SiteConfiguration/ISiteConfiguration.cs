@@ -33,5 +33,6 @@ namespace Hood.Services
         ContentApi ToContentApi(Content content);
         PropertyListingApi ToPropertyListingApi(PropertyListing property);
         ApplicationUserApi ToApplicationUserApi(ApplicationUser user);
-  }
+        string ReplacePlaceholders(string adminNoficationSubject);
+    }
 }

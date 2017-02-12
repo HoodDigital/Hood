@@ -22,7 +22,7 @@
     ViewData["BodyClass"] = mapi.GetMetaValue("Settings.CSS.BodyClass");
     ViewData["Content"] = mapi;
 
-    Layout = "_BlankLayout";
+    Layout = "_Blank";
     @switch (Model.Type.Type)
     {
         case "news":
@@ -117,11 +117,11 @@ else
     @section styles {
         <environment names="Development,Staging,ErrorTesting">
             <link rel="stylesheet" href="~/lib/dragula/dist/dragula.css" />
-            <link rel="stylesheet" href="~/lib/hood/css/designer.css" />
+            <link rel="stylesheet" href="~/lib/hood/src/css/designer.css" />
         </environment>
         <environment names="Production,PreProduction">
             <link rel="stylesheet" href="~/lib/dragula/dist/dragula.min.css" />
-            <link rel="stylesheet" href="~/lib/hood/css/designer.min.css" />
+            <link rel="stylesheet" href="~/lib/hood/dist/css/designer.min.css" />
         </environment>
     }
     @section scripts {
@@ -131,18 +131,18 @@ else
         <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
         <script src="~/lib/kendo-ui-core/js/kendo.ui.core.min.js"></script>
         <environment names="Development,Staging,ErrorTesting">
-            <script src="~/lib/hood/js/includes/datalist.js"></script>
-            <script src="~/lib/hood/js/includes/pager.js"></script>
-            <script src="~/lib/hood/js/includes/uploader.js"></script>
-            <script src="~/lib/hood/js/includes/media.js"></script>
-            <script src="~/lib/hood/js/includes/designer.js"></script>
+            <script src="~/lib/hood/src/js/includes/datalist.js"></script>
+            <script src="~/lib/hood/src/js/includes/pager.js"></script>
+            <script src="~/lib/hood/src/js/includes/uploader.js"></script>
+            <script src="~/lib/hood/src/js/includes/media.js"></script>
+            <script src="~/lib/hood/src/js/includes/designer.js"></script>
         </environment>
         <environment names="Production,PreProduction">
-            <script src="~/lib/hood/js/includes/datalist.min.js"></script>
-            <script src="~/lib/hood/js/includes/pager.min.js"></script>
-            <script src="~/lib/hood/js/includes/uploader.min.js"></script>
-            <script src="~/lib/hood/js/includes/media.min.js"></script>
-            <script src="~/lib/hood/js/includes/designer.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/datalist.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/pager.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/uploader.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/media.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/designer.min.js"></script>
         </environment>
     }
 }

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Hood.BaseTypes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
     [Serializable]
-    public class MailSettings
+    public class MailSettings : SaveableModel
     {
         [NonSerialized]
         public const string PlainTemplate = "Areas/Admin/Views/Mail/Plain.cshtml";

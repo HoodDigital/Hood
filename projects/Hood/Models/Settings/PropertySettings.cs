@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.BaseTypes;
+using Hood.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Hood.Models
 {
-    public class PropertySettings
+    public class PropertySettings : SaveableModel
     {
         public string Slug { get; set; }
         public string Name { get; set; }

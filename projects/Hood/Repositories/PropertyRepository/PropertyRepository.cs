@@ -202,10 +202,9 @@ namespace Hood.Services
         {
             PagedList<PropertyListing> properties = new PagedList<PropertyListing>();
             var propertiesQuery = GetProperties(filters, published);
-            properties.Items = await propertiesQuery.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToListAsync();
+            properties.Items = (await propertiesQuery.ToListAsync()).Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize);
             properties.Count = propertiesQuery.Count();
             properties.Pages = properties.Count / filters.pageSize;
-            properties.Pages = properties.Items.Count / filters.pageSize;
             if (properties.Pages < 1)
                 properties.Pages = 1;
             if ((properties.Pages * filters.pageSize) < properties.Count)
