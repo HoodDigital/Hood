@@ -19,31 +19,27 @@
     ViewBag.Title = metaTitle;
     ContentApi mapi = _site.ToContentApi(Model.Content);
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
-    ViewData["BodyClass"] = mapi.GetMetaValue("Settings.CSS.BodyClass");
     ViewData["Content"] = mapi;
 
     Layout = "_Blank";
-    @switch (Model.Type.Type)
+    @switch (Model.Type.BaseName)
     {
-        case "news":
-        case "blog":
+        case "News":
             Layout = "_NewsLayout";
             break;
-        case "portfolio":
+        case "Portfolio":
             Layout = "_PortfolioLayout";
             break;
-        case "catalogue":
-        case "rental":
+        case "Product":
             Layout = "_ProductLayout";
             break;
-        case "team":
+        case "Team":
             Layout = "_TeamLayout";
             break;
-        case "testimonial":
+        case "Testimonial":
             Layout = "_TestimonialLayout";
             break;
-        case "page":
-        case "pages":
+        case "Page":
             Layout = "_Page";
             break;
         default:
@@ -91,21 +87,18 @@
 }
 else
 {
-    switch (Model.Type.Type)
+    switch (Model.Type.BaseName)
     {
-        case "news":
-        case "blog":
+        case "News":
             await Html.RenderPartialAsync("_NewsView");
             break;
-        case "portfolio":
+        case "Portfolio":
             await Html.RenderPartialAsync("_PortfolioView");
             break;
-        case "catalogue":
-        case "rental":
+        case "Product":
             await Html.RenderPartialAsync("_ProductView");
             break;
-        case "page":
-        case "pages":
+        case "Page":
         default:
             await Html.RenderPartialAsync("_EditableContent");
             break;

@@ -65,7 +65,7 @@ namespace Hood.Models.Api
         public IList<MetaDataApi<ContentMeta>> Meta { get; set; }
 
         // MVVM Helpers
-        public int PublishHour { get; set;}
+        public int PublishHour { get; set; }
         public int PublishMinute { get; set; }
         public string PublishDatePart { get; set; }
 
@@ -122,17 +122,24 @@ namespace Hood.Models.Api
                 Meta = new List<MetaDataApi<ContentMeta>>();
             else
                 Meta = post.Metadata.Select(cm => new MetaDataApi<ContentMeta>(cm)).ToList();
-
-            switch (ContentType)
+            ContentSettings _contentSettings = settings.GetContentSettings();
+            ContentType type = _contentSettings.GetContentType(ContentType);
+            switch (type.UrlFormatting)
             {
-                case "page":
-                    Url = string.Format("/{0}", post.Slug);
-                    break;
-                default:
+                case "news-title":
                     Url = string.Format("/{0}/{1}/{2}", post.ContentType, post.Id, post.Title.ToSeoUrl());
                     break;
+                case "news":
+                    Url = string.Format("/{0}/{1}/{2}", post.ContentType, post.Id, post.Slug);
+                    break;
+                default:
+                    Url = string.Format("/{0}/{1}", post.ContentType, post.Id);
+                    break;
             }
-
+            if (type.BaseName == "Page")
+            {
+                Url = string.Format("/{0}", post.Slug);
+            }
             if (Status == 1)
             {
                 StatusString = "Draft <span>(Provisional publish date " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString() + ")</span>";
@@ -156,7 +163,7 @@ namespace Hood.Models.Api
             HtmlDocument inputDoc = new HtmlDocument();
             inputDoc.LoadHtml(body);
             HtmlDocument outputDoc = inputDoc;
-            foreach (HtmlNode node in inputDoc.DocumentNode.ChildNodes.Traverse(i => i.Attributes.Where(a => a.Name=="class" && a.Value.Contains("hoodcontent-replace")).Count() > 0))
+            foreach (HtmlNode node in inputDoc.DocumentNode.ChildNodes.Traverse(i => i.Attributes.Where(a => a.Name == "class" && a.Value.Contains("hoodcontent-replace")).Count() > 0))
             {
                 int id = node.GetAttributeValue("id", 0);
                 if (id != 0)
@@ -204,9 +211,9 @@ namespace Hood.Models.Api
             string align = GetMeta(string.Format("Settings.Image.{0}.Align", imageType)).ToString();
             string fit = GetMeta(string.Format("Settings.Image.{0}.Fit", imageType)).ToString();
             string bg = GetMeta(string.Format("Settings.Image.{0}.Background", imageType)).ToString();
-            return string.Format("{0}{1}{2}", 
-                !string.IsNullOrEmpty(align) ? "background-position:" + align + ";" : "", 
-                !string.IsNullOrEmpty(fit) ? "background-size:" + fit + ";" : "", 
+            return string.Format("{0}{1}{2}",
+                !string.IsNullOrEmpty(align) ? "background-position:" + align + ";" : "",
+                !string.IsNullOrEmpty(fit) ? "background-size:" + fit + ";" : "",
                 !string.IsNullOrEmpty(bg) ? "background-color:" + bg + ";" : "");
         }
     }

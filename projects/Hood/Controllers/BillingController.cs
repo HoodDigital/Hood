@@ -11,6 +11,7 @@ using Hood.Extensions;
 using Hood.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Hood.Enums;
+using Hood.Caching;
 
 namespace Hood.Controllers
 {
@@ -28,7 +29,7 @@ namespace Hood.Controllers
         private readonly IBillingService _billing;
         private readonly ISubscriptionRepository _subs;
         private readonly IAuthenticationRepository _auth;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
 
         public BillingController(
             IContentRepository data,
@@ -40,7 +41,7 @@ namespace Hood.Controllers
             IBillingService billing,
             ISubscriptionRepository subs,
             IAuthenticationRepository auth,
-            IMemoryCache cache,
+            IHoodCache cache,
             ISiteConfiguration site)
         {
             _userManager = userManager;
@@ -102,9 +103,6 @@ namespace Hood.Controllers
         {
             try
             {
-                string cacheKey = typeof(AccountInfo).ToString() + "-" + _userManager.GetUserId(User);
-                _cache.Remove(cacheKey);
-
                 ApplicationUser user = await _userManager.GetUserAsync(User);
 
                 // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
@@ -146,13 +144,9 @@ namespace Hood.Controllers
         {
             try
             {
-                string cacheKey = typeof(AccountInfo).ToString() + "-" + _userManager.GetUserId(User);
-                _cache.Remove(cacheKey);
-
                 AccountInfo account = HttpContext.GetAccountInfo();
                 await _billing.Customers.SetDefaultCard(account.User.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
-
             }
             catch (Exception)
             {
@@ -166,13 +160,9 @@ namespace Hood.Controllers
         {
             try
             {
-                string cacheKey = typeof(AccountInfo).ToString() + "-" + _userManager.GetUserId(User);
-                _cache.Remove(cacheKey);
-
                 AccountInfo account = HttpContext.GetAccountInfo();
                 await _billing.Cards.DeleteCard(account.User.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
-
             }
             catch (Exception)
             {

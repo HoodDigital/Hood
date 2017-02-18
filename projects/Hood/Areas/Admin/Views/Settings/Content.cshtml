@@ -60,12 +60,42 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Base Type (System):</label>
+                                    <div class="col-sm-9">
+                                        @if (Model.Types[i].BaseName == "Page")
+                                        {
+                                            <input asp-for="Types[i].BaseName" class="form-control" disabled>
+                                        }
+                                        else
+                                        {
+                                            <select asp-for="Types[i].BaseName" class="form-control">
+                                                <option value="Blank">Blank</option>
+                                                <option value="Slider">Slider</option>
+                                                <option value="Event">Event</option>
+                                                <option value="Client">Client</option>
+                                                <option value="News">News</option>
+                                                <option value="Team">Team</option>
+                                                <option value="Testimonial">Testimonial</option>
+                                                <option value="Portfolio">Portfolio</option>
+                                                <option value="Product">Product</option>
+                                            </select>
+                                        }
+                                    </div>
+                                </div>
                                 <hr />
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Url Slug:</label>
                                     <div class="col-sm-9">
-                                        <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" />
-                                        <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
+                                        @if (Model.Types[i].BaseName == "Page")
+                                        {
+                                            <input asp-for="Types[i].Slug" class="form-control" disabled>
+                                        }
+                                        else
+                                        {
+                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.Types[i].BaseName == "Page" ? "disabled" : "") />
+                                            <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
+                                        }
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -90,8 +120,15 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Type Variable:</label>
                                     <div class="col-sm-9">
-                                        <input asp-for="Types[i].Type" class="form-control restrict-to-slug" />
-                                        <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: This is how your type is stored in the database. <br />&nbsp;<span class="text-danger">WARNING: Changing this will affect external linking, and may cause data loss.</span></b></small></p>
+                                        @if (Model.Types[i].BaseName == "Page")
+                                        {
+                                            <input asp-for="Types[i].Type" class="form-control" disabled>
+                                        }
+                                        else
+                                        {
+                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.Types[i].BaseName == "Page" ? "disabled" : "") />
+                                            <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: This is how your type is stored in the database. <br />&nbsp;<span class="text-danger">WARNING: Changing this will affect external linking, and may cause data loss.</span></b></small></p>
+                                        }
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -104,18 +141,28 @@
                                     <label class="col-sm-3 control-label">Is Public:</label>
                                     <div class="col-sm-9">
                                         <div class="checkbox">
-                                            <input asp-for="Types[i].IsPublic" class="styled">
+                                            <input asp-for="Types[i].IsPublic" class="styled" />
                                             <label asp-for="Types[i].IsPublic">Show a page list or grid page showing all types, with search etc. for this type.</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label">Enabled:</label>
+                                    <label class="col-sm-3 control-label">Has a Page:</label>
                                     <div class="col-sm-9">
                                         <div class="checkbox">
-                                            <input asp-for="Types[i].HasPage" class="styled">
+                                            <input asp-for="Types[i].HasPage" class="styled" />
                                             <label asp-for="Types[i].HasPage">Show individual pages for each record of this type.</label>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Cached By Type:</label>
+                                    <div class="col-sm-9">
+                                        <div class="checkbox">
+                                            <input asp-for="Types[i].CachedByType" class="styled" />
+                                            <label asp-for="Types[i].CachedByType">Cache this type for speedy reuse.</label>
+                                        </div>
+                                        <p><small>Only recommended for items that are rendered a lot, not recommended on large content sets such as news.</small></p>
                                     </div>
                                 </div>
                             </fieldset>
@@ -149,6 +196,17 @@
                                             <input asp-for="Types[i].MultiLineExcerpt" class="styled">
                                             <label asp-for="Types[i].MultiLineExcerpt">Set whether or not the excerpt field allows multi-line text.</label>
                                         </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Url Formatting:</label>
+                                    <div class="col-sm-9">
+                                        <select asp-for="Types[i].UrlFormatting" class="form-control">
+                                            <option value="">Default</option>
+                                            <option value="news">News with Slug</option>
+                                            <option value="news-title">News with Title</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <hr />

@@ -19,6 +19,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Globalization;
 using Hood.IO;
+using Hood.Caching;
 
 namespace Hood
 {
@@ -87,7 +88,6 @@ namespace Hood
                 services.AddDbContext<TContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
                 services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
 
-                services.AddSingleton<ContentCategoryCache>();
 
                 services.AddIdentity<ApplicationUser, IdentityRole>(o =>
                 {
@@ -101,6 +101,9 @@ namespace Hood
                 .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
 
+                services.AddSingleton<IHoodCache, HoodCache>();
+                services.AddSingleton<ContentCategoryCache>();
+                services.AddSingleton<ContentByTypeCache>();
                 services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
                 services.AddSingleton<IFTPService, FTPService>();
                 services.AddSingleton<IPropertyImporter, PropertyImporter>();

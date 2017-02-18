@@ -4,6 +4,7 @@ using Stripe;
 using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
+using Hood.Caching;
 
 namespace Hood.Services
 {
@@ -11,10 +12,10 @@ namespace Hood.Services
     {
         private IStripeService _stripe;
         private UserManager<ApplicationUser> _userManager;
-        private IMemoryCache _cache;
+        private IHoodCache _cache;
 
         public CustomerService(IStripeService stripe,
-                               IMemoryCache cache,
+                               IHoodCache cache,
                                UserManager<ApplicationUser> userManager)
         {
             _cache = cache;

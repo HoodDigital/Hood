@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Hood.Enums;
 using Newtonsoft.Json;
 using System.Text;
+using Hood.Caching;
 
 namespace Hood.Controllers
 {
@@ -34,7 +35,7 @@ namespace Hood.Controllers
         private readonly ISiteConfiguration _site;
         private readonly IBillingService _billing;
         private readonly BasicSettings _info;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
 
         public SubscriptionsController(
             IContentRepository data,
@@ -47,7 +48,7 @@ namespace Hood.Controllers
             ISmsSender smsSender,
             ILoggerFactory loggerFactory,
             IBillingService billing,
-            IMemoryCache cache,
+            IHoodCache cache,
             ISiteConfiguration site)
         {
             _userManager = userManager;

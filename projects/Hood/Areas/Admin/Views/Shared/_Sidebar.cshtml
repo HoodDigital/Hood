@@ -5,7 +5,7 @@
     Hood.Infrastructure.OperationResult subscriptions = _site.SubscriptionsEnabled();
     Layout = null;
     PropertySettings _propertySettings = _site.GetPropertySettings();
-    var sideTypes = _content.GetAllowedTypes();
+    var sideTypes = _site.GetContentSettings().GetAllowedTypes();
     if (_propertySettings.Enabled)
     {
         sideTypes.Add(new ContentType() { Type = "property", TypeNamePlural = "Properties" });

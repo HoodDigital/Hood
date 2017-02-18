@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Caching;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Stripe;
 using System;
 using System.Collections.Generic;
@@ -25,13 +27,13 @@ namespace Hood.Services
         private readonly IConfiguration _config;
         private readonly ISiteConfiguration _site;
         private readonly IBillingService _billing;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
 
         public SubscriptionRepository(HoodDbContext db,
                                       UserManager<ApplicationUser> userManager,
                                       IAuthenticationRepository auth,
                                       IHttpContextAccessor httpContextAccessor,
-                                      IMemoryCache cache,
+                                      IHoodCache cache,
                                       IConfiguration config,
                                       IBillingService billing,
                                       ISiteConfiguration site)
@@ -96,9 +98,9 @@ namespace Hood.Services
         }
         public async Task<Subscription> GetSubscriptionById(int id, bool nocache = false)
         {
-            string cacheKey = typeof(Subscription).ToString() + "-" + id;
-            Subscription subscription = _cache.Get(cacheKey) as Subscription;
-            if (subscription != null && !nocache)
+            string cacheKey = typeof(Subscription).ToString() + ".Single." + id;
+            Subscription subscription = null;
+            if (_cache.TryGetValue(cacheKey, out subscription) && !nocache)
                 return subscription;
             else
             {
@@ -107,7 +109,7 @@ namespace Hood.Services
                                     .Include(s => s.Features)
                                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                _cache.Set(cacheKey, subscription);
+                _cache.Add(cacheKey, subscription);
                 return subscription;
             }
         }
@@ -493,8 +495,6 @@ namespace Hood.Services
         {
             var context = _httpContextAccessor.HttpContext;
             ApplicationUser user = _auth.GetUserById(_userManager.GetUserId(context.User), false, true);
-            string cacheKey = typeof(AccountInfo).ToString() + "-" + user.Id;
-            _cache.Remove(cacheKey);
             return user;
         }
         private UserSubscription GetUserSubscription(ApplicationUser user, int userSubscriptionId)

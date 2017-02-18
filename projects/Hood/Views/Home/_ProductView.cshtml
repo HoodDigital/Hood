@@ -21,7 +21,7 @@
         </div>
         <div id="share"></div>
         <div class="post-entry">
-            @Html.Raw(Model.Content.Body)
+            @{ await Html.RenderPartialAsync("_EditableContent"); }
         </div>
     </div>
 </div>

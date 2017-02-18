@@ -11,6 +11,7 @@ using Hood.Extensions;
 using Hood.Infrastructure;
 using System.Linq;
 using Hood.Models.Api;
+using Hood.Caching;
 
 namespace Hood.Services
 {
@@ -20,7 +21,7 @@ namespace Hood.Services
 
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
-        protected IMemoryCache _cache { get; }
+        private IHoodCache _cache { get; set; }
 
         public string this[string key]
         {
@@ -44,7 +45,7 @@ namespace Hood.Services
 
         public SiteConfiguration(HoodDbContext db,
                                  IConfiguration config,
-                                 IMemoryCache memoryCache)
+                                 IHoodCache memoryCache)
         {
             _db = db;
             _config = config;
@@ -59,18 +60,18 @@ namespace Hood.Services
 
         public T Get<T>(string key, bool nocache = false)
         {
-            string cacheKey = "site_setting_" + key;
+            string cacheKey = typeof(Option).ToString() + "." + key;
             try
             {
-                Option option = _cache.Get(cacheKey) as Option;
-                if (option != null && !nocache)
+                Option option = null;
+                if (_cache.TryGetValue(cacheKey, out option) && !nocache)
                     return JsonConvert.DeserializeObject<T>(option.Value);
                 else
                 {
                     option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
                     if (option != null)
                     {
-                        _cache.Set(cacheKey, option);
+                        _cache.Add(cacheKey, option);
                         return JsonConvert.DeserializeObject<T>(option.Value);
                     }
                     else
@@ -89,7 +90,7 @@ namespace Hood.Services
         {
             try
             {
-                string cacheKey = "site_setting_" + key;
+                string cacheKey = typeof(Option).ToString() + "." + key;
                 Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
                 if (option == null)
                 {
@@ -132,8 +133,8 @@ namespace Hood.Services
                 bool ret = _db.SaveChanges() == 1;
                 if (ret)
                 {
-                    string cacheKey = "site_setting_" + option.Id;
-                    _cache.Set(cacheKey, option);
+                    string cacheKey = typeof(Option).ToString() + "." + option.Id;
+                    _cache.Add(cacheKey, option);
                 }
                 return ret;
             }
@@ -153,7 +154,7 @@ namespace Hood.Services
 
         public bool Delete(string key)
         {
-            string cacheKey = "site_setting_" + key;
+            string cacheKey = typeof(Option).ToString() + "." + key;
             _cache.Remove(cacheKey);
             Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
             if (option != null)

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Hood.Services;
 using Hood.Models;
 using System;
+using Hood.Caching;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -18,13 +19,15 @@ namespace Hood.Areas.Admin.Controllers
         private readonly ISiteConfiguration _site;
         private readonly IAuthenticationRepository _auth;
         private readonly IAddressService _address;
+        private readonly IHoodCache _cache;
 
         public SettingsController(IAuthenticationRepository auth,
                               IConfiguration conf,
                               IHostingEnvironment env,
                               ISiteConfiguration site,
                               IContentRepository content,
-                              IAddressService address)
+                              IAddressService address,
+                              IHoodCache cache)
         {
             _auth = auth;
             _config = conf;
@@ -32,6 +35,7 @@ namespace Hood.Areas.Admin.Controllers
             _content = content;
             _address = address;
             _site = site;
+            _cache = cache;
         }
 
         [Route("admin/settings/basics/")]
@@ -385,6 +389,19 @@ namespace Hood.Areas.Admin.Controllers
         {
             return View();
         }
+
+        #region "Caching" 
+        public IActionResult RemoveCacheItem(string key)
+        {
+            _cache.Remove(key);
+            return RedirectToAction("Advanced");
+        }
+        public IActionResult ResetCache()
+        {
+            _cache.ResetCache();
+            return RedirectToAction("Advanced");
+        }
+        #endregion
 
     }
 }

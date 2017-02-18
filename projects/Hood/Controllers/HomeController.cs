@@ -30,7 +30,6 @@ namespace Hood.Controllers
         public readonly IHostingEnvironment _environment;
         public readonly IEmailSender _email;
         public readonly IContentRepository _content;
-        public readonly IMemoryCache _cache;
         public readonly ILogger _logger;
         private readonly IAuthenticationRepository _auth;
         private readonly IConfiguration _config;
@@ -84,7 +83,7 @@ namespace Hood.Controllers
             ContentListModel model = new ContentListModel();
             model.Posts = content;
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, type);
-            model.Type = _content.GetContentType(type);
+            model.Type = _site.GetContentSettings().GetContentType(type);
             if (!model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Search = filters.search;
@@ -105,7 +104,7 @@ namespace Hood.Controllers
             PagedList<Content> content = _content.GetPagedContent(filters, type, null, author, null, true);
             ContentListModel model = new ContentListModel();
             model.Posts = content;
-            model.Type = _content.GetContentType(type);
+            model.Type = _site.GetContentSettings().GetContentType(type);
             if (!model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
@@ -128,7 +127,7 @@ namespace Hood.Controllers
             PagedList<Content> content = _content.GetPagedContent(filters, type, category, null, null, true);
             ContentListModel model = new ContentListModel();
             model.Posts = content;
-            model.Type = _content.GetContentType(type);
+            model.Type = _site.GetContentSettings().GetContentType(type);
             if (model.Type == null || !model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
@@ -143,7 +142,7 @@ namespace Hood.Controllers
             ContentModel model = new ContentModel();
             model.EditMode = editMode;
             model.Content = _content.GetContentByID(id);
-            model.Type = _content.GetContentType(model.Content.ContentType);
+            model.Type = _site.GetContentSettings().GetContentType(model.Content.ContentType);
 
             if (model.Type == null || !model.Type.Enabled || !model.Type.HasPage)
                 return NotFound();
@@ -156,7 +155,7 @@ namespace Hood.Controllers
             if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && model.Content.Status != (int)Status.Published)
                 return NotFound();
 
-            if (model.Type.Type == "page")
+            if (model.Type.BaseName == "Page")
             {
                 // if admin only, and not logged in as admin hide.
                 if (model.Content.GetMeta("Settings.Security.AdminOnly") != null)
@@ -266,7 +265,7 @@ namespace Hood.Controllers
             sw.WriteLine("Disallow: /account/ ");
             sw.WriteLine("Disallow: /manage/ ");
             sw.WriteLine("Disallow: /install/ ");
-            foreach (ContentType ct in _content.GetRestrictedTypes())
+            foreach (ContentType ct in _site.GetContentSettings().GetRestrictedTypes())
             {
                 sw.WriteLine("Disallow: /" + ct.Slug + "/ ");
             }

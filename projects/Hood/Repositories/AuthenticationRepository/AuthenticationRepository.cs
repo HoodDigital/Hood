@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Identity;
 using Hood.Interfaces;
+using Hood.Caching;
 
 namespace Hood.Services
 {
@@ -18,11 +19,11 @@ namespace Hood.Services
         private readonly HoodDbContext _db;
         private readonly IHttpContextAccessor _context;
         private readonly ISiteConfiguration _site;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBillingService _billing;
 
-        public AuthenticationRepository(HoodDbContext db, ISiteConfiguration site, IBillingService billing, IHttpContextAccessor context, IMemoryCache cache, UserManager<ApplicationUser> userManager)
+        public AuthenticationRepository(HoodDbContext db, ISiteConfiguration site, IBillingService billing, IHttpContextAccessor context, IHoodCache cache, UserManager<ApplicationUser> userManager)
         {
             _db = db;
             _site = site;
@@ -55,7 +56,7 @@ namespace Hood.Services
         {
             if (string.IsNullOrEmpty(userId))
                 return null;
-            string cacheKey = typeof(ApplicationUser).ToString() + "-" + userId;
+            string cacheKey = typeof(ApplicationUser).ToString() + ".Single." + userId;
             ApplicationUser user;
             if (!_cache.TryGetValue(cacheKey, out user) || !cached)
             {
@@ -66,7 +67,7 @@ namespace Hood.Services
                 if (!track)
                     userQ = userQ.AsNoTracking();
                 user = userQ.FirstOrDefault();
-                _cache.Set(cacheKey, user, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
+                _cache.Add(cacheKey, user, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
             }
             return user;
         }
@@ -80,8 +81,8 @@ namespace Hood.Services
                                       .Include(u => u.Subscriptions)
                                       .ThenInclude(u => u.Subscription)
                                       .Where(u => u.StripeId == stripeId).FirstOrDefaultAsync();
-            string cacheKey = typeof(ApplicationUser).ToString() + "-" + user.Id;
-            _cache.Set(cacheKey, user, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
+            string cacheKey = typeof(ApplicationUser).ToString() + ".Single." + user.Id;
+            _cache.Add(cacheKey, user, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
             return user;
         }
 

@@ -1,4 +1,6 @@
 ﻿using Hood.ApiModels;
+using Hood.Caching;
+using Hood.Core.Infrastructure;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -24,14 +26,19 @@ namespace Hood.Services
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
         private readonly ISiteConfiguration _site;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
+        private readonly ContentSettings _contentSettings;
 
-        public ContentRepository(HoodDbContext db, IMemoryCache cache, IConfiguration config, ISiteConfiguration site)
+        public ContentRepository(HoodDbContext db,
+                                 IHoodCache cache,
+                                 IConfiguration config,
+                                 ISiteConfiguration site)
         {
             _db = db;
             _config = config;
             _site = site;
             _cache = cache;
+            _contentSettings = _site.GetContentSettings();
         }
 
         // Content CRUD
@@ -164,7 +171,7 @@ namespace Hood.Services
         }
         public List<Content> GetContentByType(string type, string categorySlug = null, bool publishedOnly = true)
         {
-            string cacheKey = typeof(Content).ToString() + "-" + type;
+            string cacheKey = typeof(Content).ToString() + ".ByType." + type;
             if (categorySlug.IsSet())
             {
                 cacheKey += "-" + categorySlug;
@@ -187,34 +194,44 @@ namespace Hood.Services
                     query = query.Where(c => c.Status == (int)Status.Published);
                 }
                 content = query.ToList();
-                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
+                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(60)));
             }
             return content;
         }
         public Content GetContentByID(int id, bool clearCache = false)
         {
+            string cacheKey = typeof(Content).ToString() + ".Single." + id;
             Content content;
-            content = _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
-                                .Include(p => p.Tags).ThenInclude(t => t.Tag)
-                                .Include(p => p.Media)
-                                .Include(p => p.Metadata)
-                                .Include(p => p.Author)
-                                .FirstOrDefault(c => c.Id == id);
-            if (content == null)
-                return content;
-            RefreshMetas(content);
+            if (!_cache.TryGetValue(cacheKey, out content))
+            {
+                content = _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
+                                    .Include(p => p.Tags).ThenInclude(t => t.Tag)
+                                    .Include(p => p.Media)
+                                    .Include(p => p.Metadata)
+                                    .Include(p => p.Author)
+                                    .FirstOrDefault(c => c.Id == id);
+                if (content == null)
+                    return content;
+                RefreshMetas(content);
+                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+            }
             return content;
         }
         public OperationResult Add(Content content)
         {
-            string typeKey = typeof(Content).ToString() + "-Type-" + content.ContentType;
             try
             {
+                // create the slug
+                var generator = new KeyGenerator();
+                content.Slug = generator.UrlSlug();
+                while (!CheckSlug(content.Slug))
+                    content.Slug = generator.UrlSlug();
+
                 _db.Content.Add(content);
                 _db.SaveChanges();
                 content = GetContentByID(content.Id);
                 RefreshMetas(content);
-                _cache.Remove(typeKey);
+                Events.Fire(nameof(Events.ContentChanged));
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -224,14 +241,11 @@ namespace Hood.Services
         }
         public OperationResult Update(Content content)
         {
-            string cacheKey = typeof(Content).ToString() + "-" + content.Id;
-            string typeKey = typeof(Content).ToString() + "-Type-" + content.ContentType;
             try
             {
                 _db.Update(content);
                 _db.SaveChanges();
-                _cache.Remove(cacheKey);
-                _cache.Remove(typeKey);
+                Events.Fire(nameof(Events.ContentChanged));
                 return new OperationResult(true);
             }
             catch (DbUpdateException ex)
@@ -244,11 +258,10 @@ namespace Hood.Services
             try
             {
                 Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
-                string typeKey = typeof(Content).ToString() + "-Type-" + content.ContentType;
                 _db.SaveChanges();
                 _db.Entry(content).State = EntityState.Deleted;
                 _db.SaveChanges();
-                _cache.Remove(typeKey);
+                Events.Fire(nameof(Events.ContentChanged));
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -307,7 +320,7 @@ namespace Hood.Services
         // Content Views
         public List<Content> GetRecent(string type, string categorySlug = null)
         {
-            string cacheKey = typeof(Content).ToString() + "-Recent-" + type;
+            string cacheKey = typeof(Content).ToString() + ".Recent." + type;
             if (categorySlug.IsSet())
                 cacheKey += "-" + categorySlug;
             List<Content> content;
@@ -325,13 +338,13 @@ namespace Hood.Services
                     query = query.Where(c => c.Categories.Any(cat => cat.Category.Slug == categorySlug));
                 }
                 content = query.OrderByDescending(p => p.PublishDate).Take(10).ToList();
-                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
         }
         public List<Content> GetFeatured(string type, string categorySlug = null)
         {
-            string cacheKey = typeof(Content).ToString() + "-Featured-" + type;
+            string cacheKey = typeof(Content).ToString() + ".Featured." + type;
             if (categorySlug.IsSet())
                 cacheKey += "-" + categorySlug;
             List<Content> content;
@@ -349,13 +362,13 @@ namespace Hood.Services
                     query = query.Where(c => c.Categories.Any(cat => cat.Category.Slug == categorySlug));
                 }
                 content = query.PickRandom(10).ToList();
-                _cache.Set(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
         }
         public ContentNeighbours GetNeighbourContent(int id, string type, string categorySlug = null)
         {
-            string cacheKey = typeof(Content).ToString() + "-Neighbours-" + id;
+            string cacheKey = typeof(Content).ToString() + ".Neighbours." + id;
             ContentNeighbours neighbours;
             if (!_cache.TryGetValue(cacheKey, out neighbours))
             {
@@ -367,39 +380,9 @@ namespace Hood.Services
                 neighbours = new ContentNeighbours();
                 neighbours.Next = all.ElementAtOrDefault(index + 1);
                 neighbours.Previous = all.ElementAtOrDefault(index - 1);
-                _cache.Set(cacheKey, neighbours, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, neighbours, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }
             return neighbours;
-        }
-
-        // Content Types
-        public ContentType GetContentType(string slug)
-        {
-            ContentSettings settings = _site.GetContentSettings();
-            var type = settings.Types.Where(t => t.Slug == slug || t.Type == slug || t.TypeNamePlural.ToLower() == slug).FirstOrDefault();
-            if (type != null)
-                return type;
-            return null;
-        }
-        public List<ContentType> GetAllowedTypes()
-        {
-            ContentSettings settings = _site.GetContentSettings();
-            return settings.Types.Where(t => t.Enabled).ToList();
-        }
-        public List<ContentType> GetDisallowedTypes()
-        {
-            ContentSettings settings = _site.GetContentSettings();
-            return settings.Types.Where(t => !t.Enabled).ToList();
-        }
-        public List<ContentType> GetPublicTypes()
-        {
-            ContentSettings settings = _site.GetContentSettings();
-            return settings.Types.Where(t => t.IsPublic && t.Enabled).ToList();
-        }
-        public List<ContentType> GetRestrictedTypes()
-        {
-            ContentSettings settings = _site.GetContentSettings();
-            return settings.Types.Where(t => !t.IsPublic || !t.Enabled).ToList();
         }
 
         #region "Tags" 
@@ -528,8 +511,7 @@ namespace Hood.Services
                 Priority = 0.9,
                 Frequency = SitemapFrequency.Never
             });
-
-            foreach (ContentType type in GetAllowedTypes())
+            foreach (ContentType type in _contentSettings.GetAllowedTypes())
             {
                 if (type.IsPublic)
                 {
@@ -583,9 +565,9 @@ namespace Hood.Services
         // Non Content Related
         public async Task<List<TweetApi>> GetTweets(string name, int count)
         {
-            string cacheKey = "tweets_" + name.ToSeoUrl();
-            List<TweetApi> tweets = _cache.Get(cacheKey) as List<TweetApi>;
-            if (tweets != null)
+            string cacheKey = typeof(TweetApi).ToString() + ".Recent." + name.ToSeoUrl();
+            List<TweetApi> tweets = new List<TweetApi>();
+            if (_cache.TryGetValue(cacheKey, out tweets))
                 return tweets;
             else
             {
@@ -647,16 +629,16 @@ namespace Hood.Services
 
                 var tws = statusList.Where(t => t.Entities.MediaEntities.Where(me => me.Type == "photo").Count() > 0);
                 tweets = tws.Take(6).Select(t => new TweetApi(t)).ToList();
-                _cache.Set(cacheKey, tweets);
+                _cache.Add(cacheKey, tweets);
                 return tweets;
             }
 
         }
         public List<Country> AllCountries()
         {
-            string cacheKey = "country_codes";
-            List<Country> countries = _cache.Get(cacheKey) as List<Country>;
-            if (countries != null)
+            string cacheKey = typeof(Country).ToString() + ".List";
+            List<Country> countries = new List<Country>();
+            if (_cache.TryGetValue(cacheKey, out countries))
                 return countries;
             else
             {
@@ -911,7 +893,7 @@ namespace Hood.Services
                 dictionary.Add(new Country("Zimbabwe", "Zimbabwe", "ZW", "ZWE", "716", "ZWL", "Zimbabwe Dollar"));
                 dictionary.Add(new Country("Åland Islands", "Åland Islands", "AX", "ALA", "248", "EUR", "Euro"));
                 dictionary = dictionary.OrderBy(c => c.Name).ToList();
-                _cache.Set(cacheKey, dictionary);
+                _cache.Add(cacheKey, dictionary);
                 return dictionary;
             }
         }
@@ -959,7 +941,7 @@ namespace Hood.Services
         }
         public void RefreshMetas(Content content)
         {
-            foreach (CustomField field in GetContentType(content.ContentType).CustomFields)
+            foreach (CustomField field in _contentSettings.GetContentType(content.ContentType).CustomFields)
             {
                 if (content.HasMeta(field.Name))
                 {
@@ -981,6 +963,12 @@ namespace Hood.Services
                 }
             }
             _db.SaveChanges();
+        }
+        public bool CheckSlug(string slug, int? id = null)
+        {
+            if (id.HasValue)
+                return _db.Content.SingleOrDefault(c => c.Slug == slug && c.Id != id) == null;
+            return _db.Content.SingleOrDefault(c => c.Slug == slug) == null;
         }
     }
 }

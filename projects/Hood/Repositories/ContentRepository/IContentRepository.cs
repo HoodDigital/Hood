@@ -2,6 +2,7 @@
 using Hood.Infrastructure;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ namespace Hood.Services
 {
     public interface IContentRepository
     {
+        // Events
 
         // Content CRUD
         PagedList<Content> GetPagedContent(ListFilters filters, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true);
@@ -29,13 +31,7 @@ namespace Hood.Services
         // Other Content functions
         void UpdateTemplateMetas(Content content, List<string> newMetas);
         void RefreshMetas(Content content);
-
-        // Content Types
-        ContentType GetContentType(string slug);
-        List<ContentType> GetAllowedTypes();
-        List<ContentType> GetDisallowedTypes();
-        List<ContentType> GetPublicTypes();
-        List<ContentType> GetRestrictedTypes();
+        bool CheckSlug(string slug, int? id = null);
 
         // Tags
         Task<OperationResult<ContentTag>> AddTag(string value);

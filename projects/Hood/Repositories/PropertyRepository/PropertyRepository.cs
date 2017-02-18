@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Caching;
+using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,9 @@ namespace Hood.Services
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
         private readonly ISiteConfiguration _site;
-        protected IMemoryCache _cache;
+        private readonly IHoodCache _cache;
 
-        public PropertyRepository(HoodDbContext db, IMemoryCache cache, IConfiguration config, ISiteConfiguration site)
+        public PropertyRepository(HoodDbContext db, IHoodCache cache, IConfiguration config, ISiteConfiguration site)
         {
             _db = db;
             _config = config;
@@ -57,9 +58,9 @@ namespace Hood.Services
         }
         public PropertyListing GetPropertyById(int id, bool nocache = false)
         {
-            string cacheKey = "Property:Listing:" + id.ToString();
-            PropertyListing property = _cache.Get(cacheKey) as PropertyListing;
-            if (property != null && !nocache)
+            string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
+            PropertyListing property = null;
+            if (_cache.TryGetValue(cacheKey, out property) && !nocache)
                 return property;
             else
             {
@@ -70,7 +71,7 @@ namespace Hood.Services
                     .Include(p => p.Metadata)
                     .FirstOrDefault(c => c.Id == id);
 
-                _cache.Set(cacheKey, property);
+                _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
                 return property;
             }
         }
@@ -306,9 +307,9 @@ namespace Hood.Services
         }
         public async Task<List<PropertyListing>> GetFeatured()
         {
-            string cacheKey = "Property:Featured";
-            List<PropertyListing> properties = _cache.Get(cacheKey) as List<PropertyListing>;
-            if (properties != null)
+            string cacheKey = typeof(PropertyListing) + ".Featured";
+            List<PropertyListing> properties = null;
+            if (_cache.TryGetValue(cacheKey, out properties))
                 return properties;
             else
             {
@@ -320,15 +321,15 @@ namespace Hood.Services
                     .Where(c => c.Featured && c.Status == (int)Status.Published)
                     .Take(20)
                     .ToListAsync();
-                _cache.Set(cacheKey, properties);
+                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
                 return properties;
             }
         }
         public async Task<List<PropertyListing>> GetRecent()
         {
-            string cacheKey = "Property:Recent";
-            List<PropertyListing> properties = _cache.Get(cacheKey) as List<PropertyListing>;
-            if (properties != null)
+            string cacheKey = typeof(PropertyListing) + ".Recent";
+            List<PropertyListing> properties = null;
+            if (_cache.TryGetValue(cacheKey, out properties))
                 return properties;
             else
             {
@@ -342,7 +343,7 @@ namespace Hood.Services
                     .ThenByDescending(p => p.CreatedOn)
                     .Take(20)
                     .ToListAsync();
-                _cache.Set(cacheKey, properties);
+                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
                 return properties;
             }
         }

@@ -14,6 +14,7 @@ using Hood.Extensions;
 using Hood.Models.Api;
 using Newtonsoft.Json;
 using Hood.Interfaces;
+using Hood.Caching;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -23,11 +24,11 @@ namespace Hood.Areas.Admin.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly HoodDbContext _db;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
         private readonly IMediaManager<SiteMedia> _media;
 
         public MediaController(
-            UserManager<ApplicationUser> userManager, HoodDbContext db, IMemoryCache cache, IMediaManager<SiteMedia> media)
+            UserManager<ApplicationUser> userManager, HoodDbContext db, IHoodCache cache, IMediaManager<SiteMedia> media)
         {
             _userManager = userManager;
             _cache = cache;
@@ -241,7 +242,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
                         await _db.SaveChangesAsync();
-                        cacheKey = typeof(Content).ToString() + "-" + contentId;
+                        cacheKey = typeof(Content).ToString() + ".Single." + contentId;
                         _cache.Remove(cacheKey);
                         return new Response(true);
 
@@ -258,7 +259,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
 
-                        cacheKey = typeof(ApplicationUser).ToString() + "-" + attach.Id;
+                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + attach.Id;
                         _cache.Remove(cacheKey);
                         await _db.SaveChangesAsync();
                         return new Response(true);
@@ -279,7 +280,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
                         await _db.SaveChangesAsync();
-                        cacheKey = typeof(PropertyListing).ToString() + "-" + propertyId;
+                        cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
                         _cache.Remove(cacheKey);
                         return new Response(true);
 
@@ -291,7 +292,7 @@ namespace Hood.Areas.Admin.Controllers
                         contentForMeta.UpdateMeta(attach.Field, mi);
                         if (await _db.SaveChangesAsync() == 0)
                             throw new Exception("Could not update the database");
-                        cacheKey = typeof(Content).ToString() + "-" + idForMeta;
+                        cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
                         _cache.Remove(cacheKey);
                         return new Response(true);
 

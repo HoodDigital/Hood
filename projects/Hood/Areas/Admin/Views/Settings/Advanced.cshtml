@@ -2,9 +2,15 @@
 @inject IConfiguration _config
 @inject IContentRepository _data
 @inject ISiteConfiguration _site
+@inject IHoodCache _cache
 @{
     var theme = _theme.CurrentTheme;
     ViewData["Title"] = "Administrator Tools";
+}
+@section buttons {
+    <a class="btn btn-danger" href="@Url.Action("ResetCache")">
+        Reset Cache
+    </a>
 }
 <div class="row">
     <div class="col-md-4 col-md-push-8">
@@ -26,6 +32,7 @@
         <div class="tabs-container">
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#basics">App Settings</a></li>
+                <li><a data-toggle="tab" href="#cache">Cache</a></li>
                 <li><a data-toggle="tab" href="#advanced">Advanced Editor</a></li>
             </ul>
             <div class="tab-content">
@@ -44,14 +51,14 @@
                                     <span class="pull-right">
                                         @_config["Data:ConnectionString"]
                                     </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
+                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
                                 }
                                 else
                                 {
                                     <span class="pull-right">
                                         -
                                     </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
+                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
                                 }
                             </li>
                             <li class="list-group-item">
@@ -60,41 +67,62 @@
                                     <span class="pull-right">
                                         @_config["ASPNETCORE_ENVIRONMENT"]
                                     </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
+                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
                                 }
                                 else
                                 {
                                     <span class="pull-right">
                                         -
                                     </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
+                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
                                 }
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_data.GetAllowedTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_site.GetContentSettings().GetAllowedTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Enabled Types</span>
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_data.GetDisallowedTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_site.GetContentSettings().GetDisallowedTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Disabled Types</span>
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_data.GetPublicTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_site.GetContentSettings().GetPublicTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Public Types</span>
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_data.GetRestrictedTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_site.GetContentSettings().GetRestrictedTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Restricted Types</span>
                             </li>
                         </ul>
+                    </div>
+                </div>
+                <div id="cache" class="tab-pane">
+                    <div class="panel-body">
+                        <strong>Cache Contents &amp; Reset</strong>
+                        <p>
+                            Here you can view the site's current cache and reset it if need be.
+                        </p>
+                    </div>
+                    <div class="panel-body">
+                        @foreach (string key in _cache.Keys.OrderBy(s => s))
+                        {
+                            <div class="list-group-item">
+                                <div class="pull-right">
+                                    <a class="btn btn-xs btn-danger" href="@Url.Action("RemoveCacheItem", new { key = key })">
+                                        Remove
+                                    </a>
+                                </div>
+                                <p>@key</p>
+                            </div>
+                        }
                     </div>
                 </div>
                 <div id="advanced" class="tab-pane">

@@ -10,6 +10,7 @@ using Hood.Models;
 using Hood.Services;
 using System;
 using Microsoft.Extensions.Caching.Memory;
+using Hood.Caching;
 
 namespace Hood.Controllers
 {
@@ -22,7 +23,7 @@ namespace Hood.Controllers
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly IContentRepository _data;
-        private readonly IMemoryCache _cache;
+        private readonly IHoodCache _cache;
 
         public AccountController(
             IContentRepository data,
@@ -30,7 +31,7 @@ namespace Hood.Controllers
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            IMemoryCache cache,
+            IHoodCache cache,
             ILoggerFactory loggerFactory)
         {
             _userManager = userManager;
@@ -72,9 +73,6 @@ namespace Hood.Controllers
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
-
-                    string cacheKey = typeof(AccountInfo).ToString() + "-" + _userManager.GetUserId(User);
-                    _cache.Remove(cacheKey);
 
                     _logger.LogInformation(1, "User " + model.Email + " logged in.");
                     return RedirectToLocal(returnUrl);
@@ -146,10 +144,6 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogOff()
         {
-
-            string cacheKey = typeof(AccountInfo).ToString() + "-" + _userManager.GetUserId(User);
-            _cache.Remove(cacheKey);
-
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");

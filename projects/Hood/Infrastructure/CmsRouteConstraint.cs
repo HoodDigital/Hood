@@ -35,7 +35,7 @@ namespace Hood.Infrastructure
                 try
                 {
                     string[] tokenised = fullUrl.ToLower().Split('/');
-                    var type = _content.GetContentType(tokenised[0]);
+                    var type = _site.GetContentSettings().GetContentType(tokenised[0]);
                     if (type != null)
                     {
                         if (tokenised.Length > 1)

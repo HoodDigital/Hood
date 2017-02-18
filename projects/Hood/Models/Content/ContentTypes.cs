@@ -37,6 +37,7 @@ namespace Hood.Models
         public bool Gallery { get; set; }
         public string CustomFieldsJson { get; set; }
         public string TemplateFolder { get; set; }
+        public string UrlFormatting { get; set; }
 
         public List<CustomField> CustomFields
         {
@@ -51,6 +52,8 @@ namespace Hood.Models
                 CustomFieldsJson = JsonConvert.SerializeObject(value);
             }
         }
+
+        public bool CachedByType { get; internal set; }
     }
 
     public class CustomField
@@ -123,6 +126,7 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = true,
                         ShowImage = true,
+                        UrlFormatting = "news-title",
                         ShowMeta = true,
                         Gallery = false,
                         Templates = false,
@@ -156,6 +160,7 @@ namespace Hood.Models
                         ShowImage = true,
                         ShowMeta = true,
                         Gallery = true,
+                        UrlFormatting = "news-title",
                         Templates = false,
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
@@ -342,6 +347,7 @@ namespace Hood.Models
                         ShowMeta = true,
                         Gallery = true,
                         Templates = true,
+                        UrlFormatting = "news-title",
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
                         new List<CustomField>()
@@ -377,6 +383,7 @@ namespace Hood.Models
                         ShowMeta = true,
                         Gallery = true,
                         Templates = false,
+                        UrlFormatting = "news-title",
                         TemplateFolder = "Templates",
                         CustomFields = BaseFields(
                         new List<CustomField>()

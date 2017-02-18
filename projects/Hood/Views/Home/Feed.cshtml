@@ -6,43 +6,37 @@
     var Feed = "_Feed";
     Layout = "_Layout";
 
-    switch (Model.Type.Type)
+    switch (Model.Type.BaseName)
     {
-        case "news":
-        case "blog":
+        case "News":
             Feed = "_NewsFeed";
             Layout = "_NewsLayout";
             break;
-        case "event":
+        case "Event":
             Feed = "_NewsFeed";
             Layout = "_EventsLayout";
             break;
-        case "product":
+        case "Product":
             Feed = "_ProductFeed";
             Layout = "_ProductLayout";
             break;
-        case "rental":
-        case "portfolio":
+        case "Portfolio":
             Feed = "_PortfolioFeed";
             Layout = "_PortfolioLayout";
             break;
-        case "property":
-            Feed = "_PropertyFeed";
-            Layout = "_PropertyLayout";
-            break;
-        case "faq":
+        case "FAQ":
             Feed = "_FaqFeed";
             Layout = "_FaqLayout";
             break;
-        case "team":
+        case "Team":
             Feed = "_TeamFeed";
             Layout = "_TeamLayout";
             break;
-        case "job":
+        case "Job":
             Feed = "_JobFeed";
             Layout = "_JobLayout";
             break;
-        case "testimonial":
+        case "Testimonial":
             Feed = "_TestimonialFeed";
             Layout = "_TestimonialLayout";
             break;

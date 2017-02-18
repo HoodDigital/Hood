@@ -23,7 +23,7 @@
             }
             @if (Model.Type.HasPage)
             {
-                <li><a href="@mapi.Url"><i class="fa fa-desktop m-r-xs" target="_blank"></i>Preview</a></li>            
+                <li><a href="@mapi.Url"><i class="fa fa-desktop m-r-xs" target="_blank"></i>Preview</a></li>
             }
             <li><a class="delete-content" data-id="@Model.Content.Id" data-type="@Model.Type.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a></li>
         </ul>
@@ -81,25 +81,24 @@
             <input type="hidden" id="Views" name="Views" value="@Model.Content.Views" />
             <div class="row">
                 <div class="col-md-8">
-                @switch (Model.Type.Type)
-                {
-                    case "product":
-                    case "rental":
-                        await Html.RenderPartialAsync("_Edit_Product");
-                        break;
-                    case "page":
-                        await Html.RenderPartialAsync("_Edit_Page");
-                        break;
-                    case "slider":
-                        await Html.RenderPartialAsync("_Edit_Slider");
-                        break;
-                    case "team":
-                        await Html.RenderPartialAsync("_Edit_Team");
-                        break;
-                    default:
-                        await Html.RenderPartialAsync("_Edit_Default");
-                        break;
-                }
+                    @switch (Model.Type.BaseName)
+                    {
+                        case "Product":
+                            await Html.RenderPartialAsync("_Edit_Product");
+                            break;
+                        case "Page":
+                            await Html.RenderPartialAsync("_Edit_Page");
+                            break;
+                        case "Slider":
+                            await Html.RenderPartialAsync("_Edit_Slider");
+                            break;
+                        case "Team":
+                            await Html.RenderPartialAsync("_Edit_Team");
+                            break;
+                        default:
+                            await Html.RenderPartialAsync("_Edit_Default");
+                            break;
+                    }
                 </div>
                 <div class="col-md-4">
                     <div class="right-column">
@@ -136,18 +135,29 @@
                             </h5>
                             @if (Model.Content.ContentType == "page")
                             {
-                                <label for="Slug" class="control-label">Slug</label>
-                                <div>
-                                    <input id="Slug" name="Slug" class="form-control" value="@Model.Content.Slug" />
+                                <div class="form-group">
+                                    <label for="Slug" class="control-label">Slug</label>
+                                    <div>
+                                        <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
+                                    </div>
+                                    <p class="font-xs url-preview">
+                                        URL Preview:
+                                        <br />
+                                        <a class="font-sm" href="@Url.AbsoluteUrl(Model.Content.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Content.Slug</span></strong></a>
+                                        <br />
+                                        Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
+                                    </p>
                                 </div>
-                                <p class="font-xs url-preview">
-                                    URL Preview:
-                                    <br />
-                                    <a class="font-sm" href="@Url.AbsoluteUrl(Model.Content.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Content.Slug</span></strong></a>
-                                    <br />
-                                    Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
-                                </p>
                                 <hr />
+                            }
+                            else
+                            {
+                                <div class="form-group">
+                                    <label for="Slug" class="control-label">Slug</label>
+                                    <div>
+                                        <input id="Slug" name="Slug" class="form-control restrict-to-slug" value="@Model.Content.Slug" />
+                                    </div>
+                                </div>
                             }
                             <div class="row">
                                 <div class="col-xs-12">
@@ -171,9 +181,5 @@
         <div role="tabpanel" class="tab-pane" id="designer">
             @{ await Html.RenderPartialAsync("_Designer"); }
         </div>
-    }
+                }
 </div>
-
-
-
-

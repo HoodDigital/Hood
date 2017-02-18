@@ -80,6 +80,34 @@ $.fn.restrictToSlug = function (restrictPattern) {
     targets.on('change', restrictHandler);
 };
 $('.restrict-to-slug').restrictToSlug();
+$.fn.restrictToPageSlug = function (restrictPattern) {
+    var targets = $(this);
+
+    // The characters inside this pattern are accepted
+    // and everything else will be 'cleaned'
+    // For example 'ABCdEfGhI5' become 'ABCEGI5'
+    var pattern = restrictPattern ||
+        /[^0-9a-z-//]*/g; // default pattern
+
+    var restrictHandler = function () {
+        var val = $(this).val();
+        var newVal = val.replace(pattern, '').toLowerCase();
+        if ((newVal.match(new RegExp("/", "g")) || []).length > 4) {
+            var pos = newVal.lastIndexOf('/');
+            newVal = newVal.substring(0, pos) + newVal.substring(pos + 1);
+            $.hood.Alerts.Warning("You can only have up to 4 '/' characters in a url slug.");
+        }
+        // This condition is to prevent selection and keyboard navigation issues
+        if (val !== newVal) {
+            $(this).val(newVal);
+        }
+    };
+
+    targets.on('keyup', restrictHandler);
+    targets.on('paste', restrictHandler);
+    targets.on('change', restrictHandler);
+};
+$('.restrict-to-page-slug').restrictToPageSlug();
 $.fn.characterCounter = function (val) {
     var targets = $(this);
     var characterCounterHandler = function () {

@@ -79,6 +79,19 @@
                 <div class="btn-group"> 
                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
                     <ul class="dropdown-menu dropdown-menu-right">
+                        #if (!IsHomepage) {#
+                             @if (Model.Type.BaseName == "Page")
+                             {
+                                <li>
+                                    <a class="hood-inline-task" href="/admin/content/${ Id }/sethomepage" data-complete="$.hood.Content.Manage.Refresh()">
+                                        <i class="fa fa-home m-r-sm"></i>
+                                        <span>
+                                            Set as Homepage
+                                        </span>
+                                    </a>
+                                </li>
+                             }
+                        #}#
                         @if (Model.Type.ShowDesigner)
                         {
                             <li>
@@ -101,16 +114,6 @@
                                 </a>
                             </li>
                         }
-                        #if (!IsHomepage) {#
-                        <li>
-                            <a class="hood-inline-task" href="/admin/content/${ Id }/sethomepage" data-complete="$.hood.Content.Manage.Refresh()">
-                                <i class="fa fa-home m-r-sm"></i>
-                                <span>
-                                    Set as Homepage
-                                </span>
-                            </a>
-                        </li>
-                        #}#
                         <li class="divider"></li>
                         <li>
                             <a class="delete-content" data-id="${ Id }">

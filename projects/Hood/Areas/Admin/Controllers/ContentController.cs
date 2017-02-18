@@ -56,7 +56,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/manage/")]
         public IActionResult Index(string type)
         {
-            var contentType = _content.GetContentType(type);
+            var contentType = _site.GetContentSettings().GetContentType(type);
             ContentListModel nhm = new ContentListModel();
             nhm.Type = contentType;
             return View(nhm);
@@ -102,7 +102,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Create(string type)
         {
             ContentListModel mcm = new ContentListModel();
-            mcm.Type = _content.GetContentType(type);
+            mcm.Type = _site.GetContentSettings().GetContentType(type);
             return View(mcm);
         }
 
@@ -126,7 +126,6 @@ namespace Hood.Areas.Admin.Controllers
                     Public = true,
                     ShareCount = 0,
                     PublishDate = new DateTime(model.cpPublishDate.Year, model.cpPublishDate.Month, model.cpPublishDate.Day, model.cpPublishHour, model.cpPublishMinute, 0),
-                    Slug = model.cpTitle.ToSeoUrl(),
                     Status = model.cpStatus,
                     Title = model.cpTitle,
                     Views = 0
@@ -160,7 +159,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var content = _content.GetContentByID(id);
             EditContentModel model = new EditContentModel();
-            model.Type = _content.GetContentType(content.ContentType);
+            model.Type = _site.GetContentSettings().GetContentType(content.ContentType);
             model.Content = content;
             return View(model);
         }
@@ -168,7 +167,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/{type}/")]
         public IActionResult CategoryList(string type)
         {
-            var contentType = _content.GetContentType(type);
+            var contentType = _site.GetContentSettings().GetContentType(type);
             ContentListModel nhm = new ContentListModel();
             nhm.Type = contentType;
             return View(nhm);
@@ -677,6 +676,9 @@ namespace Hood.Areas.Admin.Controllers
                 content.LastEditedBy = User.Identity.Name;
                 content.LastEditedOn = DateTime.Now;
 
+                if (!_content.CheckSlug(content.Slug, content.Id))
+                    throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+
                 List<string> tags = post.Tags?.Split(',').ToList();
                 if (tags == null)
                     tags = new List<string>();
@@ -704,7 +706,7 @@ namespace Hood.Areas.Admin.Controllers
                         // check if new template has been selected
                         if (val.Key == "Meta:Settings.Template")
                         {
-                            var type = _content.GetContentType(content.ContentType);
+                            var type = _site.GetContentSettings().GetContentType(content.ContentType);
                             // delete all template metas that do not exist in the new template, and add any that are missing
                             List<string> newMetas = GetMetasForTemplate(val.Value, val.Key, type.TemplateFolder);
                             _content.UpdateTemplateMetas(content, newMetas);
@@ -779,7 +781,7 @@ namespace Hood.Areas.Admin.Controllers
         private async Task<EditContentModel> GetEditorModel(Content content)
         {
             EditContentModel model = new EditContentModel();
-            model.Type = _content.GetContentType(content.ContentType);
+            model.Type = _site.GetContentSettings().GetContentType(content.ContentType);
             model.Content = content;
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
@@ -792,7 +794,7 @@ namespace Hood.Areas.Admin.Controllers
                 model = GetTemplates(model, model.Type.TemplateFolder);
 
             // Special type features.
-            switch (model.Type.Type)
+            switch (model.Type.BaseName)
             {
                 case "page":
                     model = await GetPageEditorFeatures(model);

@@ -8,7 +8,7 @@
     <div class="container">
         <h1>@p.Title</h1>
         <h2>@p.ListingType</h2>
-        <p class="lead">@p.ShortDescription</p>
+        <p class="lead">@Html.Raw(p.ShortDescription)</p>
         <p>
             @if (p.InfoDownload != null)
             {
@@ -21,11 +21,11 @@
 <div class="container ptb-60">
     <div class="row">
         <div class="col-sm-4">
-            <a href="@p.FeaturedImage.LargeUrl" class="colorbox"><img src="@p.FeaturedImage.MediumUrl" class="full-content-image content-feature-@p.Id m-b-xs" /></a>
+            <a href="@p.FeaturedImage.LargeUrl" class="colorbox"><img src="@p.FeaturedImage.MediumUrl" class="img-full content-feature-@p.Id m-b-xs" /></a>
             <div class="gallery">
                 @foreach (var media in Model.Property.Media)
                 {
-                    <a href="@media.LargeUrl" class="colorbox"><img src="@media.SmallUrl" class="img-sm content-feature-@media.Id m-b-xs" /></a>
+                    <a href="@media.LargeUrl" class="colorbox"><fixedImage src="@media.SmallUrl" class="img-xs content-feature-@media.Id m-b-xs"></fixedImage></a>
                 }
             </div>
             <div class="p-md bg-color-lighten text-center">
@@ -104,7 +104,7 @@
         <div class="col-sm-8">
             <div class="m-b-md">
                 <h2>@p.Title</h2>
-                <p class="lead">@p.ShortDescription</p>
+                <p class="lead">@Html.Raw(p.ShortDescription)</p>
             </div>
             <blockquote>
                 <h5 class="no-margin">@_settings.GetPlanningFromType(p.Planning)</h5>
