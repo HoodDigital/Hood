@@ -13,11 +13,7 @@ $.hood.Inline = {
         $.hood.Inline.Reload(this);
     },
     Reload: function (tag, complete) {
-        if ($(tag).attr('data-loading')) {
-            $(tag).empty().addClass('loading').append($($(tag).data('loading')).html());
-        } else {
-            $(tag).empty().addClass('loading').append('<i class="fa fa-refresh fa-spin"></i>');
-        }
+        $(tag).addClass('loading');
         params = null;
         if ($.hood.Helpers.IsNullOrUndefined($(tag).data('params'))) {
             params = eval($(tag).data('params'));
@@ -31,9 +27,6 @@ $.hood.Inline = {
                 $.hood.Helpers.InitIboxes(tag);
             } catch (ex) { }
         })
-        .done($.proxy(function () {
-
-        }, tag))
         .fail(function (data) {
             $.hood.Alerts.Error("There was an error loading the panel.<br/><br />" + data.status + " - " + data.statusText);
         })
@@ -51,7 +44,7 @@ $.hood.Inline = {
     Task: function (e) {
         e.preventDefault();
         $tagcontents = $(e.currentTarget).html();
-        $(e.currentTarget).addClass('loading').empty().html('<i class="fa fa-refresh fa-spin"></i>');
+        $(e.currentTarget).addClass('loading');
         $.get($(e.currentTarget).attr('href'), null, function (data) {
             if (data.Success) {
                 $.hood.Alerts.Success(data.Message);
@@ -69,7 +62,7 @@ $.hood.Inline = {
         })
         .always(function (data) {
             $.hood.Modals.Loading = false;
-            $(e.currentTarget).empty().html($tagcontents).removeClass('loading');
+            $(e.currentTarget).removeClass('loading');
         });
     }
 };
