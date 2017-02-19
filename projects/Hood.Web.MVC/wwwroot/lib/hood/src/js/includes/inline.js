@@ -15,7 +15,7 @@ $.hood.Inline = {
     Reload: function (tag, complete) {
         $(tag).addClass('loading');
         params = null;
-        if ($.hood.Helpers.IsNullOrUndefined($(tag).data('params'))) {
+        if (($(tag).attr('data-params'))) {
             params = eval($(tag).data('params'));
         }
         $.get($(tag).data('url'), params, function (data) {
@@ -31,7 +31,7 @@ $.hood.Inline = {
             $.hood.Alerts.Error("There was an error loading the panel.<br/><br />" + data.status + " - " + data.statusText);
         })
         .always(function (data) {
-            if (!$.hood.Helpers.IsNullOrUndefined($(tag).data('complete'))) {
+            if ($(tag).attr("data-complete")) {
                 eval($(tag).data('complete'));
             }
             if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
@@ -53,8 +53,8 @@ $.hood.Inline = {
             }
         })
         .done($.proxy(function () {
-            if (!$.hood.Helpers.IsNullOrUndefined($(e.currentTarget).data('complete'))) {
-                eval($(e.currentTarget).data('complete'));
+            if ($(this).attr("data-complete")) {
+                eval($(this).data('complete'));
             }
         }, e.currentTarget))
         .fail(function (data) {
