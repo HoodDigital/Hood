@@ -65,6 +65,7 @@
                                     <div class="col-sm-9">
                                         @if (Model.Types[i].BaseName == "Page")
                                         {
+                                            <input asp-for="Types[i].BaseName" class="form-control" type="hidden">
                                             <input asp-for="Types[i].BaseName" class="form-control" disabled>
                                         }
                                         else
@@ -89,6 +90,7 @@
                                     <div class="col-sm-9">
                                         @if (Model.Types[i].BaseName == "Page")
                                         {
+                                            <input asp-for="Types[i].Slug" class="form-control" type="hidden">
                                             <input asp-for="Types[i].Slug" class="form-control" disabled>
                                         }
                                         else
@@ -122,6 +124,7 @@
                                     <div class="col-sm-9">
                                         @if (Model.Types[i].BaseName == "Page")
                                         {
+                                            <input asp-for="Types[i].Type" class="form-control" type="hidden">
                                             <input asp-for="Types[i].Type" class="form-control" disabled>
                                         }
                                         else
