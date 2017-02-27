@@ -1,9 +1,9 @@
 {
   "name": "Hood.Web.MVC",
-  "version": "1.0.0-preview8-NaN",
+  "version": "1.0.0-preview8-1",
   "userSecretsId": "Hood.Web.MVC",
   "dependencies": {
-    "Hood": "1.0.0-preview7",
+    "Hood": "1.0.0-preview8",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.1.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.1.0",
