@@ -210,23 +210,26 @@ $.hood.App = {
     },
     Header: {
         Init: function () {
-            $.hood.App.Loader.AddItem('hood-menus');
             switch ($.hood.App.Options.Header.Type) {
                 case 'hover':
+                    $.hood.App.Loader.AddItem('hood-menus');
                     if (!$().superfish && !$().superclick)
                         $.getScript('/lib/superfish/dist/js/superfish.min.js', function () {
                             $.hood.App.Header.Load();
                         });
                     else
                         $.hood.App.Header.Load();
+                    $.hood.App.Loader.ItemComplete('hood-menus');
                     break;
                 case 'click':
+                    $.hood.App.Loader.AddItem('hood-menus');
                     if (!$().superfish && !$().superclick)
                         $.getScript('/lib/superclick/dist/js/superclick.min.js', function () {
                             $.hood.App.Header.Load();
                         });
                     else
                         $.hood.App.Header.Load();
+                    $.hood.App.Loader.ItemComplete('hood-menus');
                     break;
                 default:
                     $.hood.App.Header.Load();
@@ -244,7 +247,6 @@ $.hood.App = {
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
             $.hood.App.Header.Logo();
-            $.hood.App.Loader.ItemComplete('hood-menus');
         },
         Setup: function () {
             if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
