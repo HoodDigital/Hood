@@ -40,6 +40,13 @@ if (!$.hood)
 $.hood.App = {
     Options: {
         scrollOffset: 64,
+        Scroll: {
+            StickyHeader: true,
+            InitialPosition: false,
+            Functions: true,
+            ToTargetSelector: ".scroll-to-target",
+            ToTopSelector: '.scroll-top'
+        },
         Loader: {
             Delay: 500,
             Complete: null,
@@ -53,7 +60,7 @@ $.hood.App = {
         LoadTweets: true,
         Header: {
             Enabled: true,
-            Type: 'hover',
+            Type: 'basic',
             Settings: {
                 delay: 250,
                 speed: 350,
@@ -128,16 +135,23 @@ $.hood.App = {
         $.hood.App.Loader.Init();
         if ($.hood.App.Options.Header.Enabled)
             $.hood.App.Header.Init();
+
         $.hood.App.Accordion();
         $.hood.App.Counters();
-        $.hood.App.Scroll.Init();
-        $.hood.App.Scroll.Functions();
-        $.hood.App.Scroll.InitialPosition();
+
+        if ($.hood.App.Options.Scroll.StickyHeader)
+            $.hood.App.Scroll.Init();
+        if ($.hood.App.Options.Scroll.InitialPosition)
+            $.hood.App.Scroll.InitialPosition();
+        if ($.hood.App.Options.Scroll.Functions)
+            $.hood.App.Scroll.Functions();
+
         $.hood.App.SkillsBars();
         $.hood.App.Mailchimp.Init();
         $.hood.App.ResizeVideos();
         $.hood.App.ContactForms.Init();
         $.hood.App.Uploaders.Init();
+
         if ($.hood.App.Options.OwlCarousel.Enabled)
             $.hood.App.OwlCarousel();
         if ($.hood.App.Options.VideoBackgrounds.Enabled)
@@ -197,20 +211,26 @@ $.hood.App = {
     Header: {
         Init: function () {
             $.hood.App.Loader.AddItem('hood-menus');
-            if ($.hood.App.Options.Header.Type == 'hover') {
-                if (!$().superfish && !$().superclick)
-                    $.getScript('/lib/superfish/dist/js/superfish.min.js', function () {
+            switch ($.hood.App.Options.Header.Type) {
+                case 'hover':
+                    if (!$().superfish && !$().superclick)
+                        $.getScript('/lib/superfish/dist/js/superfish.min.js', function () {
+                            $.hood.App.Header.Load();
+                        });
+                    else
                         $.hood.App.Header.Load();
-                    });
-                else
-                    $.hood.App.Header.Load();
-            } else {
-                if (!$().superfish && !$().superclick)
-                    $.getScript('/lib/superclick/dist/js/superclick.min.js', function () {
+                    break;
+                case 'click':
+                    if (!$().superfish && !$().superclick)
+                        $.getScript('/lib/superclick/dist/js/superclick.min.js', function () {
+                            $.hood.App.Header.Load();
+                        });
+                    else
                         $.hood.App.Header.Load();
-                    });
-                else
+                    break;
+                default:
                     $.hood.App.Header.Load();
+                    break;
             }
         },
         Load: function (type) {
@@ -442,11 +462,11 @@ $.hood.App = {
             }
         },
         Functions: function () {
-            $('.scroll-top').click(function () {
+            $($.hood.App.Options.Scroll.ToTopSelector).click(function () {
                 $('html, body').animate({ scrollTop: 0 }, 800);
                 return false;
             });
-            $('.scroll-down, .scroll-to-target').on('click', function (e) {
+            $($.hood.App.Options.Scroll.ToTargetSelector).on('click', function (e) {
                 var url = $(this).attr('href').split('#')[0];
                 if (url !== window.location.pathname && url !== "") {
                     return;
