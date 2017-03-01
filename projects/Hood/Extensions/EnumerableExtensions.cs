@@ -1,5 +1,4 @@
-﻿using CodeComb.HtmlAgilityPack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -36,17 +35,5 @@ namespace Hood.Extensions
             Recursive<A, R> rec = r => a => f(r(r))(a); return rec(rec);
         }
 
-        public static IEnumerable<HtmlNode> Traverse(this IEnumerable<HtmlNode> source, Func<HtmlNode, bool> predicate)
-        {
-            var traverse = EnumerableExtensions.Y<IEnumerable<HtmlNode>, IEnumerable<HtmlNode>>(
-                f => items =>
-                {
-                    var r = new List<HtmlNode>(items.Where(predicate));
-                    r.AddRange(items.SelectMany(i => f(i.ChildNodes.AsEnumerable())));
-                    return r;
-                });
-
-            return traverse(source);
-        }
     }
 }

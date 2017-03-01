@@ -1,5 +1,4 @@
-﻿using CodeComb.HtmlAgilityPack;
-using Hood.Extensions;
+﻿using Hood.Extensions;
 using Hood.Services;
 using System;
 using System.Collections.Generic;
@@ -157,38 +156,6 @@ namespace Hood.Models.Api
                 }
             }
         }
-
-        public static string FormatBody(string body, List<Content> blocks, ICollection<ContentMeta> metadata)
-        {
-            HtmlDocument inputDoc = new HtmlDocument();
-            inputDoc.LoadHtml(body);
-            HtmlDocument outputDoc = inputDoc;
-            foreach (HtmlNode node in inputDoc.DocumentNode.ChildNodes.Traverse(i => i.Attributes.Where(a => a.Name == "class" && a.Value.Contains("hoodcontent-replace")).Count() > 0))
-            {
-                int id = node.GetAttributeValue("id", 0);
-                if (id != 0)
-                {
-                    // check blocks for this id content block
-                    Content block = blocks.Where(c => c.Id == id).FirstOrDefault();
-                    if (block != null)
-                    {
-                        // found one! now insert the content into the node.
-                        HtmlDocument blockDoc = new HtmlDocument();
-                        blockDoc.LoadHtml(block.Body);
-                        // then rename the node to div.
-                        StringWriter blockWriter = new StringWriter();
-                        blockDoc.Save(blockWriter);
-                        node.InnerHtml = blockWriter.ToString();
-                        node.Name = "div";
-                        node.SetAttributeValue("class", "");
-                    }
-                }
-            }
-            StringWriter sw = new StringWriter();
-            inputDoc.Save(sw);
-            return sw.ToString();
-        }
-
 
         public MetaDataApi<ContentMeta> GetMeta(string name)
         {

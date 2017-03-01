@@ -8,7 +8,6 @@
   ],
   "description": "The Hood CMS is a full content management system providing a solid backbone to any website. Created by Hood's Digital Architects, George Whysall and Thomas Burwood.",
   "dependencies": {
-    "CodeComb.HtmlAgilityPack": "2.0.0-rc1-final",
     "linqtotwitter": "4.1.0",
     "MediaTypeMap": "2.1.0",
     "Microsoft.AspNetCore.Razor.Tools": {
