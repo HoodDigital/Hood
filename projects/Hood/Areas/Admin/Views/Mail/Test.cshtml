@@ -2,30 +2,19 @@
 @{
     ViewData["Title"] = "Dashboard";
 }
-<div class="row">
-    <div class="col-xs-12">
-        <div class="wrapper wrapper-content">
-            <div class="ibox">
-                <div class="ibox-title">
-                    Send a test email...
-                </div>
-                <div class="ibox-content">
-                    @if (Model.Success)
-                    {
-                        <div class="alert alert-success">
-                            <h3>Success!</h3>
-                            <p>The test mail was successfully sent.</p>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-danger">
-                            <h3>Uh oh!</h3>
-                            <p>@Model.Exception.Message</p>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
+@if (Model.Success)
+{
+    <div class="alert alert-success">
+        <h3 class="no-margin">Success!</h3>
+        <p class="m-t-lg m-b-md">The test mail was successfully sent.</p>
+        <p><a asp-action="Mail" asp-controller="Settings" class="btn btn-success">Return to mail settings</a></p>
     </div>
-</div>
+}
+else
+{
+    <div class="alert alert-danger">
+        <h3 class="no-margin">Uh oh!</h3>
+        <p class="m-t-lg m-b-md">@Model.Exception.Message</p>
+        <p><a asp-action="Mail" asp-controller="Settings" class="btn btn-danger">Return to mail settings</a></p>
+    </div>
+}

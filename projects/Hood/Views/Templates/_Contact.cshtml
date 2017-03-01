@@ -39,7 +39,7 @@
 {
     <div class="img-lg img-full google-map" data-lat="@_info.Address?.Latitude" data-long="@_info.Address?.Longitude" data-marker="@_site.GetSiteTitle()" data-zoom="12"></div>
 }
-<div class="bg-color-light-grey" id="contact-form">
+<div class="bg-color-light-grey">
     <div class="container">
         <div class="m-t-lg m-b-lg">
             @{ await Html.RenderPartialAsync("_ContactForm", new ContactFormModel(true, true)); }

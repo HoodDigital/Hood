@@ -32,7 +32,7 @@
     @RenderSection("includes", required: false)
     @{ await Html.RenderPartialAsync("_Scripts"); }
     @RenderSection("scripts", required: false)
-    @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
+    @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seo.GoogleAnalytics)
 </body>
 </html>

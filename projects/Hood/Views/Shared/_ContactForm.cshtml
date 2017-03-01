@@ -2,8 +2,9 @@
 @inject ISiteConfiguration _site
 @{
     ContactSettings settings = _site.GetContactSettings();
+    IntegrationSettings integrations = _site.GetIntegrationSettings();
 }
-<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="contact-form" id="contact" data-redirect="@settings.ThankYouUrl" data-alert-message="@settings.ThankYouMessage">
+<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="contact-form" id="contact-form" data-redirect="@settings.ThankYouUrl" data-alert-message="@settings.ThankYouMessage">
     <div class="thank-you">
         <h2>@settings.ThankYouTitle</h2>
         <p>@settings.ThankYouMessage</p>
@@ -11,7 +12,7 @@
     <div class="form">
         <h2>@settings.ContactFormTitle</h2>
         <p>@settings.ContactFormMessage</p>
-       <div asp-validation-summary="All" class="validation-summary"></div>
+        <div asp-validation-summary="All" class="validation-summary"></div>
         <div class="form-group">
             <label asp-for="Name" class="control-label"></label>
             <input asp-for="Name" class="form-control" placeholder="Your name" />
@@ -39,7 +40,20 @@
         </div>
         <div class="row">
             <div class="col-xs-12 text-center">
-                <button class="btn btn-md btn-primary form-full" type="submit" id="form-submit" name="submit">Send Message</button>
+                @if (integrations.EnableGoogleRecaptcha)
+                {
+                    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                    <div class="g-recaptcha" id="g-recaptcha"
+                         data-target="#contact-form"
+                         data-sitekey="@integrations.GoogleRecaptchaSiteKey"
+                         data-callback="googleRecaptchaCallback"
+                         data-size="invisible">
+                    </div>
+                }
+                else
+                {
+                }
+                <button class="btn btn-md btn-primary form-full" type="submit">Send Message</button>
             </div>
         </div>
     </div>

@@ -607,7 +607,7 @@ $.hood.Content = {
             Dropzone.autoDiscover = false;
 
             var pgDropzone = new Dropzone("#content-gallery-upload", {
-                url: "/admin/content/upload/gallery?id=" + $("#content-gallery-upload").data('id'),
+                url: "/admin/content/" +$("#content-gallery-upload").data('id') + "/upload/gallery",
                 thumbnailWidth: 80,
                 thumbnailHeight: 80,
                 parallelUploads: 5,

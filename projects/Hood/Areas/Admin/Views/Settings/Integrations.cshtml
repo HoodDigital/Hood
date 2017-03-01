@@ -45,6 +45,27 @@
                 </div>
             </div>
             <div class="panel-body">
+                <h5>Google Recapthca</h5>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableGoogleRecaptcha" class="styled">
+                        <label asp-for="EnableGoogleRecaptcha"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="GoogleRecaptchaSiteKey"></label>
+                    <div>
+                        <input asp-for="GoogleRecaptchaSiteKey" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="GoogleRecaptchaSecretKey"></label>
+                    <div>
+                        <input asp-for="GoogleRecaptchaSecretKey" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
                 <h5>Mail Chimp</h5>
                 <div class="form-group">
                     <div class="checkbox">

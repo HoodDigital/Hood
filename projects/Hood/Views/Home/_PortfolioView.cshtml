@@ -25,6 +25,14 @@
             <div class="post-entry">
                 @{ await Html.RenderPartialAsync("_EditableContent"); }
             </div>
+            <div id="gallery">
+                @foreach (var media in Model.Content.Media)
+                {
+                    <a class="colorbox m-r-xs" href="@media.Url">
+                        <fixedImage src="@media.LargeUrl" class="img-sm"></fixedImage>
+                    </a>
+                }
+            </div>
         </div>
         <hr />
         @{ await Html.RenderPartialAsync("_Author"); }

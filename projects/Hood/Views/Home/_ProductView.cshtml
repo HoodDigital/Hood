@@ -9,7 +9,15 @@
             <div class="team-item-img">
                 <fixedImage src="@mapi.Author.Avatar.SmallUrl" class="user-profile-image contained content-feature-@Model.Content.Id" alt="@mapi.Author.FullName" />
             </div>
-        </div>
+            <div id="gallery">
+                @foreach (var media in Model.Content.Media)
+                {
+                    <a class="colorbox m-r-xs" href="@media.Url">
+                        <fixedImage src="@media.LargeUrl" class="img-xs"></fixedImage>
+                    </a>
+                }
+            </div>
+       </div>
     </div>
     <div class="col-sm-8">
         @if (Model.Content.FeaturedImage != null)

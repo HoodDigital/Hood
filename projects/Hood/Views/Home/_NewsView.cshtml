@@ -21,7 +21,7 @@
             <p class="text-muted"><em>@Model.Content.TagString</em></p>
             <p><a href="#post-content" class="scroll-to-target">Read on...</a></p>
             <hr />
-           @if (Model.Content.FeaturedImage != null)
+            @if (Model.Content.FeaturedImage != null)
             {
                 <div class="m-b-lg">
                     <a href="@capi.Url">
@@ -39,6 +39,14 @@
             <div id="share"></div>
             <div id="post-content">
                 @{ await Html.RenderPartialAsync("_EditableContent"); }
+            </div>
+            <div id="gallery">
+                @foreach (var media in Model.Content.Media)
+                {
+                    <a class="colorbox m-r-xs" href="@media.Url">
+                        <fixedImage src="@media.LargeUrl" class="img-sm"></fixedImage>
+                    </a>
+                }
             </div>
         </div>
         <hr />
