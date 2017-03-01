@@ -390,7 +390,7 @@ namespace Hood.Controllers
             if (model.SelectedProvider == "Email")
             {
                 MailObject message = new MailObject();
-                message.To = new SendGrid.Helpers.Mail.Email(user.Email);
+                message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
                 message.PreHeader = "Your security code for accessing the website...";
                 message.Subject = "Your security code...";
                 message.AddParagraph("Your security code is: " + code);

@@ -5,9 +5,10 @@ namespace Hood.Services
 {
     public class MailObject
     {
-        public Email To { get; set; }
+        public EmailAddress To { get; set; }
         public string Subject { get; set; }
         public string PreHeader { get; set; }
+        public string ToName { get; set; }
 
         public MailObject()
         {

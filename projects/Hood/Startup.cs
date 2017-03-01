@@ -220,8 +220,6 @@ namespace Hood
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
-            app.UseApplicationInsightsRequestTelemetry();
-
             if (env.IsEnvironment("Development") || env.IsEnvironment("PreProduction") || env.IsEnvironment("Staging"))
             {
                 loggerFactory.AddDebug(LogLevel.Debug);

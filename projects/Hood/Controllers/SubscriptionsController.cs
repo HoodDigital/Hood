@@ -349,7 +349,7 @@ namespace Hood.Controllers
                             sw.AppendLine(FormatLog("Send an email to the customer letting them know what has happened..."));
 
                             MailObject message = new MailObject();
-                            message.To = new SendGrid.Helpers.Mail.Email(endTrialUserSub.User.Email);
+                            message.To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUserSub.User.Email);
                             message.PreHeader = "Your trial will soon expire on " + _site.GetSiteTitle();
                             message.Subject = "Your trial will soon expire...";
                             message.AddH1("The end is near!");
@@ -369,7 +369,7 @@ namespace Hood.Controllers
                             var endTrialUser = await _auth.GetUserByStripeId(endTrialSubscription.CustomerId);
 
                             MailObject message = new MailObject();
-                            message.To = new SendGrid.Helpers.Mail.Email(endTrialUser.Email);
+                            message.To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUser.Email);
                             message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
                             message.Subject = "Error with your subscription...";
                             message.AddH1("Oops!");
@@ -414,7 +414,7 @@ namespace Hood.Controllers
                                 sw.AppendLine(FormatLog("Send an email to the customer letting them know what has happened..."));
 
                                 MailObject message = new MailObject();
-                                message.To = new SendGrid.Helpers.Mail.Email(failedInvoiceUserSub.User.Email);
+                                message.To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUserSub.User.Email);
                                 message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
                                 message.Subject = "Error with your subscription...";
                                 message.AddH1("Oops!");
@@ -432,7 +432,7 @@ namespace Hood.Controllers
                                 var failedInvoiceUser = await _auth.GetUserByStripeId(failedInvoice.CustomerId);
 
                                 MailObject message = new MailObject();
-                                message.To = new SendGrid.Helpers.Mail.Email(failedInvoiceUser.Email);
+                                message.To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUser.Email);
                                 message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
                                 message.Subject = "Error with your subscription...";
                                 message.AddH1("Oops!");
@@ -475,7 +475,7 @@ namespace Hood.Controllers
                                 var successfulInvoiceUser = await _auth.GetUserByStripeId(successfulInvoice.CustomerId);
 
                                 MailObject message = new MailObject();
-                                message.To = new SendGrid.Helpers.Mail.Email(successfulInvoiceUser.Email);
+                                message.To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email);
                                 message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
                                 message.Subject = "Error with your subscription...";
                                 message.AddH1("Oops!");
@@ -493,7 +493,7 @@ namespace Hood.Controllers
                                 var successfulInvoiceUser = await _auth.GetUserByStripeId(successfulInvoice.CustomerId);
 
                                 MailObject message = new MailObject();
-                                message.To = new SendGrid.Helpers.Mail.Email(successfulInvoiceUser.Email);
+                                message.To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email);
                                 message.PreHeader = "Thank you for your payment on " + _site.GetSiteTitle();
                                 message.Subject = "Thank you for your payment...";
                                 message.AddH1("Thank you!");
@@ -550,7 +550,7 @@ namespace Hood.Controllers
                     case "email":
 
                         MailObject message = new MailObject();
-                        message.To = new SendGrid.Helpers.Mail.Email(info.Email);
+                        message.To = new SendGrid.Helpers.Mail.EmailAddress(info.Email);
                         message.PreHeader = "You access information for " + _site.GetSiteTitle();
                         message.Subject = "You account has been created.";
                         message.AddH1("Stripe Error!");
@@ -581,7 +581,7 @@ namespace Hood.Controllers
                     case "email-failures":
 
                         MailObject message = new MailObject();
-                        message.To = new SendGrid.Helpers.Mail.Email(info.Email);
+                        message.To = new SendGrid.Helpers.Mail.EmailAddress(info.Email);
                         message.PreHeader = "You access information for " + _site.GetSiteTitle();
                         message.Subject = "You account has been created.";
                         message.AddH1("Stripe Error!");

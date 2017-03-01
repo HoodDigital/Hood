@@ -66,7 +66,7 @@ namespace Hood.Controllers
             try
             {
                 MailObject mail = GetDemoMail();
-                mail.To = new SendGrid.Helpers.Mail.Email(email);
+                mail.To = new SendGrid.Helpers.Mail.EmailAddress(email);
                 mail.Subject = "Test email from HoodCMS";
                 mail.PreHeader = "This is a test email from HoodCMS.";
                 await _email.SendEmail(mail, template);

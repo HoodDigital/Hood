@@ -1,6 +1,6 @@
 {
   "name": "Hood",
-  "version": "1.0.0-preview8-2",
+  "version": "1.0.0",
   "authors": [
     "Hood Digital",
     "George Whysall",
@@ -11,7 +11,6 @@
     "CodeComb.HtmlAgilityPack": "2.0.0-rc1-final",
     "linqtotwitter": "4.1.0",
     "MediaTypeMap": "2.1.0",
-    "Microsoft.ApplicationInsights.AspNetCore": "1.0.2",
     "Microsoft.AspNetCore.Razor.Tools": {
       "version": "1.0.0-preview2-final",
       "type": "build"
@@ -32,16 +31,12 @@
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
-    "Sendgrid": "8.0.5",
-    "BundlerMinifier.Core": "2.2.306",
-    "MailChimp.Net.V3": "1.8.5",
     "Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
     "Microsoft.AspNetCore.Authentication.Facebook": "1.1.0",
     "Microsoft.AspNetCore.Authentication.Google": "1.1.0",
     "Microsoft.AspNetCore.Diagnostics": "1.1.0",
     "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "1.1.0",
     "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.1.0",
-    "Microsoft.AspNetCore.Mvc": "1.1.0",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.1.0",
     "Microsoft.AspNetCore.Server.Kestrel": "1.1.0",
     "Microsoft.AspNetCore.Session": "1.1.0",
@@ -57,11 +52,16 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.1.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.1.0",
     "PayPal": "1.8.0",
-    "Stripe.net": "7.0.2",
     "System.IO.Compression.ZipFile": "4.3.0",
-    "WindowsAzure.Storage": "8.0.1",
-    "Microsoft.Extensions.FileProviders.Embedded": "1.0.0",
-    "Geocoding.net": "3.6.0"
+    "Geocoding.net": "3.6.0",
+    "BundlerMinifier.Core": "2.4.337",
+    "MailChimp.Net.V3": "1.9.1",
+    "Microsoft.ApplicationInsights.AspNetCore": "2.0.0",
+    "Microsoft.AspNetCore.Mvc": "1.1.1",
+    "Microsoft.Extensions.FileProviders.Embedded": "1.1.0",
+    "Sendgrid": "9.0.12",
+    "Stripe.net": "7.2.0",
+    "WindowsAzure.Storage": "8.1.1"
   },
   "tools": {
     "Microsoft.AspNetCore.Razor.Tools": "1.0.0-preview2-final",

@@ -207,7 +207,7 @@ namespace Hood.Services
                     mail.AddParagraph("You have requested a content data export, it has completed successfully and the data can be downloaded from the following link:", align: "left");
                     mail.AddCallToAction("Download Zip", downloadUrl, align: "left");
                     mail.AddParagraph("And that's about it!", align: "left");
-                    mail.To = new SendGrid.Helpers.Mail.Email(settings.Email);
+                    mail.To = new SendGrid.Helpers.Mail.EmailAddress(settings.Email);
                     await _email.SendEmail(mail, MailSettings.SuccessTemplate);
                 }
 

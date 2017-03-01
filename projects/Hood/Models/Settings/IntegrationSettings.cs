@@ -36,6 +36,14 @@ namespace Hood.Models
         [Display(Name = "Google Analytics Code")]
         public string GoogleAnalytics { get; set; }
 
+        // Google Recaptcha
+        [Display(Name = "Enable Google Recaptcha")]
+        public bool EnableGoogleRecaptcha { get; set; }
+        [Display(Name = "Google Recaptcha Site Key")]
+        public string GoogleRecaptchaSiteKey { get; set; }
+        [Display(Name = "Google Recaptcha Secret Key")]
+        public string GoogleRecaptchaSecretKey { get; set; }
+
         // Disqus
         [Display(Name = "Enable Chat")]
         public bool EnableChat { get; set; }

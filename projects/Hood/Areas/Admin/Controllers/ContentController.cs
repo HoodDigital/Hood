@@ -796,7 +796,7 @@ namespace Hood.Areas.Admin.Controllers
             // Special type features.
             switch (model.Type.BaseName)
             {
-                case "page":
+                case "Page":
                     model = await GetPageEditorFeatures(model);
                     break;
             }

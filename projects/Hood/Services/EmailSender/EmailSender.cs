@@ -35,24 +35,21 @@ namespace Hood.Services
                 string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
                 string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
 
-                var from = new Email(fromEmail, fromName);
+                var from = new EmailAddress(fromEmail, fromName);
                 var html = await _renderer.Render(template, message);
                 var textContent = new SendGrid.Helpers.Mail.Content("text/plain", message.ToString());
                 var htmlContent = new SendGrid.Helpers.Mail.Content("text/html", html);
 
-                var mail = new Mail(from, message.Subject, message.To, textContent);
-                mail.AddContent(htmlContent);
-                dynamic sg = new SendGridAPIClient(_mail.SendGridKey);
-                dynamic response = await sg.client.mail.send.post(requestBody: mail.Get());
-                HttpStatusCode status = response.StatusCode;
-                string body = await response.Body.ReadAsStringAsync();
-                if (status == HttpStatusCode.Accepted)
+                var client = new SendGridClient(_mail.SendGridKey);
+                var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
+                var response = await client.SendEmailAsync(msg);
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
                     return new OperationResult(true);
                 }
                 else
                 {
-                    return new OperationResult(body.ToFormattedJson());
+                    throw new Exception("The message could not be sent...");
                 }
             }
             catch (Exception ex)

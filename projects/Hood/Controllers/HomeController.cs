@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core.Models.ComplexTypes;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
@@ -18,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -204,9 +206,39 @@ namespace Hood.Controllers
         #endregion
 
         [HttpPost]
-        [Route("hood/basic-contact/")]
-        public async Task<Response> BasicContact(ContactFormModel model)
+        [Route("hood/process-contact-form/")]
+        public async Task<Response> ProcessContactForm(ContactFormModel model)
         {
+            var _integrations = _site.GetIntegrationSettings();
+            if (_integrations.EnableGoogleRecaptcha)
+            {
+                var captcha = Request.Form["g-recaptcha-response"].FirstOrDefault();
+                if (captcha.IsSet())
+                {
+                    // process the captcha.
+                    using (var client = new HttpClient())
+                    {
+                        var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                        var values = new Dictionary<string, string>
+                        {
+                            { "secret", _integrations.GoogleRecaptchaSecretKey },
+                            { "response", captcha },
+                            { "remoteip", remoteIpAddress }
+                        };
+
+                        var content = new FormUrlEncodedContent(values);
+
+                        var responseContent = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
+
+                        var responseString = await responseContent.Content.ReadAsStringAsync();
+
+                        RecaptchaResponse response = JsonConvert.DeserializeObject<RecaptchaResponse>(responseString);
+
+                        if (!response.success)
+                            return new Models.Response("You could not be validated by ReCaptcha.");
+                    }
+                }
+            }
             return await _forms.ProcessContactFormModel(model);
         }
 

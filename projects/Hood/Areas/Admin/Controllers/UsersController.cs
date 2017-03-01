@@ -322,7 +322,7 @@ namespace Hood.Areas.Admin.Controllers
                     try
                     {
                         MailObject message = new MailObject();
-                        message.To = new SendGrid.Helpers.Mail.Email(user.Email);
+                        message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
                         message.PreHeader = "You access information for " + _site.GetSiteTitle();
                         message.Subject = "You account has been created.";
                         message.AddH1("Account Created!");

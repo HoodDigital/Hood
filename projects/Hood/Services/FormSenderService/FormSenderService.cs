@@ -28,7 +28,7 @@ namespace Hood.Services
             _renderer = renderer;
         }
 
-        public async Task<Response> ProcessContactFormModel(IContactFormModel model)
+        public async Task<Models.Response> ProcessContactFormModel(IContactFormModel model)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace Hood.Services
                     string siteEmail = contactSettings.Email;
                     if (!string.IsNullOrEmpty(siteEmail))
                     {
-                        message.To = new SendGrid.Helpers.Mail.Email(siteEmail);
+                        message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
                         message.PreHeader = _site.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
                         message.Subject = _site.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
                         message.AddH1(_site.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
@@ -56,7 +56,7 @@ namespace Hood.Services
                     }
 
                     message = new MailObject();
-                    message.To = new SendGrid.Helpers.Mail.Email(model.Email);
+                    message.To = new SendGrid.Helpers.Mail.EmailAddress(model.Email);
                     message.PreHeader = _site.ReplacePlaceholders(contactSettings.Subject);
                     message.Subject = _site.ReplacePlaceholders(contactSettings.Subject);
                     message.AddH1(_site.ReplacePlaceholders(contactSettings.Title));
@@ -69,7 +69,7 @@ namespace Hood.Services
                     message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
                     await _email.SendEmail(message);
 
-                    return new Response(true);
+                    return new Models.Response(true);
                 }
                 catch (Exception sendEx)
                 {
@@ -79,7 +79,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                return new Response(ex);
+                return new Models.Response(ex);
             }
         }
 

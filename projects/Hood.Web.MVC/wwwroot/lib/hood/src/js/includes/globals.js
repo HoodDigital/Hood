@@ -174,9 +174,9 @@ $.getPlaceholders = function (str) {
     }
     return result;
 }
-$.commonHeight = function (element) {
+$.commonHeight = function (element, columnTag) {
     var maxHeight = 0;
-    element.children('.mega-menu-column').each(function () {
+    element.children(columnTag).each(function () {
         var elementChild = $(this).children();
         if (elementChild.hasClass('max-height')) {
             maxHeight = elementChild.outerHeight();
@@ -185,7 +185,7 @@ $.commonHeight = function (element) {
                 maxHeight = elementChild.outerHeight();
         }
     });
-    element.children('.mega-menu-column').each(function () {
+    element.children(columnTag).each(function () {
         $(this).height(maxHeight);
     });
 }

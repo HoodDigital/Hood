@@ -3,7 +3,7 @@
 @{
     ContactSettings settings = _site.GetContactSettings();
 }
-<form asp-controller="Home" asp-action="BasicContact" method="post" role="form" class="contact-form" id="contact" data-redirect="@settings.ThankYouUrl" data-alert-message="@settings.ThankYouMessage">
+<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="contact-form" id="contact" data-redirect="@settings.ThankYouUrl" data-alert-message="@settings.ThankYouMessage">
     <div class="thank-you">
         <h2>@settings.ThankYouTitle</h2>
         <p>@settings.ThankYouMessage</p>

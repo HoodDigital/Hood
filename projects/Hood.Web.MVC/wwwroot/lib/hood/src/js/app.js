@@ -270,7 +270,7 @@ $.hood.App = {
                     var megaMenuContent = $(this);
                     if (megaMenuContent.hasClass('mega-menu-content') && megaMenuContent.find('.widget').length > 0) {
                         if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                            $.commonHeight(megaMenuContent);
+                            $.commonHeight(megaMenuContent, '.mega-menu-column');
                         } else {
                             megaMenuContent.children().height('');
                         }
@@ -484,31 +484,41 @@ $.hood.App = {
     },
     ContactForms: {
         Init: function () {
-
             $('.contact-form .thank-you').hide();
-
+            $('.contact-form .form-submit').show();
             $('body').on('submit', '.contact-form', function (e) {
                 e.preventDefault();
-                $form = $(this);
-                $.post($form.attr('action'), $form.serialize(), function (data) {
-                    if (data.Success) {
-                        if ($form.attr('data-redirect'))
-                            window.location = $form.attr('data-redirect');
-
-                        if ($form.attr('data-alert-message'))
-                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Success", null, true);
-
-                        $form.find('.form').hide();
-                        $form.find('.thank-you').show();
-                    } else {
-                        if (typeof ($form.attr('data-alert-error')) != 'undefined')
-                            $.hood.Alerts.Success($form.attr('data-alert-error'), "Error", null, true);
-
-                        $.hood.Alerts.Error("There was an error sending the message", "Error", null, true);
-                    }
-                });
+                if ($('.g-recaptcha')) {
+                    grecaptcha.execute();
+                } else {
+                    $.hood.App.ContactForms.Submit($(this).attr('id'));
+                }
                 return false;
             });
+            $('body').on('click', '.form-submit-basic', function () {
+                $.hood.App.ContactForms.Submit($(this).data('tag'));
+            });
+        },
+        Submit: function (tag) {
+            $form = $(tag);
+            $.post($form.attr('action'), $form.serialize(), function (data) {
+                if (data.Success) {
+                    if ($form.attr('data-redirect'))
+                        window.location = $form.attr('data-redirect');
+
+                    if ($form.attr('data-alert-message'))
+                        $.hood.Alerts.Success($form.attr('data-alert-message'), "Success", null, true);
+
+                    $form.find('.form').hide();
+                    $form.find('.thank-you').show();
+                } else {
+                    if (typeof ($form.attr('data-alert-error')) != 'undefined')
+                        $.hood.Alerts.Success($form.attr('data-alert-error'), "Error", null, true);
+
+                    $.hood.Alerts.Error("There was an error sending the message", "Error", null, true);
+                }
+            });
+            return false;
         }
     },
     Accordion: function () {
@@ -859,3 +869,6 @@ $.hood.App = {
 
 if ($.hood.Site && $.hood.Site.Init());
 $(window).resize($.hood.App.Resize);
+var googleRecaptchaCallback = function (token) {
+    $.hood.App.ContactForms.Submit($('#g-recaptcha').data('target'));
+}
