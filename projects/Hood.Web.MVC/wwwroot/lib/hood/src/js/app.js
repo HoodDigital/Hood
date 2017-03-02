@@ -370,21 +370,14 @@ $.hood.App = {
         },
         StickyMenu: function (headerOffset) {
             if ($.window.scrollTop() > headerOffset) {
-                if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                    $('body:not(.side-header) #header:not(.no-sticky)').addClass(stickyHeaderClass);
-                    if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
-                }
+                $.header.addClass(stickyHeaderClass);
             } else {
                 $.hood.App.Header.RemoveStickyness();
             }
         },
         RemoveStickyness: function () {
             if ($.header.hasClass(stickyHeaderClass)) {
-                $('body:not(.side-header) #header:not(.no-sticky)').removeClass(stickyHeaderClass);
-                if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
-            }
-            if (($.body.hasClass('device-xs') || $.body.hasClass('device-xxs') || $.body.hasClass('device-sm')) && (typeof ResponsiveMenuClasses === 'undefined')) {
-                if (!$.headerWrap.hasClass('force-not-dark')) { $.headerWrap.removeClass('not-dark'); }
+                $.header.removeClass(stickyHeaderClass);
             }
         },
         SidePanel: function () {
