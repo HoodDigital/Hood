@@ -1,54 +1,26 @@
 @inject IThemesService _themes
 <environment names="Development,Staging,ErrorTesting">
-    @if (_themes.CurrentTheme == "default")
-    {
-        <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
-    }
-    else
-    {
-        <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/preload.css", _themes.CurrentTheme)" asp-append-version="true" />
-    }
+    <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
     <noscript id="deferred-styles">
-        @if (_themes.CurrentTheme == "default")
-        {
-            <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        }
-        else
-        {
-            <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/site.css", _themes.CurrentTheme)" asp-append-version="true" />
-        }
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     </noscript>
 </environment>
 <environment names="Production,PreProduction">
-    @if (_themes.CurrentTheme == "default")
-    {
-        <link rel="stylesheet" href="~/css/preload.min.css" asp-append-version="true" />
-    }
-    else
-    {
-        <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/preload.min.css", _themes.CurrentTheme)" asp-append-version="true" />
-    }
+    <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
     <noscript id="deferred-styles">
-        @if (_themes.CurrentTheme == "default")
-        {
-            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-        }
-        else
-        {
-            <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/site.min.css", _themes.CurrentTheme)" asp-append-version="true" />
-        }
+        <link rel="stylesheet" href="https://hood.azureedge.net/cdn/1.0.0/dist/css/app.min.css" asp-append-version="true" />
     </noscript>
 </environment>
 <script>
-      var loadDeferredStyles = function() {
+    var loadDeferredStyles = function () {
         var addStylesNode = document.getElementById("deferred-styles");
         var replacement = document.createElement("div");
         replacement.innerHTML = addStylesNode.textContent;
         document.body.appendChild(replacement)
         addStylesNode.parentElement.removeChild(addStylesNode);
-      };
-      var raf = requestAnimationFrame || mozRequestAnimationFrame ||
-          webkitRequestAnimationFrame || msRequestAnimationFrame;
-      if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
-      else window.addEventListener('load', loadDeferredStyles);
+    };
+    var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+        webkitRequestAnimationFrame || msRequestAnimationFrame;
+    if (raf) raf(function () { window.setTimeout(loadDeferredStyles, 0); });
+    else window.addEventListener('load', loadDeferredStyles);
 </script>
