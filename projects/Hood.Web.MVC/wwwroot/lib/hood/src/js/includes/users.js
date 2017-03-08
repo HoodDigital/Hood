@@ -43,7 +43,7 @@ $.hood.Users = {
         var $this = $(this);
         swal({
             title: "Are you sure?",
-            text: "The user will be permanently removed and all associated files will be deleted from the system.\n\nThis process CANNOT be undone!",
+            text: "The user will be permanently removed and all associated files will be deleted from the system.\n\nThis process CANNOT be undone!\n\nNote: This process will also cancel any active subscriptions.",
             type: "warning",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",

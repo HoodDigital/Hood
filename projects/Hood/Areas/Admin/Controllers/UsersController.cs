@@ -28,6 +28,7 @@ namespace Hood.Areas.Admin.Controllers
         private readonly HoodDbContext _db;
         private readonly IEmailSender _email;
         private readonly ISiteConfiguration _site;
+        private readonly IBillingService _billing;
 
         public UsersController(
             HoodDbContext db,
@@ -36,6 +37,7 @@ namespace Hood.Areas.Admin.Controllers
             RoleManager<IdentityRole> roleManager,
             IEmailSender email,
             ISiteConfiguration site,
+            IBillingService billing,
             IContentRepository content)
         {
             _userManager = userManager;
@@ -45,6 +47,7 @@ namespace Hood.Areas.Admin.Controllers
             _email = email;
             _site = site;
             _content = content;
+            _billing = billing;
         }
 
         [Route("admin/users/")]
@@ -389,6 +392,22 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     await _userManager.RemoveClaimAsync(user, claim);
                 }
+
+
+                var userSubs = _auth.GetUserById(user.Id);
+                if (userSubs.Subscriptions != null)
+                {
+                    if (userSubs.Subscriptions.Count > 0)
+                    {
+                        foreach (var sub in userSubs.Subscriptions)
+                        {
+                            var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.CustomerId, sub.StripeId, false);
+                        }
+                        userSubs.Subscriptions.Clear();
+                        _auth.UpdateUser(userSubs);
+                    }
+                }
+
                 IdentityResult result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
@@ -398,6 +417,7 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     return new Response("There was a problem updating the database");
                 }
+
             }
             catch (Exception ex)
             {
