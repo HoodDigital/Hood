@@ -145,7 +145,6 @@ gulp.task("js:package:app", function () {
     return gulp.src([
         libFolder + 'jquery-validation/dist/jquery.validate.min.js',
         libFolder + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
-        libFolder + 'bootstrap/dist/js/bootstrap.min.js',
         hood.js + "includes/production.js",
         lib + 'loaders.css/loaders.css.js',
         lib + 'FitVids/jquery.fitvids.js',
@@ -284,6 +283,7 @@ gulp.task('site:js', function () {
 gulp.task('site:js:package', ['site:js'], function () {
     return gulp.src([
         libFolder + 'jquery/dist/jquery.min.js',
+        libFolder + 'bootstrap/dist/js/bootstrap.min.js',
         libFolder + 'hood/dist/js/includes/google.min.js',
         jsFolder + 'site.min.js',
     ])

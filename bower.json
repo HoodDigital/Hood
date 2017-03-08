@@ -1,6 +1,6 @@
 {
     "name": "hood",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": [
         "./dist/css/admin.min.css",
         "./dist/css/app.min.css",
@@ -35,11 +35,11 @@
         "dragula": "3.7.1",
         "dropzone": "4.3.0",
         "FitVids": "1.2.0",
-        "font-awesome": "4.7.0",
+        "font-awesome": "~4",
         "hammer.js": "2.0.4",
         "imagesloaded": "4.1.0",
         "javascript-auto-complete": "1.0.4",
-        "jquery": "2.1.1",
+        "jquery": "~2.1",
         "jquery-validation": "1.14.0",
         "jquery-validation-unobtrusive": "3.2.4",
         "jRespond": "1.0.0",
