@@ -25,21 +25,6 @@ module.exports = function (grunt) {
                             return old + '-preview1';
                         }
                     }
-                    if (releaseType == 'patch') {
-                        if (old.includes('-preview')) {
-                            pre = old.split('-preview')[1];
-                            old = old.split('-preview')[0];
-                            if (pre.split('-').length > 0) {
-                                preMain = pre.split('-')[0];
-                                prePatch = pre.split('-')[1];
-                                return old + '-preview' + preMain + "-" + (Number(prePatch) + 1);
-                            } else {
-                                return old + '-preview' + pre + "-1";
-                            }
-                        } else {
-                            return old + '-preview1-1';
-                        }
-                    }
                     return semver.inc(old, releaseType);
                 }
             },
