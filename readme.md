@@ -1,6 +1,6 @@
 # Hood
 
-[![VS Team Services](https://hooddigital.visualstudio.com/_apis/public/build/definitions/107a1b8d-bbc9-4a7e-876e-de17e71393a0/1/badge)](http://cms.hooddigital.com/)
+[![VS Team Services](https://img.shields.io/vso/build/hooddigital/107a1b8d-bbc9-4a7e-876e-de17e71393a0/1.svg?style=flat-square)](http://cms.hooddigital.com/)
 [![Demo](https://img.shields.io/nuget/v/Hood.svg?style=flat-square&label=Demo&colorB=eab92d)](http://cms.hooddigital.com/)
 
 ## About Hood CMS
