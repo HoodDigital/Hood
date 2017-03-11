@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>Hood</id>
     <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <title>Hood</title>
+    <authors>George Whysall</authors>
+    <owners>George Whysall</owners>
     <licenseUrl>https://github.com/HoodDigital/HoodCMS/blob/master/LICENSE</licenseUrl>
     <projectUrl>http://cms.hooddigital.com/</projectUrl>
     <iconUrl>https://hood.azureedge.net/hood/nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
+    <description>The Hood CMS is a full content management system providing a solid backbone to any website.</description>
     <releaseNotes></releaseNotes>
     <copyright>2017 Hood Digital</copyright>
     <tags>ASP.NET MVC EntityFramework cms hood bootstrap jquery</tags>
