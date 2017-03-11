@@ -1,12 +1,6 @@
 {
   "name": "Hood",
   "version": "1.0.1",
-  "authors": [
-    "Hood Digital",
-    "George Whysall",
-    "Thomas Burwood"
-  ],
-  "description": "The Hood CMS is a full content management system providing a solid backbone to any website. Created by Hood's Digital Architects, George Whysall and Thomas Burwood.",
   "dependencies": {
     "linqtotwitter": "4.1.0",
     "MediaTypeMap": "2.1.0",
