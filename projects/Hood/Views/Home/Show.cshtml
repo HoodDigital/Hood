@@ -1,12 +1,12 @@
 @model ContentModel
-@inject ISiteConfiguration _site
+
 @{
-    SeoSettings meta = _site.GetSeo();
-    BasicSettings info = _site.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
 
     var cmTitle = Model.Content.GetMeta("SEO.Meta.Title");
     var cmDesc = Model.Content.GetMeta("SEO.Meta.Description");
-    string metaTitle = Model.Content.Title + " - " + info.SiteTitle;
+    string metaTitle = Model.Content.Title + " - " + _basicSettings.SiteTitle;
     string metaDesc = Model.Content.Excerpt;
     if (!cmTitle.GetStringValue().IsNullOrEmpty())
     {
@@ -17,7 +17,7 @@
         metaDesc = cmDesc.GetStringValue();
     }
     ViewBag.Title = metaTitle;
-    ContentApi mapi = _site.ToContentApi(Model.Content);
+    ContentApi mapi = _settings.ToContentApi(Model.Content);
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
     ViewData["Content"] = mapi;
 
@@ -56,9 +56,9 @@
     }
 
     string url = Context.GetSiteUrl(true, true);
-    if (meta.CanonicalUrl.IsSet())
+    if (_seoSettings.CanonicalUrl.IsSet())
     {
-        url = string.Format("{0}{1}", meta.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
 }
 @section metas {
@@ -73,9 +73,9 @@
     }
     else
     {
-        <meta property="og:image" content="@meta.OgImageUrl" />
-        <meta property="og:image:secure_url" content="@meta.OgSecureImageUrl" />
-        <meta name="twitter:image" content="@meta.TwitterCardImageUrl" />
+        <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+        <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+        <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
     }
     <meta property="og:description" content="@metaDesc" />
     <meta name="twitter:title" content="@metaTitle" />

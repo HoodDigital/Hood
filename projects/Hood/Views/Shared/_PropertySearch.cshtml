@@ -1,7 +1,7 @@
 @model ListPropertyModel
-@inject ISiteConfiguration _site
+
 @{
-    PropertySettings _settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 <form method="get">
     <div class="row no-margin">
@@ -19,7 +19,7 @@
                 </select>
             </div>
         </div>
-        @if (_settings.ShowBedrooms)
+        @if (_propertySettings.ShowBedrooms)
         {
             <div class="col-sm-6 col-md-3">
                 <div class="well">
@@ -42,7 +42,7 @@
                 </div>
             </div>
         }
-        @if (_settings.ShowRent)
+        @if (_propertySettings.ShowRent)
         {
             <div class="col-sm-6 col-md-3">
                 <div class="well">
@@ -60,7 +60,7 @@
                 </div>
             </div>
         }
-        @if (_settings.ShowAskingPrice)
+        @if (_propertySettings.ShowAskingPrice)
         {
             <div class="col-sm-6 col-md-3">
                 <div class="well">
@@ -78,7 +78,7 @@
                 </div>
             </div>
         }
-        @if (_settings.ShowPremium)
+        @if (_propertySettings.ShowPremium)
         {
             <div class="col-sm-6 col-md-3">
                 <div class="well">

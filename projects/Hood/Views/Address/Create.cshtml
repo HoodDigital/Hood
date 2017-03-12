@@ -1,8 +1,8 @@
 @model Address
 @inject IContentRepository _data
-@inject ISiteConfiguration _site
+
 @{
-    var integrations = _site.GetIntegrationSettings();
+    var integrations = _settings.GetIntegrationSettings();
     Layout = null;
 }
 <div class="modal fade" role="dialog" id="add-address-modal">

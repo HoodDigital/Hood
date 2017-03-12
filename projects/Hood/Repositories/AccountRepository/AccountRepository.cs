@@ -1,55 +1,219 @@
-﻿using Hood.Caching;
-using Hood.Enums;
-using Hood.Extensions;
-using Hood.Infrastructure;
+﻿using Hood.Infrastructure;
 using Hood.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Identity;
+using Hood.Interfaces;
+using Hood.Caching;
+using Stripe;
+using Hood.Enums;
+using Hood.Extensions;
 
 namespace Hood.Services
 {
-    public class SubscriptionRepository : ISubscriptionRepository
+    public class AccountRepository : IAccountRepository
     {
-        #region "Constructors"
         private readonly HoodDbContext _db;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IAuthenticationRepository _auth;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IConfiguration _config;
-        private readonly ISiteConfiguration _site;
-        private readonly IBillingService _billing;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IBillingService _billing;
 
-        public SubscriptionRepository(HoodDbContext db,
-                                      UserManager<ApplicationUser> userManager,
-                                      IAuthenticationRepository auth,
-                                      IHttpContextAccessor httpContextAccessor,
-                                      IHoodCache cache,
-                                      IConfiguration config,
-                                      IBillingService billing,
-                                      ISiteConfiguration site)
+        public AccountRepository(
+            HoodDbContext db,
+            ISettingsRepository site,
+            IBillingService billing,
+            IHttpContextAccessor context,
+            IHoodCache cache,
+            UserManager<ApplicationUser> userManager)
         {
             _db = db;
-            _auth = auth;
-            _userManager = userManager;
-            _httpContextAccessor = httpContextAccessor;
-            _config = config;
-            _site = site;
+            _settings = site;
+            _contextAccessor = context;
             _cache = cache;
+            _userManager = userManager;
             _billing = billing;
         }
-        #endregion
 
-        #region "Subscriptions"
+        // Users
+        public AccountInfo LoadAccountInfo(string userId)
+        {
+            AccountInfo result = new AccountInfo();
+            result = new AccountInfo();
+            result.User = GetUserById(userId);
+            if (result.User?.Subscriptions != null)
+            {
+                foreach (UserSubscription sub in result.User.Subscriptions)
+                {
+                    if (sub.Status == "trialing" || sub.Status == "active")
+                    {
+                        result.ActiveSubscriptions.Add(new Models.Api.UserSubscriptionApi(sub));
+                    }
+                }
+            }
+            return result;
+        }
+        public ApplicationUser GetUserById(string userId, bool track = true)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return null;
+            ApplicationUser user;
+            var userQ = _db.Users.Include(u => u.Addresses)
+                                   .Include(u => u.Subscriptions)
+                                   .ThenInclude(u => u.Subscription)
+                                   .Where(u => u.Id == userId);
+            if (!track)
+                userQ = userQ.AsNoTracking();
+            user = userQ.FirstOrDefault();
+            return user;
+        }
+        public async Task<ApplicationUser> GetUserByStripeId(string stripeId)
+        {
+            if (string.IsNullOrEmpty(stripeId))
+                return null;
+            ApplicationUser user;
+            user = await _db.Users.AsNoTracking()
+                                      .Include(u => u.Addresses)
+                                      .Include(u => u.Subscriptions)
+                                      .ThenInclude(u => u.Subscription)
+                                      .Where(u => u.StripeId == stripeId).FirstOrDefaultAsync();
+            return user;
+        }
+        public ApplicationUser GetCurrentUser(bool track = true)
+        {
+            if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                return GetUserById(_userManager.GetUserId(_contextAccessor.HttpContext.User), track);
+            else
+                return null;
+        }
+        public OperationResult UpdateUser(ApplicationUser user)
+        {
+            try
+            {
+                _db.Update(user);
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex);
+            }
+        }
+        public void ResetBillingInfo()
+        {
+            var user = GetCurrentUser();
+            user.StripeId = null;
+            UpdateUser(user);
+        }
+
+        // Roles
+        public IList<IdentityRole> GetAllRoles()
+        {
+            return _db.Roles.ToList();
+        }
+
+        // Addresses
+        public Address GetAddressById(int id)
+        {
+            return _db.Addresses.Where(a => a.Id == id).FirstOrDefault();
+        }
+        public OperationResult DeleteAddress(int id)
+        {
+            try
+            {
+                Address address = _db.Addresses.Where(u => u.Id == id).FirstOrDefault();
+                _db.Entry(address).State = EntityState.Deleted;
+                OperationResult result = new OperationResult();
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex.Message);
+            }
+        }
+        public OperationResult UpdateAddress(Address address)
+        {
+            try
+            {
+                _db.Update(address);
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex);
+            }
+        }
+        public OperationResult SetBillingAddress(string userId, int id)
+        {
+            try
+            {
+                var user = _db.Users.Include(u => u.Addresses).Where(u => u.Id == userId).FirstOrDefault();
+                var add = user.Addresses.SingleOrDefault(a => a.Id == id);
+                if (add != null)
+                    user.BillingAddress = add.CloneTo<Address>();
+                _db.Update(user);
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex);
+            }
+        }
+        public OperationResult SetDeliveryAddress(string userId, int id)
+        {
+            try
+            {
+                var user = _db.Users.Include(u => u.Addresses).Where(u => u.Id == userId).FirstOrDefault();
+                var add = user.Addresses.SingleOrDefault(a => a.Id == id);
+                if (add != null)
+                    user.DeliveryAddress = add.CloneTo<Address>();
+                _db.Update(user);
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex);
+            }
+        }
+        public OperationResult SaveUserSubscription(UserSubscription newUserSub)
+        {
+            try
+            {
+                _db.UserSubscriptions.Add(newUserSub);
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex);
+            }
+        }
+        public OperationResult UpdateUserSubscription(UserSubscription newUserSub)
+        {
+            try
+            {
+                _db.Update(newUserSub);
+                _db.SaveChanges();
+                return new OperationResult(true);
+            }
+            catch (Exception ex)
+            {
+                return new OperationResult(ex);
+            }
+        }
+
+        // Subscriptions
         public async Task<OperationResult> Add(Subscription subscription)
         {
             try
@@ -79,7 +243,6 @@ namespace Hood.Services
             try
             {
                 Subscription subscription = _db.Subscriptions.Where(p => p.Id == id).FirstOrDefault();
-                _cache.Remove(typeof(Subscription).ToString() + "-" + subscription.Id);
                 try
                 {
                     await _billing.Stripe.PlanService.DeleteAsync(subscription.StripeId);
@@ -96,22 +259,13 @@ namespace Hood.Services
                 return new OperationResult(ex.Message);
             }
         }
-        public async Task<Subscription> GetSubscriptionById(int id, bool nocache = false)
+        public async Task<Subscription> GetSubscriptionById(int id)
         {
-            string cacheKey = typeof(Subscription).ToString() + ".Single." + id;
-            Subscription subscription = null;
-            if (_cache.TryGetValue(cacheKey, out subscription) && !nocache)
-                return subscription;
-            else
-            {
-                subscription = await _db.Subscriptions
+            Subscription subscription = await _db.Subscriptions
                                     .Include(s => s.Users)
                                     .Include(s => s.Features)
                                     .FirstOrDefaultAsync(c => c.Id == id);
-
-                _cache.Add(cacheKey, subscription);
-                return subscription;
-            }
+            return subscription;
         }
         public async Task<Subscription> GetSubscriptionByStripeId(string stripeId)
         {
@@ -126,8 +280,8 @@ namespace Hood.Services
         {
             IQueryable<Subscription> subscriptions = _db.Subscriptions.Include(s => s.Features);
 
-            if (includeUsers) 
-                subscriptions = subscriptions.Include(s=> s.Users);
+            if (includeUsers)
+                subscriptions = subscriptions.Include(s => s.Users);
 
             // search the collection
             if (!string.IsNullOrEmpty(search))
@@ -207,7 +361,6 @@ namespace Hood.Services
         {
             try
             {
-                _cache.Remove(typeof(Subscription).ToString() + "-" + subscription.Id);
                 var myPlan = new StripePlanUpdateOptions();
                 myPlan.Name = subscription.Name;
                 StripePlan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
@@ -220,10 +373,9 @@ namespace Hood.Services
                 return new OperationResult(ex);
             }
         }
-        #endregion
 
-        #region "Stripe customer object"
-        public async Task<StripeCustomer> GetCustomerObject(string stripeId, bool allowNullObject)
+        // Stripe customer object
+        public async Task<StripeCustomer> LoadCustomerObject(string stripeId, bool allowNullObject)
         {
             // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
             if (stripeId.IsSet())
@@ -232,14 +384,14 @@ namespace Hood.Services
                     var customer = await _billing.Customers.FindByIdAsync(stripeId);
                     if (customer.Deleted.HasValue && customer.Deleted.Value)
                     {
-                        _auth.ResetBillingInfo();
+                        ResetBillingInfo();
                         customer = null;
                     }
                     if (customer == null)
                         if (!allowNullObject)
                             throw new Exception(BillingMessage.NoCustomerObject.ToString());
                         else
-                            _auth.ResetBillingInfo();
+                            ResetBillingInfo();
                     return customer;
                 }
                 catch (StripeException)
@@ -255,9 +407,8 @@ namespace Hood.Services
             else
                 throw new Exception(BillingMessage.NoStripeId.ToString());
         }
-        #endregion
 
-        #region "User Subscriptions"
+        // User Subscriptions
         private IQueryable<ApplicationUser> GetSubscribers(int subscriptionId, string search = "", string sort = "")
         {
             IQueryable<ApplicationUser> users = _db.Users
@@ -334,7 +485,7 @@ namespace Hood.Services
         public async Task CreateUserSubscription(int planId, string stripeToken, string cardId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetUserObject();
+            ApplicationUser user = GetCurrentUser();
 
             // Load the subscription plan.
             Subscription subscription = await GetSubscriptionById(planId);
@@ -343,7 +494,7 @@ namespace Hood.Services
             StripePlan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
 
             // Check for customer or throw, but allow it to be null.
-            StripeCustomer customer = await GetCustomerObject(user.StripeId, true);
+            StripeCustomer customer = await LoadCustomerObject(user.StripeId, true);
 
             // The object for the new user subscription to be recieved from stripe.
             StripeSubscription newSubscription = null;
@@ -383,7 +534,7 @@ namespace Hood.Services
                     // if it does not, create it, add the card and subscribe the plan.
                     customer = await _billing.Customers.CreateCustomer(user, stripeToken);
                     user.StripeId = customer.Id;
-                    var updateResult = _auth.UpdateUser(user);
+                    var updateResult = UpdateUser(user);
                     newSubscription = await _billing.Subscriptions.SubscribeUserAsync(user.StripeId, plan.Id);
                 }
                 else
@@ -413,18 +564,18 @@ namespace Hood.Services
             newUserSub.CustomerId = user.StripeId;
             newUserSub.UserId = user.Id;
             newUserSub.SubscriptionId = subscription.Id;
-            OperationResult result = _auth.AddUserSubscription(newUserSub);
+            OperationResult result = SaveUserSubscription(newUserSub);
         }
         public async Task UpgradeUserSubscription(int subscriptionId, int planId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetUserObject();
+            ApplicationUser user = GetCurrentUser();
 
             Subscription subscription = await GetSubscriptionById(planId);
             UserSubscription userSub = GetUserSubscription(user, subscriptionId);
 
             // Check for customer or throw.
-            var customer = await GetCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObject(user.StripeId, false);
 
             if (customer.DefaultSourceId.IsSet() || customer.Sources?.TotalCount > 0)
             {
@@ -435,7 +586,7 @@ namespace Hood.Services
                 userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
                 userSub.Subscription = subscription;
                 userSub.SubscriptionId = subscription.Id;
-                _auth.UpdateUser(user);
+                UpdateUser(user);
             }
             else
                 throw new Exception(BillingMessage.NoPaymentSource.ToString());
@@ -443,40 +594,40 @@ namespace Hood.Services
         public async Task CancelUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetUserObject();
+            ApplicationUser user = GetCurrentUser();
 
             // Check for customer or throw.
-            var customer = await GetCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObject(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
             StripeSubscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, true);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
-            _auth.UpdateUser(user);
+            UpdateUser(user);
         }
         public async Task RemoveUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetUserObject();
+            ApplicationUser user = GetCurrentUser();
 
             // Check for customer or throw.
-            var customer = await GetCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObject(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
             StripeSubscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, false);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
-            _auth.UpdateUser(user);
+            UpdateUser(user);
         }
         public async Task ReactivateUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetUserObject();
+            ApplicationUser user = GetCurrentUser();
 
             // Check for customer or throw.
-            var customer = await GetCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObject(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
@@ -486,17 +637,10 @@ namespace Hood.Services
 
             sub = await _billing.Subscriptions.UpdateSubscriptionAsync(customer.Id, sub.Id, sub.StripePlan);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
-            _auth.UpdateUser(user);
+            UpdateUser(user);
         }
-        #endregion
 
-        #region "User Subscription Helpers"
-        private ApplicationUser GetUserObject()
-        {
-            var context = _httpContextAccessor.HttpContext;
-            ApplicationUser user = _auth.GetUserById(_userManager.GetUserId(context.User), false, true);
-            return user;
-        }
+        // User Subscription Helpers
         private UserSubscription GetUserSubscription(ApplicationUser user, int userSubscriptionId)
         {
             UserSubscription subscription = user.Subscriptions.Where(us => us.UserSubscriptionId == userSubscriptionId).FirstOrDefault();
@@ -511,14 +655,13 @@ namespace Hood.Services
                 throw new Exception(BillingMessage.NoSubscription.ToString());
             return subscription;
         }
-        #endregion
 
-        #region "WebHooks"
+        // WebHooks
         public async Task ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime)
         {
             try
             {
-                ApplicationUser user = await _auth.GetUserByStripeId(created.CustomerId);
+                ApplicationUser user = await GetUserByStripeId(created.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, created.Id);
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
@@ -526,7 +669,7 @@ namespace Hood.Services
                 {
                     userSub = UpdateUserSubscriptionFromStripe(userSub, created);
                     userSub.Confirmed = true;
-                    _auth.UpdateUser(user);
+                    UpdateUser(user);
                 }
             }
             catch (Exception)
@@ -538,14 +681,14 @@ namespace Hood.Services
         {
             try
             {
-                ApplicationUser user = await _auth.GetUserByStripeId(updated.CustomerId);
+                ApplicationUser user = await GetUserByStripeId(updated.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
                 if (eventTime.HasValue && userSub.LastUpdated < eventTime)
                 {
                     userSub = UpdateUserSubscriptionFromStripe(userSub, updated);
-                    _auth.UpdateUser(user);
+                    UpdateUser(user);
                 }
             }
             catch (Exception)
@@ -557,7 +700,7 @@ namespace Hood.Services
         {
             try
             {
-                ApplicationUser user = await _auth.GetUserByStripeId(deleted.CustomerId);
+                ApplicationUser user = await GetUserByStripeId(deleted.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, deleted.Id);
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
@@ -566,7 +709,7 @@ namespace Hood.Services
                     userSub = UpdateUserSubscriptionFromStripe(userSub, deleted);
                     userSub.Deleted = true;
                     userSub.DeletedAt = DateTime.Now;
-                    _auth.UpdateUser(user);
+                    UpdateUser(user);
                 }
             }
             catch (Exception)
@@ -576,7 +719,6 @@ namespace Hood.Services
         }
         private UserSubscription UpdateUserSubscriptionFromStripe(UserSubscription userSubscription, StripeSubscription stripeSubscription)
         {
-            _auth.ClearUserFromCache(userSubscription.UserId);
             userSubscription.CancelAtPeriodEnd = stripeSubscription.CancelAtPeriodEnd;
             userSubscription.CanceledAt = stripeSubscription.CanceledAt;
             userSubscription.CurrentPeriodEnd = stripeSubscription.CurrentPeriodEnd;
@@ -592,7 +734,6 @@ namespace Hood.Services
             userSubscription.LastUpdated = DateTime.Now;
             return userSubscription;
         }
-
         public async Task<UserSubscription> FindUserSubscriptionByStripeId(string id)
         {
             UserSubscription userSub = await _db.UserSubscriptions
@@ -601,6 +742,6 @@ namespace Hood.Services
                                 .FirstOrDefaultAsync(c => c.StripeId == id);
             return userSub;
         }
-        #endregion
+
     }
 }

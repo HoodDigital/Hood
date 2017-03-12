@@ -1,33 +1,33 @@
-@inject ISiteConfiguration _site
+
 @{ 
-    BasicSettings info = _site.GetBasicSettings();
-    SeoSettings meta = _site.GetSeo();
-    var OgTitle = meta.OgTitle.IsSet() ? meta.OgTitle : ViewData["Title"];
-    var OgImageUrl = meta.OgImageUrl.IsSet() ? meta.OgImageUrl : "http://placehold.it/1200x630";
-    var OgSecureImageUrl = meta.OgSecureImageUrl.IsSet() ? meta.OgSecureImageUrl : "http://placehold.it/1200x630";
-    var TwitterCardTitle = meta.TwitterCardTitle.IsSet() ? meta.TwitterCardTitle : ViewData["Title"];
-    var TwitterCardImageUrl = meta.TwitterCardImageUrl.IsSet() ? meta.TwitterCardImageUrl : "http://placehold.it/750x560";
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    var OgTitle = _seoSettings.OgTitle.IsSet() ? _seoSettings.OgTitle : ViewData["Title"];
+    var OgImageUrl = _seoSettings.OgImageUrl.IsSet() ? _seoSettings.OgImageUrl : "http://placehold.it/1200x630";
+    var OgSecureImageUrl = _seoSettings.OgSecureImageUrl.IsSet() ? _seoSettings.OgSecureImageUrl : "http://placehold.it/1200x630";
+    var TwitterCardTitle = _seoSettings.TwitterCardTitle.IsSet() ? _seoSettings.TwitterCardTitle : ViewData["Title"];
+    var TwitterCardImageUrl = _seoSettings.TwitterCardImageUrl.IsSet() ? _seoSettings.TwitterCardImageUrl : "http://placehold.it/750x560";
 }
-@if (meta.Description.IsSet())
+@if (_seoSettings.Description.IsSet())
 {
-    <meta name="description" content="@meta.Description" />
+    <meta name="description" content="@_seoSettings.Description" />
 }
-@if (meta.OgAuthor.IsSet())
+@if (_seoSettings.OgAuthor.IsSet())
 {
-    <meta property="og:author" content="@meta.OgAuthor" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
 }
 <meta property="og:title" content="@OgTitle" />
 <meta property="og:image" content="@OgImageUrl" />
 <meta property="og:image:secure_url" content="@OgSecureImageUrl" />
-@if (meta.OgDescription.IsSet())
+@if (_seoSettings.OgDescription.IsSet())
 {
-    <meta property="og:description" content="@meta.OgDescription" />
+    <meta property="og:description" content="@_seoSettings.OgDescription" />
 }
 <meta name="twitter:title" content="@TwitterCardTitle" />
 
-@if (meta.TwitterCardDescription.IsSet())
+@if (_seoSettings.TwitterCardDescription.IsSet())
 {
-    <meta name="twitter:description" content="@meta.TwitterCardDescription" />
+    <meta name="twitter:description" content="@_seoSettings.TwitterCardDescription" />
 }
 
 <meta name="twitter:image" content="@TwitterCardImageUrl" />

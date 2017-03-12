@@ -10,8 +10,6 @@ namespace Hood.Services
 {
     public interface IContentRepository
     {
-        // Events
-
         // Content CRUD
         PagedList<Content> GetPagedContent(ListFilters filters, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true);
         List<Content> GetContentByType(string type, string categorySlug = null, bool publishedOnly = true);
@@ -37,14 +35,13 @@ namespace Hood.Services
         Task<OperationResult<ContentTag>> AddTag(string value);
         Task<OperationResult> DeleteTag(string value);
 
-        #region "Categories" 
+        // Categories
         Task<ContentCategory> GetCategoryById(int categoryId);
         IEnumerable<ContentCategory> GetCategories(int contentId);
         Task<OperationResult<ContentCategory>> AddCategory(ContentCategory category);
         Task<OperationResult<ContentCategory>> AddCategory(string value, string type);
         Task<OperationResult> DeleteCategory(int categoryId);
         Task<OperationResult> UpdateCategory(ContentCategory model);
-        #endregion
 
         // Sitemap Functions
         List<SitemapPage> GetPages(string categorySlug = null, bool publishedOnly = true);

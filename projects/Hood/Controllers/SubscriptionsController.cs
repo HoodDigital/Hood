@@ -18,19 +18,16 @@ namespace Hood.Controllers
     [StripeRequired]
     public class SubscriptionsController : Controller
     {
-        private readonly IAuthenticationRepository _auth;
-        private readonly ISubscriptionRepository _subs;
+        private readonly IAccountRepository _auth;
         private readonly IBillingService _billing;
         private readonly IStripeWebHookService _webHooks;
 
         public SubscriptionsController(
-            IAuthenticationRepository auth,
-            ISubscriptionRepository subs,
+            IAccountRepository auth,
             IBillingService billing,
             IStripeWebHookService webHooks)
         {
             _auth = auth;
-            _subs = subs;
             _billing = billing;
             _webHooks = webHooks;
         }
@@ -63,8 +60,8 @@ namespace Hood.Controllers
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel();
             model.User = account.User;
-            model.Plans = await _subs.GetLevels();
-            model.Addons = await _subs.GetAddons();
+            model.Plans = await _auth.GetLevels();
+            model.Addons = await _auth.GetAddons();
             model.Message = message;
             return View(model);
         }
@@ -84,7 +81,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _subs.CreateUserSubscription(model.PlanId, model.StripeToken, model.CardId);
+                await _auth.CreateUserSubscription(model.PlanId, model.StripeToken, model.CardId);
                 if (returnUrl.IsSet())
                     return Redirect(returnUrl);
                 else
@@ -111,9 +108,9 @@ namespace Hood.Controllers
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel();
             model.User = account.User;
-            model.Plans = await _subs.GetLevels();
-            model.Addons = await _subs.GetAddons();
-            model.Customer = await _subs.GetCustomerObject(account.User.StripeId, true);
+            model.Plans = await _auth.GetLevels();
+            model.Addons = await _auth.GetAddons();
+            model.Customer = await _auth.LoadCustomerObject(account.User.StripeId, true);
             ViewData["ReturnUrl"] = returnUrl;
             return model;
         }
@@ -125,7 +122,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _subs.UpgradeUserSubscription(id, plan);
+                await _auth.UpgradeUserSubscription(id, plan);
                 return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionUpdated });
             }
             catch (Exception ex)
@@ -140,7 +137,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _subs.CancelUserSubscription(id);
+                await _auth.CancelUserSubscription(id);
                 return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionCancelled });
             }
             catch (Exception ex)
@@ -155,7 +152,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _subs.RemoveUserSubscription(id);
+                await _auth.RemoveUserSubscription(id);
                 return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionEnded });
             }
             catch (Exception ex)
@@ -170,7 +167,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _subs.ReactivateUserSubscription(id);
+                await _auth.ReactivateUserSubscription(id);
                 return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionReactivated });
             }
             catch (Exception ex)

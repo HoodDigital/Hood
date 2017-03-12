@@ -8,7 +8,7 @@ namespace Hood.Services
     public class ViewLocationExpander : IViewLocationExpander
     {
         private IEnumerable<string> locs;
-        private ISiteConfiguration _site;
+        private ISettingsRepository _settings;
 
         public ViewLocationExpander()
         {
@@ -16,8 +16,8 @@ namespace Hood.Services
 
         public void PopulateValues(ViewLocationExpanderContext context)
         {
-            _site = (ISiteConfiguration)context.ActionContext.HttpContext.RequestServices.GetService(typeof(ISiteConfiguration));
-            string theme = _site != null ? _site["Hood.Settings.Theme"] : null;
+            _settings = (ISettingsRepository)context.ActionContext.HttpContext.RequestServices.GetService(typeof(ISettingsRepository));
+            string theme = _settings != null ? _settings["Hood.Settings.Theme"] : null;
             var temp = new List<string>();
             if (theme.IsSet())
                 temp.AddRange(GetLocations("/Themes/" + theme + "/Areas/{2}"));

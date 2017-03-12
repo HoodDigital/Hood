@@ -15,7 +15,7 @@ using Hood.Caching;
 
 namespace Hood.Services
 {
-    public class SiteConfiguration : ISiteConfiguration
+    public class SettingsRepository : ISettingsRepository
     {
         public static object scriptLock = new object();
 
@@ -43,7 +43,7 @@ namespace Hood.Services
         private const string SystemSettingsKey = "system_settings";
 
 
-        public SiteConfiguration(HoodDbContext db,
+        public SettingsRepository(HoodDbContext db,
                                  IConfiguration config,
                                  IHoodCache memoryCache)
         {
@@ -171,17 +171,17 @@ namespace Hood.Services
 
         public IConfigurationSection GetSection(string key)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public IEnumerable<IConfigurationSection> GetChildren()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public IChangeToken GetReloadToken()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public BasicSettings GetBasicSettings(bool noCache = false)
@@ -423,11 +423,6 @@ namespace Hood.Services
                 !settings.StripeTestPublicKey.IsSet())
                 return false;
             return true;
-        }
-
-        public OperationResult TypeEnabled(string type)
-        {
-            throw new NotImplementedException();
         }
 
         public string GetSiteTitle()

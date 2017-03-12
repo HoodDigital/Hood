@@ -1,7 +1,6 @@
 @model ListPropertyModel
-@inject ISiteConfiguration _site
 @{
-    PropertySettings _settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
     string urlFormat = "/{0}?Filters.page={1}{2}";
     var query = "&Filters.pageSize=" + Model.Filters.pageSize;
     query += Model.Filters.search.IsSet() ? "&Filters.search=" + Model.Filters.search : "";
@@ -20,8 +19,8 @@
 <ul class="pagination">
     @if (Model.Properties.CurrentPage > 1)
     {
-        <li><a href="@string.Format(urlFormat, _settings.Slug, 1, query)" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>
-        <li><a href="@string.Format(urlFormat, _settings.Slug, Model.Properties.CurrentPage - 1, query)" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-left"></i></span></a></li>
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug, 1, query)" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug, Model.Properties.CurrentPage - 1, query)" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-left"></i></span></a></li>
     }
     @for (int i = Model.Properties.CurrentPage - 2; i <= Model.Properties.CurrentPage + 2; i++)
     {
@@ -29,17 +28,17 @@
         {
             if (i == Model.Properties.CurrentPage)
             {
-                <li class="active"><a href="@string.Format(urlFormat, _settings.Slug, i, query)">@i</a></li>
+                <li class="active"><a href="@string.Format(urlFormat, _propertySettings.Slug, i, query)">@i</a></li>
             }
             else
             {
-                <li><a href="@string.Format(urlFormat, _settings.Slug, i, query)">@i</a></li>
+                <li><a href="@string.Format(urlFormat, _propertySettings.Slug, i, query)">@i</a></li>
             }
         }
     }
     @if (Model.Properties.CurrentPage < Model.Properties.Pages)
     {
-        <li><a href="@string.Format(urlFormat, _settings.Slug, Model.Properties.CurrentPage + 1, query)" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-right"></i></span></a></li>
-        <li><a href="@string.Format(urlFormat, _settings.Slug,  Model.Properties.Pages + 1, query)" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug, Model.Properties.CurrentPage + 1, query)" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-right"></i></span></a></li>
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug,  Model.Properties.Pages + 1, query)" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>
     }
 </ul>

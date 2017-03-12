@@ -19,12 +19,12 @@ namespace Hood.Controllers
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly IContentRepository _content;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
         private readonly IAddressService _address;
 
         public AddressController(
             IContentRepository content,
-            IAuthenticationRepository auth,
+            IAccountRepository auth,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,

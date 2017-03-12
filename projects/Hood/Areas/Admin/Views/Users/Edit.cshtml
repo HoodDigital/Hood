@@ -1,10 +1,10 @@
 @using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-@inject ISiteConfiguration _site;
+;
 @model EditUserModel
 @{
     ViewBag.Title = "Edit User: " + Model.User.UserName;
-    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
-    BasicSettings _info = _site.GetBasicSettings();
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(Model.User);
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
 }
 @section buttons {
     <a class="btn btn-default reset-password"><i class="fa fa-lock"></i> Reset Password</a>

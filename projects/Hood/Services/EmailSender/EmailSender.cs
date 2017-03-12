@@ -14,7 +14,7 @@ namespace Hood.Services
     public class EmailSender : IEmailSender
     {
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private Models.MailSettings _mail;
         private Models.BasicSettings _info;
         private readonly IRazorViewRenderer _renderer;
@@ -22,12 +22,12 @@ namespace Hood.Services
 
         public EmailSender(IHttpContextAccessor contextAccessor,
             UserManager<ApplicationUser> userManager,
-            ISiteConfiguration site,
+            ISettingsRepository site,
             IRazorViewRenderer renderer)
         {
             _contextAccessor = contextAccessor;
             _userManager = userManager;
-            _site = site;
+            _settings = site;
             _renderer = renderer;
         }
 
@@ -35,10 +35,10 @@ namespace Hood.Services
         {
             try
             {
-                _info = _site.GetBasicSettings();
-                _mail = _site.GetMailSettings(true);
+                _info = _settings.GetBasicSettings();
+                _mail = _settings.GetMailSettings(true);
 
-                string siteTitle = _site.GetSiteTitle();
+                string siteTitle = _settings.GetSiteTitle();
                 string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
                 string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
 

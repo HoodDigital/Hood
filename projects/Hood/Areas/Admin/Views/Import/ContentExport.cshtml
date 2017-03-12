@@ -1,9 +1,7 @@
 @model ContentListModel
-@inject ISiteConfiguration _site;
 @{
     ViewBag.Title = "Export all Content";
-    PropertySettings settings = _site.GetPropertySettings();
-    BasicSettings _info = _site.GetBasicSettings();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
 }
 @section buttons {
 }
@@ -28,7 +26,7 @@
                     <button id="runUpdate" class="btn btn-primary" data-start="/admin/content/export/start/" data-cancel="/admin/content/export/cancel/" data-update="/admin/content/export/status/">Prepare Export File</button>
                     <p class="m-t-sm">
                         Once you have prepared the file, by clicking 'Prepare Export File' and completing the export process, a download link will be provided here for you to download. It will expire 24 hours after it is created.<br />
-                        Once the file is prepared, a link will also be emailed to the site's default email address: <strong>@_info.Email</strong> [This can be changed in Admin > Settings > Basic Settings]
+                        Once the file is prepared, a link will also be emailed to the site's default email address: <strong>@_basicSettings.Email</strong> [This can be changed in Admin > Settings > Basic Settings]
                     </p>
                     <div id="download" class="alert alert-success m-t-lg">
                         <h5>Download your file...</h5>

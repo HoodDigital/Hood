@@ -1,12 +1,12 @@
 @model PagedList<Content>
-@inject ISiteConfiguration _site
+
 @inject IContentRepository _content
 @if (Model != null && Model.Count > 0)
 {
     <div class="sidebar-widget">
         <h4>Recently Added</h4>
         <hr />
-        @foreach (ContentApi content in Model.Items.Select(c => _site.ToContentApi(c)))
+        @foreach (ContentApi content in Model.Items.Select(c => _settings.ToContentApi(c)))
         {
             <div class="media">
                 <div class="media-left media-top">

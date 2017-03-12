@@ -1,6 +1,5 @@
 @model ContentListModel
-@inject ISiteConfiguration _site;
-@inject ISubscriptionRepository _subs;
+@inject IAccountRepository _auth;
 @{
     ViewBag.Title = "Manage Subscribers";
     var subscription = Context.Request.Query["subscription"];
@@ -30,7 +29,7 @@
                         <div class="row m-b-sm m-t-sm">
                             <div class="col-md-4">
                                 <h4>Sort</h4>
-                                <select class="form-control manage-subscriber-change" name="manage-subscriber-type" id="manage-subscriber-type" asp-items="(await _subs.GetAllAsync()).OrderBy(c => c.Level).Select(c => new SelectListItem() { Value = c.Id.ToString(), Text = c.Name, Selected = c.StripeId == subscription })">
+                                <select class="form-control manage-subscriber-change" name="manage-subscriber-type" id="manage-subscriber-type" asp-items="(await _auth.GetAllAsync()).OrderBy(c => c.Level).Select(c => new SelectListItem() { Value = c.Id.ToString(), Text = c.Name, Selected = c.StripeId == subscription })">
                                 </select>
                             </div>
                             <div class="col-md-4">

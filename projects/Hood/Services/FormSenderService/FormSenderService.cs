@@ -13,17 +13,17 @@ namespace Hood.Services
     public class FormSenderService : IFormSenderService
     {
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IRazorViewRenderer _renderer;
         private readonly IEmailSender _email;
 
         public FormSenderService(IHttpContextAccessor contextAccessor,
-                              ISiteConfiguration site,
+                              ISettingsRepository site,
                               IRazorViewRenderer renderer,
                               IEmailSender email)
         {
             _contextAccessor = contextAccessor;
-            _site = site;
+            _settings = site;
             _email = email;
             _renderer = renderer;
         }
@@ -32,7 +32,7 @@ namespace Hood.Services
         {
             try
             {
-                ContactSettings contactSettings = _site.GetContactSettings();
+                ContactSettings contactSettings = _settings.GetContactSettings();
 
                 try
                 {
@@ -42,10 +42,10 @@ namespace Hood.Services
                     if (!string.IsNullOrEmpty(siteEmail))
                     {
                         message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
-                        message.PreHeader = _site.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
-                        message.Subject = _site.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
-                        message.AddH1(_site.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
-                        message.AddParagraph(_site.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
+                        message.PreHeader = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
+                        message.Subject = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
+                        message.AddH1(_settings.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
+                        message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
                         message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
                         message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
                         message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
@@ -57,10 +57,10 @@ namespace Hood.Services
 
                     message = new MailObject();
                     message.To = new SendGrid.Helpers.Mail.EmailAddress(model.Email);
-                    message.PreHeader = _site.ReplacePlaceholders(contactSettings.Subject);
-                    message.Subject = _site.ReplacePlaceholders(contactSettings.Subject);
-                    message.AddH1(_site.ReplacePlaceholders(contactSettings.Title));
-                    message.AddParagraph(_site.ReplacePlaceholders(contactSettings.Message));
+                    message.PreHeader = _settings.ReplacePlaceholders(contactSettings.Subject);
+                    message.Subject = _settings.ReplacePlaceholders(contactSettings.Subject);
+                    message.AddH1(_settings.ReplacePlaceholders(contactSettings.Title));
+                    message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.Message));
                     message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
                     message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
                     message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");

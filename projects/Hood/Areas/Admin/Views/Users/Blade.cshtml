@@ -1,9 +1,9 @@
 @using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-@inject ISiteConfiguration _site;
+;
 @model EditUserModel
 @{
     Layout = null;
-    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(Model.User);
 }
 <div class="sidebar-container" id="user-blade-observable" data-id="@Model.User.Id">
     <div class="black-bg sidebar-title">

@@ -10,6 +10,7 @@ namespace Hood.Services
     /// </summary>
     public interface ICustomerService
     {
+
         /// <summary>
         /// Finds the customer by identifier.
         /// </summary>

@@ -1,8 +1,8 @@
 @model EditUserModel
-@inject ISiteConfiguration _site
+
 @{
     ViewData["Title"] = "Your Profile";
-    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(Model.User);
 }
 <div class="row">
     <div class="col-sm-4">

@@ -23,21 +23,21 @@ namespace Hood.Areas.Admin.Controllers
     public class SubscriptionsController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ISubscriptionRepository _subscriptions;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
+        private readonly IAccountRepository _auth;
 
         public SubscriptionsController(
-            ISubscriptionRepository subscriptions,
             UserManager<ApplicationUser> userManager,
-            ISiteConfiguration site,
+            IAccountRepository auth,
+            ISettingsRepository site,
             IBillingService billing,
             IHostingEnvironment env)
         {
             _userManager = userManager;
-            _subscriptions = subscriptions;
-            _site = site;
+            _settings = site;
+            _auth = auth;
             _billing = billing;
             _env = env;
         }
@@ -51,7 +51,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscribers/")]
         public async Task<IActionResult> Subscribers()
         {
-            ViewBag.Subcriptions = await _subscriptions.GetAllAsync();
+            ViewBag.Subcriptions = await _auth.GetAllAsync();
             return View();
         }
 
@@ -59,7 +59,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             EditSubscriptionModel model = new EditSubscriptionModel();
-            model.Subscription = await _subscriptions.GetSubscriptionById(id);       
+            model.Subscription = await _auth.GetSubscriptionById(id);       
             return View(model);
         }
 
@@ -68,7 +68,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<ActionResult> Edit(Subscription model)
         {
             EditSubscriptionModel esm = new EditSubscriptionModel();
-            esm.SaveResult = await _subscriptions.UpdateSubscription(model);
+            esm.SaveResult = await _auth.UpdateSubscription(model);
             esm.Subscription = model;
             return View(esm);
         }
@@ -83,7 +83,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/get")]
         public async Task<JsonResult> Get(ListFilters request, string search, string sort)
         {
-            PagedList<Subscription> subs = await _subscriptions.GetPagedSubscriptions(request, search, sort);
+            PagedList<Subscription> subs = await _auth.GetPagedSubscriptions(request, search, sort);
             Response response = new Response(subs.Items.Select(s => new SubscriptionApi(s)).ToArray(), subs.Count);
             return Json(response);
         }
@@ -92,8 +92,8 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscribers/get")]
         public async Task<JsonResult> GetSubscribers(ListFilters request, int subscriptionId, string search, string sort)
         {
-            PagedList<ApplicationUser> subs = await _subscriptions.GetPagedSubscribers(request, subscriptionId, search, sort);
-            Response response = new Response(subs.Items.Select(u => _site.ToApplicationUserApi(u)).ToArray(), subs.Count);
+            PagedList<ApplicationUser> subs = await _auth.GetPagedSubscribers(request, subscriptionId, search, sort);
+            Response response = new Response(subs.Items.Select(u => _settings.ToApplicationUserApi(u)).ToArray(), subs.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -109,7 +109,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-                BillingSettings billingSettings = _site.GetBillingSettings();
+                BillingSettings billingSettings = _settings.GetBillingSettings();
                 Subscription subscription = new Subscription
                 {
                     CreatedBy = user.Id,
@@ -129,7 +129,7 @@ namespace Hood.Areas.Admin.Controllers
                     TrialPeriodDays = model.TrialPeriodDays,
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
-                OperationResult result = await _subscriptions.Add(subscription);
+                OperationResult result = await _auth.Add(subscription);
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.ErrorString);
@@ -150,7 +150,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                OperationResult result = await _subscriptions.Delete(id);
+                OperationResult result = await _auth.Delete(id);
                 if (result.Succeeded)
                 {
                     return new Response(true);

@@ -23,20 +23,20 @@ namespace Hood.Areas.Admin.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
         private readonly IContentRepository _content;
         private readonly HoodDbContext _db;
         private readonly IEmailSender _email;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IBillingService _billing;
 
         public UsersController(
             HoodDbContext db,
-            IAuthenticationRepository auth,
+            IAccountRepository auth,
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IEmailSender email,
-            ISiteConfiguration site,
+            ISettingsRepository site,
             IBillingService billing,
             IContentRepository content)
         {
@@ -45,7 +45,7 @@ namespace Hood.Areas.Admin.Controllers
             _auth = auth;
             _db = db;
             _email = email;
-            _site = site;
+            _settings = site;
             _content = content;
             _billing = billing;
         }
@@ -184,7 +184,7 @@ namespace Hood.Areas.Admin.Controllers
                     users = users.OrderBy(n => n.UserName).ToList();
                     break;
             }
-            var ps = users.Skip(request.skip).Take(request.take).Select(u => _site.ToApplicationUserApi(u));
+            var ps = users.Skip(request.skip).Take(request.take).Select(u => _settings.ToApplicationUserApi(u));
             Response response = new Response(ps.ToArray(), users.Count());
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
@@ -220,7 +220,7 @@ namespace Hood.Areas.Admin.Controllers
                 if (user != null)
                 {
                     if (user.Avatar == null)
-                        return MediaApi.Blank(_site.GetMediaSettings());
+                        return MediaApi.Blank(_settings.GetMediaSettings());
                     return new MediaApi(user.Avatar);
                 }
                 else
@@ -228,7 +228,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             {
-                return MediaApi.Blank(_site.GetMediaSettings());
+                return MediaApi.Blank(_settings.GetMediaSettings());
             }
         }
 
@@ -326,10 +326,10 @@ namespace Hood.Areas.Admin.Controllers
                     {
                         MailObject message = new MailObject();
                         message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
-                        message.PreHeader = "You access information for " + _site.GetSiteTitle();
+                        message.PreHeader = "You access information for " + _settings.GetSiteTitle();
                         message.Subject = "You account has been created.";
                         message.AddH1("Account Created!");
-                        message.AddParagraph("Your account has been set up on the " + _site.GetSiteTitle() + " website.");
+                        message.AddParagraph("Your account has been set up on the " + _settings.GetSiteTitle() + " website.");
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
                         await _email.SendEmail(message);

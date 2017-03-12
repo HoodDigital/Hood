@@ -19,18 +19,18 @@ namespace Hood.Filters
         {
             private readonly ILogger _logger;
             private readonly IBillingService _billing;
-            private readonly ISiteConfiguration _site;
+            private readonly ISettingsRepository _settings;
 
-            public StripeRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing, ISiteConfiguration site)
+            public StripeRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing, ISettingsRepository site)
             {
                 _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
                 _billing = billing;
-                _site = site;
+                _settings = site;
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var result = _site.StripeEnabled();
+                var result = _settings.StripeEnabled();
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.ErrorString);

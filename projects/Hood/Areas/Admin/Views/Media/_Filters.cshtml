@@ -1,11 +1,11 @@
-@inject ISiteConfiguration _site
+
 @inject IContentRepository _content
 @{
-    BasicSettings _info = _site.GetBasicSettings();
-    Hood.Infrastructure.OperationResult subscriptions = _site.SubscriptionsEnabled();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
     Layout = null;
-    PropertySettings _propertySettings = _site.GetPropertySettings();
-    var sideTypes = _site.GetContentSettings().GetAllowedTypes();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    var sideTypes = _settings.GetContentSettings().GetAllowedTypes();
     if (_propertySettings.Enabled)
     {
         sideTypes.Add(new ContentType() { Type = "property", TypeNamePlural = "Properties", TypeName = "Property" });

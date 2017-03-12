@@ -13,12 +13,12 @@ namespace Hood.Filters
     {
         private readonly ILogger _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
 
         public AccountFilter(ILoggerFactory loggerFactory, 
-                                  IAuthenticationRepository auth,
+                                  IAccountRepository auth,
                                   UserManager<ApplicationUser> userManager,
-                                  ISiteConfiguration site)
+                                  ISettingsRepository site)
         {
             _logger = loggerFactory.CreateLogger<AccountFilter>();
             _auth = auth;
@@ -27,7 +27,7 @@ namespace Hood.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            AccountInfo info = _auth.GetAccountInfo(_userManager.GetUserId(context.HttpContext.User));
+            AccountInfo info = _auth.LoadAccountInfo(_userManager.GetUserId(context.HttpContext.User));
             context.HttpContext.Items["AccountInfo"] = info;
         }
 

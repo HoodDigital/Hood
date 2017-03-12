@@ -1,8 +1,8 @@
 @model ContentListModel
-@inject ISiteConfiguration _site;
+;
 @{
     ViewBag.Title = "Import Properties via BLM";
-    PropertySettings settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 @section buttons {
     <a class="btn btn-sm btn-primary" asp-action="Manage" asp-controller="Property" asp-area="Admin"><i class="fa fa-list-ol m-r-sm"></i>Back to List</a>

@@ -1,8 +1,8 @@
 @model ContentListModel
-@inject ISiteConfiguration _site;
+;
 @{
     ViewBag.Title = "Manage Properties";
-    PropertySettings settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 @section scripts {
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places"></script>
@@ -12,9 +12,9 @@
     {
         <a class="btn btn-sm btn-danger warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!"><i class="fa fa-trash m-r-sm"></i>Delete All</a>
     }
-    @if (settings.ShowList)
+    @if (_propertySettings.ShowList)
     {
-        <a class="btn btn-sm btn-default" href="/@settings.Slug" target="_blank"><i class="fa fa-search m-r-sm"></i>Preview</a>
+        <a class="btn btn-sm btn-default" href="/@_propertySettings.Slug" target="_blank"><i class="fa fa-search m-r-sm"></i>Preview</a>
     }
     <button class="btn btn-sm btn-primary create-property"><i class="fa fa-thumb-tack m-r-sm"></i>Create New</button>
 }
@@ -52,13 +52,13 @@
                             </div>
                             <div class="col-md-3">
                                 <h4>Type</h4>
-                                <select id="manage-property-type" class="form-control manage-property-change" asp-items="settings.GetListingTypes().Select(c => new SelectListItem() { Value = c, Text = c })">
+                                <select id="manage-property-type" class="form-control manage-property-change" asp-items="_propertySettings.GetListingTypes().Select(c => new SelectListItem() { Value = c, Text = c })">
                                     <option value="">Show All</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <h4>Planning</h4>
-                                <select id="manage-property-planning" class="form-control manage-property-change" asp-items="settings.GetPlanningTypes().Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })">
+                                <select id="manage-property-planning" class="form-control manage-property-change" asp-items="_propertySettings.GetPlanningTypes().Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })">
                                     <option value="">Show All</option>
                                 </select>
                             </div>

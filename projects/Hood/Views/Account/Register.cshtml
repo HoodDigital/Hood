@@ -3,31 +3,31 @@
 @using Microsoft.AspNetCore.Http.Authentication
 @model RegisterViewModel
 @inject SignInManager<ApplicationUser> SignInManager
-@inject ISiteConfiguration _site
+
 @inject IContentRepository _content
 @{
-    BasicSettings _info = _site.GetBasicSettings();
-    SeoSettings _meta = _site.GetSeo();
-    string description = "Sign up - " + _info.Address.ToFormat(AddressFormat.SingleLine);
-    string title = "Sign up - " + _info.CompanyName;
-    if (_meta.Login != null)
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    string description = "Sign up - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = "Sign up - " + _basicSettings.CompanyName;
+    if (_seoSettings.Login != null)
     {
-        description = _meta.SignUp.Description.IsSet() ? _meta.SignUp.Description : _meta.Description.IsSet() ? _meta.Description : "Sign up - " + _info.Address.ToFormat(AddressFormat.SingleLine);
-        title = _meta.SignUp.Title.IsSet() ? _meta.SignUp.Title : _meta.Title.IsSet() ? _meta.Title : "Sign up - " + _info.CompanyName;
+        description = _seoSettings.SignUp.Description.IsSet() ? _seoSettings.SignUp.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Sign up - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.SignUp.Title.IsSet() ? _seoSettings.SignUp.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Sign up - " + _basicSettings.CompanyName;
     }
     ViewData["Title"] = title;
     Layout = "_LoginLayout";
 }
 @section metas {
     <meta name="description" content="@description" />
-    <meta property="og:author" content="@_meta.OgAuthor" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
     <meta property="og:title" content="@title" />
-    <meta property="og:image" content="@_meta.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@_meta.OgSecureImageUrl" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
     <meta property="og:description" content="@description" />
     <meta name="twitter:title" content="@title" />
     <meta name="twitter:description" content="@description" />
-    <meta name="twitter:image" content="@_meta.TwitterCardImageUrl" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 <div class="login-block-header">
     <h2>@ViewData["Title"]</h2>

@@ -28,24 +28,24 @@ namespace Hood.Controllers
     public class HomeController : Controller
     {
         public readonly IConfiguration _configuration;
-        public readonly ISiteConfiguration _site;
+        public readonly ISettingsRepository _settings;
         public readonly IHostingEnvironment _environment;
         public readonly IEmailSender _email;
         public readonly IContentRepository _content;
         public readonly ILogger _logger;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
         private readonly ContentCategoryCache _categories;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IFormSenderService _forms;
 
-        public HomeController(IAuthenticationRepository auth,
+        public HomeController(IAccountRepository auth,
                               ContentCategoryCache categories,
                               UserManager<ApplicationUser> userManager,
                               IConfiguration conf,
                               IHostingEnvironment env,
-                              ISiteConfiguration site,
+                              ISettingsRepository site,
                               IContentRepository content,
                               IFormSenderService forms)
         {
@@ -53,7 +53,7 @@ namespace Hood.Controllers
             _config = conf;
             _env = env;
             _content = content;
-            _site = site;
+            _settings = site;
             _categories = categories;
             _userManager = userManager;
             _forms = forms;
@@ -64,7 +64,7 @@ namespace Hood.Controllers
         [ResponseCache(CacheProfileName = "Day")]
         public IActionResult Index()
         {
-            BasicSettings settings = _site.GetBasicSettings();
+            BasicSettings settings = _settings.GetBasicSettings();
             if (settings.Homepage.HasValue)
                 return Show(settings.Homepage.Value);
             else
@@ -85,7 +85,7 @@ namespace Hood.Controllers
             ContentListModel model = new ContentListModel();
             model.Posts = content;
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, type);
-            model.Type = _site.GetContentSettings().GetContentType(type);
+            model.Type = _settings.GetContentSettings().GetContentType(type);
             if (!model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Search = filters.search;
@@ -106,12 +106,12 @@ namespace Hood.Controllers
             PagedList<Content> content = _content.GetPagedContent(filters, type, null, author, null, true);
             ContentListModel model = new ContentListModel();
             model.Posts = content;
-            model.Type = _site.GetContentSettings().GetContentType(type);
+            model.Type = _settings.GetContentSettings().GetContentType(type);
             if (!model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
             model.Search = filters.search;
-            model.Author = _site.ToApplicationUserApi(_auth.GetUserById(author));
+            model.Author = _settings.ToApplicationUserApi(_auth.GetUserById(author));
             return View("Feed", model);
         }
 
@@ -129,7 +129,7 @@ namespace Hood.Controllers
             PagedList<Content> content = _content.GetPagedContent(filters, type, category, null, null, true);
             ContentListModel model = new ContentListModel();
             model.Posts = content;
-            model.Type = _site.GetContentSettings().GetContentType(type);
+            model.Type = _settings.GetContentSettings().GetContentType(type);
             if (model.Type == null || !model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
@@ -144,7 +144,7 @@ namespace Hood.Controllers
             ContentModel model = new ContentModel();
             model.EditMode = editMode;
             model.Content = _content.GetContentByID(id);
-            model.Type = _site.GetContentSettings().GetContentType(model.Content.ContentType);
+            model.Type = _settings.GetContentSettings().GetContentType(model.Content.ContentType);
 
             if (model.Type == null || !model.Type.Enabled || !model.Type.HasPage)
                 return NotFound();
@@ -169,7 +169,7 @@ namespace Hood.Controllers
                     if (!User.Identity.IsAuthenticated && model.Content.GetMeta("Settings.Security.Public").Get<bool>() == false)
                         return NotFound();
 
-                var result = _site.SubscriptionsEnabled();
+                var result = _settings.SubscriptionsEnabled();
                 if (result.Succeeded)
                 {
                     if (model.Content.GetMeta("Settings.Security.Subscription").IsStored)
@@ -178,7 +178,7 @@ namespace Hood.Controllers
                         if (subs != null)
                             if (subs.Count > 0)
                             {
-                                AccountInfo subscribeResult = _auth.GetAccountInfo(_userManager.GetUserId(User));
+                                AccountInfo subscribeResult = ControllerContext.HttpContext.GetAccountInfo();
                                 if (!subs.Any(s => subscribeResult.IsSubscribed(s)))
                                     return RedirectToAction("Index", "Subscriptions", new { message = BillingMessage.UpgradeRequired });
                             }
@@ -197,7 +197,7 @@ namespace Hood.Controllers
 
         public async Task<Response> Tweets()
         {
-            SeoSettings _info = _site.GetSeo();
+            SeoSettings _info = _settings.GetSeo();
             var tweets = await _content.GetTweets(_info.TwitterHandle.Replace("@", ""), 3);
             Response response = new Response(tweets.ToArray(), 6);
             return response;
@@ -209,7 +209,7 @@ namespace Hood.Controllers
         [Route("hood/process-contact-form/")]
         public async Task<Response> ProcessContactForm(ContactFormModel model)
         {
-            var _integrations = _site.GetIntegrationSettings();
+            var _integrations = _settings.GetIntegrationSettings();
             if (_integrations.EnableGoogleRecaptcha)
             {
                 var captcha = Request.Form["g-recaptcha-response"].FirstOrDefault();
@@ -249,9 +249,9 @@ namespace Hood.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    IntegrationSettings _settings = _site.GetIntegrationSettings();
-                    IMailChimpManager manager = new MailChimpManager(_settings.MailchimpApiKey); //if you have it in code
-                    var listId = _settings.MailchimpListId;
+                    IntegrationSettings _integrationSettings = _settings.GetIntegrationSettings();
+                    IMailChimpManager manager = new MailChimpManager(_integrationSettings.MailchimpApiKey); //if you have it in code
+                    var listId = _integrationSettings.MailchimpListId;
                     var member = new MailChimp.Net.Models.Member { EmailAddress = model.Email, Status = MailChimp.Net.Models.Status.Subscribed };
                     if (model.FirstName.IsSet())
                         member.MergeFields.Add("FNAME", model.FirstName);
@@ -297,7 +297,7 @@ namespace Hood.Controllers
             sw.WriteLine("Disallow: /account/ ");
             sw.WriteLine("Disallow: /manage/ ");
             sw.WriteLine("Disallow: /install/ ");
-            foreach (ContentType ct in _site.GetContentSettings().GetRestrictedTypes())
+            foreach (ContentType ct in _settings.GetContentSettings().GetRestrictedTypes())
             {
                 sw.WriteLine("Disallow: /" + ct.Slug + "/ ");
             }

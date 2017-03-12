@@ -1,29 +1,29 @@
 @model ListPropertyModel
-@inject ISiteConfiguration _site
+
 @{
     ViewData["Title"] = "Properties";
     Layout = "_Layout";
 
-    SeoSettings meta = _site.GetSeo();
-    BasicSettings info = _site.GetBasicSettings();
-    PropertySettings _settings = _site.GetPropertySettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
     string url = Context.GetSiteUrl(true, true);
-    if (meta.CanonicalUrl.IsSet())
+    if (_seoSettings.CanonicalUrl.IsSet())
     {
-        url = string.Format("{0}{1}", meta.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
 
 }
 @section metas {
     <meta name="description" content="Have a look a our properties, there are plenty to have a look at!" />
-    <meta property="og:author" content="@meta.OgAuthor" />
-    <meta property="og:title" content="Properties - @info.SiteTitle" />
-    <meta property="og:image" content="@meta.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@meta.OgSecureImageUrl" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
+    <meta property="og:title" content="Properties - @_basicSettings.SiteTitle" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
     <meta property="og:description" content="Have a look a our properties, there are plenty to have a look at!" />
-    <meta name="twitter:title" content="Properties - @info.SiteTitle" />
+    <meta name="twitter:title" content="Properties - @_basicSettings.SiteTitle" />
     <meta name="twitter:description" content="Have a look a our properties, there are plenty to have a look at!" />
-    <meta name="twitter:image" content="@meta.TwitterCardImageUrl" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 <div class="jumbotron">
     <div class="container">
@@ -80,7 +80,7 @@
     else
     {
         <div class="row">
-            @foreach (PropertyListingApi content in Model.Properties.Items.Select(p => _site.ToPropertyListingApi(p)))
+            @foreach (PropertyListingApi content in Model.Properties.Items.Select(p => _settings.ToPropertyListingApi(p)))
             {
                 await Html.RenderPartialAsync("_PropertyCard", content);
             }

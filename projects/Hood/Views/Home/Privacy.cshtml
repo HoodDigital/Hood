@@ -1,22 +1,22 @@
-@inject ISiteConfiguration _site
+
 @{
-    BasicSettings _info = _site.GetBasicSettings();
-    SeoSettings _meta = _site.GetSeo();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
     Layout = "_Layout";
     string description = "Privacy Policy for this website.";
-    string title = "Privacy Policy - " + _info.CompanyName;
+    string title = "Privacy Policy - " + _basicSettings.CompanyName;
     ViewData["Title"] = title;
 }
 @section metas {
     <meta name="description" content="@description" />
-    <meta property="og:author" content="@_meta.OgAuthor" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
     <meta property="og:title" content="@title" />
-    <meta property="og:image" content="@_meta.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@_meta.OgSecureImageUrl" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
     <meta property="og:description" content="@description" />
     <meta name="twitter:title" content="@title" />
     <meta name="twitter:description" content="@description" />
-    <meta name="twitter:image" content="@_meta.TwitterCardImageUrl" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 <div class="container">
     <div class="row">
@@ -132,9 +132,9 @@
             <p class="terms-paragraph"><span>6.2</span>Deleting cookies will have a negative impact on the usability of many websites.</p>
             <h3 class="terms-head">Part 3: Our details</h3>
             <h4 class="terms-head"><span>7.</span>Our details</h4>
-            <p class="terms-paragraph"><span>7.1</span>This website is owned and operated by <strong>@_info.CompanyName</strong>.</p>
-            <p class="terms-paragraph"><span>7.3</span>Our principal place of business is at <strong>@_info.Address.ToFormat(AddressFormat.SingleLine)</strong>.</p>
-            <p class="terms-paragraph"><span>7.4</span>You can contact us by writing to the business address given above, by using our website contact form, by email to <strong>@_info.Email</strong> or by telephone on <strong>@_info.Phone</strong>.</p>
+            <p class="terms-paragraph"><span>7.1</span>This website is owned and operated by <strong>@_basicSettings.CompanyName</strong>.</p>
+            <p class="terms-paragraph"><span>7.3</span>Our principal place of business is at <strong>@_basicSettings.Address.ToFormat(AddressFormat.SingleLine)</strong>.</p>
+            <p class="terms-paragraph"><span>7.4</span>You can contact us by writing to the business address given above, by using our website contact form, by email to <strong>@_basicSettings.Email</strong> or by telephone on <strong>@_basicSettings.Phone</strong>.</p>
         </div>
     </div>
 </div>

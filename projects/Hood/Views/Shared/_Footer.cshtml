@@ -1,9 +1,8 @@
-@inject ISiteConfiguration _site
 @inject IContentRepository _content
 @{
-    BasicSettings _info = _site.GetBasicSettings();
-    IntegrationSettings _plugins = _site.GetIntegrationSettings();
-    SeoSettings _meta = _site.GetSeo();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    IntegrationSettings _plugins = _settings.GetIntegrationSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
 }
 <hr />
 @if (_plugins.EnableMailchimp)
@@ -14,14 +13,14 @@
 <footer class="footer pb-60">
     <div class="container">
         <p class="address no-margin">
-            @if (_info.Address != null)
+            @if (_basicSettings.Address != null)
             {
-                <span><i class="fa fa-map-pin m-sm"></i>@_info.Address.ToFormat(AddressFormat.SingleLine)</span>
+                <span><i class="fa fa-map-pin m-sm"></i>@_basicSettings.Address.ToFormat(AddressFormat.SingleLine)</span>
             }
-            <span><i class="fa fa-phone m-sm"></i>@_info.Phone</span>
+            <span><i class="fa fa-phone m-sm"></i>@_basicSettings.Phone</span>
         </p>
         <p class="copyright">
-            <span><i class="fa fa-copyright m-sm"></i>@DateTime.Now.Year.ToString() @_info.CompanyName - All Rights Reserved.</span>
+            <span><i class="fa fa-copyright m-sm"></i>@DateTime.Now.Year.ToString() @_basicSettings.CompanyName - All Rights Reserved.</span>
             <span><i class="fa fa-paint-brush m-sm"></i><a href="http://hooddigital.com/">Website designed and built by Hood's Digital Architects</a></span>
         </p>
     </div>

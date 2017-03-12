@@ -29,26 +29,26 @@ namespace Hood.Areas.Admin.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ContentCategoryCache _categories;
         private readonly IContentRepository _content;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
-        private readonly ISubscriptionRepository _subs;
         private readonly IMediaManager<SiteMedia> _media;
+        private readonly IAccountRepository _auth;
 
         public ContentController(
+            IAccountRepository auth,
             IContentRepository content,
             ContentCategoryCache categories,
             UserManager<ApplicationUser> userManager,
-            ISiteConfiguration site,
+            ISettingsRepository site,
             IBillingService billing,
-            ISubscriptionRepository subs,
             IMediaManager<SiteMedia> media,
             IHostingEnvironment env)
         {
+            _auth = auth;
             _media = media;
             _userManager = userManager;
             _content = content;
-            _site = site;
-            _subs = subs;
+            _settings = site;
             _categories = categories;
             _env = env;
         }
@@ -56,7 +56,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/manage/")]
         public IActionResult Index(string type)
         {
-            var contentType = _site.GetContentSettings().GetContentType(type);
+            var contentType = _settings.GetContentSettings().GetContentType(type);
             ContentListModel nhm = new ContentListModel();
             nhm.Type = contentType;
             return View(nhm);
@@ -84,7 +84,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult EditorGallery(int id)
         {
             var content = _content.GetContentByID(id);
-            var model = _site.ToContentApi(content);
+            var model = _settings.ToContentApi(content);
             return View(model);
         }
 
@@ -102,7 +102,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Create(string type)
         {
             ContentListModel mcm = new ContentListModel();
-            mcm.Type = _site.GetContentSettings().GetContentType(type);
+            mcm.Type = _settings.GetContentSettings().GetContentType(type);
             return View(mcm);
         }
 
@@ -159,7 +159,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var content = _content.GetContentByID(id);
             EditContentModel model = new EditContentModel();
-            model.Type = _site.GetContentSettings().GetContentType(content.ContentType);
+            model.Type = _settings.GetContentSettings().GetContentType(content.ContentType);
             model.Content = content;
             return View(model);
         }
@@ -167,7 +167,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/{type}/")]
         public IActionResult CategoryList(string type)
         {
-            var contentType = _site.GetContentSettings().GetContentType(type);
+            var contentType = _settings.GetContentSettings().GetContentType(type);
             ContentListModel nhm = new ContentListModel();
             nhm.Type = contentType;
             return View(nhm);
@@ -180,7 +180,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // User must have an organisation.
-                Content content = _content.GetContentByID(id);
+                Content content = _content.GetContentByID(id, true);
                 if (content == null)
                     return NotFound();
                 AccountInfo account = HttpContext.GetAccountInfo();
@@ -217,7 +217,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // User must have an organisation.
-                Content content = _content.GetContentByID(id);
+                Content content = _content.GetContentByID(id, true);
                 if (content == null)
                     return NotFound();
 
@@ -333,7 +333,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Blocks(ListFilters request, string search, string sort, string type)
         {
             string[] templateDirs = {
-                    _env.ContentRootPath + "\\Themes\\" + _site["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
+                    _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
                     _env.ContentRootPath + "\\Views\\Blocks\\"
                 };
             List<BlockContent> templates = new List<BlockContent>();
@@ -376,11 +376,11 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Block(string url)
         {
             string[] templateDirs = {
-                _env.ContentRootPath + "\\Themes\\" + _site["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
+                _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
                 _env.ContentRootPath + "\\Views\\Blocks\\"
             };
             string[] templateVirtualDirs = {
-                "~/Themes/" + _site["Hood.Settings.Theme"] + "/Views/Blocks/",
+                "~/Themes/" + _settings["Hood.Settings.Theme"] + "/Views/Blocks/",
                 "~/Views/Blocks/"
             };
             for (int i = 0; i < templateDirs.Length; i++)
@@ -466,9 +466,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             { 
-                var model = _site.GetBasicSettings(false);
+                var model = _settings.GetBasicSettings(false);
                 model.Homepage = id;
-                _site.Set("Hood.Settings.Basic", model);
+                _settings.Set("Hood.Settings.Basic", model);
                 return new Response(true);
             }
             catch (Exception ex)
@@ -562,7 +562,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PagedList<Content> content = _content.GetPagedContent(request, type, category, null, null, published);
 
-            Response response = new Response(content.Items.Select(c => _site.ToContentApi(c)).ToArray(), content.Count);
+            Response response = new Response(content.Items.Select(c => _settings.ToContentApi(c)).ToArray(), content.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -575,7 +575,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             IList<Content> content = new List<Content>();
             content.Add(_content.GetContentByID(id));
-            var ups = content.Select(c => _site.ToContentApi(c));
+            var ups = content.Select(c => _settings.ToContentApi(c));
             return Json(ups.ToArray());
         }
 
@@ -591,7 +591,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             {
-                return MediaApi.Blank(_site.GetMediaSettings());
+                return MediaApi.Blank(_settings.GetMediaSettings());
             }
         }
 
@@ -607,7 +607,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             {
-                return MediaApi.Blank(_site.GetMediaSettings());
+                return MediaApi.Blank(_settings.GetMediaSettings());
             }
         }
 
@@ -706,7 +706,7 @@ namespace Hood.Areas.Admin.Controllers
                         // check if new template has been selected
                         if (val.Key == "Meta:Settings.Template")
                         {
-                            var type = _site.GetContentSettings().GetContentType(content.ContentType);
+                            var type = _settings.GetContentSettings().GetContentType(content.ContentType);
                             // delete all template metas that do not exist in the new template, and add any that are missing
                             List<string> newMetas = GetMetasForTemplate(val.Value, val.Key, type.TemplateFolder);
                             _content.UpdateTemplateMetas(content, newMetas);
@@ -737,7 +737,7 @@ namespace Hood.Areas.Admin.Controllers
             templateName = templateName.Replace("Meta:", "");
 
             // get the right template file (from theme or if it doesnt appear there from base)
-            string templatePath = _env.ContentRootPath + "\\Themes\\" + _site["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            string templatePath = _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
                 templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
@@ -781,7 +781,7 @@ namespace Hood.Areas.Admin.Controllers
         private async Task<EditContentModel> GetEditorModel(Content content)
         {
             EditContentModel model = new EditContentModel();
-            model.Type = _site.GetContentSettings().GetContentType(content.ContentType);
+            model.Type = _settings.GetContentSettings().GetContentType(content.ContentType);
             model.Content = content;
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
@@ -806,11 +806,11 @@ namespace Hood.Areas.Admin.Controllers
 
         private async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
         {
-            var result = _site.SubscriptionsEnabled();
+            var result = _settings.SubscriptionsEnabled();
             if (result.Succeeded)
             {
                 // get subscriptions - if there are any.
-                model.Subscriptions = await _subs.GetAllAsync();
+                model.Subscriptions = await _auth.GetAllAsync();
             }
             return model;
         }
@@ -819,7 +819,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             string[] templateDirs = {
                     _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
-                    _env.ContentRootPath + "\\Themes\\" + _site["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
+                    _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
                 };
             List<string> templates = new List<string>();
 

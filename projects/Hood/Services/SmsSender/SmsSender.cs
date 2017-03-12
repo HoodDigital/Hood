@@ -13,7 +13,7 @@ namespace Hood.Services
 
         public Task SendSmsAsync(string number, string message)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public SmsSenderOptions Options { get; }  // set only via Secret Manager

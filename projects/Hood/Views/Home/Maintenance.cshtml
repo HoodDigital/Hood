@@ -1,14 +1,14 @@
-@inject ISiteConfiguration _site
+
 @{
 
-    BasicSettings _info = _site.GetBasicSettings();
-    SeoSettings _meta = _site.GetSeo();
-    string description = _info.Address.ToFormat(AddressFormat.SingleLine);
-    string title = _info.CompanyName.IsSet() ? "Home - " + _info.CompanyName : _info.SiteTitle.IsSet() ? "Home - " + _info.SiteTitle : "Home";
-    if (_meta.Home != null)
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = _basicSettings.CompanyName.IsSet() ? "Home - " + _basicSettings.CompanyName : _basicSettings.SiteTitle.IsSet() ? "Home - " + _basicSettings.SiteTitle : "Home";
+    if (_seoSettings.Home != null)
     {
-        description = _meta.Home.Description.IsSet() ? _meta.Home.Description : _meta.Description.IsSet() ? _meta.Description : "Home - " + _info.Address.ToFormat(AddressFormat.SingleLine);
-        title = _meta.Home.Title.IsSet() ? _meta.Home.Title : _meta.Title.IsSet() ? _meta.Title : "Home - " + _info.CompanyName;
+        description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Home - " + _basicSettings.CompanyName;
     }
     ViewData["Title"] = title;
 
@@ -16,14 +16,14 @@
 
 @section metas {
     <meta name="description" content="@description" />
-    <meta property="og:author" content="@_meta.OgAuthor" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
     <meta property="og:title" content="@title" />
-    <meta property="og:image" content="@_meta.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@_meta.OgSecureImageUrl" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
     <meta property="og:description" content="@description" />
     <meta name="twitter:title" content="@title" />
     <meta name="twitter:description" content="@description" />
-    <meta name="twitter:image" content="@_meta.TwitterCardImageUrl" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 <div class="jumbotron">
     <div class="container">

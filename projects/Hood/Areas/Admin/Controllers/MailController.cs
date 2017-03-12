@@ -17,14 +17,14 @@ namespace Hood.Controllers
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
         private readonly IContentRepository _content;
-        private readonly ISiteConfiguration _site;
-        private readonly IAuthenticationRepository _auth;
+        private readonly ISettingsRepository _settings;
+        private readonly IAccountRepository _auth;
         private readonly IEmailSender _email;
 
-        public MailController(IAuthenticationRepository auth,
+        public MailController(IAccountRepository auth,
                               IConfiguration conf,
                               IHostingEnvironment env,
-                              ISiteConfiguration site,
+                              ISettingsRepository site,
                               IContentRepository content,
                               IEmailSender email)
         {
@@ -32,7 +32,7 @@ namespace Hood.Controllers
             _config = conf;
             _env = env;
             _content = content;
-            _site = site;
+            _settings = site;
             _email = email;
         }
         [Route("admin/mail/preview/plain/")]

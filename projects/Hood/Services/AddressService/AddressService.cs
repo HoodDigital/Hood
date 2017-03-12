@@ -9,17 +9,17 @@ namespace Hood.Services
 {
     public class AddressService : IAddressService
     {
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
 
-        public AddressService(ISiteConfiguration site)
+        public AddressService(ISettingsRepository site)
         {
-            _site = site;
+            _settings = site;
         }
 
         public Location GeocodeAddress(IAddress address)
         {
-            var key = _site.GetIntegrationSettings().GoogleMapsApiKey;
-            if (!key.IsSet() || !_site.GetIntegrationSettings().EnableGoogleGeocoding)
+            var key = _settings.GetIntegrationSettings().GoogleMapsApiKey;
+            if (!key.IsSet() || !_settings.GetIntegrationSettings().EnableGoogleGeocoding)
                 return null;
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };

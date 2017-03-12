@@ -1,5 +1,4 @@
 @inject IThemesService themesSource
-@inject ISiteConfiguration config
 @{
     var theme = themesSource.Current;
     ViewData["Title"] = "Site Theme";
@@ -62,11 +61,11 @@
             {
                 <div class="editor-box">
                     <h4>There is no theme currently active.</h4>
-                    <h5>Theme currently selected: @config["Hood.Settings.Theme"]</h5>
+                    <h5>Theme currently selected: @_settings["Hood.Settings.Theme"]</h5>
                     <p>There is no active theme currently, this could be due to no theme being selected, or an issue with the installation of the currently selected theme.</p>
                 </div>
             }
-            @if (config != null)
+            @if (_settings != null)
             {
                 <div class="editor-box">
                     <h5>Holding Page</h5>

@@ -25,12 +25,12 @@ namespace Hood.Services
         private string _hoodApiUrl;
         private string _hoodApiKey;
         private readonly IConfiguration _config;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
 
-        public MediaManager(IConfiguration config, ISiteConfiguration site)
+        public MediaManager(IConfiguration config, ISettingsRepository site)
         {
             _config = config;
-            _site = site;
+            _settings = site;
             Initialise();
         }
 
@@ -43,10 +43,10 @@ namespace Hood.Services
 
         private void Initialise()
         {
-            _container = _site.GetMediaSettings().ContainerName.ToSeoUrl();
-            _key = _site.GetMediaSettings().AzureKey;
-            _hoodApiKey = _site.GetMediaSettings().HoodApiKey;
-            _hoodApiUrl = _site.GetMediaSettings().HoodApiUrl;
+            _container = _settings.GetMediaSettings().ContainerName.ToSeoUrl();
+            _key = _settings.GetMediaSettings().AzureKey;
+            _hoodApiKey = _settings.GetMediaSettings().HoodApiKey;
+            _hoodApiUrl = _settings.GetMediaSettings().HoodApiUrl;
             try
             {
                 _storageAccount = CloudStorageAccount.Parse(_key);

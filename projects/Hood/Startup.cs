@@ -112,12 +112,11 @@ namespace Hood
                 services.AddSingleton<IContentExporter, ContentExporter>();
                 services.AddSingleton<IThemesService, ThemesService>();
                 services.AddSingleton<IAddressService, AddressService>();
-                services.AddScoped<ISiteConfiguration, SiteConfiguration>();
-                services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+                services.AddScoped<ISettingsRepository, SettingsRepository>();
+                services.AddScoped<IAccountRepository, AccountRepository>();
                 services.AddScoped<IPropertyRepository, PropertyRepository>();
                 services.AddScoped<IMediaManager<SiteMedia>, MediaManager<SiteMedia>>();
                 services.AddScoped<IContentRepository, ContentRepository>();
-                services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
                 services.AddScoped<IStripeWebHookService, StripeWebHookService>();
                 services.AddTransient<ISmsSender, SmsSender>();
                 services.AddTransient<IPayPalService, PayPalService>();

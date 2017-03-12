@@ -42,20 +42,28 @@ namespace Hood.Filters
         private class SubscriptionRequiredAttributeImpl : IActionFilter
         {
             private readonly ILogger _logger;
-            private readonly ISubscriptionRepository _subs;
             private readonly IBillingService _billing;
-            private readonly ISiteConfiguration _site;
+            private readonly ISettingsRepository _settings;
             private readonly List<string> _ids;
             private readonly List<string> _addons;
             private readonly bool _tiered;
             private readonly string _minimum;
+            private readonly IAccountRepository _auth;
 
-            public SubscriptionRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing, ISiteConfiguration site, ISubscriptionRepository subs, string[] Ids, string[] Addons, bool Tiered, string MinimumSubscription)
+            public SubscriptionRequiredAttributeImpl(
+                IAccountRepository auth, 
+                ILoggerFactory loggerFactory, 
+                IBillingService billing, 
+                ISettingsRepository site, 
+                string[] Ids, 
+                string[] Addons, 
+                bool Tiered, 
+                string MinimumSubscription)
             {
+                _auth = auth;
                 _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
                 _billing = billing;
-                _subs = subs;
-                _site = site;
+                _settings = site;
                 _ids = Ids.ToList();
                 _addons = Addons.ToList();
                 _tiered = Tiered;
@@ -66,7 +74,7 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var subscriptionsEnabled = _site.SubscriptionsEnabled();
+                var subscriptionsEnabled = _settings.SubscriptionsEnabled();
                 if (!subscriptionsEnabled.Succeeded)
                 {
                     throw new Exception(subscriptionsEnabled.ErrorString);
@@ -76,7 +84,7 @@ namespace Hood.Filters
                 AccountInfo info = context.HttpContext.GetAccountInfo();
 
                 // Set the redirect location
-                BillingSettings billingSettings = _site.GetBillingSettings();
+                BillingSettings billingSettings = _settings.GetBillingSettings();
                 IActionResult result = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
                 if (billingSettings.SubscriptionCreatePage.IsSet())
                 {
@@ -154,7 +162,7 @@ namespace Hood.Filters
                 // If an Minimum is set, check the user has a subcription of a higher level
                 if (_tiered && _minimum.IsSet())
                 {
-                    Subscription sub = _subs.GetSubscriptionByStripeId(_minimum).Result;
+                    Subscription sub = _auth.GetSubscriptionByStripeId(_minimum).Result;
                     if (sub == null)
                         throw new Exception("A subscription with Id \"" + _minimum + "\" could not be found.");
                     if (!info.ActiveSubscriptions.Any(ss => ss.Level >= sub.Level))

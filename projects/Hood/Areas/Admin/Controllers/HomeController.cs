@@ -15,19 +15,19 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
         private readonly IContentRepository _content;
-        private readonly ISiteConfiguration _site;
-        private readonly IAuthenticationRepository _auth;
+        private readonly ISettingsRepository _settings;
+        private readonly IAccountRepository _auth;
         private readonly IRazorViewRenderer _renderer;
         private readonly IEmailSender _email;
         private readonly ContentCategoryCache _categories;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(IAuthenticationRepository auth,
+        public HomeController(IAccountRepository auth,
                               ContentCategoryCache categories,
                               UserManager<ApplicationUser> userManager,
                               IConfiguration conf,
                               IHostingEnvironment env,
-                              ISiteConfiguration site,
+                              ISettingsRepository site,
                               IContentRepository content,
                               IRazorViewRenderer renderer,
                               IEmailSender email)
@@ -36,7 +36,7 @@ namespace Hood.Areas.Admin.Controllers
             _config = conf;
             _env = env;
             _content = content;
-            _site = site;
+            _settings = site;
             _renderer = renderer;
             _email = email;
             _categories = categories;

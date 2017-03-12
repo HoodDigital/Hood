@@ -1,9 +1,8 @@
-@inject ISiteConfiguration _site
 @{
-    BasicSettings _info = _site.GetBasicSettings();
-    SeoSettings _meta = _site.GetSeo();
-    IntegrationSettings _plugins = _site.GetIntegrationSettings();
-    ContactSettings _settings = _site.GetContactSettings();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    IntegrationSettings _plugins = _settings.GetIntegrationSettings();
+    ContactSettings _contact = _settings.GetContactSettings();
     Layout = "_Layout";
     ContentApi currentContent = ViewData["Content"] as ContentApi;
 }
@@ -37,7 +36,7 @@
 </section>
 @if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet())
 {
-    <div class="img-lg img-full google-map" data-lat="@_info.Address?.Latitude" data-long="@_info.Address?.Longitude" data-marker="@_site.GetSiteTitle()" data-zoom="12"></div>
+    <div class="img-lg img-full google-map" data-lat="@_basicSettings.Address?.Latitude" data-long="@_basicSettings.Address?.Longitude" data-marker="@_settings.GetSiteTitle()" data-zoom="12"></div>
 }
 <div class="bg-color-light-grey">
     <div class="container">

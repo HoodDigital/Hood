@@ -1,48 +1,55 @@
-﻿using Hood.Infrastructure;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Hood.Infrastructure;
 using Hood.Models;
 using Stripe;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public interface ISubscriptionRepository
+    public interface IAccountRepository
     {
-        // Subscriptions
+        // Account stuff
+        AccountInfo LoadAccountInfo(string userId);
+        ApplicationUser GetCurrentUser(bool track = true);
+        ApplicationUser GetUserById(string userId, bool track = true);
+        OperationResult UpdateUser(ApplicationUser user);
+
+        IList<IdentityRole> GetAllRoles();
+
+        // Addresses
+        OperationResult DeleteAddress(int id);
+        Address GetAddressById(int id);
+        OperationResult UpdateAddress(Address address);
+        OperationResult SetBillingAddress(string userId, int id);
+        OperationResult SetDeliveryAddress(string userId, int id);
+
+        // Subscription Plans
         Task<OperationResult> Add(Subscription subscription);
         Task<List<Subscription>> GetAllAsync();
         Task<List<Subscription>> GetLevels();
         Task<List<Subscription>> GetAddons();
         Task<PagedList<Subscription>> GetPagedSubscriptions(ListFilters filters, string search, string sort);
-        Task<Subscription> GetSubscriptionById(int id, bool nocache = false);
+        Task<Subscription> GetSubscriptionById(int id);
         Task<Subscription> GetSubscriptionByStripeId(string stripeId);
         Task<OperationResult> Delete(int id);
         Task<OperationResult> UpdateSubscription(Subscription model);
 
         // User Subscriptions
-        /// <summary>
-        /// Returns a paged list of all users in the subscription.
-        /// </summary>
-        /// <param name="filters"></param>
-        /// <param name="subscriptionId"></param>
-        /// <param name="search"></param>
-        /// <param name="sort"></param>
-        /// <returns></returns>
         Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, int subscriptionId, string search, string sort);
-        /// <summary>
-        /// This will create a user subsription using the token or card provided, once completed, add it to the database. Will throw an exception on error.
-        /// </summary>
-        /// <param name="planId"></param>
-        /// <param name="stripeToken"></param>
-        /// <param name="cardId"></param>
+        OperationResult SaveUserSubscription(UserSubscription newUserSub);
+        OperationResult UpdateUserSubscription(UserSubscription newUserSub);
         Task CreateUserSubscription(int planId, string stripeToken, string cardId);
         Task UpgradeUserSubscription(int subscriptionId, int planId);
         Task CancelUserSubscription(int subscriptionId);
         Task RemoveUserSubscription(int subscriptionId);
         Task ReactivateUserSubscription(int subscriptionId);
 
-        Task<StripeCustomer> GetCustomerObject(string stripeId, bool allowNullObject);
+        // Customer Objects
+        void ResetBillingInfo();
+        Task<ApplicationUser> GetUserByStripeId(string stripeId);
+        Task<StripeCustomer> LoadCustomerObject(string stripeId, bool allowNullObject);
         Task ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime);
         Task UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
         Task RemoveUserSubscriptionObject(StripeSubscription updated, DateTime? eventTime);

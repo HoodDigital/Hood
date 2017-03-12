@@ -6,7 +6,7 @@ namespace Hood.Services
     public class StripeService : IStripeService
     {
         string StripeApiKey { get; set; }
-        public StripeService(ISiteConfiguration site)
+        public StripeService(ISettingsRepository site)
         {
             BillingSettings settings = site.GetBillingSettings();
             if (settings.EnableStripeTestMode)

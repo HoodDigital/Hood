@@ -1,8 +1,7 @@
 @model PropertyListingApi
 @inject IContentRepository _data
-@inject ISiteConfiguration _site
 @{
-    PropertySettings _settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 <div id="details" class="tab-pane">
     <div class="panel-body">
@@ -11,7 +10,7 @@
                 <label class="col-sm-3 control-label">Property Type:</label>
                 <div class="col-sm-8">
                     <select class="form-control" asp-for="PropertyType">
-                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_settings.PropertyType, "\r\n|\r|\n"))
+                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PropertyType, "\r\n|\r|\n"))
                                 {
                                 <option value="@s.ToSeoUrl()">@s</option>
                                 }
@@ -52,19 +51,19 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">Planning Classification:</label>
                 <div class="col-sm-8">
-                    <select class="form-control" asp-for="Planning" asp-items="_settings.GetPlanningTypes().Select(p => new SelectListItem() { Value = p.Key, Text = p.Value })"></select>
+                    <select class="form-control" asp-for="Planning" asp-items="_propertySettings.GetPlanningTypes().Select(p => new SelectListItem() { Value = p.Key, Text = p.Value })"></select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Lease/Listing Type:</label>
                 <div class="col-sm-8">
-                    <select class="form-control" asp-for="ListingType" asp-items="_settings.GetListingTypes().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+                    <select class="form-control" asp-for="ListingType" asp-items="_propertySettings.GetListingTypes().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Lease/Listing Status:</label>
                 <div class="col-sm-8">
-                    <select class="form-control" asp-for="Lease" asp-items="_settings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+                    <select class="form-control" asp-for="Lease" asp-items="_propertySettings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
                 </div>
             </div>
             <div class="form-group">

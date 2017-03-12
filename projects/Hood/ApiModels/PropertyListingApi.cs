@@ -141,7 +141,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public PropertyListingApi(PropertyListing post, ISiteConfiguration settings = null)
+        public PropertyListingApi(PropertyListing post, ISettingsRepository settings = null)
         {
             var mediaSettings = settings.GetMediaSettings();
             var propertySettings = settings.GetPropertySettings();

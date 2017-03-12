@@ -20,16 +20,14 @@ namespace Hood.Services
 
         private void onWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
         {
-            throw new NotImplementedException();
         }
     }
 
     public class StripeWebHookService : IStripeWebHookService
     {
-        private readonly IAuthenticationRepository _auth;
-        private readonly ISubscriptionRepository _subs;
+        private readonly IAccountRepository _auth;
         private readonly IBillingService _billing;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly HttpContext _context;
         private readonly IEmailSender _email;
 
@@ -41,23 +39,21 @@ namespace Hood.Services
         private string _eventName;
 
         public StripeWebHookService(
-            IAuthenticationRepository auth,
-            ISiteConfiguration site,
-            ISubscriptionRepository subs,
+            IAccountRepository auth,
+            ISettingsRepository site,
             IBillingService billing,
             IEmailSender email,
             IHttpContextAccessor contextAccessor)
         {
             _auth = auth;
-            _site = site;
+            _settings = site;
             _basicSettings = site.GetBasicSettings();
             _mailSettings = site.GetMailSettings();
             _billingSettings = site.GetBillingSettings();
-            _subs = subs;
             _billing = billing;
             _context = contextAccessor.HttpContext;
             _email = email;
-            var info = _site.GetBasicSettings();
+            var info = _settings.GetBasicSettings();
             _log = new MailObject();
             _log.PreHeader = "A new stripe webhook has been fired.";
             _log.Subject = _log.PreHeader;
@@ -113,7 +109,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task CustomerCardDeleted(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a card's details are changed.
@@ -122,7 +118,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task CustomerCardUpdated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a new card is created for the customer.
@@ -130,7 +126,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task CustomerCardCreated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever any property of a customer changes.
@@ -138,7 +134,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task CustomerUpdated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a new customer is created.
@@ -146,7 +142,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task CustomerCreated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a charge description or metadata is updated.
@@ -154,7 +150,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task ChargeUpdated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a previously uncaptured charge is captured.
@@ -162,7 +158,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task ChargeCaptured(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a charge is refunded, including partial refunds.
@@ -170,7 +166,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task ChargeRefunded(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a failed charge attempt occurs.
@@ -178,7 +174,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task ChargeFailed(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a new charge is created and is successful.
@@ -186,7 +182,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task ChargeSucceeded(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a customer is deleted.
@@ -219,7 +215,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task InvoiceCreated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever an invoice item is created.
@@ -227,7 +223,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task InvoiceItemCreated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever an invoice item is deleted.
@@ -235,7 +231,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task InvoiceItemDeleted(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever an invoice item is updated.
@@ -243,7 +239,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task InvoiceItemUpdated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever an invoice attempts to be paid, and the payment fails. 
@@ -264,7 +260,7 @@ namespace Hood.Services
                 _log.AddParagraph("StripeSubscription Object:");
                 _log.AddParagraph(JsonConvert.SerializeObject(failedInvoiceSubscription).ToFormattedJson() + Environment.NewLine);
 
-                UserSubscription failedInvoiceUserSub = await _subs.FindUserSubscriptionByStripeId(failedInvoiceSubscription.Id);
+                UserSubscription failedInvoiceUserSub = await _auth.FindUserSubscriptionByStripeId(failedInvoiceSubscription.Id);
                 if (failedInvoiceUserSub != null)
                 {
                     _log.AddParagraph("Local User Subscription Object:");
@@ -273,7 +269,7 @@ namespace Hood.Services
 
                     MailObject message = new MailObject();
                     message.To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUserSub.User.Email);
-                    message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
+                    message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
                     message.Subject = "Error with your subscription...";
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
@@ -291,7 +287,7 @@ namespace Hood.Services
 
                     MailObject message = new MailObject();
                     message.To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUser.Email);
-                    message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
+                    message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
                     message.Subject = "Error with your subscription...";
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
@@ -319,7 +315,7 @@ namespace Hood.Services
                 _log.AddParagraph("StripeSubscription Object:");
                 _log.AddParagraph(JsonConvert.SerializeObject(subscription).ToFormattedJson() + Environment.NewLine);
 
-                UserSubscription userSub = await _subs.FindUserSubscriptionByStripeId(subscription.Id);
+                UserSubscription userSub = await _auth.FindUserSubscriptionByStripeId(subscription.Id);
                 // if ths sub is set up in the db ALL IS WELL. Continuer
                 if (userSub == null)
                 {
@@ -338,7 +334,7 @@ namespace Hood.Services
 
                     MailObject message = new MailObject();
                     message.To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email);
-                    message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
+                    message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
                     message.Subject = "Error with your subscription...";
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
@@ -356,7 +352,7 @@ namespace Hood.Services
 
                     MailObject message = new MailObject();
                     message.To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email);
-                    message.PreHeader = "Thank you for your payment on " + _site.GetSiteTitle();
+                    message.PreHeader = "Thank you for your payment on " + _settings.GetSiteTitle();
                     message.Subject = "Thank you for your payment...";
                     message.AddH1("Thank you!");
                     message.AddParagraph("Your payment has been received. You will recieve a payment reciept from our payment providers, Stripe.");
@@ -370,7 +366,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task InvoiceUpdated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a plan is deleted.
@@ -378,7 +374,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task PlanDeleted(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a plan is updated.
@@ -386,7 +382,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task PlanUpdated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a plan is created.
@@ -394,7 +390,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public async Task PlanCreated(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            UnhandledWebHook(stripeEvent);
         }
         /// <summary>
         /// Occurs whenever a customer with no subscription is signed up for a plan.
@@ -406,7 +402,7 @@ namespace Hood.Services
             StripeSubscription created = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             _log.AddParagraph("Subscription Object:");
             _log.AddParagraph(JsonConvert.SerializeObject(created).ToFormattedJson() + Environment.NewLine);
-            await _subs.ConfirmSubscriptionObject(created, stripeEvent.Created);
+            await _auth.ConfirmSubscriptionObject(created, stripeEvent.Created);
             _log.AddParagraph("[Subscription Created] complete!");
         }
         /// <summary>
@@ -419,7 +415,7 @@ namespace Hood.Services
             StripeSubscription updated = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             _log.AddParagraph("Subscription Object:");
             _log.AddParagraph(JsonConvert.SerializeObject(updated).ToFormattedJson() + Environment.NewLine);
-            await _subs.UpdateSubscriptionObject(updated, stripeEvent.Created);
+            await _auth.UpdateSubscriptionObject(updated, stripeEvent.Created);
             _log.AddParagraph("[Subscription Created] complete!");
         }
         /// <summary>
@@ -432,7 +428,7 @@ namespace Hood.Services
             StripeSubscription deleted = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             _log.AddParagraph("Subscription Object:");
             _log.AddParagraph(JsonConvert.SerializeObject(deleted).ToFormattedJson() + Environment.NewLine);
-            await _subs.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
+            await _auth.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
             _log.AddParagraph("[Subscription Deleted] complete!");
         }
         /// <summary>
@@ -445,7 +441,7 @@ namespace Hood.Services
             StripeSubscription endTrialSubscription = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             _log.AddParagraph("Subscription Object:");
             _log.AddParagraph(JsonConvert.SerializeObject(endTrialSubscription).ToFormattedJson() + Environment.NewLine);
-            UserSubscription endTrialUserSub = await _subs.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
+            UserSubscription endTrialUserSub = await _auth.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {
                 _log.AddParagraph("Local User Subscription Object:");
@@ -454,7 +450,7 @@ namespace Hood.Services
 
                 MailObject message = new MailObject();
                 message.To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUserSub.User.Email);
-                message.PreHeader = "Your trial will soon expire on " + _site.GetSiteTitle();
+                message.PreHeader = "Your trial will soon expire on " + _settings.GetSiteTitle();
                 message.Subject = "Your trial will soon expire...";
                 message.AddH1("The end is near!");
                 message.AddParagraph("Your trial subscription will soon run out.");
@@ -474,7 +470,7 @@ namespace Hood.Services
 
                 MailObject message = new MailObject();
                 message.To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUser.Email);
-                message.PreHeader = "Error with your subscription on " + _site.GetSiteTitle();
+                message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
                 message.Subject = "Error with your subscription...";
                 message.AddH1("Oops!");
                 message.AddParagraph("Seems there was an error with your subscription.");

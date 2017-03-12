@@ -1,9 +1,9 @@
-@inject ISiteConfiguration _site
+
 @model EditPropertyModel
 @{
     ViewBag.Title = "Edit " + Model.Property.Title;
-    PropertySettings _settings = _site.GetPropertySettings();
-    PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    PropertyListingApi mapi = _settings.ToPropertyListingApi(Model.Property);
 }
 @section buttons {
     <a class="btn btn-sm btn-default" href="@mapi.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>

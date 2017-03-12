@@ -1,9 +1,7 @@
 @model PropertyListingApi
 @inject IContentRepository _data
-@inject ISiteConfiguration _site
 @{
-    PropertySettings _settings = _site.GetPropertySettings();
-    var integrations = _site.GetIntegrationSettings();
+    var _integrationSettings = _settings.GetIntegrationSettings();
 }
 <div id="info" class="tab-pane active">
     <div class="panel-body">
@@ -17,7 +15,7 @@
                 <div class="col-sm-8"><input asp-for="ShortDescription" type="text" class="form-control" /></div>
             </div>
             <hr />
-            @if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
+            @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
             {
                 <div class="form-group">
                     <label class="col-sm-3 control-label">Lookup Address</label>
