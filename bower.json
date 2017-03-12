@@ -1,6 +1,11 @@
 {
     "name": "hood",
     "version": "1.0.2",
+    "homepage": "https://github.com/HoodDigital/Hood",
+    "authors": [
+        "George Whysall"
+    ],
+    "description": "The Hood CMS is a full content management system providing a solid backbone to any website.",
     "main": [
         "./dist/css/admin.min.css",
         "./dist/css/app.min.css",
