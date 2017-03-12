@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Hood.Infrastructure;
 using System;
 using System.Net;
+using Microsoft.AspNetCore.Identity;
+using Hood.Models;
 
 namespace Hood.Services
 {
@@ -16,10 +18,15 @@ namespace Hood.Services
         private Models.MailSettings _mail;
         private Models.BasicSettings _info;
         private readonly IRazorViewRenderer _renderer;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public EmailSender(IHttpContextAccessor contextAccessor, ISiteConfiguration site, IRazorViewRenderer renderer)
+        public EmailSender(IHttpContextAccessor contextAccessor,
+            UserManager<ApplicationUser> userManager,
+            ISiteConfiguration site,
+            IRazorViewRenderer renderer)
         {
             _contextAccessor = contextAccessor;
+            _userManager = userManager;
             _site = site;
             _renderer = renderer;
         }
@@ -56,6 +63,18 @@ namespace Hood.Services
             {
                 return new OperationResult(ex);
             }
+        }
+
+        public async Task<OperationResult> NotifyRole(MailObject message, string roleName, string template = "Areas/Admin/Views/Mail/Plain.cshtml")
+        {
+            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            foreach (var user in users)
+            {
+                var messageToSend = message;
+                messageToSend.To = new EmailAddress(user.Email);
+                await SendEmail(messageToSend, template);
+            }
+            return new OperationResult(true);
         }
     }
 }

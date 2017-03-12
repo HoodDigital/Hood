@@ -21,11 +21,11 @@ namespace Hood
                     OptionsChanged?.Invoke(sender, e);
                     break;
             }
-            ContentChanged.Invoke(sender, null);
         }
 
         public static event EventHandler<EventArgs> ContentChanged;
         public static event EventHandler<EventArgs> PropertiesChanged;
         public static event EventHandler<EventArgs> OptionsChanged;
+        public static event EventHandler<StripeWebHookTriggerArgs> StripeWebhook;
     }
 }

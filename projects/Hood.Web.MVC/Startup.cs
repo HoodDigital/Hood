@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Hood.Web.MVC
 {
-    public class Startup
+    public class Startup 
     {
         private IConfigurationRoot _config { get; }
 

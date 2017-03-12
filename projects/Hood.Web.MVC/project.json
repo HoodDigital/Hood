@@ -1,18 +1,18 @@
 {
   "name": "Hood.Web.MVC",
-  "version": "1.0.2",
+  "version": "1.0.2-preview1",
   "userSecretsId": "Hood.Web.MVC",
   "dependencies": {
-    "Hood": "1.0.2",
-    "Microsoft.AspNetCore.Diagnostics": "1.1.0",
-    "Microsoft.AspNetCore.Server.IISIntegration": "1.1.0",
-    "Microsoft.AspNetCore.Server.Kestrel": "1.1.0",
-    "Microsoft.EntityFrameworkCore.Design": "1.1.0",
-    "Microsoft.Extensions.Logging.Console": "1.1.0"
+    "Hood": "1.0.2-preview1",
+    "Microsoft.AspNetCore.Diagnostics": "1.1.1",
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.1.1",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.1.1",
+    "Microsoft.EntityFrameworkCore.Design": "1.1.1",
+    "Microsoft.Extensions.Logging.Console": "1.1.1"
   },
   "tools": {
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.1.0-preview4-final",
-    "Microsoft.EntityFrameworkCore.Tools": "1.1.0-preview4-final"
+    "Microsoft.EntityFrameworkCore.Tools": "1.1.0"
   },
   "frameworks": {
     "net461": {}
