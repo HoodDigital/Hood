@@ -282,8 +282,6 @@ gulp.task('site:js', function () {
 });
 gulp.task('site:js:package', ['site:js'], function () {
     return gulp.src([
-        libFolder + 'jquery/dist/jquery.min.js',
-        libFolder + 'bootstrap/dist/js/bootstrap.min.js',
         libFolder + 'hood/dist/js/includes/google.min.js',
         jsFolder + 'site.min.js',
     ])
