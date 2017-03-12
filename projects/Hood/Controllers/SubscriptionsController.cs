@@ -180,8 +180,8 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [Route("stripe/webhooks/")]
         [AllowAnonymous]
+        [Route("stripe/webhooks")]
         public async Task<StatusCodeResult> WebHooks()
         {
             var json = new StreamReader(Request.Body).ReadToEnd();

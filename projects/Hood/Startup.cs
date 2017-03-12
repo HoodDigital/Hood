@@ -101,10 +101,11 @@ namespace Hood
                 .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
 
-                services.AddSingleton<IHoodCache, HoodCache>();
+                services.AddSingleton<StripeWebHookEventListener>();
                 services.AddSingleton<ContentCategoryCache>();
                 services.AddSingleton<ContentByTypeCache>();
                 services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
+                services.AddSingleton<IHoodCache, HoodCache>();
                 services.AddSingleton<IFTPService, FTPService>();
                 services.AddSingleton<IPropertyImporter, PropertyImporter>();
                 services.AddSingleton<IPropertyExporter, PropertyExporter>();
@@ -117,6 +118,7 @@ namespace Hood
                 services.AddScoped<IMediaManager<SiteMedia>, MediaManager<SiteMedia>>();
                 services.AddScoped<IContentRepository, ContentRepository>();
                 services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+                services.AddScoped<IStripeWebHookService, StripeWebHookService>();
                 services.AddTransient<ISmsSender, SmsSender>();
                 services.AddTransient<IPayPalService, PayPalService>();
                 services.AddTransient<IShoppingCart, ShoppingCart>();

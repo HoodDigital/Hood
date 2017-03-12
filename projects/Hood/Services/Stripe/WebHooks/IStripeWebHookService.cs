@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Stripe;
-using Hood.Core.Extensions;
+using Hood.Extensions;
 
 namespace Hood.Services
 {
@@ -32,7 +32,7 @@ namespace Hood.Services
         Task SubscriptionDeleted(StripeEvent stripeEvent);
         Task SubscriptionTrialWillEnd(StripeEvent stripeEvent);
         Task SubscriptionUpdated(StripeEvent stripeEvent);
-        Task UnhandledWebHook(StripeEvent stripeEvent);
+        void UnhandledWebHook(StripeEvent stripeEvent);
     }
     public static class IStripeWebHookExtensions
     {
@@ -116,7 +116,7 @@ namespace Hood.Services
                     await service.PlanDeleted(stripeEvent);
                     break;
                 default:
-                    await service.UnhandledWebHook(stripeEvent);
+                    service.UnhandledWebHook(stripeEvent);
                     break;
             }
         }

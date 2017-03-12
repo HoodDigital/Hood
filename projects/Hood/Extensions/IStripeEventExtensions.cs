@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hood.Core.Extensions
+namespace Hood.Extensions
 {
-    public static class IStripeEventExtensions
+    public static class StripeEventExtensions
     {
         public static string GetEventName(this StripeEvent stripeEvent)
         {

@@ -15,6 +15,12 @@ namespace Hood.Services
         public StripeWebHookEventListener(IStripeWebHookService webHooks)
         {
             _webHooks = webHooks;
+            Events.StripeWebhook += onWebhookTriggered;
+        }
+
+        private void onWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -23,7 +29,6 @@ namespace Hood.Services
         private readonly IAuthenticationRepository _auth;
         private readonly ISubscriptionRepository _subs;
         private readonly IBillingService _billing;
-        private readonly IStripeWebHookService _webHooks;
         private readonly ISiteConfiguration _site;
         private readonly HttpContext _context;
         private readonly IEmailSender _email;
@@ -40,7 +45,6 @@ namespace Hood.Services
             ISiteConfiguration site,
             ISubscriptionRepository subs,
             IBillingService billing,
-            IStripeWebHookService webHooks,
             IEmailSender email,
             IHttpContextAccessor contextAccessor)
         {
@@ -52,7 +56,6 @@ namespace Hood.Services
             _subs = subs;
             _billing = billing;
             _context = contextAccessor.HttpContext;
-            _webHooks = webHooks;
             _email = email;
             var info = _site.GetBasicSettings();
             _log = new MailObject();
@@ -66,12 +69,16 @@ namespace Hood.Services
 
         public async Task ProcessEvent(string json)
         {
+            var stripeEvent = StripeEventUtility.ParseEvent(json);
+            await ProcessEvent(stripeEvent);
+        }
+        public async Task ProcessEvent(StripeEvent stripeEvent)
+        {
             try
             {
-                var args = new StripeWebHookTriggerArgs(json);
-                Events.Fire(nameof(Events.StripeWebhook), this, new StripeWebHookTriggerArgs(args.Json));
+                var args = new StripeWebHookTriggerArgs(stripeEvent);
 
-                _log.AddParagraph("Stripe Event detected: <strong>" + _eventName + "</strong>");
+                _log.AddParagraph("Stripe Event detected: <strong>" + args.StripeEvent.GetEventName() + "</strong>");
                 _log.AddParagraph("Processed JSON: <strong>" + args.Json.ToFormattedJson() + "</strong>");
                 if (_eventName == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
@@ -84,12 +91,18 @@ namespace Hood.Services
                         await _email.NotifyRole(_log, "SuperUser", MailSettings.SuccessTemplate);
                         break;
                 }
+
+                // Fire the event to allow any other packages to process the webhook.
+                Events.Fire(nameof(Events.StripeWebhook), this, args);
             }
             catch (Exception ex)
             {
                 _log.PreHeader = "An error occurred processing a stripe webhook.";
                 _log.Subject = _log.PreHeader;
                 await _email.NotifyRole(_log, "SuperUser", MailSettings.DangerTemplate);
+
+                // Throw the error back to the application, for creating the response object.
+                throw ex;
             }
         }
 
@@ -476,9 +489,9 @@ namespace Hood.Services
         /// Called whenever an unknown webhook arrives from stripe.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public Task UnhandledWebHook(StripeEvent stripeEvent)
+        public void UnhandledWebHook(StripeEvent stripeEvent)
         {
-            throw new NotImplementedException();
+            _log.AddParagraph("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName());
         }
     }
 }
