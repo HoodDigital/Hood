@@ -28,6 +28,7 @@ namespace Hood.Services
         OperationResult BillingEnabled();
         OperationResult CartEnabled();
         OperationResult PropertyEnabled();
+        string GetVersion();
 
         ContentApi ToContentApi(Content content);
         PropertyListingApi ToPropertyListingApi(PropertyListing property);

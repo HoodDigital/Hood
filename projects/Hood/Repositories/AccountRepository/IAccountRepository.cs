@@ -26,18 +26,18 @@ namespace Hood.Services
         OperationResult SetDeliveryAddress(string userId, int id);
 
         // Subscription Plans
-        Task<OperationResult> Add(Subscription subscription);
-        Task<List<Subscription>> GetAllAsync();
-        Task<List<Subscription>> GetLevels();
-        Task<List<Subscription>> GetAddons();
+        Task<OperationResult> AddSubscriptionPlan(Subscription subscription);
+        Task<List<Subscription>> GetSubscriptionPlansAsync();
+        Task<List<Subscription>> GetSubscriptionPlanLevels();
+        Task<List<Subscription>> GetSubscriptionPlanAddons();
         Task<PagedList<Subscription>> GetPagedSubscriptions(ListFilters filters, string search, string sort);
-        Task<Subscription> GetSubscriptionById(int id);
-        Task<Subscription> GetSubscriptionByStripeId(string stripeId);
-        Task<OperationResult> Delete(int id);
+        Task<Subscription> GetSubscriptionPlanById(int id);
+        Task<Subscription> GetSubscriptionPlanByStripeId(string stripeId);
+        Task<OperationResult> DeleteSubscriptionPlan(int id);
         Task<OperationResult> UpdateSubscription(Subscription model);
 
         // User Subscriptions
-        Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, int subscriptionId, string search, string sort);
+        Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription);
         OperationResult SaveUserSubscription(UserSubscription newUserSub);
         OperationResult UpdateUserSubscription(UserSubscription newUserSub);
         Task CreateUserSubscription(int planId, string stripeToken, string cardId);

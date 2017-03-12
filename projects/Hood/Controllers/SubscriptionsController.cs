@@ -34,7 +34,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/subscriptions/")]
-        [SubscriptionRequired(Tiered: true)]
+        [SubscriptionRequired(Roles: "SuperUser")]
         public IActionResult Index()
         {
             AccountInfo account = HttpContext.GetAccountInfo();
@@ -44,7 +44,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/subscriptions/addon-required/")]
-        [SubscriptionRequired(AddonsRequired: "intro")]
+        [SubscriptionRequired(AddonsRequired: "intro", Roles: "SuperUser")]
         public IActionResult AddonArea()
         {
             AccountInfo account = HttpContext.GetAccountInfo();
@@ -54,14 +54,14 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/subscriptions/change/")]
-        [SubscriptionRequired()]
+        [SubscriptionRequired(Roles: "SuperUser")]
         public async Task<IActionResult> Change(BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel();
             model.User = account.User;
-            model.Plans = await _auth.GetLevels();
-            model.Addons = await _auth.GetAddons();
+            model.Plans = await _auth.GetSubscriptionPlanLevels();
+            model.Addons = await _auth.GetSubscriptionPlanAddons();
             model.Message = message;
             return View(model);
         }
@@ -108,8 +108,8 @@ namespace Hood.Controllers
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel();
             model.User = account.User;
-            model.Plans = await _auth.GetLevels();
-            model.Addons = await _auth.GetAddons();
+            model.Plans = await _auth.GetSubscriptionPlanLevels();
+            model.Addons = await _auth.GetSubscriptionPlanAddons();
             model.Customer = await _auth.LoadCustomerObject(account.User.StripeId, true);
             ViewData["ReturnUrl"] = returnUrl;
             return model;

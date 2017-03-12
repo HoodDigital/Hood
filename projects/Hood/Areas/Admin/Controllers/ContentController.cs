@@ -810,7 +810,7 @@ namespace Hood.Areas.Admin.Controllers
             if (result.Succeeded)
             {
                 // get subscriptions - if there are any.
-                model.Subscriptions = await _auth.GetAllAsync();
+                model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
             }
             return model;
         }

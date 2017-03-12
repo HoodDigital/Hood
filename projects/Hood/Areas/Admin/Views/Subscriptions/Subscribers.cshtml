@@ -1,8 +1,7 @@
-@model ContentListModel
+@model PagedList<ApplicationUser>
 @inject IAccountRepository _auth;
 @{
     ViewBag.Title = "Manage Subscribers";
-    var subscription = Context.Request.Query["subscription"];
 }
 @section breadcrumbs {
     <ol class="breadcrumb">
@@ -20,92 +19,48 @@
         </li>
     </ol>
 }
-<div class="row">
-    <div class="col-lg-12">
-        <div class="wrapper wrapper-content">
-            <div class="ibox">
-                <div class="ibox-title">
-                    <form>
-                        <div class="row m-b-sm m-t-sm">
-                            <div class="col-md-4">
-                                <h4>Sort</h4>
-                                <select class="form-control manage-subscriber-change" name="manage-subscriber-type" id="manage-subscriber-type" asp-items="(await _auth.GetAllAsync()).OrderBy(c => c.Level).Select(c => new SelectListItem() { Value = c.Id.ToString(), Text = c.Name, Selected = c.StripeId == subscription })">
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <h4>Sort</h4>
-                                <select class="form-control manage-subscriber-change" name="manage-subscriber-sort" id="manage-subscriber-sort" data-selected="PublishDateDesc">
-                                    <optgroup label="Subscriber">
-                                        <option value="name">Name (A-Z)</option>
-                                        <option value="name+desc">Name (Z-A)</option>
-                                        <option value="date+desc">Added Date (Newest)</option>
-                                        <option value="date">Added Date (Oldest)</option>
-                                    </optgroup>
-                                    <optgroup label="Price">
-                                        <option value="price+desc">Price (£££-£)</option>
-                                        <option value="price">Price (£-£££)</option>
-                                    </optgroup>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <h4>Search</h4>
-                                <div class="input-group">
-                                    <input name="manage-subscriber-search" id="manage-subscriber-search" type="text" placeholder="Search" class="form-control">
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-primary manage-subscriber-click"> Search!</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="ibox-content">
-                    <div id="manage-subscriber-list" class="border-box-sizing"></div>
-                    <div class="manage-subscriber-pager text-center m-lg"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script id="manage-subscriber-template" class="kendo-template" type="text/template">
-    <div class="forum-item data-item">
-        <div class="row">
+<div class="m-b-lg">
+    <form method="get">
+        <div class="row m-b-sm m-t-sm">
             <div class="col-md-4">
-                <div class="forum-icon">
-                    <fixedImage src="${ Avatar.ThumbUrl }" class="img-xs ${ Id }" />
-                </div>
-                <a class="blade forum-item-title" href="/admin/users/blade/${ Id }" data-complete="$.hood.Users.Edit.Init()">${ UserName } <small>${ FirstName } ${ LastName }</small></a>
-                <small>Last logged in from <strong>${ LastLoginLocation }</strong> <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(LastLogOn), "ddd d, MMMM yyyy at hh:mm tt") #</small>
+                <h4>Sort</h4>
+                @{
+                    var items = (await _auth.GetSubscriptionPlansAsync()).OrderBy(c => c.Level).Select(c => new SelectListItem() { Value = c.StripeId.ToString(), Text = c.Name });
+                }
+                <select class="form-control manage-subscriber-change" name="subscription" id="subscription" asp-items="items"></select>
             </div>
-            <div class="col-md-3">
-                <span class="small font-bold">Active Subscriptions</span>
-                <div class="tag-list">
-                    @Html.Raw("# for (var i = 0; i < Subscriptions.length; i++) { #")
-                    # if (Subscriptions[i].Status == "active" || Subscriptions[i].Status == "trialing") { #
-                        <span class="tag-item bg-color-green txt-color-white">
-                            #= Subscriptions[i].StripeId # - #= Subscriptions[i].Status # - Next cycle: #= kendo.toString(new Date(), "dd/MM/yyyy hh:mm tt") #
-                        </span>
-                    #}#
-                    @Html.Raw("# } #")
-                </div>
+            <div class="col-md-4">
+                <h4>Sort</h4>
+                <select class="form-control manage-subscriber-change" name="sort" id="sort" data-selected="PublishDateDesc">
+                    <optgroup label="Subscriber">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="name+desc">Name (Z-A)</option>
+                        <option value="date+desc">Added Date (Newest)</option>
+                        <option value="date">Added Date (Oldest)</option>
+                    </optgroup>
+                    <optgroup label="Price">
+                        <option value="price+desc">Price (£££-£)</option>
+                        <option value="price">Price (£-£££)</option>
+                    </optgroup>
+                </select>
             </div>
-            <div class="col-md-3">
-                <span class="small font-bold">Subscriptions</span>
-                <div class="tag-list">
-                    @Html.Raw("# for (var i = 0; i < Subscriptions.length; i++) { #")
-                    # if (Subscriptions[i].Status != "active" && Subscriptions[i].Status != "trialing") { #
-                        <span class="tag-item bg-color-orange txt-color-white">
-                            #= Subscriptions[i].StripeId # - #= Subscriptions[i].Status # - Next cycle: #= kendo.toString(new Date(), "dd/MM/yyyy hh:mm tt") #
-                        </span>
-                    #}#
-                    <br />
-                    @Html.Raw("# } #")
+            <div class="col-md-4">
+                <h4>Search</h4>
+                <div class="input-group">
+                    <input name="search" id="search" type="text" placeholder="Search" class="form-control">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary"> Search!</button>
+                    </span>
                 </div>
-            </div>
-            <div class="col-md-2 action-buttons">
-                <action hood-id="${ Id }" hood-type="users" hood-action="edit"></action>
-                <action hood-id="${ Id }" hood-type="user" hood-action="delete"></action>
             </div>
         </div>
-    </div>
-</script>
+    </form>
+</div>
+@if (Model?.Count > 0)
+{
+    foreach (var user in Model.Items)
+    {
+        await Html.RenderPartialAsync("_User_Record", user);
+    }
+    await Html.RenderPartialAsync("_SubscribersPager");
+}

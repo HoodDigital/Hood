@@ -49,17 +49,18 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/subscribers/")]
-        public async Task<IActionResult> Subscribers()
+        public async Task<IActionResult> Subscribers(ListFilters filters, string subscription)
         {
-            ViewBag.Subcriptions = await _auth.GetAllAsync();
-            return View();
+            var model = await _auth.GetPagedSubscribers(filters, subscription);
+            ViewData["Subscription"] = subscription;
+            return View(model);
         }
 
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
             EditSubscriptionModel model = new EditSubscriptionModel();
-            model.Subscription = await _auth.GetSubscriptionById(id);       
+            model.Subscription = await _auth.GetSubscriptionPlanById(id);       
             return View(model);
         }
 
@@ -87,21 +88,7 @@ namespace Hood.Areas.Admin.Controllers
             Response response = new Response(subs.Items.Select(s => new SubscriptionApi(s)).ToArray(), subs.Count);
             return Json(response);
         }
-
-        [HttpGet]
-        [Route("admin/subscribers/get")]
-        public async Task<JsonResult> GetSubscribers(ListFilters request, int subscriptionId, string search, string sort)
-        {
-            PagedList<ApplicationUser> subs = await _auth.GetPagedSubscribers(request, subscriptionId, search, sort);
-            Response response = new Response(subs.Items.Select(u => _settings.ToApplicationUserApi(u)).ToArray(), subs.Count);
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            };
-            return Json(response, settings);
-        }
-
+    
         [HttpPost]
         [Route("admin/subscriptions/add")]
         public async Task<Response> Add(CreateSubscriptionModel model)
@@ -129,7 +116,7 @@ namespace Hood.Areas.Admin.Controllers
                     TrialPeriodDays = model.TrialPeriodDays,
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
-                OperationResult result = await _auth.Add(subscription);
+                OperationResult result = await _auth.AddSubscriptionPlan(subscription);
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.ErrorString);
@@ -150,7 +137,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                OperationResult result = await _auth.Delete(id);
+                OperationResult result = await _auth.DeleteSubscriptionPlan(id);
                 if (result.Succeeded)
                 {
                     return new Response(true);

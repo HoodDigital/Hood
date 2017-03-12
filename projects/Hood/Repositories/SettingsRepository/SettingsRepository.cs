@@ -455,5 +455,11 @@ namespace Hood.Services
             var basics = GetBasicSettings();
             return text.Replace("{SITETITLE}", GetSiteTitle()).Replace("{COMPANYNAME}", basics.CompanyName).Replace("{SITEOWNERNAME}", basics.OwnerFullName).Replace("{SITEPHONE}", basics.Phone).Replace("{SITEEMAIL}", basics.Email);
         }
+
+        public string GetVersion()
+        {
+            var version = typeof(SettingsRepository).Assembly.GetName().Version;
+            return string.Format("v{0}.{1}.{2}", version.Major, version.MajorRevision, version.Build);
+        }
     }
 }

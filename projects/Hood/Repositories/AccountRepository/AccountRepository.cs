@@ -214,7 +214,7 @@ namespace Hood.Services
         }
 
         // Subscriptions
-        public async Task<OperationResult> Add(Subscription subscription)
+        public async Task<OperationResult> AddSubscriptionPlan(Subscription subscription)
         {
             try
             {
@@ -238,7 +238,7 @@ namespace Hood.Services
                 return new OperationResult(ex.Message);
             }
         }
-        public async Task<OperationResult> Delete(int id)
+        public async Task<OperationResult> DeleteSubscriptionPlan(int id)
         {
             try
             {
@@ -259,7 +259,7 @@ namespace Hood.Services
                 return new OperationResult(ex.Message);
             }
         }
-        public async Task<Subscription> GetSubscriptionById(int id)
+        public async Task<Subscription> GetSubscriptionPlanById(int id)
         {
             Subscription subscription = await _db.Subscriptions
                                     .Include(s => s.Users)
@@ -267,7 +267,7 @@ namespace Hood.Services
                                     .FirstOrDefaultAsync(c => c.Id == id);
             return subscription;
         }
-        public async Task<Subscription> GetSubscriptionByStripeId(string stripeId)
+        public async Task<Subscription> GetSubscriptionPlanByStripeId(string stripeId)
         {
             Subscription subscription = await _db.Subscriptions
                                 .Include(s => s.Users)
@@ -276,7 +276,7 @@ namespace Hood.Services
 
             return subscription;
         }
-        private IQueryable<Subscription> GetSubscriptions(string search = "", string sort = "", bool includeUsers = false)
+        private IQueryable<Subscription> GetSubscriptionPlans(string search = "", string sort = "", bool includeUsers = false)
         {
             IQueryable<Subscription> subscriptions = _db.Subscriptions.Include(s => s.Features);
 
@@ -327,22 +327,22 @@ namespace Hood.Services
             }
             return subscriptions;
         }
-        public async Task<List<Subscription>> GetAllAsync()
+        public async Task<List<Subscription>> GetSubscriptionPlansAsync()
         {
-            return await GetSubscriptions().ToListAsync();
+            return await GetSubscriptionPlans().ToListAsync();
         }
-        public async Task<List<Subscription>> GetLevels()
+        public async Task<List<Subscription>> GetSubscriptionPlanLevels()
         {
-            return await GetSubscriptions().Where(s => s.Public && !s.Addon).OrderBy(s => s.Level).ToListAsync();
+            return await GetSubscriptionPlans().Where(s => s.Public && !s.Addon).OrderBy(s => s.Level).ToListAsync();
         }
-        public async Task<List<Subscription>> GetAddons()
+        public async Task<List<Subscription>> GetSubscriptionPlanAddons()
         {
-            return await GetSubscriptions().Where(s => s.Public && s.Addon).ToListAsync();
+            return await GetSubscriptionPlans().Where(s => s.Public && s.Addon).ToListAsync();
         }
         public async Task<PagedList<Subscription>> GetPagedSubscriptions(ListFilters filters, string search, string sort)
         {
             PagedList<Subscription> model = new PagedList<Subscription>();
-            var subs = GetSubscriptions(search, sort, true);
+            var subs = GetSubscriptionPlans(search, sort, true);
             model.Items = await subs.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToListAsync();
             model.Count = subs.Count();
             model.Pages = model.Count / filters.pageSize;
@@ -409,13 +409,15 @@ namespace Hood.Services
         }
 
         // User Subscriptions
-        private IQueryable<ApplicationUser> GetSubscribers(int subscriptionId, string search = "", string sort = "")
+        private IQueryable<ApplicationUser> GetSubscribers(string subcription, string search = "", string sort = "")
         {
             IQueryable<ApplicationUser> users = _db.Users
-                .Include(u => u.Avatar)
-                .Include(u => u.Subscriptions)
-                .ThenInclude(u => u.Subscription)
-                .Where(u => u.Subscriptions.Any(s => s.SubscriptionId == subscriptionId && (s.Status == "trialing" || s.Status == "active")));
+                .Include(u => u.Subscriptions).ThenInclude(u => u.Subscription);
+
+            if (subcription.IsSet())
+               users = users.Where(u => u.Subscriptions.Any(s => s.Subscription.StripeId == subcription && (s.Status == "trialing" || s.Status == "active")));
+            else 
+               users = users.Where(u => u.Subscriptions.Any(s => s.Status == "trialing" || s.Status == "active"));
 
             // search the collection
             if (!string.IsNullOrEmpty(search))
@@ -464,10 +466,10 @@ namespace Hood.Services
             }
             return users;
         }
-        public async Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, int subscriptionId, string search, string sort)
+        public async Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription)
         {
             PagedList<ApplicationUser> model = new PagedList<ApplicationUser>();
-            var subs = GetSubscribers(subscriptionId, search, sort);
+            var subs = GetSubscribers(subcription, filters.search, filters.sort);
             model.Items = await subs.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToListAsync();
             model.Count = subs.Count();
             model.Pages = model.Count / filters.pageSize;
@@ -488,7 +490,7 @@ namespace Hood.Services
             ApplicationUser user = GetCurrentUser();
 
             // Load the subscription plan.
-            Subscription subscription = await GetSubscriptionById(planId);
+            Subscription subscription = await GetSubscriptionPlanById(planId);
 
             // Get the stripe subscription plan object.
             StripePlan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
@@ -571,7 +573,7 @@ namespace Hood.Services
             // Load user object and clear cache.
             ApplicationUser user = GetCurrentUser();
 
-            Subscription subscription = await GetSubscriptionById(planId);
+            Subscription subscription = await GetSubscriptionPlanById(planId);
             UserSubscription userSub = GetUserSubscription(user, subscriptionId);
 
             // Check for customer or throw.
