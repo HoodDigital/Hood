@@ -44,7 +44,7 @@
         <a class="btn-primary btn btn-sm action-button" href="/admin/users/edit/7fb2fb76-796d-4ce1-8c2b-b0eda31e2d03">
             <i class="fa fa-edit"></i><span>&nbsp;Edit</span>
         </a>
-        <a class="btn btn-info btn-sm" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.StripeId)">
+        <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.StripeId)">
             <i class="fa fa-cc-stripe"></i><span>&nbsp;View on Stripe</span>
         </a>
     </div>

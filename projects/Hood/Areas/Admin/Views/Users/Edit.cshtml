@@ -178,7 +178,6 @@
                                     <ul>
                                         <li>
                                             <div class="pull-right">
-                                                <a class="btn btn-danger btn-xs" asp-action="CancelUserSubscription" id="@sub.SubscriptionId">Cancel Subscription</a>
                                                 <a class="btn btn-info btn-xs" target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/subscriptions/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", sub.StripeId)">View on Stripe</a>
                                             </div>
                                             <p>
