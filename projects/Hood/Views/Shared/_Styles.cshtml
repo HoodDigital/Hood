@@ -19,14 +19,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
         @if (_themes.CurrentTheme == "default")
         {
-            @if (_settings.GetIntegrationSettings().UseCDN)
-            {
-                <link rel="stylesheet" href="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/css/app.min.css", _settings.GetVersion())" />
-            }
-            else
-            {
-                <link rel="stylesheet" href="~/css/site.min.css" /> 
-            }
+            <link rel="stylesheet" href="~/css/site.min.css" /> 
         }
         else
         {
