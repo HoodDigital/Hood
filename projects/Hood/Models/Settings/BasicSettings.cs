@@ -39,6 +39,12 @@ namespace Hood.Models
         // Description
         public string Description { get; set; }
 
+        // Beta Lock
+        [Display(Name = "Beta Mode")]
+        public bool BetaLock { get; set; }
+        [Display(Name = "Beta Access Codes")]
+        public string BetaCodes { get; set; }
+
         // Notes
         public string Notes { get; set; }
 
@@ -68,6 +74,7 @@ namespace Hood.Models
                 else return "";
             }
         }
+
     }
 
     public partial class SiteAddress : IAddress

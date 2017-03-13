@@ -152,6 +152,7 @@ namespace Hood
                 {
                     // Global filters
                     options.Filters.Add(typeof(AccountFilter));
+                    options.Filters.Add(typeof(BetaLockFilter));
                     options.CacheProfiles.Add("Year",
                         new CacheProfile
                         {

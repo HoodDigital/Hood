@@ -343,5 +343,11 @@ namespace Hood.Controllers
         {
             return View("~/Views/Shared/AccessDenied.cshtml");
         }
+
+        [Route("locked/enter-access-code")]
+        public IActionResult BetaLock()
+        {
+            return View("~/Views/Shared/AccessDenied.cshtml");
+        }
     }
 }
