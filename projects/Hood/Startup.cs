@@ -135,7 +135,6 @@ namespace Hood
                 {
                     options.ConstraintMap.Add("cms", typeof(CmsUrlConstraint));
                     options.LowercaseUrls = true;
-                    options.AppendTrailingSlash = true;
                 });
 
                 services.Configure<MvcJsonOptions>(opt =>
@@ -152,6 +151,8 @@ namespace Hood
                 {
                     // Global filters
                     options.Filters.Add(typeof(AccountFilter));
+                    options.Filters.Add(typeof(LockoutModeFilter));
+
                     options.CacheProfiles.Add("Year",
                         new CacheProfile
                         {

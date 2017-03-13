@@ -36,7 +36,6 @@ namespace Hood.Services
         private readonly MailSettings _mailSettings;
 
         private MailObject _log;
-        private string _eventName;
 
         public StripeWebHookService(
             IAccountRepository auth,
@@ -76,7 +75,7 @@ namespace Hood.Services
 
                 _log.AddParagraph("Stripe Event detected: <strong>" + args.StripeEvent.GetEventName() + "</strong>");
                 _log.AddParagraph("Processed JSON: <strong>" + args.Json.ToFormattedJson() + "</strong>");
-                if (_eventName == "invalid.event.object")
+                if (stripeEvent.GetEventName() == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
 
                 this.ProcessEventByType(args.StripeEvent);

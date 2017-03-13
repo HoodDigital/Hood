@@ -65,10 +65,20 @@ namespace Hood.Controllers
         public IActionResult Index()
         {
             BasicSettings settings = _settings.GetBasicSettings();
-            if (settings.Homepage.HasValue)
-                return Show(settings.Homepage.Value);
+            if (ControllerContext.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
+            {
+                if (settings.LockoutModeHoldingPage.HasValue)
+                    return Show(settings.LockoutModeHoldingPage.Value);
+                else
+                    return View("~/Views/Home/Holding.cshtml");
+            }
             else
-                return View();
+            {
+                if (settings.Homepage.HasValue)
+                    return Show(settings.Homepage.Value);
+                else
+                    return View();
+            }
         }
 
         [ResponseCache(CacheProfileName = "Hour")]
@@ -342,6 +352,34 @@ namespace Hood.Controllers
         public IActionResult AccessDenied()
         {
             return View("~/Views/Shared/AccessDenied.cshtml");
+        }
+
+        [Route("enter-access-code")]
+        public IActionResult LockoutModeEntrance(string returnUrl)
+        {
+            byte[] betaCodeBytes = null;
+            if (ControllerContext.HttpContext.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
+            {
+                ViewData["token"] = Encoding.Default.GetString(betaCodeBytes);
+                ViewData["error"] = "The token you have entered is not valid.";
+            }
+            ViewData["returnUrl"] = returnUrl;
+            return View();
+        }
+
+        [Route("enter-access-code")]
+        [HttpPost]
+        public IActionResult LockoutModeEntrance(string token, string returnUrl)
+        {
+            if (token.IsSet())
+            {
+                ControllerContext.HttpContext.Session.Set("LockoutModeToken", Encoding.ASCII.GetBytes(token));
+                return Redirect(returnUrl);
+            }
+            ViewData["returnUrl"] = returnUrl;
+            ViewData["token"] = token;
+            ViewData["error"] = "The token you have entered is not valid.";
+            return View();
         }
     }
 }

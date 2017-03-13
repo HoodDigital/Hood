@@ -39,6 +39,14 @@ namespace Hood.Models
         // Description
         public string Description { get; set; }
 
+        // Beta Lockout Mode
+        [Display(Name = "Lockout Mode")]
+        public bool LockoutMode { get; set; }
+        [Display(Name = "Lockout Mode Access Codes")]
+        public string LockoutModeTokens { get; set; }
+        [Display(Name = "Lockout Mode Holding Page")]
+        public int? LockoutModeHoldingPage { get; set; }
+
         // Notes
         public string Notes { get; set; }
 
@@ -68,6 +76,7 @@ namespace Hood.Models
                 else return "";
             }
         }
+
     }
 
     public partial class SiteAddress : IAddress

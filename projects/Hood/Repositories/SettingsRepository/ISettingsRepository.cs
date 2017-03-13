@@ -8,6 +8,8 @@ namespace Hood.Services
 {
     public interface ISettingsRepository : IConfiguration
     {
+        List<string> LockoutAccessCodes { get; }
+
         List<Option> AllSettings();
         bool Delete(string key);
         T Get<T>(string key, bool nocache = false);

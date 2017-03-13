@@ -3,6 +3,7 @@
 @{
     Layout = "_SettingsLayout";
     ViewData["Title"] = "Site Basic Settings";
+    var pages = _content.GetPages();
 }
 @section buttons {
     <a asp-action="ResetBasics" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
@@ -17,6 +18,7 @@
         <li class="active"><a data-toggle="tab" href="#basics">Basics</a></li>
         <li><a data-toggle="tab" href="#address">Address</a></li>
         <li><a data-toggle="tab" href="#owner">Owner</a></li>
+        <li><a data-toggle="tab" href="#settings">Settings</a></li>
     </ul>
     <div class="tab-content">
         <div id="basics" class="tab-pane active">
@@ -37,21 +39,6 @@
                     <label class="control-label" asp-for="Description"></label>
                     <div>
                         <input asp-for="Description" class="form-control">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" asp-for="Homepage"></label>
-                    <div>
-                        <select asp-for="Homepage" class="form-control">
-                            <option value="">Default Homepage</option>
-                            @{ 
-                                var pages = _content.GetPages();
-                            }
-                            @foreach (var page in pages)
-                            {
-                                <option value="@page.PageId">@page.Title</option>
-                            }
-                        </select>
                     </div>
                 </div>
                 <div class="form-group">
@@ -181,6 +168,56 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div id="settings" class="tab-pane">
+            <div class="panel-body">
+                <strong>Site Settings</strong>
+                <p>
+                    General site settings, enable/disable access and set your homepage.
+                </p>
+            </div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="control-label" asp-for="Homepage"></label>
+                    <div>
+                        <select asp-for="Homepage" class="form-control">
+                            <option value="">Default Homepage</option>
+                            @foreach (var page in pages)
+                            {
+                            <option value="@page.PageId">@page.Title</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <h5>Lockout Mode (Holding Page / Beta Access)</h5>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="LockoutMode" class="styled">
+                        <label asp-for="LockoutMode"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="LockoutModeHoldingPage"></label>
+                    <div>
+                        <select asp-for="LockoutModeHoldingPage" class="form-control">
+                            <option value="">Default Holding Page</option>
+                            @foreach (var page in pages)
+                            {
+                                <option value="@page.PageId">@page.Title</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="LockoutModeTokens"></label>
+                    <div>
+                        <textarea asp-for="LockoutModeTokens" class="form-control" rows="6"></textarea>
+                    </div>
+                    <p>Enter codes for access, <strong>one code per line</strong>, you can share these codes to grant access to the site. Without one only the homepage, and login page will be available. Administrators can log in to bypass the Lockout Mode.</p>
                 </div>
             </div>
         </div>

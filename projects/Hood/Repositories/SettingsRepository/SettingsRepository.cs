@@ -23,6 +23,21 @@ namespace Hood.Services
         private readonly IConfiguration _config;
         private IHoodCache _cache { get; set; }
 
+        public List<string> LockoutAccessCodes
+        {
+            get
+            {
+                var allowedCodes = GetBasicSettings().LockoutModeTokens.Split(Environment.NewLine.ToCharArray()).ToList();
+                allowedCodes.RemoveAll(str => string.IsNullOrEmpty(str));
+
+                string overrideCode = _config["LockoutMode:OverrideToken"];
+                if (overrideCode.IsSet())
+                    allowedCodes.Add(overrideCode);
+
+                return allowedCodes;
+            }
+        }
+
         public string this[string key]
         {
             get
