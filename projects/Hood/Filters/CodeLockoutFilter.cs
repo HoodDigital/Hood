@@ -14,14 +14,14 @@ namespace Hood.Filters
     /// <summary>
     /// This checks for the stripe feature, if it is not installed correctly or enabled this will short circuit the controller/action.
     /// </summary>
-    public class BetaLockFilter : IActionFilter
+    public class LockoutModeFilter : IActionFilter
     {
         private readonly ILogger _logger;
         private readonly ISettingsRepository _settings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
 
-        public BetaLockFilter(IConfiguration config, 
+        public LockoutModeFilter(IConfiguration config, 
             ILoggerFactory loggerFactory, 
             IBillingService billing, 
             ISettingsRepository settings,
@@ -35,9 +35,25 @@ namespace Hood.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            IActionResult result = new RedirectToActionResult("BetaLock", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-            if (_settings.GetBasicSettings().BetaLock)
+            IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
+            if (_settings.GetBasicSettings().LockoutMode)
             {
+                // if this is the login page, or the betalock page allow the user through.
+                string action = (string)context.RouteData.Values["action"];
+                string controller = (string)context.RouteData.Values["controller"];
+
+                if (action.Equals("LockoutModeEntrance", StringComparison.InvariantCultureIgnoreCase) && 
+                    controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals("Index", StringComparison.InvariantCultureIgnoreCase) && 
+                    controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals("Login", StringComparison.InvariantCultureIgnoreCase) && 
+                    controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
                 // If they are in an override role, let them through.
                 if (context.HttpContext.User.Identity.IsAuthenticated)
                 {
@@ -48,22 +64,7 @@ namespace Hood.Filters
                         return;
                 }
 
-                byte[] betaCodeBytes = null;
-                if (!context.HttpContext.Session.TryGetValue("BetaCode", out betaCodeBytes))
-                {
-                    context.Result = result;
-                    return;
-                }
-
-                var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
-                var allowedCodes = _settings.GetBasicSettings().BetaCodes.Split(Environment.NewLine.ToCharArray()).ToList();
-                allowedCodes.RemoveAll(str => string.IsNullOrEmpty(str));
-
-                string overrideCode = _config["Beta:OverrideKey"];
-                if (overrideCode.IsSet())
-                    allowedCodes.Add(overrideCode);
-
-                if (!allowedCodes.Contains(betaCode))
+                if (context.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
                 {
                     context.Result = result;
                     return;

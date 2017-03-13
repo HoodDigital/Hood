@@ -1,5 +1,6 @@
 ﻿using Hood.Models;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace Hood.Extensions
 {
@@ -8,6 +9,21 @@ namespace Hood.Extensions
         public static AccountInfo GetAccountInfo(this HttpContext context)
         {
             return context.Items["AccountInfo"] as AccountInfo;
+        }
+
+        public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
+        {
+            byte[] betaCodeBytes = null;
+            if (!context.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
+                return true;
+            var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
+
+            if (allowedCodes.Contains(betaCode))
+            {
+                return false;
+            }
+            return true;
+
         }
 
         public static string GetSiteUrl(this HttpContext context, bool includePath = false, bool includeQuery = false)

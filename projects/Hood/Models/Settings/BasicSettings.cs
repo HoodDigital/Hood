@@ -39,11 +39,13 @@ namespace Hood.Models
         // Description
         public string Description { get; set; }
 
-        // Beta Lock
-        [Display(Name = "Beta Mode")]
-        public bool BetaLock { get; set; }
-        [Display(Name = "Beta Access Codes")]
-        public string BetaCodes { get; set; }
+        // Beta Lockout Mode
+        [Display(Name = "Lockout Mode")]
+        public bool LockoutMode { get; set; }
+        [Display(Name = "Lockout Mode Access Codes")]
+        public string LockoutModeTokens { get; set; }
+        [Display(Name = "Lockout Mode Holding Page")]
+        public int? LockoutModeHoldingPage { get; set; }
 
         // Notes
         public string Notes { get; set; }
