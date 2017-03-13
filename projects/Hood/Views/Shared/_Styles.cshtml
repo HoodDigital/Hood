@@ -21,7 +21,7 @@
         {
             @if (_settings.GetIntegrationSettings().UseCDN)
             {
-                <link rel="stylesheet" href="https://hood.azureedge.net/cdn/latest/dist/css/app.min.css" />
+                <link rel="stylesheet" href="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/css/app.min.css", _settings.GetVersion())" />
             }
             else
             {

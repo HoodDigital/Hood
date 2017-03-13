@@ -459,7 +459,7 @@ namespace Hood.Services
         public string GetVersion()
         {
             var version = typeof(SettingsRepository).Assembly.GetName().Version;
-            return string.Format("v{0}.{1}.{2}", version.Major, version.MajorRevision, version.Build);
+            return string.Format("{0}.{1}.{2}", version.Major, version.MajorRevision, version.Build);
         }
     }
 }

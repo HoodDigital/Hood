@@ -44,7 +44,7 @@
     }
     @if (_settings.GetIntegrationSettings().UseCDN)
     {
-        <script async defer src="https://hood.azureedge.net/cdn/latest/dist/js/app.packaged.js"></script>
+        <script async defer src="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/js/app.packaged.js", _settings.GetVersion())"></script>
     }
     else
     {

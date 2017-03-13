@@ -9163,6 +9163,11 @@ body.install .login-block {
   font-weight: bold;
   color: #2E2E2E;
 }
+.login-block p small a {
+  font-weight: normal;
+  text-decoration: none;
+  color: #939393;
+}
 .login-block .btn-block {
   text-decoration: none;
   font-weight: bold;
