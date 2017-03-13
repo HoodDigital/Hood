@@ -1,9 +1,9 @@
 @model IndexViewModel
-@inject ISiteConfiguration _site
+
 @{
     ViewData["Title"] = "Manage your account";
-    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
-    var integrations = _site.GetIntegrationSettings();
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(Model.User);
+    var integrations = _settings.GetIntegrationSettings();
 }
 @Html.Raw(ViewData["StatusMessage"])
 <div class="row">

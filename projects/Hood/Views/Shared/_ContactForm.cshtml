@@ -1,17 +1,17 @@
 @model ContactFormModel
-@inject ISiteConfiguration _site
+
 @{
-    ContactSettings settings = _site.GetContactSettings();
-    IntegrationSettings integrations = _site.GetIntegrationSettings();
+    ContactSettings _contactSettings = _settings.GetContactSettings();
+    IntegrationSettings _integrationSettings = _settings.GetIntegrationSettings();
 }
-<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="contact-form" id="contact-form" data-redirect="@settings.ThankYouUrl" data-alert-message="@settings.ThankYouMessage">
+<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="contact-form" id="contact-form" data-redirect="@_contactSettings.ThankYouUrl" data-alert-message="@_contactSettings.ThankYouMessage">
     <div class="thank-you">
-        <h2>@settings.ThankYouTitle</h2>
-        <p>@settings.ThankYouMessage</p>
+        <h2>@_contactSettings.ThankYouTitle</h2>
+        <p>@_contactSettings.ThankYouMessage</p>
     </div>
     <div class="form">
-        <h2>@settings.ContactFormTitle</h2>
-        <p>@settings.ContactFormMessage</p>
+        <h2>@_contactSettings.ContactFormTitle</h2>
+        <p>@_contactSettings.ContactFormMessage</p>
         <div asp-validation-summary="All" class="validation-summary"></div>
         <div class="form-group">
             <label asp-for="Name" class="control-label"></label>
@@ -40,12 +40,12 @@
         </div>
         <div class="row">
             <div class="col-xs-12 text-center">
-                @if (integrations.EnableGoogleRecaptcha)
+                @if (_integrationSettings.EnableGoogleRecaptcha)
                 {
                     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
                     <div class="g-recaptcha" id="g-recaptcha"
                          data-target="#contact-form"
-                         data-sitekey="@integrations.GoogleRecaptchaSiteKey"
+                         data-sitekey="@_integrationSettings.GoogleRecaptchaSiteKey"
                          data-callback="googleRecaptchaCallback"
                          data-size="invisible">
                     </div>

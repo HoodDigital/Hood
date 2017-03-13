@@ -1,7 +1,7 @@
 @model ContentListModel
-@inject ISiteConfiguration _site
+
 @{ 
-    var _basics = _site.GetBasicSettings();
+    var _basics = _settings.GetBasicSettings();
 }
 <script id="manage-content-template" type="text/template">
     <div class="forum-item data-item">

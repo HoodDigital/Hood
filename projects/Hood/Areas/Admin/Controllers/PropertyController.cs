@@ -24,8 +24,8 @@ namespace Hood.Areas.Admin.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPropertyRepository _property;
-        private readonly ISiteConfiguration _site;
-        private readonly PropertySettings _settings;
+        private readonly ISettingsRepository _settings;
+        private readonly PropertySettings _propertySettings;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
         private readonly IMediaManager<SiteMedia> _media;
@@ -34,7 +34,7 @@ namespace Hood.Areas.Admin.Controllers
         public PropertyController(
             IPropertyRepository property,
             UserManager<ApplicationUser> userManager,
-            ISiteConfiguration site,
+            ISettingsRepository site,
             IMediaManager<SiteMedia> media,
             IBillingService billing,
             IHostingEnvironment env,
@@ -42,11 +42,11 @@ namespace Hood.Areas.Admin.Controllers
         {
             _userManager = userManager;
             _property = property;
-            _site = site;
+            _settings = site;
             _billing = billing;
             _env = env;
             _media = media;
-            _settings = _site.GetPropertySettings();
+            _propertySettings = _settings.GetPropertySettings();
             _address = address;
         }
 
@@ -59,14 +59,14 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/gallery/{id}/")]
         public IActionResult EditorGallery(int id)
         {
-            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _site);
+            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _settings);
             return View(model);
         }
 
         [Route("admin/property/floorplans/{id}/")]
         public IActionResult EditorFloorplans(int id)
         {
-            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _site);
+            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _settings);
             return View(model);
         }
 
@@ -104,7 +104,7 @@ namespace Hood.Areas.Admin.Controllers
                 post.SetLocation(_address.GeocodeAddress(post));
             post.CopyProperties(property);
             property.AgentId = post.AgentId;
-            var type = _site.GetPropertySettings().GetPlanningFromType(post.Planning);
+            var type = _settings.GetPropertySettings().GetPlanningFromType(post.Planning);
             if (property.HasMeta("PlanningDescription"))
                 property.UpdateMeta("PlanningDescription", type);
             else
@@ -162,7 +162,7 @@ namespace Hood.Areas.Admin.Controllers
             propertyFilters.PlanningType = planning;
 
             PagedList<PropertyListing> properties = await _property.GetPagedProperties(propertyFilters, published);
-            Response response = new Response(properties.Items.Select(p => _site.ToPropertyListingApi(p)).ToArray(), properties.Count);
+            Response response = new Response(properties.Items.Select(p => _settings.ToPropertyListingApi(p)).ToArray(), properties.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -217,7 +217,7 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult result = _property.Add(property);
                 if (property.Metadata == null)
                     property.Metadata = new List<PropertyMeta>();
-                property.UpdateMeta("PlanningDescription", _site.GetPropertySettings().GetPlanningTypes().FirstOrDefault().Value);
+                property.UpdateMeta("PlanningDescription", _settings.GetPropertySettings().GetPlanningTypes().FirstOrDefault().Value);
                 result = _property.UpdateProperty(property);
                 if (!result.Succeeded)
                 {
@@ -403,14 +403,14 @@ namespace Hood.Areas.Admin.Controllers
                         case "InfoDownload":
                             return new MediaApi(property.InfoDownload);
                         default:
-                            return MediaApi.Blank(_site.GetMediaSettings());
+                            return MediaApi.Blank(_settings.GetMediaSettings());
                     }
                 else
                     throw new Exception("No media found.");
             }
             catch (Exception)
             {
-                return MediaApi.Blank(_site.GetMediaSettings());
+                return MediaApi.Blank(_settings.GetMediaSettings());
             }
         }
 

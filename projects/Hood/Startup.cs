@@ -101,22 +101,23 @@ namespace Hood
                 .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
 
-                services.AddSingleton<IHoodCache, HoodCache>();
+                services.AddSingleton<StripeWebHookEventListener>();
                 services.AddSingleton<ContentCategoryCache>();
                 services.AddSingleton<ContentByTypeCache>();
                 services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
+                services.AddSingleton<IHoodCache, HoodCache>();
                 services.AddSingleton<IFTPService, FTPService>();
                 services.AddSingleton<IPropertyImporter, PropertyImporter>();
                 services.AddSingleton<IPropertyExporter, PropertyExporter>();
                 services.AddSingleton<IContentExporter, ContentExporter>();
                 services.AddSingleton<IThemesService, ThemesService>();
                 services.AddSingleton<IAddressService, AddressService>();
-                services.AddScoped<ISiteConfiguration, SiteConfiguration>();
-                services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+                services.AddScoped<ISettingsRepository, SettingsRepository>();
+                services.AddScoped<IAccountRepository, AccountRepository>();
                 services.AddScoped<IPropertyRepository, PropertyRepository>();
                 services.AddScoped<IMediaManager<SiteMedia>, MediaManager<SiteMedia>>();
                 services.AddScoped<IContentRepository, ContentRepository>();
-                services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+                services.AddScoped<IStripeWebHookService, StripeWebHookService>();
                 services.AddTransient<ISmsSender, SmsSender>();
                 services.AddTransient<IPayPalService, PayPalService>();
                 services.AddTransient<IShoppingCart, ShoppingCart>();

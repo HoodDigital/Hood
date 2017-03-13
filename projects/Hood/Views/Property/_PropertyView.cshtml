@@ -1,8 +1,8 @@
 @model ShowPropertyModel
-@inject ISiteConfiguration _site
+
 @{
-    PropertySettings _settings = _site.GetPropertySettings();
-    PropertyListingApi p = _site.ToPropertyListingApi(Model.Property);
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    PropertyListingApi p = _settings.ToPropertyListingApi(Model.Property);
 }
 <div class="jumbotron">
     <div class="container">
@@ -107,7 +107,7 @@
                 <p class="lead">@Html.Raw(p.ShortDescription)</p>
             </div>
             <blockquote>
-                <h5 class="no-margin">@_settings.GetPlanningFromType(p.Planning)</h5>
+                <h5 class="no-margin">@_propertySettings.GetPlanningFromType(p.Planning)</h5>
                 <p class="m-t-sm">
                     @if (p.InfoDownload != null)
                     {
@@ -159,7 +159,7 @@
         <div class="row">
             <h4>Some of our other properties</h4>
             <div class="portfolio-carousel owl-carousel owl-theme">
-                @foreach (PropertyListingApi similar in Model.Similar.Select(similar => _site.ToPropertyListingApi(similar)))
+                @foreach (PropertyListingApi similar in Model.Similar.Select(similar => _settings.ToPropertyListingApi(similar)))
                 {
                     await Html.RenderPartialAsync("_PropertyCard", similar);
                 }

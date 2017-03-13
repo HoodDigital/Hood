@@ -19,14 +19,14 @@ namespace Hood.Controllers
         private readonly IPayPalService _paypal;
         private readonly IShoppingCart _shop;
         private readonly IContentRepository _data;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public CartController(IPayPalService paypal, 
                               IShoppingCart shop,
                               UserManager<ApplicationUser> userManager,
                               IContentRepository data,
-                              IAuthenticationRepository auth)
+                              IAccountRepository auth)
         {
             _paypal = paypal;
             _shop = shop;

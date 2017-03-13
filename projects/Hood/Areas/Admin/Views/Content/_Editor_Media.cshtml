@@ -1,5 +1,4 @@
 @model EditContentModel
-@inject ISiteConfiguration _site
 <h5>Attached Images</h5>
 <hr />
 <div id="gallery-actions" class="row">
@@ -20,5 +19,5 @@
 <div id="content-gallery-upload" class="media-upload text-center" data-id="@Model.Content.Id">
 </div>
 <div class="hood-inline refresh gallery" data-url="@Url.Action("EditorGallery")">
-    @{ await Html.RenderPartialAsync("EditorGallery", _site.ToContentApi(Model.Content)); }
+    @{ await Html.RenderPartialAsync("EditorGallery", _settings.ToContentApi(Model.Content)); }
 </div>

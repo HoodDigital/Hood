@@ -1,22 +1,22 @@
-@inject ISiteConfiguration _site
+
 @{
-    BasicSettings _info = _site.GetBasicSettings();
-    SeoSettings _meta = _site.GetSeo();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
     Layout = "_Layout";
     string description = "Terms & Conditions of use of this website.";
-    string title = "Terms & Conditions - " + _info.CompanyName;
+    string title = "Terms & Conditions - " + _basicSettings.CompanyName;
     ViewData["Title"] = title;
 }
 @section metas {
     <meta name="description" content="@description" />
-    <meta property="og:author" content="@_meta.OgAuthor" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
     <meta property="og:title" content="@title" />
-    <meta property="og:image" content="@_meta.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@_meta.OgSecureImageUrl" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
     <meta property="og:description" content="@description" />
     <meta name="twitter:title" content="@title" />
     <meta name="twitter:description" content="@description" />
-    <meta name="twitter:image" content="@_meta.TwitterCardImageUrl" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 <div class="container">
     <div class="row">
@@ -27,7 +27,7 @@
             <p class="terms-paragraph"><span>1.3</span>If you register with our website or make a purchase on our website, we will ask you to expressly agree to these terms and conditions.</p>
             <p class="terms-paragraph"><span>1.4</span>Our website uses cookies; by using our website or agreeing to these terms and conditions, you consent to our use of cookies in accordance with the terms of our privacy and cookies policy.</p>
             <h4 class="terms-head"><span>2.</span>Copyright notice</h4>
-            <p class="terms-paragraph"><span>2.1</span>Copyright (c)&nbsp;@DateTime.Now.Year&nbsp;<strong>@_info.CompanyName</strong>.</p>
+            <p class="terms-paragraph"><span>2.1</span>Copyright (c)&nbsp;@DateTime.Now.Year&nbsp;<strong>@_basicSettings.CompanyName</strong>.</p>
             <p class="terms-paragraph"><span>2.2</span>Subject to the express provisions of these terms and conditions:</p>
             <p class="terms-sub-paragraph"><span>(a)</span>we, together with our licensors, own and control all the copyright and other intellectual property rights in our website and the material on our website; and</p>
             <p class="terms-sub-paragraph"><span>(b)</span>all the copyright and other intellectual property rights in our website and the material on our website are reserved.</p>
@@ -169,9 +169,9 @@
             <p class="terms-paragraph"><span>21.1</span>These terms and conditions shall be governed by and construed in accordance with English law.</p>
             <p class="terms-paragraph"><span>21.2</span>Any disputes relating to these terms and conditions shall be subject to the exclusive jurisdiction of the courts of England.</p>
             <h4 class="terms-head"><span>23.</span>Our details</h4>
-            <p class="terms-paragraph"><span>23.1</span>This website is owned and operated by <strong>@_info.CompanyName</strong>.</p>
-            <p class="terms-paragraph"><span>23.3</span>Our principal place of business is at <strong>@_info.Address.ToFormat(AddressFormat.SingleLine)</strong></p>
-            <p class="terms-paragraph"><span>23.4</span>You can contact us by writing to the business address given above, by using our website contact form, by email to <strong>@_info.Email</strong> or by telephone on <strong>@_info.Phone</strong>.</p>
+            <p class="terms-paragraph"><span>23.1</span>This website is owned and operated by <strong>@_basicSettings.CompanyName</strong>.</p>
+            <p class="terms-paragraph"><span>23.3</span>Our principal place of business is at <strong>@_basicSettings.Address.ToFormat(AddressFormat.SingleLine)</strong></p>
+            <p class="terms-paragraph"><span>23.4</span>You can contact us by writing to the business address given above, by using our website contact form, by email to <strong>@_basicSettings.Email</strong> or by telephone on <strong>@_basicSettings.Phone</strong>.</p>
 
         </div>
     </div>

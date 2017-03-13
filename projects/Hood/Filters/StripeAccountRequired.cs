@@ -27,23 +27,23 @@ namespace Hood.Filters
         {
             private readonly ILogger _logger;
             private readonly IBillingService _billing;
-            private readonly ISiteConfiguration _site;
+            private readonly ISettingsRepository _settings;
             private readonly UserManager<ApplicationUser> _userManager;
 
             public StripeAccountRequiredAttributeImpl(ILoggerFactory loggerFactory,
                                       IBillingService billing,
                                       UserManager<ApplicationUser> userManager,
-                                      ISiteConfiguration site)
+                                      ISettingsRepository site)
             {
                 _logger = loggerFactory.CreateLogger<StripeAccountRequiredAttribute>();
                 _billing = billing;
-                _site = site;
+                _settings = site;
                 _userManager = userManager;
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var result = _site.BillingEnabled();
+                var result = _settings.BillingEnabled();
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.ErrorString);

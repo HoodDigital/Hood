@@ -1,7 +1,7 @@
-@inject ISiteConfiguration _site
+
 @{ 
-    BasicSettings _info = _site.GetBasicSettings();
-    SeoSettings _seo = _site.GetSeo();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
 }
 <!DOCTYPE html>
 <html lang="en-gb" xml:lang="en">
@@ -33,6 +33,6 @@
     @{ await Html.RenderPartialAsync("_Scripts"); }
     @RenderSection("scripts", required: false)
     @Html.Raw(JavaScriptSnippet.FullScript)
-    @Html.Raw(_seo.GoogleAnalytics)
+    @Html.Raw(_seoSettings.GoogleAnalytics)
 </body>
 </html>

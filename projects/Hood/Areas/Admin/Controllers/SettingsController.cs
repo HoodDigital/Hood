@@ -16,15 +16,15 @@ namespace Hood.Areas.Admin.Controllers
         public readonly IConfiguration _config;
         public readonly IHostingEnvironment _env;
         private readonly IContentRepository _content;
-        private readonly ISiteConfiguration _site;
-        private readonly IAuthenticationRepository _auth;
+        private readonly ISettingsRepository _settings;
+        private readonly IAccountRepository _auth;
         private readonly IAddressService _address;
         private readonly IHoodCache _cache;
 
-        public SettingsController(IAuthenticationRepository auth,
+        public SettingsController(IAccountRepository auth,
                               IConfiguration conf,
                               IHostingEnvironment env,
-                              ISiteConfiguration site,
+                              ISettingsRepository site,
                               IContentRepository content,
                               IAddressService address,
                               IHoodCache cache)
@@ -34,7 +34,7 @@ namespace Hood.Areas.Admin.Controllers
             _env = env;
             _content = content;
             _address = address;
-            _site = site;
+            _settings = site;
             _cache = cache;
         }
 
@@ -42,7 +42,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Basics()
         {
-            BasicSettings model = _site.GetBasicSettings(true);
+            BasicSettings model = _settings.GetBasicSettings(true);
             if (model == null)
                 model = new BasicSettings();
             return View(model);
@@ -59,13 +59,13 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     model.Address.Latitude = location.Latitude;
                     model.Address.Longitude = location.Longitude;
-                    _site.Set("Hood.Settings.Basic", model);
+                    _settings.Set("Hood.Settings.Basic", model);
                     model.SaveMessage = "Settings saved!";
                     model.MessageType = Enums.AlertType.Success;
                 }
                 else
                 {
-                    _site.Set("Hood.Settings.Basic", model);
+                    _settings.Set("Hood.Settings.Basic", model);
                     model.SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
                     model.MessageType = Enums.AlertType.Warning;
                 }
@@ -82,7 +82,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetBasics()
         {
             var model = new BasicSettings();
-            _site.Set("Hood.Settings.Basic", model);
+            _settings.Set("Hood.Settings.Basic", model);
             return RedirectToAction("Basics");
         }
 
@@ -91,7 +91,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Integrations()
         {
-            IntegrationSettings model = _site.GetIntegrationSettings(true);
+            IntegrationSettings model = _settings.GetIntegrationSettings(true);
             if (model == null)
                 model = new IntegrationSettings();
             return View(model);
@@ -103,7 +103,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Integrations", model);
+                _settings.Set("Hood.Settings.Integrations", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -119,7 +119,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetIntegrations()
         {
             var model = new IntegrationSettings();
-            _site.Set("Hood.Settings.Integrations", model);
+            _settings.Set("Hood.Settings.Integrations", model);
             return RedirectToAction("Integrations");
         }
 
@@ -128,7 +128,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Contact()
         {
-            ContactSettings model = _site.GetContactSettings(true);
+            ContactSettings model = _settings.GetContactSettings(true);
             if (model == null)
                 model = new ContactSettings();
             return View(model);
@@ -140,7 +140,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Contact", model);
+                _settings.Set("Hood.Settings.Contact", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -156,7 +156,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetContact()
         {
             var model = new ContactSettings();
-            _site.Set("Hood.Settings.Contact", model);
+            _settings.Set("Hood.Settings.Contact", model);
             return RedirectToAction("Contact");
         }
 
@@ -165,7 +165,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Content()
         {
-            ContentSettings model = _site.GetContentSettings(true);
+            ContentSettings model = _settings.GetContentSettings(true);
             if (model == null)
                 model = new ContentSettings();
             return View(model);
@@ -177,7 +177,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Content", model);
+                _settings.Set("Hood.Settings.Content", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -193,7 +193,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetContent()
         {
             var model = new ContactSettings();
-            _site.Set("Hood.Settings.Content", model);
+            _settings.Set("Hood.Settings.Content", model);
             return RedirectToAction("Content");
         }
 
@@ -202,7 +202,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Property()
         {
-            PropertySettings model = _site.GetPropertySettings(true);
+            PropertySettings model = _settings.GetPropertySettings(true);
             if (model == null)
                 model = new PropertySettings();
             return View(model);
@@ -214,7 +214,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Property", model);
+                _settings.Set("Hood.Settings.Property", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -230,7 +230,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetProperty()
         {
             var model = new PropertySettings();
-            _site.Set("Hood.Settings.Property", model);
+            _settings.Set("Hood.Settings.Property", model);
             return RedirectToAction("Property");
         }
 
@@ -239,7 +239,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Billing()
         {
-            BillingSettings model = _site.GetBillingSettings(true);
+            BillingSettings model = _settings.GetBillingSettings(true);
             if (model == null)
                 model = new BillingSettings();
             return View(model);
@@ -251,7 +251,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Billing", model);
+                _settings.Set("Hood.Settings.Billing", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -267,7 +267,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetBilling()
         {
             var model = new BillingSettings();
-            _site.Set("Hood.Settings.Billing", model);
+            _settings.Set("Hood.Settings.Billing", model);
             return RedirectToAction("Billing");
         }
 
@@ -276,7 +276,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager,SEO")]
         public IActionResult Seo()
         {
-            SeoSettings model = _site.GetSeo(true);
+            SeoSettings model = _settings.GetSeo(true);
             if (model == null)
                 model = new SeoSettings();
             return View(model);
@@ -288,7 +288,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Seo", model);
+                _settings.Set("Hood.Settings.Seo", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -304,7 +304,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetSeo()
         {
             var model = new SeoSettings();
-            _site.Set("Hood.Settings.Seo", model);
+            _settings.Set("Hood.Settings.Seo", model);
             return RedirectToAction("Seo");
         }
 
@@ -313,7 +313,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Editor,Manager")]
         public IActionResult Media()
         {
-            MediaSettings model = _site.GetMediaSettings(true);
+            MediaSettings model = _settings.GetMediaSettings(true);
             if (model == null)
                 model = new MediaSettings();
             return View(model);
@@ -325,7 +325,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Media", model);
+                _settings.Set("Hood.Settings.Media", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -341,7 +341,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetMedia()
         {
             var model = new MediaSettings();
-            _site.Set("Hood.Settings.Media", model);
+            _settings.Set("Hood.Settings.Media", model);
             return RedirectToAction("Media");
         }
 
@@ -350,7 +350,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Editor,Manager")]
         public IActionResult Mail()
         {
-            MailSettings model = _site.GetMailSettings(true);
+            MailSettings model = _settings.GetMailSettings(true);
             if (model == null)
                 model = new MailSettings();
             return View(model);
@@ -362,7 +362,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _site.Set("Hood.Settings.Mail", model);
+                _settings.Set("Hood.Settings.Mail", model);
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -378,7 +378,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult ResetMail()
         {
             var model = new MailSettings();
-            _site.Set("Hood.Settings.Mail", model);
+            _settings.Set("Hood.Settings.Mail", model);
             return RedirectToAction("Mail");
         }
 

@@ -15,8 +15,8 @@ namespace Hood.Api
     [Authorize(Roles = "Admin,Editor")]
     public class OptionsController : Controller
     {
-        private readonly ISiteConfiguration _options;
-        public OptionsController(ISiteConfiguration options)
+        private readonly ISettingsRepository _options;
+        public OptionsController(ISettingsRepository options)
         {
             _options = options;
         }

@@ -25,10 +25,9 @@ namespace Hood.Controllers
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly IContentRepository _data;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IBillingService _billing;
-        private readonly ISubscriptionRepository _subs;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
         private readonly IHoodCache _cache;
 
         public BillingController(
@@ -39,10 +38,9 @@ namespace Hood.Controllers
             ISmsSender smsSender,
             ILoggerFactory loggerFactory,
             IBillingService billing,
-            ISubscriptionRepository subs,
-            IAuthenticationRepository auth,
+            IAccountRepository auth,
             IHoodCache cache,
-            ISiteConfiguration site)
+            ISettingsRepository site)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -50,10 +48,9 @@ namespace Hood.Controllers
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _data = data;
-            _site = site;
+            _settings = site;
             _auth = auth;
             _billing = billing;
-            _subs = subs;
             _cache = cache;
         }
 
@@ -66,7 +63,7 @@ namespace Hood.Controllers
             model.User = account.User;
             try
             {
-                model.Customer = await _subs.GetCustomerObject(model.User?.StripeId, true);
+                model.Customer = await _auth.LoadCustomerObject(model.User?.StripeId, true);
                 if (model.Customer != null)
                 {
                     model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);

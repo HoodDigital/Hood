@@ -6,21 +6,28 @@ using System.Threading.Tasks;
 using Hood.Infrastructure;
 using System;
 using System.Net;
+using Microsoft.AspNetCore.Identity;
+using Hood.Models;
 
 namespace Hood.Services
 {
     public class EmailSender : IEmailSender
     {
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private Models.MailSettings _mail;
         private Models.BasicSettings _info;
         private readonly IRazorViewRenderer _renderer;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public EmailSender(IHttpContextAccessor contextAccessor, ISiteConfiguration site, IRazorViewRenderer renderer)
+        public EmailSender(IHttpContextAccessor contextAccessor,
+            UserManager<ApplicationUser> userManager,
+            ISettingsRepository site,
+            IRazorViewRenderer renderer)
         {
             _contextAccessor = contextAccessor;
-            _site = site;
+            _userManager = userManager;
+            _settings = site;
             _renderer = renderer;
         }
 
@@ -28,10 +35,10 @@ namespace Hood.Services
         {
             try
             {
-                _info = _site.GetBasicSettings();
-                _mail = _site.GetMailSettings(true);
+                _info = _settings.GetBasicSettings();
+                _mail = _settings.GetMailSettings(true);
 
-                string siteTitle = _site.GetSiteTitle();
+                string siteTitle = _settings.GetSiteTitle();
                 string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
                 string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
 
@@ -56,6 +63,18 @@ namespace Hood.Services
             {
                 return new OperationResult(ex);
             }
+        }
+
+        public async Task<OperationResult> NotifyRole(MailObject message, string roleName, string template = "Areas/Admin/Views/Mail/Plain.cshtml")
+        {
+            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            foreach (var user in users)
+            {
+                var messageToSend = message;
+                messageToSend.To = new EmailAddress(user.Email);
+                await SendEmail(messageToSend, template);
+            }
+            return new OperationResult(true);
         }
     }
 }

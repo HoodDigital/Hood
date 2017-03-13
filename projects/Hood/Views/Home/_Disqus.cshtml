@@ -1,6 +1,6 @@
-@inject ISiteConfiguration _site
+
 @{
-    IntegrationSettings _integrations = _site.GetIntegrationSettings();
+    IntegrationSettings _integrations = _settings.GetIntegrationSettings();
 }
 @if (_integrations.EnableDisqus && _integrations.DisqusId.IsSet())
 {

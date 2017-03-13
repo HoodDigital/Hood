@@ -63,11 +63,11 @@ $.fn.restrictToSlug = function (restrictPattern) {
     // and everything else will be 'cleaned'
     // For example 'ABCdEfGhI5' become 'ABCEGI5'
     var pattern = restrictPattern ||
-        /[^0-9a-z-]*/g; // default pattern
+        /[^0-9a-zA-Z-//]*/g; // default pattern
 
     var restrictHandler = function () {
         var val = $(this).val();
-        var newVal = val.replace(pattern, '').toLowerCase();
+        var newVal = val.replace(pattern, '');
 
         // This condition is to prevent selection and keyboard navigation issues
         if (val !== newVal) {
@@ -85,13 +85,12 @@ $.fn.restrictToPageSlug = function (restrictPattern) {
 
     // The characters inside this pattern are accepted
     // and everything else will be 'cleaned'
-    // For example 'ABCdEfGhI5' become 'ABCEGI5'
     var pattern = restrictPattern ||
-        /[^0-9a-z-//]*/g; // default pattern
+        /[^0-9a-zA-Z-//]*/g; // default pattern
 
     var restrictHandler = function () {
         var val = $(this).val();
-        var newVal = val.replace(pattern, '').toLowerCase();
+        var newVal = val.replace(pattern, '');
         if ((newVal.match(new RegExp("/", "g")) || []).length > 4) {
             var pos = newVal.lastIndexOf('/');
             newVal = newVal.substring(0, pos) + newVal.substring(pos + 1);

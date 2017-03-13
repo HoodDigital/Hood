@@ -1,11 +1,11 @@
 @inject IConfiguration _config
-@inject ISiteConfiguration _site
+
 @inject IContentRepository _content
 @{
     AccountInfo account = Context.GetAccountInfo();
-    ApplicationUserApi uapi = _site.ToApplicationUserApi(account.User);
-    BasicSettings _info = _site.GetBasicSettings();
-    Hood.Infrastructure.OperationResult subscriptions = _site.SubscriptionsEnabled();
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(account.User);
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
     Layout = null;
 }
 <div class="dropdown profile-element">

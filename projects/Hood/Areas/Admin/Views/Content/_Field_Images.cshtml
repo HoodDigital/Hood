@@ -1,7 +1,7 @@
 @model EditContentModel
-@inject ISiteConfiguration _site
+
 @{
-    var mapi = _site.ToContentApi(Model.Content);
+    var mapi = _settings.ToContentApi(Model.Content);
 }
 <div class="form-horizontal">
     @if (Model.Type.ShowImage)

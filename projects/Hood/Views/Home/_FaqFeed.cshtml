@@ -1,5 +1,5 @@
 @model ContentListModel
-@inject ISiteConfiguration _site
+
 @if (Model.Posts.Count == 0)
 {
     await Html.RenderPartialAsync("_NoResults");
@@ -8,7 +8,7 @@ else
 {
     <div class="panel-group" id="faq-accordion" role="tablist" aria-multiselectable="true">
 
-        @foreach (ContentApi content in Model.Posts.Items.Select(c => _site.ToContentApi(c)))
+        @foreach (ContentApi content in Model.Posts.Items.Select(c => _settings.ToContentApi(c)))
         {
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="@string.Format("faq-heading-{0}", content.Id)">

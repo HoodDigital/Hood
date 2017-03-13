@@ -1,9 +1,9 @@
-@inject ISiteConfiguration _site
+
 @model EditPropertyModel
 @{
     ViewBag.Title = "Edit " + Model.Property.Title;
-    PropertySettings _settings = _site.GetPropertySettings();
-    PropertyListingApi mapi = _site.ToPropertyListingApi(Model.Property);
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    PropertyListingApi mapi = _settings.ToPropertyListingApi(Model.Property);
 }
 <div class="widget-head-color-box black-bg p-lg image-heading">
     <div class="m-b-md text-center">

@@ -1,9 +1,9 @@
 @using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-@inject ISiteConfiguration _site
+
 @model EditContentModel
 @{
     ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Content.Title;
-    var mapi = _site.ToContentApi(Model.Content);
+    var mapi = _settings.ToContentApi(Model.Content);
 }
 @section buttons {
     <div class="btn-group">
@@ -122,6 +122,7 @@
                                             <button type="button" id="add-content-category" class="btn btn-primary" data-url="@Url.Action("AddCategoryToContent")"> Add!</button>
                                         </span>
                                     </div>
+                                    <p><small>Note: Type the first three letters of a category to get suggestions.</small></p>
                                 </div>
                             </div>
                         }
@@ -155,7 +156,7 @@
                                 <div class="form-group">
                                     <label for="Slug" class="control-label">Slug</label>
                                     <div>
-                                        <input id="Slug" name="Slug" class="form-control restrict-to-slug" value="@Model.Content.Slug" />
+                                        <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
                                     </div>
                                 </div>
                             }

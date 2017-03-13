@@ -12,20 +12,20 @@ namespace Hood.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPropertyRepository _property;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
 
         public PropertyController(
             IPropertyRepository property,
             UserManager<ApplicationUser> userManager,
-            ISiteConfiguration site,
+            ISettingsRepository site,
             IBillingService billing,
             IHostingEnvironment env)
         {
             _userManager = userManager;
             _property = property;
-            _site = site;
+            _settings = site;
             _billing = billing;
             _env = env;
         }
@@ -38,7 +38,7 @@ namespace Hood.Controllers
                 model.Filters = new PropertyFilters();
 
             PagedList<PropertyListing> properties = await _property.GetPagedProperties(model.Filters, true);
-            PropertySettings settings = _site.GetPropertySettings();
+            PropertySettings settings = _settings.GetPropertySettings();
             model.Properties = properties;
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();

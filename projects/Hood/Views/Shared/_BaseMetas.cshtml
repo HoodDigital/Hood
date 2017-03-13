@@ -1,11 +1,11 @@
-@inject ISiteConfiguration _site
+
 @{
-    SeoSettings meta = _site.GetSeo();
-    BasicSettings info = _site.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     string url = Context.GetSiteUrl(true, true);
-    if (meta.CanonicalUrl.IsSet())
+    if (_seoSettings.CanonicalUrl.IsSet())
     {
-        url = string.Format("{0}{1}", meta.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
 }
 <meta charset="utf-8" />
@@ -13,37 +13,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 
-@if (meta.FacebookAppId.IsSet())
+@if (_seoSettings.FacebookAppId.IsSet())
 {
-    <meta name="fb:app_id" content="@meta.FacebookAppId" />
+    <meta name="fb:app_id" content="@_seoSettings.FacebookAppId" />
 }
-@if (meta.Keywords.IsSet())
+@if (_seoSettings.Keywords.IsSet())
 {
-    <meta name="keywords" content="@meta.Keywords" />
+    <meta name="keywords" content="@_seoSettings.Keywords" />
 }
 <meta property="og:url" content="@url" />
 <meta property="og:type" content="website" />
-@if (meta.OgLocale.IsSet())
+@if (_seoSettings.OgLocale.IsSet())
 {
-    <meta property="og:locale" content="@meta.OgLocale" />
+    <meta property="og:locale" content="@_seoSettings.OgLocale" />
 }
 
 <meta name="twitter:card" content="summary_large_image">
-@if (meta.TwitterCardSite.IsSet())
+@if (_seoSettings.TwitterCardSite.IsSet())
 {
-    <meta name="twitter:site" content="@meta.TwitterCardSite">
+    <meta name="twitter:site" content="@_seoSettings.TwitterCardSite">
 }
-@if (meta.TwitterCardCreator.IsSet())
+@if (_seoSettings.TwitterCardCreator.IsSet())
 {
-    <meta name="twitter:creator" content="@meta.TwitterCardCreator" />
+    <meta name="twitter:creator" content="@_seoSettings.TwitterCardCreator" />
 }
-@if (meta.SiteIconUrl.IsSet())
+@if (_seoSettings.SiteIconUrl.IsSet())
 {
-    <link type="image/png" href="@meta.SiteIconUrl" rel="icon" />
+    <link type="image/png" href="@_seoSettings.SiteIconUrl" rel="icon" />
 }
-@if (meta.Publisher.IsSet())
+@if (_seoSettings.Publisher.IsSet())
 {
-    <link href="@meta.Publisher" rel="publisher" />
+    <link href="@_seoSettings.Publisher" rel="publisher" />
 }
 <link href="@url" rel="canonical" />
 
@@ -51,18 +51,18 @@
     {
         "@@context": "http://schema.org",
         "@@type": "Organization",
-        "url": "@meta.CanonicalUrl",
+        "url": "@_seoSettings.CanonicalUrl",
         "sameAs" : [
-            "@meta.Twitter",
-            "@meta.Facebook",
-            "@meta.GooglePlus",
-            "@meta.LinkedIn"
+            "@_seoSettings.Twitter",
+            "@_seoSettings.Facebook",
+            "@_seoSettings.GooglePlus",
+            "@_seoSettings.LinkedIn"
         ],
-        "name" : "@info.CompanyName",
-        "logo": "@meta.SiteIconUrl",
+        "name" : "@_basicSettings.CompanyName",
+        "logo": "@_seoSettings.SiteIconUrl",
         "contactPoint" : [{
             "@@type" : "ContactPoint",
-            "telephone" : "@info.Phone",
+            "telephone" : "@_basicSettings.Phone",
             "contactType" : "customer service"
         }]
     }

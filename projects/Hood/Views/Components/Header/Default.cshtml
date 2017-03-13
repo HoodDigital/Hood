@@ -1,10 +1,10 @@
-@inject ISiteConfiguration _site
+
 @inject IContentRepository _content
 @model HeaderModel
 @{
-    BasicSettings _info = _site.GetBasicSettings();
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
     AccountInfo _account = Context.GetAccountInfo();
-    ApplicationUserApi uapi = _site.ToApplicationUserApi(Model.User);
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(Model.User);
 }
 <header class="header" id="header">
     <div class="wrap" id="header-wrap">
@@ -12,7 +12,7 @@
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="/">
-                        @_info.SiteTitle
+                        @_basicSettings.SiteTitle
                     </a>
                 </div>
 
@@ -24,11 +24,11 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 @{
-                                    var settings = _site.GetPropertySettings();
-                                    var sideTypes = _site.GetContentSettings().GetAllowedTypes();
-                                    if (settings.Enabled)
+                                    var _propertySettings = _settings.GetPropertySettings();
+                                    var sideTypes = _settings.GetContentSettings().GetAllowedTypes();
+                                    if (_propertySettings.Enabled)
                                     {
-                                        sideTypes.Add(new ContentType() { Type = "property", Title = settings.Title, TypeNamePlural = settings.Plural, Slug = settings.Slug, IsPublic = true });
+                                        sideTypes.Add(new ContentType() { Type = "property", Title = _propertySettings.Title, TypeNamePlural = _propertySettings.Plural, Slug = _propertySettings.Slug, IsPublic = true });
                                     }
                                     sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
                                 }
@@ -61,10 +61,10 @@
                                         </div>
                                     </li>
                                     <li class="divider"></li>
-                                    @if (_site.BillingEnabled().Succeeded)
+                                    @if (_settings.BillingEnabled().Succeeded)
                                     {
                                         <li><a asp-action="Index" asp-controller="Billing"><i class="fa fa-money"></i>Billing</a></li>
-                                        @if (_site.SubscriptionsEnabled().Succeeded)
+                                        @if (_settings.SubscriptionsEnabled().Succeeded)
                                         {
                                             <li><a asp-action="Index" asp-controller="Subscriptions"><i class="fa fa-user-plus"></i>Members Area</a></li>
                                             @if (_account.HasTieredSubscription)

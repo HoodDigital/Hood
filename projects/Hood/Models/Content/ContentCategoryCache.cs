@@ -10,14 +10,14 @@ namespace Hood.Models
     public class ContentCategoryCache
     {
         private readonly IConfiguration _config;
-        private readonly ISiteConfiguration _settings;
+        private readonly ISettingsRepository _settings;
 
         private Lazy<Dictionary<int, ContentCategory>> byKey;
         private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>  bySlug;
         private Lazy<ContentCategory[]> topLevel;
 
         public ContentCategoryCache(IConfiguration config, 
-                                    ISiteConfiguration settings)
+                                    ISettingsRepository settings)
         {
             _config = config;
             _settings = settings;

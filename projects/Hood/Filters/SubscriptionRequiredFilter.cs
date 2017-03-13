@@ -1,6 +1,8 @@
 ﻿using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -24,59 +26,73 @@ namespace Hood.Filters
         /// <param name="Ids">The Ids of the subscription which you are checking for.</param>
         /// <param name="AddonsRequired">The Ids of the addon subscription which you are checking for. These will be checked for first and then the user is redirected to the purchase addon page if not present.</param>        /// 
         /// <param name="MinimumSubscription">The miminum tiered subscription level that is required. If set with SubscriptionIds, will require both (a matched Id and a minimum level of this parameter). This will also override the Tiered parameter, as a tiered subscription will be required to need a subscription above a minimum tier.</param>
-        public SubscriptionRequiredAttribute(bool Tiered = false, string SubscriptionIds = "", string MinimumSubscription = "", string AddonsRequired = "") : base(typeof(SubscriptionRequiredAttributeImpl))
+        public SubscriptionRequiredAttribute(string SubscriptionIds = "", string AddonsRequired = "", string Roles = "") : base(typeof(SubscriptionRequiredAttributeImpl))
         {
             if (SubscriptionIds == null)
                 SubscriptionIds = "";
             var Ids = SubscriptionIds.Split(',').ToList();
             Ids.RemoveAll(str => string.IsNullOrEmpty(str));
 
+            if (Roles == null)
+                Roles = "";
+            var RoleOverrides = Roles.Split(',').ToList();
+            RoleOverrides.RemoveAll(str => string.IsNullOrEmpty(str));
+
             if (AddonsRequired == null)
                 AddonsRequired = "";
             var Addons = AddonsRequired.Split(',').ToList();
             Addons.RemoveAll(str => string.IsNullOrEmpty(str));
 
-            Arguments = new object[] { Ids.ToArray(), Addons.ToArray(), Tiered, MinimumSubscription };
+            Arguments = new object[] { Ids.ToArray(), Addons.ToArray(), RoleOverrides.ToArray(), };
         }
 
         private class SubscriptionRequiredAttributeImpl : IActionFilter
         {
             private readonly ILogger _logger;
-            private readonly ISubscriptionRepository _subs;
             private readonly IBillingService _billing;
-            private readonly ISiteConfiguration _site;
+            private readonly ISettingsRepository _settings;
             private readonly List<string> _ids;
             private readonly List<string> _addons;
-            private readonly bool _tiered;
-            private readonly string _minimum;
+            private readonly List<string> _roles;
+            private readonly UserManager<ApplicationUser> _userManager;
+            private readonly IAccountRepository _auth;
+            private readonly RoleManager<IdentityRole> _roleManager;
 
-            public SubscriptionRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing, ISiteConfiguration site, ISubscriptionRepository subs, string[] Ids, string[] Addons, bool Tiered, string MinimumSubscription)
+            public SubscriptionRequiredAttributeImpl(
+                IAccountRepository auth,
+                ILoggerFactory loggerFactory,
+                IBillingService billing,
+                ISettingsRepository site,
+                RoleManager<IdentityRole> roleManager,
+                UserManager<ApplicationUser> userManager,
+                string[] Ids,
+                string[] Addons,
+                string[] RoleOverrides)
             {
+                _auth = auth;
                 _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
                 _billing = billing;
-                _subs = subs;
-                _site = site;
+                _settings = site;
                 _ids = Ids.ToList();
+                _userManager = userManager;
+                _roleManager = roleManager;
                 _addons = Addons.ToList();
-                _tiered = Tiered;
-                _minimum = MinimumSubscription;
-                if (_minimum.IsSet())
-                    _tiered = true;
+                _roles = RoleOverrides.ToList();
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var subscriptionsEnabled = _site.SubscriptionsEnabled();
+                var subscriptionsEnabled = _settings.SubscriptionsEnabled();
                 if (!subscriptionsEnabled.Succeeded)
                 {
                     throw new Exception(subscriptionsEnabled.ErrorString);
                 }
 
                 // Load the account information from the global context (set in the global AccountFilter)
-                AccountInfo info = context.HttpContext.GetAccountInfo();
+                AccountInfo _account = context.HttpContext.GetAccountInfo();
 
                 // Set the redirect location
-                BillingSettings billingSettings = _site.GetBillingSettings();
+                BillingSettings billingSettings = _settings.GetBillingSettings();
                 IActionResult result = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
                 if (billingSettings.SubscriptionCreatePage.IsSet())
                 {
@@ -104,10 +120,10 @@ namespace Hood.Filters
                 // If an addon is required, this takes preference, and should be purchased to continue, as it may be a standalone addon required.
                 if (_addons.Count > 0)
                 {
-                    bool go = _ids.Count == 0 && !_tiered && !_minimum.IsSet();
+                    bool go = _ids.Count == 0;
                     foreach (string addon in _addons)
                     {
-                        if (!info.IsSubscribed(addon))
+                        if (!_account.IsSubscribed(addon))
                         {
                             IActionResult addonResult = new RedirectToActionResult("Addon", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent(), required = addon });
                             if (billingSettings.SubscriptionAddonPage.IsSet())
@@ -128,42 +144,27 @@ namespace Hood.Filters
                         return;
                 }
 
-                // If we reached this point then we are on the hunt for a tiered subscription of some kind.
+                // If they are in an override role, let them through.
+                if (_userManager.GetRolesAsync(_account.User).Result.Any(r => _roles.Contains(r)))
+                    return;
 
+                // If we reached this point then we are on the hunt for a tiered subscription of some kind.
                 // Check for general tiered subscriptions - one is always required to proceed further.
-                if (!info.HasTieredSubscription)
+                if (!_account.HasTieredSubscription)
                 {
                     context.Result = result;
                     return;
                 }
 
                 // If an Id is set, then check that one of the user's subscriptions has that Id.
-                if (_ids.Count > 0 && !_ids.Any(i => info.IsSubscribed(i)))
+                if (_ids.Count > 0 && !_ids.Any(i => _account.IsSubscribed(i)))
                 {
                     context.Result = changeResult;
                     return;
                 }
 
-                // If tiered is set, check if any of the user's subscriptions are tiered.
-                if (_tiered && !info.ActiveSubscriptions.Any(ss => ss.Tiered))
-                {
-                    context.Result = changeResult;
-                    return;
-                }
-
-                // If an Minimum is set, check the user has a subcription of a higher level
-                if (_tiered && _minimum.IsSet())
-                {
-                    Subscription sub = _subs.GetSubscriptionByStripeId(_minimum).Result;
-                    if (sub == null)
-                        throw new Exception("A subscription with Id \"" + _minimum + "\" could not be found.");
-                    if (!info.ActiveSubscriptions.Any(ss => ss.Level >= sub.Level))
-                    {
-                        context.Result = changeResult;
-                        return;
-                    }
-                }
-
+                context.Result = result;
+                return;
             }
 
             public void OnActionExecuted(ActionExecutedContext context)

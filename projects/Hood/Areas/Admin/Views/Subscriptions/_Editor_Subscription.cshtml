@@ -1,8 +1,8 @@
 @model Subscription
 @inject IContentRepository _data
-@inject ISiteConfiguration _site
+
 @{
-    PropertySettings settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 <input asp-for="Id" type="hidden" />
 <input asp-for="StripeId" type="hidden" />
@@ -41,7 +41,7 @@
                         <div class="col-sm-8">
                             <div class="row image-cell">
                                 <div class="col-xs-1">
-                                    <img src="@(Model.FeaturedImageUrl.IsSet() ? Model.FeaturedImageUrl : _site.GetMediaSettings().NoImage.IsSet() ? _site.GetMediaSettings().NoImage : "/lib/hood/images/no-image.jpg")" class="img-xxs img-circle subscription-@Model.Id" />
+                                    <img src="@(Model.FeaturedImageUrl.IsSet() ? Model.FeaturedImageUrl : _settings.GetMediaSettings().NoImage.IsSet() ? _settings.GetMediaSettings().NoImage : "/lib/hood/images/no-image.jpg")" class="img-xxs img-circle subscription-@Model.Id" />
                                 </div>
                                 <div class="col-xs-11">
                                     <div class="input-group">

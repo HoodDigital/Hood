@@ -16,14 +16,14 @@ namespace Hood.Services
     {
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
-        private readonly ISiteConfiguration _site;
+        private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
 
-        public PropertyRepository(HoodDbContext db, IHoodCache cache, IConfiguration config, ISiteConfiguration site)
+        public PropertyRepository(HoodDbContext db, IHoodCache cache, IConfiguration config, ISettingsRepository site)
         {
             _db = db;
             _config = config;
-            _site = site;
+            _settings = site;
             _cache = cache;
         }
 

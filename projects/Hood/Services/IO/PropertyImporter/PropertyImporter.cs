@@ -20,15 +20,15 @@ namespace Hood.Services
         private IFTPService _ftp;
         private IConfiguration _config;
         private IMediaManager<SiteMedia> _media;
-        private PropertySettings _settings;
-        private ISiteConfiguration _site;
+        private PropertySettings _propertySettings;
+        private ISettingsRepository _settings;
 
         public PropertyImporter(
             IFTPService ftp, 
             IHostingEnvironment env, 
             IConfiguration config, 
             IMediaManager<SiteMedia> media,
-            ISiteConfiguration site,
+            ISettingsRepository site,
             IAddressService address)
         {
             _ftp = ftp;
@@ -50,8 +50,8 @@ namespace Hood.Services
             RemoteList = new List<string>();
             StatusMessage = "Not running...";
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(PropertyImporter) + "\\";
-            _site = site;
-            _settings = site.GetPropertySettings();
+            _settings = site;
+            _propertySettings = site.GetPropertySettings();
             _media = media;
             _address = address;
         }
@@ -103,7 +103,7 @@ namespace Hood.Services
                 RemoteList = new List<string>();
                 Account = context.GetAccountInfo();
                 StatusMessage = "Starting import, loading property files from FTP Service...";
-                _settings = _site.GetPropertySettings();
+                _propertySettings = _settings.GetPropertySettings();
                 // Get a new instance of the HoodDbContext for this import.
                 var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
                 options.UseSqlServer(_config["Data:ConnectionString"]);
@@ -140,7 +140,7 @@ namespace Hood.Services
                 CleanTempFolder();
 
                 // open a socket to the FTP site, and pull the property file out
-                GetFileFromFtp(_settings.FTPImporterSettings.Filename);
+                GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
 
                 if (HasFileError())
                     throw new Exception("There was a problem downloading the properties file. Please try again.");
@@ -500,9 +500,9 @@ namespace Hood.Services
             FileError = false;
             Lock.ReleaseWriterLock();
 
-            _ftp.GetFileFromFTP(_settings.FTPImporterSettings.Server,
-                                _settings.FTPImporterSettings.Username,
-                                _settings.FTPImporterSettings.Password,
+            _ftp.GetFileFromFTP(_propertySettings.FTPImporterSettings.Server,
+                                _propertySettings.FTPImporterSettings.Username,
+                                _propertySettings.FTPImporterSettings.Password,
                                 filename,
                                 TempFolder);
 
@@ -534,7 +534,7 @@ namespace Hood.Services
             CheckForCancel();
 
             // Load the body template from the templates directory
-            string fileName = TempFolder + _settings.FTPImporterSettings.Filename;
+            string fileName = TempFolder + _propertySettings.FTPImporterSettings.Filename;
 
             //// Get a StreamReader class that can be used to read the file
             StreamReader objStreamReader = new StreamReader(fileName);

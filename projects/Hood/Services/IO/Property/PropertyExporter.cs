@@ -21,8 +21,8 @@ namespace Hood.Services
         private IFTPService _ftp;
         private IConfiguration _config;
         private IMediaManager<SiteMedia> _media;
-        private PropertySettings _settings;
-        private ISiteConfiguration _site;
+        private PropertySettings _propertySettings;
+        private ISettingsRepository _settings;
         private IEmailSender _email;
         private HoodDbContext _db { get; set; }
 
@@ -34,7 +34,7 @@ namespace Hood.Services
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
 
-        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<SiteMedia> media, ISiteConfiguration site, IEmailSender email)
+        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<SiteMedia> media, ISettingsRepository site, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;
@@ -50,9 +50,9 @@ namespace Hood.Services
             Status.Succeeded = false;
             Status.HasFile = false;
             Status.Message = "Not running...";
-            _site = site;
+            _settings = site;
             _email = email;
-            _settings = site.GetPropertySettings();
+            _propertySettings = site.GetPropertySettings();
             _media = media;
             _tempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(PropertyExporter) + "\\";
             _contentFolder = _tempFolder + "Content\\";
@@ -212,7 +212,7 @@ namespace Hood.Services
 
                 // Send email to site email with the export link in it.
                 MarkCompleteTask("Sending file link via email...");
-                BasicSettings settings = _site.GetBasicSettings();
+                BasicSettings settings = _settings.GetBasicSettings();
                 if (settings.Email.IsSet())
                 {
                     MailObject mail = new MailObject();
@@ -329,7 +329,7 @@ namespace Hood.Services
             Status.HasFile = false;
             Account = context.GetAccountInfo();
             Status.Message = "Starting import, loading property files from FTP Service...";
-            _settings = _site.GetPropertySettings();
+            _propertySettings = _settings.GetPropertySettings();
 
             // Get a new instance of the HoodDbContext for this import.
             var options = new DbContextOptionsBuilder<HoodDbContext>();

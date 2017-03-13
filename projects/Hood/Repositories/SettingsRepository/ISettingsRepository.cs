@@ -6,7 +6,7 @@ using Hood.Models.Api;
 
 namespace Hood.Services
 {
-    public interface ISiteConfiguration : IConfiguration
+    public interface ISettingsRepository : IConfiguration
     {
         List<Option> AllSettings();
         bool Delete(string key);
@@ -28,7 +28,7 @@ namespace Hood.Services
         OperationResult BillingEnabled();
         OperationResult CartEnabled();
         OperationResult PropertyEnabled();
-        OperationResult TypeEnabled(string type);
+        string GetVersion();
 
         ContentApi ToContentApi(Content content);
         PropertyListingApi ToPropertyListingApi(PropertyListing property);

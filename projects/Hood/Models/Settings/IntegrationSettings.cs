@@ -14,9 +14,8 @@ namespace Hood.Models
         [Display(Name = "Loading Animation")]
         public string LoadingAnimationType { get; set; }
 
-        // Show Theme Demo Page
-        [Display(Name = "Enable the Boostrap Demo Page")]
-        public bool ShowDemoPage { get; set; }
+        [Display(Name = "Use Hood CDN")]
+        public bool UseCDN { get; set; }
 
         // Disqus
         [Display(Name = "Enable Disqus")]
@@ -60,6 +59,7 @@ namespace Hood.Models
 
         public IntegrationSettings()
         {
+            UseCDN = true;
         }
     }
 

@@ -1,8 +1,8 @@
 @model PropertyListingApi
 @inject IContentRepository _data
-@inject ISiteConfiguration _site
+
 @{
-    PropertySettings _settings = _site.GetPropertySettings();
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 <div id="media" class="tab-pane">
     <div class="panel-body">

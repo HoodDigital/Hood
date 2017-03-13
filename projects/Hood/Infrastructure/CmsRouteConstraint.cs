@@ -31,11 +31,11 @@ namespace Hood.Infrastructure
                     fullUrl = fullUrl.TrimEnd('/');
                 IContentRepository _content = (IContentRepository)httpContext.RequestServices.GetService(typeof(IContentRepository));
                 IMemoryCache _cache = (IMemoryCache)httpContext.RequestServices.GetService(typeof(IMemoryCache));
-                ISiteConfiguration _site = (ISiteConfiguration)httpContext.RequestServices.GetService(typeof(ISiteConfiguration));
+                ISettingsRepository _settings = (ISettingsRepository)httpContext.RequestServices.GetService(typeof(ISettingsRepository));
                 try
                 {
                     string[] tokenised = fullUrl.ToLower().Split('/');
-                    var type = _site.GetContentSettings().GetContentType(tokenised[0]);
+                    var type = _settings.GetContentSettings().GetContentType(tokenised[0]);
                     if (type != null)
                     {
                         if (tokenised.Length > 1)
@@ -85,7 +85,7 @@ namespace Hood.Infrastructure
                     }
                     else
                     {
-                        var settings = _site.GetPropertySettings();
+                        var settings = _settings.GetPropertySettings();
                         if (tokenised[0].ToLower() == settings.Slug)
                         {
                             values["action"] = "Index";

@@ -1,9 +1,4 @@
 @model PropertyListingApi
-@inject IContentRepository _data
-@inject ISiteConfiguration _site
-@{
-    PropertySettings _settings = _site.GetPropertySettings();
-}
 <input asp-for="Id" type="hidden" />
 <input asp-for="ContactName" type="hidden" />
 <input asp-for="QuickName" type="hidden" />

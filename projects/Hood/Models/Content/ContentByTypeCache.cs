@@ -10,13 +10,13 @@ namespace Hood.Models
     public class ContentByTypeCache
     {
         private readonly IConfiguration _config;
-        private readonly ISiteConfiguration _settings;
+        private readonly ISettingsRepository _settings;
 
         private Dictionary<string, Lazy<Dictionary<int, Content>>> bySlug;
         private readonly ContentCategoryCache _categories;
 
         public ContentByTypeCache(IConfiguration config, 
-                                  ISiteConfiguration settings, 
+                                  ISettingsRepository settings, 
                                   ContentCategoryCache categories)
         {
             _config = config;

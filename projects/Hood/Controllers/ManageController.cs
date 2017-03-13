@@ -20,7 +20,7 @@ namespace Hood.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
-        private readonly IAuthenticationRepository _auth;
+        private readonly IAccountRepository _auth;
         private readonly IMediaManager<SiteMedia> _media;
 
         public ManageController(
@@ -28,7 +28,7 @@ namespace Hood.Controllers
         SignInManager<ApplicationUser> signInManager,
         IEmailSender emailSender,
         ISmsSender smsSender,
-        IAuthenticationRepository auth,
+        IAccountRepository auth,
         ILoggerFactory loggerFactory,
         IMediaManager<SiteMedia> media)
         {

@@ -1,5 +1,5 @@
 @model ContentListModel
-@inject ISiteConfiguration _site
+
 @{
     string title =  Model.Type.MetaTitle.IsSet() ? Model.Type.MetaTitle : Model.Type.Title;
     ViewData["Title"] = title;
@@ -42,24 +42,24 @@
             break;
     }
 
-    SeoSettings meta = _site.GetSeo();
-    BasicSettings info = _site.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     string url = Context.GetSiteUrl(true, true);
-    if (meta.CanonicalUrl.IsSet())
+    if (_seoSettings.CanonicalUrl.IsSet())
     {
-        url = string.Format("{0}{1}", meta.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
 
 }
 @section metas {
     <meta name="description" content="@Model.Type.Description" />
-    <meta property="og:author" content="@meta.OgAuthor" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
     <meta property="og:title" content="@title" />
-    <meta property="og:image" content="@meta.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@meta.OgSecureImageUrl" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
     <meta property="og:description" content="@Model.Type.Description" />
     <meta name="twitter:title" content="@title" />
     <meta name="twitter:description" content="@Model.Type.Description" />
-    <meta name="twitter:image" content="@meta.TwitterCardImageUrl" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 @{ await Html.RenderPartialAsync(Feed); }

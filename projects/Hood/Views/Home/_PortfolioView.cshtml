@@ -1,8 +1,8 @@
 @model ContentModel
-@inject ISiteConfiguration _site
+
 @{
-    var mapi = _site.ToContentApi(Model.Content);
-    IntegrationSettings siteSettings = _site.GetIntegrationSettings();
+    var mapi = _settings.ToContentApi(Model.Content);
+    IntegrationSettings _integrationSettings = _settings.GetIntegrationSettings();
 }
 <div class="m-b-lg">
     @{ await Html.RenderPartialAsync("_NeighbourPosts"); }
@@ -43,7 +43,7 @@
             (function () { 
                 var d = document, s = d.createElement('script');
 
-                s.src = '@string.Format("//{0}.disqus.com/embed.js", siteSettings.DisqusId)';
+                s.src = '@string.Format("//{0}.disqus.com/embed.js", _integrationSettings.DisqusId)';
 
                 s.setAttribute('data-timestamp', +new Date());
                 (d.head || d.body).appendChild(s);

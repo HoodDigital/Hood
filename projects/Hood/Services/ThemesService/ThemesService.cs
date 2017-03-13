@@ -8,13 +8,13 @@ namespace Hood.Services
 {
     public class ThemesService : IThemesService
     {
-        private ISiteConfiguration _siteConfig;
+        private ISettingsRepository _settingsConfig;
         private Dictionary<string, IConfiguration> _configs;
         public static object scriptLock = new object();
 
-        public ThemesService(IHostingEnvironment env, ISiteConfiguration config, IConfiguration mainConfig)
+        public ThemesService(IHostingEnvironment env, ISettingsRepository config, IConfiguration mainConfig)
         {
-            _siteConfig = config;
+            _settingsConfig = config;
 
             _configs = new Dictionary<string, IConfiguration>();
 
@@ -65,12 +65,12 @@ namespace Hood.Services
         {
             get
             {
-                string loadTheme = _siteConfig["Hood.Settings.Theme"];
+                string loadTheme = _settingsConfig["Hood.Settings.Theme"];
                 if (string.IsNullOrEmpty(loadTheme))
                 {
-                    _siteConfig.Set("Hood.Settings.Theme", "default");
+                    _settingsConfig.Set("Hood.Settings.Theme", "default");
                 }
-                return _siteConfig["Hood.Settings.Theme"];
+                return _settingsConfig["Hood.Settings.Theme"];
             }
         }
 
@@ -80,7 +80,7 @@ namespace Hood.Services
             {
                 if (ThemeConfigs.ContainsKey(themeName))
                 {
-                    _siteConfig["Hood.Settings.Theme"] = themeName;
+                    _settingsConfig["Hood.Settings.Theme"] = themeName;
                     return true;
                 }
                 return false;

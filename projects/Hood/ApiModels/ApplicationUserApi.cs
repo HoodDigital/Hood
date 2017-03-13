@@ -81,7 +81,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public ApplicationUserApi(ApplicationUser user, ISiteConfiguration settings = null)
+        public ApplicationUserApi(ApplicationUser user, ISettingsRepository settings = null)
         {
             var mediaSettings = settings.GetMediaSettings();
 

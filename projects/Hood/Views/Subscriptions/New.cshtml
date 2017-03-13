@@ -1,7 +1,7 @@
 @model SubscriptionModel
-@inject ISiteConfiguration _site
+
 @{
-    BillingSettings settings = _site.GetBillingSettings();
+    BillingSettings settings = _settings.GetBillingSettings();
     ViewBag.Title = "You need a subscription...";
 }
 @{ await Html.RenderPartialAsync("_BillingMessage", Model.Message); }

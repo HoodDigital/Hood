@@ -79,7 +79,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public ContentApi(Content post, ISiteConfiguration settings = null)
+        public ContentApi(Content post, ISettingsRepository settings = null)
         {
             if (post == null)
                 return;

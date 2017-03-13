@@ -1,7 +1,7 @@
 @inject IThemesService _theme
 @inject IConfiguration _config
 @inject IContentRepository _data
-@inject ISiteConfiguration _site
+
 @inject IHoodCache _cache
 @{
     var theme = _theme.CurrentTheme;
@@ -79,25 +79,25 @@
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_site.GetContentSettings().GetAllowedTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_settings.GetContentSettings().GetAllowedTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Enabled Types</span>
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_site.GetContentSettings().GetDisallowedTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_settings.GetContentSettings().GetDisallowedTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Disabled Types</span>
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_site.GetContentSettings().GetPublicTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_settings.GetContentSettings().GetPublicTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Public Types</span>
                             </li>
                             <li class="list-group-item">
                                 <span class="pull-right">
-                                    @string.Join(",", (_site.GetContentSettings().GetRestrictedTypes()).Select(c => c.Type))
+                                    @string.Join(",", (_settings.GetContentSettings().GetRestrictedTypes()).Select(c => c.Type))
                                 </span>
                                 <span class="label label-success"><i class="fa fa-check"></i></span> <span>Restricted Types</span>
                             </li>
