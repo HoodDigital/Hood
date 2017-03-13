@@ -5,8 +5,22 @@
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-    <script src="~/lib/hood/src/js/login.js" asp-append-version="true"></script>
+    @if (_settings.GetIntegrationSettings().UseCDN)
+    {
+        <script src="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/js/login.js", _settings.GetVersion())"></script>
+    }
+    else
+    {
+        <script src="~/lib/hood/dist/js/login.js" asp-append-version="true"></script>
+    }
 </environment>
 <environment names="Production,PreProduction">
-    <script src="~/lib/hood/dist/js/login.packaged.js" asp-append-version="true"></script>
+    @if (_settings.GetIntegrationSettings().UseCDN)
+    {
+        <script src="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/js/login.packaged.js", _settings.GetVersion())"></script>
+    }
+    else
+    {
+        <script src="~/lib/hood/dist/js/login.packaged.js" asp-append-version="true"></script>
+    }
 </environment>

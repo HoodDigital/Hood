@@ -1,6 +1,21 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <environment names="Development,Staging,ErrorTesting">
-    <link rel="stylesheet" href="~/lib/hood/src/css/login.css" asp-append-version="true" />
+    @if (_settings.GetIntegrationSettings().UseCDN)
+    {
+        <link rel="stylesheet" href="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/css/login.css", _settings.GetVersion())" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/lib/hood/src/css/login.css" asp-append-version="true" />
+    }
 </environment>
 <environment names="Production,PreProduction">
-    <link rel="stylesheet" href="~/lib/hood/dist/css/login.min.css" asp-append-version="true" />
+    @if (_settings.GetIntegrationSettings().UseCDN)
+    {
+        <link rel="stylesheet" href="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/css/login.min.css", _settings.GetVersion())" />
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/lib/hood/src/css/login.min.css" asp-append-version="true" />
+    }
 </environment>
