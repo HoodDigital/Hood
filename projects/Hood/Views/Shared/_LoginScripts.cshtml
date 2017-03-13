@@ -7,11 +7,11 @@
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     @if (_settings.GetIntegrationSettings().UseCDN)
     {
-        <script src="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/js/login.js", _settings.GetVersion())"></script>
+        <script src="@string.Format("https://hood.azureedge.net/cdn/{0}/src/js/login.js", _settings.GetVersion())"></script>
     }
     else
     {
-        <script src="~/lib/hood/dist/js/login.js" asp-append-version="true"></script>
+        <script src="~/lib/hood/src/js/login.js" asp-append-version="true"></script>
     }
 </environment>
 <environment names="Production,PreProduction">
