@@ -162,9 +162,6 @@ namespace Hood.Filters
                     context.Result = changeResult;
                     return;
                 }
-
-                context.Result = result;
-                return;
             }
 
             public void OnActionExecuted(ActionExecutedContext context)
