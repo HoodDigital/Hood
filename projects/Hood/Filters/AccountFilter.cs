@@ -17,8 +17,7 @@ namespace Hood.Filters
 
         public AccountFilter(ILoggerFactory loggerFactory, 
                                   IAccountRepository auth,
-                                  UserManager<ApplicationUser> userManager,
-                                  ISettingsRepository site)
+                                  UserManager<ApplicationUser> userManager)
         {
             _logger = loggerFactory.CreateLogger<AccountFilter>();
             _auth = auth;

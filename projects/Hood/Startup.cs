@@ -79,7 +79,10 @@ namespace Hood
             services.Configure<RazorViewEngineOptions>(options =>
             {
                 options.FileProviders.Add(EmbeddedFiles.GetProvider());
-                options.ViewLocationExpanders.Add(new ViewLocationExpander());
+                if (config.CheckSetup("Installed:DB"))
+                {
+                    options.ViewLocationExpanders.Add(new ViewLocationExpander());
+                }
             });
 
             // Add framework services.
@@ -199,7 +202,10 @@ namespace Hood
                 });
 
             }
-
+            else
+            {
+                services.AddScoped<ISettingsRepository, SettingsRepositoryStub>();
+            }
             services.AddDistributedMemoryCache();
             services.AddSession();
 

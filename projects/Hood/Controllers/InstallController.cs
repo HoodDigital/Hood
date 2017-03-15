@@ -19,8 +19,6 @@ namespace Hood.Controllers
 
         public IActionResult Install()
         {
-            var provider = EmbeddedFiles.GetProvider();
-            var files = provider.GetDirectoryContents("");     
             return View();
         }
 

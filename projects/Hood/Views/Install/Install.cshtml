@@ -42,7 +42,7 @@
                     <p>No database setup has been detected. Please ensure you have set set the database connecion string inside your connection.json file.</p>
                 </div>
             }
-            <p class="text-center">Powered by HoodCMS @string.Format("v{0}", Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion.TrimEnd('0', '.'))</p>
+            <p class="text-center"><small><a href="http://hooddigital.com/">Powered by HoodCMS v@_settings.GetVersion() by Hood Digital</a></small></p>
         </div>
     </div>
     @{ await Html.RenderPartialAsync("_LoginScripts"); }

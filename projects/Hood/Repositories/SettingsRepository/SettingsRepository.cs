@@ -477,4 +477,168 @@ namespace Hood.Services
             return string.Format("{0}.{1}.{2}", version.Major, version.MajorRevision, version.Build);
         }
     }
+
+    public class SettingsRepositoryStub : ISettingsRepository
+    {
+        public string GetSiteTitle()
+        {
+            return "Uninstalled Hood Site";
+        }
+        public string GetVersion()
+        {
+            var version = typeof(SettingsRepositoryStub).Assembly.GetName().Version;
+            return string.Format("{0}.{1}.{2}", version.Major, version.MajorRevision, version.Build);
+        }
+        public string this[string key]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public List<string> LockoutAccessCodes
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public List<Option> AllSettings()
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult BillingEnabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult CartEnabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Delete(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T Get<T>(string key, bool nocache = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BasicSettings GetBasicSettings(bool noCache = false)
+        {
+            return new BasicSettings();
+        }
+
+        public BillingSettings GetBillingSettings(bool noCache = false)
+        {
+            return new BillingSettings();
+        }
+
+        public IEnumerable<IConfigurationSection> GetChildren()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ContactSettings GetContactSettings(bool noCache = false)
+        {
+            return new ContactSettings();
+        }
+
+        public ContentSettings GetContentSettings(bool noCache = false)
+        {
+            return new ContentSettings();
+        }
+
+        public IntegrationSettings GetIntegrationSettings(bool noCache = false)
+        {
+            return new IntegrationSettings();
+        }
+
+        public MailSettings GetMailSettings(bool noCache = false)
+        {
+            return new MailSettings();
+        }
+
+        public MediaSettings GetMediaSettings(bool noCache = false)
+        {
+            return new MediaSettings();
+        }
+
+        public PropertySettings GetPropertySettings(bool noCache = false)
+        {
+            return new PropertySettings();
+        }
+
+        public IChangeToken GetReloadToken()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IConfigurationSection GetSection(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SeoSettings GetSeo(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult PayPalEnabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult PropertyEnabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ReplacePlaceholders(string adminNoficationSubject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Set<T>(string key, T newValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult StripeEnabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public OperationResult SubscriptionsEnabled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ApplicationUserApi ToApplicationUserApi(ApplicationUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ContentApi ToContentApi(Content content)
+        {
+            throw new NotImplementedException();
+        }
+
+        public PropertyListingApi ToPropertyListingApi(PropertyListing property)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }

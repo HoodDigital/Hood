@@ -59,7 +59,7 @@ namespace Hood.Models
 
         public IntegrationSettings()
         {
-            UseCDN = true;
+            UseCDN = false;
         }
     }
 

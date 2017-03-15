@@ -6780,9 +6780,7 @@ body {
 }
 /*Reg Header*/
 .login-block-header {
-  padding-bottom: 5px;
   margin-bottom: 30px;
-  border-bottom: solid 1px #eee;
 }
 .login-block-header h2 {
   text-align: center;
@@ -6802,7 +6800,6 @@ body.install .login-block {
   width: 70%;
   padding: 20px;
   margin: 60px auto;
-  background: #fff;
 }
 .login-block .hood-title img {
   width: 50%;

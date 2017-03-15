@@ -13,6 +13,9 @@ namespace Hood.Extensions
 
         public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
         {
+            if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
+                return false;
+
             byte[] betaCodeBytes = null;
             if (!context.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
                 return true;
@@ -23,7 +26,6 @@ namespace Hood.Extensions
                 return false;
             }
             return true;
-
         }
 
         public static string GetSiteUrl(this HttpContext context, bool includePath = false, bool includeQuery = false)
