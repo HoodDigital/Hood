@@ -45,7 +45,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/billing/updated/")]
-        public async Task<IActionResult> Updated(int planId, BillingMessage? message = null)
+        public async Task<IActionResult> Updated(int plan, BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel();
@@ -53,7 +53,7 @@ namespace Hood.Controllers
             model.Plans = await _auth.GetSubscriptionPlanLevels();
             model.Addons = await _auth.GetSubscriptionPlanAddons();
             model.Message = message;
-            model.CurrentPlan = await _auth.GetSubscriptionPlanById(planId);
+            model.CurrentPlan = await _auth.GetSubscriptionPlanById(plan);
             return View(model);
         }
 
