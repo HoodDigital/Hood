@@ -38,13 +38,13 @@ namespace Hood.Services
 
         // User Subscriptions
         Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription);
-        OperationResult SaveUserSubscription(UserSubscription newUserSub);
-        OperationResult UpdateUserSubscription(UserSubscription newUserSub);
-        Task CreateUserSubscription(int planId, string stripeToken, string cardId);
-        Task UpgradeUserSubscription(int subscriptionId, int planId);
-        Task CancelUserSubscription(int subscriptionId);
-        Task RemoveUserSubscription(int subscriptionId);
-        Task ReactivateUserSubscription(int subscriptionId);
+        Task<UserSubscription> SaveUserSubscription(UserSubscription newUserSub);
+        Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub);
+        Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId);
+        Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId);
+        Task<UserSubscription> CancelUserSubscription(int subscriptionId);
+        Task<UserSubscription> RemoveUserSubscription(int subscriptionId);
+        Task<UserSubscription> ReactivateUserSubscription(int subscriptionId);
 
         // Customer Objects
         void ResetBillingInfo();

@@ -14,6 +14,10 @@
         SubscriptionEnded,
         SubscriptionCancelled,
         SubscriptionReactivated,
-        SubscriptionExists
+        SubscriptionExists,
+        ErrorUpdatingSubscription,
+        ErrorRemovingSubscription,
+        ErrorCancellingSubscription,
+        ErrorReactivatingSubscription
     }
 }

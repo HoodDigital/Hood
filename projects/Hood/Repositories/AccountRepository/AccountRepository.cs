@@ -186,31 +186,17 @@ namespace Hood.Services
                 return new OperationResult(ex);
             }
         }
-        public OperationResult SaveUserSubscription(UserSubscription newUserSub)
+        public async Task<UserSubscription> SaveUserSubscription(UserSubscription newUserSub)
         {
-            try
-            {
-                _db.UserSubscriptions.Add(newUserSub);
-                _db.SaveChanges();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            await _db.UserSubscriptions.AddAsync(newUserSub);
+            _db.SaveChanges();
+            return newUserSub;
         }
-        public OperationResult UpdateUserSubscription(UserSubscription newUserSub)
+        public async Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub)
         {
-            try
-            {
-                _db.Update(newUserSub);
-                _db.SaveChanges();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            await _db.AddAsync(newUserSub);
+            _db.SaveChanges();
+            return newUserSub;
         }
 
         // Subscriptions
@@ -415,9 +401,9 @@ namespace Hood.Services
                 .Include(u => u.Subscriptions).ThenInclude(u => u.Subscription);
 
             if (subcription.IsSet())
-               users = users.Where(u => u.Subscriptions.Any(s => s.Subscription.StripeId == subcription && (s.Status == "trialing" || s.Status == "active")));
-            else 
-               users = users.Where(u => u.Subscriptions.Any(s => s.Status == "trialing" || s.Status == "active"));
+                users = users.Where(u => u.Subscriptions.Any(s => s.Subscription.StripeId == subcription && (s.Status == "trialing" || s.Status == "active")));
+            else
+                users = users.Where(u => u.Subscriptions.Any(s => s.Status == "trialing" || s.Status == "active"));
 
             // search the collection
             if (!string.IsNullOrEmpty(search))
@@ -484,7 +470,7 @@ namespace Hood.Services
                 model.PageSize = filters.pageSize;
             return model;
         }
-        public async Task CreateUserSubscription(int planId, string stripeToken, string cardId)
+        public async Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId)
         {
             // Load user object and clear cache.
             ApplicationUser user = GetCurrentUser();
@@ -566,9 +552,10 @@ namespace Hood.Services
             newUserSub.CustomerId = user.StripeId;
             newUserSub.UserId = user.Id;
             newUserSub.SubscriptionId = subscription.Id;
-            OperationResult result = SaveUserSubscription(newUserSub);
+            newUserSub = await SaveUserSubscription(newUserSub);
+            return newUserSub;
         }
-        public async Task UpgradeUserSubscription(int subscriptionId, int planId)
+        public async Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId)
         {
             // Load user object and clear cache.
             ApplicationUser user = GetCurrentUser();
@@ -592,8 +579,10 @@ namespace Hood.Services
             }
             else
                 throw new Exception(BillingMessage.NoPaymentSource.ToString());
+
+            return userSub;
         }
-        public async Task CancelUserSubscription(int userSubscriptionId)
+        public async Task<UserSubscription> CancelUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
             ApplicationUser user = GetCurrentUser();
@@ -607,8 +596,9 @@ namespace Hood.Services
             StripeSubscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, true);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
             UpdateUser(user);
+            return userSub;
         }
-        public async Task RemoveUserSubscription(int userSubscriptionId)
+        public async Task<UserSubscription> RemoveUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
             ApplicationUser user = GetCurrentUser();
@@ -622,8 +612,9 @@ namespace Hood.Services
             StripeSubscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, false);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
             UpdateUser(user);
+            return userSub;
         }
-        public async Task ReactivateUserSubscription(int userSubscriptionId)
+        public async Task<UserSubscription> ReactivateUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
             ApplicationUser user = GetCurrentUser();
@@ -640,6 +631,7 @@ namespace Hood.Services
             sub = await _billing.Subscriptions.UpdateSubscriptionAsync(customer.Id, sub.Id, sub.StripePlan);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
             UpdateUser(user);
+            return userSub;
         }
 
         // User Subscription Helpers

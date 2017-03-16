@@ -9,6 +9,26 @@ namespace Hood.Extensions
 {
     public static class StringExtensions
     {
+        #region "Urls"
+
+        public static Uri AddParameterToUrl(this string url, Dictionary<string, string> parameters, bool relative = true)
+        {
+            var uriBuilder = new UriBuilder(url);
+            var uri = uriBuilder.Uri;
+            foreach (var prm in parameters)
+            {
+                uri = uri.AddParameter(prm.Key, prm.Value);
+            }
+            return uri;
+        }
+
+        public static bool IsAbsoluteUrl(this string url)
+        {
+            Uri result;
+            return Uri.TryCreate(url, UriKind.Absolute, out result);
+        }
+
+        #endregion
 
         public static bool IsNullOrEmpty(this string str)
         {

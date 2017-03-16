@@ -11,6 +11,7 @@ using Hood.Filters;
 using Hood.Enums;
 using Newtonsoft.Json;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Hood.Controllers
 {
@@ -39,6 +40,20 @@ namespace Hood.Controllers
         {
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel();
+            return View(model);
+        }
+
+        [HttpGet]
+        [Route("account/billing/updated/")]
+        public async Task<IActionResult> Updated(int planId, BillingMessage? message = null)
+        {
+            AccountInfo account = HttpContext.GetAccountInfo();
+            SubscriptionModel model = new SubscriptionModel();
+            model.User = account.User;
+            model.Plans = await _auth.GetSubscriptionPlanLevels();
+            model.Addons = await _auth.GetSubscriptionPlanAddons();
+            model.Message = message;
+            model.CurrentPlan = await _auth.GetSubscriptionPlanById(planId);
             return View(model);
         }
 
@@ -81,11 +96,9 @@ namespace Hood.Controllers
         {
             try
             {
-                await _auth.CreateUserSubscription(model.PlanId, model.StripeToken, model.CardId);
-                if (returnUrl.IsSet())
-                    return Redirect(returnUrl);
-                else
-                    return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionCreated });
+                var sub = await _auth.CreateUserSubscription(model.PlanId, model.StripeToken, model.CardId);
+                returnUrl = GetReturnUrl(BillingMessage.SubscriptionCreated, sub.SubscriptionId, returnUrl);
+                return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
@@ -122,12 +135,14 @@ namespace Hood.Controllers
         {
             try
             {
-                await _auth.UpgradeUserSubscription(id, plan);
-                return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionUpdated });
+                var sub = await _auth.UpgradeUserSubscription(id, plan);
+                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionUpdated, sub.SubscriptionId, null);
+                return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index", "Billing", new { message = ex.Message.ToEnum(BillingMessage.Error) });
+                var returnUrl = GetReturnUrl(BillingMessage.ErrorUpdatingSubscription, id, null, ex.Message);
+                return Redirect(returnUrl);
             }
         }
 
@@ -137,12 +152,14 @@ namespace Hood.Controllers
         {
             try
             {
-                await _auth.CancelUserSubscription(id);
-                return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionCancelled });
+                var sub = await _auth.CancelUserSubscription(id);
+                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionCancelled, sub.SubscriptionId, null);
+                return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index", "Billing", new { message = ex.Message.ToEnum(BillingMessage.Error) });
+                var returnUrl = GetReturnUrl(BillingMessage.ErrorCancellingSubscription, id, null, ex.Message);
+                return Redirect(returnUrl);
             }
         }
 
@@ -152,12 +169,14 @@ namespace Hood.Controllers
         {
             try
             {
-                await _auth.RemoveUserSubscription(id);
-                return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionEnded });
+                var sub = await _auth.RemoveUserSubscription(id);
+                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionEnded, sub.SubscriptionId, null);
+                return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index", "Billing", new { message = ex.Message.ToEnum(BillingMessage.Error) });
+                var returnUrl = GetReturnUrl(BillingMessage.ErrorRemovingSubscription, id, null, ex.Message);
+                return Redirect(returnUrl);
             }
         }
 
@@ -167,12 +186,14 @@ namespace Hood.Controllers
         {
             try
             {
-                await _auth.ReactivateUserSubscription(id);
-                return RedirectToAction("Index", "Billing", new { message = BillingMessage.SubscriptionReactivated });
+                var sub = await _auth.ReactivateUserSubscription(id);
+                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionReactivated, sub.SubscriptionId, null);
+                return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index", "Billing", new { message = ex.Message.ToEnum(BillingMessage.Error) });
+                var returnUrl = GetReturnUrl(BillingMessage.ErrorReactivatingSubscription, id, null, ex.Message);
+                return Redirect(returnUrl);
             }
         }
 
@@ -195,6 +216,25 @@ namespace Hood.Controllers
         private string FormatLog(string v)
         {
             return DateTime.Now.ToShortDateString() + " - " + DateTime.Now.ToShortTimeString() + ": " + v + Environment.NewLine;
+        }
+
+        private string GetReturnUrl(BillingMessage? message, int? planId, string returnUrl, string errors = null)
+        {
+            if (!returnUrl.IsSet())
+            {
+                returnUrl = Url.Action("Updated", "Subscriptions");
+            }
+            var newParams = new Dictionary<string, string>();
+            if (message.HasValue)
+                newParams.Add("message", message.ToString());
+            if (planId.HasValue)
+                newParams.Add("plan", planId.Value.ToString());
+            if (errors.IsSet())
+                newParams.Add("errors", errors);
+            if (!returnUrl.IsAbsoluteUrl())
+                returnUrl = ControllerContext.HttpContext.GetSiteUrl() + returnUrl.TrimStart('/');             
+            var uri = returnUrl.AddParameterToUrl(newParams);
+            return uri.ToString();
         }
     }
 
