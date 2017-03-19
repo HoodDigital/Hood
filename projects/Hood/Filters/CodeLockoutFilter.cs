@@ -42,8 +42,12 @@ namespace Hood.Filters
                 string action = (string)context.RouteData.Values["action"];
                 string controller = (string)context.RouteData.Values["controller"];
 
-                if (action.Equals("LockoutModeEntrance", StringComparison.InvariantCultureIgnoreCase) && 
+                if (action.Equals("LockoutModeEntrance", StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals("WebHooks", StringComparison.InvariantCultureIgnoreCase) &&
+                    controller.Equals("Subscriptions", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
                 if (action.Equals("Index", StringComparison.InvariantCultureIgnoreCase) && 
