@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Web;
 
 namespace Hood.Extensions
 {
@@ -9,6 +11,15 @@ namespace Hood.Extensions
         public static void Configure(IHttpContextAccessor httpContextAccessor)
         {
             HttpContextAccessor = httpContextAccessor;
+        }
+
+        public static Uri AddParameter(this Uri url, string name, string value)
+        {
+            var uriBuilder = new UriBuilder(url);
+            var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+            query[name] = value;
+            uriBuilder.Query = query.ToString();
+            return uriBuilder.Uri;
         }
 
         /// <summary>

@@ -26,5 +26,6 @@ namespace Hood.Models
         public ApplicationUser User { get; set; }
         public BillingMessage? Message { get; set; }
         public IEnumerable<StripeCard> Cards { get; set; }
+        public Subscription CurrentPlan { get; internal set; }
     }
 }
