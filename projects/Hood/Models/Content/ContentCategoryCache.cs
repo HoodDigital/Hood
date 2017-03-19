@@ -16,8 +16,9 @@ namespace Hood.Models
         private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>  bySlug;
         private Lazy<ContentCategory[]> topLevel;
 
-        public ContentCategoryCache(IConfiguration config, 
-                                    ISettingsRepository settings)
+        public ContentCategoryCache(IConfiguration config,
+                                    ISettingsRepository settings,
+                                    EventsService events)
         {
             _config = config;
             _settings = settings;
@@ -25,7 +26,7 @@ namespace Hood.Models
             {
                 ResetCache();
             };
-            Events.ContentChanged += resetContentByTypeCache;
+            events.ContentChanged += resetContentByTypeCache;
             ResetCache();
         }
 

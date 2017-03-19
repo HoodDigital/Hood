@@ -14,19 +14,22 @@ namespace Hood.Models
 
         private Dictionary<string, Lazy<Dictionary<int, Content>>> bySlug;
         private readonly ContentCategoryCache _categories;
+        private readonly EventsService _events;
 
         public ContentByTypeCache(IConfiguration config, 
-                                  ISettingsRepository settings, 
-                                  ContentCategoryCache categories)
+                                  ISettingsRepository settings,
+                                  ContentCategoryCache categories,
+                                  EventsService events)
         {
             _config = config;
             _settings = settings;
             _categories = categories;
+            _events = events;
             EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
             {
                 ResetCache();
             };
-            Events.ContentChanged += resetContentByTypeCache;
+            _events.ContentChanged += resetContentByTypeCache;
             ResetCache();
         }
 

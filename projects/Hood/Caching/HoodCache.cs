@@ -1,4 +1,5 @@
 ﻿using Hood.Models;
+using Hood.Services;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -13,14 +14,16 @@ namespace Hood.Caching
         private readonly IMemoryCache _cache;
 
         private IList<string> _entries { get; set; }
+        private readonly EventsService _events;
 
-        public HoodCache(IMemoryCache cache)
+        public HoodCache(IMemoryCache cache,
+                         EventsService events)
         {
             _cache = cache;
             _entries = new List<string>();
-            Events.ContentChanged += onContentChanged;
-            Events.PropertiesChanged += onPropertiesChanged;
-            Events.OptionsChanged += onOptionsChanged;
+            events.ContentChanged += onContentChanged;
+            events.PropertiesChanged += onPropertiesChanged;
+            events.OptionsChanged += onOptionsChanged;
         }
 
         public string Add<T>(string key, T cacheItem, MemoryCacheEntryOptions options = null)

@@ -8,21 +8,6 @@ using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    internal class StripeWebHookEventListener
-    {
-        private readonly IStripeWebHookService _webHooks;
-
-        public StripeWebHookEventListener(IStripeWebHookService webHooks)
-        {
-            _webHooks = webHooks;
-            Events.StripeWebhook += onWebhookTriggered;
-        }
-
-        private void onWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
-        {
-        }
-    }
-
     public class StripeWebHookService : IStripeWebHookService
     {
         private readonly IAccountRepository _auth;
@@ -34,6 +19,8 @@ namespace Hood.Services
         private readonly BasicSettings _basicSettings;
         private readonly BillingSettings _billingSettings;
         private readonly MailSettings _mailSettings;
+
+        private readonly EventsService _events;
 
         private MailObject _log;
 
@@ -88,7 +75,7 @@ namespace Hood.Services
                 }
 
                 // Fire the event to allow any other packages to process the webhook.
-                Events.Fire(nameof(Events.StripeWebhook), this, args);
+                _events.triggerStripeWebhook(this, args);
             }
             catch (Exception ex)
             {

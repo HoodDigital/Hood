@@ -25,6 +25,8 @@ namespace Hood
 {
     public static class HoodStartup
     {
+        private static readonly object serviceScope;
+
         /// <summary>
         /// Generate the config file for use with HoodCMS.      
         /// </summary>
@@ -104,7 +106,8 @@ namespace Hood
                 .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
 
-                services.AddSingleton<StripeWebHookEventListener>();
+                services.AddSingleton<EventsService>();
+                services.AddSingleton<SubscriptionsEventListener>();
                 services.AddSingleton<ContentCategoryCache>();
                 services.AddSingleton<ContentByTypeCache>();
                 services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
@@ -254,6 +257,9 @@ namespace Hood
                     options.UseSqlServer(config["Data:ConnectionString"]);
                     var db = new HoodDbContext(options.Options);
                     db.EnsureSetup(userManager, roleManager);
+
+                    // Initialise events
+                    serviceScope.ServiceProvider.GetService<SubscriptionsEventListener>().Configure();
                 }
             }
 

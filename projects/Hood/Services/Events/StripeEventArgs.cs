@@ -1,6 +1,7 @@
 ﻿using System;
 using Stripe;
 using Newtonsoft.Json;
+using Hood.Models;
 
 namespace Hood
 {

@@ -28,16 +28,19 @@ namespace Hood.Services
         private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
         private readonly ContentSettings _contentSettings;
+        private readonly EventsService _events;
 
         public ContentRepository(HoodDbContext db,
                                  IHoodCache cache,
                                  IConfiguration config,
-                                 ISettingsRepository site)
+                                 ISettingsRepository site,
+                                 EventsService events)
         {
             _db = db;
             _config = config;
             _settings = site;
             _cache = cache;
+            _events = events;
             _contentSettings = _settings.GetContentSettings();
         }
 
@@ -231,7 +234,7 @@ namespace Hood.Services
                 _db.SaveChanges();
                 content = GetContentByID(content.Id);
                 RefreshMetas(content);
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -245,7 +248,7 @@ namespace Hood.Services
             {
                 _db.Update(content);
                 _db.SaveChanges();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (DbUpdateException ex)
@@ -261,7 +264,7 @@ namespace Hood.Services
                 _db.SaveChanges();
                 _db.Entry(content).State = EntityState.Deleted;
                 _db.SaveChanges();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -276,7 +279,7 @@ namespace Hood.Services
                 Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
                 content.Status = (int)status;
                 _db.SaveChanges();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
                 return new OperationResult<Content>(content);
             }
             catch (Exception ex)
@@ -293,7 +296,7 @@ namespace Hood.Services
                     _db.Entry(p).State = EntityState.Deleted;
                 });
                 await _db.SaveChangesAsync();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -311,7 +314,7 @@ namespace Hood.Services
                 _db.Media.Add(new SiteMedia(media));
                 _db.Content.Update(content);
                 await _db.SaveChangesAsync();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
                 return new OperationResult<Content>(content);
             }
             catch (Exception ex)
@@ -401,7 +404,7 @@ namespace Hood.Services
                 tag = new ContentTag() { Value = value };
                 _db.ContentTags.Add(tag);
                 await _db.SaveChangesAsync();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
             }
             return new OperationResult<ContentTag>(tag);
 
@@ -416,7 +419,7 @@ namespace Hood.Services
             {
                 _db.ContentTags.Remove(tag);
                 await _db.SaveChangesAsync();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
             }
             return new OperationResult(true);
 
@@ -456,7 +459,7 @@ namespace Hood.Services
                 };
                 _db.ContentCategories.Add(category);
                 await _db.SaveChangesAsync();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
             }
             return new OperationResult<ContentCategory>(category);
 
@@ -477,7 +480,7 @@ namespace Hood.Services
             {
                 _db.ContentCategories.Add(category);
                 await _db.SaveChangesAsync();
-                Events.Fire(nameof(Events.ContentChanged));
+                _events.triggerContentChanged(this);
             }
             return new OperationResult<ContentCategory>(category);
         }
@@ -486,14 +489,14 @@ namespace Hood.Services
             var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.ContentCategoryId == categoryId);
             _db.Entry(category).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
-            Events.Fire(nameof(Events.ContentChanged));
+            _events.triggerContentChanged(this);
             return new OperationResult(true);
         }
         public async Task<OperationResult> UpdateCategory(ContentCategory category)
         {
             _db.Update(category);
             await _db.SaveChangesAsync();
-            Events.Fire(nameof(Events.ContentChanged));
+            _events.triggerContentChanged(this);
             return new OperationResult(true);
         }
         #endregion
@@ -972,7 +975,7 @@ namespace Hood.Services
                 }
             }
             _db.SaveChanges();
-            Events.Fire(nameof(Events.ContentChanged));
+            _events.triggerContentChanged(this);
         }
         public bool CheckSlug(string slug, int? id = null)
         {
