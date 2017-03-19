@@ -21,9 +21,9 @@ namespace Hood.Filters
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
 
-        public LockoutModeFilter(IConfiguration config, 
-            ILoggerFactory loggerFactory, 
-            IBillingService billing, 
+        public LockoutModeFilter(IConfiguration config,
+            ILoggerFactory loggerFactory,
+            IBillingService billing,
             ISettingsRepository settings,
             UserManager<ApplicationUser> userManager)
         {
@@ -36,7 +36,8 @@ namespace Hood.Filters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-            if (_settings.GetBasicSettings().LockoutMode)
+            var basicSettings = _settings.GetBasicSettings();
+            if (basicSettings.LockoutMode)
             {
                 // if this is the login page, or the betalock page allow the user through.
                 string action = (string)context.RouteData.Values["action"];
@@ -50,13 +51,16 @@ namespace Hood.Filters
                     controller.Equals("Subscriptions", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals("Index", StringComparison.InvariantCultureIgnoreCase) && 
+                if (action.Equals("Index", StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals("Login", StringComparison.InvariantCultureIgnoreCase) && 
-                    controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
-                    return;
+                if (!basicSettings.LockLoginPage)
+                {
+                    if (action.Equals("Login", StringComparison.InvariantCultureIgnoreCase) &&
+                        controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
+                        return;
+                }
 
                 // If they are in an override role, let them through.
                 if (context.HttpContext.User.Identity.IsAuthenticated)

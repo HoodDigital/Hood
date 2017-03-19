@@ -42,6 +42,8 @@ namespace Hood.Models
         // Beta Lockout Mode
         [Display(Name = "Lockout Mode")]
         public bool LockoutMode { get; set; }
+        [Display(Name = "Lock Login Page")]
+        public bool LockLoginPage { get; set; }
         [Display(Name = "Lockout Mode Access Codes")]
         public string LockoutModeTokens { get; set; }
         [Display(Name = "Lockout Mode Holding Page")]
