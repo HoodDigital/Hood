@@ -65,7 +65,7 @@ namespace Hood.Controllers
         public IActionResult Index()
         {
             BasicSettings settings = _settings.GetBasicSettings();
-            if (ControllerContext.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
+            if (settings.LockoutMode && ControllerContext.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
             {
                 if (settings.LockoutModeHoldingPage.HasValue)
                     return Show(settings.LockoutModeHoldingPage.Value);
