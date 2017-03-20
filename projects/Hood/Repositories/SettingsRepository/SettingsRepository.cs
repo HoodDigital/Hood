@@ -27,7 +27,11 @@ namespace Hood.Services
         {
             get
             {
-                var allowedCodes = GetBasicSettings().LockoutModeTokens.Split(Environment.NewLine.ToCharArray()).ToList();
+                var tokens = GetBasicSettings().LockoutModeTokens;
+                if (tokens == null)
+                    return new List<string>();
+
+                var allowedCodes = tokens.Split(Environment.NewLine.ToCharArray()).ToList();
                 allowedCodes.RemoveAll(str => string.IsNullOrEmpty(str));
 
                 string overrideCode = _config["LockoutMode:OverrideToken"];
