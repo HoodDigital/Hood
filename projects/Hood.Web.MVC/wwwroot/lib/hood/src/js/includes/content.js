@@ -420,12 +420,13 @@ $.hood.Content = {
             tinymce.init({
                 selector: '.edit-content-editor',
                 height: 500,
+
                 plugins: [
-                  'advlist autolink lists link image charmap print preview anchor',
+                  'advlist autolink lists link image charmap print preview anchor media',
                   'searchreplace visualblocks code fullscreen',
                   'insertdatetime media contextmenu paste code'
                 ],
-                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image hoodimage',
+                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media hoodimage',
                 link_class_list: [
                     { title: 'None', value: '' },
                     { title: 'Button link', value: 'btn btn-default' },
@@ -449,12 +450,12 @@ $.hood.Content = {
                 selector: '.edit-content-editor-simple',
                 height: 500,
                 plugins: [
-                  'advlist autolink lists link image charmap print preview anchor',
+                  'advlist autolink lists link image charmap print preview anchor media',
                   'searchreplace visualblocks code fullscreen',
                   'insertdatetime media contextmenu paste code'
                 ],
                 menubar: false,
-                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | undo redo | link image hoodimage',
+                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | undo redo | link image media hoodimage',
                 link_class_list: [
                     { title: 'None', value: '' },
                     { title: 'Button link', value: 'btn btn-default' },

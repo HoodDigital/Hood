@@ -1,10 +1,14 @@
 @model ContactFormModel
-
 @{
     ContactSettings _contactSettings = _settings.GetContactSettings();
     IntegrationSettings _integrationSettings = _settings.GetIntegrationSettings();
+    string action = Url.Action("ProcessContactForm", "Home");
+    if (Model.FormAction.IsSet())
+    {
+        action = Model.FormAction;
+    }
 }
-<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="contact-form" id="contact-form" data-redirect="@_contactSettings.ThankYouUrl" data-alert-message="@_contactSettings.ThankYouMessage">
+<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="@(Model.FormClass.IsSet() ? Model.FormClass : "contact-form")" id="@(Model.FormAction.IsSet() ? Model.FormAction : "contact-form")" data-redirect="@_contactSettings.ThankYouUrl" data-alert-message="@_contactSettings.ThankYouMessage">
     <div class="thank-you">
         <h2>@_contactSettings.ThankYouTitle</h2>
         <p>@_contactSettings.ThankYouMessage</p>
