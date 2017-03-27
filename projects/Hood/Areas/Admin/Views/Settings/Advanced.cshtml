@@ -46,19 +46,19 @@
                     <div class="panel-body">
                         <ul class="list-group settings-list clear-list m-t">
                             <li class="list-group-item">
-                                @if (_config["Data:ConnectionString"].IsSet())
+                                @if (_config["ConnectionStrings:DefaultConnection"].IsSet())
                                 {
                                     <span class="pull-right">
-                                        @_config["Data:ConnectionString"]
+                                        @_config["ConnectionStrings:DefaultConnection"]
                                     </span>
-                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
+                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Connection String</span>
                                 }
                                 else
                                 {
                                     <span class="pull-right">
                                         -
                                     </span>
-                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Data:ConnectionString</span>
+                                    <span class="label label-danger"><i class="fa fa-close"></i></span> <span>Connection String</span>
                                 }
                             </li>
                             <li class="list-group-item">
@@ -67,14 +67,14 @@
                                     <span class="pull-right">
                                         @_config["ASPNETCORE_ENVIRONMENT"]
                                     </span>
-                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
+                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting Environment</span>
                                 }
                                 else
                                 {
                                     <span class="pull-right">
                                         -
                                     </span>
-                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting:Environment</span>
+                                    <span class="label label-danger"><i class="fa fa-close"></i></span> <span>Hosting Environment</span>
                                 }
                             </li>
                             <li class="list-group-item">

@@ -46,8 +46,10 @@ namespace Hood.Services
         public AccountInfo LoadAccountInfo(string userId)
         {
             AccountInfo result = new AccountInfo();
-            result = new AccountInfo();
-            result.User = GetUserById(userId);
+            result = new AccountInfo()
+            {
+                User = GetUserById(userId)
+            };
             if (result.User?.Subscriptions != null)
             {
                 foreach (UserSubscription sub in result.User.Subscriptions)
@@ -205,14 +207,16 @@ namespace Hood.Services
             try
             {
                 // try adding to stripe
-                var myPlan = new StripePlanCreateOptions();
-                myPlan.Id = subscription.StripeId;
-                myPlan.Amount = subscription.Amount;                     // all amounts on Stripe are in cents, pence, etc
-                myPlan.Currency = subscription.Currency;                 // "usd" only supported right now
-                myPlan.Interval = subscription.Interval;                 // "month" or "year"
-                myPlan.IntervalCount = subscription.IntervalCount;       // optional
-                myPlan.Name = subscription.Name;
-                myPlan.TrialPeriodDays = subscription.TrialPeriodDays;   // amount of time that will lapse before the customer is billed
+                var myPlan = new StripePlanCreateOptions()
+                {
+                    Id = subscription.StripeId,
+                    Amount = subscription.Amount,                     // all amounts on Stripe are in cents, pence, etc
+                    Currency = subscription.Currency,                 // "usd" only supported right now
+                    Interval = subscription.Interval,                 // "month" or "year"
+                    IntervalCount = subscription.IntervalCount,       // optional
+                    Name = subscription.Name,
+                    TrialPeriodDays = subscription.TrialPeriodDays   // amount of time that will lapse before the customer is billed
+                };
                 StripePlan response = await _billing.Stripe.PlanService.CreateAsync(myPlan);
                 subscription.StripeId = response.Id;
                 _db.Subscriptions.Add(subscription);
@@ -347,8 +351,10 @@ namespace Hood.Services
         {
             try
             {
-                var myPlan = new StripePlanUpdateOptions();
-                myPlan.Name = subscription.Name;
+                var myPlan = new StripePlanUpdateOptions()
+                {
+                    Name = subscription.Name
+                };
                 StripePlan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
                 _db.Update(subscription);
                 await _db.SaveChangesAsync();
@@ -718,7 +724,7 @@ namespace Hood.Services
             userSubscription.CurrentPeriodEnd = stripeSubscription.CurrentPeriodEnd;
             userSubscription.CurrentPeriodStart = stripeSubscription.CurrentPeriodStart;
             userSubscription.EndedAt = stripeSubscription.EndedAt;
-            userSubscription.Quantity = stripeSubscription.Quantity;
+            userSubscription.Quantity = stripeSubscription.Quantity ?? 0;
             userSubscription.Start = stripeSubscription.Start;
             userSubscription.Status = stripeSubscription.Status;
             userSubscription.TaxPercent = stripeSubscription.TaxPercent;

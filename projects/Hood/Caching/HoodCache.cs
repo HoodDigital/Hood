@@ -14,7 +14,6 @@ namespace Hood.Caching
         private readonly IMemoryCache _cache;
 
         private IList<string> _entries { get; set; }
-        private readonly EventsService _events;
 
         public HoodCache(IMemoryCache cache,
                          EventsService events)

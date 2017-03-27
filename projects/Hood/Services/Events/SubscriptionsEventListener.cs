@@ -16,15 +16,15 @@ namespace Hood.Services
 
         internal void Configure()
         {
-            _events.StripeWebhook += onWebhookTriggered;
-            _events.UserSubcriptionChanged += onUserSubscriptionChanged;
+            _events.StripeWebhook += OnWebhookTriggered;
+            _events.UserSubcriptionChanged += OnUserSubscriptionChanged;
         }
 
-        private void onUserSubscriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
+        private void OnUserSubscriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
         {
         }
 
-        private void onWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
+        private void OnWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
         {
         }
 

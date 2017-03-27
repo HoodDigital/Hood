@@ -214,11 +214,11 @@ namespace Hood.Controllers
             try
             {
                 await _webHooks.ProcessEvent(json);
-                return new StatusCodeResult(202);
+                return new StatusCodeResult(200);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new StatusCodeResult(500);
+                return new StatusCodeResult(202);
             }
         }
         private string FormatLog(string v)
