@@ -22,7 +22,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageTags>ASP.NET MVC EntityFramework CMS</PackageTags>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

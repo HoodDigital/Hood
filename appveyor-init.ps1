@@ -1,4 +1,4 @@
-$version = "dev-$($env:APPVEYOR_REPO_COMMIT)";
+$version = "dev-$($env:APPVEYOR_REPO_COMMIT.substring(0,7))";
 Update-AppveyorBuild -Version "$version"
 if ($env:APPVEYOR_REPO_TAG -ne "true")
 {

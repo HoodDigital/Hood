@@ -9,10 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		appveyor-init.ps1 = appveyor-init.ps1
+		appveyor-post-build.ps1 = appveyor-post-build.ps1
 		bower.json = bower.json
 		BuildCommon.targets = BuildCommon.targets
 		LICENSE = LICENSE
-		post-build.ps = post-build.ps
 		readme.md = readme.md
 	EndProjectSection
 EndProject
