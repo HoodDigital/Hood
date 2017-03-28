@@ -8,6 +8,12 @@ else
 {
     $version = "$($env:APPVEYOR_REPO_TAG_NAME)"
 }
-$exec = "dotnet pack projects/Hood/Hood.csproj -c Release /p:Version=$version"
+$exec = "dotnet restore"
+Write-Host "$exec"
+Invoke-Expression $exec
+$exec = "dotnet build .\projects\Hood\ -c Release /p:Version=$version"
+Write-Host "$exec"
+Invoke-Expression $exec
+$exec = "dotnet pack .\projects\Hood\ -c Release /p:Version=$version"
 Write-Host "$exec"
 Invoke-Expression $exec
