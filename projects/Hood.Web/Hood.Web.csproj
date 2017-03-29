@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <UserSecretsId>aspnet-Hood.Web-2e2cdf5e-4fbd-4cc9-bcb8-1c967625b5be</UserSecretsId>
+    <UserSecretsId>Hood.Web</UserSecretsId>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
 
