@@ -1,7 +1,8 @@
 # Hood
 
 [![Build status](https://ci.appveyor.com/api/projects/status/7j755tgusxqrw6nl/branch/master?svg=true)](https://ci.appveyor.com/project/hooddigital/hood/branch/master)
-![VS Team Services](https://img.shields.io/vso/build/hooddigital/107a1b8d-bbc9-4a7e-876e-de17e71393a0/1.svg?label=VisualStudio)
+![Build status](https://img.shields.io/badge/Visual%20Studio-2017-magenta.svg?colorB=770ca3)
+![VS Team Services](https://img.shields.io/vso/build/hooddigital/107a1b8d-bbc9-4a7e-876e-de17e71393a0/1.svg?label=VSTS)
 [![Demo](https://img.shields.io/myget/hood/vpre/hood.svg?label=Demo&colorB=eab92d)](http://cms.hooddigital.com/)
 
 ## About Hood CMS
