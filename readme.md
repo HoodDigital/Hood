@@ -1,9 +1,10 @@
 # Hood
 
-[![Build status](https://ci.appveyor.com/api/projects/status/7j755tgusxqrw6nl/branch/master?svg=true)](https://ci.appveyor.com/project/hooddigital/hood/branch/master)
-![Build status](https://img.shields.io/badge/Visual%20Studio-2017-magenta.svg?colorB=770ca3)
-![VS Team Services](https://img.shields.io/vso/build/hooddigital/107a1b8d-bbc9-4a7e-876e-de17e71393a0/1.svg?label=VSTS)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/7j755tgusxqrw6nl/branch/master?svg=true)](https://ci.appveyor.com/project/hooddigital/hood/branch/master)
+![Visual Studio Version](https://img.shields.io/badge/Visual%20Studio-2017-magenta.svg?colorB=770ca3)
+![VS Team Services Build](https://img.shields.io/vso/build/hooddigital/107a1b8d-bbc9-4a7e-876e-de17e71393a0/1.svg?label=VSTS)
 [![Demo](https://img.shields.io/myget/hood/vpre/hood.svg?label=Demo&colorB=eab92d)](http://cms.hooddigital.com/)
+
 
 ## About Hood CMS
 The Hood CMS is a full content management system providing a solid backbone to any website. Created by Hood's Digital Architects, George Whysall and Thomas Burwood.

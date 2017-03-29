@@ -13,7 +13,7 @@ namespace Hood.Models
         private readonly ISettingsRepository _settings;
 
         private Lazy<Dictionary<int, ContentCategory>> byKey;
-        private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>  bySlug;
+        private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>> bySlug;
         private Lazy<ContentCategory[]> topLevel;
 
         public ContentCategoryCache(IConfiguration config,
@@ -46,9 +46,24 @@ namespace Hood.Models
         public void ResetCache()
         {
             var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
-            options.UseSqlServer(_config["Data:ConnectionString"]);
+            options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             var db = new DefaultHoodDbContext(options.Options);
-            byKey = new Lazy<Dictionary<int, ContentCategory>>(() => db.ContentCategories.ToDictionary(c => c.ContentCategoryId));
+            byKey = new Lazy<Dictionary<int, ContentCategory>>(() =>
+            {
+                var q = from d in db.ContentCategories
+                        select new ContentCategory
+                        {
+                            ContentCategoryId = d.ContentCategoryId,
+                            DisplayName = d.DisplayName,
+                            Slug = d.Slug,
+                            ContentType = d.ContentType,
+                            ParentCategoryId = d.ParentCategoryId,
+                            ParentCategory = d.ParentCategory,
+                            Children = d.Children,
+                            Count = d.Content.Count(),
+                        };
+                return q.ToDictionary(c => c.ContentCategoryId);
+            });
 
             ContentSettings contentSettings = _settings.GetContentSettings();
             bySlug = new Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>();
@@ -56,7 +71,22 @@ namespace Hood.Models
             {
                 bySlug.Add(
                     type.Type,
-                    new Lazy<Dictionary<string, ContentCategory>>(() => db.ContentCategories.Where(c => c.ContentType == type.Type && c.Slug != null).ToDictionary(c => c.Slug))
+                    new Lazy<Dictionary<string, ContentCategory>>(() =>
+                    {
+                        var q = from d in db.ContentCategories
+                                select new ContentCategory
+                                {
+                                    ContentCategoryId = d.ContentCategoryId,
+                                    DisplayName = d.DisplayName,
+                                    Slug = d.Slug,
+                                    ContentType = d.ContentType,
+                                    ParentCategoryId = d.ParentCategoryId,
+                                    ParentCategory = d.ParentCategory,
+                                    Children = d.Children,
+                                    Count = d.Content.Count(),
+                                };
+                        return q.ToDictionary(c => c.Slug);
+                    })
                 );
             }
             topLevel = new Lazy<ContentCategory[]>(() => byKey.Value.Values.Where(c => c.ParentCategoryId == null).ToArray());

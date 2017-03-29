@@ -54,6 +54,27 @@ namespace Hood.Models
         }
 
         public bool CachedByType { get; internal set; }
+
+        public CustomField GetMetaDetails(string name)
+        {
+            var field = CustomFields.SingleOrDefault(c => c.Name == name);
+            if (field != null)
+                return field;
+            var baseType = ContentTypes.All.SingleOrDefault(t => t.TypeName == this.TypeName);
+            if (baseType != null)
+            {
+                field = baseType.CustomFields.SingleOrDefault(c => c.Name == name);
+                if (field != null)
+                    return field;
+            }
+            return new CustomField()
+            {
+                Default = "",
+                Name = name,
+                System = false,
+                Type = "System.String"
+            };
+        }
     }
 
     public class CustomField
@@ -166,7 +187,7 @@ namespace Hood.Models
                         CustomFields = BaseFields(
                         new List<CustomField>()
                         {
-                            new CustomField() { Name = "Content.News.VideoUrl", Default = "", System = true, Type="System.String" },
+                            new CustomField() { Name = "Content.News.Video", Default = "", System = true, Type="Hood.MultiLineString" },
                             new CustomField() { Name = "Content.News.Headline", Default = "", System = true, Type="System.String" }
                         })
                     },
@@ -418,6 +439,8 @@ namespace Hood.Models
             fields.AddRange(new List<CustomField>()
             {
                 new CustomField() {Name="Settings.Template", Default = "_Blank", System = true, Type = "System.String" },
+
+                new CustomField() {Name="Settings.SubType", Default = "", System = true, Type = "System.String" },
 
                 new CustomField() {Name="SEO.Meta.Title", Default = "", System = true, Type = "System.String" },
                 new CustomField() {Name="SEO.Meta.Description", Default = "", System = true, Type = "System.String" },

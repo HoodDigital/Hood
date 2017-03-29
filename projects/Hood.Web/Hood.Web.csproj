@@ -1,0 +1,663 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <UserSecretsId>Hood.Web</UserSecretsId>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="wwwroot\js\site.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\less\preload.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\less\site.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\500x500.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\arrow.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\1.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\10.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\11.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\12.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\13.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\2.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\3.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\4.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\5.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\6.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\7.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\8.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\bg\9.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\AmericanExpress.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\DinnersClub.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\Discover.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\JCB.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\maestro.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\MasterCard.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\cards\Visa.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\facebook-card.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\finger-move.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\h-black.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\h-white.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hex-loader.gif">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hood-account.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hood-cms-demo.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hood-cms.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hood-logo.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hood-white.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\hood.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\audio.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\excel.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\file.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\pdf.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\photoshop.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\powerpoint.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\video.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\icons\word.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\loading.svg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\no-avatar.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\no-image.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\site-icon.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\transparent.png">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\twitter-card.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\images\university.jpg">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\admin.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\app.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\addresses.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\alerts.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\blades.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\cart.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\content.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\datalist.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\designer.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\fileupload.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\forms.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\globals.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\google.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\handlers.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\helpers.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\import.property.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\inline.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\io.reporter.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\media.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\modals.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\observable.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\options.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\pager.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\production.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\property.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\stringhelpers.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\subscriptions.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\themes.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\uploader.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\users.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\includes\validator.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\js\login.js">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\base.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\breadcrumb.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\editor.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\footer.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\layout.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\page-heading.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\right-sidebar.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\top-bar.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\admin\variables.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\app.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\app\imports\bootstrap.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\app\imports\hood.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\app\main.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\app\variables.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\designer.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\air.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\animate.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\animations.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\base.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\bg-colors.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\checkboxes.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\font-sizes.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\header-sticky.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\header.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\helpers.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\images.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\logo.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\margins.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\nav-mobile.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\nav-primary.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\nav-subtitles.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\overwrites.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\padding.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\preloader.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\push-menu.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\socials.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\spacers.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\sweetalert.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\text-colors.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\top-bar.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\top-socials.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\hood\variables.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\login.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\login\base.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\lib\hood\src\less\login\variables.less">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="1.1.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0" />
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Areas\Admin\Views\Content\AddField.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\Categories.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\CategoryList.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\Choose.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\Create.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\Edit.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\EditCategory.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\EditorGallery.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\Index.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Designer.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Body.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_CustomFields.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Media.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Meta_TabContent.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Meta_Tabs.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_SEO.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Settings.Image.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Settings.Security.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Template.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Titles.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Type.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Default.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Page.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Product.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Slider.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Team.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_Author.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_Images.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_PublishDate.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_Status.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Content\_ListTemplate.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Home\Index.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Home\Theme.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Import\ContentExport.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Import\PropertiesExport.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Import\PropertyFTP.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Mail\Danger.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Mail\Plain.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Mail\Success.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Mail\Test.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Mail\Warning.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\AttachLoad.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\Blade.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\Create.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\Directories.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\Index.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\Insert.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\Select.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\_Filters.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Media\_List.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\Create.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\Edit.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\EditorFloorplans.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\EditorGallery.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\Index.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Descriptions.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Details.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Hidden.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Info.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Media.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Metadata.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Prices.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Property.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_Editor_Sidebar.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Property\_ListTemplate.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Advanced.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Basics.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Billing.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Contact.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Content.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Integrations.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Mail.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Media.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Property.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Settings\Seo.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\Error.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_AdminScripts.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_AdminStyles.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_LoginPartial.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_MetaEditor_Default.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_MetaEditor_Template.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_SettingsLayout.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_Sidebar.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_SidebarHeader.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_ThemeSidebarBottom.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_ThemeSidebarTop.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_User_Record.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Create.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Edit.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Index.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Stripe.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Subscribers.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Webhook.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\_Editor_Subscription.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\_SubscribersPager.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Users\Blade.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Users\Create.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Users\Edit.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Users\Index.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Users\Roles.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\_ViewImports.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\_ViewStart.cshtml" />
+    <EmbeddedResource Include="Views\Account\ConfirmEmail.cshtml" />
+    <EmbeddedResource Include="Views\Account\ConfirmRequired.cshtml" />
+    <EmbeddedResource Include="Views\Account\ExternalLoginConfirmation.cshtml" />
+    <EmbeddedResource Include="Views\Account\ExternalLoginFailure.cshtml" />
+    <EmbeddedResource Include="Views\Account\ForgotPassword.cshtml" />
+    <EmbeddedResource Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <EmbeddedResource Include="Views\Account\Lockout.cshtml" />
+    <EmbeddedResource Include="Views\Account\Login.cshtml" />
+    <EmbeddedResource Include="Views\Account\Register.cshtml" />
+    <EmbeddedResource Include="Views\Account\ResetPassword.cshtml" />
+    <EmbeddedResource Include="Views\Account\ResetPasswordConfirmation.cshtml" />
+    <EmbeddedResource Include="Views\Account\SendCode.cshtml" />
+    <EmbeddedResource Include="Views\Account\VerifyCode.cshtml" />
+    <EmbeddedResource Include="Views\Account\_ContactForm.cshtml" />
+    <EmbeddedResource Include="Views\Address\Create.cshtml" />
+    <EmbeddedResource Include="Views\Address\Edit.cshtml" />
+    <EmbeddedResource Include="Views\Address\Index.cshtml" />
+    <EmbeddedResource Include="Views\Billing\AddCard.cshtml" />
+    <EmbeddedResource Include="Views\Billing\Index.cshtml" />
+    <EmbeddedResource Include="Views\Billing\_Card.cshtml" />
+    <EmbeddedResource Include="Views\Billing\_Invoice.cshtml" />
+    <EmbeddedResource Include="Views\Billing\_Subscription.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\Columns.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\Columns.json" />
+    <EmbeddedResource Include="Views\Blocks\GeneralContent.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\GeneralContent.json" />
+    <EmbeddedResource Include="Views\Blocks\Separator.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\Separator.json" />
+    <EmbeddedResource Include="Views\Blocks\TitleBlock.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\TitleBlock.json" />
+    <EmbeddedResource Include="Views\Cart\Cart.cshtml" />
+    <EmbeddedResource Include="Views\Cart\Checkout.cshtml" />
+    <EmbeddedResource Include="Views\Cart\Failure.cshtml" />
+    <EmbeddedResource Include="Views\Cart\MiniCart.cshtml" />
+    <EmbeddedResource Include="Views\Cart\Success.cshtml" />
+    <EmbeddedResource Include="Views\Components\Header\Default.cshtml" />
+    <EmbeddedResource Include="Views\Home\Feed.cshtml" />
+    <EmbeddedResource Include="Views\Home\Holding.cshtml" />
+    <EmbeddedResource Include="Views\Home\Index.cshtml" />
+    <EmbeddedResource Include="Views\Home\LockoutModeEntrance.cshtml" />
+    <EmbeddedResource Include="Views\Home\Maintenance.cshtml" />
+    <EmbeddedResource Include="Views\Home\Privacy.cshtml" />
+    <EmbeddedResource Include="Views\Home\Show.cshtml" />
+    <EmbeddedResource Include="Views\Home\Terms.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Author.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Categories.cshtml" />
+    <EmbeddedResource Include="Views\Home\_DesignerBar.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Disqus.cshtml" />
+    <EmbeddedResource Include="Views\Home\_EditableContent.cshtml" />
+    <EmbeddedResource Include="Views\Home\_EventsFeed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_FaqFeed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Feed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_NeighbourPosts.cshtml" />
+    <EmbeddedResource Include="Views\Home\_NewsFeed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_NewsView.cshtml" />
+    <EmbeddedResource Include="Views\Home\_NoResults.cshtml" />
+    <EmbeddedResource Include="Views\Home\_PortfolioFeed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_PortfolioView.cshtml" />
+    <EmbeddedResource Include="Views\Home\_ProductFeed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_ProductView.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Recent.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Search.cshtml" />
+    <EmbeddedResource Include="Views\Home\_Sidebar.cshtml" />
+    <EmbeddedResource Include="Views\Home\_TeamFeed.cshtml" />
+    <EmbeddedResource Include="Views\Home\_TestimonialFeed.cshtml" />
+    <EmbeddedResource Include="Views\Install\Install.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_EventsLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_FaqLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_Layout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_LoginLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_NewsLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_PortfolioLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_ProductLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_PropertyLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_TeamLayout.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_TestimonialLayout.cshtml" />
+    <EmbeddedResource Include="Views\Manage\AddPhoneNumber.cshtml" />
+    <EmbeddedResource Include="Views\Manage\ChangePassword.cshtml" />
+    <EmbeddedResource Include="Views\Manage\Index.cshtml" />
+    <EmbeddedResource Include="Views\Manage\ManageLogins.cshtml" />
+    <EmbeddedResource Include="Views\Manage\Profile.cshtml" />
+    <EmbeddedResource Include="Views\Manage\RemoveLogin.cshtml" />
+    <EmbeddedResource Include="Views\Manage\SetPassword.cshtml" />
+    <EmbeddedResource Include="Views\Manage\VerifyPhoneNumber.cshtml" />
+    <EmbeddedResource Include="Views\Property\Index.cshtml" />
+    <EmbeddedResource Include="Views\Property\Show.cshtml" />
+    <EmbeddedResource Include="Views\Property\_Pagination.cshtml" />
+    <EmbeddedResource Include="Views\Property\_PropertyView.cshtml" />
+    <EmbeddedResource Include="Views\Shared\AccessDenied.cshtml" />
+    <EmbeddedResource Include="Views\Shared\Error.cshtml" />
+    <EmbeddedResource Include="Views\Shared\ErrorCode.cshtml" />
+    <EmbeddedResource Include="Views\Shared\NotImplemented.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_AdminEditor.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_BaseMetas.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_BillingMessage.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_ContactForm.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Email_Header.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Email_Layout.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Email_PreHeader.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Footer.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_LoginPartial.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_LoginScripts.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_LoginSocials.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_LoginStyles.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_MailchimpForm.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Metas.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_NoScript.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Pagination.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_PreLoader.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_PropertyCard.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_PropertySearch.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Scripts.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_Styles.cshtml" />
+    <EmbeddedResource Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <EmbeddedResource Include="Views\SliderTemplates\_OwlCarouselDefault.cshtml" />
+    <EmbeddedResource Include="Views\Subscriptions\Addon.cshtml" />
+    <EmbeddedResource Include="Views\Subscriptions\Change.cshtml" />
+    <EmbeddedResource Include="Views\Subscriptions\Index.cshtml" />
+    <EmbeddedResource Include="Views\Subscriptions\New.cshtml" />
+    <EmbeddedResource Include="Views\Subscriptions\Updated.cshtml" />
+    <EmbeddedResource Include="Views\Templates\_Blank.cshtml" />
+    <EmbeddedResource Include="Views\Templates\_Contact.cshtml" />
+    <EmbeddedResource Include="Views\Templates\_Demo.cshtml" />
+    <EmbeddedResource Include="Views\Templates\_Page.cshtml" />
+    <EmbeddedResource Include="Views\_ViewImports.cshtml" />
+    <EmbeddedResource Include="Views\_ViewStart.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hood\Hood.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -45,7 +45,7 @@ namespace Hood.Models
         public void ResetCache()
         {
             var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
-            options.UseSqlServer(_config["Data:ConnectionString"]);
+            options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             var db = new DefaultHoodDbContext(options.Options);
 
             ContentSettings contentSettings = _settings.GetContentSettings();

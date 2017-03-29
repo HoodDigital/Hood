@@ -29,7 +29,8 @@ namespace Hood.Services
             ISettingsRepository site,
             IBillingService billing,
             IEmailSender email,
-            IHttpContextAccessor contextAccessor)
+            IHttpContextAccessor contextAccessor,
+            EventsService events)
         {
             _auth = auth;
             _settings = site;
@@ -39,6 +40,7 @@ namespace Hood.Services
             _billing = billing;
             _context = contextAccessor.HttpContext;
             _email = email;
+            _events = events;
             var info = _settings.GetBasicSettings();
             _log = new MailObject();
             _log.PreHeader = "A new stripe webhook has been fired.";

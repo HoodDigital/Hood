@@ -1,6 +1,7 @@
 ﻿using Hood.BaseTypes;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Hood.Models
 {
@@ -36,6 +37,5 @@ namespace Hood.Models
         {
             return Types.Where(t => !t.IsPublic || !t.Enabled).ToList();
         }
-
     }
 }

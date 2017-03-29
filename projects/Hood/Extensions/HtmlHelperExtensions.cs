@@ -19,8 +19,8 @@ namespace Hood.Extensions
                 foreach (var category in categories)
                 {
                     htmlOutput += "<li>";
-                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\">", contentSlug, category.Slug);
-                    htmlOutput += category.DisplayName;
+                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("{0} <span>{1}</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";
                     htmlOutput += html.ContentCategoryTree(category.Children, contentSlug);
                     htmlOutput += "</li>";
@@ -46,7 +46,7 @@ namespace Hood.Extensions
                     {
                         htmlOutput += "- ";
                     }
-                    htmlOutput += category.DisplayName;
+                    htmlOutput += string.Format("{0} ({1})", category.DisplayName, category.Count);
                     htmlOutput += "</option>";
                     htmlOutput += html.CategorySelectOptions(category.Children, useSlug, startingLevel + 1);
                 }
@@ -68,8 +68,8 @@ namespace Hood.Extensions
                     {
                         htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
                     }
-                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\">", contentSlug, category.Slug);
-                    htmlOutput += category.DisplayName;
+                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";
                     htmlOutput += " <small>[" + category.Slug + "]</small>";
                     htmlOutput += "</td>";

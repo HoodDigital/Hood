@@ -25,36 +25,15 @@ namespace Hood
 {
     public static class HoodStartup
     {
-        private static readonly object serviceScope;
-
         /// <summary>
-        /// Generate the config file for use with HoodCMS.      
+        /// Configure Services for the application to run HoodCMS. 
         /// </summary>
-        /// <param name="env">The current IHostingEnvironment. Standard parameter of Startup().</param>
-        /// <param name="addCustomSettings"></param>
-        public static IConfigurationRoot Config(IHostingEnvironment env, Action<IConfigurationBuilder> addCustomSettings = null)
+        /// <param name="config">The site's conficuration object. In a default ASP.NET application template this is called Configuration.</param>
+        /// <param name="services">The IServiceCollection. Standard parameter of Startup.ConfigureServices().</param>
+        public static void AddHood<TContext>(this IServiceCollection services, IConfigurationRoot config)
+            where TContext : HoodDbContext
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            addCustomSettings(builder);
-
-            if (env.IsEnvironment("Development") || env.IsEnvironment("PreProduction") || env.IsEnvironment("ErrorTesting"))
-            {
-                // For more details on using the user secret store see http://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets();
-                builder.AddApplicationInsightsSettings(developerMode: true);
-            }
-
-            builder.AddJsonFile("connection.json", optional: true, reloadOnChange: true);
-            builder.AddEnvironmentVariables();
-
-            IConfigurationRoot config = builder.Build();
-
-            // Check required app settings
-            config.ConfigSetup("Installed:DB", "Data:ConnectionString");
+            config.ConfigSetup("Installed:DB", "ConnectionStrings:DefaultConnection");
 
             config.ConfigSetup("Installed:ApplicationInsights", "ApplicationInsights:Key");
 
@@ -65,17 +44,6 @@ namespace Hood
             config.ConfigSetup("Installed:Facebook", "Authentication:Facebook:AppId", "Authentication:Facebook:Secret");
             config.ConfigSetup("Installed:Google", "Authentication:Google:AppId", "Authentication:Google:Secret");
 
-            return config;
-        }
-
-        /// <summary>
-        /// Configure Services for the application to run HoodCMS. 
-        /// </summary>
-        /// <param name="config">The site's conficuration object. In a default ASP.NET application template this is called Configuration.</param>
-        /// <param name="services">The IServiceCollection. Standard parameter of Startup.ConfigureServices().</param>
-        public static void ConfigureServices<TContext>(IServiceCollection services, IConfigurationRoot config)
-            where TContext : HoodDbContext
-        {
             services.AddMvc();
 
             services.Configure<RazorViewEngineOptions>(options =>
@@ -90,8 +58,8 @@ namespace Hood
             // Add framework services.
             if (config.CheckSetup("Installed:DB"))
             {
-                services.AddDbContext<TContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
-                services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["Data:ConnectionString"], b => { b.UseRowNumberForPaging(); }));
+                services.AddDbContext<TContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
+                services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
 
 
                 services.AddIdentity<ApplicationUser, IdentityRole>(o =>
@@ -225,7 +193,7 @@ namespace Hood
         /// <param name="loggerFactory">The ILoggerFactory. Standard parameter of Startup.ConfigureServices().</param>
         /// <param name="config">The IConfigurationRoot. Standard parameter of Startup.ConfigureServices().</param>
         /// <param name="customRoutes">Routes to add to the sites route map. These will be added after the standard HoodCMS routes, but before the standard catch all route {area:exists}/{controller=Home}/{action=Index}/{id?}.</param>
-        public static void Configure<TContext>(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot config, Action<IRouteBuilder> customRoutes = null)
+        public static void UseHood<TContext>(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfigurationRoot config, Action<IRouteBuilder> configureRoutes = null)
             where TContext : HoodDbContext
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
@@ -254,7 +222,7 @@ namespace Hood
                     var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>();
                     var roleManager = app.ApplicationServices.GetService<RoleManager<IdentityRole>>();
                     var options = new DbContextOptionsBuilder<HoodDbContext>();
-                    options.UseSqlServer(config["Data:ConnectionString"]);
+                    options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]);
                     var db = new HoodDbContext(options.Options);
                     db.EnsureSetup(userManager, roleManager);
 
@@ -303,17 +271,6 @@ namespace Hood
             {
                 app.UseMvc(routes =>
                 {
-
-                    //routes.MapHoodMaintenanceRoute(
-                    //    name: "MaintenancePage",
-                    //    template: "{*url}",
-                    //    defaults: new { controller = "Home", action = "Maintenance" });
-
-                    //routes.MapHoodHoldingRoute(
-                    //    name: "HoldingPage",
-                    //    template: "{*url}",
-                    //    defaults: new { controller = "Home", action = "Holding" });
-
                     routes.MapRoute(
                         name: "ContentCheck",
                         template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
@@ -323,12 +280,11 @@ namespace Hood
                         name: "areaRoute",
                         template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-                    customRoutes?.Invoke(routes);
+                    configureRoutes?.Invoke(routes);
 
                     routes.MapRoute(
-                        name: "default",
+                        name: "default-fallback",
                         template: "{controller=Home}/{action=Index}/{id?}");
-
                 });
             }
         }

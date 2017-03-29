@@ -319,7 +319,7 @@ namespace Hood.Services
 
             // Get a new instance of the HoodDbContext for this import.
             var options = new DbContextOptionsBuilder<HoodDbContext>();
-            options.UseSqlServer(_config["Data:ConnectionString"]);
+            options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             _db = new HoodDbContext(options.Options);
             Lock.ReleaseWriterLock();
         }
