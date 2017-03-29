@@ -1,4 +1,6 @@
-﻿body {
+﻿@import url('../../../../owlcarousel2/dist/assets/owl.carousel.css');
+
+body {
     padding-top: 50px;
 }
 
@@ -12,4 +14,16 @@ p {
 .jumbotron h1, .jumbotron .h1 {
     font-weight: 100;
     margin-top: 0px;
+}
+
+.content-category {
+    span {
+        &:before {
+            content: '\0028';
+        }
+
+        &:after {
+            content: '\0029';
+        }
+    }
 }

@@ -187,7 +187,7 @@ namespace Hood.Models
                         CustomFields = BaseFields(
                         new List<CustomField>()
                         {
-                            new CustomField() { Name = "Content.News.VideoUrl", Default = "", System = true, Type="System.String" },
+                            new CustomField() { Name = "Content.News.Video", Default = "", System = true, Type="Hood.MultiLineString" },
                             new CustomField() { Name = "Content.News.Headline", Default = "", System = true, Type="System.String" }
                         })
                     },

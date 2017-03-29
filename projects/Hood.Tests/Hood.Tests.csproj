@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.5</VersionPrefix>
     <TargetFramework>net461</TargetFramework>
     <AssemblyName>Hood.Web.Tests</AssemblyName>
     <PackageId>Hood.Tests</PackageId>

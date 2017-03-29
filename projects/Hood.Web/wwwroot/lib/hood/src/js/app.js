@@ -33,7 +33,8 @@ retinaLogoImg = retinaLogo.find('img').attr('src'),
 retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
 retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
 
-owlCarousels = $('#content').find('.owl-carousel-basic');
+owlCarousels = $('.owl-carousel-basic');
+owlSliders = $('.owl-slider');
 
 if (!$.hood)
     $.hood = {}
@@ -628,6 +629,12 @@ $.hood.App = {
         $.hood.App.Loader.AddItem('owl');
         $.getScript('/lib/OwlCarousel2/dist/owl.carousel.min.js', function () {
             owlCarousels.owlCarousel($.hood.App.Options.OwlCarousel.Settings);
+            owlSliders.owlCarousel({
+                loop: true,
+                margin: 0,
+                nav: true,
+                items: 1
+            });
             $.hood.App.Loader.ItemComplete('owl');
         });
     },

@@ -10697,6 +10697,31 @@ figure.img img {
 .img-full {
   width: 100%;
 }
+.img-square:after {
+  padding-top: 100%;
+  /* 16:9 ratio */
+  display: block;
+  content: '';
+  background-size: contain;
+}
+.img-standard:after {
+  padding-top: 33%;
+  /* tall */
+  display: block;
+  content: '';
+}
+.img-wide:after {
+  padding-top: 56.25%;
+  /* 16:9 ratio */
+  display: block;
+  content: '';
+}
+.img-mobile-card:after {
+  padding-top: 151.3%;
+  /* tall */
+  display: block;
+  content: '';
+}
 .m-xxs {
   margin: 2px 4px;
 }
