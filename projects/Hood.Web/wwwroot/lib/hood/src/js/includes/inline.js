@@ -18,7 +18,8 @@ $.hood.Inline = {
         if (($(tag).attr('data-params'))) {
             params = eval($(tag).data('params'));
         }
-        $.get($(tag).data('url'), params, function (data) {
+        var urlLoad = $(tag).data('url');
+        $.get(urlLoad, params, function (data) {
             $(tag).html(data);
             try {
                 $.hood.Helpers.InitMetisMenu(tag);
@@ -28,7 +29,7 @@ $.hood.Inline = {
             } catch (ex) { }
         })
         .fail(function (data) {
-            $.hood.Alerts.Error("There was an error loading the panel.<br/><br />" + data.status + " - " + data.statusText);
+            $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
         })
         .always(function (data) {
             if ($(tag).attr("data-complete")) {
@@ -45,7 +46,8 @@ $.hood.Inline = {
         e.preventDefault();
         $tagcontents = $(e.currentTarget).html();
         $(e.currentTarget).addClass('loading');
-        $.get($(e.currentTarget).attr('href'), null, function (data) {
+        var urlLoad = $(e.currentTarget).attr('href');
+        $.get(urlLoad, null, function (data) {
             if (data.Success) {
                 $.hood.Alerts.Success(data.Message);
             } else {
@@ -58,7 +60,7 @@ $.hood.Inline = {
             }
         }, e.currentTarget))
         .fail(function (data) {
-            $.hood.Alerts.Error("There was an error during the operation.<br/><br />" + data.status + " - " + data.statusText);
+            $.hood.Alerts.Error("There was an error processing the AJAX request:<br/><strong>" + urlLoad + "</strong>");
         })
         .always(function (data) {
             $.hood.Modals.Loading = false;

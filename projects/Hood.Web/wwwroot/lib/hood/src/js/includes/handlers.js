@@ -4,7 +4,7 @@ $.hood.Handlers = {
     Init: function () {
         // Click to select boxes
         $('body').on('click', '.select-text', $.hood.Handlers.SelectTextContent);
-        $('body').on('click', '.btn.click-select[data-target][data-value]', $.hood.Handlers.ClickSelectButton);
+        $('body').on('click', '.btn.click-select[data-target][data-value]', $.hood.Handlers.ClickSelect);
         $('body').on('click', '.click-select[data-target][data-value]', $.hood.Handlers.ClickSelect);
         $('body').on('click', '.slide-link', $.hood.Handlers.SlideToAnchor);
         $('body').on('change', 'input[type=checkbox][data-input]', $.hood.Handlers.CheckboxChange);
@@ -48,17 +48,12 @@ $.hood.Handlers = {
             $(this).val(selected);
         }
     },
-    ClickSelect: function () {
+ClickSelect: function () {
         var $this = $(this);
         targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));
-    },
-    ClickSelectButton: function () {
-        var $this = $(this);
-        targetId = '#' + $this.data('target');
-        $(targetId).val($this.data('value'));
-        $('.click-select[data-target="' + $this.data('target') + '"]').html($this.data('temp')).removeClass('active');
-        $this.data('temp', $this.html()).html('Selected').addClass('active');
+        $('.click-select[data-target="' + $this.data('target') + '"]').each(function () { $(this).html($(this).data('temp')).removeClass('active'); });
+        $('.click-select[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).data('temp', $(this).html()).html('Selected').addClass('active') });;
     },
     SelectTextContent: function () {
         var $this = $(this);

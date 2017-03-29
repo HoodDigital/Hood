@@ -697,6 +697,8 @@ namespace Hood.Areas.Admin.Controllers
                     for (int i = 0; i < extraneous.Count(); i++)
                         content.RemoveTag(extraneous[i]);
                 }
+                var _contentSettings = _settings.GetContentSettings();
+                var type = _contentSettings.GetContentType(content.ContentType);
                 // update  meta values
                 foreach (var val in Request.Form)
                 {
@@ -706,14 +708,30 @@ namespace Hood.Areas.Admin.Controllers
                         // check if new template has been selected
                         if (val.Key == "Meta:Settings.Template")
                         {
-                            var type = _settings.GetContentSettings().GetContentType(content.ContentType);
                             // delete all template metas that do not exist in the new template, and add any that are missing
                             List<string> newMetas = GetMetasForTemplate(val.Value, val.Key, type.TemplateFolder);
                             _content.UpdateTemplateMetas(content, newMetas);
                         }
 
+
                         // bosh we have a meta
-                        content.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                        if (content.HasMeta(val.Key.Replace("Meta:", "")))
+                        {
+                            content.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                        }
+                        else
+                        {
+                            // Add it...
+                            var metaDetails = type.GetMetaDetails(val.Key.Replace("Meta:", ""));
+                            content.AddMeta(new ContentMeta()
+                            {
+                                ContentId = content.Id,
+                                Name = metaDetails.Name,
+                                Type = metaDetails.Type,
+                                BaseValue = JsonConvert.SerializeObject(val.Value)
+                            });
+
+                        }
                     }
                 }
 
