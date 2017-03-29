@@ -19,36 +19,7 @@
             }
             <p>@capi.Excerpt</p>
             <p class="text-muted"><em>@Model.Content.TagString</em></p>
-            <div class="featured-media">
-                @switch (capi.GetMetaValue("Settings.SubType"))
-                {
-                    case "Video":
-                            @if (capi.GetMetaValue("Content.News.Video").IsSet())
-                            {
-                                @Html.Raw(capi.GetMetaValue("Content.News.Video"));
-                            }
-                            break;
-                        case "Slider":
-                            break;
-                        default:
-                            if (Model.Content.FeaturedImage != null)
-                            {
-                                <div class="m-b-lg">
-                                    <a href="@capi.Url">
-                                        @if (Model.Content.GetMeta("Settings.Image.Featured.Fit").GetStringValue() == "100%")
-                                        {
-                                            <img src="@capi.FeaturedImage.LargeUrl" class="img-full content-feature-@Model.Content.Id" />
-                                        }
-                                        else
-                                        {
-                                            <fixedImage src="@capi.FeaturedImage.MediumUrl" class="img-16-9 img-full content-feature-@Model.Content.Id" style="@capi.GetImageStyle()" />
-                                        }
-                                    </a>
-                                </div>
-                            }
-                            break;
-                    }
-            </div>
+            @{ await Html.RenderPartialAsync("_FeaturedMedia", content); }
             <p><a href="#post-content" class="scroll-to-target">Read on...</a></p>
             <hr />
             <div id="share"></div>
