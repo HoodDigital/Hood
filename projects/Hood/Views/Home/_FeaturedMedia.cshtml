@@ -1,0 +1,45 @@
+@model Content
+@{ 
+    var capi = _settings.ToContentApi(Model);
+}
+<div class="featured-media">
+    @switch (capi.GetMetaValue("Settings.SubType"))
+    {
+        case "Video":
+            @if (capi.GetMetaValue("Content.News.Video").IsSet())
+            {
+                @Html.Raw(capi.GetMetaValue("Content.News.Video"));
+            }
+            break;
+        case "Slides":
+            if (Model.Media.Count > 0)
+            {
+                <div class="owl-carousel owl-slider">
+                    @foreach (var media in Model.Media)
+                    {
+                        <div class="item">
+                            <a href="@capi.Url">
+                                <fixedImage src="@media.MediumUrl" class="img-wide img-full content-feature-@Model.Id" />
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            break;
+        default:
+            if (Model.FeaturedImage != null)
+            {
+                <a href="@capi.Url">
+                    @if (Model.GetMeta("Settings.Image.Featured.Fit").GetStringValue() == "100%")
+                    {
+                        <img src="@capi.FeaturedImage.LargeUrl" class="img-full content-feature-@Model.Id" />
+                    }
+                    else
+                    {
+                        <fixedImage src="@capi.FeaturedImage.MediumUrl" class="img-wide img-full content-feature-@Model.Id" style="@capi.GetImageStyle()" />
+                    }
+                </a>
+            }
+            break;
+    }
+</div>

@@ -12,54 +12,7 @@
             {
                 var capi = _settings.ToContentApi(content);
                 <div class="col-md-12">
-                    <div class="featured-media">
-                        @switch (capi.GetMetaValue("Settings.SubType"))
-                        {
-                            case "Video":
-                                @if (capi.GetMetaValue("Content.News.Video").IsSet())
-                                {
-                                    @Html.Raw(capi.GetMetaValue("Content.News.Video"));
-                                }
-                                break;
-                            case "Slides":
-                                if (content.Media.Count > 0)
-                                {
-                                    <div class="owl-carousel owl-slider">                                    
-                                        @foreach (var media in content.Media)
-                                        {                                            
-                                            <div class="item">
-                                                <a href="@capi.Url">
-                                                    @if (content.GetMeta("Settings.Image.Featured.Fit").GetStringValue() == "100%")
-                                                    {
-                                                        <img src="@media.LargeUrl" class="img-full content-feature-@content.Id" />
-                                                    }
-                                                    else
-                                                    {
-                                                        <fixedImage src="@media.MediumUrl" class="img-wide img-full content-feature-@content.Id" />
-                                                    }
-                                                </a>
-                                            </div>                                           
-                                        }
-                                    </div>
-                                }
-                                break;
-                            default:
-                                if (content.FeaturedImage != null)
-                                {
-                                    <a href="@capi.Url">
-                                        @if (content.GetMeta("Settings.Image.Featured.Fit").GetStringValue() == "100%")
-                                {
-                                            <img src="@capi.FeaturedImage.LargeUrl" class="img-full content-feature-@content.Id" />
-                                        }
-                                        else
-                                        {
-                                            <fixedImage src="@capi.FeaturedImage.MediumUrl" class="img-wide img-full content-feature-@content.Id" style="@capi.GetImageStyle()" />
-                                        }
-                                    </a>
-                                }
-                                break;
-                        }
-                    </div>
+                    @{ await Html.RenderPartialAsync("_FeaturedMedia", content); }
                     <h3><a href="@capi.Url">@content.Title</a></h3>
                     <p>
                         <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.Type.Type.ToLower(), content.Author.UserName)">@content.Author.FullName</a></span>
