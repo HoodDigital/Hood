@@ -74,6 +74,7 @@ namespace Hood.Models
                     new Lazy<Dictionary<string, ContentCategory>>(() =>
                     {
                         var q = from d in db.ContentCategories
+                                where d.ContentType == type.Type
                                 select new ContentCategory
                                 {
                                     ContentCategoryId = d.ContentCategoryId,
