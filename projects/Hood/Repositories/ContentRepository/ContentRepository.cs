@@ -993,11 +993,14 @@ namespace Hood.Services
                 var currentTemplate = content.GetMeta("Settings.Template");
                 if (currentTemplate != null)
                 {
-
-                    // delete all template metas that do not exist in the new template, and add any that are missing
-                    var type = _contentSettings.GetContentType(content.ContentType);
-                    List<string> newMetas = GetMetasForTemplate(currentTemplate.GetStringValue(), type.TemplateFolder);
-                    UpdateTemplateMetas(content, newMetas);
+                    var template = currentTemplate.GetStringValue();
+                    if (template.IsSet())
+                    {
+                        // delete all template metas that do not exist in the new template, and add any that are missing
+                        var type = _contentSettings.GetContentType(content.ContentType);
+                        List<string> newMetas = GetMetasForTemplate(template, type.TemplateFolder);
+                        UpdateTemplateMetas(content, newMetas);
+                    }
                 }
             }
             _db.SaveChanges();
