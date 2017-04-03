@@ -5,8 +5,10 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
+using Hood.IO;
 using Hood.Models;
 using Hood.Models.Api;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -16,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -29,11 +32,13 @@ namespace Hood.Services
         private readonly IHoodCache _cache;
         private readonly ContentSettings _contentSettings;
         private readonly EventsService _events;
+        private readonly IHostingEnvironment _env;
 
         public ContentRepository(HoodDbContext db,
                                  IHoodCache cache,
                                  IConfiguration config,
                                  ISettingsRepository site,
+                                 IHostingEnvironment env,
                                  EventsService events)
         {
             _db = db;
@@ -41,6 +46,7 @@ namespace Hood.Services
             _settings = site;
             _cache = cache;
             _events = events;
+            _env = env;
             _contentSettings = _settings.GetContentSettings();
         }
 
@@ -953,6 +959,7 @@ namespace Hood.Services
         }
         public void RefreshMetas(Content content)
         {
+            var _contentSettings = _settings.GetContentSettings();
             foreach (CustomField field in _contentSettings.GetContentType(content.ContentType).CustomFields)
             {
                 if (content.HasMeta(field.Name))
@@ -976,6 +983,69 @@ namespace Hood.Services
             }
             _db.SaveChanges();
             _events.triggerContentChanged(this);
+        }
+        public void RefreshAllMetas()
+        {
+            var _contentSettings = _settings.GetContentSettings();
+            foreach (var content in _db.Content.Include(p => p.Metadata).ToList())
+            {
+                RefreshMetas(content);
+                var currentTemplate = content.GetMeta("Settings.Template");
+                if (currentTemplate != null)
+                {
+
+                    // delete all template metas that do not exist in the new template, and add any that are missing
+                    var type = _contentSettings.GetContentType(content.ContentType);
+                    List<string> newMetas = GetMetasForTemplate(currentTemplate.GetStringValue(), type.TemplateFolder);
+                    UpdateTemplateMetas(content, newMetas);
+                }
+            }
+            _db.SaveChanges();
+        }
+        public List<string> GetMetasForTemplate(string templateName, string folder)
+        {
+            templateName = templateName.Replace("Meta:", "");
+
+            // get the right template file (from theme or if it doesnt appear there from base)
+            string templatePath = _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            if (!System.IO.File.Exists(templatePath))
+                templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            if (!System.IO.File.Exists(templatePath))
+            {
+                templatePath = null;
+            }
+            string template = null;
+            if (templatePath != null)
+            {
+                // get the file contents 
+                template = System.IO.File.ReadAllText(templatePath);
+            }
+            else
+            {
+                template = EmbeddedFiles.ReadAllText("~/Views/" + folder + "/" + templateName + ".cshtml");
+            }
+
+            // pull out any instance of @TemplateData["XXX"]
+            Regex regex = new Regex(@"@ViewData\[\""(.*?)\""\]");
+            List<string> metas = new List<string>();
+            var matches = regex.Matches(template);
+            foreach (Match mtch in matches)
+            {
+                var meta = mtch.Value.Replace("@ViewData[\"", "").Replace("\"]", "");
+                if (meta.StartsWith("Template."))
+                    metas.Add(meta);
+            }
+
+            regex = new Regex(@"@Html.Raw\(ViewData\[\""(.*?)\""\]\)");
+            matches = regex.Matches(template);
+            foreach (Match mtch in matches)
+            {
+                var meta = mtch.Value.Replace("@Html.Raw(ViewData[\"", "").Replace("\"])", "");
+                if (meta.StartsWith("Template."))
+                    metas.Add(meta);
+            }
+            // return list of all XXX metas.
+            return metas.Distinct().ToList();
         }
         public bool CheckSlug(string slug, int? id = null)
         {

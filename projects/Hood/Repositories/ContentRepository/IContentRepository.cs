@@ -29,6 +29,8 @@ namespace Hood.Services
         // Other Content functions
         void UpdateTemplateMetas(Content content, List<string> newMetas);
         void RefreshMetas(Content content);
+        void RefreshAllMetas();
+        List<string> GetMetasForTemplate(string templateName, string folder);
         bool CheckSlug(string slug, int? id = null);
 
         // Tags
@@ -51,5 +53,6 @@ namespace Hood.Services
         Task<List<TweetApi>> GetTweets(string name, int count);
         List<Country> AllCountries();
         Country GetCountry(string name);
+        
     }
 }
