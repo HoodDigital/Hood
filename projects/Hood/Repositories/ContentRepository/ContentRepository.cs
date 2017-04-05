@@ -999,7 +999,8 @@ namespace Hood.Services
                         // delete all template metas that do not exist in the new template, and add any that are missing
                         var type = _contentSettings.GetContentType(content.ContentType);
                         List<string> newMetas = GetMetasForTemplate(template, type.TemplateFolder);
-                        UpdateTemplateMetas(content, newMetas);
+                        if (newMetas != null) 
+                            UpdateTemplateMetas(content, newMetas);
                     }
                 }
             }
@@ -1025,7 +1026,11 @@ namespace Hood.Services
             }
             else
             {
-                template = EmbeddedFiles.ReadAllText("~/Views/" + folder + "/" + templateName + ".cshtml");
+                var path = "~/Views/" + folder + "/" + templateName + ".cshtml";
+                if (EmbeddedFiles.GetFiles(path).Length > 0)
+                    template = EmbeddedFiles.ReadAllText(path);
+                else
+                    return null;
             }
 
             // pull out any instance of @TemplateData["XXX"]

@@ -1,3 +1,4 @@
+using Hood.Core.Infrastructure;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
@@ -676,8 +677,18 @@ namespace Hood.Areas.Admin.Controllers
                 content.LastEditedBy = User.Identity.Name;
                 content.LastEditedOn = DateTime.Now;
 
-                if (!_content.CheckSlug(content.Slug, content.Id))
-                    throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                if (content.Slug.IsSet())
+                {
+                    if (!_content.CheckSlug(content.Slug, content.Id))
+                        throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                }
+                else
+                {
+                    var generator = new KeyGenerator();
+                    content.Slug = generator.UrlSlug();
+                    while (!_content.CheckSlug(content.Slug))
+                        content.Slug = generator.UrlSlug();
+                }
 
                 List<string> tags = post.Tags?.Split(',').ToList();
                 if (tags == null)
