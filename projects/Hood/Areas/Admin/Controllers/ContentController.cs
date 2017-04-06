@@ -1,3 +1,4 @@
+using Hood.Core.Infrastructure;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
@@ -65,7 +66,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<IActionResult> Edit(int id)
         {
-            var content = _content.GetContentByID(id);
+            var content = _content.GetContentByID(id, true);
             if (content == null)
                 return NotFound();
             EditContentModel model = await GetEditorModel(content);
@@ -676,8 +677,18 @@ namespace Hood.Areas.Admin.Controllers
                 content.LastEditedBy = User.Identity.Name;
                 content.LastEditedOn = DateTime.Now;
 
-                if (!_content.CheckSlug(content.Slug, content.Id))
-                    throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                if (content.Slug.IsSet())
+                {
+                    if (!_content.CheckSlug(content.Slug, content.Id))
+                        throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                }
+                else
+                {
+                    var generator = new KeyGenerator();
+                    content.Slug = generator.UrlSlug();
+                    while (!_content.CheckSlug(content.Slug))
+                        content.Slug = generator.UrlSlug();
+                }
 
                 List<string> tags = post.Tags?.Split(',').ToList();
                 if (tags == null)
@@ -700,20 +711,11 @@ namespace Hood.Areas.Admin.Controllers
                 var _contentSettings = _settings.GetContentSettings();
                 var type = _contentSettings.GetContentType(content.ContentType);
                 // update  meta values
+                var oldTemplate = content.GetMeta("Settings.Template").GetStringValue();
                 foreach (var val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
-
-                        // check if new template has been selected
-                        if (val.Key == "Meta:Settings.Template")
-                        {
-                            // delete all template metas that do not exist in the new template, and add any that are missing
-                            List<string> newMetas = GetMetasForTemplate(val.Value, val.Key, type.TemplateFolder);
-                            _content.UpdateTemplateMetas(content, newMetas);
-                        }
-
-
                         // bosh we have a meta
                         if (content.HasMeta(val.Key.Replace("Meta:", "")))
                         {
@@ -734,6 +736,15 @@ namespace Hood.Areas.Admin.Controllers
                         }
                     }
                 }
+                var currentTemplate = content.GetMeta("Settings.Template").GetStringValue();
+                // check if new template has been selected
+                if (oldTemplate.IsSet() && currentTemplate.IsSet() && oldTemplate != currentTemplate)
+                {
+                    // delete all template metas that do not exist in the new template, and add any that are missing
+                    List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, type.TemplateFolder);
+                    _content.UpdateTemplateMetas(content, newMetas);
+                }
+
 
                 OperationResult result = _content.Update(content);
 
@@ -750,52 +761,6 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        private List<string> GetMetasForTemplate(string templateName, string type, string folder)
-        {
-            templateName = templateName.Replace("Meta:", "");
-
-            // get the right template file (from theme or if it doesnt appear there from base)
-            string templatePath = _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
-            if (!System.IO.File.Exists(templatePath))
-                templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
-            if (!System.IO.File.Exists(templatePath))
-            {
-                templatePath = null;
-            }
-            string template = null;
-            if (templatePath != null)
-            {
-                // get the file contents 
-                template = System.IO.File.ReadAllText(templatePath);
-            }
-            else
-            {
-                template = EmbeddedFiles.ReadAllText("~/Views/" + folder + "/" + templateName + ".cshtml");
-            }
-
-            // pull out any instance of @TemplateData["XXX"]
-            Regex regex = new Regex(@"@ViewData\[\""(.*?)\""\]");
-            List<string> metas = new List<string>();
-            var matches = regex.Matches(template);
-            foreach (Match mtch in matches)
-            {
-                var meta = mtch.Value.Replace("@ViewData[\"", "").Replace("\"]", "");
-                if (meta.StartsWith("Template."))
-                    metas.Add(meta);
-            }
-
-            regex = new Regex(@"@Html.Raw\(ViewData\[\""(.*?)\""\]\)");
-            matches = regex.Matches(template);
-            foreach (Match mtch in matches)
-            {
-                var meta = mtch.Value.Replace("@Html.Raw(ViewData[\"", "").Replace("\"])", "");
-                if (meta.StartsWith("Template."))
-                    metas.Add(meta);
-            }
-            // return list of all XXX metas.
-            return metas.Distinct().ToList();
-        }
-
         private async Task<EditContentModel> GetEditorModel(Content content)
         {
             EditContentModel model = new EditContentModel();
@@ -804,8 +769,6 @@ namespace Hood.Areas.Admin.Controllers
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
             model.Authors = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
-
-            _content.RefreshMetas(content);
 
             // Templates
             if (model.Type.Templates)

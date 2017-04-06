@@ -178,6 +178,10 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 _settings.Set("Hood.Settings.Content", model);
+
+                // refresh all content metas and things
+                _content.RefreshAllMetas();
+                
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -194,6 +198,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new ContactSettings();
             _settings.Set("Hood.Settings.Content", model);
+            // refresh all content metas and things
+            _content.RefreshAllMetas();
             return RedirectToAction("Content");
         }
 
