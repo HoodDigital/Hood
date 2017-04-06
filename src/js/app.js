@@ -140,10 +140,6 @@ $.hood.App = {
         $.hood.App.Accordion();
         $.hood.App.Counters();
 
-        if ($.hood.App.Options.Scroll.StickyHeader)
-            $.hood.App.Scroll.Init();
-        if ($.hood.App.Options.Scroll.InitialPosition)
-            $.hood.App.Scroll.InitialPosition();
         if ($.hood.App.Options.Scroll.Functions)
             $.hood.App.Scroll.Functions();
 
@@ -172,10 +168,17 @@ $.hood.App = {
                 $.hood.App.Wow();
         }
     },
+    onInitComplete: function () {
+        if ($.hood.App.Options.Scroll.StickyHeader)
+            $.hood.App.Scroll.Init();
+        if ($.hood.App.Options.Scroll.InitialPosition)
+            $.hood.App.Scroll.InitialPosition();
+    },
     Loader: {
         LoadList: new Array(),
         Init: function () {
             var event = new CustomEvent('load-completed');
+            $(document).on('load-completed', 'body', $.hood.App.onInitComplete);
             $(document).on('load-completed', 'body', $.hood.App.Options.Loader.Complete || $.hood.App.Loader.Complete);
             for (i = 0; i < $.hood.App.Options.Loader.Items.length; i++) {
                 $.hood.App.Loader.AddItem($.hood.App.Options.Loader.Items[i]);
@@ -244,7 +247,6 @@ $.hood.App = {
                 $.hood.App.Header.FullWidthMenu();
             }
             $.hood.App.Header.OverlayMenu();
-            $.hood.App.Header.StickyMenu();
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
             $.hood.App.Header.Logo();
@@ -370,6 +372,7 @@ $.hood.App = {
             }
         },
         StickyMenu: function (headerOffset) {
+            //console.log("headerOffset:" + headerOffset + "$.window.scrollTop():" + $.window.scrollTop())
             if ($.window.scrollTop() > headerOffset) {
                 $.header.addClass(stickyHeaderClass);
             } else {
@@ -422,17 +425,6 @@ $.hood.App = {
 
             if ($.header.length > 0) { headerOffset = $.header.offset().top; }
             if ($.header.length > 0) { headerWrapOffset = $.headerWrap.offset().top; }
-
-            var headerDefinedOffset = $.header.attr('data-sticky-offset');
-            if (typeof headerDefinedOffset !== 'undefined') {
-                if (headerDefinedOffset == 'full') {
-                    headerWrapOffset = $.window.height();
-                    var headerOffsetNegative = $.header.attr('data-sticky-offset-negative');
-                    if (typeof headerOffsetNegative !== 'undefined') { headerWrapOffset = headerWrapOffset - headerOffsetNegative - 1; }
-                } else {
-                    headerWrapOffset = Number(headerDefinedOffset);
-                }
-            }
 
             $.hood.App.Header.StickyMenu(headerWrapOffset);
 
