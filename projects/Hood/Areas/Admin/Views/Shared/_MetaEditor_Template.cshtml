@@ -16,7 +16,14 @@
                 break;
             case "Body":
             case "WYSIWYG":
-                <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control tinymce-simple">@Model.GetStringValue()</textarea>
+                if (User.IsInRole("Admin"))
+                {
+                    <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control tinymce-simple-admin">@Model.GetStringValue()</textarea>
+                }
+                else
+                {
+                    <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control tinymce-simple">@Model.GetStringValue()</textarea>
+                }
                 break;
             case "Url":
                 <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" />

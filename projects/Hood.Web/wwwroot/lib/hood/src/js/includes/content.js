@@ -417,63 +417,6 @@ $.hood.Content = {
             this.LoadEditors('#edit-content');
             $.hood.Content.Upload.InitImageUploader();
 
-            tinymce.init({
-                selector: '.edit-content-editor',
-                height: 500,
-
-                plugins: [
-                  'advlist autolink lists link image charmap print preview anchor media',
-                  'searchreplace visualblocks code fullscreen',
-                  'insertdatetime media contextmenu paste code'
-                ],
-                toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media hoodimage',
-                link_class_list: [
-                    { title: 'None', value: '' },
-                    { title: 'Button link', value: 'btn btn-default' },
-                    { title: 'Theme coloured button link', value: 'btn btn-primary' },
-                    { title: 'Popup image/video', value: 'colorbox-iframe' },
-                    { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-                    { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-                    { title: 'Large link', value: 'font-lg' },
-                    { title: 'Large button link', value: 'btn btn-default btn-lg' },
-                    { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-                    { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-                    { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-                    { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-                ],
-                setup: $.hood.Uploader.Load.Insert,
-                content_css: [
-                ]
-            });
-
-            tinymce.init({
-                selector: '.edit-content-editor-simple',
-                height: 500,
-                plugins: [
-                  'advlist autolink lists link image charmap print preview anchor media',
-                  'searchreplace visualblocks code fullscreen',
-                  'insertdatetime media contextmenu paste code'
-                ],
-                menubar: false,
-                toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | undo redo | link image media hoodimage',
-                link_class_list: [
-                    { title: 'None', value: '' },
-                    { title: 'Button link', value: 'btn btn-default' },
-                    { title: 'Theme coloured button link', value: 'btn btn-primary' },
-                    { title: 'Popup image/video', value: 'colorbox-iframe' },
-                    { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-                    { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-                    { title: 'Large link', value: 'font-lg' },
-                    { title: 'Large button link', value: 'btn btn-default btn-lg' },
-                    { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-                    { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-                    { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-                    { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-                ],
-                setup: $.hood.Uploader.Load.Insert,
-                content_css: [
-                ]
-            });
 
             //$('body').on('click', '#content-category-submit', this.AddCategory);
             if ($('#designer-window').doesExist())
