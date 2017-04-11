@@ -84,6 +84,41 @@ $.hood.Google = {
                 });
             }
         }
+
+    },
+    ClusteredMap: function () {
+
+        var mapElement = $('#clustered-map');
+        if (!mapElement)
+            return;
+
+        var map = new google.maps.Map(document.getElementById('clustered-map'), {
+            zoom: 7,
+            center: { lat: mapElement.data('lat'), lng: mapElement.data('long') }
+        });
+
+        // Create an array  of alphabetical characters used to label the markers.
+        var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        var locations = mapElement.data('locations');
+        var clickFunction = mapElement.data('click')
+        // Add some markers to the map.
+        // Note: The code uses the JavaScript Array.prototype.map() method to
+        // create an array of markers based on a given "locations" array.
+        // The map() method here has nothing to do with the Google Maps API.
+        var markers = locations.map(function (location, i) {
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng(location.Latitude, location.Longitude),
+                label: location.Title
+            });
+            marker.addListener('click', function () {
+                eval(clickFunction + "(" + location.AssociatedId + ")");
+            });
+            return marker;
+        });
+
+        // Add a marker clusterer to manage the markers.
+        var markerCluster = new MarkerClusterer(map, markers, { imagePath: '/lib/hood/images/maps/m' });
     }
 };
 function initGoogleMapsComplete() {
@@ -91,4 +126,7 @@ function initGoogleMapsComplete() {
         $.hood.Google.Addresses.InitAutocomplete();
     }
     $.hood.Google.Maps();
+    $.hood.Google.ClusteredMap();
+    // try calling initMaps, this may have been added to pages.
+    try {initMap();} catch (ex) {}
 }
