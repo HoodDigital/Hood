@@ -135,7 +135,7 @@ namespace Hood.Models.Api
         // Formatted Members
         public string StatusString { get; set; }
         public bool PublishPending { get; set; }
-        public string Url { get; set; }
+        public string Url { get; }
 
         public PropertyListingApi()
         {
@@ -195,7 +195,6 @@ namespace Hood.Models.Api
                 FormattedFees = propertySettings.ShowFeesDecimals ? post.Fees.Value.ToString("C") : post.Fees.Value.ToString("C0");
 
 
-            Url = string.Format("/property/{0}/{1}/{2}/{3}", post.Id, post.Address2.IsSet() ? post.Address2.ToSeoUrl() : post.City.ToSeoUrl(), post.Postcode.Split(' ').First().ToSeoUrl(), post.Title.ToSeoUrl());
 
             if (Status == 1)
             {

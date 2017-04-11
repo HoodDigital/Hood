@@ -1,29 +1,29 @@
 @inject IThemesService _themes
 <environment names="Development,Staging,ErrorTesting">
-    <link rel="stylesheet" href="~/css/preload.css" />
+    <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
     <noscript id="deferred-styles">
         <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.css" />
         @if (_themes.CurrentTheme == "default")
         {
-            <link rel="stylesheet" href="~/css/site.css" />
+            <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
         }
         else
         {
-            <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/site.min.css", _themes.CurrentTheme)" />
+            <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/site.min.css", _themes.CurrentTheme)" asp-append-version="true" />
         }
     </noscript>
 </environment>
 <environment names="Production,PreProduction">
-    <link rel="stylesheet" href="~/css/preload.css" />
+    <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
     <noscript id="deferred-styles">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
         @if (_themes.CurrentTheme == "default")
         {
-            <link rel="stylesheet" href="~/css/site.min.css" /> 
+            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" /> 
         }
         else
         {
-            <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/site.min.css", _themes.CurrentTheme)" />
+            <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/site.min.css", _themes.CurrentTheme)" asp-append-version="true" />
         }
     </noscript>
 </environment>

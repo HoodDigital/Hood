@@ -216,6 +216,12 @@ namespace Hood.Services
             properties.PageSize = filters.pageSize;
             return properties;
         }
+        public Task<List<MapMarker>> GetLocations(PropertyFilters filters)
+        {
+            PagedList<PropertyListing> properties = new PagedList<PropertyListing>();
+            var propertiesQuery = GetProperties(filters, true);
+            return propertiesQuery.AsNoTracking().Select(p => new MapMarker(p, p.Title, p.Id.ToString(), p.Url)).ToListAsync();
+        }
         public OperationResult<PropertyListing> UpdateProperty(PropertyListing property)
         {
             try

@@ -31,9 +31,33 @@
         <h2>Search our property portfolio...</h2>
     </div>
 </div>
-<section class="ptb-15" id="search-rental-box">
+<section id="search-rental-box">
     @{ await Html.RenderPartialAsync("_PropertySearch"); }
 </section>
+<div id="clustered-map" class="img-lg img-full m-t-lg m-b-lg"
+     data-lat="@Model.CentrePoint.Latitude"
+     data-long="@Model.CentrePoint.Longitude"
+     data-zoom="10"
+     data-scrollwheel="false"
+     data-marker="/lib/hood/images/maps/marker.png"
+     data-click="openPropertyModal"
+     data-locations="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Locations)">
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="property-modal">
+</div>
+<script>
+    function openPropertyModal(id) {
+        $.get('/property/modal', { id: id }, function (data, textStatus, jqXHR) {
+            if (textStatus == 'success') {
+                $('#property-modal').empty().html(data).modal();
+
+            } else {
+                alert('Failed to load property.');
+            }
+        });
+    }
+</script>
+<script src="~/lib/hood/src/js/includes/markerclusterer.js"></script>
 <div class="container">
     <div class="ptb-60 row">
         <div class="col-sm-6">
@@ -88,5 +112,5 @@
         <div class="text-center">
             @{   await Html.RenderPartialAsync("_Pagination");}
         </div>
-    }
+                }
 </div>

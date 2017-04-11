@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Hood.Models
 {
@@ -109,6 +110,16 @@ namespace Hood.Models
         public string AskingPriceDisplay { get; set; }
         public string PremiumDisplay { get; set; }
         public string FeesDisplay { get; set; }
+
+        [NotMapped]
+        public string Url
+        {
+            get
+            {
+                return string.Format("/property/{0}/{1}/{2}/{3}", Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.Split(' ').First().ToSeoUrl(), Title.ToSeoUrl());
+
+            }
+        }
 
         public List<PropertyMeta> Metadata { get; set; }
         public List<PropertyMedia> Media { get; set; }

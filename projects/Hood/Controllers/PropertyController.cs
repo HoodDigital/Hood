@@ -4,6 +4,7 @@ using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
+using System.Linq;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers
@@ -38,6 +39,8 @@ namespace Hood.Controllers
                 model.Filters = new PropertyFilters();
 
             PagedList<PropertyListing> properties = await _property.GetPagedProperties(model.Filters, true);
+            model.Locations = await _property.GetLocations(model.Filters);
+            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             PropertySettings settings = _settings.GetPropertySettings();
             model.Properties = properties;
             model.Types = settings.GetListingTypes();
@@ -59,6 +62,19 @@ namespace Hood.Controllers
             return View(um);
         }
 
+        [Route("property/modal")]
+        public IActionResult Modal(int id)
+        {
+            ShowPropertyModel um = new ShowPropertyModel();
+
+            um.Property = _property.GetPropertyById(id);
+
+            // if not admin, and not published, hide.
+            if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && um.Property.Status != (int)Status.Published)
+                return NotFound();
+
+            return View(um);
+        }
     }
 
 }

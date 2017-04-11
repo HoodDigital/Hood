@@ -9,6 +9,7 @@ namespace Hood.Services
     {
         OperationResult<PropertyListing> Add(PropertyListing property);
         Task<PagedList<PropertyListing>> GetPagedProperties(PropertyFilters propertyFilters, bool published = true);
+        Task<List<MapMarker>> GetLocations(PropertyFilters filters);
         PropertyListing GetPropertyById(int id, bool nocache = false);
         void ClearField(int id, string field);
         OperationResult Delete(int id);
@@ -19,5 +20,6 @@ namespace Hood.Services
         Task<OperationResult<PropertyListing>> AddFloorplan(PropertyListing property, PropertyFloorplan media);
         Task<List<PropertyListing>> GetFeatured();
         Task<List<PropertyListing>> GetRecent();
+       
     }
 }
