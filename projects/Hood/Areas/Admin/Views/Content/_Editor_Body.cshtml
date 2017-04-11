@@ -1,20 +1,36 @@
 @model EditContentModel
-@if (Model.Type.ShowDesigner)
+@if (Model.Type.ShowEditor)
 {
-    <div class="text-center">
-        <a class="btn btn-lg btn-info" asp-area="" asp-action="Show" asp-controller="Home" asp-route-id="@Model.Content.Id" asp-route-editMode="true"><i class="fa fa-pencil m-r-xs"></i>Edit this @Model.Type.TypeName in the Designer...</a>
-        <p>or...</p>
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#showHideEditor" aria-expanded="false" aria-controls="showHideEditor">
-            Edit in the standard editor...
-        </button>
-    </div>
-    <div class="collapse" id="showHideEditor">
-        <div class="m-t-lg">
-            @{  await Html.RenderPartialAsync("_Editor_TinyMce"); }
+    <h5 class="m-t-lg">Content</h5>
+    @if (Model.Type.ShowDesigner)
+    {
+        <div class="text-center">
+            <a class="btn btn-lg btn-info" asp-area="" asp-action="Show" asp-controller="Home" asp-route-id="@Model.Content.Id" asp-route-editMode="true"><i class="fa fa-pencil m-r-xs"></i>Edit this @Model.Type.TypeName in the Designer...</a>
+            <p>or...</p>
+            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#showHideEditor" aria-expanded="false" aria-controls="showHideEditor">
+                Edit in the standard editor...
+            </button>
         </div>
-    </div>
-}
-else
-{
-    await Html.RenderPartialAsync("_Editor_TinyMce");
+        <div class="collapse" id="showHideEditor">
+            <div class="m-t-lg">
+                <textarea id="Body" name="Body" class="edit-content-editor">@Model.Content.Body</textarea>
+            </div>
+        </div>
+    }
+    else
+    {
+
+        switch (Model.Type.EditorType)
+        {
+            case "simple":
+                <textarea id="Body" name="Body" class="edit-content-editor-simple">@Model.Content.Body</textarea>
+                break;
+            case "full":
+                <textarea id="Body" name="Body" class="edit-content-editor">@Model.Content.Body</textarea>
+                break;
+            default:
+                <textarea id="Body" name="Body" class="edit-content-editor-simple">@Model.Content.Body</textarea>
+                break;
+        }
+    }
 }
