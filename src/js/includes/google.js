@@ -89,11 +89,20 @@ $.hood.Google = {
     ClusteredMap: function () {
 
         var mapElement = $('#clustered-map');
-        if (!mapElement)
+        if (!mapElement.length)
             return;
 
+        var scrollWheel = false;
+        if (mapElement.attr('data-scrollwheel'))
+            scrollWheel = mapElement.data('scrollwheel');
+
+        var zoom = false;
+        if (mapElement.attr('data-zoom'))
+            zoom = mapElement.data('zoom');
+
         var map = new google.maps.Map(document.getElementById('clustered-map'), {
-            zoom: 7,
+            zoom: zoom,
+            scrollwheel: scrollWheel,
             center: { lat: mapElement.data('lat'), lng: mapElement.data('long') }
         });
 

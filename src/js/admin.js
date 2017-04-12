@@ -1,56 +1,38 @@
-/*
- *
- *   INSPINIA - Responsive Admin Theme
- *   version 2.2
- *
- */
-
-
 $(document).ready(function () {
 
-    // Add body-small class if window less than 768px
     if ($(this).width() < 769) {
         $('body').addClass('body-small')
     } else {
         $('body').removeClass('body-small')
     }
 
-    // MetsiMenu
-
     $.hood.Helpers.InitIboxes('body');
     $.hood.Helpers.InitMetisMenu('#side-menu');
 
-    // Close menu in canvas mode
     $('.close-canvas-menu').click(function () {
         $("body").toggleClass("mini-nav");
         SmoothlyMenu();
     });
-
-    // Open close right sidebar
     $('.right-sidebar-toggle').click(function () {
         $('#right-sidebar').toggleClass('sidebar-open');
     });
 
-    // Initialize slimscroll for right sidebar
     $('.sidebar-container').slimScroll({
         height: '100%',
         railOpacity: 0.4,
         wheelStep: 10
     });
 
-    // Open close small chat
     $('.open-small-chat').click(function () {
         $(this).children().toggleClass('fa-comments').toggleClass('fa-remove');
         $('.small-chat-box').toggleClass('active');
     });
 
-    // Initialize slimscroll for small chat
     $('.small-chat-box .content').slimScroll({
         height: '234px',
         railOpacity: 0.4
     });
 
-    // Small todo handler
     $('.check-link').click(function () {
         var button = $(this).find('i');
         var label = $(this).next('span');
@@ -64,7 +46,7 @@ $(document).ready(function () {
         else
             $("body").removeClass("mini-nav")
     }
-    // Minimalize menu
+
     $('.sidebar-toggle').click(function () {
         $("body").toggleClass("mini-nav");
         SmoothlyMenu();
@@ -76,17 +58,13 @@ $(document).ready(function () {
         }
     });
 
-    // Tooltips demo
     $('.tooltip-demo').tooltip({
         selector: "[data-toggle=tooltip]",
         container: "body"
     });
 
-    // Move modal to body
-    // Fix Bootstrap backdrop issu with animation.css
     $('.modal').appendTo("body");
 
-    // Full height of sidebar
     function fix_height() {
         var heightWithoutNavbar = $("body > #wrapper").height() - 61;
         $(".sidebard-panel").css("min-height", heightWithoutNavbar + "px");
@@ -110,7 +88,6 @@ $(document).ready(function () {
 
     fix_height();
 
-    // Fixed Sidebar
     $(window).bind("load", function () {
         if ($("body").hasClass('fixed-sidebar')) {
             $('.sidebar-collapse').slimScroll({
@@ -120,7 +97,6 @@ $(document).ready(function () {
         }
     });
 
-    // Move right sidebar top after scroll
     $(window).scroll(function () {
         if ($(window).scrollTop() > 0 && !$('body').hasClass('fixed-nav')) {
             $('#right-sidebar').addClass('sidebar-top');
@@ -138,24 +114,11 @@ $(document).ready(function () {
     $("[data-toggle=popover]")
         .popover();
 
-    // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
         height: '100%'
     })
 });
 
-
-// Minimalize menu when screen is less than 768px
-$(window).bind("resize", function () {
-    if ($(this).width() < 769) {
-        $('body').addClass('body-small')
-    } else {
-        $('body').removeClass('body-small')
-    }
-});
-
-// Local Storage functions
-// Set proper body class and plugins based on user configuration
 $(document).ready(function () {
     if (localStorageSupport) {
 
@@ -266,7 +229,20 @@ $.hood.Admin = {
     Init: function () {
         $.hood.Helpers.InitMetisMenu(document);
         $.hood.Helpers.InitIboxes(document);
-
+        var linkClasses = [
+            { title: 'None', value: '' },
+            { title: 'Button link', value: 'btn btn-default' },
+            { title: 'Theme coloured button link', value: 'btn btn-primary' },
+            { title: 'Popup image/video', value: 'colorbox-iframe' },
+            { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
+            { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
+            { title: 'Large link', value: 'font-lg' },
+            { title: 'Large button link', value: 'btn btn-default btn-lg' },
+            { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
+            { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
+            { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
+            { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
+        ];
         // Load any tinymce editors.
         tinymce.init({
             selector: '.tinymce-full-admin',
@@ -278,20 +254,7 @@ $.hood.Admin = {
                 'insertdatetime media contextmenu paste code'
             ],
             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage | code',
-            link_class_list: [
-                { title: 'None', value: '' },
-                { title: 'Button link', value: 'btn btn-default' },
-                { title: 'Theme coloured button link', value: 'btn btn-primary' },
-                { title: 'Popup image/video', value: 'colorbox-iframe' },
-                { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-                { title: 'Large link', value: 'font-lg' },
-                { title: 'Large button link', value: 'btn btn-default btn-lg' },
-                { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-                { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-                { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-            ],
+            link_class_list: linkClasses,
             setup: $.hood.Uploader.Load.Insert,
             content_css: [
             ]
@@ -307,20 +270,7 @@ $.hood.Admin = {
             ],
             menubar: false,
             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage',
-            link_class_list: [
-                { title: 'None', value: '' },
-                { title: 'Button link', value: 'btn btn-default' },
-                { title: 'Theme coloured button link', value: 'btn btn-primary' },
-                { title: 'Popup image/video', value: 'colorbox-iframe' },
-                { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-                { title: 'Large link', value: 'font-lg' },
-                { title: 'Large button link', value: 'btn btn-default btn-lg' },
-                { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-                { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-                { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-            ],
+            link_class_list: linkClasses,
             setup: $.hood.Uploader.Load.Insert,
             content_css: [
             ]
@@ -336,20 +286,7 @@ $.hood.Admin = {
             ],
             menubar: false,
             toolbar: 'bold italic | bullist numlist | undo redo | link | code',
-            link_class_list: [
-                { title: 'None', value: '' },
-                { title: 'Button link', value: 'btn btn-default' },
-                { title: 'Theme coloured button link', value: 'btn btn-primary' },
-                { title: 'Popup image/video', value: 'colorbox-iframe' },
-                { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-                { title: 'Large link', value: 'font-lg' },
-                { title: 'Large button link', value: 'btn btn-default btn-lg' },
-                { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-                { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-                { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-            ],
+            link_class_list: linkClasses,
             content_css: [
             ]
         });
@@ -364,20 +301,7 @@ $.hood.Admin = {
             ],
             menubar: false,
             toolbar: 'bold italic | bullist numlist | undo redo | link',
-            link_class_list: [
-                { title: 'None', value: '' },
-                { title: 'Button link', value: 'btn btn-default' },
-                { title: 'Theme coloured button link', value: 'btn btn-primary' },
-                { title: 'Popup image/video', value: 'colorbox-iframe' },
-                { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-                { title: 'Large link', value: 'font-lg' },
-                { title: 'Large button link', value: 'btn btn-default btn-lg' },
-                { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-                { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-                { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-                { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-            ],
+            link_class_list: linkClasses,
             content_css: [
             ]
         });

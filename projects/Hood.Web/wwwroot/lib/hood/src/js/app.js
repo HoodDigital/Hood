@@ -1,5 +1,4 @@
-﻿/// <reference path="../../../dropzone/dist/min/dropzone.min.js" />
-// Global variables for the $.hood.App
+﻿// Global variables for the $.hood.App
 // Overwrite these in your site.js to use different classes/elements etc.
 
 $.window = $(window),

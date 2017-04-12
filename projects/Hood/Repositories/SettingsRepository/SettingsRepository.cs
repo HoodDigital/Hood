@@ -491,7 +491,7 @@ namespace Hood.Services
         public string GetVersion()
         {
             var version = typeof(SettingsRepositoryStub).Assembly.GetName().Version;
-            return string.Format("{0}.{1}.{2}", version.Major, version.MajorRevision, version.Build);
+            return string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
         }
         public string this[string key]
         {
