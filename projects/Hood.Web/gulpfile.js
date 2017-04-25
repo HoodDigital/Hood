@@ -34,13 +34,15 @@ var gulp = require("gulp"),
 // add/edit/work on can then be copied to the Core directory prior to publishing a build.
 gulp.task('update-views', function () {
     return gulp.src([
-        './Views/**/*.cshtml'
+        './Views/**/*.cshtml',
+        './Views/**/*.json'
     ], { base: './Views/' })
     .pipe(gulp.dest('./../Hood/Views/'));
 });
 gulp.task('update-admin-views', function () {
     return gulp.src([
-        './Areas/Admin/Views/**/*.cshtml'
+        './Areas/Admin/Views/**/*.cshtml',
+        './Areas/Admin/Views/**/*.json'
     ], { base: './Areas/Admin/Views/' })
     .pipe(gulp.dest('./../Hood/Areas/Admin/Views/'));
 });

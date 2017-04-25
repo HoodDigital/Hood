@@ -1,4 +1,4 @@
-﻿{
+{
     "Description": "A basic grid layout for columned content, up to 3 rows, and 1, 2, 3, 4 or 6 column layout.",
     "IconUrl": "/lib/hood/images/no-image.jpg",
     "Name": "Content Columns",

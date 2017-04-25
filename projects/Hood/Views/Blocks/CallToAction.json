@@ -1,7 +1,7 @@
 {
-    "Description": "A left or right aligned content block section, an image with a freely editable content block.",
+    "Description": "A basic call to action block, contains a heading, paragraph and action button.",
     "IconUrl": "/lib/hood/images/no-image.jpg",
-    "Name": "Left/Right Content Block",
+    "Name": "Call to Action",
   "Variables": [
     {
       "Name": "CSS Class",
@@ -9,22 +9,6 @@
       "Type": "text",
       "Values": [],
       "Value": ""
-    },
-    {
-      "Name": "Alignment",
-      "VariableName": "align",
-      "Type": "select",
-      "Values": [
-        {
-          "Key": "Left",
-          "Value": "left"
-        },
-        {
-          "Key": "Right",
-          "Value": "right"
-        }
-      ],
-      "Value": "left"
     },
     {
       "Name": "Full width",
