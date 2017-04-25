@@ -2,22 +2,38 @@
     "Description": "A simple editable block, you can insert virtually any text/image/embed content into a General Content block.",
     "IconUrl": "/lib/hood/images/no-image.jpg",
     "Name": "General Content",
-    "Variables": [
+  "Variables": [
+    {
+      "Name": "CSS Class",
+      "VariableName": "class",
+      "Type": "select",
+      "Values": [
         {
-            "Name": "CSS Class",
-            "VariableName": "class",
-            "Type": "select",
-            "Values": [
-              {
-                "Key": "Grey",
-                "Value": "bg-color-light-grey"
-              },
-              {
-                "Key": "White",
-                "Value": "bg-color-white"
-              }
-            ],
-            "Value": "bg-color-white"
+          "Key": "Grey",
+          "Value": "bg-color-light-grey"
+        },
+        {
+          "Key": "White",
+          "Value": "bg-color-white"
         }
-    ]
+      ],
+      "Value": "bg-color-white"
+    },
+    {
+      "Name": "Full width",
+      "VariableName": "fullwidth",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Full width",
+          "Value": "true"
+        },
+        {
+          "Key": "Contained",
+          "Value": "false"
+        }
+      ],
+      "Value": "true"
+    }
+  ]
 }

@@ -14,7 +14,7 @@
             }
             @if (Model.Type.ShowDesigner)
             {
-                <li><a asp-area="" asp-action="Show" asp-controller="Content" asp-route-id="@Model.Content.Id" asp-route-editMode="true"><i class="fa fa-pencil m-r-xs"></i>Designer</a></li>
+                <li><a asp-area="" asp-action="Show" asp-controller="Home" asp-route-id="@Model.Content.Id" asp-route-editMode="true"><i class="fa fa-pencil m-r-xs"></i>Designer</a></li>
             }
             @if (Model.Type.ShowPreview)
             {

@@ -13,21 +13,15 @@
             <div class="modal-body tab-content">
                 <div class="row">
                     <div class="col-sm-6">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div id="content-block-list" class="border-box-sizing block-list"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div class="content-block-pager m-lg text-center"></div>
-                            </div>
-                        </div>
+                        <div id="content-block-list" class="border-box-sizing block-list"></div>
+                        <div class="content-block-pager m-lg text-center"></div>
                     </div>
                     <div class="col-sm-6">
-                        <div id="insert-block-details"></div>
+                        <div id="insert-block-details" class="p-sm bg-color-greenLight">
+                            <p>Choose a shortcode block to insert.</p>
+                        </div>
                         <script id="content-block-insert-template" class="kendo-template" type="text/template">
-                            <h4>${ Name }</h4>
+                            <h4>Insert: <strong>${ Name }</strong></h4>
                             <p>${ Description }</p>
                             <form id="content-block-variables">
                                 #if (typeof Variables !== 'undefined' && Variables != null) {#
@@ -64,8 +58,8 @@
         </div>
     </div>
     <div id="content-block-template" class="kendo-template">
-        <div class="thumbnail m-b-sm">
-            <span class="pull-right m-sm">
+        <div class="bg-color-light-grey p-xs m-b-sm">
+            <span class="pull-right">
                 <button class="choose-content-block action-button btn btn-xs btn-default" data-uid="#= uid #">
                     <i class="fa fa-clone m-r-xs"></i>
                     <span>
@@ -73,7 +67,7 @@
                     </span>
                 </button>
             </span>
-            <h4>${ Name }</h4>
+            <p style="font-size:large;font-weight:bold">${ Name }</p>
             <p>${ Description }</p>
         </div>
     </div>

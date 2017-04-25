@@ -229,20 +229,6 @@ $.hood.Admin = {
     Init: function () {
         $.hood.Helpers.InitMetisMenu(document);
         $.hood.Helpers.InitIboxes(document);
-        var linkClasses = [
-            { title: 'None', value: '' },
-            { title: 'Button link', value: 'btn btn-default' },
-            { title: 'Theme coloured button link', value: 'btn btn-primary' },
-            { title: 'Popup image/video', value: 'colorbox-iframe' },
-            { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
-            { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
-            { title: 'Large link', value: 'font-lg' },
-            { title: 'Large button link', value: 'btn btn-default btn-lg' },
-            { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
-            { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
-            { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
-            { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
-        ];
         // Load any tinymce editors.
         tinymce.init({
             selector: '.tinymce-full-admin',
@@ -254,7 +240,7 @@ $.hood.Admin = {
                 'insertdatetime media contextmenu paste code'
             ],
             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage | code',
-            link_class_list: linkClasses,
+            link_class_list: $.hood.LinkClasses,
             setup: $.hood.Uploader.Load.Insert,
             content_css: [
             ]
@@ -270,7 +256,7 @@ $.hood.Admin = {
             ],
             menubar: false,
             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage',
-            link_class_list: linkClasses,
+            link_class_list: $.hood.LinkClasses,
             setup: $.hood.Uploader.Load.Insert,
             content_css: [
             ]
@@ -286,7 +272,7 @@ $.hood.Admin = {
             ],
             menubar: false,
             toolbar: 'bold italic | bullist numlist | undo redo | link | code',
-            link_class_list: linkClasses,
+            link_class_list: $.hood.LinkClasses,
             content_css: [
             ]
         });
@@ -301,7 +287,7 @@ $.hood.Admin = {
             ],
             menubar: false,
             toolbar: 'bold italic | bullist numlist | undo redo | link',
-            link_class_list: linkClasses,
+            link_class_list: $.hood.LinkClasses,
             content_css: [
             ]
         });
