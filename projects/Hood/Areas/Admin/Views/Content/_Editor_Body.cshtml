@@ -1,4 +1,8 @@
 @model EditContentModel
+@{ 
+    var editorClass = string.Format("tinymce-{0}{1}", Model.Type.EditorType, User.IsInRole("Admin") ? "-admin" : "");
+
+}
 @if (Model.Type.ShowEditor)
 {
     <h5 class="m-t-lg">Content</h5>
@@ -13,24 +17,12 @@
         </div>
         <div class="collapse" id="showHideEditor">
             <div class="m-t-lg">
-                <textarea id="Body" name="Body" class="edit-content-editor">@Model.Content.Body</textarea>
+                <textarea id="Body" name="Body" class="@editorClass">@Model.Content.Body</textarea>
             </div>
         </div>
     }
     else
     {
-
-        switch (Model.Type.EditorType)
-        {
-            case "simple":
-                <textarea id="Body" name="Body" class="edit-content-editor-simple">@Model.Content.Body</textarea>
-                break;
-            case "full":
-                <textarea id="Body" name="Body" class="edit-content-editor">@Model.Content.Body</textarea>
-                break;
-            default:
-                <textarea id="Body" name="Body" class="edit-content-editor-simple">@Model.Content.Body</textarea>
-                break;
-        }
+        <textarea id="Body" name="Body" class="@editorClass">@Model.Content.Body</textarea>
     }
 }
