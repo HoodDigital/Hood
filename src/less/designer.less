@@ -1,4 +1,4 @@
-﻿:focus {
+﻿﻿﻿﻿﻿﻿:focus {
     outline: 0;
 }
 
@@ -17,7 +17,6 @@
 
 .hood-editors-active div.editable-content {
     padding: 5px;
-    background: rgba(0,0,0,0.05);
 }
 
 .hood-editors-active .hood-block {
@@ -25,7 +24,7 @@
     background: #fff;
     padding: 5px;
     margin-top: 5px;
-    border-bottom: 30px solid #f2f2f2;
+    border-bottom: 35px solid #f2f2f2;
 }
 
 .hood-editors-active .hood-block:first-child {
@@ -51,13 +50,13 @@
     color: #fff;
     padding: 3px;
     text-align: center;
-    background-color: rgba(0,0,0,.5);
+    background-color: #e8b72b;
     background-image: url(/lib/hood/images/finger-move.png);
     background-size: 80%;
     background-repeat: no-repeat;
     background-position: center;
     border-radius: 4px;
-    opacity: .3;
+    opacity: .7;
     cursor: move;
 }
 
@@ -110,11 +109,7 @@ div#designer-bar p {
     right: 0;
     bottom: 0;
     position: absolute;
-}
-
-
-.hood-editors-active .hood-designer:hover::before {
-    background-color: rgba(0,0,0,0.03);
+    background-color: #cacaca;
 }
 
 .hood-designer-actions {
@@ -122,16 +117,16 @@ div#designer-bar p {
 }
 
 .hood-editors-active .hood-designer-actions {
-    display: none;
+    display: block;
     padding: 10px;
-    text-align: right;
-    background-color: rgba(0,0,0,0.5);
+    background-color: #cacaca;
     position: absolute;
     bottom: 0px;
     right: 0px;
     width: 100%;
     -webkit-transform: translateY(100%);
     transform: translateY(100%);
+    text-align: center;
 }
 
 .hood-editors-active .hood-designer-actions button {
@@ -161,10 +156,6 @@ div#designer-bar p {
 
 .hood-editors-active .hood-designer-actions button:hover {
     background-color: #eab92d;
-}
-
-.hood-editors-active .hood-designer:hover .hood-designer-actions {
-    display: block;
 }
 
 div#hood-designer-loader {

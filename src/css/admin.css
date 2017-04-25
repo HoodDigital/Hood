@@ -10658,6 +10658,10 @@ figure.media-select {
   width: 100%;
   height: 100px !important;
 }
+.row-center {
+  display: flex;
+  align-items: center;
+}
 .v-middle {
   position: absolute;
   top: 50%;

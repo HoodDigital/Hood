@@ -11,16 +11,18 @@
     var cssClass = Context.Request.Query["class"];
 }
 <div class="hood-block">
-    <div class="image-section @cssClass @align">
+    <div class="main-content features @cssClass">
         <div class="@container">
-            <div class="col-image">
-                <figure class="img img-md img-circle hood-image-switch" style="background-image:url(/lib/hood/images/no-image.jpg);">
-                    <img src="~/lib/hood/images/no-image.jpg" alt="Generic placeholder image" width="140" height="140" />
-                </figure>
-            </div>
-            <div class="col-left">
-                <div class="tinymce-free">
-                    Enter your content here...
+            <div class="row row-center">
+                <div class="@(align == "left" ? "col-md-4" : "col-md-4 col-md-push-8")">
+                    <figure class="img img-full img-square hood-image-switch" style="background-image:url(/lib/hood/images/no-image.jpg);">
+                        <img src="~/lib/hood/images/no-image.jpg" alt="Generic placeholder image" />
+                    </figure>
+                </div>
+                <div class="@(align == "left" ? "col-md-7 col-md-offset-1" : "col-md-7 col-md-pull-4")">
+                    <div class="tinymce-free">
+                        Enter your content here...
+                    </div>
                 </div>
             </div>
         </div>

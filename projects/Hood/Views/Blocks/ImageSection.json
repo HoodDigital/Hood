@@ -6,9 +6,18 @@
     {
       "Name": "CSS Class",
       "VariableName": "class",
-      "Type": "text",
-      "Values": [],
-      "Value": ""
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Grey",
+          "Value": "bg-color-light-grey"
+        },
+        {
+          "Key": "White",
+          "Value": "bg-color-white"
+        }
+      ],
+      "Value": "bg-color-white"
     },
     {
       "Name": "Alignment",
