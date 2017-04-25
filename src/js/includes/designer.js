@@ -110,6 +110,7 @@ $.hood.Designer = {
             menubar: false,
             link_class_list: linkClasses,
             setup: $.hood.Uploader.Load.Insert,
+            inline: true,
             image_advtab: true,
             paste_data_images: true,
             images_upload_handler: function (blobInfo, success, failure) {
