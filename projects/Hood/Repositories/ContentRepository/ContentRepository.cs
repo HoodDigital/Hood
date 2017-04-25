@@ -960,7 +960,10 @@ namespace Hood.Services
         public void RefreshMetas(Content content)
         {
             var _contentSettings = _settings.GetContentSettings();
-            foreach (CustomField field in _contentSettings.GetContentType(content.ContentType).CustomFields)
+            var type = _contentSettings.GetContentType(content.ContentType);
+            if (type == null)
+                return;
+            foreach (CustomField field in type.CustomFields)
             {
                 if (content.HasMeta(field.Name))
                 {
@@ -989,18 +992,21 @@ namespace Hood.Services
             var _contentSettings = _settings.GetContentSettings();
             foreach (var content in _db.Content.Include(p => p.Metadata).ToList())
             {
-                RefreshMetas(content);
-                var currentTemplate = content.GetMeta("Settings.Template");
-                if (currentTemplate != null)
+                var type = _contentSettings.GetContentType(content.ContentType);
+                if (type != null)
                 {
-                    var template = currentTemplate.GetStringValue();
-                    if (template.IsSet())
+                    RefreshMetas(content);
+                    var currentTemplate = content.GetMeta("Settings.Template");
+                    if (currentTemplate.GetStringValue().IsSet())
                     {
-                        // delete all template metas that do not exist in the new template, and add any that are missing
-                        var type = _contentSettings.GetContentType(content.ContentType);
-                        List<string> newMetas = GetMetasForTemplate(template, type.TemplateFolder);
-                        if (newMetas != null) 
-                            UpdateTemplateMetas(content, newMetas);
+                        var template = currentTemplate.GetStringValue();
+                        if (template.IsSet())
+                        {
+                            // delete all template metas that do not exist in the new template, and add any that are missing
+                            List<string> newMetas = GetMetasForTemplate(template, type.TemplateFolder);
+                            if (newMetas != null)
+                                UpdateTemplateMetas(content, newMetas);
+                        }
                     }
                 }
             }

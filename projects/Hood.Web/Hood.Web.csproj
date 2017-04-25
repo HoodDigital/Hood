@@ -63,6 +63,10 @@
     <EmbeddedResource Include="Views\Blocks\Columns.json" />
     <EmbeddedResource Include="Views\Blocks\GeneralContent.cshtml" />
     <EmbeddedResource Include="Views\Blocks\GeneralContent.json" />
+    <EmbeddedResource Include="Views\Blocks\CallToAction.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\CallToAction.json" />
+    <EmbeddedResource Include="Views\Blocks\ImageSection.cshtml" />
+    <EmbeddedResource Include="Views\Blocks\ImageSection.json" />
     <EmbeddedResource Include="Views\Blocks\Separator.cshtml" />
     <EmbeddedResource Include="Views\Blocks\Separator.json" />
     <EmbeddedResource Include="Views\Blocks\TitleBlock.cshtml" />

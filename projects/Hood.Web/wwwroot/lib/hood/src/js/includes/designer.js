@@ -81,13 +81,35 @@ $.hood.Designer = {
         });
     },
     InitEditors: function () {
+        var linkClasses = [
+            { title: 'None', value: '' },
+            { title: 'Button link', value: 'btn btn-default' },
+            { title: 'Theme coloured button link', value: 'btn btn-primary' },
+            { title: 'Popup image/video', value: 'colorbox-iframe' },
+            { title: 'Button popup link', value: 'btn btn-default colorbox-iframe' },
+            { title: 'Theme coloured button popup link', value: 'btn btn-primary colorbox-iframe' },
+            { title: 'Large link', value: 'font-lg' },
+            { title: 'Large button link', value: 'btn btn-default btn-lg' },
+            { title: 'Large theme coloured button link', value: 'btn btn-primary btn-lg' },
+            { title: 'Large popup image/video', value: 'font-lg colorbox-iframe' },
+            { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
+            { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
+        ];
+
         tinymce.init({
             selector: '.tinymce-free',
-            theme: 'inlite',
-            plugins: 'image table link paste contextmenu textpattern autolink',
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor media table',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media contextmenu paste code'
+            ],
+            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage | code',
             selection_toolbar: 'styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | undo redo | link image',
             insert_toolbar: 'quickimage quicktable',
+            height: 500,
             menubar: false,
+            link_class_list: linkClasses,
+            setup: $.hood.Uploader.Load.Insert,
             inline: true,
             image_advtab: true,
             paste_data_images: true,

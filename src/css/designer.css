@@ -20,12 +20,14 @@
   background: #fff;
   padding: 5px;
   margin-top: 5px;
+  border-bottom: 30px solid #f2f2f2;
 }
 .hood-editors-active .hood-block:first-child {
   margin-top: 0;
 }
-.hood-editors-active .tinymce-free {
+.hood-editors-active .mce-content-body {
   padding: 5px;
+  border: 1px dashed #cacaca;
 }
 .hood-drag-handle,
 .hood-delete-block {
@@ -55,7 +57,7 @@
   background-color: orangered;
   left: auto;
   right: 5px;
-  bottom: 5px;
+  bottom: -30px;
   top: auto;
   background-image: none;
   cursor: pointer;

@@ -151,9 +151,16 @@ namespace Hood.Controllers
         [ResponseCache(CacheProfileName = "Day")]
         public IActionResult Show(int id, bool editMode = false)
         {
+            if (id == 0)
+                return NotFound();
+
             ContentModel model = new ContentModel();
             model.EditMode = editMode;
             model.Content = _content.GetContentByID(id);
+
+            if (model.Content == null)
+                return NotFound();
+
             model.Type = _settings.GetContentSettings().GetContentType(model.Content.ContentType);
 
             if (model.Type == null || !model.Type.Enabled || !model.Type.HasPage)
