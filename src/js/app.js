@@ -370,8 +370,14 @@ $.hood.App = {
                 $('nav.primary').children('ul').children('li:first-child').css({ 'margin-top': firstItemOffset + 'px' });
             }
         },
-        StickyMenu: function (headerOffset) {
-            //console.log("headerOffset:" + headerOffset + "$.window.scrollTop():" + $.window.scrollTop())
+        StickyMenu: function () {
+            var headerOffset = 0,
+                headerWrapOffset = 0,
+                pageMenuOffset = 0;
+
+            if ($.header.length > 0) { headerOffset = $.header.offset().top; }
+            if ($.header.length > 0) { headerWrapOffset = $.headerWrap.offset().top; }
+
             if ($.window.scrollTop() > headerOffset) {
                 $.header.addClass(stickyHeaderClass);
             } else {
@@ -418,19 +424,13 @@ $.hood.App = {
     Scroll: {
         Init: function () {
 
-            var headerOffset = 0,
-                headerWrapOffset = 0,
-                pageMenuOffset = 0;
 
-            if ($.header.length > 0) { headerOffset = $.header.offset().top; }
-            if ($.header.length > 0) { headerWrapOffset = $.headerWrap.offset().top; }
-
-            $.hood.App.Header.StickyMenu(headerWrapOffset);
+            $.hood.App.Header.StickyMenu();
 
             $.window.on('scroll', function () {
 
                 $('body.open-header.close-header-on-scroll').removeClass("side-header-open");
-                $.hood.App.Header.StickyMenu(headerWrapOffset);
+                $.hood.App.Header.StickyMenu();
                 $.hood.App.Header.Logo();
 
             });
