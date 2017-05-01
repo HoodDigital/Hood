@@ -2,11 +2,11 @@
 // Overwrite these in your site.js to use different classes/elements etc.
 
 $.window = $(window),
-$.wrapper = $('#wrapper'),
-$.header = $('#header'),
-$.headerWrap = $('#header-wrap'),
-$.content = $('#content'),
-$.footer = $('#footer');
+    $.wrapper = $('#wrapper'),
+    $.header = $('#header'),
+    $.headerWrap = $('#header-wrap'),
+    $.content = $('#content'),
+    $.footer = $('#footer');
 $.mobileMenu = $('#mobile-menu');
 $.mobileMenuTrigger = $('.mobile-menu-trigger');
 $.background = $('#site-background-image');
@@ -16,23 +16,23 @@ $.sideMenuTrigger = $(".side-panel-trigger");
 var windowWidth = $.window.width()
 
 stickyHeaderClass = 'sticky-header',
-mobileMenuOpenClass = 'mobile-menu-open',
-sidePushPanelClass = 'side-push-panel',
-sidePushPanelOpenClass = 'side-panel-open',
+    mobileMenuOpenClass = 'mobile-menu-open',
+    sidePushPanelClass = 'side-push-panel',
+    sidePushPanelOpenClass = 'side-panel-open',
 
-defaultLogo = $('#logo').find('.standard-logo'),
-defaultLogoImg = defaultLogo.find('img').attr('src'),
-defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
-defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
+    defaultLogo = $('#logo').find('.standard-logo'),
+    defaultLogoImg = defaultLogo.find('img').attr('src'),
+    defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
+    defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
 
-defaultLogoWidth = defaultLogo.find('img').outerWidth(),
+    defaultLogoWidth = defaultLogo.find('img').outerWidth(),
 
-retinaLogo = $('#logo').find('.retina-logo'),
-retinaLogoImg = retinaLogo.find('img').attr('src'),
-retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
-retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
+    retinaLogo = $('#logo').find('.retina-logo'),
+    retinaLogoImg = retinaLogo.find('img').attr('src'),
+    retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
+    retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
 
-owlCarousels = $('.owl-carousel-basic');
+    owlCarousels = $('.owl-carousel-basic');
 owlSliders = $('.owl-slider');
 
 if (!$.hood)
@@ -215,24 +215,27 @@ $.hood.App = {
         Init: function () {
             switch ($.hood.App.Options.Header.Type) {
                 case 'hover':
-                    $.hood.App.Loader.AddItem('hood-menus');
-                    if (!$().superfish && !$().superclick)
+                    if (!$().superfish && !$().superclick) {
+                        $.hood.App.Loader.AddItem('hood-menus');
                         $.getScript('/lib/superfish/dist/js/superfish.min.js', function () {
                             $.hood.App.Header.Load();
+                            $.hood.App.Loader.ItemComplete('hood-menus');
+
                         });
+                    }
                     else
                         $.hood.App.Header.Load();
-                    $.hood.App.Loader.ItemComplete('hood-menus');
                     break;
                 case 'click':
-                    $.hood.App.Loader.AddItem('hood-menus');
-                    if (!$().superfish && !$().superclick)
+                    if (!$().superfish && !$().superclick) {
+                        $.hood.App.Loader.AddItem('hood-menus');
                         $.getScript('/lib/superclick/dist/js/superclick.min.js', function () {
                             $.hood.App.Header.Load();
+                            $.hood.App.Loader.ItemComplete('hood-menus');
                         });
+                    }
                     else
                         $.hood.App.Header.Load();
-                    $.hood.App.Loader.ItemComplete('hood-menus');
                     break;
                 default:
                     $.hood.App.Header.Load();
@@ -314,9 +317,9 @@ $.hood.App = {
         Invert: function () {
             $('nav.primary .mega-menu-content, nav.primary ul ul').each(function (index, element) {
                 var $menuChildElement = $(element),
-					menuChildOffset = $menuChildElement.offset(),
-					menuChildWidth = $menuChildElement.width(),
-					menuChildLeft = menuChildOffset.left;
+                    menuChildOffset = $menuChildElement.offset(),
+                    menuChildWidth = $menuChildElement.width(),
+                    menuChildLeft = menuChildOffset.left;
                 if (windowWidth - (menuChildWidth + menuChildLeft) < 0) {
                     $menuChildElement.addClass('menu-pos-invert');
                 }
@@ -363,9 +366,9 @@ $.hood.App = {
         OverlayMenu: function () {
             if ($.body.hasClass('overlay-menu')) {
                 var OverlayMenuItem = $('nav.primary').children('ul').children('li'),
-					OverlayMenuItemHeight = OverlayMenuItem.outerHeight(),
-					OverlayMenuItemTHeight = OverlayMenuItem.length * OverlayMenuItemHeight,
-					firstItemOffset = ($.window.height() - OverlayMenuItemTHeight) / 2;
+                    OverlayMenuItemHeight = OverlayMenuItem.outerHeight(),
+                    OverlayMenuItemTHeight = OverlayMenuItem.length * OverlayMenuItemHeight,
+                    firstItemOffset = ($.window.height() - OverlayMenuItemTHeight) / 2;
 
                 $('nav.primary').children('ul').children('li:first-child').css({ 'margin-top': firstItemOffset + 'px' });
             }
@@ -603,17 +606,17 @@ $.hood.App = {
             $({ countNum: $this.text() }).animate({
                 countNum: countTo
             },
-            {
-                duration: 8000,
-                easing: 'linear',
-                step: function () {
-                    $this.text(Math.floor(this.countNum));
-                },
-                complete: function () {
-                    $this.text(this.countNum);
-                    //alert('finished');
-                }
-            });
+                {
+                    duration: 8000,
+                    easing: 'linear',
+                    step: function () {
+                        $this.text(Math.floor(this.countNum));
+                    },
+                    complete: function () {
+                        $this.text(this.countNum);
+                        //alert('finished');
+                    }
+                });
         });
     },
     OwlCarousel: function () {
