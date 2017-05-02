@@ -32,7 +32,6 @@ namespace Hood.Controllers
         public readonly IHostingEnvironment _environment;
         public readonly IEmailSender _email;
         public readonly IContentRepository _content;
-        public readonly ILogger _logger;
         private readonly IAccountRepository _auth;
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
@@ -342,6 +341,7 @@ namespace Hood.Controllers
         {
             var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
             var error = feature?.Error;
+
             switch (code)
             {
                 case 404:
