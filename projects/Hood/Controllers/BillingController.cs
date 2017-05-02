@@ -128,9 +128,18 @@ namespace Hood.Controllers
                 return RedirectToAction("Index");
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // If we got this far, something failed, redisplay form
+                BillingMessage bm = BillingMessage.Null;
+                if (Enum.TryParse(ex.Message, out bm))
+                {
+                    model.Message = bm;
+                }
+                else
+                {
+                    model.Message = BillingMessage.StripeError;
+                    model.MessageText = ex.Message;
+                }
                 return View(model);
             }
         }
