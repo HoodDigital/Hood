@@ -19,11 +19,6 @@
     ViewBag.Title = metaTitle;
     ContentApi mapi = _settings.ToContentApi(Model.Content);
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
-    if (Model.Type.ShowDesigner)
-    {
-        ViewData["DesignerUrl"] = string.Format("{0}?editMode=true", mapi.Url);
-        ViewData["ExitDesignerUrl"] = mapi.Url;
-    }
     ViewData["Content"] = mapi;
 
     Layout = "_Blank";

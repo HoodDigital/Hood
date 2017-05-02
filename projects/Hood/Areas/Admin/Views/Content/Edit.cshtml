@@ -14,7 +14,7 @@
             }
             @if (Model.Type.ShowDesigner)
             {
-                <li><a href="@string.Format("{0}?editMode=true", mapi.Url)"><i class="fa fa-pencil m-r-xs"></i>Designer</a></li>
+                <li><a asp-area="" asp-action="Show" asp-controller="Home" asp-route-id="@Model.Content.Id" asp-route-editMode="true"><i class="fa fa-pencil m-r-xs"></i>Designer</a></li>
             }
             @if (Model.Type.ShowPreview)
             {
@@ -117,7 +117,7 @@
                                     <div class="input-group">
                                         <input name="content-category-name" id="content-category-name" type="text" placeholder="Enter a new (or existing) category..." class="form-control autocomplete-category">
                                         <span class="input-group-btn">
-                                            <button type="button" id="add-content-category" class="btn btn-primary" data-url="@Url.Action("AddCategoryToContent")"> Add!</button>
+                                            <button type="button" id="add-content-category" class="btn btn-primary" data-url="@Url.Action(" AddCategoryToContent")"> Add!</button>
                                         </span>
                                     </div>
                                     <p><small>Note: Type the first three letters of a category to get suggestions.</small></p>

@@ -25,6 +25,7 @@ namespace Hood.Models
         public StripeCustomer Customer { get; set; }
         public ApplicationUser User { get; set; }
         public BillingMessage? Message { get; set; }
+        public string MessageText { get; set; }
         public IEnumerable<StripeCard> Cards { get; set; }
         public Subscription CurrentPlan { get; internal set; }
     }

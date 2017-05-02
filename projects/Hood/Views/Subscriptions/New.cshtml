@@ -4,7 +4,23 @@
     BillingSettings settings = _settings.GetBillingSettings();
     ViewBag.Title = "You need a subscription...";
 }
-@{ await Html.RenderPartialAsync("_BillingMessage", Model.Message); }
+@if (Model.Message == Hood.Enums.BillingMessage.StripeError)
+{
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <div class="alert alert-danger">
+                <p>
+                    <i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />There was an error updating or changing your subscription. Please try again.<br />
+                    <strong>@Model.MessageText</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    await Html.RenderPartialAsync("_BillingMessage", Model.Message);
+}
 @if (Model.Plans?.Count <= 0)
 {
     <div class="alert alert-warning text-center">

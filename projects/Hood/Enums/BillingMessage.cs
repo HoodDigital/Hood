@@ -2,6 +2,7 @@
 {
     public enum BillingMessage
     {
+        StripeError,
         NoStripeId,
         NoCustomerObject,
         NoSubscription,
@@ -18,6 +19,7 @@
         ErrorUpdatingSubscription,
         ErrorRemovingSubscription,
         ErrorCancellingSubscription,
-        ErrorReactivatingSubscription
+        ErrorReactivatingSubscription,
+        Null
     }
 }

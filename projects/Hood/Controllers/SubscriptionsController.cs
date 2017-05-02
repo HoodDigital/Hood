@@ -107,7 +107,16 @@ namespace Hood.Controllers
             catch (Exception ex)
             {
                 model = await GetCreateModel(returnUrl);
-                model.Message = ex.Message.ToEnum(BillingMessage.Error);
+                BillingMessage bm = BillingMessage.Null;
+                if (Enum.TryParse(ex.Message, out bm))
+                {
+                    model.Message = bm;
+                }
+                else
+                {
+                    model.Message = BillingMessage.StripeError;
+                    model.MessageText = ex.Message;
+                }
                 return View(model);
             }
         }
