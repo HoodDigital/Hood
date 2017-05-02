@@ -54,6 +54,18 @@ namespace Hood.Models
         public bool EnableMailchimp { get; set; }
         [Display(Name = "Mailchimp Api Key")]
         public string MailchimpApiKey { get; set; }
+        public string MailchimpDataCenter
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(MailchimpApiKey)
+                    ? string.Empty
+                    : MailchimpApiKey.Substring(
+                        MailchimpApiKey.LastIndexOf("-", StringComparison.Ordinal) + 1,
+                        MailchimpApiKey.Length - MailchimpApiKey.LastIndexOf("-", StringComparison.Ordinal) - 1);
+            }
+        }
+        public string MailchimpAuthHeader => $"apikey {this.MailchimpApiKey}";
         [Display(Name = "Mailchimp List Id")]
         public string MailchimpListId { get; set; }
 
