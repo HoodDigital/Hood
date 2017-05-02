@@ -715,7 +715,7 @@ $.hood.App = {
         },
         SendForm: function (e) {
             data = $(this).serialize();
-            $.post('/signup/mailchimp', data, function (data) {
+            $.post('/hood/signup/mailchimp', data, function (data) {
                 if (data.Success) {
                     $.hood.Alerts.Success("You have been sent a sign up confirmation, please check your email inbox.", "Thank you!", "success")
                 } else {

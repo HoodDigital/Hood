@@ -342,8 +342,6 @@ namespace Hood.Controllers
         {
             var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
             var error = feature?.Error;
-            _logger.LogWarning((int)ErrorEvent.General, "Error " + code.ToString() + ": " + Request.Path.ToUriComponent().ToString());
-
             switch (code)
             {
                 case 404:
