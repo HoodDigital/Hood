@@ -24,6 +24,7 @@ namespace Hood.Controllers
         private readonly ILogger _logger;
         private readonly IContentRepository _data;
         private readonly IHoodCache _cache;
+        private readonly ISettingsRepository _settings;
 
         public AccountController(
             IContentRepository data,
@@ -32,7 +33,8 @@ namespace Hood.Controllers
             IEmailSender emailSender,
             ISmsSender smsSender,
             IHoodCache cache,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            ISettingsRepository settings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -41,6 +43,7 @@ namespace Hood.Controllers
             _logger = loggerFactory.CreateLogger<AccountController>();
             _data = data;
             _cache = cache;
+            _settings = settings;
         }
 
         //
@@ -275,7 +278,7 @@ namespace Hood.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
@@ -283,11 +286,17 @@ namespace Hood.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
-                //var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                //await _emailSender.SendEmail(model.Email, "Reset Password",
-                //   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                //return View("ForgotPasswordConfirmation");
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+                MailObject message = new MailObject();
+                message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
+                message.PreHeader = _settings.ReplacePlaceholders("Reset your password.");
+                message.Subject = _settings.ReplacePlaceholders("Reset your password.");
+                message.AddH1(_settings.ReplacePlaceholders("Reset your password."));
+                message.AddParagraph($"Please reset your password by clicking here:");
+                message.AddCallToAction("Reset your password", callbackUrl);
+                await _emailSender.SendEmail(message, MailSettings.WarningTemplate);
             }
 
             // If we got this far, something failed, redisplay form
