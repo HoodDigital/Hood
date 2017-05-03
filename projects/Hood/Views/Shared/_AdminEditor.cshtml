@@ -9,14 +9,33 @@
             {
                 <li>
                     <a href="@ViewData["EditUrl"]" class="admin">
-                        <i class="fa fa-edit m-r-xs"></i>Edit this...
+                        <i class="fa fa-edit m-r-xs"></i>Edit...
                     </a>
                 </li>
+            }
+            @if (ViewData["DesignerUrl"] != null)
+            {
+                <li>
+                    <a href="@ViewData["DesignerUrl"]" class="admin">
+                        <i class="fa fa-paint-brush m-r-xs"></i>Designer
+                    </a>
+                </li>
+            }
+            @if (ViewData["ExitDesignerUrl"] != null)
+            {
+                <li>
+                    <a href="@ViewData["ExitDesignerUrl"]" class="admin">
+                        <i class="fa fa-desktop m-r-xs"></i>Back to Preview
+                    </a>
+                </li>
+            }
+            @if ((ViewData["EditUrl"] != null) || (ViewData["EditUrl"] != null) || (ViewData["EditUrl"] != null))
+            {
                 <li class="divider"></li>
             }
             <li class="active">
                 <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="admin">
-                    <i class="fa fa-desktop m-r-xs"></i>Dashboard
+                    <i class="fa fa-desktop m-r-xs"></i>HoodCMS Dashboard
                 </a>
             </li>
             <li class="divider"></li>
