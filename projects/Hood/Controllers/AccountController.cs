@@ -297,6 +297,7 @@ namespace Hood.Controllers
                 message.AddParagraph($"Please reset your password by clicking here:");
                 message.AddCallToAction("Reset your password", callbackUrl);
                 await _emailSender.SendEmail(message, MailSettings.WarningTemplate);
+                return View("ForgotPasswordConfirmation");
             }
 
             // If we got this far, something failed, redisplay form
