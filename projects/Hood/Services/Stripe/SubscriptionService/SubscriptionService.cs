@@ -24,12 +24,12 @@ namespace Hood.Services
 
         public async Task<StripeSubscription> CancelSubscriptionAsync(string customerId, string subscriptionId, bool cancelAtPeriodEnd = true)
         {
-            return await _stripe.SubscriptionService.CancelAsync(customerId, subscriptionId, cancelAtPeriodEnd); // optional cancelAtPeriodEnd flag        
+            return await _stripe.SubscriptionService.CancelAsync(subscriptionId, cancelAtPeriodEnd); // optional cancelAtPeriodEnd flag        
         }
 
         public async Task<StripeSubscription> FindById(string customerId, string subscriptionId)
         {
-            return await _stripe.SubscriptionService.GetAsync(customerId, subscriptionId);
+            return await _stripe.SubscriptionService.GetAsync(subscriptionId);
         }
 
         public async Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, string tokenId = null, DateTime? trialEnd = null, decimal taxPercent = 0)
@@ -48,7 +48,7 @@ namespace Hood.Services
 
         public async Task<StripeSubscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, StripePlan subscription)
         {
-            StripeSubscription currentSubscription = await _stripe.SubscriptionService.GetAsync(customerId, subscriptionId);
+            StripeSubscription currentSubscription = await _stripe.SubscriptionService.GetAsync(subscriptionId);
             var updateOptions = new StripeSubscriptionUpdateOptions();
             updateOptions.PlanId = subscription.Id;
             if (currentSubscription.Status == "trialing" && subscription.TrialPeriodDays > 0)
@@ -64,7 +64,7 @@ namespace Hood.Services
             {
                 updateOptions.EndTrialNow = true;
             }
-            currentSubscription = await _stripe.SubscriptionService.UpdateAsync(customerId, subscriptionId, updateOptions);
+            currentSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
             return currentSubscription;
         }
 
@@ -72,7 +72,7 @@ namespace Hood.Services
         {
             var updateOptions = new StripeSubscriptionUpdateOptions();
             updateOptions.TaxPercent = taxPercent;
-            StripeSubscription stripeSubscription = await _stripe.SubscriptionService.UpdateAsync(customerId, subscriptionId, updateOptions);
+            StripeSubscription stripeSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
             return stripeSubscription;
         }
 
@@ -90,7 +90,10 @@ namespace Hood.Services
 
         public async Task<IEnumerable<StripeSubscription>> UserSubscriptionsAsync(string customerId)
         {
-            IEnumerable<StripeSubscription> response = await _stripe.SubscriptionService.ListAsync(customerId);
+            IEnumerable<StripeSubscription> response = await _stripe.SubscriptionService.ListAsync(new StripeSubscriptionListOptions()
+            {
+                CustomerId = customerId
+            });
             return response;
         }
     }

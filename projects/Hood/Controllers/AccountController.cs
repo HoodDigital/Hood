@@ -296,7 +296,7 @@ namespace Hood.Controllers
                 message.AddH1(_settings.ReplacePlaceholders("Reset your password."));
                 message.AddParagraph($"Please reset your password by clicking here:");
                 message.AddCallToAction("Reset your password", callbackUrl);
-                await _emailSender.SendEmail(message, MailSettings.WarningTemplate);
+                await _emailSender.SendEmailAsync(message, MailSettings.WarningTemplate);
                 return View("ForgotPasswordConfirmation");
             }
 
@@ -404,7 +404,7 @@ namespace Hood.Controllers
                 message.PreHeader = "Your security code for accessing the website...";
                 message.Subject = "Your security code...";
                 message.AddParagraph("Your security code is: " + code);
-                await _emailSender.SendEmail(message);
+                await _emailSender.SendEmailAsync(message);
             }
             else if (model.SelectedProvider == "Phone")
             {

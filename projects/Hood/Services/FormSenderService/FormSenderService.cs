@@ -52,7 +52,7 @@ namespace Hood.Services
                         message.AddParagraph("Subject: <strong>" + model.Subject + "</strong>");
                         message.AddParagraph("Enquiry:");
                         message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
-                        await _email.SendEmail(message);
+                        await _email.SendEmailAsync(message);
                     }
 
                     message = new MailObject();
@@ -67,7 +67,7 @@ namespace Hood.Services
                     message.AddParagraph("Subject: <strong>" + model.Subject + "</strong>");
                     message.AddParagraph("Enquiry:");
                     message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
-                    await _email.SendEmail(message);
+                    await _email.SendEmailAsync(message);
 
                     return new Models.Response(true);
                 }

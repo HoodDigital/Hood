@@ -332,7 +332,7 @@ namespace Hood.Areas.Admin.Controllers
                         message.AddParagraph("Your account has been set up on the " + _settings.GetSiteTitle() + " website.");
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
-                        await _email.SendEmail(message);
+                        await _email.SendEmailAsync(message);
                     }
                     catch (Exception)
                     {

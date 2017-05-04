@@ -8,6 +8,7 @@ using System;
 using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Hood.Models;
+using System.Linq;
 
 namespace Hood.Services
 {
@@ -31,50 +32,76 @@ namespace Hood.Services
             _renderer = renderer;
         }
 
-        public async Task<OperationResult> SendEmail(MailObject message, string template = Models.MailSettings.PlainTemplate)
+        private SendGridClient GetMailClient()
         {
-            try
-            {
-                _info = _settings.GetBasicSettings();
-                _mail = _settings.GetMailSettings(true);
-
-                string siteTitle = _settings.GetSiteTitle();
-                string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
-                string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
-
-                var from = new EmailAddress(fromEmail, fromName);
-                var html = await _renderer.Render(template, message);
-                var textContent = new SendGrid.Helpers.Mail.Content("text/plain", message.ToString());
-                var htmlContent = new SendGrid.Helpers.Mail.Content("text/html", html);
-
-                var client = new SendGridClient(_mail.SendGridKey);
-                var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
-                var response = await client.SendEmailAsync(msg);
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    return new OperationResult(true);
-                }
-                else
-                {
-                    throw new Exception("The message could not be sent...");
-                }
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            _info = _settings.GetBasicSettings();
+            _mail = _settings.GetMailSettings();
+            return new SendGridClient(_mail.SendGridKey);
         }
 
-        public async Task<OperationResult> NotifyRole(MailObject message, string roleName, string template = "Areas/Admin/Views/Mail/Plain.cshtml")
+        public EmailAddress GetSiteFromEmail()
+        {
+            _info = _settings.GetBasicSettings();
+            _mail = _settings.GetMailSettings();
+            string siteTitle = _settings.GetSiteTitle();
+            string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
+            string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
+            return new EmailAddress(fromEmail, fromName);
+        }
+
+        public async Task<int> SendEmailAsync(MailObject message, string template = Models.MailSettings.PlainTemplate, EmailAddress from = null)
+        {
+            SendGridClient client = GetMailClient();
+            if (from == null)
+                from = GetSiteFromEmail();
+
+            var html = await _renderer.Render(template, message);
+            var textContent = new SendGrid.Helpers.Mail.Content("text/plain", message.ToString());
+            var htmlContent = new SendGrid.Helpers.Mail.Content("text/html", html);
+
+            var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
+            var response = await client.SendEmailAsync(msg);
+            var body = response.DeserializeResponseBody(response.Body);
+            if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
+                return 1;            
+
+            return 0;
+        }
+        public async Task<int> SendEmailAsync(EmailAddress[] emails, string subject, string htmlContent, string textContent = null, EmailAddress from = null)
+        {
+            SendGridClient client = GetMailClient();
+            if (from == null)
+                from = GetSiteFromEmail();
+            int sent = 0;
+            foreach (var email in emails)
+            {
+                var msg = MailHelper.CreateSingleEmail(from, email, subject, textContent, htmlContent);
+                var response = await client.SendEmailAsync(msg);
+                var body = response.DeserializeResponseBody(response.Body);
+                if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode== HttpStatusCode.OK)
+                    sent++;
+            }
+            return sent;
+        }
+
+        public async Task<int> NotifyRoleAsync(MailObject message, string roleName, string template = "Areas/Admin/Views/Mail/Plain.cshtml", EmailAddress from = null)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
+            int sent = 0;
             foreach (var user in users)
             {
                 var messageToSend = message;
                 messageToSend.To = new EmailAddress(user.Email);
-                await SendEmail(messageToSend, template);
+                sent += await SendEmailAsync(messageToSend, template);
             }
-            return new OperationResult(true);
+            return sent;
         }
+        public async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null)
+        {
+            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            var emails = users.Select(u => new EmailAddress(u.Email, u.FullName)).ToArray();
+            return await SendEmailAsync(emails, subject, htmlContent, textContent);
+        }
+
     }
 }
