@@ -4,7 +4,7 @@
     <fieldset class="form-horizontal">
         @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).OrderBy(cm => cm.Name))
         {
-            if ((Model.Type.ShowBanner && cm.Name.Contains("Banner")) || (Model.Type.ShowImage && cm.Name.Contains("Featured")))
+            if (Model.Type.ShowImage && cm.Name.Contains("Featured"))
             {
                 <div class="form-group">
                     @if (cm.Name.Contains("Banner"))

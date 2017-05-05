@@ -459,11 +459,7 @@ namespace Hood.Models
 
                 new CustomField() {Name="Settings.Image.Featured.Align", Default = "center", System = true, Type = "System.String" },
                 new CustomField() {Name="Settings.Image.Featured.Fit", Default = "cover", System = true, Type = "System.String" },
-                new CustomField() {Name="Settings.Image.Featured.Background", Default = "transparent", System = true, Type = "System.String" },
-
-                new CustomField() {Name="Settings.Image.Banner.Align", Default = "center", System = true, Type = "System.String" },
-                new CustomField() {Name="Settings.Image.Banner.Fit", Default = "cover", System = true, Type = "System.String" },
-                new CustomField() {Name="Settings.Image.Banner.Background", Default = "transparent", System = true, Type = "System.String" }
+                new CustomField() {Name="Settings.Image.Featured.Background", Default = "transparent", System = true, Type = "System.String" }
             });
             return fields;
         }

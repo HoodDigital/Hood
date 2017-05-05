@@ -22,9 +22,13 @@
     case "Settings.Image.Featured.Fit":
         <select class="form-control" data-selected="@Model.GetStringValue()" id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)">
             <option value="100%">Full width, automatic height</option>
-            <option value="contain">Fit (Image will not overstep the edge)</option>
-            <option value="cover">Fill (Image will fill the space automatically)</option>
-            <option value="100% 100%">Stretch (Image will distort to fill the space)</option>
+            <option value="left">Automatic width, automatic height, left aligned.</option>
+            <option value="center">Automatic width, automatic height, centre aligned.</option>
+            <option value="right">Automatic width, automatic height, right aligned.</option>
+            <option value="auto">Auto sized (Image will not be resized, in a fixed block)</option>
+            <option value="contain">Fit (Image will not overstep the edge, in a fixed block)</option>
+            <option value="cover">Fill (Image will fill the space automatically, in a fixed block)</option>
+            <option value="100% 100%">Stretch (Image will distort to fill the space, in a fixed block)</option>
         </select>
         break;
     case "Settings.Image.Background":

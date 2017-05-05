@@ -30,13 +30,31 @@
             if (Model.FeaturedImage != null)
             {
                 <a href="@capi.Url">
-                    @if (Model.GetMeta("Settings.Image.Featured.Fit").GetStringValue() == "100%")
+                    @switch (Model.GetMeta("Settings.Image.Featured.Fit").GetStringValue())
                     {
-                        <img src="@capi.FeaturedImage.LargeUrl" class="img-full content-feature-@Model.Id" />
-                    }
-                    else
-                    {
-                        <fixedImage src="@capi.FeaturedImage.MediumUrl" class="img-wide img-full content-feature-@Model.Id" style="@capi.GetImageStyle()" />
+                        case "100%":
+                            <div>
+                                <img src="@capi.FeaturedImage.LargeUrl" class="img-full content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        case "center":
+                            <div class="text-center">
+                                <img src="@capi.FeaturedImage.LargeUrl" class="content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        case "left":
+                            <div class="text-left">
+                                <img src="@capi.FeaturedImage.LargeUrl" class="content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        case "right":
+                            <div class="text-right">
+                                <img src="@capi.FeaturedImage.LargeUrl" class="content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        default:
+                            <fixedImage src="@capi.FeaturedImage.MediumUrl" class="img-wide img-full content-feature-@Model.Id" style="@capi.GetImageStyle()" />
+                            break;
                     }
                 </a>
             }
