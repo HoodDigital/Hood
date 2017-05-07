@@ -11,27 +11,27 @@ console.info = console.info || function () { };
 /*! jRespond.js v 0.10 | Author: Jeremy Fields [jeremy.fields@viget.com], 2013 | License: MIT */
 !function (a, b, c) { "object" == typeof module && module && "object" == typeof module.exports ? module.exports = c : (a[b] = c, "function" == typeof define && define.amd && define(b, [], function () { return c })) }(this, "jRespond", function (a, b, c) { "use strict"; return function (a) { var b = [], d = [], e = a, f = "", g = "", i = 0, j = 100, k = 500, l = k, m = function () { var a = 0; return a = "number" != typeof window.innerWidth ? 0 !== document.documentElement.clientWidth ? document.documentElement.clientWidth : document.body.clientWidth : window.innerWidth }, n = function (a) { if (a.length === c) o(a); else for (var b = 0; b < a.length; b++) o(a[b]) }, o = function (a) { var e = a.breakpoint, h = a.enter || c; b.push(a), d.push(!1), r(e) && (h !== c && h.call(null, { entering: f, exiting: g }), d[b.length - 1] = !0) }, p = function () { for (var a = [], e = [], h = 0; h < b.length; h++) { var i = b[h].breakpoint, j = b[h].enter || c, k = b[h].exit || c; "*" === i ? (j !== c && a.push(j), k !== c && e.push(k)) : r(i) ? (j === c || d[h] || a.push(j), d[h] = !0) : (k !== c && d[h] && e.push(k), d[h] = !1) } for (var l = { entering: f, exiting: g }, m = 0; m < e.length; m++) e[m].call(null, l); for (var n = 0; n < a.length; n++) a[n].call(null, l) }, q = function (a) { for (var b = !1, c = 0; c < e.length; c++) if (a >= e[c].enter && a <= e[c].exit) { b = !0; break } b && f !== e[c].label ? (g = f, f = e[c].label, p()) : b || "" === f || (f = "", p()) }, r = function (a) { if ("object" == typeof a) { if (a.join().indexOf(f) >= 0) return !0 } else { if ("*" === a) return !0; if ("string" == typeof a && f === a) return !0 } }, s = function () { var a = m(); a !== i ? (l = j, q(a)) : l = k, i = a, setTimeout(s, l) }; return s(), { addFunc: function (a) { n(a) }, getBreakpoint: function () { return f } } } }(this, this.document));
 var jRes = jRespond([
-	{
-	    label: 'smallest',
-	    enter: 0,
-	    exit: 479
-	}, {
-	    label: 'handheld',
-	    enter: 480,
-	    exit: 767
-	}, {
-	    label: 'tablet',
-	    enter: 768,
-	    exit: 991
-	}, {
-	    label: 'laptop',
-	    enter: 992,
-	    exit: 1199
-	}, {
-	    label: 'desktop',
-	    enter: 1200,
-	    exit: 10000
-	}
+    {
+        label: 'smallest',
+        enter: 0,
+        exit: 479
+    }, {
+        label: 'handheld',
+        enter: 480,
+        exit: 767
+    }, {
+        label: 'tablet',
+        enter: 768,
+        exit: 991
+    }, {
+        label: 'laptop',
+        enter: 992,
+        exit: 1199
+    }, {
+        label: 'desktop',
+        enter: 1200,
+        exit: 10000
+    }
 ]);
 jRes.addFunc([
     {
@@ -154,14 +154,14 @@ $.fn.warningAlert = function (val) {
                 showLoaderOnConfirm: true,
                 closeOnCancel: false
             },
-            function (isConfirm) {
-                if (isConfirm) {
-                    url = $(target).attr('href');
-                    window.location = url;
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
+                function (isConfirm) {
+                    if (isConfirm) {
+                        url = $(target).attr('href');
+                        window.location = url;
+                    } else {
+                        swal("Cancelled", "It's all good in the hood!", "error");
+                    }
+                });
         }, this));
         return false;
     };
@@ -282,19 +282,16 @@ if (!$.mobile.Android) {
     $.device = "desktop";
 }
 
+// Custom Event polyfill
 (function () {
-
     if (typeof window.CustomEvent === "function") return false;
-
     function CustomEvent(event, params) {
         params = params || { bubbles: false, cancelable: false, detail: undefined };
         var evt = document.createEvent('CustomEvent');
         evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
         return evt;
     }
-
     CustomEvent.prototype = window.Event.prototype;
-
     window.CustomEvent = CustomEvent;
 })();
 
@@ -366,16 +363,16 @@ function humaneDate(date, compareTo) {
         ],
         isString = typeof date === 'string',
         date = isString ?
-                    new Date(('' + date).replace(/-/g, "/").replace(/[TZ]/g, " ")) :
-                    date,
+            new Date(('' + date).replace(/-/g, "/").replace(/[TZ]/g, " ")) :
+            date,
         compareTo = compareTo || new Date,
         seconds = (compareTo - date +
-                        (compareTo.getTimezoneOffset() -
-                            // if we received a GMT time from a string, doesn't include time zone bias
-                            // if we got a date object, the time zone is built in, we need to remove it.
-                            (isString ? 0 : date.getTimezoneOffset())
-                        ) * 60000
-                    ) / 1000,
+            (compareTo.getTimezoneOffset() -
+                // if we received a GMT time from a string, doesn't include time zone bias
+                // if we got a date object, the time zone is built in, we need to remove it.
+                (isString ? 0 : date.getTimezoneOffset())
+            ) * 60000
+        ) / 1000,
         token;
 
     if (seconds < 0) {
@@ -420,9 +417,9 @@ function humaneDate(date, compareTo) {
 
             var val = Math.ceil(normalize(seconds, format[3]) / (format[3]));
             return val +
-                    ' ' +
-                    (val !== 1 ? format[2] : format[1]) +
-                    (i > 0 ? token : '');
+                ' ' +
+                (val !== 1 ? format[2] : format[1]) +
+                (i > 0 ? token : '');
         }
     }
 };
@@ -465,10 +462,10 @@ if (typeof jQuery !== 'undefined') {
 
         var iframe = iframes[i],
 
-        /*
-           * RegExp, extend this if you need more players
-           */
-        players = /www.youtube.com|player.vimeo.com|www.londonlive.co.uk|www.slideshare.net|www.ustream.tv/;
+            /*
+               * RegExp, extend this if you need more players
+               */
+            players = /www.youtube.com|player.vimeo.com|www.londonlive.co.uk|www.slideshare.net|www.ustream.tv/;
 
         /*
          * If the RegExp pattern exists within the current iframe
