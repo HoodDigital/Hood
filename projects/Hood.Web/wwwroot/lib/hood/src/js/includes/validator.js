@@ -18,7 +18,7 @@ $.hood.FormValidator = function (element, options) {
         serializationFunction: function () {
             rtn = $(this.formTag).serialize();
             return rtn;
-        },
+        }
     }, options || {});
     this.LoadValidation = function () {
         if ($.hood.Helpers.IsNullOrUndefined(this.Options.formTag))

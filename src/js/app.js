@@ -176,12 +176,20 @@ $.hood.App = {
     Loader: {
         LoadList: new Array(),
         Init: function () {
-            var event = new CustomEvent('load-completed');
-            $(document).on('load-completed', 'body', $.hood.App.onInitComplete);
-            $(document).on('load-completed', 'body', $.hood.App.Options.Loader.Complete || $.hood.App.Loader.Complete);
-            for (i = 0; i < $.hood.App.Options.Loader.Items.length; i++) {
-                $.hood.App.Loader.AddItem($.hood.App.Options.Loader.Items[i]);
-            }
+            if (document.createEvent) {
+                var event = new CustomEvent('load-completed');
+                $(document).on('load-completed', 'body', $.hood.App.onInitComplete);
+                $(document).on('load-completed', 'body', $.hood.App.Options.Loader.Complete || $.hood.App.Loader.Complete);
+                for (i = 0; i < $.hood.App.Options.Loader.Items.length; i++) {
+                    $.hood.App.Loader.AddItem($.hood.App.Options.Loader.Items[i]);
+                }
+            } else {
+                // if we can't add events, we cant load, its going to be ugly, but show the site.
+                if ($.hood.App.Options.Loader.Complete)
+                    $.hood.App.Options.Loader.Complete();
+                else
+                    $.hood.App.Loader.Complete();
+            }            
         },
         Complete: function () {
             $('#loader').fadeOut();
@@ -254,11 +262,6 @@ $.hood.App = {
             $.hood.App.Header.Logo();
         },
         Setup: function () {
-            if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                $('nav.primary ul ul, nav.primary ul .mega-menu-content').css('display', 'block');
-                $.hood.App.Header.Invert();
-                $('nav.primary ul ul, nav.primary ul .mega-menu-content').css('display', '');
-            }
             if (!$().superfish && !$().superclick) {
                 $.body.addClass('no-superfish');
                 return true;
@@ -272,14 +275,6 @@ $.hood.App = {
                 animationOut: $.hood.App.Options.Header.Settings.animationOut,
                 cssArrows: $.hood.App.Options.Header.Settings.cssArrows,
                 onShow: function () {
-                    var megaMenuContent = $(this);
-                    if (megaMenuContent.hasClass('mega-menu-content') && megaMenuContent.find('.widget').length > 0) {
-                        if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                            $.commonHeight(megaMenuContent, '.mega-menu-column');
-                        } else {
-                            megaMenuContent.children().height('');
-                        }
-                    }
                     $.hood.App.Options.Header.Settings.onShow();
                 }
             };
@@ -330,10 +325,6 @@ $.hood.App = {
             $('nav.primary ul li:has(ul)').addClass('sub-menu');
             $('.top-links ul li:has(ul) > a').append('<i class="fa fa-caret-down"></i>');
             $('.top-links > ul').addClass('clearfix');
-
-            if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                $('nav.primary.sub-title').children('ul').children('.current').prev().css({ backgroundImage: 'none' });
-            }
 
             if ($.mobile.Android()) {
                 $('nav.primary ul li.sub-menu').children('a').on('touchstart', function (e) {
@@ -417,10 +408,6 @@ $.hood.App = {
             } else {
                 if (defaultLogoImg) { defaultLogo.find('img').attr('src', defaultLogoImg); }
                 if (retinaLogoImg) { retinaLogo.find('img').attr('src', retinaLogoImg); }
-            }
-            if ($.body.hasClass('device-xs') || $.body.hasClass('device-xxs')) {
-                if (defaultMobileLogo) { defaultLogo.find('img').attr('src', defaultMobileLogo); }
-                if (retinaMobileLogo) { retinaLogo.find('img').attr('src', retinaMobileLogo); }
             }
         }
     },
@@ -645,9 +632,6 @@ $.hood.App = {
         var t = setTimeout(function () {
             $.hood.App.Header.FullWidthMenu();
             $.hood.App.Header.OverlayMenu();
-            if ($.body.hasClass('device-lg') || $.body.hasClass('device-md')) {
-                $('nav.primary').find('ul.mobile-primary-menu').removeClass('show');
-            }
         }, 500);
         windowWidth = $.window.width();
     },
@@ -671,7 +655,7 @@ $.hood.App = {
                 shares: this.Options.SharerOptions,
                 showLabel: true,
                 showCount: true,
-                shareIn: "popup",
+                shareIn: "popup"
             });
         }, this));
     },

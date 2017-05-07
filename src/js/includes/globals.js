@@ -538,7 +538,7 @@ function dropdownEffectData(target) {
         dropdown: dropdown,
         dropdownMenu: dropdownMenu,
         effectIn: dropdownMenu.data('dropdown-in') || effectInDefault,
-        effectOut: dropdownMenu.data('dropdown-out') || effectOutDefault,
+        effectOut: dropdownMenu.data('dropdown-out') || effectOutDefault
     };
 }
 
@@ -594,6 +594,6 @@ dropdownSelectors.on({
                 dropdown.dropdown.removeClass('open');
             });
         }
-    },
+    }
 });
 

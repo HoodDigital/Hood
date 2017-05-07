@@ -46,5 +46,5 @@ $.hood.Forms = {
     },
     ValidationHighlight: function (e) {
         $(e).closest('label').removeClass('state-success').addClass('state-error');
-    },
+    }
 };
