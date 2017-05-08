@@ -55,6 +55,15 @@ $.hood.App = {
             ]
         },
         ShowCookieMessage: !$('body').hasClass('disable-cookies'),
+        Mailchimp: {
+            Enabled: $('#mailchimp-signup-form').length,
+            onSuccess: function () {
+                $.hood.Alerts.Success("You have been successfully added to the mailing list, you can unsubscribe at any time.", "Thank you!", "success", true);
+            },
+            onFail: function () {
+                $.hood.Alerts.Success("There was a problem signing up: " + data.Errors, "Error!", "error", true)
+            }
+        },
         Colorbox: true,
         Parallax: true,
         LoadTweets: true,
@@ -143,11 +152,12 @@ $.hood.App = {
             $.hood.App.Scroll.Functions();
 
         $.hood.App.SkillsBars();
-        $.hood.App.Mailchimp.Init();
         $.hood.App.ResizeVideos();
         $.hood.App.ContactForms.Init();
         $.hood.App.Uploaders.Init();
 
+        if ($.hood.App.Options.Mailchimp.Enabled)
+            $.hood.App.Mailchimp.Init();
         if ($.hood.App.Options.OwlCarousel.Enabled)
             $.hood.App.OwlCarousel();
         if ($.hood.App.Options.VideoBackgrounds.Enabled)
@@ -189,7 +199,7 @@ $.hood.App = {
                     $.hood.App.Options.Loader.Complete();
                 else
                     $.hood.App.Loader.Complete();
-            }            
+            }
         },
         Complete: function () {
             $('#loader').fadeOut();
@@ -701,10 +711,10 @@ $.hood.App = {
             data = $(this).serialize();
             $.post('/hood/signup/mailchimp', data, function (data) {
                 if (data.Success) {
-                    $.hood.Alerts.Success("You have been sent a sign up confirmation, please check your email inbox.", "Thank you!", "success")
+                    $.hood.App.Options.Mailchimp.onSuccess();
                 } else {
-                    $.hood.Alerts.Success("There was a problem signing up: " + data.Errors, "Error!", "error")
-                }
+                    $.hood.App.Options.Mailchimp.onFail();
+               }
             });
             return false;
         }
