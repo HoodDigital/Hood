@@ -63,6 +63,8 @@ namespace Hood.Services
                 var args = new StripeWebHookTriggerArgs(stripeEvent);
 
                 _log.AddParagraph("Stripe Event detected: <strong>" + args.StripeEvent.GetEventName() + "</strong>");
+                _log.AddParagraph("Processed JSON: <strong>" + args.Json.ToFormattedJson() + "</strong>");
+
                 if (stripeEvent.GetEventName() == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
 
