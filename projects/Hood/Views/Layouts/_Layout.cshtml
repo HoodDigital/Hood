@@ -31,6 +31,7 @@
     @{ await Html.RenderPartialAsync("_AdminEditor"); }
     @RenderSection("includes", required: false)
     @{ await Html.RenderPartialAsync("_Scripts"); }
+    @{ await Html.RenderPartialAsync("_DefferedStylesLoader"); }
     @RenderSection("scripts", required: false)
     @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seoSettings.GoogleAnalytics)
