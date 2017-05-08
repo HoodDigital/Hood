@@ -36,10 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Views\Shared\_DeferredStylesLoader.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="linqtotwitter" Version="4.1.0" />
     <PackageReference Include="MediaTypeMap" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="1.1.0">
