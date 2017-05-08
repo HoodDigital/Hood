@@ -1,3 +1,73 @@
+/* IMAGES */
+.hood-image,
+figure.img {
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+.hood-avatar.loading:after,
+.hood-image.loading:after,
+figure.img:after {
+    content: '';
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background-color: rgba(255,255,255,0.5);
+}
+
+.hood-image img {
+    display: none !important;
+}
+
+figure.img {
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.figure.img.contain {
+    background-size: contain;
+}
+
+.figure.img.auto {
+    background-size: auto;
+}
+
+figure.img img {
+    display: none;
+}
+
+.bg-img {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background-size: cover;
+}
+
+.bg-img img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+
 .img-xxs {
     width: 48px;
     height: 48px;
