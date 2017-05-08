@@ -196,8 +196,8 @@ namespace Hood.Services
         }
         public async Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub)
         {
-            await _db.AddAsync(newUserSub);
-            _db.SaveChanges();
+            _db.Update(newUserSub);
+            await _db.SaveChangesAsync();
             return newUserSub;
         }
 
@@ -683,12 +683,17 @@ namespace Hood.Services
             {
                 ApplicationUser user = await GetUserByStripeId(updated.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
+                Subscription plan = await GetSubscriptionPlanByStripeId(updated.StripePlan.Id);
+                if (userSub.SubscriptionId != plan.Id)
+                {
+                    userSub.SubscriptionId = plan.Id;
+                }
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
                 if (eventTime.HasValue && userSub.LastUpdated < eventTime)
                 {
                     userSub = UpdateUserSubscriptionFromStripe(userSub, updated);
-                    UpdateUser(user);
+                    await UpdateUserSubscription(userSub);
                 }
             }
             catch (Exception)
