@@ -15,9 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="wwwroot\lib\hood\src\less\app - Copy.less">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Include="wwwroot\lib\hood\src\less\preload.less" />
   </ItemGroup>
 
