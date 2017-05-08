@@ -1,49 +1,107 @@
 ﻿/* IMAGES */
 .hood-image,
-figure.img {
+.img {
     display: inline-block;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     vertical-align: middle;
-}
-
-.hood-avatar.loading:before,
-.hood-image.loading:before {
-    content: '';
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    z-index: 1;
-    background-color: rgba(255,255,255,0.5);
-}
-
-.hood-image img {
-    display: none !important;
-}
-
-figure.img {
-    display: inline-block;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     overflow: hidden;
-}
 
-.figure.img.contain {
-    background-size: contain;
-}
+    img {
+        display: none !important;
+    }
 
-.figure.img.auto {
-    background-size: auto;
-}
+    &.loading:before {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        bottom: 0px;
+        left: 0px;
+        right: 0px;
+        z-index: 1;
+        background-color: rgba(255,255,255,0.5);
+    }
 
-figure.img img {
-    display: none;
+    &.contain {
+        background-size: contain;
+    }
+
+    &.auto {
+        background-size: auto;
+    }
+
+    &.img-xxs {
+        width: 48px;
+        height: 48px;
+    }
+
+    &.img-xs {
+        width: 64px;
+        height: 64px;
+    }
+
+    &.img-sm {
+        width: 128px;
+        height: 128px;
+    }
+
+    &.img-md {
+        width: 250px;
+        height: 250px;
+    }
+
+    &.img-lg {
+        width: 450px;
+        height: 450px;
+    }
+
+    &.img-xl {
+        width: 800px;
+        height: 800px;
+    }
+
+    &.img-full {
+        width: 100%;
+        display:block;
+    }
+
+    &.img-square, 
+    &.img-standard, 
+    &.img-wide, 
+    &.img-mobile-card {
+        &:after {
+            padding-top: 100%;
+            /* 16:9 ratio */
+            display: block;
+            content: '';
+            background-size: contain;
+        }
+    }
+
+    &.img-standard {
+        &:after {
+            padding-top: 33%;
+            /* tall */
+        }
+    }
+
+    &.img-wide {
+        &:after {
+            padding-top: 56.25%;
+            /* 16:9 ratio */
+        }
+    }
+
+
+    &.img-mobile-card {
+        &:after {
+            padding-top: 151.3%;
+            /* tall */
+        }
+    }
 }
 
 .bg-img {
@@ -56,77 +114,13 @@ figure.img img {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     background-size: cover;
-}
 
-.bg-img img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    min-width: 100%;
-    min-height: 100%;
-}
-
-
-.img-xxs {
-    width: 48px;
-    height: 48px;
-}
-
-.img-xs {
-    width: 64px;
-    height: 64px;
-}
-
-.img-sm {
-    width: 128px;
-    height: 128px;
-}
-
-.img-md {
-    width: 250px;
-    height: 250px;
-}
-
-.img-lg {
-    width: 450px;
-    height: 450px;
-}
-
-.img-xl {
-    width: 800px;
-    height: 800px;
-}
-
-.img-full {
-    width: 100%;
-}
-
-.img-square:after {
-    padding-top: 100%;
-    /* 16:9 ratio */
-    display: block;
-    content: '';
-    background-size: contain;
-}
-
-.img-standard:after {
-    padding-top: 33%;
-    /* tall */
-    display: block;
-    content: '';
-}
-
-.img-wide:after {
-    padding-top: 56.25%;
-    /* 16:9 ratio */
-    display: block;
-    content: '';
-}
-
-.img-mobile-card:after {
-    padding-top: 151.3%;
-    /* tall */
-    display: block;
-    content: '';
+    img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        min-width: 100%;
+        min-height: 100%;
+    }
 }
