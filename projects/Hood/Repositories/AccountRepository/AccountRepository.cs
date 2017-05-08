@@ -14,6 +14,7 @@ using Hood.Caching;
 using Stripe;
 using Hood.Enums;
 using Hood.Extensions;
+using System.IO;
 
 namespace Hood.Services
 {
@@ -81,8 +82,7 @@ namespace Hood.Services
             if (string.IsNullOrEmpty(stripeId))
                 return null;
             ApplicationUser user;
-            user = await _db.Users.AsNoTracking()
-                                      .Include(u => u.Addresses)
+            user = await _db.Users.Include(u => u.Addresses)
                                       .Include(u => u.Subscriptions)
                                       .ThenInclude(u => u.Subscription)
                                       .Where(u => u.StripeId == stripeId).FirstOrDefaultAsync();
@@ -196,7 +196,7 @@ namespace Hood.Services
         }
         public async Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub)
         {
-            _db.Update(newUserSub);
+            _db.Entry(newUserSub).State = EntityState.Modified;
             await _db.SaveChangesAsync();
             return newUserSub;
         }
@@ -640,7 +640,7 @@ namespace Hood.Services
             return userSub;
         }
 
-        // User Subscription Helpers
+        // [UserSubscription] Helpers
         private UserSubscription GetUserSubscription(ApplicationUser user, int userSubscriptionId)
         {
             UserSubscription subscription = user.Subscriptions.Where(us => us.UserSubscriptionId == userSubscriptionId).FirstOrDefault();
@@ -657,70 +657,200 @@ namespace Hood.Services
         }
 
         // WebHooks
-        public async Task ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime)
+        public async Task<string> ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime)
         {
+            StringWriter sw = new StringWriter();
             try
             {
+                sw.WriteLine("[System] Processing [AccountRepository.ConfirmSubscriptionObject].");
                 ApplicationUser user = await GetUserByStripeId(created.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, created.Id);
+                sw.WriteLine("[DB] [User] Name: " + user.FullName);
+                sw.WriteLine("[DB] [User] Email: " + user.Email);
+                sw.WriteLine("[DB] [User] Stripe: " + user.StripeId);
+                sw.WriteLine("[DB] [UserSubscription] Stripe Id: " + userSub.StripeId);
+                sw.WriteLine("[DB] [UserSubscription] Status: " + userSub.Status);
+                sw.WriteLine("[DB] [UserSubscription] TrialEnd: " + userSub.TrialEnd);
+                sw.WriteLine("[DB] [UserSubscription] TrialStart: " + userSub.TrialStart);
+                sw.WriteLine("[DB] [UserSubscription] CurrentPeriodEnd: " + userSub.CurrentPeriodEnd);
+                sw.WriteLine("[DB] [UserSubscription] CurrentPeriodStart: " + userSub.CurrentPeriodStart);
+                sw.WriteLine("[DB] [UserSubscription] EndedAt: " + userSub.EndedAt);
+                sw.WriteLine("[DB] [UserSubscription] DeletedAt: " + userSub.DeletedAt);
+                sw.WriteLine("[DB] [UserSubscription] CanceledAt: " + userSub.CanceledAt);
+                sw.WriteLine("[DB] [UserSubscription] (Plan) Id: " + userSub.SubscriptionId);
+                sw.WriteLine("[DB] [UserSubscription] (Plan) Amount: " + userSub.Subscription.Amount);
+
+                sw.WriteLine("[Stripe] [UserSubscription] Stripe Id: " + created.Id);
+                sw.WriteLine("[Stripe] [UserSubscription] Status: " + created.Status);
+                sw.WriteLine("[Stripe] [UserSubscription] TrialEnd: " + created.TrialEnd);
+                sw.WriteLine("[Stripe] [UserSubscription] TrialStart: " + created.TrialStart);
+                sw.WriteLine("[Stripe] [UserSubscription] CurrentPeriodEnd: " + created.CurrentPeriodEnd);
+                sw.WriteLine("[Stripe] [UserSubscription] CurrentPeriodStart: " + created.CurrentPeriodStart);
+                sw.WriteLine("[Stripe] [UserSubscription] EndedAt: " + created.EndedAt);
+                sw.WriteLine("[Stripe] [UserSubscription] CanceledAt: " + created.CanceledAt);
+
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
-                if (eventTime.HasValue && userSub.LastUpdated < eventTime)
+                if (eventTime.HasValue && userSub.LastUpdated > eventTime)
                 {
-                    userSub = UpdateUserSubscriptionFromStripe(userSub, created);
-                    userSub.Confirmed = true;
-                    UpdateUser(user);
+                    sw.WriteLine(string.Format("[System] Thread will be aborted, the database has been updated more recently than this event."));
+                    sw.WriteLine(string.Format("[System] Timestamps... [eventTime] = {0} < [userSub.LastUpdated] = {1}", eventTime.Value.ToString(), userSub.LastUpdated.ToString()));
+                    return sw.ToString();
                 }
-            }
-            catch (Exception)
-            {
+
+                sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)]...");
+                userSub = UpdateUserSubscriptionFromStripe(userSub, created);
+                userSub.Confirmed = true;
+                sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)] complete.");
+                sw.WriteLine("[System] Saving user subscription to database.");
+                sw.WriteLine("[System] [UpdateUserSubscription(userSub)] complete.");
+                await _db.SaveChangesAsync();
+                sw.WriteLine("[System] Done.");
 
             }
+            catch (Exception ex)
+            {
+                sw.WriteLine("[System] An error occurred while updating the subscription.");
+                sw.WriteLine("[System] " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    sw.WriteLine("[System] " + ex.InnerException.Message);
+                }
+            }
+            return sw.ToString();
         }
-        public async Task UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime)
+
+        public async Task<string> UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime)
         {
+            StringWriter sw = new StringWriter();
             try
             {
+                sw.WriteLine("[System] Processing [AccountRepository.RemoveUserSubscriptionObject].");
                 ApplicationUser user = await GetUserByStripeId(updated.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
+                sw.WriteLine("[DB] [User] Name: " + user.FullName);
+                sw.WriteLine("[DB] [User] Email: " + user.Email);
+                sw.WriteLine("[DB] [User] Stripe: " + user.StripeId);
+                sw.WriteLine("[DB] [UserSubscription] Stripe Id: " + userSub.StripeId);
+                sw.WriteLine("[DB] [UserSubscription] Status: " + userSub.Status);
+                sw.WriteLine("[DB] [UserSubscription] TrialEnd: " + userSub.TrialEnd);
+                sw.WriteLine("[DB] [UserSubscription] TrialStart: " + userSub.TrialStart);
+                sw.WriteLine("[DB] [UserSubscription] CurrentPeriodEnd: " + userSub.CurrentPeriodEnd);
+                sw.WriteLine("[DB] [UserSubscription] CurrentPeriodStart: " + userSub.CurrentPeriodStart);
+                sw.WriteLine("[DB] [UserSubscription] EndedAt: " + userSub.EndedAt);
+                sw.WriteLine("[DB] [UserSubscription] DeletedAt: " + userSub.DeletedAt);
+                sw.WriteLine("[DB] [UserSubscription] CanceledAt: " + userSub.CanceledAt);
+                sw.WriteLine("[DB] [UserSubscription] (Plan) Id: " + userSub.SubscriptionId);
+                sw.WriteLine("[DB] [UserSubscription] (Plan) Amount: " + userSub.Subscription.Amount);
+
+                sw.WriteLine("[Stripe] [UserSubscription] Stripe Id: " + updated.Id);
+                sw.WriteLine("[Stripe] [UserSubscription] Status: " + updated.Status);
+                sw.WriteLine("[Stripe] [UserSubscription] TrialEnd: " + updated.TrialEnd);
+                sw.WriteLine("[Stripe] [UserSubscription] TrialStart: " + updated.TrialStart);
+                sw.WriteLine("[Stripe] [UserSubscription] CurrentPeriodEnd: " + updated.CurrentPeriodEnd);
+                sw.WriteLine("[Stripe] [UserSubscription] CurrentPeriodStart: " + updated.CurrentPeriodStart);
+                sw.WriteLine("[Stripe] [UserSubscription] EndedAt: " + updated.EndedAt);
+                sw.WriteLine("[Stripe] [UserSubscription] CanceledAt: " + updated.CanceledAt);
+
                 Subscription plan = await GetSubscriptionPlanByStripeId(updated.StripePlan.Id);
+                sw.WriteLine("[Stripe] [UserSubscription] (Plan) Id: " + plan.Id);
+                sw.WriteLine("[Db] [UserSubscription] (Plan) Amount: " + updated.StripePlan.Amount);
+                sw.WriteLine("[Stripe] [UserSubscription] (Plan-Stripe) Amount: " + updated.StripePlan.Amount);
+
                 if (userSub.SubscriptionId != plan.Id)
                 {
+                    sw.WriteLine("[System] Plan has changed, [userSub.SubscriptionId != plan.Id], updating database records.");
                     userSub.SubscriptionId = plan.Id;
+                    sw.WriteLine("[System] Done.");
                 }
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
-                if (eventTime.HasValue && userSub.LastUpdated < eventTime)
+
+                if (eventTime.HasValue && userSub.LastUpdated > eventTime)
                 {
-                    userSub = UpdateUserSubscriptionFromStripe(userSub, updated);
-                    await UpdateUserSubscription(userSub);
+                    sw.WriteLine(string.Format("[System] Thread will be aborted, the database has been updated more recently than this event."));
+                    sw.WriteLine(string.Format("[System] Timestamps... [eventTime] = {0} < [userSub.LastUpdated] = {1}", eventTime.Value.ToString(), userSub.LastUpdated.ToString()));
+                    return sw.ToString();
+                }
+                sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)]...");
+                userSub = UpdateUserSubscriptionFromStripe(userSub, updated);
+                sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)] complete.");
+                sw.WriteLine("[System] Saving user subscription to database.");
+                sw.WriteLine("[System] [UpdateUserSubscription(userSub)] complete.");
+                await _db.SaveChangesAsync();
+                sw.WriteLine("[System] Done.");
+            }
+            catch (Exception ex)
+            {
+                sw.WriteLine("[System] An error occurred while updating the subscription.");
+                sw.WriteLine("[System] " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    sw.WriteLine("[System] " + ex.InnerException.Message); 
                 }
             }
-            catch (Exception)
-            {
-
-            }
+            return sw.ToString();
         }
-        public async Task RemoveUserSubscriptionObject(StripeSubscription deleted, DateTime? eventTime)
+        public async Task<string> RemoveUserSubscriptionObject(StripeSubscription deleted, DateTime? eventTime)
         {
+            StringWriter sw = new StringWriter();
             try
             {
+                sw.WriteLine("[System] Processing [AccountRepository.RemoveUserSubscriptionObject].");
                 ApplicationUser user = await GetUserByStripeId(deleted.CustomerId);
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, deleted.Id);
+                sw.WriteLine("User: " + user.FullName);
+                sw.WriteLine("User Email: " + user.Email);
+                sw.WriteLine("User Stripe: " + user.StripeId);
+                sw.WriteLine("[DB] [UserSubscription] Stripe Id: " + userSub.StripeId);
+                sw.WriteLine("[DB] [UserSubscription] Status: " + userSub.Status);
+                sw.WriteLine("[DB] [UserSubscription] TrialEnd: " + userSub.TrialEnd);
+                sw.WriteLine("[DB] [UserSubscription] TrialStart: " + userSub.TrialStart);
+                sw.WriteLine("[DB] [UserSubscription] CurrentPeriodEnd: " + userSub.CurrentPeriodEnd);
+                sw.WriteLine("[DB] [UserSubscription] CurrentPeriodStart: " + userSub.CurrentPeriodStart);
+                sw.WriteLine("[DB] [UserSubscription] EndedAt: " + userSub.EndedAt);
+                sw.WriteLine("[DB] [UserSubscription] DeletedAt: " + userSub.DeletedAt);
+                sw.WriteLine("[DB] [UserSubscription] CanceledAt: " + userSub.CanceledAt);
+                sw.WriteLine("[DB] [UserSubscription] (Plan) Id: " + userSub.SubscriptionId);
+                sw.WriteLine("[DB] [UserSubscription] (Plan) Amount: " + userSub.Subscription.Amount);
+
+                sw.WriteLine("[Stripe] [UserSubscription] Stripe Id: " + deleted.Id);
+                sw.WriteLine("[Stripe] [UserSubscription] Status: " + deleted.Status);
+                sw.WriteLine("[Stripe] [UserSubscription] TrialEnd: " + deleted.TrialEnd);
+                sw.WriteLine("[Stripe] [UserSubscription] TrialStart: " + deleted.TrialStart);
+                sw.WriteLine("[Stripe] [UserSubscription] CurrentPeriodEnd: " + deleted.CurrentPeriodEnd);
+                sw.WriteLine("[Stripe] [UserSubscription] CurrentPeriodStart: " + deleted.CurrentPeriodStart);
+                sw.WriteLine("[Stripe] [UserSubscription] EndedAt: " + deleted.EndedAt);
+                sw.WriteLine("[Stripe] [UserSubscription] CanceledAt: " + deleted.CanceledAt);
+
                 // Check the timestamp of the event, with the last update of the object
                 // If this was updated last before the event, therefore the event is valid and should be applied.
-                if (eventTime.HasValue && userSub.LastUpdated < eventTime)
+                if (eventTime.HasValue && userSub.LastUpdated > eventTime)
                 {
-                    userSub = UpdateUserSubscriptionFromStripe(userSub, deleted);
-                    userSub.Deleted = true;
-                    userSub.DeletedAt = DateTime.Now;
-                    UpdateUser(user);
+                    sw.WriteLine(string.Format("[System] Thread will be aborted, the database has been updated more recently than this event."));
+                    sw.WriteLine(string.Format("[System] Timestamps... [eventTime] = {0} < [userSub.LastUpdated] = {1}", eventTime.Value.ToString(), userSub.LastUpdated.ToString()));
+                    return sw.ToString();
+                }
+                sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)]...");
+                userSub = UpdateUserSubscriptionFromStripe(userSub, deleted);
+                userSub.Deleted = true;
+                userSub.DeletedAt = DateTime.Now;
+                sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)] complete.");
+                sw.WriteLine("[System] Saving user subscription to database.");
+                sw.WriteLine("[System] [UpdateUserSubscription(userSub)] complete.");
+                await _db.SaveChangesAsync();
+                sw.WriteLine("[System] Done.");
+            }
+            catch (Exception ex)
+            {
+                sw.WriteLine("[System] An error occurred while updating the subscription.");
+                sw.WriteLine("[System] " + ex.Message);
+                if (ex.InnerException != null)
+                {
+                    sw.WriteLine("[System] " + ex.InnerException.Message);
                 }
             }
-            catch (Exception)
-            {
-
-            }
+            return sw.ToString();
         }
         private UserSubscription UpdateUserSubscriptionFromStripe(UserSubscription userSubscription, StripeSubscription stripeSubscription)
         {

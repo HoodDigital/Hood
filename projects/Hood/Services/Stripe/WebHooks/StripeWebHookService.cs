@@ -63,7 +63,6 @@ namespace Hood.Services
                 var args = new StripeWebHookTriggerArgs(stripeEvent);
 
                 _log.AddParagraph("Stripe Event detected: <strong>" + args.StripeEvent.GetEventName() + "</strong>");
-                _log.AddParagraph("Processed JSON: <strong>" + args.Json.ToFormattedJson() + "</strong>");
                 if (stripeEvent.GetEventName() == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
 
@@ -388,9 +387,8 @@ namespace Hood.Services
         {
             _log.AddParagraph("[Subscription Created] processing...");
             StripeSubscription created = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            _log.AddParagraph("Subscription Object:");
-            _log.AddParagraph(JsonConvert.SerializeObject(created).ToFormattedJson() + Environment.NewLine);
-            await _auth.ConfirmSubscriptionObject(created, stripeEvent.Created);
+            var log = await _auth.ConfirmSubscriptionObject(created, stripeEvent.Created);
+            _log.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
             _log.AddParagraph("[Subscription Created] complete!");
         }
         /// <summary>
@@ -401,10 +399,9 @@ namespace Hood.Services
         {
             _log.AddParagraph("[Subscription Updated] processing...");
             StripeSubscription updated = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            _log.AddParagraph("Subscription Object:");
-            _log.AddParagraph(JsonConvert.SerializeObject(updated).ToFormattedJson() + Environment.NewLine);
-            await _auth.UpdateSubscriptionObject(updated, stripeEvent.Created);
-            _log.AddParagraph("[Subscription Created] complete!");
+            var log = await _auth.UpdateSubscriptionObject(updated, stripeEvent.Created);
+            _log.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
+            _log.AddParagraph("[Subscription Updated] complete!");
         }
         /// <summary>
         /// Occurs whenever a customer ends their subscription.
@@ -414,9 +411,8 @@ namespace Hood.Services
         {
             _log.AddParagraph("[Subscription Deleted] processing...");
             StripeSubscription deleted = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            _log.AddParagraph("Subscription Object:");
-            _log.AddParagraph(JsonConvert.SerializeObject(deleted).ToFormattedJson() + Environment.NewLine);
-            await _auth.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
+            _log.AddH2("Log:");
+            var log = await _auth.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
             _log.AddParagraph("[Subscription Deleted] complete!");
         }
         /// <summary>
@@ -427,8 +423,6 @@ namespace Hood.Services
         {
             _log.AddParagraph("[Subscription TrialWillEnd] processing...");
             StripeSubscription endTrialSubscription = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            _log.AddParagraph("Subscription Object:");
-            _log.AddParagraph(JsonConvert.SerializeObject(endTrialSubscription).ToFormattedJson() + Environment.NewLine);
             UserSubscription endTrialUserSub = await _auth.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {

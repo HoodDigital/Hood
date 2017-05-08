@@ -95,6 +95,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             var content = _content.GetContentByID(post.Id, true);
             content.Body = post.Body;
+            content.Body = Regex.Replace(content.Body, @"contenteditable=""true""", "", RegexOptions.IgnoreCase);
+            content.Body = Regex.Replace(content.Body, @"id=""mce_[^;]+""", "", RegexOptions.IgnoreCase);
+            content.Body = Regex.Replace(content.Body, @"mce-content-body", "", RegexOptions.IgnoreCase);
             OperationResult result = _content.Update(content);
             return result;
         }
@@ -370,6 +373,37 @@ namespace Hood.Areas.Admin.Controllers
                         }
                     }
             }
+
+            // Add the base templates:
+            foreach (string temp in EmbeddedFiles.GetFiles("~/Views/Blocks/").Where(s => s.Contains(".cshtml")))
+            {
+                string name = temp.Replace(".cshtml", "").ToSentenceCase().ToTitleCase();
+                try
+                {
+                    var jsonFile = temp.Replace(".cshtml", ".json");
+                    string json = EmbeddedFiles.ReadAllText("~/Views/Blocks/" + jsonFile);
+                    ContentBlockSettings settings = JsonConvert.DeserializeObject<ContentBlockSettings>(json);
+                    if (!templates.Select(t => t.Name).Contains(name))
+                        templates.Add(new BlockContent()
+                        {
+                            Name = settings.Name,
+                            Description = settings.Description,
+                            Variables = settings.Variables,
+                            Url = temp
+                        });
+                }
+                catch
+                {
+                    if (!templates.Select(t => t.Name).Contains(name))
+                        templates.Add(new BlockContent()
+                        {
+                            Name = name,
+                            Description = "No description added...",
+                            Url = temp
+                        });
+                }
+            }
+
             Response response = new Response(templates.OrderBy(t => t.Name).Skip(request.skip).Take(request.take).ToArray(), templates.Count());
             return Json(response);
         }
@@ -390,6 +424,9 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     string view = templateDirs[i] + url;
                     if (System.IO.File.Exists(view))
+                        return View(templateVirtualDirs[i] + url);
+                    view = templateVirtualDirs[i] + url;
+                    if (EmbeddedFiles.GetFiles(view).Count() == 1)
                         return View(templateVirtualDirs[i] + url);
                 }
                 catch { }
@@ -466,7 +503,7 @@ namespace Hood.Areas.Admin.Controllers
         public Response SetHomepage(int id)
         {
             try
-            { 
+            {
                 var model = _settings.GetBasicSettings(false);
                 model.Homepage = id;
                 _settings.Set("Hood.Settings.Basic", model);
