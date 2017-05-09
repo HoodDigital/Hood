@@ -3,38 +3,38 @@
 @{
     string title =  Model.Type.MetaTitle.IsSet() ? Model.Type.MetaTitle : Model.Type.Title;
     ViewData["Title"] = title;
-    var Feed = "_Feed";
+    var Feed = "_DefaultFeed";
     Layout = "_Layout";
 
     switch (Model.Type.BaseName)
     {
-        case "News":
-            Feed = "_NewsFeed";
-            Layout = "_NewsLayout";
-            break;
         case "Event":
             Feed = "_NewsFeed";
             Layout = "_EventsLayout";
-            break;
-        case "Product":
-            Feed = "_ProductFeed";
-            Layout = "_ProductLayout";
-            break;
-        case "Portfolio":
-            Feed = "_PortfolioFeed";
-            Layout = "_PortfolioLayout";
             break;
         case "FAQ":
             Feed = "_FaqFeed";
             Layout = "_FaqLayout";
             break;
-        case "Team":
-            Feed = "_TeamFeed";
-            Layout = "_TeamLayout";
-            break;
         case "Job":
             Feed = "_JobFeed";
             Layout = "_JobLayout";
+            break;
+        case "News":
+            Feed = "_NewsFeed";
+            Layout = "_NewsLayout";
+            break;
+        case "Portfolio":
+            Feed = "_PortfolioFeed";
+            Layout = "_PortfolioLayout";
+            break;
+        case "Product":
+            Feed = "_ProductFeed";
+            Layout = "_ProductLayout";
+            break;
+        case "Team":
+            Feed = "_TeamFeed";
+            Layout = "_TeamLayout";
             break;
         case "Testimonial":
             Feed = "_TestimonialFeed";

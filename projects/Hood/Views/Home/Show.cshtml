@@ -28,8 +28,17 @@
     Layout = "_Blank";
     @switch (Model.Type.BaseName)
     {
+        case "Event":
+            Layout = "_EventLayout";
+            break;
+        case "FAQ":
+            Layout = "_FaqLayout";
+            break;
         case "News":
             Layout = "_NewsLayout";
+            break;
+        case "Page":
+            Layout = "_Page";
             break;
         case "Portfolio":
             Layout = "_PortfolioLayout";
@@ -42,9 +51,6 @@
             break;
         case "Testimonial":
             Layout = "_TestimonialLayout";
-            break;
-        case "Page":
-            Layout = "_Page";
             break;
         default:
             break;
@@ -93,6 +99,15 @@ else
 {
     switch (Model.Type.BaseName)
     {
+        case "Event":
+            await Html.RenderPartialAsync("_EventView");
+            break;
+        case "Faq":
+            await Html.RenderPartialAsync("_FaqView");
+            break;
+        case "Job":
+            await Html.RenderPartialAsync("_JobView");
+            break;
         case "News":
             await Html.RenderPartialAsync("_NewsView");
             break;
@@ -101,6 +116,12 @@ else
             break;
         case "Product":
             await Html.RenderPartialAsync("_ProductView");
+            break;
+        case "Team":
+            await Html.RenderPartialAsync("_TeamView");
+            break;
+        case "Testimonial":
+            await Html.RenderPartialAsync("_TestimonialView");
             break;
         case "Page":
         default:
