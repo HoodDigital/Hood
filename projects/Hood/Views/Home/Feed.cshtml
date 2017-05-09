@@ -3,7 +3,7 @@
 @{
     string title =  Model.Type.MetaTitle.IsSet() ? Model.Type.MetaTitle : Model.Type.Title;
     ViewData["Title"] = title;
-    var Feed = "_DefaultFeed";
+    var Feed = "_Feed";
     Layout = "_Layout";
 
     switch (Model.Type.BaseName)
