@@ -121,10 +121,10 @@ namespace Hood.Models
                         CustomFields = BaseFields(
                         new List<CustomField>()
                         {
-                            new CustomField() { Name = "Settings.Slider.CallToAction.Url", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Settings.Slider.CallToAction.Style", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Settings.Slider.CallToAction.Text", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Settings.Slider.DisplayOrder", Default = "0", System = true, Type="System.Int32" }
+                            new CustomField() { Name = "Content.Slider.CallToAction.Url", Default = "", System = true, Type="System.String" },
+                            new CustomField() { Name = "Content.Slider.CallToAction.Style", Default = "", System = true, Type="System.String" },
+                            new CustomField() { Name = "Content.Slider.CallToAction.Text", Default = "", System = true, Type="System.String" },
+                            new CustomField() { Name = "Content.Slider.DisplayOrder", Default = "0", System = true, Type="System.Int32" }
                         })
                     },
                     new ContentType() {
