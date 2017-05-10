@@ -12,6 +12,10 @@ using Hood.Infrastructure;
 using System.Linq;
 using Hood.Models.Api;
 using Hood.Caching;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http;
+using Hood.Core.Models.ComplexTypes;
 
 namespace Hood.Services
 {
@@ -141,6 +145,45 @@ namespace Hood.Services
                 {
                     throw;
                 }
+            }
+        }
+
+        public async Task ProcessCaptchaOrThrowAsync(HttpRequest request)
+        {
+            var _integrations = GetIntegrationSettings(true);
+            if (_integrations.EnableGoogleRecaptcha)
+            {
+                var captcha = request.Form["g-recaptcha-response"].FirstOrDefault();
+                if (captcha.IsSet())
+                {
+                    // process the captcha.
+                    using (var client = new HttpClient())
+                    {
+                        var remoteIpAddress = request.HttpContext.Connection.RemoteIpAddress.ToString();
+                        var values = new Dictionary<string, string>
+                        {
+                            { "secret", _integrations.GoogleRecaptchaSecretKey },
+                            { "response", captcha },
+                            { "remoteip", remoteIpAddress }
+                        };
+
+                        var content = new FormUrlEncodedContent(values);
+
+                        var responseContent = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
+
+                        var responseString = await responseContent.Content.ReadAsStringAsync();
+
+                        RecaptchaResponse response = JsonConvert.DeserializeObject<RecaptchaResponse>(responseString);
+
+                        if (!response.success)
+                            throw new Exception("Sorry, your reCaptcha validation failed.");
+
+                        if (request.Host.Host != response.hostname)
+                            throw new Exception("Sorry, your reCaptcha validation failed, your host name does not match the validated host name.");
+                    }
+                }
+                else
+                    throw new Exception("Sorry, your reCaptcha validation failed, no captcha response found.");
             }
         }
 
@@ -640,6 +683,11 @@ namespace Hood.Services
         }
 
         public PropertyListingApi ToPropertyListingApi(PropertyListing property)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ProcessCaptchaOrThrowAsync(HttpRequest request)
         {
             throw new NotImplementedException();
         }

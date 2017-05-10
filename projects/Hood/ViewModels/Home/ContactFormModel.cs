@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Hood.Services;
 
 namespace Hood.Models
 {
@@ -39,6 +41,17 @@ namespace Hood.Models
             ShowValidationMessage = showValidationMessage;
             ShowValidationIndividualMessages = showValidationIndividualMessages;
         }
+
+        public MailObject WriteToMessage(MailObject message)
+        {
+            message.AddParagraph("Name: <strong>" + this.Name + "</strong>");
+            message.AddParagraph("Email: <strong>" + this.Email + "</strong>");
+            message.AddParagraph("Phone: <strong>" + this.PhoneNumber + "</strong>");
+            message.AddParagraph("Subject: <strong>" + this.Subject + "</strong>");
+            message.AddParagraph("Enquiry:");
+            message.AddParagraph("<strong>" + this.Enquiry + "</strong>");
+            return message;
+        }
     }
 
     public interface IContactFormModel
@@ -51,5 +64,7 @@ namespace Hood.Models
         string Subject { get; set; }
         bool ShowValidationMessage { get; set; }
         bool ShowValidationIndividualMessages { get; set; }
+
+        MailObject WriteToMessage(MailObject message);
     }
 }

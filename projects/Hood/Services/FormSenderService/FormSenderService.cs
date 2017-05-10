@@ -46,12 +46,7 @@ namespace Hood.Services
                         message.Subject = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
                         message.AddH1(_settings.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
                         message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
-                        message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
-                        message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
-                        message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
-                        message.AddParagraph("Subject: <strong>" + model.Subject + "</strong>");
-                        message.AddParagraph("Enquiry:");
-                        message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
+                        message = model.WriteToMessage(message);
                         await _email.SendEmailAsync(message);
                     }
 
@@ -61,12 +56,7 @@ namespace Hood.Services
                     message.Subject = _settings.ReplacePlaceholders(contactSettings.Subject);
                     message.AddH1(_settings.ReplacePlaceholders(contactSettings.Title));
                     message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.Message));
-                    message.AddParagraph("Name: <strong>" + model.Name + "</strong>");
-                    message.AddParagraph("Email: <strong>" + model.Email + "</strong>");
-                    message.AddParagraph("Phone: <strong>" + model.PhoneNumber + "</strong>");
-                    message.AddParagraph("Subject: <strong>" + model.Subject + "</strong>");
-                    message.AddParagraph("Enquiry:");
-                    message.AddParagraph("<strong>" + model.Enquiry + "</strong>");
+                    message = model.WriteToMessage(message);
                     await _email.SendEmailAsync(message);
 
                     return new Models.Response(true);

@@ -227,37 +227,15 @@ namespace Hood.Controllers
         [Route("hood/process-contact-form/")]
         public async Task<Response> ProcessContactForm(ContactFormModel model)
         {
-            var _integrations = _settings.GetIntegrationSettings();
-            if (_integrations.EnableGoogleRecaptcha)
+            try
             {
-                var captcha = Request.Form["g-recaptcha-response"].FirstOrDefault();
-                if (captcha.IsSet())
-                {
-                    // process the captcha.
-                    using (var client = new HttpClient())
-                    {
-                        var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                        var values = new Dictionary<string, string>
-                        {
-                            { "secret", _integrations.GoogleRecaptchaSecretKey },
-                            { "response", captcha },
-                            { "remoteip", remoteIpAddress }
-                        };
-
-                        var content = new FormUrlEncodedContent(values);
-
-                        var responseContent = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
-
-                        var responseString = await responseContent.Content.ReadAsStringAsync();
-
-                        RecaptchaResponse response = JsonConvert.DeserializeObject<RecaptchaResponse>(responseString);
-
-                        if (!response.success)
-                            return new Models.Response("You could not be validated by ReCaptcha.");
-                    }
-                }
+                await _settings.ProcessCaptchaOrThrowAsync(Request);
+                return await _forms.ProcessContactFormModel(model);
             }
-            return await _forms.ProcessContactFormModel(model);
+            catch (Exception ex)
+            {
+                return new Models.Response(ex);
+            }
         }
 
         [Route("hood/signup/mailchimp/")]

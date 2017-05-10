@@ -3,6 +3,8 @@ using Hood.Models;
 using Microsoft.Extensions.Configuration;
 using Hood.Infrastructure;
 using Hood.Models.Api;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Hood.Services
 {
@@ -31,6 +33,8 @@ namespace Hood.Services
         OperationResult CartEnabled();
         OperationResult PropertyEnabled();
         string GetVersion();
+
+        Task ProcessCaptchaOrThrowAsync(HttpRequest request);
 
         ContentApi ToContentApi(Content content);
         PropertyListingApi ToPropertyListingApi(PropertyListing property);
