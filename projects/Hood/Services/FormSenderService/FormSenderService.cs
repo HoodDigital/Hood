@@ -7,6 +7,7 @@ using Hood.Infrastructure;
 using System;
 using System.Net;
 using Hood.Models;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Hood.Services
 {
@@ -16,15 +17,18 @@ namespace Hood.Services
         private readonly ISettingsRepository _settings;
         private readonly IRazorViewRenderer _renderer;
         private readonly IEmailSender _email;
+        private readonly IHostingEnvironment _environment;
 
         public FormSenderService(IHttpContextAccessor contextAccessor,
                               ISettingsRepository site,
                               IRazorViewRenderer renderer,
-                              IEmailSender email)
+                              IEmailSender email,
+                              IHostingEnvironment env)
         {
             _contextAccessor = contextAccessor;
             _settings = site;
             _email = email;
+            _environment = env;
             _renderer = renderer;
         }
 
@@ -48,10 +52,17 @@ namespace Hood.Services
                         message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
                         message = model.WriteToMessage(message);
 
-                        message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
 
-                        await _email.SendEmailAsync(message);
-                        await _email.NotifyRoleAsync(message, "ContactFormNotifications");
+                        if (_environment.IsDevelopment() || _environment.IsStaging())
+                        {
+                            await _email.NotifyRoleAsync(message, "SuperUser");
+                        }
+                        else
+                        {
+                            message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
+                            await _email.SendEmailAsync(message);
+                            await _email.NotifyRoleAsync(message, "ContactFormNotifications");
+                        }
                     }
 
                     message = new MailObject();
