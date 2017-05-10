@@ -41,13 +41,17 @@ namespace Hood.Services
                     string siteEmail = contactSettings.Email;
                     if (!string.IsNullOrEmpty(siteEmail))
                     {
-                        message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
+
                         message.PreHeader = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
                         message.Subject = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
                         message.AddH1(_settings.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
                         message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
                         message = model.WriteToMessage(message);
+
+                        message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
+
                         await _email.SendEmailAsync(message);
+                        await _email.NotifyRoleAsync(message, "ContactFormNotifications");
                     }
 
                     message = new MailObject();
