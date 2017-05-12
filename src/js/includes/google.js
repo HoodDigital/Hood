@@ -16,6 +16,11 @@ $.hood.Google = {
                 map: map,
                 title: $(this).data('marker')
             });
+
+            $(window).resize(function () {
+                google.maps.event.trigger(map, 'resize');
+            });
+            google.maps.event.trigger(map, 'resize');
         });
     },
     Addresses: {
