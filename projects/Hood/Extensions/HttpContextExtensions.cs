@@ -1,5 +1,6 @@
 ﻿using Hood.Models;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 
 namespace Hood.Extensions
@@ -26,6 +27,23 @@ namespace Hood.Extensions
                 return false;
             }
             return true;
+        }
+
+        public static bool MatchesAccessCode(this HttpContext context, string code)
+        {
+            if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
+                return true;
+
+            byte[] betaCodeBytes = null;
+            if (!context.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
+                return false;
+            var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
+
+            if (betaCode.Equals(code, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return true;
+            }
+            return false;
         }
 
         public static string GetSiteUrl(this HttpContext context, bool includePath = false, bool includeQuery = false)

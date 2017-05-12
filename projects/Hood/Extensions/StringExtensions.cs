@@ -28,6 +28,60 @@ namespace Hood.Extensions
             return Uri.TryCreate(url, UriKind.Absolute, out result);
         }
 
+        public static string ToUrl(this string url)
+        {
+            Uri formattedUrl = null;
+            try
+            {
+                formattedUrl = new UriBuilder(url).Uri;
+                return formattedUrl.ToString();
+            }
+            catch (ArgumentNullException ex)
+            {
+                return url;
+            }
+            catch (UriFormatException ex)
+            {
+                Uri uri;
+                if (Uri.TryCreate(url, UriKind.Absolute, out uri) || Uri.TryCreate("http://" + url, UriKind.Absolute, out uri))
+                {
+                    return uri.ToString();
+                }
+            }
+            return url;
+        }
+        public static string ToTwitterUrl(this string url)
+        {
+            if (url.ToLower().Contains("twitter.com"))
+                return url.ToUrl();
+            if (url.StartsWith("@"))
+                return ("https://twitter.com/" + url.Replace("@", "")).ToUrl();
+            return ("https://twitter.com/" + url).ToUrl();
+        }
+        public static string ToInstagramUrl(this string url)
+        {
+            if (url.ToLower().Contains("instagram.com"))
+                return url.ToUrl();
+            if (url.StartsWith("@"))
+                return ("https://www.instagram.com/" + url.Replace("@", "")).ToUrl();
+            return ("https://www.instagram.com/" + url).ToUrl();
+        }
+        public static string ToFacebookUrl(this string url)
+        {
+            if (url.ToLower().Contains("facebook.com"))
+                return url.ToUrl();
+            return ("https://www.facebook.com/" + url).ToUrl();
+        }
+        public static string ToGooglePlusUrl(this string url)
+        {
+            if (url.ToLower().Contains("plus.google.com"))
+                return url.ToUrl();
+            if (url.StartsWith("+"))
+                return ("https://plus.google.com/" + url).ToUrl();
+            return ("https://plus.google.com/+" + url).ToUrl();
+        }
+
+
         #endregion
 
         public static bool IsNullOrEmpty(this string str)
