@@ -10667,6 +10667,15 @@ figure.media-select {
   -webkit-flex-flow: row wrap;
   align-items: center;
 }
+.row-full {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  align-items: stretch;
+}
 .v-middle {
   position: absolute;
   top: 50%;
@@ -10674,6 +10683,9 @@ figure.media-select {
   -webkit-transform: translateY(-50%);
   -o-transform: translateY(-50%);
   -ms-transition: translateY(-50%);
+}
+.full-width {
+  width: 100%;
 }
 .no-border {
   border: 0px !important;
