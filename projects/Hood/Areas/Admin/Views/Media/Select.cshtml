@@ -23,7 +23,10 @@
     <div id="media-template" class="kendo-template">
         <div class="col-xs-6 col-sm-4">
             <div class="thumbnail text-center">
-                <fixedImage src="${ LargeUrl }" class="img img-md m-b-sm media-select" data-tag="@Model.Tag" data-url="${ DownloadUrl }" />
+                <fixedImage src="${ LargeUrl }" class="img img-full img-square media-select" data-tag="@Model.Tag" data-url="${ DownloadUrl }" />
+                <p class="no-wrap">
+                    <small>${ Filename }</small>
+                </p>
                 <p class="no-margin">
                     <a class="media-select action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ SmallUrl }">
                         <span>

@@ -24,7 +24,10 @@
     <div id="media-template" class="kendo-template">
         <div class="col-xs-6 col-sm-4 col-lg-3">
             <div class="thumbnail text-center">
-                <fixedImage src="${ LargeUrl }" class="img-md img-full m-b-sm attach-media-select" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="${ Id }" />
+                <fixedImage src="${ LargeUrl }" class="img img-full img-square attach-media-select" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="${ Id }" />
+                <p class="no-wrap">
+                    <small>${ Filename }</small>
+                </p>
                 <p class="no-margin">
                     <a class="attach-media-select action-button btn btn-xs btn-default" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="${ Id }">
                         <i class="fa fa-clone m-r-xs"></i>
