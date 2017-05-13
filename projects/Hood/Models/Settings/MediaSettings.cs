@@ -10,6 +10,12 @@ namespace Hood.Models
         [Display(Name = "Azure Storage Key")]
         public string AzureKey { get; set; }
 
+        [Display(Name = "Azure Storage Host (Or CDN Endpoint Host)")]
+        public string AzureHost { get; set; }
+
+        [Display(Name = "Azure Storage Scheme")]
+        public string AzureScheme { get; set; }
+
         [Display(Name = "Hood Image API Url")]
         public string HoodApiUrl { get; set; }
 

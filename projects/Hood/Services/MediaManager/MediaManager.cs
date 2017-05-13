@@ -26,6 +26,8 @@ namespace Hood.Services
         private string _hoodApiKey;
         private readonly IConfiguration _config;
         private readonly ISettingsRepository _settings;
+        private string _hoodApiScheme;
+        private string _hoodApiHost;
 
         public MediaManager(IConfiguration config, ISettingsRepository site)
         {
@@ -47,6 +49,8 @@ namespace Hood.Services
             _key = _settings.GetMediaSettings().AzureKey;
             _hoodApiKey = _settings.GetMediaSettings().HoodApiKey;
             _hoodApiUrl = _settings.GetMediaSettings().HoodApiUrl;
+            _hoodApiHost = _settings.GetMediaSettings().AzureHost;
+            _hoodApiScheme = _settings.GetMediaSettings().AzureScheme;
             try
             {
                 _storageAccount = CloudStorageAccount.Parse(_key);
@@ -306,6 +310,8 @@ namespace Hood.Services
                 var requestParams = new System.Collections.Specialized.NameValueCollection();
                 requestParams.Add("apiKey", _hoodApiKey);
                 requestParams.Add("azureKey", _key);
+                requestParams.Add("azureHost", _hoodApiHost);
+                requestParams.Add("azureScheme", _hoodApiScheme);
                 requestParams.Add("url", media.Url);
                 requestParams.Add("container", _container);
                 requestParams.Add("blobReference", media.BlobReference);
