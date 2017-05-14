@@ -204,7 +204,7 @@ namespace Hood.Services
             var uploadResult = await Upload(file.OpenReadStream(), media.BlobReference);
 
             // Attach to the entity
-            media.Url = uploadResult.StorageUri.PrimaryUri.AbsoluteUri;
+            media.Url = GetSavedUrl(uploadResult.StorageUri.PrimaryUri);
 
             // Process type, size etc.
             media.CreatedOn = DateTime.Now;
@@ -235,7 +235,7 @@ namespace Hood.Services
             var uploadResult = await Upload(file, media.BlobReference);
 
             // Attach to the entity
-            media.Url = uploadResult.StorageUri.PrimaryUri.AbsoluteUri;
+            media.Url = GetSavedUrl(uploadResult.StorageUri.PrimaryUri);
 
             // Process type, size etc.
             media.CreatedOn = DateTime.Now;
@@ -253,6 +253,26 @@ namespace Hood.Services
 
             return media;
         }
+
+        private string GetSavedUrl(Uri absoluteUri)
+        {
+            var host = absoluteUri.Host;
+            if (!string.IsNullOrEmpty(_hoodApiHost))
+                host = _hoodApiHost;
+
+            var scheme = Uri.UriSchemeHttps;
+            if (_hoodApiScheme != "https")
+                scheme = Uri.UriSchemeHttp;
+
+            var uriBuilder = new UriBuilder(absoluteUri)
+            {
+                Host = host,
+                Scheme = scheme,
+                Port = -1
+            };
+            return uriBuilder.Uri.AbsoluteUri;
+        }
+
         public async Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read)
         {
             string sasBlobToken;
