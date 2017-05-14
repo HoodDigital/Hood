@@ -6,6 +6,8 @@ using Hood.Services;
 using Hood.Models;
 using System;
 using Hood.Caching;
+using System.Threading.Tasks;
+using Hood.Extensions;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -20,6 +22,10 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IAccountRepository _auth;
         private readonly IAddressService _address;
         private readonly IHoodCache _cache;
+        private readonly IMediaManager<SiteMedia> _media;
+        private readonly HoodDbContext _db;
+        private readonly IEmailSender _email;
+        private readonly IMediaRefreshService _mediaRefresh;
 
         public SettingsController(IAccountRepository auth,
                               IConfiguration conf,
@@ -27,7 +33,11 @@ namespace Hood.Areas.Admin.Controllers
                               ISettingsRepository site,
                               IContentRepository content,
                               IAddressService address,
-                              IHoodCache cache)
+                              IHoodCache cache,
+                              IMediaManager<SiteMedia> media,
+                              HoodDbContext db,
+                              IEmailSender email, 
+                              IMediaRefreshService mediaRefresh)
         {
             _auth = auth;
             _config = conf;
@@ -36,6 +46,10 @@ namespace Hood.Areas.Admin.Controllers
             _address = address;
             _settings = site;
             _cache = cache;
+            _media = media;
+            _db = db;
+            _email = email;
+            _mediaRefresh = mediaRefresh;
         }
 
         [Route("admin/settings/basics/")]
@@ -181,7 +195,7 @@ namespace Hood.Areas.Admin.Controllers
 
                 // refresh all content metas and things
                 _content.RefreshAllMetas();
-                
+
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -322,6 +336,9 @@ namespace Hood.Areas.Admin.Controllers
             MediaSettings model = _settings.GetMediaSettings(true);
             if (model == null)
                 model = new MediaSettings();
+
+            model.UpdateReport = _mediaRefresh.Report();
+
             return View(model);
         }
         [HttpPost]
@@ -340,6 +357,9 @@ namespace Hood.Areas.Admin.Controllers
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
             }
+
+            model.UpdateReport = _mediaRefresh.Report();
+
             return View(model);
         }
         [Route("admin/settings/media/reset/")]
@@ -350,6 +370,25 @@ namespace Hood.Areas.Admin.Controllers
             _settings.Set("Hood.Settings.Media", model);
             return RedirectToAction("Media");
         }
+
+        [Route("admin/settings/media/refresh/")]
+        [Authorize(Roles = "Admin,Manager")]
+        public IActionResult RefreshMedia()
+        {
+            _mediaRefresh.Kill();
+            _mediaRefresh.RunUpdate(HttpContext);
+            return RedirectToAction("Media");
+        }
+
+        [HttpPost]
+        [Route("admin/settings/media/refresh/cancel/")]
+        public IActionResult RefreshMediaKillAsync()
+        {
+            _mediaRefresh.Kill();
+            return Json(new { success = true });
+        }
+
+
 
 
         [Route("admin/settings/mail/")]

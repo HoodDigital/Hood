@@ -1,6 +1,7 @@
 ﻿using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
+using Hood.Models.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -45,12 +46,13 @@ namespace Hood.Services
 
         private void Initialise()
         {
-            _container = _settings.GetMediaSettings().ContainerName.ToSeoUrl();
-            _key = _settings.GetMediaSettings().AzureKey;
-            _hoodApiKey = _settings.GetMediaSettings().HoodApiKey;
-            _hoodApiUrl = _settings.GetMediaSettings().HoodApiUrl;
-            _hoodApiHost = _settings.GetMediaSettings().AzureHost;
-            _hoodApiScheme = _settings.GetMediaSettings().AzureScheme;
+            var _mediaSettings = _settings.GetMediaSettings(true);
+            _container = _mediaSettings.ContainerName.ToSeoUrl();
+            _key = _mediaSettings.AzureKey;
+            _hoodApiKey = _mediaSettings.HoodApiKey;
+            _hoodApiUrl = _mediaSettings.HoodApiUrl;
+            _hoodApiHost = _mediaSettings.AzureHost;
+            _hoodApiScheme = _mediaSettings.AzureScheme;
             try
             {
                 _storageAccount = CloudStorageAccount.Parse(_key);
@@ -338,5 +340,27 @@ namespace Hood.Services
             }
         }
 
+        public async Task<TMediaObject> RefreshMedia(TMediaObject media, string tempDirectory)
+        {
+            // copy record of original files into new object
+            var old = new SiteMedia();
+            media.CopyProperties(old);
+
+            // download the orignal file, and save it to temp.
+            var tempFile = tempDirectory + media.UniqueId;
+            using (var client = new WebClient())
+            {
+                client.DownloadFile(new Uri(media.Url), tempFile);
+            }
+
+            using (var fileStream = File.OpenRead(tempFile))
+            {
+                // reupload to a new location, and process.
+                await ProcessUpload(fileStream, media.Filename, media.FileType, media.FileSize, media);
+            }
+
+            // save the new file urls to the media object
+            return media;
+        }
     }
 }

@@ -91,7 +91,7 @@ namespace Hood.Services
                     return JsonConvert.DeserializeObject<T>(option.Value);
                 else
                 {
-                    option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
+                    option = _db.Options.AsNoTracking().Where(o => o.Id == key).FirstOrDefault();
                     if (option != null)
                     {
                         _cache.Add(cacheKey, option);

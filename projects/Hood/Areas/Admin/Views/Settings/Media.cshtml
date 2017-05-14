@@ -4,12 +4,39 @@
     Layout = "_SettingsLayout";
 }
 @section buttons {
+    <a asp-action="RefreshMedia" class="btn btn-warning warning-alert" data-warning="This will refresh all media items, removing any broken media, and updating the location to the currently set up cloud storage. Are you sure?"><i class="fa fa-refresh"></i> Refresh all media</a>
     <a asp-action="ResetMedia" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
     <p>
         Settings for uploading media to the site.
     </p>
+}
+@section alerts {
+    @if (Model.UpdateReport.HasRun)
+    {
+        <div class="alert @(Model.UpdateReport.Succeeded ? "alert-success" : Model.UpdateReport.Running ? "alert-warning" : "alert-danger")">
+            @if (Model.UpdateReport.Running)
+            {
+                <h3 class="no-margin">Media is being refreshed.</h3>
+            }
+            else
+            {
+                if (Model.UpdateReport.Succeeded)
+                {
+                    <h3 class="no-margin">Media refresh succeeded.</h3>
+                }
+                else
+                {
+                    <h3 class="no-margin">Media refresh failed.</h3>
+                }
+            }
+            <p class="m-t-md">@Model.UpdateReport.StatusMessage</p>
+            <p>Processed: @Model.UpdateReport.Processed</p>
+            <p>Total: @Model.UpdateReport.Total</p>
+            <p>Completed: @Model.UpdateReport.Complete</p>
+        </div>
+    }
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">

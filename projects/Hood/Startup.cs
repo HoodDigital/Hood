@@ -82,6 +82,7 @@ namespace Hood
                 services.AddSingleton<IHoodCache, HoodCache>();
                 services.AddSingleton<IFTPService, FTPService>();
                 services.AddSingleton<IPropertyImporter, PropertyImporter>();
+                services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
                 services.AddSingleton<IPropertyExporter, PropertyExporter>();
                 services.AddSingleton<IContentExporter, ContentExporter>();
                 services.AddSingleton<IThemesService, ThemesService>();
