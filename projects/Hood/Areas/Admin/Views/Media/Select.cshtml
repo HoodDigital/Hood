@@ -1,6 +1,7 @@
 @model AttachMediaModel
 @{
     Layout = null;
+    MediaSettings mediaSettings = _settings.GetMediaSettings();
 }
 <div class="modal fade inmodal hood-modal" id="attach-media-modal" tabindex="-1" role="dialog" aria-labelledby="attach-media-title">
     <div class="modal-dialog modal-lg" role="document">
@@ -23,7 +24,14 @@
     <div id="media-template" class="kendo-template">
         <div class="col-xs-6 col-sm-4">
             <div class="thumbnail text-center">
-                <fixedImage src="${ LargeUrl }" class="img img-full img-square media-select" data-tag="@Model.Tag" data-url="${ DownloadUrl }" />
+                @if (mediaSettings.AzureScheme == "https")
+                {
+                    <fixedImage src="${ LargeUrl }" class="img img-full img-square media-select" data-tag="@Model.Tag" data-url="${ DownloadUrlHttps }" />
+                }
+                else
+                {
+                    <fixedImage src="${ LargeUrl }" class="img img-full img-square media-select" data-tag="@Model.Tag" data-url="${ DownloadUrl }" />
+                }
                 <p class="no-wrap">
                     <small>${ Filename }</small>
                 </p>

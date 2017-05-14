@@ -37,6 +37,7 @@ namespace Hood.Models
         {
             HoodApiUrl = "http://api.hooddigital.com/v2/thumb";
             ContainerName = Guid.NewGuid().ToString();
+            AzureScheme = "https";
         }
     }
 }
