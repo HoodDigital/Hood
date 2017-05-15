@@ -5,7 +5,7 @@
     PropertyListingApi mapi = _settings.ToPropertyListingApi(Model.Property);
 }
 @section buttons {
-    <a class="btn btn-sm btn-default" href="@mapi.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+    <a class="btn btn-sm btn-default" href="@Model.Property.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
     <a class="btn btn-sm btn-danger delete-property" data-id="@Model.Property.Id"><i class="fa fa-trash m-r-xs"></i>Delete</a>
 }
 @section breadcrumbs {
