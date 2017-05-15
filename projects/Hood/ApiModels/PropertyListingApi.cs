@@ -64,6 +64,7 @@ namespace Hood.Models.Api
 
         // Settings
         public string ListingType { get; set; }
+        public string LeaseStatus { get; set; }
         public string PropertyType { get; set; }
         public string Size { get; set; }
         public int Bedrooms { get; set; }

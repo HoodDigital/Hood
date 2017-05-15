@@ -63,7 +63,7 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">Lease/Listing Status:</label>
                 <div class="col-sm-8">
-                    <select class="form-control" asp-for="Lease" asp-items="_propertySettings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+                    <select class="form-control" asp-for="LeaseStatus" asp-items="_propertySettings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
                 </div>
             </div>
             <div class="form-group">
