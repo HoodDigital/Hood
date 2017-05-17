@@ -46,7 +46,7 @@
             case "PictureUrl":
                 <div class="row image-cell">
                     <div class="col-xs-1">
-                        <img src="@(Model.GetStringValue().IsSet() ? Model.GetStringValue() : "/lib/hood/images/no-image.jpg")" class="img-xxs img-circle @string.Format("Meta-{0}", Model.Name).ToSeoUrl()" />
+                        <img src="@(Model.GetStringValue().IsSet() ? Model.GetStringValue() : "/lib/hood/images/no-image.jpg")" class="img img-xxs img-circle @string.Format("Meta-{0}", Model.Name).ToSeoUrl()" />
                     </div>
                     <div class="col-xs-11">
                         <div class="input-group">
