@@ -45,8 +45,4 @@
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Admin\" />
-  </ItemGroup>
-
 </Project>
