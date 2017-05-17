@@ -8,6 +8,7 @@ using System;
 using Hood.Caching;
 using System.Threading.Tasks;
 using Hood.Extensions;
+using Geocoding.Google;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -36,7 +37,7 @@ namespace Hood.Areas.Admin.Controllers
                               IHoodCache cache,
                               IMediaManager<SiteMedia> media,
                               HoodDbContext db,
-                              IEmailSender email, 
+                              IEmailSender email,
                               IMediaRefreshService mediaRefresh)
         {
             _auth = auth;
@@ -68,20 +69,38 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                _settings.Set("Hood.Settings.Basic", model);
                 var location = _address.GeocodeAddress(model.Address);
                 if (location != null)
                 {
                     model.Address.Latitude = location.Latitude;
                     model.Address.Longitude = location.Longitude;
                     _settings.Set("Hood.Settings.Basic", model);
-                    model.SaveMessage = "Settings saved!";
+                    model.SaveMessage = "Settings saved & address geocoded via Google API.";
                     model.MessageType = Enums.AlertType.Success;
                 }
                 else
                 {
-                    _settings.Set("Hood.Settings.Basic", model);
                     model.SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
                     model.MessageType = Enums.AlertType.Warning;
+                }
+            }
+            catch (GoogleGeocodingException ex)
+            {
+                switch (ex.Status)
+                {
+                    case GoogleStatus.RequestDenied:
+                        model.SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a RequestDenied status] this means your API account is not activated for Geocoding Requests.";
+                        model.MessageType = Enums.AlertType.Warning;
+                        break;
+                    case GoogleStatus.OverQueryLimit:
+                        model.SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a OverQueryLimit status] this means your API account is has run out of Geocoding Requests.";
+                        model.MessageType = Enums.AlertType.Warning;
+                        break;
+                    default:
+                        model.SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled. Google returned a status of " + ex.Status.ToString();
+                        model.MessageType = Enums.AlertType.Warning;
+                        break;
                 }
             }
             catch (Exception ex)

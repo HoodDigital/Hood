@@ -25,9 +25,17 @@ namespace Hood.Services
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
             IEnumerable<Address> addresses = geocoder.Geocode(
                 address.Number.IsSet() ? string.Format("{0} {1}", address.Number, address.Address1) : address.Address1, 
-                address.City, address.County, address.Postcode, address.Country);
+                address.City, 
+                address.County, 
+                address.Postcode, 
+                address.Country
+            );
             if (addresses.Count() == 0)
-                return null;
+            {
+                addresses = geocoder.Geocode(address.Postcode);
+                if (addresses.Count() == 0)
+                    return null;
+            }
 
             return addresses.First().Coordinates;           
         }
