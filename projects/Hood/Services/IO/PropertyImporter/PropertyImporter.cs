@@ -49,6 +49,8 @@ namespace Hood.Services
             Cancelled = false;
             Succeeded = false;
             RemoteList = new List<string>();
+            Errors = new List<string>();
+            Warnings = new List<string>();
             StatusMessage = "Not running...";
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(PropertyImporter) + "\\";
             _settings = site;
