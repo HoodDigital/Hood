@@ -34,7 +34,7 @@
 <section id="search-rental-box">
     @{ await Html.RenderPartialAsync("_PropertySearch"); }
 </section>
-<div id="clustered-map" class="img-lg img-full m-t-lg m-b-lg"
+<div id="clustered-map" class="google-map" style="height:300px;"
      data-lat="@Model.CentrePoint.Latitude"
      data-long="@Model.CentrePoint.Longitude"
      data-zoom="3"
@@ -104,7 +104,7 @@
     else
     {
         <div class="row">
-            @foreach (PropertyListingApi content in Model.Properties.Items.Select(p => _settings.ToPropertyListingApi(p)))
+            @foreach (var content in Model.Properties.Items)
             {
                 await Html.RenderPartialAsync("_PropertyCard", content);
             }

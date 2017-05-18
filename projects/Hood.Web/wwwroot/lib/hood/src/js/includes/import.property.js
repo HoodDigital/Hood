@@ -69,6 +69,24 @@ $.hood.Import = {
                     $('#progressbar').css({
                         width: result.Importer.Complete + "%"
                     });
+                    if (result.Importer.Errors.length) {
+                        errorHtml = "";
+                        for (i = 0; i < result.Importer.Errors.length; i++) {
+                            errorHtml += '<p class="text-danger">' + result.Importer.Errors[i] + '</p>';
+                        }
+                        $('#Errors').html(errorHtml);
+                    } else {
+                        $('#Errors').html("<p>No errors reported.</p>");
+                    }
+                    if (result.Importer.Warnings.length) {
+                        warningHtml = "";
+                        for (i = 0; i < result.Importer.Warnings.length; i++) {
+                            warningHtml += '<p class="text-warning">' + result.Importer.Warnings[i] + '</p>';
+                        }
+                        $('#Warnings').html(warningHtml);
+                    } else {
+                        $('#Warnings').html("<p>No warnings reported.</p>");
+                    }
                 }
             });
         },

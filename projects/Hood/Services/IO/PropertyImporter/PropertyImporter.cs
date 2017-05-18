@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Hood.Interfaces;
+using Geocoding.Google;
 
 namespace Hood.Services
 {
@@ -60,6 +61,8 @@ namespace Hood.Services
         private bool Running { get; set; }
         private bool Succeeded { get; set; }
         private double PercentComplete { get; set; }
+        private List<string> Errors { get; set; }
+        private List<string> Warnings { get; set; }
         private int Total { get; set; }
         private int Tasks { get; set; }
         private int CompletedTasks { get; set; }
@@ -101,6 +104,8 @@ namespace Hood.Services
                 Succeeded = false;
                 FileError = false;
                 RemoteList = new List<string>();
+                Errors = new List<string>();
+                Warnings = new List<string>();
                 Account = context.GetAccountInfo();
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = _settings.GetPropertySettings();
@@ -203,6 +208,7 @@ namespace Hood.Services
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Added++;
+                        Errors.Add(FormatLog("Error adding property: " + addPropertyException.Message, propertyRef));
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Adding property failed: " + addPropertyException.Message);
                     }
@@ -235,6 +241,7 @@ namespace Hood.Services
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Updated++;
+                        Errors.Add(FormatLog("Error updating property: " + updatePropertyException.Message, propertyRef));
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Updating property failed: " + updatePropertyException.Message);
                     }
@@ -259,6 +266,7 @@ namespace Hood.Services
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Updated++;
+                        Errors.Add(FormatLog("Error removing property: " + removePropertyException.Message, property));
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Removing property failed: " + removePropertyException.Message);
                     }
@@ -520,6 +528,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 StatusMessage = "There was an error downloading the file (" + filename + ")...";
+                Errors.Add(FormatLog(StatusMessage));
                 FileError = true;
                 Lock.ReleaseWriterLock();
             }
@@ -678,9 +687,53 @@ namespace Hood.Services
 
             // Geocode
             if (!validatingOnly)
-                property.SetLocation(_address.GeocodeAddress(property));
+            {
+                try
+                {
+                    var loc = _address.GeocodeAddress(property);
+                    property.SetLocation(loc);
+                }
+                catch (GoogleGeocodingException ex)
+                {
+                    switch (ex.Status)
+                    {
+                        case GoogleStatus.RequestDenied:
+                            Lock.AcquireWriterLock(Timeout.Infinite);
+                            StatusMessage = "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
+                            Errors.Add(FormatLog(StatusMessage, property));
+                            Lock.ReleaseWriterLock();
+                            break;
+                        case GoogleStatus.OverQueryLimit:
+                            Lock.AcquireWriterLock(Timeout.Infinite);
+                            StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
+                            Errors.Add(FormatLog(StatusMessage, property));
+                            Lock.ReleaseWriterLock();
+                            break; 
+                        default:
+                            Lock.AcquireWriterLock(Timeout.Infinite);
+                            StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
+                            Errors.Add(FormatLog(StatusMessage, property));
+                            Lock.ReleaseWriterLock();
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = "There was an error GeoLocating the property.";
+                    Errors.Add(FormatLog(StatusMessage, property));
+                    Lock.ReleaseWriterLock();
+                }
+            }
 
             return property;
+        }
+
+        private string FormatLog(string statusMessage, PropertyListing property = null)
+        {
+            if (property != null)
+                return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
+            return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), statusMessage);
         }
 
         private PropertyListing UpdateMetadata(PropertyListing property, Dictionary<string, string> data)
@@ -786,7 +839,9 @@ namespace Hood.Services
                 Updated = Updated,
                 ToAdd = ToAdd,
                 ToDelete = ToDelete,
-                ToUpdate = ToUpdate
+                ToUpdate = ToUpdate, 
+                Errors = Errors, 
+                Warnings = Warnings
             };
             Lock.ReleaseWriterLock();
             return report;
@@ -813,7 +868,12 @@ namespace Hood.Services
             _killFlag = Cancelled;
             Lock.ReleaseWriterLock();
             if (_killFlag)
+            {
+                Lock.AcquireWriterLock(Timeout.Infinite);
+                Warnings.Add(FormatLog("Import process was cancelled early."));
+                Lock.ReleaseWriterLock();
                 throw new Exception("Action cancelled...");
+            }
         }
         private bool HasFileError()
         {

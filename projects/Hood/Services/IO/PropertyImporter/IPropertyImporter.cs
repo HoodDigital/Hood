@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Hood.Services
 {
@@ -23,6 +24,7 @@ namespace Hood.Services
         public double Complete { get;set; }
         public string StatusMessage { get;set; }
         public bool Running { get;set; }
-
+        public List<string> Errors { get; internal set; }
+        public List<string> Warnings { get; internal set; }
     }
 }

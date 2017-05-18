@@ -1,5 +1,4 @@
 @model ContentListModel
-;
 @{
     ViewBag.Title = "Import Properties via BLM";
     PropertySettings _propertySettings = _settings.GetPropertySettings();
@@ -9,20 +8,20 @@
 }
 @section scripts {
     <environment names="Development,Staging,ErrorTesting">
-        <script src="~/lib/hood/dist/js/includes/import.property.min.js"></script>
+        <script src="~/lib/hood/src/js/includes/import.property.js"></script>
     </environment>
     <environment names="Production,PreProduction">
-        <script src="~/lib/hood/src/js/includes/import.property.js"></script>
+        <script src="~/lib/hood/dist/js/includes/import.property.min.js"></script>
     </environment>
 }
 <div class="row">
     <div class="col-lg-12">
         <div class="wrapper wrapper-content">
-            <div class="ibox">
-                <div class="ibox-title">
+            <div>
+                <div>
                     <h4>Update from FTP Service</h4>
                 </div>
-                <div class="ibox-content">
+                <div>
                     <p>Here you can run the update from the remote FTP service. Click 'Run Update' to start the automatic update.</p>
                     <button id="cancel" class="btn" value="">Cancel</button>
                     <button id="runUpdate" class="btn btn-primary">Run Update</button>
@@ -35,11 +34,11 @@
                     </div>
                 </div>
             </div>
-            <div class="ibox" id="update-info">
-                <div class="ibox-title">
+            <div class="m-t-lg" id="update-info">
+                <div>
                     <h4>Activity</h4>
                 </div>
-                <div class="ibox-content">
+                <div>
                     <div id="progress">
                         <div class="well-lg">
                             <p>Current Task: <strong id="pt"></strong></p>
@@ -60,6 +59,18 @@
                             </p>
                         </div>
                     </div>
+                </div>
+                <div class="m-t-lg">
+                    <h4>Errors</h4>
+                </div>
+                <div id="Errors">
+                    <p>No errors reported.</p>
+                </div>
+                <div class="m-t-lg">
+                    <h4>Warnings</h4>
+                </div>
+                <div id="Warnings">
+                    <p>No warnings reported.</p>
                 </div>
             </div>
         </div>

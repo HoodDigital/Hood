@@ -1,11 +1,11 @@
-@model PropertyListingApi
-
+@model PropertyListing
 @{
+    var papi = _settings.ToPropertyListingApi(Model);
     PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
     <div class="thumbnail">
-        <a href="@Model.Url"><fixedImage src="@Model.FeaturedImage.MediumUrl" class="img-md img-full content-feature-@Model.Id" /></a>
+        <a href="@Model.Url"><fixedImage src="@papi.FeaturedImage.MediumUrl" class="img img-md img-full content-feature-@Model.Id" /></a>
         <div class="caption">
             <a href="@Model.Url">
                 <h3>@Model.Title</h3>
@@ -15,7 +15,7 @@
             @if (_propertySettings.ShowAskingPrice)
             {
                 <div class="ratings text-left">
-                    <p class="pull-right">@Model.FormattedAskingPrice</p>
+                    <p class="pull-right">@papi.FormattedAskingPrice</p>
                     <p>
                         Asking Price:
                     </p>
@@ -24,16 +24,16 @@
             @if (_propertySettings.ShowRent)
             {
                 <div class="ratings text-left">
-                    <p class="pull-right">@Model.FormattedRent</p>
+                    <p class="pull-right">@papi.FormattedRent</p>
                     <p>
-                       aaa Rent:
+                       Rent:
                     </p>
                 </div>
             }
             @if (_propertySettings.ShowPremium)
             {
                 <div class="ratings text-left">
-                    <p class="pull-right">@Model.FormattedPremium</p>
+                    <p class="pull-right">@papi.FormattedPremium</p>
                     <p>
                         Premium:
                     </p>
@@ -42,7 +42,7 @@
             @if (_propertySettings.ShowFees)
             {
                 <div class="ratings text-left">
-                    <p class="pull-right">@Model.FormattedFees</p>
+                    <p class="pull-right">@papi.FormattedFees</p>
                     <p>
                         Fees:
                     </p>
