@@ -38,19 +38,19 @@ namespace Hood.Models
 
         public PropertyMediaBase(IMediaObject media)
         {
-            this.FileSize = media.FileSize;
-            this.FileType = media.FileType;
-            this.Filename = media.Filename;
-            this.Directory = media.Directory;
-            this.BlobReference = media.BlobReference;
-            this.Url = media.Url;
-            this.CreatedOn = media.CreatedOn;
-            this.GeneralFileType = media.GeneralFileType;
-            this.ThumbUrl = media.ThumbUrl;
-            this.SmallUrl = media.SmallUrl;
-            this.MediumUrl = media.MediumUrl;
-            this.LargeUrl = media.LargeUrl;
-            this.UniqueId = media.UniqueId;
+            FileSize = media.FileSize;
+            FileType = media.FileType;
+            Filename = media.Filename;
+            Directory = media.Directory;
+            BlobReference = media.BlobReference;
+            Url = media.Url;
+            CreatedOn = media.CreatedOn;
+            GeneralFileType = media.GeneralFileType;
+            ThumbUrl = media.ThumbUrl;
+            SmallUrl = media.SmallUrl;
+            MediumUrl = media.MediumUrl;
+            LargeUrl = media.LargeUrl;
+            UniqueId = media.UniqueId;
         }
 
         public int Id { get; set; }

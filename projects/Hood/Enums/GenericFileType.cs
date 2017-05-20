@@ -1,6 +1,6 @@
 ﻿namespace Hood.Enums
 {
-    public enum FileType
+    public enum GenericFileType
     {
         Image,
         PDF,

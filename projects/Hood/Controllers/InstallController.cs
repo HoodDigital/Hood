@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Area("Hood")]
     public class InstallController : Controller

@@ -20,7 +20,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Area("Hood")]
     public class HomeController : Controller
@@ -344,7 +344,7 @@ namespace Hood.Areas.Hood.Controllers
         public ActionResult SitemapXml()
         {
             string xml = _content.GetSitemapDocument(Url);
-            return this.Content(xml, "text/xml", Encoding.UTF8);
+            return Content(xml, "text/xml", Encoding.UTF8);
         }
 
         [Route("error/")]

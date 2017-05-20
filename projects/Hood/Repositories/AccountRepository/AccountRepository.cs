@@ -542,7 +542,12 @@ namespace Hood.Services
                     else
                     {
                         // finally, add the user to the NEW subscription, using the new card as the charge source.
-                        newSubscription = await _billing.Subscriptions.SubscribeUserAsync(customer.Id, plan.Id, stripeToken);
+                        var source = await _billing.Cards.CreateCard(customer.Id, stripeToken);
+
+                        // set the card as the default for the user, then subscribe the user.
+                        await _billing.Customers.SetDefaultCard(customer.Id, source.Id);
+
+                        newSubscription = await _billing.Subscriptions.SubscribeUserAsync(customer.Id, plan.Id);
                     }
                 }
             }

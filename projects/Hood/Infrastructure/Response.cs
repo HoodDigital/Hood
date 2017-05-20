@@ -47,7 +47,7 @@ namespace Hood.Models
         {
             Errors = ex.Message;
             Success = false;
-            this.Exception = ex;
+            Exception = ex;
         }
     }
 

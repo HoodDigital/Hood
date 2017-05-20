@@ -78,24 +78,24 @@ namespace Hood.Models.Api
             if (tweet == null)
                 return;
             tweet.CopyProperties(this);
-            this.sCurrentUserRetweet = tweet.CurrentUserRetweet.ToString();
-            this.sStatusID = tweet.StatusID.ToString();
-            this.sSinceID = tweet.SinceID.ToString();
-            this.sUserID = tweet.UserID.ToString();
-            this.sMaxID = tweet.MaxID.ToString();
-            this.sID = tweet.ID.ToString();
-            this.AvatarUrl = "/images/twitter.jpg";
+            sCurrentUserRetweet = tweet.CurrentUserRetweet.ToString();
+            sStatusID = tweet.StatusID.ToString();
+            sSinceID = tweet.SinceID.ToString();
+            sUserID = tweet.UserID.ToString();
+            sMaxID = tweet.MaxID.ToString();
+            sID = tweet.ID.ToString();
+            AvatarUrl = "/images/twitter.jpg";
             if (tweet.Entities.MediaEntities.Count() > 0)
             {
-                this.AvatarUrl = tweet.Entities.MediaEntities[0].MediaUrlHttps;
+                AvatarUrl = tweet.Entities.MediaEntities[0].MediaUrlHttps;
             }
-            if (string.IsNullOrEmpty(this.ScreenName))
+            if (string.IsNullOrEmpty(ScreenName))
             {
-                this.ScreenName = tweet.User.ScreenName;
+                ScreenName = tweet.User.ScreenName;
             }
-            if (string.IsNullOrEmpty(this.ScreenName))
+            if (string.IsNullOrEmpty(ScreenName))
             {
-                this.ScreenName = tweet.User.ScreenNameResponse;
+                ScreenName = tweet.User.ScreenNameResponse;
             }
         }
 

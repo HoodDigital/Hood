@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Area("Hood")]
     public class CartController : Controller

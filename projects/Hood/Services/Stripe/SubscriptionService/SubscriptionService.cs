@@ -32,20 +32,13 @@ namespace Hood.Services
             return await _stripe.SubscriptionService.GetAsync(subscriptionId);
         }
 
-        public async Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, string tokenId = null, DateTime? trialEnd = null, decimal taxPercent = 0)
+        public async Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null, decimal taxPercent = 0)
         {
             var options = new StripeSubscriptionCreateOptions()
             {
                 TrialEnd = trialEnd,
                 TaxPercent = taxPercent
             };
-            if (tokenId.IsSet())
-            {
-                options.Card = new StripeCreditCardOptions()
-                {
-                    TokenId = tokenId
-                };
-            }
             StripeSubscription stripeSubscription = await _stripe.SubscriptionService.CreateAsync(customerId, planId, options);
             return stripeSubscription;
         }

@@ -1,4 +1,3 @@
-
 @inject IContentRepository _content
 @{
     BasicSettings _basicSettings  = _settings.GetBasicSettings();
@@ -29,8 +28,8 @@
         <select class="form-control media-change" name="media-type" id="media-type">
             <option value="">All Types</option>
             @{
-                string[] names = Enum.GetNames(typeof(FileType));
-                FileType[] values = (FileType[])Enum.GetValues(typeof(FileType));
+                string[] names = Enum.GetNames(typeof(GenericFileType));
+                GenericFileType[] values = (GenericFileType[])Enum.GetValues(typeof(GenericFileType));
 
                 for (int i = 0; i < names.Length; i++)
                 {

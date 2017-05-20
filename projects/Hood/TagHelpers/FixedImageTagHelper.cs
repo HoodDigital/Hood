@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using Hood.Extensions;
+using Hood.Services;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
 {
@@ -10,6 +12,12 @@ namespace Hood.TagHelpers
         [HtmlAttributeName(SrcAttrName)]
         public string Src { get; set; }
 
+        private ISettingsRepository _settings;
+
+        public FixedImageTagHelper(ISettingsRepository settings)
+        {
+            _settings = settings;
+        }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -24,7 +32,8 @@ namespace Hood.TagHelpers
             }
             output.TagName = "figure";
             output.TagMode = TagMode.StartTagAndEndTag;
-            string url = "/lib/hood/images/no-image.jpg";
+            var mediaSettings = _settings.GetMediaSettings();
+            string url = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
             if (!string.IsNullOrEmpty(Src))
             {
                 url = Src;

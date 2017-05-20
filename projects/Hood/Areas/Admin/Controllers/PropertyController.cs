@@ -400,9 +400,9 @@ namespace Hood.Areas.Admin.Controllers
                     switch (type)
                     {
                         case "FeaturedImage":
-                            return new MediaApi(property.FeaturedImage);
+                            return new MediaApi(property.FeaturedImage, _settings);
                         case "InfoDownload":
-                            return new MediaApi(property.InfoDownload);
+                            return new MediaApi(property.InfoDownload, _settings);
                         default:
                             return MediaApi.Blank(_settings.GetMediaSettings());
                     }

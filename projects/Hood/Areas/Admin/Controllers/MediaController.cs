@@ -26,14 +26,16 @@ namespace Hood.Areas.Admin.Controllers
         private readonly HoodDbContext _db;
         private readonly IHoodCache _cache;
         private readonly IMediaManager<SiteMedia> _media;
+        private readonly ISettingsRepository _settings;
 
         public MediaController(
-            UserManager<ApplicationUser> userManager, HoodDbContext db, IHoodCache cache, IMediaManager<SiteMedia> media)
+            UserManager<ApplicationUser> userManager, HoodDbContext db, IHoodCache cache, IMediaManager<SiteMedia> media, ISettingsRepository settings)
         {
             _userManager = userManager;
             _cache = cache;
             _db = db;
             _media = media;
+            _settings = settings;
         }
 
         [Route("admin/media/")]
@@ -70,7 +72,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             else
             {
-                media = await _db.Media.Where(m => m.GeneralFileType != FileType.Directory.ToString()).ToListAsync();
+                media = await _db.Media.Where(m => m.GeneralFileType != GenericFileType.Directory.ToString()).ToListAsync();
             }
             if (!string.IsNullOrEmpty(directory))
             {
@@ -107,7 +109,7 @@ namespace Hood.Areas.Admin.Controllers
                     media = media.OrderByDescending(n => n.CreatedOn).ToList();
                     break;
             }
-            Response response = new Response(media.Select(m => new MediaApi(m)).Skip(request.skip).Take(request.take).ToArray(), media.Count());
+            Response response = new Response(media.Select(m => new MediaApi(m, _settings)).Skip(request.skip).Take(request.take).ToArray(), media.Count());
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -136,7 +138,7 @@ namespace Hood.Areas.Admin.Controllers
                     Filename = directory,
                     FileSize = 0,
                     FileType = "directory/dir",
-                    GeneralFileType = FileType.Directory.ToString(),
+                    GeneralFileType = GenericFileType.Directory.ToString(),
                     SmallUrl = "",
                     MediumUrl = "",
                     LargeUrl = "",
@@ -158,7 +160,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<JsonResult> GetById(int id)
         {
             IList<SiteMedia> media = await _db.Media.Where(u => u.Id == id).ToListAsync();
-            return Json(media.Select(m => new MediaApi(m)).ToArray());
+            return Json(media.Select(m => new MediaApi(m, _settings)).ToArray());
         }
 
         [HttpPost()]

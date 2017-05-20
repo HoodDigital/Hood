@@ -1,7 +1,7 @@
 @model SiteMedia
 @{
     Layout = null;
-    MediaApi mapi = new MediaApi(Model);
+    MediaApi mapi = new MediaApi(Model, _settings);
 }
 <div class="sidebar-container">
     <form id="edit-media-form" asp-antiforgery="true" autocomplete="off">

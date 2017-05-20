@@ -10,7 +10,7 @@ using Hood.Filters;
 using Hood.Enums;
 using System.Collections.Generic;
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
@@ -57,16 +57,6 @@ namespace Hood.Areas.Hood.Controllers
                 Message = message,
                 CurrentPlan = await _auth.GetSubscriptionPlanById(plan)
             };
-            return View(model);
-        }
-
-        [HttpGet]
-        [Route("account/subscriptions/addon-required/")]
-        [SubscriptionRequired(AddonsRequired: "intro", Roles: "SuperUser")]
-        public IActionResult AddonArea()
-        {
-            AccountInfo account = HttpContext.GetAccountInfo();
-            SubscriptionModel model = new SubscriptionModel();
             return View(model);
         }
 

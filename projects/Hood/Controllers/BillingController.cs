@@ -12,7 +12,7 @@ using Hood.Filters;
 using Hood.Enums;
 using Hood.Caching;
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]

@@ -89,7 +89,7 @@ namespace Hood.Models.Api
             IsHomepage = Id == settings.GetBasicSettings().Homepage;
 
             if (post.FeaturedImage != null)
-                FeaturedImage = new MediaApi(post.FeaturedImage);
+                FeaturedImage = new MediaApi(post.FeaturedImage, settings);
             else
                 FeaturedImage = MediaApi.Blank(mediaSettings);
 
@@ -104,7 +104,7 @@ namespace Hood.Models.Api
             if (post.Media == null || post.Media.Count == 0)
                 Media = new List<MediaApi>();
             else
-                Media = post.Media.Select(c => new MediaApi(c)).ToList();
+                Media = post.Media.Select(c => new MediaApi(c, settings)).ToList();
 
             if (post.Categories == null || post.Categories.Count == 0)
                 Categories = new List<string>();

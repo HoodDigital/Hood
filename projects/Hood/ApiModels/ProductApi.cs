@@ -72,7 +72,7 @@ namespace Hood.Models.Api
                 return;
             contentBase.CopyProperties(this);
             //Api = new ContentApi(contentBase);
-            this.Metadata = contentBase.Metadata;
+            Metadata = contentBase.Metadata;
         }
     }
 }

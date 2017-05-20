@@ -65,7 +65,7 @@ namespace Hood.Models
                         MailchimpApiKey.Length - MailchimpApiKey.LastIndexOf("-", StringComparison.Ordinal) - 1);
             }
         }
-        public string MailchimpAuthHeader => $"apikey {this.MailchimpApiKey}";
+        public string MailchimpAuthHeader => $"apikey {MailchimpApiKey}";
         [Display(Name = "Mailchimp List Id")]
         public string MailchimpListId { get; set; }
 

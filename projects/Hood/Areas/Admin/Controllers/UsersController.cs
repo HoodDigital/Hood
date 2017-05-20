@@ -229,7 +229,7 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     if (user.Avatar == null)
                         return MediaApi.Blank(_settings.GetMediaSettings());
-                    return new MediaApi(user.Avatar);
+                    return new MediaApi(user.Avatar, _settings);
                 }
                 else
                     throw new Exception("No avatar found");

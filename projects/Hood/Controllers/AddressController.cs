@@ -9,7 +9,7 @@ using System;
 using Hood.Interfaces;
 using Hood.Extensions;
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Authorize]
     [Area("Hood")]

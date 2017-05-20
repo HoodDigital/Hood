@@ -632,7 +632,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Content content = _content.GetContentByID(id);
                 if (content != null && content.FeaturedImage != null)
-                    return new MediaApi(content.FeaturedImage);
+                    return new MediaApi(content.FeaturedImage, _settings);
                 else
                     throw new Exception("No featured image found");
             }
@@ -648,7 +648,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Content content = _content.GetContentByID(id);
                 if (content != null)
-                    return new MediaApi(content.GetMeta(field).Get<IMediaObject>());
+                    return new MediaApi(content.GetMeta(field).Get<IMediaObject>(), _settings);
                 else
                     throw new Exception("No featured image found");
             }

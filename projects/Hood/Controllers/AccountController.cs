@@ -11,7 +11,7 @@ using Hood.Services;
 using System;
 using Hood.Caching;
 
-namespace Hood.Areas.Hood.Controllers
+namespace Hood.Controllers
 {
     [Authorize]
     [Area("Hood")]

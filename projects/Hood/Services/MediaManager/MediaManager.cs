@@ -215,7 +215,7 @@ namespace Hood.Services
             var type = media.FileType.ToFileType();
             switch (type)
             {
-                case FileType.Image:
+                case GenericFileType.Image:
                     media = ProcessImage(media);
                     break;
             }
@@ -245,7 +245,7 @@ namespace Hood.Services
             var type = filetype.ToFileType();
             switch (type)
             {
-                case FileType.Image:
+                case GenericFileType.Image:
                     media = ProcessImage(media);
                     break;
             }
