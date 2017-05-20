@@ -26,10 +26,12 @@ namespace Hood.Services
 
         public async Task<IEnumerable<StripeInvoice>> GetAllAsync(string customerId, string startAfterId, int? pageSize = null)
         {
-            StripeInvoiceListOptions options = new StripeInvoiceListOptions();
-            options.CustomerId = customerId;
-            options.StartingAfter = startAfterId;
-            options.Limit = pageSize;
+            StripeInvoiceListOptions options = new StripeInvoiceListOptions()
+            {
+                CustomerId = customerId,
+                StartingAfter = startAfterId,
+                Limit = pageSize
+            };
             IEnumerable<StripeInvoice> response = await _stripe.InvoiceService.ListAsync(options);
             return response;
         }

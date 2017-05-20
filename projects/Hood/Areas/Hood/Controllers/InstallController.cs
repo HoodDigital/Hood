@@ -1,12 +1,12 @@
 ﻿using Hood.Extensions;
-using Hood.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 
-namespace Hood.Controllers
+namespace Hood.Areas.Hood.Controllers
 {
+    [Area("Hood")]
     public class InstallController : Controller
     {
         private readonly IApplicationLifetime _applicationLifetime;

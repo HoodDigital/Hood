@@ -20,10 +20,10 @@ namespace Hood.Services
 
         public async Task<StripeCard> CreateCard(string customerId, string token)
         {
-            var card = new StripeCardCreateOptions();
-
-            card.SourceToken = token;
-
+            var card = new StripeCardCreateOptions()
+            {
+                SourceToken = token
+            };
             StripeCard stripeCard = await _stripe.CardService.CreateAsync(customerId, card); // optional isRecipient
 
             return stripeCard;

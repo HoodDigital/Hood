@@ -1,4 +1,5 @@
-﻿using Hood.Infrastructure;
+﻿using Hood.Enums;
+using Hood.Infrastructure;
 using Hood.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;

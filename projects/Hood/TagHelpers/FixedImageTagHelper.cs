@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
 
-namespace Hood.Core.TagHelpers
+namespace Hood.TagHelpers
 {
     [HtmlTargetElement("fixedImage")]
     public class FixedImageTagHelper : TagHelper

@@ -5,10 +5,12 @@ using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using System.Linq;
+using Hood.Enums;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-namespace Hood.Controllers
+namespace Hood.Areas.Hood.Controllers
 {
+    [Area("Hood")]
     public class PropertyController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -51,9 +53,10 @@ namespace Hood.Controllers
         [Route("property/{id}/{city}/{postcode}/{title}")]
         public IActionResult Show(int id)
         {
-            ShowPropertyModel um = new ShowPropertyModel();
-
-            um.Property = _property.GetPropertyById(id);
+            ShowPropertyModel um = new ShowPropertyModel()
+            {
+                Property = _property.GetPropertyById(id)
+            };
 
             // if not admin, and not published, hide.
             if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && um.Property.Status != (int)Status.Published)
@@ -65,9 +68,10 @@ namespace Hood.Controllers
         [Route("property/modal")]
         public IActionResult Modal(int id)
         {
-            ShowPropertyModel um = new ShowPropertyModel();
-
-            um.Property = _property.GetPropertyById(id);
+            ShowPropertyModel um = new ShowPropertyModel()
+            {
+                Property = _property.GetPropertyById(id)
+            };
 
             // if not admin, and not published, hide.
             if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && um.Property.Status != (int)Status.Published)

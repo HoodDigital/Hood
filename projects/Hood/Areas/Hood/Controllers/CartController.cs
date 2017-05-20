@@ -12,8 +12,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
 
-namespace Hood.Controllers
+namespace Hood.Areas.Hood.Controllers
 {
+    [Area("Hood")]
     public class CartController : Controller
     {
         private readonly IPayPalService _paypal;
@@ -156,25 +157,27 @@ namespace Hood.Controllers
                 throw new Exception("You need to select a valid billing address.");
             }
             Country country = _data.GetCountry(billingAdd.Country);
-            PayPal.Api.Address billingAddress = new PayPal.Api.Address();
-            billingAddress.city = billingAdd.City;
-            billingAddress.country_code = country.Iso2;
-            billingAddress.line1 = billingAdd.Address1;
-            billingAddress.postal_code = billingAdd.Postcode;
-            billingAddress.state = billingAdd.County;
+            PayPal.Api.Address billingAddress = new PayPal.Api.Address()
+            {
+                city = billingAdd.City,
+                country_code = country.Iso2,
+                line1 = billingAdd.Address1,
+                postal_code = billingAdd.Postcode,
+                state = billingAdd.County
+            };
 
             //Now Create an object of credit card and add above details to it
-            CreditCard crdtCard = new CreditCard();
-            crdtCard.billing_address = billingAddress;
-            crdtCard.cvv2 = model.CVV2;
-            crdtCard.expire_month = model.ExpiryMonth;
-            crdtCard.expire_year = model.ExpiryYear;
-            crdtCard.first_name = model.FirstName;
-            crdtCard.last_name = model.LastName;
-            crdtCard.number = model.Number.StripSpaces().Trim();
-            crdtCard.type = model.Type;
-
-
+            CreditCard crdtCard = new CreditCard()
+            {
+                billing_address = billingAddress,
+                cvv2 = model.CVV2,
+                expire_month = model.ExpiryMonth,
+                expire_year = model.ExpiryYear,
+                first_name = model.FirstName,
+                last_name = model.LastName,
+                number = model.Number.StripSpaces().Trim(),
+                type = model.Type
+            };
             var guid = Convert.ToString((new Random()).Next(100000));
 
             Transaction transaction = _paypal.CreateTransactionFromCart(_shop.Cart, guid);
@@ -188,8 +191,10 @@ namespace Hood.Controllers
             // Now we need to specify the FundingInstrument of the Payer
             // for credit card payments, set the CreditCard which we made above
 
-            FundingInstrument fundInstrument = new FundingInstrument();
-            fundInstrument.credit_card = crdtCard;
+            FundingInstrument fundInstrument = new FundingInstrument()
+            {
+                credit_card = crdtCard
+            };
 
             // The Payment creation API requires a list of FundingIntrument
 
@@ -197,16 +202,19 @@ namespace Hood.Controllers
             fundingInstrumentList.Add(fundInstrument);
 
             // Now create Payer object and assign the fundinginstrument list to the object
-            Payer payr = new Payer();
-            payr.funding_instruments = fundingInstrumentList;
-            payr.payment_method = "credit_card";
+            Payer payr = new Payer()
+            {
+                funding_instruments = fundingInstrumentList,
+                payment_method = "credit_card"
+            };
 
             // finally create the payment object and assign the payer object & transaction list to it
-            Payment payment = new Payment();
-            payment.intent = "sale";
-            payment.payer = payr;
-            payment.transactions = transactions;
-
+            Payment payment = new Payment()
+            {
+                intent = "sale",
+                payer = payr,
+                transactions = transactions
+            };
             try
             {
                 //getting context from the paypal, basically we are sending the clientID and clientSecret key in this function 
@@ -225,9 +233,11 @@ namespace Hood.Controllers
                 {
                     if (User.IsInRole("Admin"))
                     {
-                        var pex = new PayPalPaymentException("Payment Failed!", ex);
-                        pex.Payment = payment;
-                        pex.Transaction = transaction;
+                        var pex = new PayPalPaymentException("Payment Failed!", ex)
+                        {
+                            Payment = payment,
+                            Transaction = transaction
+                        };
                         return View("Failure", pex);
                     }
                     throw new Exception("There was an error processing your card payment. Please try again.");
@@ -334,9 +344,11 @@ namespace Hood.Controllers
                     {
                         if (User.IsInRole("Admin"))
                         {
-                            var pex = new PayPalPaymentException("Payment Failed!", ex);
-                            pex.Payment = payment;
-                            pex.Transaction = transaction;
+                            var pex = new PayPalPaymentException("Payment Failed!", ex)
+                            {
+                                Payment = payment,
+                                Transaction = transaction
+                            };
                             return View("Failure", pex);
                         }
                         throw new Exception("There was an error processing your PayPal payment. Please try again.");

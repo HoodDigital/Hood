@@ -6,8 +6,6 @@ using Hood.Services;
 using Hood.Models;
 using System;
 using Hood.Caching;
-using System.Threading.Tasks;
-using Hood.Extensions;
 using Geocoding.Google;
 
 namespace Hood.Areas.Admin.Controllers

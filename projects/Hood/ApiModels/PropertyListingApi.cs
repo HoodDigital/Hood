@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
 using System;

@@ -1,7 +1,7 @@
-﻿using Hood.Extensions;
+﻿using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
-using Hood.Models.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -145,8 +145,7 @@ namespace Hood.Services
                 throw new ArgumentNullException("blobReference");
 
             // check if it is a full url - if so strip the bollocks.
-            Uri uriResult;
-            bool result = Uri.TryCreate(blobReference, UriKind.Absolute, out uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            bool result = Uri.TryCreate(blobReference, UriKind.Absolute, out Uri uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             if (result)
             {
                 blobReference = uriResult.PathAndQuery.Replace("/" + _container, "").TrimStart('/');
@@ -300,7 +299,7 @@ namespace Hood.Services
             {
                 // When the start time for the SAS is omitted, the start time is assumed to be the time when the storage service receives the request.
                 // Omitting the start time for a SAS that is effective immediately helps to avoid clock skew.
-                SharedAccessExpiryTime = expiry.HasValue ? expiry.Value : DateTime.UtcNow.AddHours(24),
+                SharedAccessExpiryTime = expiry ?? DateTime.UtcNow.AddHours(24),
                 Permissions = permissions
             };
 
@@ -329,14 +328,16 @@ namespace Hood.Services
             var json = "";
             using (WebClient client = new WebClient())
             {
-                var requestParams = new System.Collections.Specialized.NameValueCollection();
-                requestParams.Add("apiKey", _hoodApiKey);
-                requestParams.Add("azureKey", _key);
-                requestParams.Add("azureHost", _hoodApiHost);
-                requestParams.Add("azureScheme", _hoodApiScheme);
-                requestParams.Add("url", media.Url);
-                requestParams.Add("container", _container);
-                requestParams.Add("blobReference", media.BlobReference);
+                var requestParams = new System.Collections.Specialized.NameValueCollection
+                {
+                    { "apiKey", _hoodApiKey },
+                    { "azureKey", _key },
+                    { "azureHost", _hoodApiHost },
+                    { "azureScheme", _hoodApiScheme },
+                    { "url", media.Url },
+                    { "container", _container },
+                    { "blobReference", media.BlobReference }
+                };
                 byte[] responsebytes = client.UploadValues(_hoodApiUrl, "POST", requestParams);
                 json = Encoding.UTF8.GetString(responsebytes);
             }

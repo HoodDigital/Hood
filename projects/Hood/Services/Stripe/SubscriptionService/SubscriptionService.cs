@@ -34,13 +34,17 @@ namespace Hood.Services
 
         public async Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, string tokenId = null, DateTime? trialEnd = null, decimal taxPercent = 0)
         {
-            var options = new StripeSubscriptionCreateOptions();
-            options.TrialEnd = trialEnd;
-            options.TaxPercent = taxPercent;
+            var options = new StripeSubscriptionCreateOptions()
+            {
+                TrialEnd = trialEnd,
+                TaxPercent = taxPercent
+            };
             if (tokenId.IsSet())
             {
-                options.Card = new StripeCreditCardOptions();
-                options.Card.TokenId = tokenId;
+                options.Card = new StripeCreditCardOptions()
+                {
+                    TokenId = tokenId
+                };
             }
             StripeSubscription stripeSubscription = await _stripe.SubscriptionService.CreateAsync(customerId, planId, options);
             return stripeSubscription;
@@ -49,8 +53,10 @@ namespace Hood.Services
         public async Task<StripeSubscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, StripePlan subscription)
         {
             StripeSubscription currentSubscription = await _stripe.SubscriptionService.GetAsync(subscriptionId);
-            var updateOptions = new StripeSubscriptionUpdateOptions();
-            updateOptions.PlanId = subscription.Id;
+            var updateOptions = new StripeSubscriptionUpdateOptions()
+            {
+                PlanId = subscription.Id
+            };
             if (currentSubscription.Status == "trialing" && subscription.TrialPeriodDays > 0)
             {
                 // if the current trialEnd is before the new subscription's trial WOULD end
@@ -70,8 +76,10 @@ namespace Hood.Services
 
         public async Task<StripeSubscription> UpdateSubscriptionTax(string customerId, string subscriptionId, decimal taxPercent)
         {
-            var updateOptions = new StripeSubscriptionUpdateOptions();
-            updateOptions.TaxPercent = taxPercent;
+            var updateOptions = new StripeSubscriptionUpdateOptions()
+            {
+                TaxPercent = taxPercent
+            };
             StripeSubscription stripeSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
             return stripeSubscription;
         }

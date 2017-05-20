@@ -55,54 +55,54 @@ namespace Hood.Models.Api
             }
             // Formatted Members
 
-            Hood.FileType type = Hood.FileType.Unknown;
+            Enums.FileType type = Enums.FileType.Unknown;
             if (Enum.TryParse(GeneralFileType, out type))
             {
                 switch (type)
                 {
-                    case Hood.FileType.Image:
+                    case Enums.FileType.Image:
                         this.Icon = mi.SmallUrl;
                         this.SmallUrl = mi.SmallUrl;
                         this.MediumUrl = mi.MediumUrl;
                         this.LargeUrl = mi.LargeUrl;
                         this.ThumbUrl = mi.ThumbUrl;
                         break;
-                    case Hood.FileType.Excel:
+                    case Enums.FileType.Excel:
                         this.Icon = "/lib/hood/images/icons/excel.png";
                         this.SmallUrl = Icon;
                         this.MediumUrl = Icon;
                         this.LargeUrl = Icon;
                         this.ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.PDF:
+                    case Enums.FileType.PDF:
                         this.Icon = "/lib/hood/images/icons/pdf.png";
                         this.SmallUrl = Icon;
                         this.MediumUrl = Icon;
                         this.LargeUrl = Icon;
                         this.ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.PowerPoint:
+                    case Enums.FileType.PowerPoint:
                         this.Icon = "/lib/hood/images/icons/powerpoint.png";
                         this.SmallUrl = Icon;
                         this.MediumUrl = Icon;
                         this.LargeUrl = Icon;
                         this.ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.Word:
+                    case Enums.FileType.Word:
                         this.Icon = "/lib/hood/images/icons/word.png";
                         this.SmallUrl = Icon;
                         this.MediumUrl = Icon;
                         this.LargeUrl = Icon;
                         this.ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.Photoshop:
+                    case Enums.FileType.Photoshop:
                         this.Icon = "/lib/hood/images/icons/photoshop.png";
                         this.SmallUrl = Icon;
                         this.MediumUrl = Icon;
                         this.LargeUrl = Icon;
                         this.ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.Unknown:
+                    case Enums.FileType.Unknown:
                         this.Icon = "/lib/hood/images/icons/file.png";
                         this.SmallUrl = Icon;
                         this.MediumUrl = Icon;
@@ -125,11 +125,12 @@ namespace Hood.Models.Api
 
         public static MediaApi Blank(MediaSettings settings = null)
         {
-            MediaApi ret = new MediaApi();
+            MediaApi ret = new MediaApi()
+            {
 
-            // Formatted Members
-            ret.FormattedSize = "0Kb";
-
+                // Formatted Members
+                FormattedSize = "0Kb"
+            };
             var noImage = "/lib/hood/images/no-image.jpg";
             if (settings.NoImage.IsSet())
                 noImage = settings.NoImage;

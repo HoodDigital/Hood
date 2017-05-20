@@ -1,11 +1,6 @@
-﻿using SendGrid;
-using SendGrid.Helpers.Mail;
-using Microsoft.AspNetCore.Http;
-using Hood.Extensions;
+﻿using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using Hood.Infrastructure;
 using System;
-using System.Net;
 using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
 
@@ -65,10 +60,12 @@ namespace Hood.Services
                         }
                     }
 
-                    message = new MailObject();
-                    message.To = new SendGrid.Helpers.Mail.EmailAddress(model.Email);
-                    message.PreHeader = _settings.ReplacePlaceholders(contactSettings.Subject);
-                    message.Subject = _settings.ReplacePlaceholders(contactSettings.Subject);
+                    message = new MailObject()
+                    {
+                        To = new SendGrid.Helpers.Mail.EmailAddress(model.Email),
+                        PreHeader = _settings.ReplacePlaceholders(contactSettings.Subject),
+                        Subject = _settings.ReplacePlaceholders(contactSettings.Subject)
+                    };
                     message.AddH1(_settings.ReplacePlaceholders(contactSettings.Title));
                     message.AddParagraph(_settings.ReplacePlaceholders(contactSettings.Message));
                     message = model.WriteToMessage(message);

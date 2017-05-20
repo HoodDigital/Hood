@@ -173,19 +173,6 @@ namespace Hood.Models
                 {
                     context.Options.Add(new Option { Id = "Hood.Settings.Seo", Value = JsonConvert.SerializeObject(new SeoSettings()) });
                 }
-
-                if (!context.Options.Any(o => o.Id == "Hood.Version"))
-                {
-                    context.Options.Add(new Option { Id = "Hood.Version", Value = JsonConvert.SerializeObject(Versions.Current()) });
-                }
-                else
-                {
-                    Option option = context.Options.Where(o => o.Id == "Hood.Version").FirstOrDefault();
-                    string setting = JsonConvert.DeserializeObject<string>(option.Value);
-                    // Ensure the context is up to the latest version.
-                    context.ToLatest(new Version(setting));
-                }
-
                 context.SaveChanges();
             }
         }

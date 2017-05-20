@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Hood.Models.Api;
 using Microsoft.AspNetCore.Http;
 using Hood.Interfaces;
+using Hood.Enums;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers

@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Hood.Interfaces;
 using Geocoding.Google;
+using Hood.Enums;
 
 namespace Hood.Services
 {
@@ -118,9 +119,11 @@ namespace Hood.Services
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(ImportFromFTP);
-                Thread thread = new Thread(pts);
-                thread.Name = "ImportFromFTP";
-                thread.Priority = ThreadPriority.Normal;
+                Thread thread = new Thread(pts)
+                {
+                    Name = "ImportFromFTP",
+                    Priority = ThreadPriority.Normal
+                };
                 thread.Start();
 
                 return true;
@@ -616,19 +619,17 @@ namespace Hood.Services
         {
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
-            DateTime date;
             DateTime create = DateTime.Now;
             DateTime update = DateTime.Now;
             DateTime available = DateTime.Now;
-            if (DateTime.TryParseExact(data["CREATE_DATE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
+            if (DateTime.TryParseExact(data["CREATE_DATE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
                 create = date;
             if (DateTime.TryParseExact(data["UPDATE_DATE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
                 update = date;
             if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
                 available = date;
 
-            int bedrooms = 0;
-            if (!int.TryParse(data["BEDROOMS"], out bedrooms))
+            if (!int.TryParse(data["BEDROOMS"], out int bedrooms))
                 bedrooms = 0;
 
             string rentFreq = PropertyDetails.RentFrequency[int.Parse(data["LET_RENT_FREQUENCY"])];
@@ -744,9 +745,8 @@ namespace Hood.Services
                 property.Metadata = new List<PropertyMeta>();
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
-            DateTime date;
             DateTime available = DateTime.Now;
-            if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
+            if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
                 available = date;
             if (!property.HasMeta("LetDate"))
                 property.AddMeta(new PropertyMeta() { Name = "LetDate", BaseValue = JsonConvert.SerializeObject(available), Type = "System.DateTime" });

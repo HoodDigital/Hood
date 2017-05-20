@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Hood.Models.ComplexTypes
+namespace Hood.Models
 {
 
     public class ContentBlockSettings

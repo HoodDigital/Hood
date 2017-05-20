@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 using Hood.Models;
 using Hood.Services;
 using System;
-using Microsoft.Extensions.Caching.Memory;
 using Hood.Caching;
 
-namespace Hood.Controllers
+namespace Hood.Areas.Hood.Controllers
 {
     [Authorize]
+    [Area("Hood")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -289,10 +289,12 @@ namespace Hood.Controllers
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
-                MailObject message = new MailObject();
-                message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
-                message.PreHeader = _settings.ReplacePlaceholders("Reset your password.");
-                message.Subject = _settings.ReplacePlaceholders("Reset your password.");
+                MailObject message = new MailObject()
+                {
+                    To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                    PreHeader = _settings.ReplacePlaceholders("Reset your password."),
+                    Subject = _settings.ReplacePlaceholders("Reset your password.")
+                };
                 message.AddH1(_settings.ReplacePlaceholders("Reset your password."));
                 message.AddParagraph($"Please reset your password by clicking here:");
                 message.AddCallToAction("Reset your password", callbackUrl);
@@ -399,10 +401,12 @@ namespace Hood.Controllers
             }
             if (model.SelectedProvider == "Email")
             {
-                MailObject message = new MailObject();
-                message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
-                message.PreHeader = "Your security code for accessing the website...";
-                message.Subject = "Your security code...";
+                MailObject message = new MailObject()
+                {
+                    To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                    PreHeader = "Your security code for accessing the website...",
+                    Subject = "Your security code..."
+                };
                 message.AddParagraph("Your security code is: " + code);
                 await _emailSender.SendEmailAsync(message);
             }

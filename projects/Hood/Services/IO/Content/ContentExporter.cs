@@ -39,17 +39,19 @@ namespace Hood.Services
             _ftp = ftp;
             _config = config;
             Lock = new ReaderWriterLock();
-            Status = new ContentExporterReport();
-            Status.Total = 0;
-            Status.Tasks = 0;
-            Status.CompletedTasks = 0;
-            Status.Processed = 0;
-            Status.PercentComplete = 0.0;
-            Status.Running = false;
-            Status.Cancelled = false;
-            Status.Succeeded = false;
-            Status.HasFile = false;
-            Status.Message = "Not running...";
+            Status = new ContentExporterReport()
+            {
+                Total = 0,
+                Tasks = 0,
+                CompletedTasks = 0,
+                Processed = 0,
+                PercentComplete = 0.0,
+                Running = false,
+                Cancelled = false,
+                Succeeded = false,
+                HasFile = false,
+                Message = "Not running..."
+            };
             _settings = site;
             _email = email;
             _propertySettings = site.GetPropertySettings();
@@ -70,9 +72,11 @@ namespace Hood.Services
                 ResetImporter(context);
 
                 ThreadStart pts = new ThreadStart(ExportContent);
-                Thread thread = new Thread(pts);
-                thread.Name = "ImportContent";
-                thread.Priority = ThreadPriority.Normal;
+                Thread thread = new Thread(pts)
+                {
+                    Name = "ImportContent",
+                    Priority = ThreadPriority.Normal
+                };
                 thread.Start();
 
                 return true;
@@ -200,9 +204,11 @@ namespace Hood.Services
                 BasicSettings settings = _settings.GetBasicSettings();
                 if (settings.Email.IsSet())
                 {
-                    MailObject mail = new MailObject();
-                    mail.Subject = "Content Export";
-                    mail.PreHeader = "Your export was completed successfully";
+                    MailObject mail = new MailObject()
+                    {
+                        Subject = "Content Export",
+                        PreHeader = "Your export was completed successfully"
+                    };
                     mail.AddH3("Your export was completed successfully.", align: "left");
                     mail.AddParagraph("You have requested a content data export, it has completed successfully and the data can be downloaded from the following link:", align: "left");
                     mail.AddCallToAction("Download Zip", downloadUrl, align: "left");
@@ -302,17 +308,19 @@ namespace Hood.Services
         private void ResetImporter(HttpContext context)
         {
             Lock.AcquireWriterLock(Timeout.Infinite);
-            Status = new ContentExporterReport();
-            Status.Total = 0;
-            Status.Tasks = 0;
-            Status.CompletedTasks = 0;
-            Status.Processed = 0;
-            Status.PercentComplete = 0.0;
-            Status.Running = true;
-            Status.Cancelled = false;
-            Status.Succeeded = false;
-            Status.FileError = false;
-            Status.HasFile = false;
+            Status = new ContentExporterReport()
+            {
+                Total = 0,
+                Tasks = 0,
+                CompletedTasks = 0,
+                Processed = 0,
+                PercentComplete = 0.0,
+                Running = true,
+                Cancelled = false,
+                Succeeded = false,
+                FileError = false,
+                HasFile = false
+            };
             Account = context.GetAccountInfo();
             Status.Message = "Starting import, loading property files from FTP Service...";
             _propertySettings = _settings.GetPropertySettings();

@@ -57,8 +57,10 @@ namespace Hood.Services
         /// <returns>The PayPal Api Context</returns>
         public APIContext GetAPIContext()
         {
-            APIContext apiContext = new APIContext(GetAccessToken());
-            apiContext.Config = GetConfig();
+            APIContext apiContext = new APIContext(GetAccessToken())
+            {
+                Config = GetConfig()
+            };
             return apiContext;
         }
 

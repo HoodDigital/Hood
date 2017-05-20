@@ -51,9 +51,11 @@ namespace Hood.Services
                 // Create the newsletter objects and pass it to the threading function
                 object[] parameters = { server, username, password, filename, destination };
                 ParameterizedThreadStart pts = new ParameterizedThreadStart(GetFile);
-                Thread thread = new Thread(pts);
-                thread.Name = "GetFile";
-                thread.Priority = ThreadPriority.Normal;
+                Thread thread = new Thread(pts)
+                {
+                    Name = "GetFile",
+                    Priority = ThreadPriority.Normal
+                };
                 thread.Start(parameters);
 
                 // If we have reached this point, then we have successfully started the thread, so return true.

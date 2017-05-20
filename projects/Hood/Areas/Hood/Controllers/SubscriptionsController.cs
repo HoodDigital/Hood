@@ -4,19 +4,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Hood.Models;
 using Hood.Services;
-using Stripe;
 using Hood.Extensions;
 using System.IO;
 using Hood.Filters;
 using Hood.Enums;
-using Newtonsoft.Json;
-using System.Text;
 using System.Collections.Generic;
 
-namespace Hood.Controllers
+namespace Hood.Areas.Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
+    [Area("Hood")]
     public class SubscriptionsController : Controller
     {
         private readonly IAccountRepository _auth;
@@ -51,12 +49,14 @@ namespace Hood.Controllers
         public async Task<IActionResult> Updated(int plan, BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
-            SubscriptionModel model = new SubscriptionModel();
-            model.User = account.User;
-            model.Plans = await _auth.GetSubscriptionPlanLevels();
-            model.Addons = await _auth.GetSubscriptionPlanAddons();
-            model.Message = message;
-            model.CurrentPlan = await _auth.GetSubscriptionPlanById(plan);
+            SubscriptionModel model = new SubscriptionModel()
+            {
+                User = account.User,
+                Plans = await _auth.GetSubscriptionPlanLevels(),
+                Addons = await _auth.GetSubscriptionPlanAddons(),
+                Message = message,
+                CurrentPlan = await _auth.GetSubscriptionPlanById(plan)
+            };
             return View(model);
         }
 
@@ -76,11 +76,13 @@ namespace Hood.Controllers
         public async Task<IActionResult> Change(BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
-            SubscriptionModel model = new SubscriptionModel();
-            model.User = account.User;
-            model.Plans = await _auth.GetSubscriptionPlanLevels();
-            model.Addons = await _auth.GetSubscriptionPlanAddons();
-            model.Message = message;
+            SubscriptionModel model = new SubscriptionModel()
+            {
+                User = account.User,
+                Plans = await _auth.GetSubscriptionPlanLevels(),
+                Addons = await _auth.GetSubscriptionPlanAddons(),
+                Message = message
+            };
             return View(model);
         }
 
@@ -132,11 +134,13 @@ namespace Hood.Controllers
         private async Task<SubscriptionModel> GetCreateModel(string returnUrl)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
-            SubscriptionModel model = new SubscriptionModel();
-            model.User = account.User;
-            model.Plans = await _auth.GetSubscriptionPlanLevels();
-            model.Addons = await _auth.GetSubscriptionPlanAddons();
-            model.Customer = await _auth.LoadCustomerObject(account.User.StripeId, true);
+            SubscriptionModel model = new SubscriptionModel()
+            {
+                User = account.User,
+                Plans = await _auth.GetSubscriptionPlanLevels(),
+                Addons = await _auth.GetSubscriptionPlanAddons(),
+                Customer = await _auth.LoadCustomerObject(account.User.StripeId, true)
+            };
             ViewData["ReturnUrl"] = returnUrl;
             return model;
         }

@@ -1,20 +1,15 @@
-﻿using Hood.Core.Models.ComplexTypes;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
-using Hood.Models.Api;
 using Hood.Services;
-using MailChimp.Net;
 using MailChimp.Net.Core;
-using MailChimp.Net.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,8 +20,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hood.Controllers
+namespace Hood.Areas.Hood.Controllers
 {
+    [Area("Hood")]
     public class HomeController : Controller
     {
         public readonly IConfiguration _configuration;
@@ -93,10 +89,12 @@ namespace Hood.Controllers
                 pageSize = size
             };
             PagedList<Content> content = _content.GetPagedContent(filters, type, null, null, null, true);
-            ContentListModel model = new ContentListModel();
-            model.Posts = content;
-            model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, type);
-            model.Type = _settings.GetContentSettings().GetContentType(type);
+            ContentListModel model = new ContentListModel()
+            {
+                Posts = content,
+                Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, type),
+                Type = _settings.GetContentSettings().GetContentType(type)
+            };
             if (!model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Search = filters.search;
@@ -115,9 +113,11 @@ namespace Hood.Controllers
                 pageSize = size
             };
             PagedList<Content> content = _content.GetPagedContent(filters, type, null, author, null, true);
-            ContentListModel model = new ContentListModel();
-            model.Posts = content;
-            model.Type = _settings.GetContentSettings().GetContentType(type);
+            ContentListModel model = new ContentListModel()
+            {
+                Posts = content,
+                Type = _settings.GetContentSettings().GetContentType(type)
+            };
             if (!model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
@@ -138,9 +138,11 @@ namespace Hood.Controllers
                 pageSize = size
             };
             PagedList<Content> content = _content.GetPagedContent(filters, type, category, null, null, true);
-            ContentListModel model = new ContentListModel();
-            model.Posts = content;
-            model.Type = _settings.GetContentSettings().GetContentType(type);
+            ContentListModel model = new ContentListModel()
+            {
+                Posts = content,
+                Type = _settings.GetContentSettings().GetContentType(type)
+            };
             if (model.Type == null || !model.Type.Enabled || !model.Type.IsPublic)
                 return NotFound();
             model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
@@ -155,10 +157,11 @@ namespace Hood.Controllers
             if (id == 0)
                 return NotFound();
 
-            ContentModel model = new ContentModel();
-            model.EditMode = editMode;
-            model.Content = _content.GetContentByID(id);
-
+            ContentModel model = new ContentModel()
+            {
+                EditMode = editMode,
+                Content = _content.GetContentByID(id)
+            };
             if (model.Content == null)
                 return NotFound();
 
@@ -378,8 +381,7 @@ namespace Hood.Controllers
         [Route("enter-access-code")]
         public IActionResult LockoutModeEntrance(string returnUrl)
         {
-            byte[] betaCodeBytes = null;
-            if (ControllerContext.HttpContext.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
+            if (ControllerContext.HttpContext.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
             {
                 ViewData["token"] = Encoding.Default.GetString(betaCodeBytes);
                 ViewData["error"] = "The token you have entered is not valid.";

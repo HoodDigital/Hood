@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Hood.Services;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
-namespace Hood.Api
+namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]

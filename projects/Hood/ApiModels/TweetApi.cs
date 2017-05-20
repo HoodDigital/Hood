@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hood.ApiModels
+namespace Hood.Models.Api
 {
     public partial class TweetApi
     {

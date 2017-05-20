@@ -18,9 +18,11 @@ namespace Hood.ViewComponents
 
         public IViewComponentResult Invoke()
         {
-            HeaderModel model = new HeaderModel();
-            model.Pages = _content.GetContentByType("page");
-            model.Subscription = HttpContext.GetAccountInfo();
+            HeaderModel model = new HeaderModel()
+            {
+                Pages = _content.GetContentByType("page"),
+                Subscription = HttpContext.GetAccountInfo()
+            };
             model.User = model.Subscription.User;
             return View(model);
         }

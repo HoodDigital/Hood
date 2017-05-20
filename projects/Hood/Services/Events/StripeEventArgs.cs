@@ -1,9 +1,8 @@
 ﻿using System;
 using Stripe;
 using Newtonsoft.Json;
-using Hood.Models;
 
-namespace Hood
+namespace Hood.Events
 {
     public class StripeWebHookTriggerArgs : EventArgs
     {

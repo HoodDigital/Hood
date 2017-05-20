@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Hood.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.EntityFrameworkCore;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +14,7 @@ using Hood.Models.Api;
 using Newtonsoft.Json;
 using Hood.Interfaces;
 using Hood.Caching;
+using Hood.Enums;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -39,8 +39,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/media/")]
         public async Task<IActionResult> Index()
         {
-            ManageMediaModel model = new ManageMediaModel();
-            model.Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync();
+            ManageMediaModel model = new ManageMediaModel()
+            {
+                Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync()
+            };
             if (!model.Directories.Contains("Default"))
                 model.Directories.Add("Default");
             return View(model);
@@ -49,8 +51,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/media/directories/")]
         public async Task<IActionResult> Directories()
         {
-            ManageMediaModel model = new ManageMediaModel();
-            model.Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync();
+            ManageMediaModel model = new ManageMediaModel()
+            {
+                Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync()
+            };
             if (!model.Directories.Contains("Default"))
                 model.Directories.Add("Default");
             return View(model);

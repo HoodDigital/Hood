@@ -15,14 +15,16 @@ namespace Hood.Services
 
         public async Task<StripePlan> CreatePlan(string name, int amount, string colour, string description, string features, string currency = "gbp", string interval = "month", int intervalCount = 1, int trialPeriodDays = 30)
         {
-            var myPlan = new StripePlanCreateOptions();
-            myPlan.Id = Guid.NewGuid().ToString();
-            myPlan.Amount = amount;                     // all amounts on Stripe are in cents, pence, etc
-            myPlan.Currency = currency;                 // "usd" only supported right now
-            myPlan.Interval = interval;                 // "month" or "year"
-            myPlan.IntervalCount = intervalCount;       // optional
-            myPlan.Name = name;
-            myPlan.TrialPeriodDays = trialPeriodDays;   // amount of time that will lapse before the customer is billed
+            var myPlan = new StripePlanCreateOptions()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Amount = amount,                     // all amounts on Stripe are in cents, pence, etc
+                Currency = currency,                 // "usd" only supported right now
+                Interval = interval,                 // "month" or "year"
+                IntervalCount = intervalCount,       // optional
+                Name = name,
+                TrialPeriodDays = trialPeriodDays   // amount of time that will lapse before the customer is billed
+            };
             myPlan.Metadata.Add("Colour", colour);
             myPlan.Metadata.Add("Description", description);
             myPlan.Metadata.Add("Features", features);
