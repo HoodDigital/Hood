@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Stripe;
 using Hood.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Memory;
 using Hood.Caching;
 
 namespace Hood.Services
@@ -25,11 +24,13 @@ namespace Hood.Services
 
         public async Task<StripeCustomer> CreateCustomer(ApplicationUser user, string token, string planId = null)
         {
-            var customer = new StripeCustomerCreateOptions();
-            customer.Email = user.Email;
-            customer.Description = string.Format("{0} {1} ({2})", user.FirstName, user.LastName, user.Email);
-            customer.SourceToken = token;
-            customer.PlanId = planId;
+            var customer = new StripeCustomerCreateOptions()
+            {
+                Email = user.Email,
+                Description = string.Format("{0} {1} ({2})", user.FirstName, user.LastName, user.Email),
+                SourceToken = token,
+                PlanId = planId
+            };
             StripeCustomer stripeCustomer = await _stripe.CustomerService.CreateAsync(customer);
             return stripeCustomer;
         }
@@ -58,8 +59,10 @@ namespace Hood.Services
 
         public async Task SetDefaultCard(string customerId, string cardId)
         {
-            var customer = new StripeCustomerUpdateOptions();
-            customer.DefaultSource = cardId;
+            var customer = new StripeCustomerUpdateOptions()
+            {
+                DefaultSource = cardId
+            };
             StripeCustomer stripeCustomer = await _stripe.CustomerService.UpdateAsync(customerId, customer);
         }
 

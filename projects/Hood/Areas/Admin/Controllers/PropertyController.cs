@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Hood.Models.Api;
 using Microsoft.AspNetCore.Http;
 using Hood.Interfaces;
+using Hood.Enums;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
@@ -399,9 +400,9 @@ namespace Hood.Areas.Admin.Controllers
                     switch (type)
                     {
                         case "FeaturedImage":
-                            return new MediaApi(property.FeaturedImage);
+                            return new MediaApi(property.FeaturedImage, _settings);
                         case "InfoDownload":
-                            return new MediaApi(property.InfoDownload);
+                            return new MediaApi(property.InfoDownload, _settings);
                         default:
                             return MediaApi.Blank(_settings.GetMediaSettings());
                     }

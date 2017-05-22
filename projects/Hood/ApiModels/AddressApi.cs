@@ -33,21 +33,21 @@ namespace Hood.Models.Api
             address.CopyProperties(this);
 
             // Formatted Members
-            this.FullAddress = this.Address1 + ", ";
-            if (!string.IsNullOrEmpty(this.Address2))
-                this.FullAddress += this.Address2 + ", ";
-            this.FullAddress += this.City + ", ";
-            this.FullAddress += this.County + ", ";
-            this.FullAddress += this.Country + ", ";
-            this.FullAddress += this.Postcode;
+            FullAddress = Address1 + ", ";
+            if (!string.IsNullOrEmpty(Address2))
+                FullAddress += Address2 + ", ";
+            FullAddress += City + ", ";
+            FullAddress += County + ", ";
+            FullAddress += Country + ", ";
+            FullAddress += Postcode;
 
-            if (string.IsNullOrEmpty(this.QuickName))
-                this.QuickName = this.Address1;
+            if (string.IsNullOrEmpty(QuickName))
+                QuickName = Address1;
 
             if (user != null)
             {
-                this.IsBilling = this.Id == user.BillingAddress?.Id;
-                this.IsDelivery = this.Id == user.DeliveryAddress?.Id;
+                IsBilling = Id == user.BillingAddress?.Id;
+                IsDelivery = Id == user.DeliveryAddress?.Id;
             }
 
         }

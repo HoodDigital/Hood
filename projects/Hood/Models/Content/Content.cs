@@ -101,7 +101,7 @@ namespace Hood.Models
                 Tags = new List<ContentTagJoin>();
             if (!Tags.Select(c => c.Tag.Value).Contains(value))
             {
-                Tags.Add(new ContentTagJoin() { ContentId = this.Id, TagId = value });
+                Tags.Add(new ContentTagJoin() { ContentId = Id, TagId = value });
             }
         }
 

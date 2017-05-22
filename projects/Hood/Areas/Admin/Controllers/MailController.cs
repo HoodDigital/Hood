@@ -9,7 +9,7 @@ using Hood.Models;
 using System.Threading.Tasks;
 using SendGrid.Helpers.Mail;
 
-namespace Hood.Controllers
+namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles="SuperUser,Admin")]
@@ -108,9 +108,11 @@ namespace Hood.Controllers
 
         private MailObject GetDemoMail()
         {
-            MailObject mail = new MailObject();
-                  mail.Subject = "Plain old email";
-            mail.PreHeader = "Some preheader text...";
+            MailObject mail = new MailObject()
+            {
+                Subject = "Plain old email",
+                PreHeader = "Some preheader text..."
+            };
             mail.AddH1("This is the heading 1!", align: "left");
             mail.AddH2("This is the heading 2!", align: "left");
             mail.AddH3("This is the heading 3!", align: "left");

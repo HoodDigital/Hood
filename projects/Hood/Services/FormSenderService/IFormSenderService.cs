@@ -1,5 +1,4 @@
-﻿using Hood.Infrastructure;
-using Hood.Models;
+﻿using Hood.Models;
 using System.Threading.Tasks;
 
 namespace Hood.Services

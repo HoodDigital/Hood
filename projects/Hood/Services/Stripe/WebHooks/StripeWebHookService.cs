@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Events;
+using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -42,8 +43,10 @@ namespace Hood.Services
             _email = email;
             _events = events;
             var info = _settings.GetBasicSettings();
-            _log = new MailObject();
-            _log.PreHeader = "A new stripe webhook has been fired.";
+            _log = new MailObject()
+            {
+                PreHeader = "A new stripe webhook has been fired."
+            };
             _log.Subject = _log.PreHeader;
             _log.AddH1("Stripe Webhook Recieved!");
             _log.AddParagraph("Webhook recieved on site: <strong>" + info.SiteTitle + "</strong>");
@@ -256,10 +259,12 @@ namespace Hood.Services
                     _log.AddParagraph(JsonConvert.SerializeObject(failedInvoiceUserSub).ToFormattedJson() + Environment.NewLine);
                     _log.AddParagraph("Send an email to the customer letting them know what has happened...");
 
-                    MailObject message = new MailObject();
-                    message.To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUserSub.User.Email);
-                    message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
-                    message.Subject = "Error with your subscription...";
+                    MailObject message = new MailObject()
+                    {
+                        To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUserSub.User.Email),
+                        PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                        Subject = "Error with your subscription..."
+                    };
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
                     message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the service.");
@@ -274,10 +279,12 @@ namespace Hood.Services
                     _log.AddParagraph("Send an email to the customer letting them know what has happened...");
                     var failedInvoiceUser = await _auth.GetUserByStripeId(failedInvoice.CustomerId);
 
-                    MailObject message = new MailObject();
-                    message.To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUser.Email);
-                    message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
-                    message.Subject = "Error with your subscription...";
+                    MailObject message = new MailObject()
+                    {
+                        To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUser.Email),
+                        PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                        Subject = "Error with your subscription..."
+                    };
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
                     message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the service.");
@@ -321,10 +328,12 @@ namespace Hood.Services
                     _log.AddParagraph("Send an email to the customer letting them know what has happened...");
                     var successfulInvoiceUser = await _auth.GetUserByStripeId(successfulInvoice.CustomerId);
 
-                    MailObject message = new MailObject();
-                    message.To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email);
-                    message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
-                    message.Subject = "Error with your subscription...";
+                    MailObject message = new MailObject()
+                    {
+                        To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email),
+                        PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                        Subject = "Error with your subscription..."
+                    };
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
                     message.AddParagraph("The charge was created, and completed however the subscription could not be created. Therefore we have refunded the charge to your card, and reset the subscription. Please subscribe again in order to reinstate your subscription.");
@@ -339,10 +348,12 @@ namespace Hood.Services
                     _log.AddParagraph("Send an email to the customer letting them know they have been charged...");
                     var successfulInvoiceUser = await _auth.GetUserByStripeId(successfulInvoice.CustomerId);
 
-                    MailObject message = new MailObject();
-                    message.To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email);
-                    message.PreHeader = "Thank you for your payment on " + _settings.GetSiteTitle();
-                    message.Subject = "Thank you for your payment...";
+                    MailObject message = new MailObject()
+                    {
+                        To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email),
+                        PreHeader = "Thank you for your payment on " + _settings.GetSiteTitle(),
+                        Subject = "Thank you for your payment..."
+                    };
                     message.AddH1("Thank you!");
                     message.AddParagraph("Your payment has been received. You will recieve a payment reciept from our payment providers, Stripe.");
                     await _email.SendEmailAsync(message, MailSettings.DangerTemplate);
@@ -432,10 +443,12 @@ namespace Hood.Services
                 _log.AddParagraph(JsonConvert.SerializeObject(endTrialUserSub).ToFormattedJson() + Environment.NewLine);
                 _log.AddParagraph("Send an email to the customer letting them know what has happened...");
 
-                MailObject message = new MailObject();
-                message.To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUserSub.User.Email);
-                message.PreHeader = "Your trial will soon expire on " + _settings.GetSiteTitle();
-                message.Subject = "Your trial will soon expire...";
+                MailObject message = new MailObject()
+                {
+                    To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUserSub.User.Email),
+                    PreHeader = "Your trial will soon expire on " + _settings.GetSiteTitle(),
+                    Subject = "Your trial will soon expire..."
+                };
                 message.AddH1("The end is near!");
                 message.AddParagraph("Your trial subscription will soon run out.");
                 message.AddParagraph(endTrialSubscription.TrialEnd.Value.ToShortDateString() + " " + endTrialSubscription.TrialEnd.Value.ToShortTimeString());
@@ -452,10 +465,12 @@ namespace Hood.Services
                 _log.AddParagraph("Send an email to the customer letting them know what has happened...");
                 var endTrialUser = await _auth.GetUserByStripeId(endTrialSubscription.CustomerId);
 
-                MailObject message = new MailObject();
-                message.To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUser.Email);
-                message.PreHeader = "Error with your subscription on " + _settings.GetSiteTitle();
-                message.Subject = "Error with your subscription...";
+                MailObject message = new MailObject()
+                {
+                    To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUser.Email),
+                    PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                    Subject = "Error with your subscription..."
+                };
                 message.AddH1("Oops!");
                 message.AddParagraph("Seems there was an error with your subscription.");
                 message.AddParagraph("The charge has failed, and we couldn't find a valid subscription on the service, therefore we have prevented any further charges to your card.");

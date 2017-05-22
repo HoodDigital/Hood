@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
@@ -59,8 +60,7 @@ namespace Hood.Services
         public PropertyListing GetPropertyById(int id, bool nocache = false)
         {
             string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
-            PropertyListing property = null;
-            if (_cache.TryGetValue(cacheKey, out property) && !nocache)
+            if (_cache.TryGetValue(cacheKey, out PropertyListing property) && !nocache)
                 return property;
             else
             {
@@ -314,8 +314,7 @@ namespace Hood.Services
         public async Task<List<PropertyListing>> GetFeatured()
         {
             string cacheKey = typeof(PropertyListing) + ".Featured";
-            List<PropertyListing> properties = null;
-            if (_cache.TryGetValue(cacheKey, out properties))
+            if (_cache.TryGetValue(cacheKey, out List<PropertyListing> properties))
                 return properties;
             else
             {
@@ -334,8 +333,7 @@ namespace Hood.Services
         public async Task<List<PropertyListing>> GetRecent()
         {
             string cacheKey = typeof(PropertyListing) + ".Recent";
-            List<PropertyListing> properties = null;
-            if (_cache.TryGetValue(cacheKey, out properties))
+            if (_cache.TryGetValue(cacheKey, out List<PropertyListing> properties))
                 return properties;
             else
             {

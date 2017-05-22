@@ -1,11 +1,10 @@
-using Hood.Core.Infrastructure;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
 using Hood.Models.Api;
-using Hood.Models.ComplexTypes;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -58,8 +57,10 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Index(string type)
         {
             var contentType = _settings.GetContentSettings().GetContentType(type);
-            ContentListModel nhm = new ContentListModel();
-            nhm.Type = contentType;
+            ContentListModel nhm = new ContentListModel()
+            {
+                Type = contentType
+            };
             return View(nhm);
         }
 
@@ -105,8 +106,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/create/")]
         public IActionResult Create(string type)
         {
-            ContentListModel mcm = new ContentListModel();
-            mcm.Type = _settings.GetContentSettings().GetContentType(type);
+            ContentListModel mcm = new ContentListModel()
+            {
+                Type = _settings.GetContentSettings().GetContentType(type)
+            };
             return View(mcm);
         }
 
@@ -162,9 +165,11 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Categories(int id)
         {
             var content = _content.GetContentByID(id);
-            EditContentModel model = new EditContentModel();
-            model.Type = _settings.GetContentSettings().GetContentType(content.ContentType);
-            model.Content = content;
+            EditContentModel model = new EditContentModel()
+            {
+                Type = _settings.GetContentSettings().GetContentType(content.ContentType),
+                Content = content
+            };
             return View(model);
         }
 
@@ -172,8 +177,10 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult CategoryList(string type)
         {
             var contentType = _settings.GetContentSettings().GetContentType(type);
-            ContentListModel nhm = new ContentListModel();
-            nhm.Type = contentType;
+            ContentListModel nhm = new ContentListModel()
+            {
+                Type = contentType
+            };
             return View(nhm);
         }
 
@@ -611,8 +618,10 @@ namespace Hood.Areas.Admin.Controllers
 
         public JsonResult GetById(int id)
         {
-            IList<Content> content = new List<Content>();
-            content.Add(_content.GetContentByID(id));
+            IList<Content> content = new List<Content>
+            {
+                _content.GetContentByID(id)
+            };
             var ups = content.Select(c => _settings.ToContentApi(c));
             return Json(ups.ToArray());
         }
@@ -623,7 +632,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Content content = _content.GetContentByID(id);
                 if (content != null && content.FeaturedImage != null)
-                    return new MediaApi(content.FeaturedImage);
+                    return new MediaApi(content.FeaturedImage, _settings);
                 else
                     throw new Exception("No featured image found");
             }
@@ -639,7 +648,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Content content = _content.GetContentByID(id);
                 if (content != null)
-                    return new MediaApi(content.GetMeta(field).Get<IMediaObject>());
+                    return new MediaApi(content.GetMeta(field).Get<IMediaObject>(), _settings);
                 else
                     throw new Exception("No featured image found");
             }
@@ -800,9 +809,11 @@ namespace Hood.Areas.Admin.Controllers
 
         private async Task<EditContentModel> GetEditorModel(Content content)
         {
-            EditContentModel model = new EditContentModel();
-            model.Type = _settings.GetContentSettings().GetContentType(content.ContentType);
-            model.Content = content;
+            EditContentModel model = new EditContentModel()
+            {
+                Type = _settings.GetContentSettings().GetContentType(content.ContentType),
+                Content = content
+            };
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
             model.Authors = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();

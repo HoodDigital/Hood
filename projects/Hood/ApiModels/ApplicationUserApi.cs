@@ -90,9 +90,9 @@ namespace Hood.Models.Api
 
             user.CopyProperties(this);
             if (user.Avatar != null)
-                this.Avatar = new MediaApi(user.Avatar);
+                Avatar = new MediaApi(user.Avatar, settings);
             else
-                this.Avatar = MediaApi.Blank(mediaSettings);
+                Avatar = MediaApi.Blank(mediaSettings);
 
 
             Addresses = user.Addresses?.Select(s => new AddressApi(s)).ToList();

@@ -11,8 +11,8 @@ namespace Hood.Infrastructure
 
         public OperationResult(TObject item)
         {
-            this.Succeeded = true;
-            this.Item = item;
+            Succeeded = true;
+            Item = item;
         }
     }
 
@@ -91,10 +91,10 @@ namespace Hood.Infrastructure
 
         public OperationResult(Exception exception)
         {
-            this.Exception = exception;
+            Exception = exception;
             Succeeded = false;
             Errors = new List<OperationError>();
-            this.Errors.Add(new OperationError(exception.Message));
+            Errors.Add(new OperationError(exception.Message));
         }
 
         public void AddError(string error)

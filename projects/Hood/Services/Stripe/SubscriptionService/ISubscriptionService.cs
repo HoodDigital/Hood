@@ -29,7 +29,7 @@ namespace Hood.Services
         /// <returns>
         /// The subscription
         /// </returns>
-        Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, string tokenId = null, DateTime? trialEnd = null, decimal taxPercent = 0);
+        Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null, decimal taxPercent = 0);
 
         /// <summary>
         /// Gets the User's subscriptions asynchronous.

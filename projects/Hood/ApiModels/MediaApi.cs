@@ -1,5 +1,7 @@
-﻿using Hood.Extensions;
+﻿using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Services;
 using System;
 
 namespace Hood.Models.Api
@@ -33,88 +35,89 @@ namespace Hood.Models.Api
         public string MediumUrl { get; set; }
         public string LargeUrl { get; set; }
 
-        public MediaApi(IMediaObject mi)
+        public MediaApi(IMediaObject mi, ISettingsRepository settings)
         {
             if (mi == null)
                 return;
             if (mi != null)
             {
                 mi.CopyProperties(this);
-                this.FormattedSize = (mi.FileSize / 1024).ToString() + "Kb";
-                this.DownloadUrl = mi.Url.Replace("https://", "http://");
-                this.DownloadUrlHttps = mi.Url.Replace("http://", "https://");
+                FormattedSize = (mi.FileSize / 1024).ToString() + "Kb";
+                DownloadUrl = mi.Url.Replace("https://", "http://");
+                DownloadUrlHttps = mi.Url.Replace("http://", "https://");
 
-                if (this.GeneralFileType == "Directory")
+                if (GeneralFileType == "Directory")
                 {
-                    this.DownloadUrl = this.DownloadUrl + this.Directory.ToSeoUrl();
-                    this.DownloadUrlHttps = this.DownloadUrlHttps + this.Directory.ToSeoUrl();
-                    this.Container = "N/A";
-                    this.BlobReference = "N/A";
+                    DownloadUrl = DownloadUrl + Directory.ToSeoUrl();
+                    DownloadUrlHttps = DownloadUrlHttps + Directory.ToSeoUrl();
+                    Container = "N/A";
+                    BlobReference = "N/A";
                 }
 
             }
             // Formatted Members
 
-            Hood.FileType type = Hood.FileType.Unknown;
+            GenericFileType type = GenericFileType.Unknown;
             if (Enum.TryParse(GeneralFileType, out type))
             {
                 switch (type)
                 {
-                    case Hood.FileType.Image:
-                        this.Icon = mi.SmallUrl;
-                        this.SmallUrl = mi.SmallUrl;
-                        this.MediumUrl = mi.MediumUrl;
-                        this.LargeUrl = mi.LargeUrl;
-                        this.ThumbUrl = mi.ThumbUrl;
+                    case GenericFileType.Image:
+                        Icon = mi.SmallUrl;
+                        SmallUrl = mi.SmallUrl;
+                        MediumUrl = mi.MediumUrl;
+                        LargeUrl = mi.LargeUrl;
+                        ThumbUrl = mi.ThumbUrl;
                         break;
-                    case Hood.FileType.Excel:
-                        this.Icon = "/lib/hood/images/icons/excel.png";
-                        this.SmallUrl = Icon;
-                        this.MediumUrl = Icon;
-                        this.LargeUrl = Icon;
-                        this.ThumbUrl = Icon;
+                    case GenericFileType.Excel:
+                        Icon = "/lib/hood/images/icons/excel.png";
+                        SmallUrl = Icon;
+                        MediumUrl = Icon;
+                        LargeUrl = Icon;
+                        ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.PDF:
-                        this.Icon = "/lib/hood/images/icons/pdf.png";
-                        this.SmallUrl = Icon;
-                        this.MediumUrl = Icon;
-                        this.LargeUrl = Icon;
-                        this.ThumbUrl = Icon;
+                    case GenericFileType.PDF:
+                        Icon = "/lib/hood/images/icons/pdf.png";
+                        SmallUrl = Icon;
+                        MediumUrl = Icon;
+                        LargeUrl = Icon;
+                        ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.PowerPoint:
-                        this.Icon = "/lib/hood/images/icons/powerpoint.png";
-                        this.SmallUrl = Icon;
-                        this.MediumUrl = Icon;
-                        this.LargeUrl = Icon;
-                        this.ThumbUrl = Icon;
+                    case GenericFileType.PowerPoint:
+                        Icon = "/lib/hood/images/icons/powerpoint.png";
+                        SmallUrl = Icon;
+                        MediumUrl = Icon;
+                        LargeUrl = Icon;
+                        ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.Word:
-                        this.Icon = "/lib/hood/images/icons/word.png";
-                        this.SmallUrl = Icon;
-                        this.MediumUrl = Icon;
-                        this.LargeUrl = Icon;
-                        this.ThumbUrl = Icon;
+                    case GenericFileType.Word:
+                        Icon = "/lib/hood/images/icons/word.png";
+                        SmallUrl = Icon;
+                        MediumUrl = Icon;
+                        LargeUrl = Icon;
+                        ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.Photoshop:
-                        this.Icon = "/lib/hood/images/icons/photoshop.png";
-                        this.SmallUrl = Icon;
-                        this.MediumUrl = Icon;
-                        this.LargeUrl = Icon;
-                        this.ThumbUrl = Icon;
+                    case GenericFileType.Photoshop:
+                        Icon = "/lib/hood/images/icons/photoshop.png";
+                        SmallUrl = Icon;
+                        MediumUrl = Icon;
+                        LargeUrl = Icon;
+                        ThumbUrl = Icon;
                         break;
-                    case Hood.FileType.Unknown:
-                        this.Icon = "/lib/hood/images/icons/file.png";
-                        this.SmallUrl = Icon;
-                        this.MediumUrl = Icon;
-                        this.LargeUrl = Icon;
-                        this.ThumbUrl = Icon;
+                    case GenericFileType.Unknown:
+                        Icon = "/lib/hood/images/icons/file.png";
+                        SmallUrl = Icon;
+                        MediumUrl = Icon;
+                        LargeUrl = Icon;
+                        ThumbUrl = Icon;
                         break;
                 }
             }
 
-            if (string.IsNullOrEmpty(this.Icon))
+            if (string.IsNullOrEmpty(Icon))
             {
-                this.Icon = "/lib/hood/images/no-image.jpg";
+                var mediaSettings = settings.GetMediaSettings();
+                string url = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
             }
 
         }
@@ -125,11 +128,12 @@ namespace Hood.Models.Api
 
         public static MediaApi Blank(MediaSettings settings = null)
         {
-            MediaApi ret = new MediaApi();
+            MediaApi ret = new MediaApi()
+            {
 
-            // Formatted Members
-            ret.FormattedSize = "0Kb";
-
+                // Formatted Members
+                FormattedSize = "0Kb"
+            };
             var noImage = "/lib/hood/images/no-image.jpg";
             if (settings.NoImage.IsSet())
                 noImage = settings.NoImage;

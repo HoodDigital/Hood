@@ -1,4 +1,4 @@
-﻿namespace Hood
+﻿namespace Hood.Enums
 {
 
     public enum Status

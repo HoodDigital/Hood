@@ -9,7 +9,6 @@ using Hood.Services;
 using Stripe;
 using Hood.Extensions;
 using Hood.Filters;
-using Microsoft.Extensions.Caching.Memory;
 using Hood.Enums;
 using Hood.Caching;
 
@@ -17,6 +16,7 @@ namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
+    [Area("Hood")]
     public class BillingController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -59,8 +59,10 @@ namespace Hood.Controllers
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
-            BillingHomeModel model = new BillingHomeModel();
-            model.User = account.User;
+            BillingHomeModel model = new BillingHomeModel()
+            {
+                User = account.User
+            };
             try
             {
                 model.Customer = await _auth.LoadCustomerObject(model.User?.StripeId, true);

@@ -3,8 +3,6 @@ using SendGrid.Helpers.Mail;
 using Microsoft.AspNetCore.Http;
 using Hood.Extensions;
 using System.Threading.Tasks;
-using Hood.Infrastructure;
-using System;
 using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Hood.Models;

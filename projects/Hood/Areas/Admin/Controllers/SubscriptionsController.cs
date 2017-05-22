@@ -9,7 +9,6 @@ using Hood.Extensions;
 using Hood.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using System;
-using Newtonsoft.Json;
 using Hood.Models.Api;
 using System.Net;
 using System.Text;
@@ -59,8 +58,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
-            EditSubscriptionModel model = new EditSubscriptionModel();
-            model.Subscription = await _auth.GetSubscriptionPlanById(id);       
+            EditSubscriptionModel model = new EditSubscriptionModel()
+            {
+                Subscription = await _auth.GetSubscriptionPlanById(id)
+            };
             return View(model);
         }
 
@@ -68,9 +69,11 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<ActionResult> Edit(Subscription model)
         {
-            EditSubscriptionModel esm = new EditSubscriptionModel();
-            esm.SaveResult = await _auth.UpdateSubscription(model);
-            esm.Subscription = model;
+            EditSubscriptionModel esm = new EditSubscriptionModel()
+            {
+                SaveResult = await _auth.UpdateSubscription(model),
+                Subscription = model
+            };
             return View(esm);
         }
 

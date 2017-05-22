@@ -13,6 +13,7 @@ using Hood.Extensions;
 namespace Hood.Controllers
 {
     [Authorize]
+    [Area("Hood")]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -83,8 +84,10 @@ namespace Hood.Controllers
         [Route("account/profile/")]
         public async Task<IActionResult> Profile()
         {
-            EditUserModel um = new EditUserModel();
-            um.User = _auth.GetUserById(_userManager.GetUserId(User));
+            EditUserModel um = new EditUserModel()
+            {
+                User = _auth.GetUserById(_userManager.GetUserId(User))
+            };
             um.Roles = await _userManager.GetRolesAsync(um.User);
             um.AllRoles = _auth.GetAllRoles();
             return View(um);
@@ -94,8 +97,10 @@ namespace Hood.Controllers
         [Route("account/profile/")]
         public IActionResult Profile(EditUserModel model)
         {
-            EditUserModel um = new EditUserModel();
-            um.User = _auth.GetUserById(_userManager.GetUserId(User));
+            EditUserModel um = new EditUserModel()
+            {
+                User = _auth.GetUserById(_userManager.GetUserId(User))
+            };
             try
             {
                 model.User.CopyProperties(um.User);

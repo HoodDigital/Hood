@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using Hood.Interfaces;
+using Hood.Extensions;
 
 namespace Hood.Controllers
 {
     [Authorize]
+    [Area("Hood")]
     public partial class AddressController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

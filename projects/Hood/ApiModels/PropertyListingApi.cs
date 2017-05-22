@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
 using System;
@@ -155,12 +156,12 @@ namespace Hood.Models.Api
 
 
             if (post.FeaturedImage != null)
-                FeaturedImage = new MediaApi(post.FeaturedImage);
+                FeaturedImage = new MediaApi(post.FeaturedImage, settings);
             else
                 FeaturedImage = MediaApi.Blank(mediaSettings);
 
             if (post.InfoDownload != null)
-                InfoDownload = new MediaApi(post.InfoDownload);
+                InfoDownload = new MediaApi(post.InfoDownload, settings);
             else
                 InfoDownload = MediaApi.Blank(mediaSettings);
 
@@ -170,12 +171,12 @@ namespace Hood.Models.Api
                 Meta = new List<MetaDataApi<PropertyMeta>>();
 
             if (post.Media != null)
-                Media = post.Media.Select(c => new MediaApi(c)).ToList();
+                Media = post.Media.Select(c => new MediaApi(c, settings)).ToList();
             else
                 Media = new List<MediaApi>();
 
             if (post.FloorPlans != null)
-                FloorPlans = post.FloorPlans.Select(c => new MediaApi(c)).ToList();
+                FloorPlans = post.FloorPlans.Select(c => new MediaApi(c, settings)).ToList();
             else
                 FloorPlans = new List<MediaApi>();
 

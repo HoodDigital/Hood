@@ -24,8 +24,7 @@ namespace Hood.Extensions
 
         public static bool IsAbsoluteUrl(this string url)
         {
-            Uri result;
-            return Uri.TryCreate(url, UriKind.Absolute, out result);
+            return Uri.TryCreate(url, UriKind.Absolute, out Uri result);
         }
 
         public static string ToUrl(this string url)
@@ -36,14 +35,13 @@ namespace Hood.Extensions
                 formattedUrl = new UriBuilder(url).Uri;
                 return formattedUrl.ToString();
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
                 return url;
             }
-            catch (UriFormatException ex)
+            catch (UriFormatException)
             {
-                Uri uri;
-                if (Uri.TryCreate(url, UriKind.Absolute, out uri) || Uri.TryCreate("http://" + url, UriKind.Absolute, out uri))
+                if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri) || Uri.TryCreate("http://" + url, UriKind.Absolute, out uri))
                 {
                     return uri.ToString();
                 }

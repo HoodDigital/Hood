@@ -22,7 +22,10 @@ namespace Hood.Infrastructure
 
                 foreach (KeyValuePair<string, object> val in values.OrderBy(k => k.Key))
                 {
-                    if (val.Key != "controller" && val.Key != "action" && val.Key != "id")
+                    if (val.Key != "area" && 
+                        val.Key != "controller" &&
+                        val.Key != "action" && 
+                        val.Key != "id")
                     {
                         fullUrl += val.Value + "/";
                     }
@@ -38,6 +41,8 @@ namespace Hood.Infrastructure
                     var type = _settings.GetContentSettings().GetContentType(tokenised[0]);
                     if (type != null)
                     {
+                        // if a type is matched, we must use the Hood routes, content CMS routes cannot be overridden.
+                        values["area"] = "Hood";
                         if (tokenised.Length > 1)
                         {
                             switch (tokenised[1].ToLower())

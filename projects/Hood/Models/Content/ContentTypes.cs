@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace Hood.Models
 {
@@ -60,7 +59,7 @@ namespace Hood.Models
             var field = CustomFields.SingleOrDefault(c => c.Name == name);
             if (field != null)
                 return field;
-            var baseType = ContentTypes.All.SingleOrDefault(t => t.TypeName == this.TypeName);
+            var baseType = ContentTypes.All.SingleOrDefault(t => t.TypeName == TypeName);
             if (baseType != null)
             {
                 field = baseType.CustomFields.SingleOrDefault(c => c.Name == name);

@@ -17,8 +17,7 @@ namespace Hood.Extensions
             if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
                 return false;
 
-            byte[] betaCodeBytes = null;
-            if (!context.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
+            if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
                 return true;
             var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
 
@@ -34,8 +33,7 @@ namespace Hood.Extensions
             if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
                 return true;
 
-            byte[] betaCodeBytes = null;
-            if (!context.Session.TryGetValue("LockoutModeToken", out betaCodeBytes))
+            if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
                 return false;
             var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
 

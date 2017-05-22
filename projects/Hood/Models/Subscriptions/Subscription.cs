@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Hood.Interfaces;
+using Hood.Extensions;
 
 namespace Hood.Models
 {

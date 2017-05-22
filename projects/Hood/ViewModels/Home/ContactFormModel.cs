@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Hood.Services;
 
 namespace Hood.Models
@@ -44,12 +43,12 @@ namespace Hood.Models
 
         public MailObject WriteToMessage(MailObject message)
         {
-            message.AddParagraph("Name: <strong>" + this.Name + "</strong>");
-            message.AddParagraph("Email: <strong>" + this.Email + "</strong>");
-            message.AddParagraph("Phone: <strong>" + this.PhoneNumber + "</strong>");
-            message.AddParagraph("Subject: <strong>" + this.Subject + "</strong>");
+            message.AddParagraph("Name: <strong>" + Name + "</strong>");
+            message.AddParagraph("Email: <strong>" + Email + "</strong>");
+            message.AddParagraph("Phone: <strong>" + PhoneNumber + "</strong>");
+            message.AddParagraph("Subject: <strong>" + Subject + "</strong>");
             message.AddParagraph("Enquiry:");
-            message.AddParagraph("<strong>" + this.Enquiry + "</strong>");
+            message.AddParagraph("<strong>" + Enquiry + "</strong>");
             return message;
         }
     }

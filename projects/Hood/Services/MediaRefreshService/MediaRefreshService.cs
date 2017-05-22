@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Hood.Models;
 using Hood.Extensions;
-using Newtonsoft.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using Hood.Interfaces;
 using System.Net;
 
 namespace Hood.Services
@@ -82,9 +78,11 @@ namespace Hood.Services
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(RefreshAllMedia);
-                Thread thread = new Thread(pts);
-                thread.Name = "RefreshAllMedia";
-                thread.Priority = ThreadPriority.Normal;
+                Thread thread = new Thread(pts)
+                {
+                    Name = "RefreshAllMedia",
+                    Priority = ThreadPriority.Normal
+                };
                 thread.Start();
 
                 return true;
@@ -200,9 +198,11 @@ namespace Hood.Services
                 StatusMessage = string.Format("All done, emailing results...");
                 Lock.ReleaseWriterLock();
 
-                MailObject message = new MailObject();
-                message.PreHeader = _settings.ReplacePlaceholders("All media files have been refreshed.");
-                message.Subject = _settings.ReplacePlaceholders("All media files have been refreshed.");
+                MailObject message = new MailObject()
+                {
+                    PreHeader = _settings.ReplacePlaceholders("All media files have been refreshed."),
+                    Subject = _settings.ReplacePlaceholders("All media files have been refreshed.")
+                };
                 message.AddH1(_settings.ReplacePlaceholders("Complete!"));
                 message.AddParagraph(_settings.ReplacePlaceholders("All media files have been successfully refreshed on " + _context.GetSiteUrl()));
                 await _email.NotifyRoleAsync(message, "SuperUser");

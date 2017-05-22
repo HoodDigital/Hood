@@ -59,8 +59,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/edit/{id}/")]
         public async Task<IActionResult> Edit(string id)
         {
-            EditUserModel um = new EditUserModel();
-            um.User = _auth.GetUserById(id);
+            EditUserModel um = new EditUserModel()
+            {
+                User = _auth.GetUserById(id)
+            };
             um.Roles = await _userManager.GetRolesAsync(um.User);
             um.AllRoles = _auth.GetAllRoles();
             return View(um);
@@ -70,8 +72,10 @@ namespace Hood.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(string id, SaveProfileModel model)
         {
-            EditUserModel um = new EditUserModel();
-            um.User = _auth.GetUserById(id);
+            EditUserModel um = new EditUserModel()
+            {
+                User = _auth.GetUserById(id)
+            };
             model.User.CopyProperties(um.User);
             _auth.UpdateUser(um.User);
 
@@ -85,8 +89,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/blade/{id}/")]
         public async Task<IActionResult> Blade(string id)
         {
-            EditUserModel um = new EditUserModel();
-            um.User = _auth.GetUserById(id);
+            EditUserModel um = new EditUserModel()
+            {
+                User = _auth.GetUserById(id)
+            };
             um.Roles = await _userManager.GetRolesAsync(um.User);
             um.AllRoles = _auth.GetAllRoles();
             return View(um);
@@ -102,8 +108,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/roles/")]
         public async Task<IActionResult> Roles(string id)
         {
-            EditUserModel um = new EditUserModel();
-            um.User = _auth.GetUserById(id);
+            EditUserModel um = new EditUserModel()
+            {
+                User = _auth.GetUserById(id)
+            };
             um.Roles = await _userManager.GetRolesAsync(um.User);
             return View(um);
         }
@@ -221,7 +229,7 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     if (user.Avatar == null)
                         return MediaApi.Blank(_settings.GetMediaSettings());
-                    return new MediaApi(user.Avatar);
+                    return new MediaApi(user.Avatar, _settings);
                 }
                 else
                     throw new Exception("No avatar found");
@@ -324,10 +332,12 @@ namespace Hood.Areas.Admin.Controllers
 
                     try
                     {
-                        MailObject message = new MailObject();
-                        message.To = new SendGrid.Helpers.Mail.EmailAddress(user.Email);
-                        message.PreHeader = "You access information for " + _settings.GetSiteTitle();
-                        message.Subject = "You account has been created.";
+                        MailObject message = new MailObject()
+                        {
+                            To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                            PreHeader = "You access information for " + _settings.GetSiteTitle(),
+                            Subject = "You account has been created."
+                        };
                         message.AddH1("Account Created!");
                         message.AddParagraph("Your account has been set up on the " + _settings.GetSiteTitle() + " website.");
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");

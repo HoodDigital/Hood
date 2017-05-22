@@ -1,21 +1,19 @@
-﻿using Hood.Models;
+﻿using Hood.Caching;
+using Hood.Extensions;
+using Hood.Infrastructure;
+using Hood.Models;
+using Hood.Models.Api;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
-using Hood.Extensions;
-using Hood.Infrastructure;
 using System.Linq;
-using Hood.Models.Api;
-using Hood.Caching;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using System.Net.Http;
-using Hood.Core.Models.ComplexTypes;
+using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -86,8 +84,7 @@ namespace Hood.Services
             string cacheKey = typeof(Option).ToString() + "." + key;
             try
             {
-                Option option = null;
-                if (_cache.TryGetValue(cacheKey, out option) && !nocache)
+                if (_cache.TryGetValue(cacheKey, out Option option) && !nocache)
                     return JsonConvert.DeserializeObject<T>(option.Value);
                 else
                 {
@@ -136,8 +133,7 @@ namespace Hood.Services
 
             catch (DbUpdateException ex)
             {
-                SqlException innerException = ex.InnerException as SqlException;
-                if (innerException != null && innerException.Number == 2627)
+                if (ex.InnerException is SqlException innerException && innerException.Number == 2627)
                 {
                     throw new Exception("There is already an option with that key in the database.");
                 }
@@ -202,8 +198,7 @@ namespace Hood.Services
             }
             catch (DbUpdateException ex)
             {
-                SqlException innerException = ex.InnerException as SqlException;
-                if (innerException != null && innerException.Number == 2627)
+                if (ex.InnerException is SqlException innerException && innerException.Number == 2627)
                 {
                     throw new Exception("There is already an option with that key in the database.");
                 }
