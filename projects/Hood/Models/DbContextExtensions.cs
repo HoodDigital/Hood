@@ -22,9 +22,11 @@ namespace Hood.Models
             builder.Entity<Option>().ToTable("HoodOptions");
             builder.Entity<SiteMedia>().ToTable("HoodMedia");
             builder.Entity<Address>().ToTable("HoodAddresses");
+            builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
+            builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId);
 
             // Subscriptions
             builder.Entity<Subscription>().ToTable("HoodSubscriptions");

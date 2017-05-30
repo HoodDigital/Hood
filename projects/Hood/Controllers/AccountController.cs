@@ -10,6 +10,9 @@ using Hood.Models;
 using Hood.Services;
 using System;
 using Hood.Caching;
+using Hood.Infrastructure;
+using System.Collections.Generic;
+using Hood.Extensions;
 
 namespace Hood.Controllers
 {
@@ -20,6 +23,7 @@ namespace Hood.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IAccountRepository _account;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
         private readonly IContentRepository _data;
@@ -34,12 +38,14 @@ namespace Hood.Controllers
             ISmsSender smsSender,
             IHoodCache cache,
             ILoggerFactory loggerFactory,
+            IAccountRepository account,
             ISettingsRepository settings)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
+            _account = account;
             _logger = loggerFactory.CreateLogger<AccountController>();
             _data = data;
             _cache = cache;
@@ -52,6 +58,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
+
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -68,16 +75,16 @@ namespace Hood.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    var user = await _userManager.FindByNameAsync(model.Username);
                     user.LastLogOn = DateTime.Now;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
 
-                    _logger.LogInformation(1, "User " + model.Email + " logged in.");
+                    _logger.LogInformation(1, "User " + model.Username + " logged in.");
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -106,7 +113,16 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+            if (accountSettings.RegistrationType == "code")
+            {
+                var url = "/account/create";
+                if (returnUrl != null)
+                    url += "?returnUrl=" + System.Net.WebUtility.UrlEncode(returnUrl);
+                return Redirect(url);
+            }
             return View();
         }
 
@@ -117,6 +133,10 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -139,6 +159,239 @@ namespace Hood.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+
+        //
+        // GET: /Account/Create
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Create(string returnUrl)
+        {
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(RegisterCodeViewModel model, string returnUrl)
+        {
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var keyGen = new KeyGenerator(true, true, true, false);
+
+                // check if the user is registered, if so forward to login, filling in the email address.
+                var user = _account.GetUserByEmail(model.Email);
+                if (user == null)
+                {
+                    // if no account exists, create one, then carry on.
+                    user = new ApplicationUser { UserName = Guid.NewGuid().ToString(), Email = model.Email };
+                    var result = await _userManager.CreateAsync(user, keyGen.Generate(24));
+                    if (!result.Succeeded)
+                    {
+                        AddErrors(result);
+                        return View(model);
+                    }
+                }
+
+                // the user exists, has a code, but isn't set up for access, forward to the complete page
+                if (user.EmailConfirmed)
+                {
+                    if (!user.Active)
+                    {
+                        return RedirectWithReturnUrl("/account/finish?uid=" + user.Id, returnUrl);
+                    }
+                    else
+                    {
+                        // They are good, let them log in.
+                        return RedirectWithReturnUrl("/account/login?uid=", returnUrl);
+                    }
+                }
+
+                // check if they have a current valid code, if so forward them to the code page.
+                user = _account.GetUserById(user.Id);
+                if (CheckForAccessCodes(user))
+                {
+                    return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
+                }
+
+                // If they don't have a valid code, let them add a new code to their account, send it and forward to the code page.
+
+                // Attach the code to the user, along with it's expiry date.
+                keyGen = new KeyGenerator(false, false, true, false);
+                var code = keyGen.Generate(6);
+                if (user.AccessCodes == null)
+                    user.AccessCodes = new List<UserAccessCode>();
+                user.AccessCodes.Add(
+                    new UserAccessCode()
+                    {
+                        Code = code,
+                        Expiry = DateTime.Now.AddHours(accountSettings.CodeExpiry),
+                        UserId = user.Id,
+                        Type = "Registration"
+                    }
+                );
+                await _userManager.UpdateAsync(user);
+
+                MailObject message = new MailObject()
+                {
+                    To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                    PreHeader = _settings.ReplacePlaceholders("Your access code."),
+                    Subject = _settings.ReplacePlaceholders("Your access code.")
+                };
+                message.AddH1(_settings.ReplacePlaceholders("Your access code."));
+                message.AddParagraph($"You can use the following access code to complete your registration:");
+                message.AddH2(code.Substring(0, 3) + " - " + code.Substring(3, 3), "#5fba7d", "center");
+                message.AddParagraph($"Once you have entered your code you can create a username and password for the site. Click the button below to enter your code now.");
+                message.AddCallToAction("Validate your account", "/account/code?uid=" + user.Id);
+                await _emailSender.SendEmailAsync(message, MailSettings.SuccessTemplate);
+
+                return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Code(string uid, string returnUrl)
+        {
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+
+            // Here we must flag the account as email confirmed. If the code entered matches. 
+
+            // If the userid is not set then we cannot validate them! 
+            // Back to user create we go.
+            if (!uid.IsSet())
+            {
+                return RedirectWithReturnUrl("/account/create", returnUrl);
+            }
+
+            // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
+            var user = _account.GetUserById(uid);
+            if (!CheckForAccessCodes(user))
+            {
+                // generate one with their account info, and re-display the code page.
+                return RedirectWithReturnUrl("/account/create", returnUrl);
+            }
+
+            // First off, let's display the input for the code, let's go ahead and display the form.
+            return View(new EnterCodeViewModel() { UserId = uid });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult Code(EnterCodeViewModel model, string returnUrl)
+        {
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+
+            // check if they have a current valid code, if not forward them back to the create page to set up a new code.
+            var user = _account.GetUserById(model.UserId);
+            if (!CheckForAccessCodes(user))
+            {
+                return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
+            }
+
+            var codes = user.AccessCodes.Where(ac =>
+                ac.Type == "Registration" &&
+                ac.Expiry > DateTime.Now &&
+                !ac.Used);
+
+            // Here we must flag the account as email confirmed. If the code entered matches. 
+            var code = model.Code.Replace("-", "");
+
+            foreach (var test in codes)
+            {
+                if (code == test.Code)
+                {
+                    // We found a matching code. Update the user as confirmed, and then redirect on to the complete setup page.
+                    user.EmailConfirmed = true;
+                    _account.UpdateUser(user);
+                    return RedirectWithReturnUrl("/account/finish?uid=" + user.Id, returnUrl);
+                }
+            }
+
+            ModelState.AddModelError("Invalid Code", "The code you have entered is not valid.");
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Finish(string uid, string returnUrl)
+        {
+            var accountSettings = _settings.GetAccountSettings();
+            if (!accountSettings.EnableRegistration)
+                return NotFound();
+
+            // Here we must flag the account as email confirmed. If the code entered matches. 
+
+            // If the userid is not set then we cannot validate them! 
+            // Back to user create we go.
+            if (!uid.IsSet())
+            {
+                return RedirectWithReturnUrl("/account/create", returnUrl);
+            }
+
+            // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
+            var user = _account.GetUserById(uid);
+            if (!user.EmailConfirmed)
+            {
+                // generate one with their account info, and re-display the code page.
+                return RedirectWithReturnUrl("/account/create", returnUrl);
+            }
+
+            // First off, let's display the input for the code, let's go ahead and display the form.
+            return View(new FinishAccountSetupModel() { UserId = uid });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Finish(FinishAccountSetupModel model, string returnUrl)
+        {
+            try
+            {
+                var accountSettings = _settings.GetAccountSettings();
+                if (!accountSettings.EnableRegistration)
+                    return NotFound();
+
+                // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
+                var user = _account.GetUserById(model.UserId);
+                if (!user.EmailConfirmed)
+                {
+                    // generate one with their account info, and re-display the code page.
+                    return RedirectWithReturnUrl("/account/create", returnUrl);
+                }
+
+                user.UserName = model.Username;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                _account.UpdateUser(user);
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                _logger.LogInformation(3, "User created a new account with password.");
+                return RedirectToLocal(returnUrl);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(ex.Message, ex.Message);
+                return View(model);
+            }
         }
 
         //
@@ -490,6 +743,29 @@ namespace Hood.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+
+        private IActionResult RedirectWithReturnUrl(string url, string returnUrl)
+        {
+            if (returnUrl != null)
+                url += "&returnUrl=" + System.Net.WebUtility.UrlEncode(returnUrl);
+            return RedirectToLocal(url);
+        }
+
+        private bool CheckForAccessCodes(ApplicationUser user)
+        {
+            if (user.AccessCodes == null)
+                return false;
+
+            var codes = user.AccessCodes.Where(ac =>
+                    ac.Type == "Registration" &&
+                    ac.Expiry > DateTime.Now &&
+                    !ac.Used);
+
+            if (codes.Count() > 0)
+                return true;
+
+            return false;
         }
 
         #endregion

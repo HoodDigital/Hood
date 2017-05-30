@@ -40,6 +40,35 @@
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\Account\Finish.cshtml" />
+    <EmbeddedResource Include="Views\Account\Code.cshtml" />
+    <EmbeddedResource Include="Views\Account\ConfirmEmail.cshtml" />
+    <EmbeddedResource Include="Views\Account\ConfirmRequired.cshtml" />
+    <EmbeddedResource Include="Views\Account\Create.cshtml" />
+    <EmbeddedResource Include="Views\Account\ExternalLoginConfirmation.cshtml" />
+    <EmbeddedResource Include="Views\Account\ExternalLoginFailure.cshtml" />
+    <EmbeddedResource Include="Views\Account\ForgotPassword.cshtml" />
+    <EmbeddedResource Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <EmbeddedResource Include="Views\Account\Lockout.cshtml" />
+    <EmbeddedResource Include="Views\Account\Login.cshtml" />
+    <EmbeddedResource Include="Views\Account\Register.cshtml" />
+    <EmbeddedResource Include="Views\Account\ResetPassword.cshtml" />
+    <EmbeddedResource Include="Views\Account\ResetPasswordConfirmation.cshtml" />
+    <EmbeddedResource Include="Views\Account\SendCode.cshtml" />
+    <EmbeddedResource Include="Views\Account\VerifyCode.cshtml" />
+    <EmbeddedResource Include="Views\Account\_ContactForm.cshtml" />
+    <EmbeddedResource Include="Views\Manage\AddPhoneNumber.cshtml" />
+    <EmbeddedResource Include="Views\Manage\ChangePassword.cshtml" />
+    <EmbeddedResource Include="Views\Manage\Index.cshtml" />
+    <EmbeddedResource Include="Views\Manage\ManageLogins.cshtml" />
+    <EmbeddedResource Include="Views\Manage\Profile.cshtml" />
+    <EmbeddedResource Include="Views\Manage\RemoveLogin.cshtml" />
+    <EmbeddedResource Include="Views\Manage\SetPassword.cshtml" />
+    <EmbeddedResource Include="Views\Manage\VerifyPhoneNumber.cshtml" />
+    <EmbeddedResource Include="Views\_ViewImports.cshtml" />
+    <EmbeddedResource Include="Views\_ViewStart.cshtml" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />

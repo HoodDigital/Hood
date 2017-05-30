@@ -66,7 +66,7 @@
                         </figure>
                     </div>
                     <div class="media-body">
-                        <a class="forum-item-title" href="/admin/users/edit/${ Id }">${ UserName } <small>${ FirstName } ${ LastName }</small></a>
+                        <a class="forum-item-title" href="/admin/users/edit/${ Id }">${ FullName } <small>Username: <strong>${ UserName }</strong> - Email: <strong>${ Email }</strong></small></a>
                         <small>Last logged in from <strong>${ LastLoginLocation }</strong> <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(LastLogOn), "ddd d, MMMM yyyy at hh:mm tt") #</small>
                     </div>
                 </div>

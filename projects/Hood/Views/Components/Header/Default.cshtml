@@ -101,10 +101,10 @@
                         else
                         {
                             <li>
-                                <a asp-action="Login" asp-controller="Account"><i class="fa fa-lock m-r-xs"></i>Login</a>
+                                <a asp-action="Login" asp-controller="Account" asp-route-returnurl="@Context.Request.Path"><i class="fa fa-lock m-r-xs"></i>Login</a>
                             </li>
                             <li>
-                                <a asp-action="Register" asp-controller="Account"><i class="fa fa-user-plus m-r-xs"></i>Sign up</a>
+                                <a asp-action="Register" asp-controller="Account" asp-route-returnurl="@Context.Request.Path"><i class="fa fa-user-plus m-r-xs"></i>Sign up</a>
                             </li>
                         }
                     </ul>

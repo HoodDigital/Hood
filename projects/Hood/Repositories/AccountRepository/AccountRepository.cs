@@ -68,9 +68,25 @@ namespace Hood.Services
                 return null;
             ApplicationUser user;
             var userQ = _db.Users.Include(u => u.Addresses)
+                                   .Include(u => u.AccessCodes)
                                    .Include(u => u.Subscriptions)
                                    .ThenInclude(u => u.Subscription)
                                    .Where(u => u.Id == userId);
+            if (!track)
+                userQ = userQ.AsNoTracking();
+            user = userQ.FirstOrDefault();
+            return user;
+        }
+        public ApplicationUser GetUserByEmail(string email, bool track = true)
+        {
+            if (string.IsNullOrEmpty(email))
+                return null;
+            ApplicationUser user;
+            var userQ = _db.Users.Include(u => u.Addresses)
+                                   .Include(u => u.AccessCodes)
+                                   .Include(u => u.Subscriptions)
+                                   .ThenInclude(u => u.Subscription)
+                                   .Where(u => u.Email == email);
             if (!track)
                 userQ = userQ.AsNoTracking();
             user = userQ.FirstOrDefault();
@@ -82,6 +98,7 @@ namespace Hood.Services
                 return null;
             ApplicationUser user;
             user = await _db.Users.Include(u => u.Addresses)
+                                     .Include(u => u.AccessCodes)
                                       .Include(u => u.Subscriptions)
                                       .ThenInclude(u => u.Subscription)
                                       .Where(u => u.StripeId == stripeId).FirstOrDefaultAsync();

@@ -178,9 +178,7 @@ gulp.task("js:package:login", function () {
         l.end();
     });
     return gulp.src([
-        lib + 'jquery/dist/jquery.min.js',
-        lib + 'jquery-validation/dist/jquery.validate.min.js',
-        lib + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
+        lib + 'jQuery-Mask-Plugin/dist/jquery.mask.js',
         hood.js + "includes/production.js",
         hood.js + 'login.js'
     ], { base: '.' })

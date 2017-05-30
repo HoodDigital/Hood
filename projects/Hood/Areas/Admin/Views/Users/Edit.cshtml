@@ -39,12 +39,25 @@
                     <li><a data-toggle="tab" href="#socials"> Socials</a></li>
                     <li><a data-toggle="tab" href="#bio"> Bio</a></li>
                     <li><a data-toggle="tab" href="#subscriptions"> Subscriptions</a></li>
+                    <li><a data-toggle="tab" href="#accesscodes"> Access codes</a></li>
                 </ul>
                 <div class="tab-content">
                     <div id="info" class="tab-pane active">
                         <div class="panel-body">
                             <h5>Basic Profile &amp; Contact Info</h5>
                             <fieldset class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.UserName"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.UserName">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label" asp-for="User.Email"></label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" asp-for="User.Email">
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label" asp-for="User.FirstName"></label>
                                     <div class="col-sm-8">
@@ -219,6 +232,23 @@
                                                     <span class="label label-warning">@sub.Status</span>
                                                 }
                                                 <span class="label label-default">Next cycle: @sub.CurrentPeriodEnd.Value.ToDisplay()</span>
+                                            </p>
+                                        </li>
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div id="accesscodes" class="tab-pane">
+                        <div class="panel-body">
+                            <h4>Access Codes</h4>
+                            <div class="tag-list">
+                                @foreach (var code in Model.User.AccessCodes)
+                                {
+                                    <ul>
+                                        <li>
+                                            <p>
+                                                @code.Type - @code.Code - @code.Expiry.ToDisplay()
                                             </p>
                                         </li>
                                     </ul>

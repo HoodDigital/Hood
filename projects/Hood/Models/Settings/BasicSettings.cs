@@ -57,9 +57,6 @@ namespace Hood.Models
         {
             // Set Defaults
             SiteTitle = "My Hood Site";
-            OwnerFirstName = "Website.com";
-            OwnerLastName = "Website.com";
-
         }
 
         public string OwnerFullName

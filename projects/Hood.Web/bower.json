@@ -32,6 +32,7 @@
     "imagesloaded": "v4.1.1",
     "javascript-auto-complete": "1.0.4",
     "jquery": "~2.1",
+    "jQuery-Mask-Plugin": "1.14.10",
     "jquery-colorbox": "1.6.4",
     "jquery-slimscroll": "slimScroll#v1.3.8",
     "jquery-validation": "1.16.0",

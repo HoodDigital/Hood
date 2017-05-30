@@ -308,6 +308,42 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Billing");
         }
 
+        [Route("admin/settings/account/")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Account()
+        {
+            AccountSettings model = _settings.GetAccountSettings(true);
+            if (model == null)
+                model = new AccountSettings();
+            return View(model);
+        }
+        [HttpPost]
+        [Route("admin/settings/account/")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Account(AccountSettings model)
+        {
+            try
+            {
+                _settings.Set("Hood.Settings.Account", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
+            return View(model);
+        }
+        [Route("admin/settings/account/reset/")]
+        [Authorize(Roles = "Admin,Manager")]
+        public IActionResult ResetAccount()
+        {
+            var model = new AccountSettings();
+            _settings.Set("Hood.Settings.Account", model);
+            return RedirectToAction("Account");
+        }
+
 
         [Route("admin/settings/seo/")]
         [Authorize(Roles = "Admin,Manager,SEO")]

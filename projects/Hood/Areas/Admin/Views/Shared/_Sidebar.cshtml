@@ -149,6 +149,11 @@
             <a><i class="fa fa-wrench"></i><span class="nav-label">Settings</span> <span class="fa arrow"></span></a>
             <ul class="nav nav-second-level collapse" style="height: 0px;">
                 <li>
+                    <a asp-action="Account" asp-controller="Settings" asp-route-area="Admin">
+                        <i class="fa fa-user-plus"></i>Account Settings
+                    </a>
+                </li>
+                <li>
                     <a asp-action="Basics" asp-controller="Settings" asp-route-area="Admin">
                         <i class="fa fa-cog"></i>Basic Settings
                     </a>

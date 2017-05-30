@@ -353,6 +353,22 @@ namespace Hood.Services
             }
         }
 
+        public AccountSettings GetAccountSettings(bool noCache = false)
+        {
+            try
+            {
+                AccountSettings ret = Get<AccountSettings>("Hood.Settings.Account", noCache);
+                if (ret == null)
+                    ret = new AccountSettings();
+                return ret;
+            }
+            catch (Exception)
+            {
+                Delete("Hood.Settings.Account");
+                return new AccountSettings();
+            }
+        }
+
         public MediaSettings GetMediaSettings(bool noCache = false)
         {
             try
@@ -585,6 +601,11 @@ namespace Hood.Services
         public BillingSettings GetBillingSettings(bool noCache = false)
         {
             return new BillingSettings();
+        }
+
+        public AccountSettings GetAccountSettings(bool noCache = false)
+        {
+            return new AccountSettings();
         }
 
         public IEnumerable<IConfigurationSection> GetChildren()

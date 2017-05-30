@@ -58,7 +58,18 @@ namespace Hood.Models
 
         [Display(Name = "Client Code")]
         public string ClientCode { get; set; }
+
         public string UserVars { get; set; }
+        [NotMapped]
+        public Dictionary<string, string> UserVariables
+        {
+            get { return UserVars.IsSet() ? JsonConvert.DeserializeObject<Dictionary<string, string>>(UserVars) : new Dictionary<string, string>(); }
+            set { UserVars = JsonConvert.SerializeObject(value); }
+        }
+
+        [Display(Name = "Account Activated")]
+        public bool Active { get; set; }
+
         public string Notes { get; set; }
         public string SystemNotes { get; set; }
 
@@ -98,9 +109,9 @@ namespace Hood.Models
             set { AvatarJson = JsonConvert.SerializeObject(value); }
         }
 
+        public List<UserAccessCode> AccessCodes { get; set; }
         public List<Content> Content { get; set; }
         public List<PropertyListing> Properties { get; set; }
-
         public List<UserSubscription> Subscriptions { get; set; }
 
         public string FullName {

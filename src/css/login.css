@@ -6745,9 +6745,8 @@ body {
 }
 .login-block-header h2,
 .login-block h3 {
-  font-size: 20px;
-  font-weight: 900;
-  text-transform: uppercase;
+  font-size: 18px;
+  font-weight: 100;
 }
 .login-block h3 {
   margin-top: 0;
@@ -6928,9 +6927,6 @@ body.content-page .header-v6 .navbar-brand img {
 }
 .block.half-high {
   height: auto;
-}
-.row {
-  margin: 0px;
 }
 /* HEADINGS AND BLOCKS AND ALL THE MEDIAS */
 @media (min-width: 992px) {

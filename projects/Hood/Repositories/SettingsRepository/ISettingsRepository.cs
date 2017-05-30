@@ -22,6 +22,7 @@ namespace Hood.Services
         ContentSettings GetContentSettings(bool noCache = false);
         PropertySettings GetPropertySettings(bool noCache = false);
         BillingSettings GetBillingSettings(bool noCache = false);
+        AccountSettings GetAccountSettings(bool noCache = false);
         MediaSettings GetMediaSettings(bool noCache = false);
         MailSettings GetMailSettings(bool noCache = false);
         SeoSettings GetSeo(bool noCache = false);

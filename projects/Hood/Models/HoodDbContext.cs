@@ -15,6 +15,7 @@ namespace Hood.Models
         }
 
         // Identity
+        public DbSet<UserAccessCode> AccessCodes { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<SiteMedia> Media { get; set; }
 
@@ -55,6 +56,7 @@ namespace Hood.Models
         }
 
         // Identity
+        public DbSet<UserAccessCode> AccessCodes { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<SiteMedia> Media { get; set; }
 

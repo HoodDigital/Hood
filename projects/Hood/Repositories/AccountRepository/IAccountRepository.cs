@@ -14,6 +14,7 @@ namespace Hood.Services
         AccountInfo LoadAccountInfo(string userId);
         ApplicationUser GetCurrentUser(bool track = true);
         ApplicationUser GetUserById(string userId, bool track = true);
+        ApplicationUser GetUserByEmail(string email, bool track = true);
         OperationResult UpdateUser(ApplicationUser user);
 
         IList<IdentityRole> GetAllRoles();

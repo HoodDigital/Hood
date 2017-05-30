@@ -20,3 +20,4 @@ $.backstretch([
     fade: 1000,
     duration: 3000
 });
+$('.code-mask').mask("000-000", {placeholder: "___-___"});
