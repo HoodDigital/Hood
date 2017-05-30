@@ -1,19 +1,19 @@
 @using System.Collections.Generic
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Authentication
-@model RegisterCodeViewModel
+@model EnterCodeViewModel
 @inject SignInManager<ApplicationUser> SignInManager
 
 @inject IContentRepository _content
 @{
     BasicSettings _basicSettings  = _settings.GetBasicSettings();
     SeoSettings _seoSettings = _settings.GetSeo();
-    string description = "Sign up - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-    string title = "Sign up - " + _basicSettings.CompanyName;
+    string description = "Validate your Email - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = "Validate your Email - " + _basicSettings.CompanyName;
     if (_seoSettings.Login != null)
     {
-        description = _seoSettings.SignUp.Description.IsSet() ? _seoSettings.SignUp.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Sign up - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-        title = _seoSettings.SignUp.Title.IsSet() ? _seoSettings.SignUp.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Sign up - " + _basicSettings.CompanyName;
+        description = _seoSettings.SignUp.Description.IsSet() ? _seoSettings.SignUp.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Validate your Email - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.SignUp.Title.IsSet() ? _seoSettings.SignUp.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Validate your Email - " + _basicSettings.CompanyName;
     }
     ViewData["Title"] = title;
     Layout = "_LoginLayout";
@@ -31,21 +31,23 @@
 }
 <div class="login-block-header">
     <h2>@ViewData["Title"]</h2>
-    <p>Already have an account? Click here to <a asp-action="Login">log in</a>.</p>
+    <p>We have sent you a six digit code via email, please enter this code to confirm your email address and continue setting up your account.</p>
 </div>
-<form asp-controller="Account" asp-action="Create" method="post" class="" role="form">
+<form method="post">
     <div asp-validation-summary="All" class="validation-summary"></div>
+    <input asp-for="UserId" type="hidden" />
+
     <div class="form-group">
-        <label asp-for="Email" class="control-label"></label>
+        <label asp-for="Code" class="control-label"></label>
         <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-            <input asp-for="Email" class="form-control" placeholder="Your email address" />
+            <span class="input-group-addon"><i class="fa fa-hashtag"></i></span>
+            <input asp-for="Code" class="form-control code-mask" placeholder="Your email address" />
         </div>
-        <span asp-validation-for="Email" class="text-danger"></span>
+        <span asp-validation-for="Code" class="text-danger"></span>
     </div>
     <div class="row">
         <div class="col-xs-12 text-center">
-            <p><button type="submit" class="btn btn-block">Create Account</button></p>
+            <p><button type="submit" class="btn btn-block">Confirm your email</button></p>
         </div>
     </div>
 </form>

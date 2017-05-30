@@ -26,6 +26,18 @@
                         <hr class="m-b-lg" />
                         <fieldset class="form-horizontal">
                             <div class="form-group">
+                                <label class="col-sm-3 control-label" asp-for="User.UserName"></label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" asp-for="User.UserName" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" asp-for="User.Email"></label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" asp-for="User.Email" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label" asp-for="User.FirstName"></label>
                                 <div class="col-sm-9">
                                     <input type="text" class="form-control" asp-for="User.FirstName">
