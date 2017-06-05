@@ -10,7 +10,7 @@ using Hood.Enums;
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers
 {
-    [Area("Hood")]
+    //[Area("Hood")]
     public class PropertyController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

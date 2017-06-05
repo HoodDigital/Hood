@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    [Area("Hood")]
+    //[Area("Hood")]
     public class HomeController : Controller
     {
         public readonly IConfiguration _configuration;

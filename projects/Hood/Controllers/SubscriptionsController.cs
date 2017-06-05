@@ -14,7 +14,7 @@ namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
-    [Area("Hood")]
+    //[Area("Hood")]
     public class SubscriptionsController : Controller
     {
         private readonly IAccountRepository _auth;

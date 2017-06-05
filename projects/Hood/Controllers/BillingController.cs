@@ -16,7 +16,7 @@ namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
-    [Area("Hood")]
+    //[Area("Hood")]
     public class BillingController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

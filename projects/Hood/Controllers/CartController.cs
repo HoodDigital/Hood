@@ -14,7 +14,7 @@ using System.Linq;
 
 namespace Hood.Controllers
 {
-    [Area("Hood")]
+    //[Area("Hood")]
     public class CartController : Controller
     {
         private readonly IPayPalService _paypal;
