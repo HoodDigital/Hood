@@ -25,6 +25,7 @@ namespace Hood.Services
         private readonly IHoodCache _cache;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBillingService _billing;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountRepository(
             HoodDbContext db,
@@ -32,13 +33,15 @@ namespace Hood.Services
             IBillingService billing,
             IHttpContextAccessor context,
             IHoodCache cache,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _db = db;
             _settings = site;
             _contextAccessor = context;
             _cache = cache;
             _userManager = userManager;
+            _roleManager = roleManager;
             _billing = billing;
         }
 
@@ -48,8 +51,12 @@ namespace Hood.Services
             AccountInfo result = new AccountInfo();
             result = new AccountInfo()
             {
-                User = GetUserById(userId)
+                User = GetUserById(userId)            
             };
+            if (result.User != null)
+            {
+                result.Roles = _userManager.GetRolesAsync(result.User).Result;
+            }
             if (result.User?.Subscriptions != null)
             {
                 foreach (UserSubscription sub in result.User.Subscriptions)
@@ -67,7 +74,8 @@ namespace Hood.Services
             if (string.IsNullOrEmpty(userId))
                 return null;
             ApplicationUser user;
-            var userQ = _db.Users.Include(u => u.Addresses)
+            var userQ = _db.Users.Include(u => u.Roles)
+                                   .Include(u => u.Addresses)
                                    .Include(u => u.AccessCodes)
                                    .Include(u => u.Subscriptions)
                                    .ThenInclude(u => u.Subscription)
