@@ -282,25 +282,12 @@ namespace Hood
                     configureRoutes?.Invoke(routes);
 
                     routes.MapRoute(
+                        name: "areaRoute",
+                        template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+                    routes.MapRoute(
                         name: "default-fallback", 
                         template: "{controller=Home}/{action=Index}/{id?}");
-
-                    //// Catch any basic routes that match to site controllers first.
-                    //routes.MapRoute(
-                    //    name: "basic-controllers",
-                    //    template: "{controller}/{action}/{id?}",
-                    //    defaults: new { area = "" });
-
-                    //// If an area matches, either on the site or in Hood, push it into that route.
-                    //routes.MapRoute(
-                    //    name: "areaRoute",
-                    //    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-                    //// If no match can be found, push it into the Hood area, and default to Home/Index.
-                    //routes.MapRoute(                        
-                    //    name: "hood-controllers-fallback",
-                    //    template: "{controller=Home}/{action=Index}/{id?}",
-                    //    defaults: new { area = "Hood" });
                 });
             }
         }
