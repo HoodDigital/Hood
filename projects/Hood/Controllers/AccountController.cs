@@ -17,7 +17,7 @@ using Hood.Extensions;
 namespace Hood.Controllers
 {
     [Authorize]
-    [Area("Hood")]
+    //[Area("Hood")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;

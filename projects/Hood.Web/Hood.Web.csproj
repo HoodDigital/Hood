@@ -58,6 +58,7 @@
     <EmbeddedResource Include="Views\Account\SendCode.cshtml" />
     <EmbeddedResource Include="Views\Account\VerifyCode.cshtml" />
     <EmbeddedResource Include="Views\Account\_ContactForm.cshtml" />
+    <EmbeddedResource Include="Views\Layouts\_LoginLayout.cshtml" />
     <EmbeddedResource Include="Views\Manage\AddPhoneNumber.cshtml" />
     <EmbeddedResource Include="Views\Manage\ChangePassword.cshtml" />
     <EmbeddedResource Include="Views\Manage\Index.cshtml" />
@@ -72,10 +73,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

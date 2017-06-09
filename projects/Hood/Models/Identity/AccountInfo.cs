@@ -6,6 +6,7 @@ namespace Hood.Models
 {
     public class AccountInfo
     {
+        public IList<string> Roles { get; set; }
         public ApplicationUser User { get; set; }
         public List<UserSubscriptionApi> ActiveSubscriptions { get; set; }
 
@@ -32,6 +33,7 @@ namespace Hood.Models
         public AccountInfo()
         {
             ActiveSubscriptions = new List<UserSubscriptionApi>();
+            Roles = new List<string>();
         }
     }
 }
