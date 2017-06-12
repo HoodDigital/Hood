@@ -47,6 +47,11 @@ namespace Hood.Models
 
         public string Bio { get; set; }
 
+        internal string ReplacePlaceholders(string msg)
+        {
+            return msg.Replace("{USERNAME}", UserName).Replace("{USEREMAIL}", Email).Replace("{FULLNAME}", FullName).Replace("{FIRSTNAME}", FirstName).Replace("{LASTNAME}", LastName);
+        }
+
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
 

@@ -16,17 +16,38 @@ namespace Hood.Services
             _body = new StringWriter();
         }
 
+
+
         private StringWriter _body;
-        public string ToHtmlString()
+        public string Html
         {
-            return _body.ToString();
+            get
+            {
+                return _body.ToString();
+            }
+            set
+            {
+                _body.Close();
+                _body = new StringWriter();
+                _body.Write(value);
+            }
         }
 
         private StringWriter _textBody;
-        public override string ToString()
+        public string Text
         {
-            return _textBody.ToString();
+            get
+            {
+                return _body.ToString();
+            }
+            set
+            {
+                _body.Close();
+                _body = new StringWriter();
+                _body.Write(value);
+            }
         }
+
 
         public void AddH1(string content, string colour = "#222222", string align = "left")
         {
@@ -66,11 +87,17 @@ namespace Hood.Services
             _textBody.WriteLine();
             _body.WriteLine(string.Format(@"<p class='align-{2}' style='color: {1}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: {2};'>{0}</p>", content, colour, align));
         }
+        public void AddDiv(string content, string colour = "#222222", string align = "left")
+        {
+            _textBody.WriteLine(content);
+            _textBody.WriteLine();
+            _body.WriteLine(string.Format(@"<div class='align-{2}' style='color: {1}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: {2};'>{0}</p>", content, colour, align));
+        }
         public void AddImage(string url, string altText)
         {
             _textBody.WriteLine("Image: " + url + "(" + altText + ")");
             _body.WriteLine(string.Format(@"<p style='font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;'><img src='{0}' alt='{1}' width='520' class='img-responsive img-block' style='border: none; -ms-interpolation-mode: bicubic; max-width: 100%; display: block;'></p>", url, altText));
-        }        
+        }
         public void AddCallToAction(string content, string url, string colour = "#3498db", string align = "left")
         {
             _textBody.WriteLine(content + ": " + url);

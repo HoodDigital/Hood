@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public interface IFormSenderService
+    public interface IMailSenderService<TEmailModel>
+        where TEmailModel : IEmailSendable
     {
-        Task<Response> ProcessContactFormModel(IContactFormModel model);
+        Task<Response> ProcessAndSend(TEmailModel model);
     }
 }

@@ -29,6 +29,7 @@ namespace Hood.Controllers
         private readonly IContentRepository _data;
         private readonly IHoodCache _cache;
         private readonly ISettingsRepository _settings;
+        private readonly WelcomeEmailSender _welcome;
 
         public AccountController(
             IContentRepository data,
@@ -39,7 +40,8 @@ namespace Hood.Controllers
             IHoodCache cache,
             ILoggerFactory loggerFactory,
             IAccountRepository account,
-            ISettingsRepository settings)
+            ISettingsRepository settings,
+            WelcomeEmailSender welcome)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -50,6 +52,7 @@ namespace Hood.Controllers
             _data = data;
             _cache = cache;
             _settings = settings;
+            _welcome = welcome;
         }
 
         //
@@ -151,7 +154,9 @@ namespace Hood.Controllers
                     //await _emailSender.SendEmail(model.Email, "Confirm your account",
                     //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation(3, "User created a new account with password.");
+
+                    await _welcome.ProcessAndSend(new WelcomeEmailModel(user));
+
                     return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
@@ -385,6 +390,9 @@ namespace Hood.Controllers
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 _logger.LogInformation(3, "User created a new account with password.");
+
+                await _welcome.ProcessAndSend(new WelcomeEmailModel(user));
+
                 return RedirectToLocal(returnUrl);
             }
             catch (Exception ex)
