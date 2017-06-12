@@ -68,6 +68,13 @@
                     </div>
                     <small>Note: This will send a formatted welcome email to new account holders.</small>
                 </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="NotifyNewAccount" class="styled">
+                        <label asp-for="NotifyNewAccount"></label>
+                    </div>
+                    <small>Note: This will copy in the NewAccountNotifications role on the above email.</small>
+                </div>
             </div>
             <div class="panel-body form-horizontal">
                 <div class="form-group">
