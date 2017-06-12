@@ -53,17 +53,20 @@ namespace Hood.Models
         }
     }
 
-    public interface IContactFormModel
+    public interface IContactFormModel : IEmailSendable
     {
         string Name { get; set; }
         string Email { get; set; }
-        string PhoneNumber { get; set; }
-        string Enquiry { get; set; }
         string Message { get; set; }
         string Subject { get; set; }
+        string PhoneNumber { get; set; }
+        string Enquiry { get; set; }
         bool ShowValidationMessage { get; set; }
         bool ShowValidationIndividualMessages { get; set; }
+    }
 
+    public interface IEmailSendable
+    {
         MailObject WriteToMessage(MailObject message);
     }
 }

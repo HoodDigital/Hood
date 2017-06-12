@@ -35,7 +35,7 @@ namespace Hood.Controllers
         private readonly IHostingEnvironment _env;
         private readonly ContentCategoryCache _categories;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IFormSenderService _forms;
+        private readonly FormSenderService _forms;
 
         public HomeController(IAccountRepository auth,
                               ContentCategoryCache categories,
@@ -44,7 +44,7 @@ namespace Hood.Controllers
                               IHostingEnvironment env,
                               ISettingsRepository site,
                               IContentRepository content,
-                              IFormSenderService forms)
+                              FormSenderService forms)
         {
             _auth = auth;
             _config = conf;
@@ -233,7 +233,7 @@ namespace Hood.Controllers
             try
             {
                 await _settings.ProcessCaptchaOrThrowAsync(Request);
-                return await _forms.ProcessContactFormModel(model);
+                return await _forms.ProcessAndSend(model);
             }
             catch (Exception ex)
             {

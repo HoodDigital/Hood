@@ -104,7 +104,8 @@ namespace Hood
                 services.AddTransient<IInvoiceService, InvoiceService>();
                 services.AddTransient<IBillingService, BillingService>();
                 services.AddTransient<IEmailSender, EmailSender>();
-                services.AddTransient<IFormSenderService, FormSenderService>();
+                services.AddTransient<FormSenderService>();
+                services.AddTransient<WelcomeEmailSender>();
 
                 services.Configure<RouteOptions>(options =>
                 {

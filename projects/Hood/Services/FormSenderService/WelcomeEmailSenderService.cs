@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Hood.Services
 {
-    public class FormSenderService : IMailSenderService<IContactFormModel>
+    public class WelcomeEmailSender : IMailSenderService<WelcomeEmailModel>
     {
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ISettingsRepository _settings;
@@ -14,7 +14,7 @@ namespace Hood.Services
         private readonly IEmailSender _email;
         private readonly IHostingEnvironment _environment;
 
-        public FormSenderService(IHttpContextAccessor contextAccessor,
+        public WelcomeEmailSender(IHttpContextAccessor contextAccessor,
                               ISettingsRepository site,
                               IRazorViewRenderer renderer,
                               IEmailSender email,
@@ -27,26 +27,25 @@ namespace Hood.Services
             _renderer = renderer;
         }
 
-        public async Task<Models.Response> ProcessAndSend(IContactFormModel model)
+        public async Task<Models.Response> ProcessAndSend(WelcomeEmailModel model)
         {
             try
             {
-                ContactSettings contactSettings = _settings.GetContactSettings();
+                AccountSettings accountSettings = _settings.GetAccountSettings();
+
+                if (!accountSettings.EnableWelcome)
+                    return new Response(true);
 
                 try
                 {
                     MailObject message = new MailObject();
-
-                    string siteEmail = contactSettings.Email;
-                    if (!string.IsNullOrEmpty(siteEmail))
+                    if (accountSettings.NotifyNewAccount)
                     {
-
-                        message.PreHeader = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
-                        message.Subject = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
-                        message.AddH1(_settings.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
-                        message.AddDiv(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
+                        message.PreHeader = _settings.ReplacePlaceholders(accountSettings.WelcomeTitle);
+                        message.Subject = _settings.ReplacePlaceholders(accountSettings.WelcomeSubject + " [COPY]");
+                        message.AddH1(_settings.ReplacePlaceholders(accountSettings.WelcomeTitle));
+                        message.AddDiv(accountSettings.WelcomeMessage);
                         message = model.WriteToMessage(message);
-
 
                         if (_environment.IsDevelopment() || _environment.IsStaging())
                         {
@@ -54,21 +53,21 @@ namespace Hood.Services
                         }
                         else
                         {
-                            message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
-                            await _email.SendEmailAsync(message);
-                            await _email.NotifyRoleAsync(message, "ContactFormNotifications");
+                            await _email.NotifyRoleAsync(message, "NewAccountNotifications");
                         }
+
                     }
 
                     message = new MailObject()
                     {
-                        To = new SendGrid.Helpers.Mail.EmailAddress(model.Email, model.Name),
-                        PreHeader = _settings.ReplacePlaceholders(contactSettings.Subject),
-                        Subject = _settings.ReplacePlaceholders(contactSettings.Subject)
+                        To = new SendGrid.Helpers.Mail.EmailAddress(model.User.Email, model.User.FullName),
+                        PreHeader = _settings.ReplacePlaceholders(accountSettings.WelcomeSubject),
+                        Subject = _settings.ReplacePlaceholders(accountSettings.WelcomeSubject)
                     };
-                    message.AddH1(_settings.ReplacePlaceholders(contactSettings.Title));
-                    message.AddDiv(_settings.ReplacePlaceholders(contactSettings.Message));
+                    message.AddH1(_settings.ReplacePlaceholders(accountSettings.WelcomeTitle));
+                    message.AddParagraph(_settings.ReplacePlaceholders(accountSettings.WelcomeMessage));
                     message = model.WriteToMessage(message);
+
                     await _email.SendEmailAsync(message);
 
                     return new Models.Response(true);
