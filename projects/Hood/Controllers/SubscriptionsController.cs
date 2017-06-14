@@ -211,12 +211,12 @@ namespace Hood.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("stripe/webhooks")]
-        public async Task<StatusCodeResult> WebHooks()
+        public StatusCodeResult WebHooks()
         {
             var json = new StreamReader(Request.Body).ReadToEnd();
             try
             {
-                await _webHooks.ProcessEvent(json);
+                _webHooks.ProcessEvent(json);
                 return new StatusCodeResult(200);
             }
             catch (Exception)

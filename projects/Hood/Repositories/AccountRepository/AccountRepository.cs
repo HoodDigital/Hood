@@ -685,14 +685,14 @@ namespace Hood.Services
             return subscription;
         }
 
-        // WebHooks
-        public async Task<string> ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime)
+        // WebHooks - ALL MUST RUN SYNCRONOUSLY
+        public string ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime)
         {
             StringWriter sw = new StringWriter();
             try
             {
                 sw.WriteLine("[System] Processing [AccountRepository.ConfirmSubscriptionObject].");
-                ApplicationUser user = await GetUserByStripeId(created.CustomerId);
+                ApplicationUser user = GetUserByStripeId(created.CustomerId).Result;
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, created.Id);
                 sw.WriteLine("[DB] [User] Name: " + user.FullName);
                 sw.WriteLine("[DB] [User] Email: " + user.Email);
@@ -733,7 +733,7 @@ namespace Hood.Services
                 sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)] complete.");
                 sw.WriteLine("[System] Saving user subscription to database.");
                 sw.WriteLine("[System] [UpdateUserSubscription(userSub)] complete.");
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
                 sw.WriteLine("[System] Done.");
 
             }
@@ -748,14 +748,13 @@ namespace Hood.Services
             }
             return sw.ToString();
         }
-
-        public async Task<string> UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime)
+        public string UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime)
         {
             StringWriter sw = new StringWriter();
             try
             {
-                sw.WriteLine("[System] Processing [AccountRepository.RemoveUserSubscriptionObject].");
-                ApplicationUser user = await GetUserByStripeId(updated.CustomerId);
+                sw.WriteLine("[System] Processing [AccountRepository.UpdateSubscriptionObject].");
+                ApplicationUser user = GetUserByStripeId(updated.CustomerId).Result;
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
                 sw.WriteLine("[DB] [User] Name: " + user.FullName);
                 sw.WriteLine("[DB] [User] Email: " + user.Email);
@@ -781,7 +780,7 @@ namespace Hood.Services
                 sw.WriteLine("[Stripe] [UserSubscription] EndedAt: " + updated.EndedAt);
                 sw.WriteLine("[Stripe] [UserSubscription] CanceledAt: " + updated.CanceledAt);
 
-                Subscription plan = await GetSubscriptionPlanByStripeId(updated.StripePlan.Id);
+                Subscription plan = GetSubscriptionPlanByStripeId(updated.StripePlan.Id).Result;
                 sw.WriteLine("[Stripe] [UserSubscription] (Plan) Id: " + plan.Id);
                 sw.WriteLine("[Db] [UserSubscription] (Plan) Amount: " + updated.StripePlan.Amount);
                 sw.WriteLine("[Stripe] [UserSubscription] (Plan-Stripe) Amount: " + updated.StripePlan.Amount);
@@ -806,7 +805,7 @@ namespace Hood.Services
                 sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)] complete.");
                 sw.WriteLine("[System] Saving user subscription to database.");
                 sw.WriteLine("[System] [UpdateUserSubscription(userSub)] complete.");
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
                 sw.WriteLine("[System] Done.");
             }
             catch (Exception ex)
@@ -820,13 +819,13 @@ namespace Hood.Services
             }
             return sw.ToString();
         }
-        public async Task<string> RemoveUserSubscriptionObject(StripeSubscription deleted, DateTime? eventTime)
+        public string RemoveUserSubscriptionObject(StripeSubscription deleted, DateTime? eventTime)
         {
             StringWriter sw = new StringWriter();
             try
             {
                 sw.WriteLine("[System] Processing [AccountRepository.RemoveUserSubscriptionObject].");
-                ApplicationUser user = await GetUserByStripeId(deleted.CustomerId);
+                ApplicationUser user = GetUserByStripeId(deleted.CustomerId).Result;
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, deleted.Id);
                 sw.WriteLine("User: " + user.FullName);
                 sw.WriteLine("User Email: " + user.Email);
@@ -867,7 +866,7 @@ namespace Hood.Services
                 sw.WriteLine("[System] [UpdateUserSubscriptionFromStripe(userSub, updated)] complete.");
                 sw.WriteLine("[System] Saving user subscription to database.");
                 sw.WriteLine("[System] [UpdateUserSubscription(userSub)] complete.");
-                await _db.SaveChangesAsync();
+                _db.SaveChanges();
                 sw.WriteLine("[System] Done.");
             }
             catch (Exception ex)
@@ -898,12 +897,12 @@ namespace Hood.Services
             userSubscription.LastUpdated = DateTime.Now;
             return userSubscription;
         }
-        public async Task<UserSubscription> FindUserSubscriptionByStripeId(string id)
+        public UserSubscription FindUserSubscriptionByStripeId(string id)
         {
-            UserSubscription userSub = await _db.UserSubscriptions
+            UserSubscription userSub = _db.UserSubscriptions
                                 .Include(s => s.User)
                                 .Include(s => s.Subscription)
-                                .FirstOrDefaultAsync(c => c.StripeId == id);
+                                .FirstOrDefault(c => c.StripeId == id);
             return userSub;
         }
 

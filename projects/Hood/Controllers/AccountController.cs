@@ -268,7 +268,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Code(string uid, string returnUrl)
+        public IActionResult Code(string uid, string returnUrl)
         {
             var accountSettings = _settings.GetAccountSettings();
             if (!accountSettings.EnableRegistration)

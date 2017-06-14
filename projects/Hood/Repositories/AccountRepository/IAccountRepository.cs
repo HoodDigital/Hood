@@ -51,9 +51,9 @@ namespace Hood.Services
         void ResetBillingInfo();
         Task<ApplicationUser> GetUserByStripeId(string stripeId);
         Task<StripeCustomer> LoadCustomerObject(string stripeId, bool allowNullObject);
-        Task<string> ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime);
-        Task<string> UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
-        Task<string> RemoveUserSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
-        Task<UserSubscription> FindUserSubscriptionByStripeId(string id);
+        string ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime);
+        string UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
+        string RemoveUserSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
+        UserSubscription FindUserSubscriptionByStripeId(string id);
     }
 }
