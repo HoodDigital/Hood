@@ -42,7 +42,6 @@ namespace Hood.Infrastructure
                     if (type != null)
                     {
                         // if a type is matched, we must use the Hood routes, content CMS routes cannot be overridden.
-                        values["area"] = "Hood";
                         if (tokenised.Length > 1)
                         {
                             switch (tokenised[1].ToLower())
