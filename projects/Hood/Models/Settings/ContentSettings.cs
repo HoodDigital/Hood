@@ -43,18 +43,30 @@ namespace Hood.Models
             foreach (var systemType in ContentTypes.All)
             {
                 // Check that this field type exists still.
-                foreach (var type in Types.Where(t => t.BaseName == systemType.BaseName))
+                for (int i = 0; i < Types.Count(); i++)
                 {
-                    foreach (var systemField in systemType.CustomFields)
+                    if (Types[i].BaseName == systemType.BaseName)
                     {
-                        var field = type.CustomFields.Find(f => f.Name == systemField.Name);
-                        if (field == null)
-                            type.CustomFields.Add(field);
-                        else
+                        foreach (var systemField in systemType.CustomFields)
                         {
-                            field.Type = systemField.Type;
-                            field.Default = systemField.Default;
-                            field.System = systemField.System;
+                            if (Types[i].CustomFields.Find(f => f.Name == systemField.Name) == null)
+                            {
+                                var fieldsTemp = Types[i].CustomFields;
+                                fieldsTemp.Add(new CustomField()
+                                {
+                                    System = systemField.System,
+                                    Default = systemField.Default,
+                                    Name = systemField.Name,
+                                    Type = systemField.Type
+                                });
+                                Types[i].CustomFields = fieldsTemp;
+                            }
+                            else
+                            {
+                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).Type = systemField.Type;
+                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).Default = systemField.Default;
+                                Types[i].CustomFields.Find(f => f.Name == systemField.Name).System = systemField.System;
+                            }
                         }
                     }
                 }
