@@ -208,10 +208,13 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                model.CheckBaseFields();
+
                 _settings.Set("Hood.Settings.Content", model);
 
                 // refresh all content metas and things
-                _content.RefreshAllMetas();
+                _content.RefreshAllMetas();                
+
 
                 model.SaveMessage = "Settings saved!";
                 model.MessageType = Enums.AlertType.Success;
@@ -227,7 +230,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult ResetContent()
         {
-            var model = new ContactSettings();
+            var model = new ContentSettings();
             _settings.Set("Hood.Settings.Content", model);
             // refresh all content metas and things
             _content.RefreshAllMetas();
