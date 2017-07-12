@@ -241,6 +241,7 @@ $.hood.Admin = {
             ],
             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage | code',
             link_class_list: $.hood.LinkClasses,
+            image_class_list: $.hood.ImageClasses,
             setup: $.hood.Uploader.Load.Insert,
             content_css: [
             ]
@@ -257,6 +258,7 @@ $.hood.Admin = {
             menubar: false,
             toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage',
             link_class_list: $.hood.LinkClasses,
+            image_class_list: $.hood.ImageClasses,
             setup: $.hood.Uploader.Load.Insert,
             content_css: [
             ]
@@ -273,6 +275,7 @@ $.hood.Admin = {
             menubar: false,
             toolbar: 'bold italic | bullist numlist | undo redo | link | code',
             link_class_list: $.hood.LinkClasses,
+            image_class_list: $.hood.ImageClasses,
             content_css: [
             ]
         });
@@ -288,6 +291,7 @@ $.hood.Admin = {
             menubar: false,
             toolbar: 'bold italic | bullist numlist | undo redo | link',
             link_class_list: $.hood.LinkClasses,
+            image_class_list: $.hood.ImageClasses,
             content_css: [
             ]
         });

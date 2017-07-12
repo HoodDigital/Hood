@@ -10874,6 +10874,37 @@ a.full-box-link {
   padding-top: 151.3%;
   /* tall */
 }
+.post-content img {
+  max-width: 100%;
+}
+img.user-image {
+  max-width: 100%;
+  display: block;
+}
+img.user-image.full {
+  width: 100%;
+}
+img.user-image.left {
+  margin: 0px auto;
+  margin-left: 0px;
+}
+img.user-image.center {
+  margin: 0px auto;
+}
+img.user-image.right {
+  margin: 0px auto;
+  margin-right: 0px;
+}
+img.user-image.inline {
+  display: inline-block;
+  vertical-align: middle;
+}
+img.user-image.inline.top {
+  vertical-align: top;
+}
+img.user-image.inline.bottom {
+  vertical-align: top;
+}
 .bg-img {
   position: absolute;
   overflow: hidden;

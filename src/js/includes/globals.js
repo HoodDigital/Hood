@@ -314,6 +314,19 @@ $.hood.LinkClasses = [
     { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
 ];
 
+$.hood.ImageClasses = [
+    { title: 'None', value: '' },
+    { title: 'Full Width', value: 'user-image full' },
+    { title: 'Left Aligned', value: 'user-image left' },
+    { title: 'Centered', value: 'user-image center' },
+    { title: 'Right Aligned', value: 'user-image right' },
+    { title: 'Inline with text, top aligned', value: 'user-image inline top' },
+    { title: 'Inline with text, middle aligned', value: 'user-image inline' },
+    { title: 'Inline with text, bottom aligned', value: 'user-image inline bottom' },
+    { title: 'Pulled Left', value: 'user-image pull-left' },
+    { title: 'Pulled Right', value: 'user-image pull-right' },
+];
+
 
 
 /*

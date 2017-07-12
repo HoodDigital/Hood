@@ -65,12 +65,12 @@
 
     &.img-full {
         width: 100%;
-        display:block;
+        display: block;
     }
 
-    &.img-square, 
-    &.img-standard, 
-    &.img-wide, 
+    &.img-square,
+    &.img-standard,
+    &.img-wide,
     &.img-mobile-card {
         &:after {
             padding-top: 100%;
@@ -100,6 +100,58 @@
         &:after {
             padding-top: 151.3%;
             /* tall */
+        }
+    }
+}
+
+.post-content, #post-content {
+
+    &:before, &:after {
+        content: " ";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+
+    img {
+        max-width: 100%;
+    }
+}
+
+img.user-image {
+    max-width: 100%;
+    display: block;
+
+    &.full {
+        width: 100%;
+    }
+
+    &.left {
+        margin: 0px auto;
+        margin-left: 0px;
+    }
+
+    &.center {
+        margin: 0px auto;
+    }
+
+    &.right {
+        margin: 0px auto;
+        margin-right: 0px;
+    }
+
+    &.inline {
+        display: inline-block;
+        vertical-align: middle;
+
+        &.top {
+            vertical-align: top;
+        }
+
+        &.bottom {
+            vertical-align: top;
         }
     }
 }
