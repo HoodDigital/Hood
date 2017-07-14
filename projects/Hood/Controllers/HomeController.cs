@@ -308,6 +308,13 @@ namespace Hood.Controllers
             using (var md5 = MD5.Create()) return md5.GetHash(emailAddress.ToLower());
         }
 
+        [ResponseCache(CacheProfileName = "TenMinutes")]
+        [Route("hood/twitter-feed/")]
+        public IActionResult TwitterFeed()
+        {
+            return View();
+        }
+
         [ResponseCache(CacheProfileName = "Month")]
         [Route("terms/")]
         public IActionResult Terms()

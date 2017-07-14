@@ -50,7 +50,7 @@ namespace Hood.Services
         string GetSitemapDocument(IUrlHelper urlHelper);
 
         // Non Content Related
-        Task<List<TweetApi>> GetTweets(string name, int count);
+        Task<List<LinqToTwitter.Status>> GetTweets(string name, int count);
         List<Country> AllCountries();
         Country GetCountry(string name);
         

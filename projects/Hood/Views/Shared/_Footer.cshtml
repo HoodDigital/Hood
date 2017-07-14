@@ -7,7 +7,9 @@
 <hr />
 @if (_plugins.EnableMailchimp)
 {
-    await Html.RenderPartialAsync("_MailchimpForm", new MailchimpFormModel());
+    <div class="container">
+        @{ await Html.RenderPartialAsync("_MailchimpForm", new MailchimpFormModel()); }
+    </div>
     <hr />
 }
 <footer class="footer pb-60">

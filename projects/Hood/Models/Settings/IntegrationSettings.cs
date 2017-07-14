@@ -17,6 +17,12 @@ namespace Hood.Models
         [Display(Name = "Use Hood CDN")]
         public bool UseCDN { get; set; }
 
+        // Twitter Feed
+        [Display(Name = "Twitter Feed")]
+        public bool EnableTwitter { get; set; }
+        [Display(Name = "Twitter Handle")]
+        public string TwitterId { get; set; }
+
         // Disqus
         [Display(Name = "Enable Disqus")]
         public bool EnableDisqus { get; set; }

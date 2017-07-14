@@ -577,10 +577,10 @@ namespace Hood.Services
         }
 
         // Non Content Related
-        public async Task<List<TweetApi>> GetTweets(string name, int count)
+        public async Task<List<LinqToTwitter.Status>> GetTweets(string name, int count = 6)
         {
-            string cacheKey = typeof(TweetApi).ToString() + ".Recent." + name.ToSeoUrl();
-            List<TweetApi> tweets = new List<TweetApi>();
+            string cacheKey = typeof(LinqToTwitter.Status).ToString() + ".Recent." + name.ToSeoUrl();
+            List<LinqToTwitter.Status> tweets = new List<LinqToTwitter.Status>();
             if (_cache.TryGetValue(cacheKey, out tweets))
                 return tweets;
             else
@@ -618,35 +618,32 @@ namespace Hood.Services
                 // first tweet processed on current query
                 maxID = userStatusResponse.Min(status => status.StatusID) - 1;
 
-                do
-                {
-                    // now add sinceID and maxID
-                    userStatusResponse =
-                        (from tweet in twitterCtx.Status
-                         where tweet.Type == LinqToTwitter.StatusType.User &&
-                               tweet.ScreenName == name &&
-                               tweet.Count == count &&
-                               tweet.SinceID == sinceID &&
-                               tweet.MaxID == maxID
-                         select tweet)
-                        .ToList();
+                //do
+                //{
+                //    // now add sinceID and maxID
+                //    userStatusResponse =
+                //        (from tweet in twitterCtx.Status
+                //         where tweet.Type == LinqToTwitter.StatusType.User &&
+                //               tweet.ScreenName == name &&
+                //               tweet.Count == count &&
+                //               tweet.SinceID == sinceID &&
+                //               tweet.MaxID == maxID
+                //         select tweet)
+                //        .ToList();
 
-                    if (userStatusResponse.Count > 0)
-                    {
-                        // first tweet processed on current query
-                        maxID = userStatusResponse.Min(status => status.StatusID) - 1;
+                //    if (userStatusResponse.Count > 0)
+                //    {
+                //        // first tweet processed on current query
+                //        maxID = userStatusResponse.Min(status => status.StatusID) - 1;
 
-                        statusList.AddRange(userStatusResponse);
-                    }
-                }
-                while (userStatusResponse.Count != 0 && statusList.Count < 30);
-
-                var tws = statusList.Where(t => t.Entities.MediaEntities.Where(me => me.Type == "photo").Count() > 0);
-                tweets = tws.Take(6).Select(t => new TweetApi(t)).ToList();
-                _cache.Add(cacheKey, tweets);
+                //        statusList.AddRange(userStatusResponse);
+                //    }
+                //}
+                //while (userStatusResponse.Count != 0 && statusList.Count < 30);
+                tweets = statusList.Take(count).ToList();
+                _cache.Add(cacheKey, tweets, new MemoryCacheEntryOptions() { AbsoluteExpiration = DateTime.Now.AddMinutes(1) });
                 return tweets;
             }
-
         }
         public List<Country> AllCountries()
         {
