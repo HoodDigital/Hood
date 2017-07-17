@@ -356,7 +356,7 @@ namespace Hood.Extensions
         {
             string x = m.ToString();
             string tag = x.Replace("#", "%23");
-            return x.Link("http://search.twitter.com/search?q=" + tag);
+            return x.Link("http://twitter.com/search?q=" + tag);
         }
         private static string Username(Match m)
         {
