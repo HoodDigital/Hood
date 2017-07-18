@@ -35,6 +35,10 @@ namespace Hood.Controllers
 
         public async Task<IActionResult> Index(ListPropertyModel model)
         {
+            var propertySettings = _settings.GetPropertySettings();
+            if (!propertySettings.Enabled || !propertySettings.ShowList)
+                return NotFound();
+
             if (model == null)
                 model = new ListPropertyModel();
             if (model.Filters == null)
@@ -53,6 +57,10 @@ namespace Hood.Controllers
         [Route("property/{id}/{city}/{postcode}/{title}")]
         public IActionResult Show(int id)
         {
+            var propertySettings = _settings.GetPropertySettings();
+            if (!propertySettings.Enabled || !propertySettings.ShowItem)
+                return NotFound();
+
             ShowPropertyModel um = new ShowPropertyModel()
             {
                 Property = _property.GetPropertyById(id)
