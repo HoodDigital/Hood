@@ -13,6 +13,7 @@ namespace Hood.Controllers
     //[Area("Hood")]
     public class PropertyController : Controller
     {
+
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPropertyRepository _property;
         private readonly ISettingsRepository _settings;
