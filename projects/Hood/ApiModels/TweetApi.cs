@@ -30,24 +30,23 @@ namespace Hood.Models.Api
 
             AvatarUrl = "/images/twitter.jpg";
             if (tweet.Entities.MediaEntities.Count() > 0)
-            {
                 AvatarUrl = tweet.Entities.MediaEntities[0].MediaUrlHttps;
-            }
             else
             {
                 if (Retweet)
                 {
                     if (tweet.RetweetedStatus.Entities.MediaEntities.Count() > 0)
                     {
-                        AvatarUrl = tweet.Entities.MediaEntities[0].MediaUrlHttps;
+                        if (tweet.Entities.MediaEntities.Count() > 0)
+                            AvatarUrl = tweet.Entities.MediaEntities[0].MediaUrlHttps;
+                        else
+                            AvatarUrl = tweet.RetweetedStatus.User.ProfileBannerUrl;
                     }
                     else
                         AvatarUrl = tweet.RetweetedStatus.User.ProfileBannerUrl;
                 }
                 else
-                {
                     AvatarUrl = tweet.User.ProfileBannerUrl;
-                }
             }
 
             if (Retweet)
