@@ -87,17 +87,35 @@ namespace Hood.Services
             if (published)
                 properties = properties.Where(p => p.Status == (int)Status.Published);
 
-            // posts by author
+            if (!string.IsNullOrEmpty(propertyFilters.Transaction))
+            {
+                if (propertyFilters.Transaction == "Rent")
+                {
+                    properties = properties.Where(n => n.ListingType == "Long Term" ||
+                                                       n.ListingType == "Short Term" ||
+                                                       n.ListingType == "Student" ||
+                                                       n.ListingType == "Long Term");
+                }
+                else
+                {
+                    properties = properties.Where(n => n.ListingType == "Not Specified" ||
+                                                       n.ListingType == "Commercial" ||
+                                                       n.ListingType == "Lease for sale" ||
+                                                       n.ListingType == "Sale");
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(propertyFilters.Type))
+                    properties = properties.Where(n => n.ListingType == propertyFilters.Type);
+            }
+
             if (!string.IsNullOrEmpty(propertyFilters.Agent))
                 properties = properties.Where(n => n.Agent.UserName == propertyFilters.Agent);
 
-            // posts by author
             if (!string.IsNullOrEmpty(propertyFilters.PlanningType))
                 properties = properties.Where(n => n.Planning == propertyFilters.PlanningType);
 
-            // posts by author
-            if (!string.IsNullOrEmpty(propertyFilters.Type))
-                properties = properties.Where(n => n.ListingType == propertyFilters.Type);
 
             if (propertyFilters.Bedrooms.HasValue)
                 properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);

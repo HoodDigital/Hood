@@ -3,6 +3,7 @@
     public class PropertyFilters : ListFilters
     {
         public string Type { get; set; }
+        public string Transaction { get; set; }
         public string PlanningType { get; set; }
         public string Location { get; set; }
         public int? Bedrooms { get; set; }
