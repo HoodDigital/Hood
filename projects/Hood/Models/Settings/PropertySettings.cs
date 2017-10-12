@@ -221,7 +221,8 @@ namespace Hood.Models
             { 3,  "Student" },
             { 4,  "Commercial" },
             { 5,  "Lease for sale" },
-            { 6,  "Sub-lease" }
+            { 6,  "Sub-lease" },
+            { 7,  "Sale" }
         };
 
         public static Dictionary<int, string> LeaseStatuses = new Dictionary<int, string>()
