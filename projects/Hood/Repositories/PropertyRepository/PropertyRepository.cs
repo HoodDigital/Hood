@@ -99,10 +99,8 @@ namespace Hood.Services
             if (!string.IsNullOrEmpty(propertyFilters.Type))
                 properties = properties.Where(n => n.ListingType == propertyFilters.Type);
 
-            if (propertyFilters.MinBedrooms.HasValue)
-                properties = properties.Where(n => n.Bedrooms >= propertyFilters.MinBedrooms.Value);
-            if (propertyFilters.MaxBedrooms.HasValue)
-                properties = properties.Where(n => n.Bedrooms <= propertyFilters.MaxBedrooms.Value);
+            if (propertyFilters.Bedrooms.HasValue)
+                properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);
 
             if (propertyFilters.MinRent.HasValue)
                 properties = properties.Where(n => n.Rent >= propertyFilters.MinRent.Value);

@@ -5,8 +5,7 @@
         public string Type { get; set; }
         public string PlanningType { get; set; }
         public string Location { get; set; }
-        public int? MinBedrooms { get; set; }
-        public int? MaxBedrooms { get; set; }
+        public int? Bedrooms { get; set; }
         public int? MaxRent { get; set; }
         public int? MinRent { get; set; }
         public int? MaxPrice { get; set; }
