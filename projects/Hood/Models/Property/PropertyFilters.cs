@@ -16,5 +16,6 @@
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string Agent { get; set; }
+        public string Status { get; set; }
     }
 }

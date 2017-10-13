@@ -116,6 +116,8 @@ namespace Hood.Services
             if (!string.IsNullOrEmpty(propertyFilters.PlanningType))
                 properties = properties.Where(n => n.Planning == propertyFilters.PlanningType);
 
+            if (!string.IsNullOrEmpty(propertyFilters.Status))
+                properties = properties.Where(n => n.LeaseStatus == propertyFilters.Status);
 
             if (propertyFilters.Bedrooms.HasValue)
                 properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);
