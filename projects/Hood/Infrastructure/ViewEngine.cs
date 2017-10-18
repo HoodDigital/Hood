@@ -37,9 +37,12 @@ namespace Hood.Services
             {
                 baseLocation + "/Views/{0}.cshtml",
                 baseLocation + "/Views/{1}/{0}.cshtml",
+                baseLocation + "/Views/Layouts/{1}/{0}.cshtml",
                 baseLocation + "/Views/Layouts/{0}.cshtml",
+                baseLocation + "/Views/Shared/{1}/{0}.cshtml",
                 baseLocation + "/Views/Shared/{0}.cshtml",
                 baseLocation + "/Views/Templates/{0}.cshtml",
+                baseLocation + "/Views/Components/{1}/{0}.cshtml",
                 baseLocation + "/Views/Components/{0}.cshtml"
             };
         }
