@@ -129,9 +129,35 @@ namespace Hood.Extensions
 
         public static string ToSentenceCase(this string str)
         {
-            return Regex.Replace(str, "[a-z][A-Z]", m => m.Value[0] + " " + char.ToLower(m.Value[1]));
+            return Regex.Replace(str, "[a-z][A-Z][0-9]", m => m.Value[0] + " " + char.ToLower(m.Value[1]));
         }
 
+        public static string CamelCaseToString(this string str, bool titleCase = true)
+        {
+            if (str == null || str.Length == 0)
+                return null;
+
+            StringBuilder retVal = new StringBuilder(32);
+
+            retVal.Append(char.ToUpper(str[0]));
+            for (int i = 1; i < str.Length; i++)
+            {
+                if ((char.IsUpper(str[i]) && !char.IsUpper(str[i - 1])) || (char.IsNumber(str[i]) && !char.IsNumber(str[i-1])))
+                {
+                    retVal.Append(" ");
+                    if (titleCase)
+                        retVal.Append(char.ToUpper(str[i]));
+                    else
+                        retVal.Append(char.ToLower(str[i]));
+                }
+                else
+                {
+                    retVal.Append(str[i]);
+                }
+            }
+
+            return retVal.ToString();
+        }
         public static string StripLineBreaks(this string value)
         {
             if (String.IsNullOrEmpty(value))

@@ -114,6 +114,31 @@ namespace Hood.Areas.Admin.Controllers
                     property.Metadata = new List<PropertyMeta>();
                 property.AddMeta(new PropertyMeta("PlanningDescription", type));
             }
+
+            // if the site's edit form has special properties, add them to metas:
+            foreach (var val in Request.Form)
+            {
+                if (val.Key.StartsWith("Meta:"))
+                {
+                    // bosh we have a meta
+                    if (property.HasMeta(val.Key.Replace("Meta:", "")))
+                    {
+                        property.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                    }
+                    else
+                    {
+                        // Add it...
+                        property.AddMeta(new PropertyMeta()
+                        {
+                            PropertyId = property.Id,
+                            Name = val.Key.Replace("Meta:", ""),
+                            Type = "System.String",
+                            BaseValue = JsonConvert.SerializeObject(val.Value)
+                        });
+                    }
+                }
+            }
+
             property.LastEditedBy = User.Identity.Name;
             property.LastEditedOn = DateTime.Now;
             OperationResult result = _property.UpdateProperty(property);
@@ -138,6 +163,26 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        [Route("admin/property/addfeature/{id}/")]
+        public IActionResult AddFeature(int id)
+        {
+            var property = _property.GetPropertyById(id, true);
+            int? count = property.Metadata?.Where(m => m.Name.Contains("Feature")).Count();
+            if (!count.HasValue)
+                count = 0;
+
+            property.AddMeta(new PropertyMeta()
+            {
+                PropertyId = property.Id,
+                Name = "Feature" + (count + 1).ToString(),
+                Type = "System.String",
+                BaseValue = JsonConvert.SerializeObject("")
+            });
+            _property.UpdateProperty(property);
+
+            return RedirectToAction("Edit", new { id = property.Id });
         }
 
         [Authorize(Roles = "SuperUser,Admin")]
@@ -219,6 +264,18 @@ namespace Hood.Areas.Admin.Controllers
                 if (property.Metadata == null)
                     property.Metadata = new List<PropertyMeta>();
                 property.UpdateMeta("PlanningDescription", _settings.GetPropertySettings().GetPlanningTypes().FirstOrDefault().Value);
+
+                for (int i = 0; i < 11; i++)
+                {
+                    property.AddMeta(new PropertyMeta()
+                    {
+                        PropertyId = property.Id,
+                        Name = "Feature" + i.ToString(),
+                        Type = "System.String",
+                        BaseValue = JsonConvert.SerializeObject("")
+                    });
+                }
+
                 result = _property.UpdateProperty(property);
                 if (!result.Succeeded)
                 {

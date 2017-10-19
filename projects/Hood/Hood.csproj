@@ -39,6 +39,76 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Admin\Views\Property\Create.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\Edit.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\EditorFloorplans.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\EditorGallery.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\Index.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Descriptions.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Details.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Features.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Hidden.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Info.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Media.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Metadata.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Prices.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Property.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_Editor_Sidebar.cshtml" />
+    <None Remove="Areas\Admin\Views\Property\_ListTemplate.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Areas\Admin\Views\Property\Create.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\Edit.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\EditorFloorplans.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\EditorGallery.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\Index.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Descriptions.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Details.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Features.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Hidden.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Info.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Media.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Metadata.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Prices.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Property.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_Editor_Sidebar.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Areas\Admin\Views\Property\_ListTemplate.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="linqtotwitter" Version="4.1.0" />
     <PackageReference Include="MediaTypeMap" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.ViewCompilation" Version="1.1.1">

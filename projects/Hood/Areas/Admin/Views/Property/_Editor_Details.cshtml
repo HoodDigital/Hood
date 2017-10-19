@@ -1,7 +1,8 @@
-@model PropertyListingApi
+@model PropertyListing
 @inject IContentRepository _data
 @{
     PropertySettings _propertySettings = _settings.GetPropertySettings();
+    PropertyListingApi mapi = _settings.ToPropertyListingApi(Model);
 }
 <div id="details" class="tab-pane">
     <div class="panel-body">
@@ -74,9 +75,9 @@
                             <div class="col-xs-12">
                                 <input type="hidden" asp-for="Floors" />
                                 <div class="floor-list">
-                                    @if (Model.FloorAreas?.Count > 0)
+                                    @if (mapi.FloorAreas?.Count > 0)
                                             {
-                                            @foreach (var floor in Model.FloorAreas)
+                                            @foreach (var floor in mapi.FloorAreas)
                                                 {
                                             <div class="row m-b-xs">
                                                 <div class="col-xs-4"><strong>@floor.Name</strong> @floor.Number</div>
@@ -103,7 +104,7 @@
                             </div>
                             <div class="col-xs-2 no-padding">
                                 <small>Number:</small>
-                                <input id="Floor-Number" type="number" step="1" class="form-control" value="@(Model.FloorAreas == null ? 0 : Model.FloorAreas.Count)" />
+                                <input id="Floor-Number" type="number" step="1" class="form-control" value="@(mapi.FloorAreas == null ? 0 : mapi.FloorAreas.Count)" />
                             </div>
                             <div class="col-xs-3 no-padding">
                                 <small>Metres<sup>2</sup>:</small>

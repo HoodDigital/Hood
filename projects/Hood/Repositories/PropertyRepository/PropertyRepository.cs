@@ -32,6 +32,8 @@ namespace Hood.Services
         {
             try
             {
+
+
                 _db.Properties.Add(property);
                 _db.SaveChanges();
                 var result = new OperationResult<PropertyListing>(property);
