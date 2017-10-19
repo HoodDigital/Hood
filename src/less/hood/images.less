@@ -104,7 +104,17 @@
     }
 }
 
-.post-content {
+.post-content, #post-content {
+
+    &:before, &:after {
+        content: " ";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+
     img {
         max-width: 100%;
     }

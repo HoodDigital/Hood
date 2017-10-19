@@ -215,7 +215,6 @@ gulp.task("js:package:admin", function () {
         hood.js + "includes/inline.js",
         hood.js + "includes/core.js",
         hood.js + "includes/media.js",
-        hood.js + "includes/options.js",
         hood.js + "includes/users.js",
         hood.js + "includes/themes.js",
         hood.js + "includes/property.js",

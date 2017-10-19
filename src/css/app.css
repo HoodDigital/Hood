@@ -11030,7 +11030,19 @@ a.full-box-link {
   padding-top: 151.3%;
   /* tall */
 }
-.post-content img {
+.post-content:before,
+#post-content:before,
+.post-content:after,
+#post-content:after {
+  content: " ";
+  display: table;
+}
+.post-content:after,
+#post-content:after {
+  clear: both;
+}
+.post-content img,
+#post-content img {
   max-width: 100%;
 }
 img.user-image {
