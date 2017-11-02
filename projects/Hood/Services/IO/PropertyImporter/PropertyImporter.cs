@@ -409,7 +409,7 @@ namespace Hood.Services
             // Images
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")))
             {
-                if (data[key].IsSet() && !data[key].Contains("60"))
+                if (data[key].IsSet() && !key.Contains("60"))
                 {
                     // We have an image, download it with the FTPService
                     GetFileFromFtp(data[key]);
@@ -453,6 +453,46 @@ namespace Hood.Services
                                 // add it.
                                 property.FeaturedImage = mediaResult;
                             }
+                        }
+                    }
+                    MarkCompleteTask("Attached image successfully.");
+                }
+                else if (data[key].IsSet() && (key.Contains("60") || key.Contains("61")))
+                {
+                    // We have an EPC, download it with the FTPService.
+                    GetFileFromFtp(data[key]);
+                    if (!HasFileError())
+                    {
+                        Lock.AcquireWriterLock(Timeout.Infinite);
+                        StatusMessage = "Thumbnailing and processing EPC...";
+                        Lock.ReleaseWriterLock();
+
+                        string imageFile = TempFolder + data[key];
+                        SiteMedia mediaResult = null;
+                        FileInfo fi = new FileInfo(imageFile);
+                        string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
+                        using (var s = File.OpenRead(imageFile))
+                        {
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.MimeTypeMap.GetMimeType("pdf"), fi.Length, new SiteMedia() { Directory = "Property" });
+                        }
+                        if (mediaResult != null)
+                        {
+                            string url = mediaResult.Url;
+                            if (!property.HasMeta("EnergyPerformanceCertificate"))
+                                property.AddMeta(new PropertyMeta("EnergyPerformanceCertificate", url));
+                            else
+                                property.UpdateMeta("EnergyPerformanceCertificate", url);
+
+                            var existing = _db.Media.SingleOrDefault(m => m.Filename == fileName);
+                            if (existing == null)
+                                _db.Media.Add(mediaResult);
+                            else
+                            {
+                                _db.Media.Remove(existing);
+                                _db.Media.Add(mediaResult);
+                            }
+
+                            _db.SaveChanges();
                         }
                     }
                     MarkCompleteTask("Attached image successfully.");
