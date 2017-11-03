@@ -2,7 +2,7 @@
 
 namespace Hood.Services
 {
-    internal class SubscriptionsEventListener
+    public class SubscriptionsEventListener
     {
         private readonly EventsService _events;
 
