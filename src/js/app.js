@@ -474,6 +474,7 @@ $.hood.App = {
             $('body').on('submit', '.contact-form', function (e) {
                 e.preventDefault();
                 if ($('.g-recaptcha')) {
+                    grecaptcha.reset();
                     grecaptcha.execute();
                 } else {
                     $.hood.App.ContactForms.Submit($(this).attr('id'));
