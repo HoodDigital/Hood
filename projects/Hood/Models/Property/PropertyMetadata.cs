@@ -2,7 +2,15 @@
 
 namespace Hood.Models
 {
-    public partial class PropertyMeta : IMetadata
+    public class PropertyMeta : PropertyMeta<HoodIdentityUser>
+    {
+        public PropertyMeta(string name, string value, string type = "System.String")
+            : base(name, value, type)
+        {
+        }
+    }
+
+    public partial class PropertyMeta<TUser> : IMetadata where TUser : IHoodUser
     {
         public int Id { get; set; }
         public string BaseValue { get; set; }
@@ -10,7 +18,7 @@ namespace Hood.Models
         public string Type { get; set; }
 
         public int PropertyId { get; set; }
-        public PropertyListing Property { get; set; }
+        public PropertyListing<TUser> Property { get; set; }
 
         public PropertyMeta()
         {

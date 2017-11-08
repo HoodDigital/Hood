@@ -187,7 +187,7 @@ namespace Hood.Services
 
             // Get a reference to the blob named blobReference
             CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(blobReference);
-            blockBlob.UploadFromStream(stream);
+            await blockBlob.UploadFromStreamAsync(stream);
             return blockBlob;
         }
 
@@ -290,7 +290,7 @@ namespace Hood.Services
 
             // Get a reference to the blob named blobReference
             CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(filename);
-            blockBlob.UploadFromStream(file);
+            await blockBlob.UploadFromStreamAsync(file);
 
             // Create a new access policy and define its constraints.
             // Note that the SharedAccessBlobPolicy class is used both to define the parameters of an ad-hoc SAS, and

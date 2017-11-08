@@ -50,7 +50,7 @@ namespace Hood.Services
         private int Processed { get; set; }
         private string StatusMessage { get; set; }
         private bool Cancelled { get; set; }
-        private DefaultHoodDbContext _db { get; set; }
+        private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IEmailSender _email;
         private HttpContext _context;

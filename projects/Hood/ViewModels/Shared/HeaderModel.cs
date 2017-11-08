@@ -2,10 +2,10 @@
 
 namespace Hood.Models
 {
-    public class HeaderModel
+    public class HeaderModel<TUser> where TUser : IHoodUser
     {
-        public List<Content> Pages { get; internal set; }
-        public ApplicationUser User { get; internal set; }
-        public AccountInfo Subscription { get; internal set; }
+        public List<Content<TUser>> Pages { get; internal set; }
+        public TUser User { get; internal set; }
+        public AccountInfo<TUser> Subscription { get; internal set; }
     }
 }

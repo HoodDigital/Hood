@@ -430,7 +430,7 @@ namespace Hood.Services
         #region "Categories" 
         public async Task<ContentCategory> GetCategoryById(int categoryId)
         {
-            var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.ContentCategoryId == categoryId);
+            var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
             return category;
         }
         public IEnumerable<ContentCategory> GetCategories(int contentId)
@@ -487,7 +487,7 @@ namespace Hood.Services
         }
         public async Task<OperationResult> DeleteCategory(int categoryId)
         {
-            var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.ContentCategoryId == categoryId);
+            var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
             _db.Entry(category).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
             _events.triggerContentChanged(this);

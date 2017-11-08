@@ -1,8 +1,17 @@
 ﻿using Hood.Extensions;
+using Hood.Interfaces;
 
 namespace Hood.Models.Api
 {
-    public partial class AddressApi
+    public class AddressApi : AddressApi<HoodIdentityUser>
+    {
+        public AddressApi(IAddress address, IHoodUser user = null)
+            : base(address, user)
+        {
+        }
+    }
+
+    public partial class AddressApi<TUser> where TUser : IHoodUser
     {
         public int Id { get; set; }
         public string UserId { get; set; }
@@ -25,7 +34,8 @@ namespace Hood.Models.Api
         public bool IsDelivery { get; set; }
         public bool IsBilling { get; set; }
 
-        public AddressApi(Address address, ApplicationUser user = null)
+        public AddressApi(IAddress address, IHoodUser user = null)
+            
         {
             if (address == null)
                 return;

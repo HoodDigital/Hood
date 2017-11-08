@@ -4,15 +4,40 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Hood.Interfaces;
 using Hood.Extensions;
+using Hood.Entities;
 
 namespace Hood.Models
 {
-    // Add profile data for application users by adding properties to the ApplicationUser class
-    public partial class Subscription
+    public partial class Subscription : SubscriptionBase
     {
-        // Content
-        [Key]
-        public int Id { get; set; }
+        public List<UserSubscription> Users { get; set; }
+        public int SubscriberCount
+        {
+            get
+            {
+                if (Users == null)
+                    return 0;
+                else
+                    return Users.Count;
+            }
+        }
+    }
+    public partial class Subscription<TUser> : BaseEntity where TUser : IHoodUser
+    {
+        public List<UserSubscription<TUser>> Users { get; set; }
+        public int SubscriberCount
+        {
+            get
+            {
+                if (Users == null)
+                    return 0;
+                else
+                    return Users.Count;
+            }
+        }
+    }
+    public abstract class SubscriptionBase : BaseEntity
+    {
         public string StripeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -33,15 +58,6 @@ namespace Hood.Models
         public string StatementDescriptor { get; set; }
         public int? TrialPeriodDays { get; set; }
 
-        public int SubscriberCount {
-            get
-            {
-                if (Users == null)
-                    return 0;
-                else
-                    return Users.Count;
-            }
-        }
         public string Price
         {
             get
@@ -96,9 +112,6 @@ namespace Hood.Models
                 return false;
             return true;
         }
-
-        public List<UserSubscription> Users { get; set; }
-
     }
 }
 

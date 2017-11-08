@@ -7,9 +7,9 @@ namespace Hood.Extensions
 {
     public static class HttpContextExtensions
     {
-        public static AccountInfo GetAccountInfo(this HttpContext context)
+        public static AccountInfo<HoodIdentityUser> GetAccountInfo(this HttpContext context)
         {
-            return context.Items["AccountInfo"] as AccountInfo;
+            return context.Items["AccountInfo"] as AccountInfo<HoodIdentityUser>;
         }
 
         public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)

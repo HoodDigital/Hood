@@ -19,8 +19,8 @@ namespace Hood.Controllers
     //[Area("Hood")]
     public class BillingController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
+        private readonly SignInManager<HoodIdentityUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
@@ -32,8 +32,8 @@ namespace Hood.Controllers
 
         public BillingController(
             IContentRepository data,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            UserManager<HoodIdentityUser> userManager,
+            SignInManager<HoodIdentityUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
             ILoggerFactory loggerFactory,
@@ -46,7 +46,7 @@ namespace Hood.Controllers
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<AccountController>();
+            _logger = loggerFactory.CreateLogger<BillingController>();
             _data = data;
             _settings = site;
             _auth = auth;
@@ -58,8 +58,8 @@ namespace Hood.Controllers
         [Route("account/billing/")]
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
-            AccountInfo account = HttpContext.GetAccountInfo();
-            BillingHomeModel model = new BillingHomeModel()
+            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
+            BillingHomeModel<HoodIdentityUser> model = new BillingHomeModel<HoodIdentityUser>()
             {
                 User = account.User
             };
@@ -91,18 +91,18 @@ namespace Hood.Controllers
         [Route("account/billing/cards/add/")]
         public async Task<IActionResult> AddCard()
         {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
+            HoodIdentityUser user = await _userManager.GetUserAsync(User);
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/billing/cards/add/")]
-        public async Task<IActionResult> AddCard(SubscriptionModel model, string returnUrl = null)
+        public async Task<IActionResult> AddCard(SubscriptionModel<HoodIdentityUser> model, string returnUrl = null)
         {
             try
             {
-                ApplicationUser user = await _userManager.GetUserAsync(User);
+                HoodIdentityUser user = await _userManager.GetUserAsync(User);
 
                 // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
                 if (user.StripeId.IsSet())
@@ -152,7 +152,7 @@ namespace Hood.Controllers
         {
             try
             {
-                AccountInfo account = HttpContext.GetAccountInfo();
+                AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
                 await _billing.Customers.SetDefaultCard(account.User.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
             }
@@ -168,7 +168,7 @@ namespace Hood.Controllers
         {
             try
             {
-                AccountInfo account = HttpContext.GetAccountInfo();
+                AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
                 await _billing.Cards.DeleteCard(account.User.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
             }

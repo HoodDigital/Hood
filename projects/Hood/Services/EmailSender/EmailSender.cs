@@ -17,10 +17,10 @@ namespace Hood.Services
         private Models.MailSettings _mail;
         private Models.BasicSettings _info;
         private readonly IRazorViewRenderer _renderer;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
 
         public EmailSender(IHttpContextAccessor contextAccessor,
-            UserManager<ApplicationUser> userManager,
+            UserManager<HoodIdentityUser> userManager,
             ISettingsRepository site,
             IRazorViewRenderer renderer)
         {

@@ -4,18 +4,18 @@ using Hood.Infrastructure;
 
 namespace Hood.Models
 {
-    public class EditContentModel
+    public partial class EditContentModel
     {
         public Content Content { get; set; }
         public ContentType Type { get; set; }
         public List<ContentCategory> Categories { get; set; }
         public List<string> Templates { get; set; }
         public IEnumerable<Subscription> Subscriptions { get; set; }
-        public IList<ApplicationUser> Authors { get; internal set; }
+        public IList<HoodIdentityUser> Authors { get; internal set; }
         public OperationResult SaveResult { get; internal set; }
     }
 
-    public class EditContentModelSend
+    public partial class EditContentModelSend
     {
         public int Id { get; set; }
         public string Title { get; set; }

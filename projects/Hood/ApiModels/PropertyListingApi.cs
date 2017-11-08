@@ -8,7 +8,11 @@ using System.Linq;
 
 namespace Hood.Models.Api
 {
-    public class PropertyListingApi : IAddress
+    public partial class PropertyListingApi : PropertyListingApi<HoodIdentityUser>
+    {
+    }
+
+    public partial class PropertyListingApi<TUser> : IAddress where TUser : IHoodUser
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -121,11 +125,11 @@ namespace Hood.Models.Api
                 return FloorAreas.Select(f => f.SquareFeet).Sum();
             }
         }
-        public ApplicationUserApi Agent { get; set; }
+        public ApplicationUserApi<TUser> Agent { get; set; }
         public MediaApi FeaturedImage { get; set; }
         public MediaApi InfoDownload { get; set; }
 
-        public List<MetaDataApi<PropertyMeta>> Meta { get; set; }
+        public List<MetaDataApi<PropertyMeta<TUser>>> Meta { get; set; }
         public List<MediaApi> Media { get; set; }
         public List<MediaApi> FloorPlans { get; set; }
 
@@ -143,7 +147,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public PropertyListingApi(PropertyListing post, ISettingsRepository settings = null)
+        public PropertyListingApi(PropertyListing<TUser> post, ISettingsRepository<TUser> settings = null)
         {
             var mediaSettings = settings.GetMediaSettings();
             var propertySettings = settings.GetPropertySettings();
@@ -166,9 +170,9 @@ namespace Hood.Models.Api
                 InfoDownload = MediaApi.Blank(mediaSettings);
 
             if (post.Metadata != null)
-                Meta = post.Metadata.Select(c => new MetaDataApi<PropertyMeta>(c)).ToList();
+                Meta = post.Metadata.Select(c => new MetaDataApi<PropertyMeta<TUser>>(c)).ToList();
             else
-                Meta = new List<MetaDataApi<PropertyMeta>>();
+                Meta = new List<MetaDataApi<PropertyMeta<TUser>>>();
 
             if (post.Media != null)
                 Media = post.Media.Select(c => new MediaApi(c, settings)).ToList();
@@ -180,7 +184,7 @@ namespace Hood.Models.Api
             else
                 FloorPlans = new List<MediaApi>();
 
-            Agent = new ApplicationUserApi(post.Agent, settings);
+            Agent = new ApplicationUserApi<TUser>(post.Agent, settings);
 
             PublishPending = false;
             PublishDatePart = PublishDate.ToShortDateString();

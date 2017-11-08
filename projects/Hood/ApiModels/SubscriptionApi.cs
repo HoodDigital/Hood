@@ -4,7 +4,14 @@ using System.Linq;
 
 namespace Hood.Models.Api
 {
-    public class SubscriptionApi
+    public partial class SubscriptionApi : SubscriptionApi<HoodIdentityUser>
+    {
+        public SubscriptionApi(Subscription sub) 
+            : base(sub)
+        {
+        }
+    }
+    public class SubscriptionApi<TUser> where TUser : IHoodUser
     {
         public int Id { get; set; }
         public string StripeId { get; set; }
@@ -51,7 +58,7 @@ namespace Hood.Models.Api
             }
         }
 
-        public SubscriptionApi(Subscription sub)
+        public SubscriptionApi(Subscription<TUser> sub)
         {
             if (sub == null)
                 return;
@@ -66,7 +73,6 @@ namespace Hood.Models.Api
                 SubscriberCount = sub.Users.Count;
                 ActiveSubscribers = sub.Users.Where(u => u.Status == "active" || u.Status == "trialing").Count();
             }
-
         }
     }
 }

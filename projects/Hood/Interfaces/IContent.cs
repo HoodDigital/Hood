@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Hood.Models;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Interfaces
 {
-    public interface IContent<TMetadata, TMediaItem> : IMetaObect<TMetadata>
+    public interface IContent<TMetadata, TMediaItem, TUser> : IMetaObect<TMetadata>
         where TMetadata : IMetadata
         where TMediaItem : IMediaObject
+        where TUser : IHoodUser
     {
 
         // Content
@@ -41,5 +44,16 @@ namespace Hood.Interfaces
         // Settings
         bool AllowComments { get; set; }
         bool Public { get; set; }
+
+        List<ContentCategoryJoin> Categories { get; set; }
+        List<TMediaItem> Media { get; set; }
+        List<ContentTagJoin> Tags { get; set; }
+
+        [NotMapped]
+        string TagString{get;}
+        bool IsInCategory(string category);
+        void AddTag(string value);
+        void RemoveTag(string value);
+
     }
 }

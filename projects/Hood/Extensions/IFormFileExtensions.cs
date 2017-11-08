@@ -13,8 +13,7 @@ namespace Hood.Extensions
         {
             string filename = ContentDispositionHeaderValue
                       .Parse(file.ContentDisposition)
-                      .FileName
-                      .Trim('"'); // FileName returns "fileName.ext"(with double quotes) in beta 3
+                      .FileName.ToString();
             return filename;
         }
 

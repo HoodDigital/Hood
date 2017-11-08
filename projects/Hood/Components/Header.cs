@@ -8,17 +8,15 @@ namespace Hood.ViewComponents
     public class Header : ViewComponent
     {
         private readonly IContentRepository _content;
-        private readonly IShoppingCart _cart;
 
-        public Header(IContentRepository content, IShoppingCart cart)
+        public Header(IContentRepository content)
         {
             _content = content;
-            _cart = cart;
         }
 
         public IViewComponentResult Invoke()
         {
-            HeaderModel model = new HeaderModel()
+            HeaderModel<HoodIdentityUser> model = new HeaderModel<HoodIdentityUser>()
             {
                 Pages = _content.GetContentByType("page"),
                 Subscription = HttpContext.GetAccountInfo()

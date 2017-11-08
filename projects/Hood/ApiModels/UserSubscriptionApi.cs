@@ -1,9 +1,23 @@
 ﻿using Hood.Extensions;
+using Hood.Interfaces;
 using System;
 
 namespace Hood.Models.Api
 {
-    public class UserSubscriptionApi
+    public partial class UserSubscriptionApi : UserSubscriptionApi<HoodIdentityUser>
+    {
+        public UserSubscriptionApi(UserSubscription sub) 
+            :base(null)
+        {
+            if (sub == null)
+                return;
+            sub.CopyProperties(this);
+            StripeId = sub.Subscription.StripeId;
+            Tiered = !sub.Subscription.Addon;
+            Level = sub.Subscription.Level;
+        }
+    }
+    public partial class UserSubscriptionApi<TUser> where TUser : IHoodUser
     {
         public bool Confirmed { get; set; }
         public bool Deleted { get; set; }
@@ -27,7 +41,7 @@ namespace Hood.Models.Api
         public bool Tiered { get; internal set; }
         public int Level { get; internal set; }
 
-        public UserSubscriptionApi(UserSubscription sub)
+        public UserSubscriptionApi(UserSubscription<TUser> sub)
         {
             if (sub == null)
                 return;

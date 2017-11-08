@@ -81,8 +81,8 @@ namespace Hood.Services
         private bool Cancelled { get; set; }
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
-        private AccountInfo Account { get; set; }
-        private DefaultHoodDbContext _db { get; set; }
+        private AccountInfo<HoodIdentityUser> Account { get; set; }
+        private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
 
@@ -113,9 +113,9 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = _settings.GetPropertySettings();
                 // Get a new instance of the HoodDbContext for this import.
-                var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
+                var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                _db = new DefaultHoodDbContext(options.Options);
+                _db = new HoodDbContext(options.Options);
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(ImportFromFTP);
@@ -158,8 +158,8 @@ namespace Hood.Services
                 // Go through the file, and extract key/value pairs of
                 List<Dictionary<string, string>> properties = GetPropertiesFromFile();
 
-                List<PropertyListing> feedProperties = new List<PropertyListing>();
-                List<PropertyListing> siteProperties = _db.Properties
+                List<PropertyListing<HoodIdentityUser>> feedProperties = new List<PropertyListing<HoodIdentityUser>>();
+                List<PropertyListing<HoodIdentityUser>> siteProperties = _db.Properties
                     .Include(p => p.Media)
                     .Include(p => p.FloorPlans)
                     .Include(p => p.Metadata)
@@ -173,7 +173,7 @@ namespace Hood.Services
                     StatusMessage = "Checking property (" + data["ADDRESS_1"] + ", " + data["ADDRESS_2"] + ") information from the BLM file...";
                     Lock.ReleaseWriterLock();
 
-                    var property = new PropertyListing();
+                    var property = new PropertyListing<HoodIdentityUser>();
                     ProcessProperty(property, data, true);
                     feedProperties.Add(property);
                 }
@@ -197,7 +197,7 @@ namespace Hood.Services
                         // Find matching record to update the property.
                         Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
 
-                        var property = await Process(new PropertyListing(), data);
+                        var property = await Process(new PropertyListing<HoodIdentityUser>(), data);
 
                         _db.Properties.Add(property);
                         _db.SaveChanges();
@@ -300,7 +300,7 @@ namespace Hood.Services
             }
         }
 
-        private async Task<PropertyListing> Process(PropertyListing property, Dictionary<string, string> data)
+        private async Task<PropertyListing<HoodIdentityUser>> Process(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
         {
             property = ProcessProperty(property, data);
             property = UpdateMetadata(property, data);
@@ -315,7 +315,7 @@ namespace Hood.Services
             return property;
         }
 
-        private async Task<PropertyListing> ProcessDocuments(PropertyListing property, Dictionary<string, string> data)
+        private async Task<PropertyListing<HoodIdentityUser>> ProcessDocuments(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
         {
             // Documents
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_DOCUMENT") && !k.Contains("TEXT")))
@@ -358,7 +358,7 @@ namespace Hood.Services
             }
             return property;
         }
-        private async Task<PropertyListing> ProcessFloorPlans(PropertyListing property, Dictionary<string, string> data)
+        private async Task<PropertyListing<HoodIdentityUser>> ProcessFloorPlans(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
         {
             // Floor plans
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_FLOOR_PLAN") && !k.Contains("TEXT")))
@@ -404,7 +404,7 @@ namespace Hood.Services
             }
             return property;
         }
-        private async Task<PropertyListing> ProcessImages(PropertyListing property, Dictionary<string, string> data)
+        private async Task<PropertyListing<HoodIdentityUser>> ProcessImages(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
         {
             // Images
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")))
@@ -534,7 +534,7 @@ namespace Hood.Services
         {
             try
             {
-                ProcessProperty(new PropertyListing(), propertyDetails, true);
+                ProcessProperty(new PropertyListing<HoodIdentityUser>(), propertyDetails, true);
             }
             catch (Exception)
             {
@@ -655,7 +655,7 @@ namespace Hood.Services
         /// </summary>
         /// <param name="data">Property</param>
         /// <returns></returns>
-        private PropertyListing ProcessProperty(PropertyListing property, Dictionary<string, string> data, bool validatingOnly = false)
+        private PropertyListing<HoodIdentityUser> ProcessProperty(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data, bool validatingOnly = false)
         {
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
@@ -772,14 +772,14 @@ namespace Hood.Services
             return property;
         }
 
-        private string FormatLog(string statusMessage, PropertyListing property = null)
+        private string FormatLog(string statusMessage, PropertyListing<HoodIdentityUser> property = null)
         {
             if (property != null)
                 return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
             return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), statusMessage);
         }
 
-        private PropertyListing UpdateMetadata(PropertyListing property, Dictionary<string, string> data)
+        private PropertyListing<HoodIdentityUser> UpdateMetadata(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
         {
             if (property.Metadata == null)
                 property.Metadata = new List<PropertyMeta>();
@@ -836,7 +836,7 @@ namespace Hood.Services
             return property;
         }
 
-        private PropertyListing AddMeta(PropertyListing property, string key, string value, string type)
+        private PropertyListing<HoodIdentityUser> AddMeta(PropertyListing<HoodIdentityUser> property, string key, string value, string type)
         {
             if (!property.HasMeta(key))
                 property.AddMeta(new PropertyMeta(key, value, type));

@@ -21,22 +21,22 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Manager")]
     public class UsersController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IAccountRepository _auth;
         private readonly IContentRepository _content;
-        private readonly HoodDbContext _db;
+        private readonly HoodDbContext<HoodIdentityUser> _db;
         private readonly IEmailSender _email;
-        private readonly ISettingsRepository _settings;
+        private readonly ISettingsRepository<HoodIdentityUser> _settings;
         private readonly IBillingService _billing;
 
         public UsersController(
-            HoodDbContext db,
+            HoodDbContext<HoodIdentityUser> db,
             IAccountRepository auth,
-            UserManager<ApplicationUser> userManager,
+            UserManager<HoodIdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
             IEmailSender email,
-            ISettingsRepository site,
+            ISettingsRepository<HoodIdentityUser> site,
             IBillingService billing,
             IContentRepository content)
         {
@@ -59,7 +59,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/edit/{id}/")]
         public async Task<IActionResult> Edit(string id)
         {
-            EditUserModel um = new EditUserModel()
+            EditUserModel<HoodIdentityUser> um = new EditUserModel<HoodIdentityUser>()
             {
                 User = _auth.GetUserById(id)
             };
@@ -72,7 +72,7 @@ namespace Hood.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(string id, SaveProfileModel model)
         {
-            EditUserModel um = new EditUserModel()
+            EditUserModel<HoodIdentityUser> um = new EditUserModel<HoodIdentityUser>()
             {
                 User = _auth.GetUserById(id)
             };
@@ -89,7 +89,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/blade/{id}/")]
         public async Task<IActionResult> Blade(string id)
         {
-            EditUserModel um = new EditUserModel()
+            EditUserModel<HoodIdentityUser> um = new EditUserModel<HoodIdentityUser>()
             {
                 User = _auth.GetUserById(id)
             };
@@ -108,7 +108,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/roles/")]
         public async Task<IActionResult> Roles(string id)
         {
-            EditUserModel um = new EditUserModel()
+            EditUserModel<HoodIdentityUser> um = new EditUserModel<HoodIdentityUser>()
             {
                 User = _auth.GetUserById(id)
             };
@@ -122,7 +122,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                HoodIdentityUser user = await _userManager.FindByIdAsync(id);
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await _userManager.ResetPasswordAsync(user, token, password);
                 if (result.Succeeded)
@@ -149,7 +149,7 @@ namespace Hood.Areas.Admin.Controllers
         [HttpGet]
         public async Task<JsonResult> Get(ListFilters request, string search, string sort, string role)
         {
-            IList<ApplicationUser> users = null;
+            IList<HoodIdentityUser> users = null;
             if (!string.IsNullOrEmpty(role))
             {
                 users = await _userManager.GetUsersInRoleAsync(role);
@@ -204,10 +204,10 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/users/getaddresses/")]
         [HttpGet]
-        public List<AddressApi> GetAddresses()
+        public List<AddressApi<HoodIdentityUser>> GetAddresses()
         {
             var user = _auth.GetCurrentUser();
-            return user.Addresses.Select(a => new AddressApi(a, user)).ToList();
+            return user.Addresses.Select(a => new AddressApi<HoodIdentityUser>(a, user)).ToList();
         }
 
         [Route("admin/users/getusernames/")]
@@ -244,7 +244,7 @@ namespace Hood.Areas.Admin.Controllers
         [HttpGet]
         public async Task<JsonResult> GetRoles(string id)
         {
-            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            HoodIdentityUser user = await _userManager.FindByIdAsync(id);
             IList<string> roles = await _userManager.GetRolesAsync(user);
             return Json(new { success = true, roles = roles });
         }
@@ -255,7 +255,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                HoodIdentityUser user = await _userManager.FindByIdAsync(id);
                 if (!await _roleManager.RoleExistsAsync(role))
                     await _roleManager.CreateAsync(new IdentityRole(role));
 
@@ -286,7 +286,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                HoodIdentityUser user = await _userManager.FindByIdAsync(id);
                 IdentityResult result = await _userManager.RemoveFromRoleAsync(user, role);
                 if (result.Succeeded)
                 {
@@ -309,7 +309,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = new ApplicationUser
+                var user = new HoodIdentityUser
                 {
                     UserName = model.cuUserName,
                     Email = model.cuUserName,
@@ -385,8 +385,8 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // delete the avatar - if it exists.
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
-                string container = typeof(ApplicationUser).Name;
+                HoodIdentityUser user = await _userManager.FindByIdAsync(id);
+                string container = typeof(HoodIdentityUser).Name;
                 var logins = await _userManager.GetLoginsAsync(user);
                 foreach (var li in logins)
                 {

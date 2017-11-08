@@ -1,10 +1,11 @@
-﻿using Hood.Extensions;
+﻿using Hood.Entities;
+using Hood.Extensions;
 using Hood.Interfaces;
 using System;
 
 namespace Hood.Models
 {
-    public partial class SiteMedia : IMediaObject
+    public partial class SiteMedia : BaseEntity, IMediaObject
     {
         public SiteMedia()
         {

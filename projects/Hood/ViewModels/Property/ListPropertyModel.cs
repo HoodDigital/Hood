@@ -2,10 +2,10 @@
 
 namespace Hood.Models
 {
-    public class ListPropertyModel
+    public class ListPropertyModel<TUser> where TUser : IHoodUser
     {
         public PropertyFilters Filters { get; set; }
-        public PagedList<PropertyListing> Properties { get; set; }
+        public PagedList<PropertyListing<TUser>> Properties { get; set; }
         public List<string> Types { get; set; }
         public Dictionary<string, string> PlanningTypes { get; set; }
         public List<MapMarker> Locations { get; set; }

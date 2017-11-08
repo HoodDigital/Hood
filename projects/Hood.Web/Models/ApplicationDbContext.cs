@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Hood.Web
 {
-    public class ApplicationDbContext : HoodDbContext
+    public class ApplicationDbContext : HoodDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<HoodDbContext> options)
+        public ApplicationDbContext(DbContextOptions options)
             : base(options)
         {
         }

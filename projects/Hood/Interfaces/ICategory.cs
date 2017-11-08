@@ -3,7 +3,7 @@
 namespace Hood.Interfaces
 {
     public interface ICategory<TContent>
-        where TContent : IContent<IMetadata, IMediaObject>
+        where TContent : IContent<IMetadata, IMediaObject, IHoodUser>
     {
         List<ICategory<TContent>> Children { get; set; }
         string DisplayName { get; set; }

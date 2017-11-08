@@ -34,12 +34,12 @@ namespace Hood.Services
         OperationResult CartEnabled();
         OperationResult PropertyEnabled();
         string GetVersion();
-
         Task ProcessCaptchaOrThrowAsync(HttpRequest request);
+        string ReplacePlaceholders(string adminNoficationSubject);
 
         ContentApi ToContentApi(Content content);
         PropertyListingApi ToPropertyListingApi(PropertyListing property);
-        ApplicationUserApi ToApplicationUserApi(ApplicationUser user);
-        string ReplacePlaceholders(string adminNoficationSubject);
+        ApplicationUserApi ToApplicationUserApi(IHoodUser user);
     }
+
 }

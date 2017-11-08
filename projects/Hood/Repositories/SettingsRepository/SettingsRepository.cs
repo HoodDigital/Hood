@@ -1,6 +1,7 @@
 ﻿using Hood.Caching;
 using Hood.Extensions;
 using Hood.Infrastructure;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.Models.Api;
 using Microsoft.AspNetCore.Http;
@@ -518,7 +519,7 @@ namespace Hood.Services
             return new PropertyListingApi(property, this);
         }
 
-        public ApplicationUserApi ToApplicationUserApi(ApplicationUser user)
+        public ApplicationUserApi ToApplicationUserApi(IHoodUser user)
         {
             return new ApplicationUserApi(user, this);
         }
@@ -688,24 +689,24 @@ namespace Hood.Services
             throw new NotImplementedException();
         }
 
-        public ApplicationUserApi ToApplicationUserApi(ApplicationUser user)
+        public Task ProcessCaptchaOrThrowAsync(HttpRequest request)
         {
             throw new NotImplementedException();
         }
 
         public ContentApi ToContentApi(Content content)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public PropertyListingApi ToPropertyListingApi(PropertyListing property)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
-        public Task ProcessCaptchaOrThrowAsync(HttpRequest request)
+        public ApplicationUserApi ToApplicationUserApi(IHoodUser user)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 

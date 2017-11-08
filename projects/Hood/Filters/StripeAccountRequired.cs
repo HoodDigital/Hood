@@ -27,13 +27,13 @@ namespace Hood.Filters
         {
             private readonly ILogger _logger;
             private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
-            private readonly UserManager<ApplicationUser> _userManager;
+            private readonly ISettingsRepository<HoodIdentityUser> _settings;
+            private readonly UserManager<HoodIdentityUser> _userManager;
 
             public StripeAccountRequiredAttributeImpl(ILoggerFactory loggerFactory,
                                       IBillingService billing,
-                                      UserManager<ApplicationUser> userManager,
-                                      ISettingsRepository site)
+                                      UserManager<HoodIdentityUser> userManager,
+                                      ISettingsRepository<HoodIdentityUser> site)
             {
                 _logger = loggerFactory.CreateLogger<StripeAccountRequiredAttribute>();
                 _billing = billing;

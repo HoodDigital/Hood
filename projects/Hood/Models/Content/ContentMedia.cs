@@ -4,7 +4,9 @@ using System;
 
 namespace Hood.Models
 {
-    public class ContentMedia : IMediaObject
+    public partial class ContentMedia : ContentMedia<HoodIdentityUser> { }
+
+    public partial class ContentMedia<TUser> : IMediaObject where TUser : IHoodUser
     {
         public ContentMedia()
         {
@@ -31,7 +33,7 @@ namespace Hood.Models
         public string UniqueId { get; set; }
 
         public int ContentId { get; set; }
-        public Content Content { get; set; }
+        public Content<TUser> Content { get; set; }
 
     }
 

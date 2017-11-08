@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Entities;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Newtonsoft.Json;
 using System;
@@ -10,12 +11,31 @@ using System.Linq;
 namespace Hood.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
-    public partial class PropertyListing : IAddress, IContent<PropertyMeta, SiteMedia>
+
+    public partial class PropertyListing : PropertyListingBase
+    {
+        // Agent 
+        public string AgentId { get; set; }
+        public HoodIdentityUser Agent { get; set; }
+
+        public List<PropertyMeta> Metadata { get; set; }
+        public List<PropertyMedia> Media { get; set; }
+        public List<PropertyFloorplan> FloorPlans { get; set; }
+    }
+    public partial class PropertyListing<TUser> : PropertyListingBase where TUser : IHoodUser
+    {
+        // Agent 
+        public string AgentId { get; set; }
+        public TUser Agent { get; set; }
+
+        public List<PropertyMeta<TUser>> Metadata { get; set; }
+        public List<PropertyMedia<TUser>> Media { get; set; }
+        public List<PropertyFloorplan<TUser>> FloorPlans { get; set; }
+    }
+    public partial class PropertyListingBase : BaseEntity, IAddress
     {
 
         // Content
-        [Key]
-        public int Id { get; set; }
         public string Title { get; set; }
         public string Reference { get; set; }
         public string Tags { get; set; }
@@ -32,10 +52,6 @@ namespace Hood.Models
         public string Country { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-
-        // Agent 
-        public string AgentId { get; set; }
-        public ApplicationUser Agent { get; set; }
 
         // Publish Status
         public int Status { get; set; }
@@ -121,11 +137,6 @@ namespace Hood.Models
 
             }
         }
-
-        public List<PropertyMeta> Metadata { get; set; }
-        public List<PropertyMedia> Media { get; set; }
-        public List<PropertyFloorplan> FloorPlans { get; set; }
-
     }
 
 }

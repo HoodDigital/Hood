@@ -5,12 +5,12 @@ namespace Hood.Models
 {
     public class WelcomeEmailModel : IEmailSendable
     {
-        public WelcomeEmailModel(ApplicationUser user)
+        public WelcomeEmailModel(HoodIdentityUser user)
         {
             User = user;
         }
 
-        public ApplicationUser User { get; set; }
+        public HoodIdentityUser User { get; set; }
         public MailObject WriteToMessage(MailObject message)
         {
             message.Subject = User.ReplacePlaceholders(message.Subject);

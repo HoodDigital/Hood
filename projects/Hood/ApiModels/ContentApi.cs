@@ -1,4 +1,5 @@
 ﻿using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Services;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,16 @@ using System.Linq;
 
 namespace Hood.Models.Api
 {
-    public class ContentApi
+    public class ContentApi : ContentApi<HoodIdentityUser>
+    {
+        public ContentApi(Content post, ISettingsRepository settings = null)
+            : base(post, settings)
+        {
+        }
+
+    }
+
+    public class ContentApi<TUser> where TUser : IHoodUser
     {
         // Content
         public int Id { get; set; }
@@ -54,13 +64,13 @@ namespace Hood.Models.Api
         public bool AllowComments { get; set; }
         public bool Public { get; set; }
 
-        public ApplicationUserApi Author { get; set; }
+        public ApplicationUserApi<TUser> Author { get; set; }
         public MediaApi FeaturedImage { get; set; }
         public string CreatedBy { get; set; }
         public string LastEditedBy { get; set; }
 
         public List<string> Categories { get; set; }
-        public IList<MetaDataApi<ContentMeta>> Meta { get; set; }
+        public IList<MetaDataApi<ContentMeta<TUser>>> Meta { get; set; }
 
         // MVVM Helpers
         public int PublishHour { get; set; }
@@ -78,7 +88,7 @@ namespace Hood.Models.Api
         {
         }
 
-        public ContentApi(Content post, ISettingsRepository settings = null)
+        public ContentApi(Content<TUser> post, ISettingsRepository settings = null)
         {
             if (post == null)
                 return;
@@ -94,7 +104,7 @@ namespace Hood.Models.Api
                 FeaturedImage = MediaApi.Blank(mediaSettings);
 
             if (post.Author != null)
-                Author = new ApplicationUserApi(post.Author, settings);
+                Author = new ApplicationUserApi<TUser>(post.Author, settings);
 
             if (post.CreatedBy != null)
                 CreatedBy = post.CreatedBy;
@@ -117,9 +127,9 @@ namespace Hood.Models.Api
             PublishMinute = PublishDate.Minute;
 
             if (post.Metadata == null || post.Metadata.Count == 0)
-                Meta = new List<MetaDataApi<ContentMeta>>();
+                Meta = new List<MetaDataApi<ContentMeta<TUser>>>();
             else
-                Meta = post.Metadata.Select(cm => new MetaDataApi<ContentMeta>(cm)).ToList();
+                Meta = post.Metadata.Select(cm => new MetaDataApi<ContentMeta<TUser>>(cm)).ToList();
             ContentSettings _contentSettings = settings.GetContentSettings();
             ContentType type = _contentSettings.GetContentType(ContentType);
             switch (type.UrlFormatting)
@@ -156,17 +166,17 @@ namespace Hood.Models.Api
             }
         }
 
-        public MetaDataApi<ContentMeta> GetMeta(string name)
+        public MetaDataApi<ContentMeta<TUser>> GetMeta(string name)
         {
-            MetaDataApi<ContentMeta> cm = Meta.FirstOrDefault(p => p.Name == name);
+            MetaDataApi<ContentMeta<TUser>> cm = Meta.FirstOrDefault(p => p.Name == name);
             if (cm != null)
                 return cm;
-            return new MetaDataApi<ContentMeta>();
+            return new MetaDataApi<ContentMeta<TUser>>();
         }
 
         public string GetMetaValue(string name)
         {
-            MetaDataApi<ContentMeta> cm = Meta.FirstOrDefault(p => p.Name == name);
+            MetaDataApi<ContentMeta<TUser>> cm = Meta.FirstOrDefault(p => p.Name == name);
             if (cm != null)
                 return cm.ToString();
             return null;

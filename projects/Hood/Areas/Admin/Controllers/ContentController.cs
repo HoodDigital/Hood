@@ -26,7 +26,7 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class ContentController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
         private readonly ContentCategoryCache _categories;
         private readonly IContentRepository _content;
         private readonly ISettingsRepository _settings;
@@ -38,8 +38,8 @@ namespace Hood.Areas.Admin.Controllers
             IAccountRepository auth,
             IContentRepository content,
             ContentCategoryCache categories,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository site,
+            UserManager<HoodIdentityUser> userManager,
+            ISettingsRepository settings,
             IBillingService billing,
             IMediaManager<SiteMedia> media,
             IHostingEnvironment env)
@@ -48,7 +48,7 @@ namespace Hood.Areas.Admin.Controllers
             _media = media;
             _userManager = userManager;
             _content = content;
-            _settings = site;
+            _settings = settings;
             _categories = categories;
             _env = env;
         }
@@ -118,7 +118,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+                HoodIdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 Content content = new Content
                 {
                     AllowComments = true,
@@ -149,7 +149,7 @@ namespace Hood.Areas.Admin.Controllers
                         content.Categories = new List<ContentCategoryJoin>();
                     // add it to the model object.
                     if (categoryResult.Succeeded)
-                        content.Categories.Add(new ContentCategoryJoin() { CategoryId = categoryResult.Item.ContentCategoryId, ContentId = content.Id });
+                        content.Categories.Add(new ContentCategoryJoin() { CategoryId = categoryResult.Item.Id, ContentId = content.Id });
                     _content.Update(content);
                 }
                 return new Response(true);
@@ -209,7 +209,7 @@ namespace Hood.Areas.Admin.Controllers
                     content.Categories = new List<ContentCategoryJoin>();
                 // add it to the model object.
                 if (categoryResult.Succeeded)
-                    content.Categories.Add(new ContentCategoryJoin() { CategoryId = categoryResult.Item.ContentCategoryId, ContentId = content.Id });
+                    content.Categories.Add(new ContentCategoryJoin() { CategoryId = categoryResult.Item.Id, ContentId = content.Id });
 
                 var contentResult = _content.Update(content);
                 _categories.ResetCache();
@@ -290,11 +290,11 @@ namespace Hood.Areas.Admin.Controllers
             {
                 if (model.ParentCategoryId.HasValue)
                 {
-                    if (model.ParentCategoryId == model.ContentCategoryId)
+                    if (model.ParentCategoryId == model.Id)
                         throw new Exception("You cannot set the parent to be the same category!");
 
-                    var thisAndChildren = _categories.GetThisAndChildren(model.ContentCategoryId);
-                    if (thisAndChildren.Select(c => c.ContentCategoryId).ToList().Contains(model.ParentCategoryId.Value))
+                    var thisAndChildren = _categories.GetThisAndChildren(model.Id);
+                    if (thisAndChildren.Select(c => c.Id).ToList().Contains(model.ParentCategoryId.Value))
                         throw new Exception("You cannot set the parent to be a child of this category!");
                 }
 

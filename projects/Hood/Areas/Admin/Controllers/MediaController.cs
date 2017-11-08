@@ -22,14 +22,14 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class MediaController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly HoodDbContext _db;
+        private readonly UserManager<HoodIdentityUser> _userManager;
+        private readonly HoodDbContext<HoodIdentityUser> _db;
         private readonly IHoodCache _cache;
         private readonly IMediaManager<SiteMedia> _media;
         private readonly ISettingsRepository _settings;
 
         public MediaController(
-            UserManager<ApplicationUser> userManager, HoodDbContext db, IHoodCache cache, IMediaManager<SiteMedia> media, ISettingsRepository settings)
+            UserManager<HoodIdentityUser> userManager, HoodDbContext<HoodIdentityUser> db, IHoodCache cache, IMediaManager<SiteMedia> media, ISettingsRepository settings)
         {
             _userManager = userManager;
             _cache = cache;
@@ -255,7 +255,7 @@ namespace Hood.Areas.Admin.Controllers
                     case "ApplicationUser":
 
                         // create the new media item for content =>
-                        ApplicationUser user = await _db.Users.Where(p => p.Id == attach.Id).FirstOrDefaultAsync();
+                        HoodIdentityUser user = await _db.Users.Where(p => p.Id == attach.Id).FirstOrDefaultAsync();
 
                         switch (attach.Field)
                         {
@@ -265,7 +265,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
 
-                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + attach.Id;
+                        cacheKey = typeof(HoodIdentityUser).ToString() + ".Single." + attach.Id;
                         _cache.Remove(cacheKey);
                         await _db.SaveChangesAsync();
                         return new Response(true);

@@ -20,11 +20,11 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IRazorViewRenderer _renderer;
         private readonly IEmailSender _email;
         private readonly ContentCategoryCache _categories;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
 
         public HomeController(IAccountRepository auth,
                               ContentCategoryCache categories,
-                              UserManager<ApplicationUser> userManager,
+                              UserManager<HoodIdentityUser> userManager,
                               IConfiguration conf,
                               IHostingEnvironment env,
                               ISettingsRepository site,

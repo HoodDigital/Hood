@@ -29,7 +29,7 @@ namespace Hood.Services
         // Members
         private ReaderWriterLock Lock { get; set; }
         private ContentExporterReport Status { get; set; }
-        private AccountInfo Account { get; set; }
+        private AccountInfo<HoodIdentityUser> Account { get; set; }
         private string _tempFolder { get; set; }
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
@@ -99,7 +99,7 @@ namespace Hood.Services
 
                 // Get all the properties.
 
-                List<Content> items = await _db.Content
+                List<Content<HoodIdentityUser>> items = await _db.Content
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -112,7 +112,7 @@ namespace Hood.Services
                 Status.Tasks = Status.Total + 6;
                 Lock.ReleaseWriterLock();
 
-                List<Content> content = new List<Content>();
+                List<Content<HoodIdentityUser>> content = new List<Content<HoodIdentityUser>>();
 
                 foreach (var item in items)
                 {
@@ -326,9 +326,9 @@ namespace Hood.Services
             _propertySettings = _settings.GetPropertySettings();
 
             // Get a new instance of the HoodDbContext for this import.
-            var options = new DbContextOptionsBuilder<HoodDbContext>();
+            var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            _db = new HoodDbContext(options.Options);
+            _db = new DefaultHoodDbContext(options.Options);
             Lock.ReleaseWriterLock();
         }
 

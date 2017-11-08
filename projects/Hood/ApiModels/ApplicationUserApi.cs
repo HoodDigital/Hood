@@ -1,4 +1,5 @@
 ﻿using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Services;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,26 @@ using System.Linq;
 
 namespace Hood.Models.Api
 {
-    public class ApplicationUserApi
+    public class ApplicationUserApi : ApplicationUserApi<HoodIdentityUser>
+    {
+        public ApplicationUserApi(IHoodUser user, ISettingsRepository settings = null)
+            : base(user, settings)
+        {
+            if (user.Avatar != null)
+                Avatar = new MediaApi(user.Avatar, settings);
+            else
+                Avatar = MediaApi.Blank(mediaSettings);
+
+            Addresses = user.Addresses?.Select(s => new AddressApi<IHoodUser>(s)).ToList();
+            DeliveryAddress = user.DeliveryAddress == null ? null : new AddressApi<IHoodUser>(user.DeliveryAddress);
+            BillingAddress = user.BillingAddress == null ? null : new AddressApi<IHoodUser>(user.BillingAddress);
+
+            Subscriptions = user.Subscriptions?.Select(s => new UserSubscriptionApi<IHoodUser>(s)).ToList();
+
+        }
+    }
+
+    public class ApplicationUserApi<TUser> where TUser : IHoodUser
     {
         public string Id { get; set; }
         public string UserName { get; set; }
@@ -69,37 +89,25 @@ namespace Hood.Models.Api
         public int? DeliveryAddressId { get; set; }
         public int? BillingAddressId { get; set; }
 
-        public List<AddressApi> Addresses { get; set; }
-        public AddressApi Address { get; set; }
-        public AddressApi DeliveryAddress { get; set; }
-        public AddressApi BillingAddress { get; set; }
+        public List<AddressApi<IHoodUser>> Addresses { get; set; }
+        public AddressApi<IHoodUser> Address { get; set; }
+        public AddressApi<IHoodUser> DeliveryAddress { get; set; }
+        public AddressApi<IHoodUser> BillingAddress { get; set; }
         public MediaApi Avatar { get; set; }
 
-        public List<UserSubscriptionApi> Subscriptions { get; set; }
+        public List<UserSubscriptionApi<IHoodUser>> Subscriptions { get; set; }
 
         public ApplicationUserApi()
         {
         }
 
-        public ApplicationUserApi(ApplicationUser user, ISettingsRepository settings = null)
+        public ApplicationUserApi(IHoodUser user)
         {
-            var mediaSettings = settings.GetMediaSettings();
 
             if (user == null)
                 return;
 
             user.CopyProperties(this);
-            if (user.Avatar != null)
-                Avatar = new MediaApi(user.Avatar, settings);
-            else
-                Avatar = MediaApi.Blank(mediaSettings);
-
-
-            Addresses = user.Addresses?.Select(s => new AddressApi(s)).ToList();
-            DeliveryAddress = user.DeliveryAddress == null ? null : new AddressApi(user.DeliveryAddress);
-            BillingAddress = user.BillingAddress == null ? null : new AddressApi(user.BillingAddress);
-
-            Subscriptions = user.Subscriptions?.Select(s => new UserSubscriptionApi(s)).ToList();
 
             if (string.IsNullOrEmpty(LastLoginLocation))
             {

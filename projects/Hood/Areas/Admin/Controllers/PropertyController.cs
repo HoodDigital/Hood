@@ -23,9 +23,9 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class PropertyController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
         private readonly IPropertyRepository _property;
-        private readonly ISettingsRepository _settings;
+        private readonly ISettingsRepository<HoodIdentityUser> _settings;
         private readonly PropertySettings _propertySettings;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
@@ -34,8 +34,8 @@ namespace Hood.Areas.Admin.Controllers
 
         public PropertyController(
             IPropertyRepository property,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository site,
+            UserManager<HoodIdentityUser> userManager,
+            ISettingsRepository<HoodIdentityUser> settings,
             IMediaManager<SiteMedia> media,
             IBillingService billing,
             IHostingEnvironment env,
@@ -43,7 +43,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             _userManager = userManager;
             _property = property;
-            _settings = site;
+            _settings = settings;
             _billing = billing;
             _env = env;
             _media = media;
@@ -60,14 +60,14 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/gallery/{id}/")]
         public IActionResult EditorGallery(int id)
         {
-            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _settings);
+            var model = new PropertyListingApi<HoodIdentityUser>(_property.GetPropertyById(id, true), _settings);
             return View(model);
         }
 
         [Route("admin/property/floorplans/{id}/")]
         public IActionResult EditorFloorplans(int id)
         {
-            var model = new PropertyListingApi(_property.GetPropertyById(id, true), _settings);
+            var model = new PropertyListingApi<HoodIdentityUser>(_property.GetPropertyById(id, true), _settings);
             return View(model);
         }
 
@@ -111,7 +111,7 @@ namespace Hood.Areas.Admin.Controllers
             else
             {
                 if (property.Metadata == null)
-                    property.Metadata = new List<PropertyMeta>();
+                    property.Metadata = new List<PropertyMeta<HoodIdentityUser>>();
                 property.AddMeta(new PropertyMeta("PlanningDescription", type));
             }
 
@@ -128,7 +128,7 @@ namespace Hood.Areas.Admin.Controllers
                     else
                     {
                         // Add it...
-                        property.AddMeta(new PropertyMeta()
+                        property.AddMeta(new PropertyMeta<HoodIdentityUser>()
                         {
                             PropertyId = property.Id,
                             Name = val.Key.Replace("Meta:", ""),
@@ -173,7 +173,7 @@ namespace Hood.Areas.Admin.Controllers
             if (!count.HasValue)
                 count = 0;
 
-            property.AddMeta(new PropertyMeta()
+            property.AddMeta(new PropertyMeta<HoodIdentityUser>()
             {
                 PropertyId = property.Id,
                 Name = "Feature" + (count + 1).ToString(),
@@ -222,7 +222,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+                HoodIdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
 
                 PropertyListing property = new PropertyListing
                 {
@@ -262,12 +262,12 @@ namespace Hood.Areas.Admin.Controllers
 
                 OperationResult result = _property.Add(property);
                 if (property.Metadata == null)
-                    property.Metadata = new List<PropertyMeta>();
+                    property.Metadata = new List<PropertyMeta<HoodIdentityUser>>();
                 property.UpdateMeta("PlanningDescription", _settings.GetPropertySettings().GetPlanningTypes().FirstOrDefault().Value);
 
                 for (int i = 0; i < 11; i++)
                 {
-                    property.AddMeta(new PropertyMeta()
+                    property.AddMeta(new PropertyMeta<HoodIdentityUser>()
                     {
                         PropertyId = property.Id,
                         Name = "Feature" + i.ToString(),
@@ -370,7 +370,7 @@ namespace Hood.Areas.Admin.Controllers
             PropertyListing property = _property.GetPropertyById(id);
             if (property == null)
                 return NotFound();
-            AccountInfo account = HttpContext.GetAccountInfo();
+            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
 
             try
             {
@@ -415,7 +415,7 @@ namespace Hood.Areas.Admin.Controllers
             PropertyListing property = _property.GetPropertyById(id);
             if (property == null)
                 return NotFound();
-            AccountInfo account = HttpContext.GetAccountInfo();
+            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
 
             try
             {
@@ -493,7 +493,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 PropertyListing property = _property.GetPropertyById(id, true);
-                PropertyMedia media = property.Media.SingleOrDefault(m => m.Id == mediaId);
+                PropertyMedia<HoodIdentityUser> media = property.Media.SingleOrDefault(m => m.Id == mediaId);
                 if (media != null)
                 {
                     property.FeaturedImage = new SiteMedia(media);
@@ -512,7 +512,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 PropertyListing property = _property.GetPropertyById(id, true);
-                PropertyMedia media = property.Media.Find(m => m.Id == mediaId);
+                PropertyMedia<HoodIdentityUser> media = property.Media.Find(m => m.Id == mediaId);
                 if (media != null)
                     property.Media.Remove(media);
                 _property.UpdateProperty(property);
@@ -529,7 +529,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 PropertyListing property = _property.GetPropertyById(id, true);
-                PropertyFloorplan media = property.FloorPlans.Find(m => m.Id == mediaId);
+                PropertyFloorplan<HoodIdentityUser> media = property.FloorPlans.Find(m => m.Id == mediaId);
                 if (media != null)
                     property.FloorPlans.Remove(media);
                 _property.UpdateProperty(property);

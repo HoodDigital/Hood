@@ -29,7 +29,7 @@ namespace Hood.Services
         // Members
         private ReaderWriterLock Lock { get; set; }
         private PropertyExporterReport Status { get; set; }
-        private AccountInfo Account { get; set; }
+        private AccountInfo<HoodIdentityUser> Account { get; set; }
         private string _tempFolder { get; set; }
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
@@ -107,7 +107,7 @@ namespace Hood.Services
                 Status.Tasks = Status.Total + 6;
                 Lock.ReleaseWriterLock();
 
-                List<PropertyListing> properties = new List<PropertyListing>();
+                List<PropertyListing<HoodIdentityUser>> properties = new List<PropertyListing<HoodIdentityUser>>();
 
                 foreach (var item in items)
                 {
@@ -143,7 +143,7 @@ namespace Hood.Services
                                 tempMedia.Property = null;
                                 tempMedia.PropertyId = 0;
                                 if (item.Media == null)
-                                    item.Media = new List<PropertyMedia>();
+                                    item.Media = new List<PropertyMedia<HoodIdentityUser>>();
                                 item.Media.Add(tempMedia);
                             }
 
@@ -156,7 +156,7 @@ namespace Hood.Services
                                 tempMedia.Property = null;
                                 tempMedia.PropertyId = 0;
                                 if (item.FloorPlans == null)
-                                    item.FloorPlans = new List<PropertyFloorplan>();
+                                    item.FloorPlans = new List<PropertyFloorplan<HoodIdentityUser>>();
                                 item.FloorPlans.Add(tempMedia);
                             }
 
@@ -168,7 +168,7 @@ namespace Hood.Services
                                 tempMeta.Property = null;
                                 tempMeta.PropertyId = 0;
                                 if (item.Metadata == null)
-                                    item.Metadata = new List<PropertyMeta>();
+                                    item.Metadata = new List<PropertyMeta<HoodIdentityUser>>();
                                 item.Metadata.Add(tempMeta);
                             }
 

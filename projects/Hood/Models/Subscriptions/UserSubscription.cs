@@ -1,21 +1,33 @@
-﻿using System;
+﻿using Hood.Entities;
+using Hood.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
-    public partial class UserSubscription
+    public partial class UserSubscription : UserSubscriptionBase
+    {
+        public HoodIdentityUser User { get; set; }
+        public Subscription Subscription { get; set; }
+    }
+
+    public partial class UserSubscription<TUser> : UserSubscriptionBase where TUser : IHoodUser
+    {
+
+        public TUser User { get; set; }
+        public Subscription<TUser> Subscription { get; set; }
+    }
+
+    public abstract class UserSubscriptionBase : BaseEntity
     {
         [Key]
         public int UserSubscriptionId { get; set; }
-        public bool Confirmed { get; set; }
-        public bool Deleted { get; set; }
 
         public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-
         public int SubscriptionId { get; set; }
-        public Subscription Subscription { get; set; }
 
+        public bool Confirmed { get; set; }
+        public bool Deleted { get; set; }
         public string StripeId { get; set; }
         public bool CancelAtPeriodEnd { get; set; }
         public DateTime? CanceledAt { get; set; }

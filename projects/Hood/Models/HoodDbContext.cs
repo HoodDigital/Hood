@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Models
@@ -7,32 +8,32 @@ namespace Hood.Models
     /// In order to use the Hood functionality on the site, you must call the 'void Configure(DbContextOptionsBuilder optionsBuilder)' function in the OnConfiguring() method, and then call the 'void CreateModels(ModelBuilder builder)' function in the OnModelCreating() method.
     /// </summary>
     /// <param name="optionsBuilder"></param>
-    public class HoodDbContext : IdentityDbContext<ApplicationUser>
+    public class HoodDbContext<TUser> : IdentityDbContext<TUser, IdentityRole, string> where TUser : HoodIdentityUser
     {
-        public HoodDbContext(DbContextOptions<HoodDbContext> options)
+        public HoodDbContext(DbContextOptions options)
             : base(options)
         {
         }
 
         // Identity
-        public DbSet<UserAccessCode> AccessCodes { get; set; }
-        public DbSet<Address> Addresses { get; set; }
+        public DbSet<UserAccessCode<TUser>> AccessCodes { get; set; }
+        public DbSet<Address<TUser>> Addresses { get; set; }
         public DbSet<SiteMedia> Media { get; set; }
 
         // Content
-        public DbSet<Subscription> Subscriptions { get; set; }
-        public DbSet<UserSubscription> UserSubscriptions { get; set; }
+        public DbSet<Subscription<TUser>> Subscriptions { get; set; }
+        public DbSet<UserSubscription<TUser>> UserSubscriptions { get; set; }
 
         // Options
         public DbSet<Option> Options { get; set; }
 
         // Content
-        public DbSet<Content> Content { get; set; }
-        public DbSet<ContentCategory> ContentCategories { get; set; }
-        public DbSet<ContentTag> ContentTags { get; set; }
+        public DbSet<Content<TUser>> Content { get; set; }
+        public DbSet<ContentCategory<TUser>> ContentCategories { get; set; }
+        public DbSet<ContentTag<TUser>> ContentTags { get; set; }
 
         // Property
-        public DbSet<PropertyListing> Properties { get; set; }
+        public DbSet<PropertyListing<TUser>> Properties { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -47,10 +48,10 @@ namespace Hood.Models
         }
     }
 
-    public class DefaultHoodDbContext : IdentityDbContext<ApplicationUser>
+    public class HoodDbContext : IdentityDbContext<HoodIdentityUser, IdentityRole, string>
     {
 
-        public DefaultHoodDbContext(DbContextOptions<DefaultHoodDbContext> options)
+        public HoodDbContext(DbContextOptions options)
             : base(options)
         {
         }

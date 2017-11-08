@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Hood.Infrastructure;
 using Hood.Models;
 using Stripe;
 using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.Services
 {
@@ -12,10 +12,10 @@ namespace Hood.Services
     {
         // Account stuff
         AccountInfo LoadAccountInfo(string userId);
-        ApplicationUser GetCurrentUser(bool track = true);
-        ApplicationUser GetUserById(string userId, bool track = true);
-        ApplicationUser GetUserByEmail(string email, bool track = true);
-        OperationResult UpdateUser(ApplicationUser user);
+        HoodIdentityUser GetCurrentUser(bool track = true);
+        HoodIdentityUser GetUserById(string userId, bool track = true);
+        HoodIdentityUser GetUserByEmail(string email, bool track = true);
+        OperationResult UpdateUser(HoodIdentityUser user);
 
         IList<IdentityRole> GetAllRoles();
 
@@ -38,7 +38,7 @@ namespace Hood.Services
         Task<OperationResult> UpdateSubscription(Subscription model);
 
         // User Subscriptions
-        Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription);
+        Task<PagedList<HoodIdentityUser>> GetPagedSubscribers(ListFilters filters, string subcription);
         Task<UserSubscription> SaveUserSubscription(UserSubscription newUserSub);
         Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub);
         Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId);
@@ -49,7 +49,7 @@ namespace Hood.Services
 
         // Customer Objects
         void ResetBillingInfo();
-        Task<ApplicationUser> GetUserByStripeId(string stripeId);
+        Task<HoodIdentityUser> GetUserByStripeId(string stripeId);
         Task<StripeCustomer> LoadCustomerObject(string stripeId, bool allowNullObject);
         string ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime);
         string UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime);

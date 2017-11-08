@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public class PropertyRepository : IPropertyRepository
+    public class PropertyRepository: IPropertyRepository
     {
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;

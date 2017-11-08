@@ -21,16 +21,16 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Manager")]
     public class SubscriptionsController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ISettingsRepository _settings;
+        private readonly UserManager<HoodIdentityUser> _userManager;
+        private readonly ISettingsRepository<HoodIdentityUser> _settings;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
         private readonly IAccountRepository _auth;
 
         public SubscriptionsController(
-            UserManager<ApplicationUser> userManager,
+            UserManager<HoodIdentityUser> userManager,
             IAccountRepository auth,
-            ISettingsRepository site,
+            ISettingsRepository<HoodIdentityUser> site,
             IBillingService billing,
             IHostingEnvironment env)
         {
@@ -67,7 +67,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost()]
         [Route("admin/subscriptions/edit/{id}/")]
-        public async Task<ActionResult> Edit(Subscription model)
+        public async Task<ActionResult> Edit(Subscription<HoodIdentityUser> model)
         {
             EditSubscriptionModel esm = new EditSubscriptionModel()
             {
@@ -87,8 +87,8 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/get")]
         public async Task<JsonResult> Get(ListFilters request, string search, string sort)
         {
-            PagedList<Subscription> subs = await _auth.GetPagedSubscriptions(request, search, sort);
-            Response response = new Response(subs.Items.Select(s => new SubscriptionApi(s)).ToArray(), subs.Count);
+            PagedList<Subscription<HoodIdentityUser>> subs = await _auth.GetPagedSubscriptions(request, search, sort);
+            Response response = new Response(subs.Items.Select(s => new SubscriptionApi<HoodIdentityUser>(s)).ToArray(), subs.Count);
             return Json(response);
         }
     
@@ -98,9 +98,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+                HoodIdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 BillingSettings billingSettings = _settings.GetBillingSettings();
-                Subscription subscription = new Subscription
+                Subscription<HoodIdentityUser> subscription = new Subscription<HoodIdentityUser>
                 {
                     CreatedBy = user.Id,
                     StripeId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString(),

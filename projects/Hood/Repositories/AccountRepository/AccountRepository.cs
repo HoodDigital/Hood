@@ -1,19 +1,17 @@
-﻿using Hood.Infrastructure;
-using Hood.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Hood.Interfaces;
-using Hood.Caching;
-using Stripe;
+﻿using Hood.Caching;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Infrastructure;
+using Hood.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Stripe;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -23,7 +21,7 @@ namespace Hood.Services
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<HoodIdentityUser> _userManager;
         private readonly IBillingService _billing;
         private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -33,7 +31,7 @@ namespace Hood.Services
             IBillingService billing,
             IHttpContextAccessor context,
             IHoodCache cache,
-            UserManager<ApplicationUser> userManager,
+            UserManager<HoodIdentityUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             _db = db;
@@ -46,7 +44,7 @@ namespace Hood.Services
         }
 
         // Users
-        public AccountInfo LoadAccountInfo(string userId)
+        public AccountInfo LoadAccountInfo(string userId) 
         {
             AccountInfo result = new AccountInfo();
             result = new AccountInfo()
@@ -69,13 +67,12 @@ namespace Hood.Services
             }
             return result;
         }
-        public ApplicationUser GetUserById(string userId, bool track = true)
+        public HoodIdentityUser GetUserById(string userId, bool track = true)
         {
             if (string.IsNullOrEmpty(userId))
                 return null;
-            ApplicationUser user;
-            var userQ = _db.Users.Include(u => u.Roles)
-                                   .Include(u => u.Addresses)
+            HoodIdentityUser user;
+            var userQ = _db.Users.Include(u => u.Addresses)
                                    .Include(u => u.AccessCodes)
                                    .Include(u => u.Subscriptions)
                                    .ThenInclude(u => u.Subscription)
@@ -85,11 +82,11 @@ namespace Hood.Services
             user = userQ.FirstOrDefault();
             return user;
         }
-        public ApplicationUser GetUserByEmail(string email, bool track = true)
+        public HoodIdentityUser GetUserByEmail(string email, bool track = true)
         {
             if (string.IsNullOrEmpty(email))
                 return null;
-            ApplicationUser user;
+            HoodIdentityUser user;
             var userQ = _db.Users.Include(u => u.Addresses)
                                    .Include(u => u.AccessCodes)
                                    .Include(u => u.Subscriptions)
@@ -100,11 +97,11 @@ namespace Hood.Services
             user = userQ.FirstOrDefault();
             return user;
         }
-        public async Task<ApplicationUser> GetUserByStripeId(string stripeId)
+        public async Task<HoodIdentityUser> GetUserByStripeId(string stripeId)
         {
             if (string.IsNullOrEmpty(stripeId))
                 return null;
-            ApplicationUser user;
+            HoodIdentityUser user;
             user = await _db.Users.Include(u => u.Addresses)
                                      .Include(u => u.AccessCodes)
                                       .Include(u => u.Subscriptions)
@@ -112,14 +109,14 @@ namespace Hood.Services
                                       .Where(u => u.StripeId == stripeId).FirstOrDefaultAsync();
             return user;
         }
-        public ApplicationUser GetCurrentUser(bool track = true)
+        public HoodIdentityUser GetCurrentUser(bool track = true)
         {
             if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 return GetUserById(_userManager.GetUserId(_contextAccessor.HttpContext.User), track);
             else
                 return null;
         }
-        public OperationResult UpdateUser(ApplicationUser user)
+        public OperationResult UpdateUser(HoodIdentityUser user)
         {
             try
             {
@@ -425,9 +422,9 @@ namespace Hood.Services
         }
 
         // User Subscriptions
-        private IQueryable<ApplicationUser> GetSubscribers(string subcription, string search = "", string sort = "")
+        private IQueryable<HoodIdentityUser> GetSubscribers(string subcription, string search = "", string sort = "")
         {
-            IQueryable<ApplicationUser> users = _db.Users
+            IQueryable<HoodIdentityUser> users = _db.Users
                 .Include(u => u.Subscriptions).ThenInclude(u => u.Subscription);
 
             if (subcription.IsSet())
@@ -482,9 +479,9 @@ namespace Hood.Services
             }
             return users;
         }
-        public async Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription)
+        public async Task<PagedList<HoodIdentityUser>> GetPagedSubscribers(ListFilters filters, string subcription)
         {
-            PagedList<ApplicationUser> model = new PagedList<ApplicationUser>();
+            PagedList<HoodIdentityUser> model = new PagedList<HoodIdentityUser>();
             var subs = GetSubscribers(subcription, filters.search, filters.sort);
             model.Items = await subs.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToListAsync();
             model.Count = subs.Count();
@@ -503,7 +500,7 @@ namespace Hood.Services
         public async Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            HoodIdentityUser user = GetCurrentUser();
 
             // Load the subscription plan.
             Subscription subscription = await GetSubscriptionPlanById(planId);
@@ -593,7 +590,7 @@ namespace Hood.Services
         public async Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            HoodIdentityUser user = GetCurrentUser();
 
             Subscription subscription = await GetSubscriptionPlanById(planId);
             UserSubscription userSub = GetUserSubscription(user, subscriptionId);
@@ -620,7 +617,7 @@ namespace Hood.Services
         public async Task<UserSubscription> CancelUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            HoodIdentityUser user = GetCurrentUser();
 
             // Check for customer or throw.
             var customer = await LoadCustomerObject(user.StripeId, false);
@@ -636,7 +633,7 @@ namespace Hood.Services
         public async Task<UserSubscription> RemoveUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            HoodIdentityUser user = GetCurrentUser();
 
             // Check for customer or throw.
             var customer = await LoadCustomerObject(user.StripeId, false);
@@ -652,7 +649,7 @@ namespace Hood.Services
         public async Task<UserSubscription> ReactivateUserSubscription(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            HoodIdentityUser user = GetCurrentUser();
 
             // Check for customer or throw.
             var customer = await LoadCustomerObject(user.StripeId, false);
@@ -670,14 +667,14 @@ namespace Hood.Services
         }
 
         // [UserSubscription] Helpers
-        private UserSubscription GetUserSubscription(ApplicationUser user, int userSubscriptionId)
+        private UserSubscription GetUserSubscription(HoodIdentityUser user, int userSubscriptionId)
         {
-            UserSubscription subscription = user.Subscriptions.Where(us => us.UserSubscriptionId == userSubscriptionId).FirstOrDefault();
+            UserSubscription subscription = user.Subscriptions.Where(us => us.Id == userSubscriptionId).FirstOrDefault();
             if (subscription == null)
                 throw new Exception(BillingMessage.NoSubscription.ToString());
             return subscription;
         }
-        private UserSubscription GetUserSubscriptionByStripeId(ApplicationUser user, string stripeId)
+        private UserSubscription GetUserSubscriptionByStripeId(HoodIdentityUser user, string stripeId)
         {
             UserSubscription subscription = user.Subscriptions.Where(us => us.StripeId == stripeId).FirstOrDefault();
             if (subscription == null)
@@ -692,7 +689,7 @@ namespace Hood.Services
             try
             {
                 sw.WriteLine("[System] Processing [AccountRepository.ConfirmSubscriptionObject].");
-                ApplicationUser user = GetUserByStripeId(created.CustomerId).Result;
+                HoodIdentityUser user = GetUserByStripeId(created.CustomerId).Result;
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, created.Id);
                 sw.WriteLine("[DB] [User] Name: " + user.FullName);
                 sw.WriteLine("[DB] [User] Email: " + user.Email);
@@ -754,7 +751,7 @@ namespace Hood.Services
             try
             {
                 sw.WriteLine("[System] Processing [AccountRepository.UpdateSubscriptionObject].");
-                ApplicationUser user = GetUserByStripeId(updated.CustomerId).Result;
+                HoodIdentityUser user = GetUserByStripeId(updated.CustomerId).Result;
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
                 sw.WriteLine("[DB] [User] Name: " + user.FullName);
                 sw.WriteLine("[DB] [User] Email: " + user.Email);
@@ -825,7 +822,7 @@ namespace Hood.Services
             try
             {
                 sw.WriteLine("[System] Processing [AccountRepository.RemoveUserSubscriptionObject].");
-                ApplicationUser user = GetUserByStripeId(deleted.CustomerId).Result;
+                HoodIdentityUser user = GetUserByStripeId(deleted.CustomerId).Result;
                 UserSubscription userSub = GetUserSubscriptionByStripeId(user, deleted.Id);
                 sw.WriteLine("User: " + user.FullName);
                 sw.WriteLine("User Email: " + user.Email);

@@ -9,10 +9,10 @@ namespace Hood.Services
     public class InvoiceService : IInvoiceService
     {
         private IStripeService _stripe;
-        private UserManager<ApplicationUser> _userManager;
+        private UserManager<HoodIdentityUser> _userManager;
 
         public InvoiceService(IStripeService stripe,
-                               UserManager<ApplicationUser> userManager)
+                               UserManager<HoodIdentityUser> userManager)
         {
             _stripe = stripe;
             _userManager = userManager;
