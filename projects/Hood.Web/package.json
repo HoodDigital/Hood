@@ -1,6 +1,6 @@
 {
     "name": "hood.web",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "devDependencies": {
         "del": "2.2.2",
         "fs": "0.0.1-security",
