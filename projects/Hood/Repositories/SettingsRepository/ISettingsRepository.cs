@@ -37,8 +37,8 @@ namespace Hood.Services
         Task ProcessCaptchaOrThrowAsync(HttpRequest request);
         string ReplacePlaceholders(string adminNoficationSubject);
 
-        ContentApi ToContentApi(Content content);
-        PropertyListingApi ToPropertyListingApi(PropertyListing property);
+        ContentApi ToContentApi(IContentBase content);
+        PropertyListingApi ToPropertyListingApi(IPropertyListingBase property);
         ApplicationUserApi ToApplicationUserApi(IHoodUser user);
     }
 

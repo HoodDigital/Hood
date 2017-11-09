@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hood.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Hood.Interfaces
@@ -54,5 +55,6 @@ namespace Hood.Interfaces
         string VATNumber { get; set; }
         string WebsiteUrl { get; set; }
         string ReplacePlaceholders(string msg);
+        SiteMedia Avatar { get; set; }
     }
 }

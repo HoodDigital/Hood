@@ -28,13 +28,6 @@ namespace Hood.Models
             set { BillingAddressJson = JsonConvert.SerializeObject(value); }
         }
 
-        [NotMapped]
-        public SiteMedia Avatar
-        {
-            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<SiteMedia>(AvatarJson) : null; }
-            set { AvatarJson = JsonConvert.SerializeObject(value); }
-        }
-
         public List<UserAccessCode> AccessCodes { get; set; }
         public List<Content> Content { get; set; }
         public List<PropertyListing> Properties { get; set; }
@@ -122,6 +115,12 @@ namespace Hood.Models
         public string Longitude { get; set; }
 
         public string AvatarJson { get; set; }
+        [NotMapped]
+        public SiteMedia Avatar
+        {
+            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<SiteMedia>(AvatarJson) : null; }
+            set { AvatarJson = JsonConvert.SerializeObject(value); }
+        }
 
         public string BillingAddressJson { get; set; }
         public string DeliveryAddressJson { get; set; }

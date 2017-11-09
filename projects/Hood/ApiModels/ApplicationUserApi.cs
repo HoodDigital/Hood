@@ -8,26 +8,7 @@ using System.Linq;
 
 namespace Hood.Models.Api
 {
-    public class ApplicationUserApi : ApplicationUserApi<HoodIdentityUser>
-    {
-        public ApplicationUserApi(IHoodUser user, ISettingsRepository settings = null)
-            : base(user, settings)
-        {
-            if (user.Avatar != null)
-                Avatar = new MediaApi(user.Avatar, settings);
-            else
-                Avatar = MediaApi.Blank(mediaSettings);
-
-            Addresses = user.Addresses?.Select(s => new AddressApi<IHoodUser>(s)).ToList();
-            DeliveryAddress = user.DeliveryAddress == null ? null : new AddressApi<IHoodUser>(user.DeliveryAddress);
-            BillingAddress = user.BillingAddress == null ? null : new AddressApi<IHoodUser>(user.BillingAddress);
-
-            Subscriptions = user.Subscriptions?.Select(s => new UserSubscriptionApi<IHoodUser>(s)).ToList();
-
-        }
-    }
-
-    public class ApplicationUserApi<TUser> where TUser : IHoodUser
+    public class ApplicationUserApi
     {
         public string Id { get; set; }
         public string UserName { get; set; }
@@ -101,8 +82,13 @@ namespace Hood.Models.Api
         {
         }
 
-        public ApplicationUserApi(IHoodUser user)
+        public ApplicationUserApi(IHoodUser user, ISettingsRepository settings = null)
         {
+            var mediaSettings = settings.GetMediaSettings();
+            if (user.Avatar != null)
+                Avatar = new MediaApi(user.Avatar, settings);
+            else
+                Avatar = MediaApi.Blank(mediaSettings);
 
             if (user == null)
                 return;
