@@ -39,8 +39,8 @@ namespace Hood.Controllers
         [SubscriptionRequired(Roles: "SuperUser")]
         public IActionResult Index()
         {
-            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
-            SubscriptionModel<HoodIdentityUser> model = new SubscriptionModel<HoodIdentityUser>();
+            AccountInfo account = HttpContext.GetAccountInfo();
+            SubscriptionModel model = new SubscriptionModel();
             return View(model);
         }
 
@@ -48,8 +48,8 @@ namespace Hood.Controllers
         [Route("account/billing/updated/")]
         public async Task<IActionResult> Updated(int plan, BillingMessage? message = null)
         {
-            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
-            SubscriptionModel<HoodIdentityUser> model = new SubscriptionModel<HoodIdentityUser>()
+            AccountInfo account = HttpContext.GetAccountInfo();
+            SubscriptionModel model = new SubscriptionModel()
             {
                 User = account.User,
                 Plans = await _auth.GetSubscriptionPlanLevels(),
@@ -65,8 +65,8 @@ namespace Hood.Controllers
         [SubscriptionRequired(Roles: "SuperUser")]
         public async Task<IActionResult> Change(BillingMessage? message = null)
         {
-            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
-            SubscriptionModel<HoodIdentityUser> model = new SubscriptionModel<HoodIdentityUser>()
+            AccountInfo account = HttpContext.GetAccountInfo();
+            SubscriptionModel model = new SubscriptionModel()
             {
                 User = account.User,
                 Plans = await _auth.GetSubscriptionPlanLevels(),
@@ -80,14 +80,14 @@ namespace Hood.Controllers
         [Route("account/subscriptions/new/")]
         public async Task<IActionResult> New(string returnUrl = null, BillingMessage? message = null)
         {
-            SubscriptionModel<HoodIdentityUser> model = await GetCreateModel(returnUrl);
+            SubscriptionModel model = await GetCreateModel(returnUrl);
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/subscriptions/new/")]
-        public async Task<IActionResult> New(SubscriptionModel<HoodIdentityUser> model, string returnUrl = null)
+        public async Task<IActionResult> New(SubscriptionModel model, string returnUrl = null)
         {
             try
             {
@@ -117,14 +117,14 @@ namespace Hood.Controllers
         [Route("account/subscriptions/addon/")]
         public async Task<IActionResult> Addon(string required, string returnUrl = null, BillingMessage? message = null)
         {
-            SubscriptionModel<HoodIdentityUser> model = await GetCreateModel(returnUrl);
+            SubscriptionModel model = await GetCreateModel(returnUrl);
             return View(model);
         }
 
-        private async Task<SubscriptionModel<HoodIdentityUser>> GetCreateModel(string returnUrl)
+        private async Task<SubscriptionModel> GetCreateModel(string returnUrl)
         {
-            AccountInfo<HoodIdentityUser> account = HttpContext.GetAccountInfo();
-            SubscriptionModel<HoodIdentityUser> model = new SubscriptionModel<HoodIdentityUser>()
+            AccountInfo account = HttpContext.GetAccountInfo();
+            SubscriptionModel model = new SubscriptionModel()
             {
                 User = account.User,
                 Plans = await _auth.GetSubscriptionPlanLevels(),

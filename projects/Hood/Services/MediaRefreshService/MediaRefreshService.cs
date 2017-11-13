@@ -15,13 +15,13 @@ namespace Hood.Services
     public class MediaRefreshService : IMediaRefreshService
     {
         private IConfiguration _config;
-        private IMediaManager<SiteMedia> _media;
+        private IMediaManager<MediaObject> _media;
         private ISettingsRepository _settings;
 
         public MediaRefreshService(
             IHostingEnvironment env,
             IConfiguration config,
-            IMediaManager<SiteMedia> media,
+            IMediaManager<MediaObject> media,
             ISettingsRepository site,
             IEmailSender email)
         {
@@ -72,9 +72,9 @@ namespace Hood.Services
                 StatusMessage = "Starting update...";
                 _context = context;
                 // Get a new instance of the HoodDbContext for this import.
-                var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
+                var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                _db = new DefaultHoodDbContext(options.Options);
+                _db = new HoodDbContext(options.Options);
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(RefreshAllMedia);
@@ -152,7 +152,8 @@ namespace Hood.Services
                 {
                     if (content.FeaturedImage != null)
                     {
-                        content.FeaturedImage = _db.Media.Find(content.FeaturedImage.Id);
+                        var media = _db.Media.Find(content.FeaturedImage.Id);
+                        content.FeaturedImage = new ContentMedia(media);
                         StatusMessage = string.Format("Refreshing content featured image: {0} {1}", content.Id, content.Title);
                     }
                 }

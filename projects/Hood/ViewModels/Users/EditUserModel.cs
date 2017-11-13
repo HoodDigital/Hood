@@ -6,7 +6,7 @@ namespace Hood.Models
 {
     public class EditUserModel : SaveableModel
     {
-        public HoodIdentityUser User { get; set; }
+        public ApplicationUser User { get; set; }
         public IList<string> Roles { get; set; }
         public IList<IdentityRole> AllRoles { get; set; }
     }

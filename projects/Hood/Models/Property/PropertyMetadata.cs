@@ -1,36 +1,22 @@
 ﻿using Hood.Interfaces;
+using System;
 
 namespace Hood.Models
 {
-    public class PropertyMeta : PropertyMeta<HoodIdentityUser>
+    public class PropertyMeta : MetadataBase
     {
+        public int PropertyId { get; set; }
+        public PropertyListing Property { get; set; }
+
+        public PropertyMeta()
+            : base()
+        {
+        }
+
         public PropertyMeta(string name, string value, string type = "System.String")
             : base(name, value, type)
         {
         }
     }
-
-    public partial class PropertyMeta<TUser> : IMetadata where TUser : IHoodUser
-    {
-        public int Id { get; set; }
-        public string BaseValue { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
-
-        public int PropertyId { get; set; }
-        public PropertyListing<TUser> Property { get; set; }
-
-        public PropertyMeta()
-        {
-        }
-
-        public PropertyMeta(string name, string value, string type = "System.String")
-        {
-            Type = type;
-            Name = name;
-            BaseValue = value;
-        }
-    }
-
 }
 

@@ -26,9 +26,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="linqtotwitter" Version="4.2.0-beta2" />
-    <PackageReference Include="MediaTypeMap" Version="2.1.0" />
     <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="Stripe.net" Version="11.7.1" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
@@ -46,8 +47,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Views\**\*.cshtml" />
-    <EmbeddedResource Include="Views\**\*.json" />
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
   </ItemGroup>

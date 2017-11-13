@@ -11,16 +11,14 @@ namespace Hood.Models
 {
     public static class DbContextExtensions
     {
-
         public static void ConfigureForHood(DbContextOptionsBuilder optionsBuilder)
         {
         }
-
         public static void CreateHoodModels(ModelBuilder builder)
         {
             // Identity
             builder.Entity<Option>().ToTable("HoodOptions");
-            builder.Entity<SiteMedia>().ToTable("HoodMedia");
+            builder.Entity<MediaObject>().ToTable("HoodMedia");
             builder.Entity<Address>().ToTable("HoodAddresses");
             builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
@@ -32,6 +30,7 @@ namespace Hood.Models
             builder.Entity<Subscription>().ToTable("HoodSubscriptions");
             builder.Entity<SubscriptionFeature>().ToTable("HoodSubscriptionFeatures");
             builder.Entity<UserSubscription>().ToTable("HoodUserSubscriptions");
+            builder.Entity<UserSubscription>().Property("Id").HasColumnName("UserSubscriptionId");
             builder.Entity<UserSubscription>().HasOne(pt => pt.User).WithMany(p => p.Subscriptions).HasForeignKey(pt => pt.UserId);
             builder.Entity<UserSubscription>().HasOne(pt => pt.Subscription).WithMany(t => t.Users).HasForeignKey(pt => pt.SubscriptionId);
 
@@ -39,22 +38,22 @@ namespace Hood.Models
             builder.Entity<Content>().ToTable("HoodContent");
             builder.Entity<Content>().HasOne(c => c.Author).WithMany(up => up.Content).HasForeignKey(c => c.AuthorId);
 
-            builder.Entity<ContentMedia>().ToTable("HoodContentMedia");
-            builder.Entity<ContentMedia>().HasOne(up => up.Content).WithMany(t => t.Media).HasForeignKey(au => au.ContentId);
-
-            // Categories
-            builder.Entity<ContentCategory>().ToTable("HoodContentCategories");
-            builder.Entity<ContentCategoryJoin>().ToTable("HoodContentCategoryJoins");
-            builder.Entity<ContentCategoryJoin>().HasKey(t => new { t.ContentId, t.CategoryId });
-            builder.Entity<ContentCategoryJoin>().HasOne(pt => pt.Category).WithMany(p => p.Content).HasForeignKey(pt => pt.CategoryId);
-            builder.Entity<ContentCategoryJoin>().HasOne(pt => pt.Content).WithMany(t => t.Categories).HasForeignKey(pt => pt.ContentId);
-
             // Content Tags
             builder.Entity<ContentTag>().ToTable("HoodContentTags");
             builder.Entity<ContentTagJoin>().ToTable("HoodContentTagJoins");
             builder.Entity<ContentTagJoin>().HasKey(t => new { t.ContentId, t.TagId });
             builder.Entity<ContentTagJoin>().HasOne(pt => pt.Tag).WithMany(p => p.Content).HasForeignKey(pt => pt.TagId);
             builder.Entity<ContentTagJoin>().HasOne(pt => pt.Content).WithMany(t => t.Tags).HasForeignKey(pt => pt.ContentId);
+            builder.Entity<ContentMedia>().ToTable("HoodContentMedia");
+            builder.Entity<ContentMedia>().HasOne(up => up.Content).WithMany(t => t.Media).HasForeignKey(au => au.ContentId);
+
+            // Categories
+            builder.Entity<ContentCategory>().ToTable("HoodContentCategories");
+            builder.Entity<ContentCategory>().Property("Id").HasColumnName("ContentCategoryId");
+            builder.Entity<ContentCategoryJoin>().ToTable("HoodContentCategoryJoins");
+            builder.Entity<ContentCategoryJoin>().HasKey(t => new { t.ContentId, t.CategoryId });
+            builder.Entity<ContentCategoryJoin>().HasOne(pt => pt.Category).WithMany(p => p.Content).HasForeignKey(pt => pt.CategoryId);
+            builder.Entity<ContentCategoryJoin>().HasOne(pt => pt.Content).WithMany(t => t.Categories).HasForeignKey(pt => pt.ContentId);
 
             // Content Metadata
             builder.Entity<ContentMeta>().ToTable("HoodContentMetadata");
@@ -77,7 +76,6 @@ namespace Hood.Models
             builder.Entity<PropertyFloorplan>().ToTable("HoodPropertyFloorplans");
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
         }
-
         public static bool AllMigrationsApplied(this HoodDbContext context)
         {
             var applied = context.GetService<IHistoryRepository>()
@@ -90,7 +88,6 @@ namespace Hood.Models
 
             return !total.Except(applied).Any();
         }
-
         public static void EnsureSetup(this HoodDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (context.AllMigrationsApplied())

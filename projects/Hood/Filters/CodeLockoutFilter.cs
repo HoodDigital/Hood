@@ -18,14 +18,14 @@ namespace Hood.Filters
     {
         private readonly ILogger _logger;
         private readonly ISettingsRepository _settings;
-        private readonly UserManager<IHoodUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
 
         public LockoutModeFilter(IConfiguration config,
             ILoggerFactory loggerFactory,
             IBillingService billing,
             ISettingsRepository settings,
-            UserManager<IHoodUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
             _settings = settings;
@@ -65,7 +65,7 @@ namespace Hood.Filters
                 // If they are in an override role, let them through.
                 if (context.HttpContext.User.Identity.IsAuthenticated)
                 {
-                    AccountInfo<IHoodUser> _account = context.HttpContext.GetAccountInfo();
+                    AccountInfo _account = context.HttpContext.GetAccountInfo();
 
                     string[] _roles = { "SuperUser", "Admin" };
                     if (_userManager.GetRolesAsync(_account.User).Result.Any(r => _roles.Contains(r)))

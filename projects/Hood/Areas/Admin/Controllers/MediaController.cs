@@ -1,20 +1,18 @@
-﻿using System;
+﻿using Hood.Caching;
+using Hood.Enums;
+using Hood.Extensions;
+using Hood.Models;
+using Hood.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Hood.Models;
-using Microsoft.EntityFrameworkCore;
-using Hood.Services;
-using Microsoft.AspNetCore.Http;
-using Hood.Extensions;
-using Hood.Models.Api;
-using Newtonsoft.Json;
-using Hood.Interfaces;
-using Hood.Caching;
-using Hood.Enums;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -22,14 +20,14 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class MediaController : Controller
     {
-        private readonly UserManager<HoodIdentityUser> _userManager;
-        private readonly HoodDbContext<HoodIdentityUser> _db;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly HoodDbContext _db;
         private readonly IHoodCache _cache;
-        private readonly IMediaManager<SiteMedia> _media;
+        private readonly IMediaManager<MediaObject> _media;
         private readonly ISettingsRepository _settings;
 
         public MediaController(
-            UserManager<HoodIdentityUser> userManager, HoodDbContext<HoodIdentityUser> db, IHoodCache cache, IMediaManager<SiteMedia> media, ISettingsRepository settings)
+            UserManager<ApplicationUser> userManager, HoodDbContext db, IHoodCache cache, IMediaManager<MediaObject> media, ISettingsRepository settings)
         {
             _userManager = userManager;
             _cache = cache;
@@ -65,7 +63,7 @@ namespace Hood.Areas.Admin.Controllers
         [HttpGet]
         public async Task<JsonResult> Get(ListFilters request, string search, string sort, string type, string directory, string container = "mediaitem")
         {
-            IList<SiteMedia> media = new List<SiteMedia>();
+            IList<MediaObject> media = new List<MediaObject>();
             if (!string.IsNullOrEmpty(type))
             {
                 media = await _db.Media.Where(m => m.GeneralFileType == type).ToListAsync();
@@ -109,7 +107,7 @@ namespace Hood.Areas.Admin.Controllers
                     media = media.OrderByDescending(n => n.CreatedOn).ToList();
                     break;
             }
-            Response response = new Response(media.Select(m => new MediaApi(m, _settings)).Skip(request.skip).Take(request.take).ToArray(), media.Count());
+            Response response = new Response(media.Skip(request.skip).Take(request.take).ToArray(), media.Count());
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -131,7 +129,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                SiteMedia newMedia = new SiteMedia()
+                MediaObject newMedia = new MediaObject()
                 {
                     BlobReference = "",
                     CreatedOn = DateTime.Now,
@@ -159,8 +157,8 @@ namespace Hood.Areas.Admin.Controllers
         [HttpGet]
         public async Task<JsonResult> GetById(int id)
         {
-            IList<SiteMedia> media = await _db.Media.Where(u => u.Id == id).ToListAsync();
-            return Json(media.Select(m => new MediaApi(m, _settings)).ToArray());
+            IList<MediaObject> media = await _db.Media.Where(u => u.Id == id).ToListAsync();
+            return Json(media.ToArray());
         }
 
         [HttpPost()]
@@ -209,7 +207,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/media/blade/{id}/")]
         public async Task<IActionResult> Blade(int id)
         {
-            SiteMedia media = await _db.Media.SingleAsync(m => m.Id == id);
+            MediaObject media = await _db.Media.SingleAsync(m => m.Id == id);
             return View(media);
         }
 
@@ -230,7 +228,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // load the media object.
-                SiteMedia media = _db.Media.SingleOrDefault(m => m.Id == attach.MediaId);
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == attach.MediaId);
                 string cacheKey;
                 switch (attach.Entity)
                 {
@@ -243,7 +241,7 @@ namespace Hood.Areas.Admin.Controllers
                         switch (attach.Field)
                         {
                             case "FeaturedImage":
-                                content.FeaturedImage = media;
+                                content.FeaturedImage = new ContentMedia(media);
                                 break;
                         }
 
@@ -255,7 +253,7 @@ namespace Hood.Areas.Admin.Controllers
                     case "ApplicationUser":
 
                         // create the new media item for content =>
-                        HoodIdentityUser user = await _db.Users.Where(p => p.Id == attach.Id).FirstOrDefaultAsync();
+                        ApplicationUser user = await _db.Users.Where(p => p.Id == attach.Id).FirstOrDefaultAsync();
 
                         switch (attach.Field)
                         {
@@ -265,7 +263,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
 
-                        cacheKey = typeof(HoodIdentityUser).ToString() + ".Single." + attach.Id;
+                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + attach.Id;
                         _cache.Remove(cacheKey);
                         await _db.SaveChangesAsync();
                         return new Response(true);
@@ -294,7 +292,7 @@ namespace Hood.Areas.Admin.Controllers
 
                         int idForMeta = int.Parse(attach.Id);
                         Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();
-                        SiteMedia mi = await _db.Media.Where(m => m.Id == attach.MediaId).FirstOrDefaultAsync();
+                        MediaObject mi = await _db.Media.Where(m => m.Id == attach.MediaId).FirstOrDefaultAsync();
                         contentForMeta.UpdateMeta(attach.Field, mi);
                         if (await _db.SaveChangesAsync() == 0)
                             throw new Exception("Could not update the database");
@@ -345,7 +343,7 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     foreach (IFormFile file in files)
                     {
-                        SiteMedia mi = await _media.ProcessUpload(file, new SiteMedia() { Directory = directory });
+                        MediaObject mi = await _media.ProcessUpload(file, new MediaObject() { Directory = directory });
                         _db.Media.Add(mi);
                         _db.SaveChanges();
                     }
@@ -370,7 +368,7 @@ namespace Hood.Areas.Admin.Controllers
                     directory = "Default";
                 if (file != null)
                 {
-                    SiteMedia mi = await _media.ProcessUpload(file, new SiteMedia() { Directory = directory });
+                    MediaObject mi = await _media.ProcessUpload(file, new MediaObject() { Directory = directory });
                     _db.Media.Add(mi);
                     _db.SaveChanges();
                     return Json(new { Success = false, Message = mi.LargeUrl });

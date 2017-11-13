@@ -20,7 +20,7 @@ namespace Hood.Services
         // Services
         private IFTPService _ftp;
         private IConfiguration _config;
-        private IMediaManager<SiteMedia> _media;
+        private IMediaManager<MediaObject> _media;
         private PropertySettings _propertySettings;
         private ISettingsRepository _settings;
         private IEmailSender _email;
@@ -29,12 +29,12 @@ namespace Hood.Services
         // Members
         private ReaderWriterLock Lock { get; set; }
         private ContentExporterReport Status { get; set; }
-        private AccountInfo<HoodIdentityUser> Account { get; set; }
+        private AccountInfo Account { get; set; }
         private string _tempFolder { get; set; }
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
 
-        public ContentExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<SiteMedia> media, ISettingsRepository site, IEmailSender email)
+        public ContentExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<MediaObject> media, ISettingsRepository site, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;
@@ -99,7 +99,7 @@ namespace Hood.Services
 
                 // Get all the properties.
 
-                List<Content<HoodIdentityUser>> items = await _db.Content
+                List<Content> items = await _db.Content
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -112,7 +112,7 @@ namespace Hood.Services
                 Status.Tasks = Status.Total + 6;
                 Lock.ReleaseWriterLock();
 
-                List<Content<HoodIdentityUser>> content = new List<Content<HoodIdentityUser>>();
+                List<Content> content = new List<Content>();
 
                 foreach (var item in items)
                 {
@@ -326,9 +326,9 @@ namespace Hood.Services
             _propertySettings = _settings.GetPropertySettings();
 
             // Get a new instance of the HoodDbContext for this import.
-            var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
+            var options = new DbContextOptionsBuilder<HoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            _db = new DefaultHoodDbContext(options.Options);
+            _db = new HoodDbContext(options.Options);
             Lock.ReleaseWriterLock();
         }
 

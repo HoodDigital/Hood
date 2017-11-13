@@ -1,18 +1,17 @@
-﻿using System.Threading.Tasks;
+﻿using Hood.Extensions;
+using Hood.Infrastructure;
+using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Hood.Models;
-using System.Linq;
-using Hood.Services;
-using Hood.Extensions;
-using Hood.Infrastructure;
-using Microsoft.AspNetCore.Hosting;
 using System;
-using Hood.Models.Api;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
-using System.IO;
+using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
@@ -21,16 +20,16 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Manager")]
     public class SubscriptionsController : Controller
     {
-        private readonly UserManager<HoodIdentityUser> _userManager;
-        private readonly ISettingsRepository<HoodIdentityUser> _settings;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
         private readonly IAccountRepository _auth;
 
         public SubscriptionsController(
-            UserManager<HoodIdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             IAccountRepository auth,
-            ISettingsRepository<HoodIdentityUser> site,
+            ISettingsRepository site,
             IBillingService billing,
             IHostingEnvironment env)
         {
@@ -67,7 +66,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost()]
         [Route("admin/subscriptions/edit/{id}/")]
-        public async Task<ActionResult> Edit(Subscription<HoodIdentityUser> model)
+        public async Task<ActionResult> Edit(Subscription model)
         {
             EditSubscriptionModel esm = new EditSubscriptionModel()
             {
@@ -87,8 +86,8 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/get")]
         public async Task<JsonResult> Get(ListFilters request, string search, string sort)
         {
-            PagedList<Subscription<HoodIdentityUser>> subs = await _auth.GetPagedSubscriptions(request, search, sort);
-            Response response = new Response(subs.Items.Select(s => new SubscriptionApi<HoodIdentityUser>(s)).ToArray(), subs.Count);
+            PagedList<Subscription> subs = await _auth.GetPagedSubscriptions(request, search, sort);
+            Response response = new Response(subs.Items.ToArray(), subs.Count);
             return Json(response);
         }
     
@@ -98,9 +97,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                HoodIdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 BillingSettings billingSettings = _settings.GetBillingSettings();
-                Subscription<HoodIdentityUser> subscription = new Subscription<HoodIdentityUser>
+                Subscription subscription = new Subscription
                 {
                     CreatedBy = user.Id,
                     StripeId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString(),

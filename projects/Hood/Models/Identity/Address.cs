@@ -1,25 +1,14 @@
 ﻿using Hood.Entities;
+using Hood.Extensions;
 using Hood.Interfaces;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
-    public partial class Address : AddressBase
+    public partial class Address : BaseEntity, IAddress
     {
-        [Key]
-        public int Id { get; set; }
-        public string UserId { get; set; }
-        public HoodIdentityUser User { get; set; }
-    }
-    public partial class Address<TUser> : AddressBase where TUser : IHoodUser
-    {
-        [Key]
-        public int Id { get; set; }
-        public string UserId { get; set; }
-        public TUser User { get; set; }
-    }
-    public abstract class AddressBase : BaseEntity, IAddress
-    {
+
         public string ContactName { get; set; }
         public string QuickName { get; set; }
 
@@ -43,5 +32,26 @@ namespace Hood.Models
         public string Postcode { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+
+        public string UserId { get; set; }
+        public ApplicationUser User { get; set; }
+
+        public string FullAddress
+        {
+            get
+            {
+                var output = Address1 + ", ";
+                if (!string.IsNullOrEmpty(Address2))
+                    output += Address2 + ", ";
+                output += City + ", ";
+                output += County + ", ";
+                output += Country + ", ";
+                output += Postcode;
+                return output;
+            }
+        }
+        public bool IsDelivery { get { return Id == User.DeliveryAddress?.Id; } }
+        public bool IsBilling { get { return Id == User.BillingAddress?.Id; } }
+
     }
 }

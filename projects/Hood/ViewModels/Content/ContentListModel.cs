@@ -1,5 +1,4 @@
-﻿using Hood.Models.Api;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Hood.Models
 {
@@ -14,6 +13,6 @@ namespace Hood.Models
 
         // List
         public PagedList<Content> Posts { get; set; }
-        public ApplicationUserApi Author { get; set; }
+        public ApplicationUser Author { get; set; }
     }
 }

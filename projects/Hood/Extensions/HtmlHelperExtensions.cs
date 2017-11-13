@@ -41,7 +41,7 @@ namespace Hood.Extensions
                     if (useSlug)
                         htmlOutput += "<option value=\"" + category.Slug + "\">";
                     else
-                        htmlOutput += "<option value=\"" + category.ContentCategoryId + "\">";
+                        htmlOutput += "<option value=\"" + category.Id + "\">";
                     for (int i = 0; i < startingLevel; i++)
                     {
                         htmlOutput += "- ";
@@ -74,8 +74,8 @@ namespace Hood.Extensions
                     htmlOutput += " <small>[" + category.Slug + "]</small>";
                     htmlOutput += "</td>";
                     htmlOutput += "<td class='text-right'>";
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.ContentCategoryId, category.ContentType);
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.ContentCategoryId);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
                     htmlOutput += "</td>";
                     htmlOutput += html.AdminContentCategoryTree(category.Children, contentSlug, startingLevel + 1);
                     htmlOutput += "</tr>";

@@ -21,7 +21,7 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IAccountRepository _auth;
         private readonly IAddressService _address;
         private readonly IHoodCache _cache;
-        private readonly IMediaManager<SiteMedia> _media;
+        private readonly IMediaManager<MediaObject> _media;
         private readonly HoodDbContext _db;
         private readonly IEmailSender _email;
         private readonly IMediaRefreshService _mediaRefresh;
@@ -33,7 +33,7 @@ namespace Hood.Areas.Admin.Controllers
                               IContentRepository content,
                               IAddressService address,
                               IHoodCache cache,
-                              IMediaManager<SiteMedia> media,
+                              IMediaManager<MediaObject> media,
                               HoodDbContext db,
                               IEmailSender email,
                               IMediaRefreshService mediaRefresh)

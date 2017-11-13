@@ -10,19 +10,19 @@ namespace Hood.Services
     public class CustomerService : ICustomerService
     {
         private IStripeService _stripe;
-        private UserManager<HoodIdentityUser> _userManager;
+        private UserManager<ApplicationUser> _userManager;
         private IHoodCache _cache;
 
         public CustomerService(IStripeService stripe,
                                IHoodCache cache,
-                               UserManager<HoodIdentityUser> userManager)
+                               UserManager<ApplicationUser> userManager)
         {
             _cache = cache;
             _stripe = stripe;
             _userManager = userManager;
         }
 
-        public async Task<StripeCustomer> CreateCustomer(HoodIdentityUser user, string token, string planId = null)
+        public async Task<StripeCustomer> CreateCustomer(ApplicationUser user, string token, string planId = null)
         {
             var customer = new StripeCustomerCreateOptions()
             {

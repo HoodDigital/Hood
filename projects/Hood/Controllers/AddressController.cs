@@ -15,8 +15,8 @@ namespace Hood.Controllers
     //[Area("Hood")]
     public partial class AddressController : Controller
     {
-        private readonly UserManager<HoodIdentityUser> _userManager;
-        private readonly SignInManager<HoodIdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
@@ -27,8 +27,8 @@ namespace Hood.Controllers
         public AddressController(
             IContentRepository content,
             IAccountRepository auth,
-            UserManager<HoodIdentityUser> userManager,
-            SignInManager<HoodIdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
             ILoggerFactory loggerFactory,
@@ -55,13 +55,13 @@ namespace Hood.Controllers
         public ActionResult Create()
         {
             string userID = _userManager.GetUserId(User);
-            Address<HoodIdentityUser> add = new Address<HoodIdentityUser>() { UserId = userID };
+            Address add = new Address() { UserId = userID };
             return View(add);
         }
 
         [HttpPost]
         [Route("account/addresses/create/")]
-        public IActionResult Create(Address<HoodIdentityUser> address)
+        public IActionResult Create(Address address)
         {
             try
             {
@@ -74,9 +74,9 @@ namespace Hood.Controllers
                 _auth.UpdateUser(user);
 
                 if (user.BillingAddress == null)
-                    user.BillingAddress = address.CloneTo<Address<HoodIdentityUser>>();
+                    user.BillingAddress = address.CloneTo<Address>();
                 if (user.DeliveryAddress == null)
-                    user.DeliveryAddress = address.CloneTo<Address<HoodIdentityUser>>();
+                    user.DeliveryAddress = address.CloneTo<Address>();
 
                 _auth.UpdateUser(user);
 
@@ -96,7 +96,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [Route("account/addresses/edit/")]
-        public IActionResult Edit(Address<HoodIdentityUser> address)
+        public IActionResult Edit(Address address)
         {
             try
             {

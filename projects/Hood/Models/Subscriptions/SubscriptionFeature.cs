@@ -11,7 +11,7 @@ namespace Hood.Models
         public string Type { get; set; }
 
         public int SubscriptionId { get; set; }
-        public Subscription<HoodIdentityUser> Subscription { get; set; }
+        public Subscription Subscription { get; set; }
 
     }
 

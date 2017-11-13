@@ -1,6 +1,9 @@
-﻿using Hood.Entities;
+﻿using Hood.Core;
+using Hood.Entities;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,31 +13,8 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    // Add profile data for application users by adding properties to the ApplicationUser class
-
-    public partial class PropertyListing : PropertyListingBase
+    public partial class PropertyListing : BaseEntity, IAddress, IMetaObect<PropertyMeta>
     {
-        // Agent 
-        public string AgentId { get; set; }
-        public HoodIdentityUser Agent { get; set; }
-
-        public List<PropertyMeta> Metadata { get; set; }
-        public List<PropertyMedia> Media { get; set; }
-        public List<PropertyFloorplan> FloorPlans { get; set; }
-    }
-    public partial class PropertyListing<TUser> : PropertyListingBase where TUser : IHoodUser
-    {
-        // Agent 
-        public string AgentId { get; set; }
-        public TUser Agent { get; set; }
-
-        public List<PropertyMeta<TUser>> Metadata { get; set; }
-        public List<PropertyMedia<TUser>> Media { get; set; }
-        public List<PropertyFloorplan<TUser>> FloorPlans { get; set; }
-    }
-    public partial class PropertyListingBase : BaseEntity, IAddress
-    {
-
         // Content
         public string Title { get; set; }
         public string Reference { get; set; }
@@ -80,18 +60,18 @@ namespace Hood.Models
         // Featured Images
         public string FeaturedImageJson { get; set; }
         [NotMapped]
-        public SiteMedia FeaturedImage
+        public MediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<SiteMedia>(FeaturedImageJson) : null; }
+            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : null; }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
         }
 
         // Media
         public string InfoDownloadJson { get; set; }
         [NotMapped]
-        public SiteMedia InfoDownload
+        public MediaObject InfoDownload
         {
-            get { return InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<SiteMedia>(InfoDownloadJson) : null; }
+            get { return InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : null; }
             set { InfoDownloadJson = JsonConvert.SerializeObject(value); }
         }
 
@@ -128,15 +108,208 @@ namespace Hood.Models
         public string PremiumDisplay { get; set; }
         public string FeesDisplay { get; set; }
 
+        public string Email { get; set; }
+        public string QuickName { get; set; }
+        public string Addressee { get; set; }
+        public string Phone { get; set; }
+        public string SingleLineAddress => this.ToFormat(AddressFormat.SingleLine);
+
+        // Agent 
+        public string AgentId { get; set; }
+        public ApplicationUser Agent { get; set; }
+
+        public List<PropertyMeta> Metadata { get; set; }
+        public List<PropertyMedia> Media { get; set; }
+        public List<PropertyFloorplan> FloorPlans { get; set; }
+
         [NotMapped]
         public string Url
         {
             get
             {
                 return string.Format("/property/{0}/{1}/{2}/{3}", Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.Split(' ').First().ToSeoUrl(), Title.ToSeoUrl());
-
             }
         }
+
+        [NotMapped]
+        public string FormattedRent
+        {
+            get
+            {
+                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                decimal rent = 0;
+                if (Rent.HasValue)
+                    rent = Rent.Value;
+                return propertySettings.ShowRentDecimals ? rent.ToString("C") : rent.ToString("C0");
+            }
+        }
+
+        [NotMapped]
+        public string FormattedAskingPrice
+        {
+            get
+            {
+                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                decimal ap = 0;
+                if (AskingPrice.HasValue)
+                    ap = AskingPrice.Value;
+                return propertySettings.ShowAskingPriceDecimals ? ap.ToString("C") : ap.ToString("C0");
+            }
+        }
+
+        [NotMapped]
+        public string FormattedPremium
+        {
+            get
+            {
+                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                decimal premium = 0;
+                if (Premium.HasValue)
+                    premium = Premium.Value;
+                return propertySettings.ShowPremiumDecimals ? premium.ToString("C") : premium.ToString("C0");
+            }
+        }
+
+        [NotMapped]
+        public string FormattedFees
+        {
+            get
+            {
+                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                decimal fees = 0;
+                if (Fees.HasValue)
+                    fees = Fees.Value;
+                return propertySettings.ShowFeesDecimals ? fees.ToString("C") : fees.ToString("C0");
+            }
+        }
+
+
+        // Calculated
+        [NotMapped]
+        public List<FloorArea> FloorAreas
+        {
+            get
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<List<FloorArea>>(Floors);
+                }
+                catch (Exception)
+                {
+                    return new List<FloorArea>();
+                }
+            }
+        }
+        [NotMapped]
+        public decimal TotalFloorAreaMetres
+        {
+            get
+            {
+                if (FloorAreas == null) return 0;
+                if (FloorAreas.Count == 0) return 0;
+                return FloorAreas.Select(f => f.SquareMetres).Sum();
+            }
+        }
+        [NotMapped]
+        public decimal TotalFloorAreaFeet
+        {
+            get
+            {
+                if (FloorAreas == null) return 0;
+                if (FloorAreas.Count == 0) return 0;
+                return FloorAreas.Select(f => f.SquareFeet).Sum();
+            }
+        }
+
+        // MVVM Helpers
+        [NotMapped]
+        public int PublishHour => PublishDate.Hour;
+        [NotMapped]
+        public int PublishMinute => PublishDate.Minute;
+        [NotMapped]
+        public string PublishDatePart => PublishDate.ToShortDateString();
+
+        // Formatted Members
+        [NotMapped]
+        public string StatusString
+        {
+            get
+            {
+                switch ((Enums.Status)Status)
+                {
+                    case Enums.Status.Published:
+                        if (PublishDate > DateTime.Now)
+                            return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                        else
+                            return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                    case Enums.Status.Draft:
+                    default:
+                        return "Draft";
+                    case Enums.Status.Archived:
+                        return "Archived";
+                    case Enums.Status.Deleted:
+                        return "Deleted";
+                }
+            }
+        }
+        [NotMapped]
+        public bool PublishPending { get; set; }
+
+        public PropertyMeta GetMeta(string name)
+        {
+            PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
+            if (cm == null)
+                return new PropertyMeta()
+                {
+                    BaseValue = null,
+                    Name = name,
+                    Type = null
+                };
+            return cm;
+        }
+        public void UpdateMeta<T>(string name, T value)
+        {
+            if (Metadata != null)
+            {
+                PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
+                if (cm != null)
+                {
+                    cm.Set(value);
+                }
+            }
+        }
+        public void AddMeta(PropertyMeta value)
+        {
+            if (Metadata != null)
+            {
+                Metadata.Add(value);
+            }
+        }
+        public bool HasMeta(string name)
+        {
+            if (Metadata != null)
+            {
+                PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
+                if (cm != null)
+                    return true;
+            }
+            return false;
+        }
+        public bool BillIncludes(string type)
+        {
+            var meta = Metadata.SingleOrDefault(m => m.Name == "Bill.Includes." + type);
+            if (meta == null)
+                return false;
+            var value = meta.GetValue<bool>();
+            if (value)
+                return true;
+            return false;
+        }
+
     }
 
 }

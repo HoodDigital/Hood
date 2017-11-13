@@ -45,15 +45,15 @@ namespace Hood.Models
 
         public void ResetCache()
         {
-            var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
+            var options = new DbContextOptionsBuilder<HoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            var db = new DefaultHoodDbContext(options.Options);
+            var db = new HoodDbContext(options.Options);
             byKey = new Lazy<Dictionary<int, ContentCategory>>(() =>
             {
                 var q = from d in db.ContentCategories
                         select new ContentCategory
                         {
-                            ContentCategoryId = d.ContentCategoryId,
+                            Id = d.Id,
                             DisplayName = d.DisplayName,
                             Slug = d.Slug,
                             ContentType = d.ContentType,
@@ -62,7 +62,7 @@ namespace Hood.Models
                             Children = d.Children,
                             Count = d.Content.Count(),
                         };
-                return q.ToDictionary(c => c.ContentCategoryId);
+                return q.ToDictionary(c => c.Id);
             });
 
             ContentSettings contentSettings = _settings.GetContentSettings();
@@ -77,7 +77,7 @@ namespace Hood.Models
                                 where d.ContentType == type.Type
                                 select new ContentCategory
                                 {
-                                    ContentCategoryId = d.ContentCategoryId,
+                                    Id = d.Id,
                                     DisplayName = d.DisplayName,
                                     Slug = d.Slug,
                                     ContentType = d.ContentType,

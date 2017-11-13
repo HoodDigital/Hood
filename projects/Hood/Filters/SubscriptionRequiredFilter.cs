@@ -50,11 +50,11 @@ namespace Hood.Filters
         {
             private readonly ILogger _logger;
             private readonly IBillingService _billing;
-            private readonly ISettingsRepository<HoodIdentityUser> _settings;
+            private readonly ISettingsRepository _settings;
             private readonly List<string> _ids;
             private readonly List<string> _addons;
             private readonly List<string> _roles;
-            private readonly UserManager<HoodIdentityUser> _userManager;
+            private readonly UserManager<ApplicationUser> _userManager;
             private readonly IAccountRepository _auth;
             private readonly RoleManager<IdentityRole> _roleManager;
 
@@ -62,9 +62,9 @@ namespace Hood.Filters
                 IAccountRepository auth,
                 ILoggerFactory loggerFactory,
                 IBillingService billing,
-                ISettingsRepository<HoodIdentityUser> site,
+                ISettingsRepository site,
                 RoleManager<IdentityRole> roleManager,
-                UserManager<HoodIdentityUser> userManager,
+                UserManager<ApplicationUser> userManager,
                 string[] Ids,
                 string[] Addons,
                 string[] RoleOverrides)
@@ -89,7 +89,7 @@ namespace Hood.Filters
                 }
 
                 // Load the account information from the global context (set in the global AccountFilter)
-                AccountInfo<HoodIdentityUser> _account = context.HttpContext.GetAccountInfo();
+                AccountInfo _account = context.HttpContext.GetAccountInfo();
 
                 // Set the redirect location
                 BillingSettings billingSettings = _settings.GetBillingSettings();

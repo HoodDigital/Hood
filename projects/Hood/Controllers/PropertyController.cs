@@ -14,7 +14,7 @@ namespace Hood.Controllers
     public class PropertyController : Controller
     {
 
-        private readonly UserManager<HoodIdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPropertyRepository _property;
         private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
@@ -22,7 +22,7 @@ namespace Hood.Controllers
 
         public PropertyController(
             IPropertyRepository property,
-            UserManager<HoodIdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ISettingsRepository site,
             IBillingService billing,
             IHostingEnvironment env)
@@ -34,18 +34,18 @@ namespace Hood.Controllers
             _env = env;
         }
 
-        public async Task<IActionResult> Index(ListPropertyModel<HoodIdentityUser> model)
+        public async Task<IActionResult> Index(ListPropertyModel model)
         {
             var propertySettings = _settings.GetPropertySettings();
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
             if (model == null)
-                model = new ListPropertyModel<HoodIdentityUser>();
+                model = new ListPropertyModel();
             if (model.Filters == null)
                 model.Filters = new PropertyFilters();
 
-            PagedList<PropertyListing<HoodIdentityUser>> properties = await _property.GetPagedProperties(model.Filters, true);
+            PagedList<PropertyListing> properties = await _property.GetPagedProperties(model.Filters, true);
             model.Locations = await _property.GetLocations(model.Filters);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             PropertySettings settings = _settings.GetPropertySettings();

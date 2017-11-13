@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Hood.Interfaces;
 using Geocoding.Google;
 using Hood.Enums;
+using Hood.Core;
 
 namespace Hood.Services
 {
@@ -21,7 +22,7 @@ namespace Hood.Services
     {
         private IFTPService _ftp;
         private IConfiguration _config;
-        private IMediaManager<SiteMedia> _media;
+        private IMediaManager<MediaObject> _media;
         private PropertySettings _propertySettings;
         private ISettingsRepository _settings;
 
@@ -29,7 +30,7 @@ namespace Hood.Services
             IFTPService ftp, 
             IHostingEnvironment env, 
             IConfiguration config, 
-            IMediaManager<SiteMedia> media,
+            IMediaManager<MediaObject> media,
             ISettingsRepository site,
             IAddressService address)
         {
@@ -81,7 +82,7 @@ namespace Hood.Services
         private bool Cancelled { get; set; }
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
-        private AccountInfo<HoodIdentityUser> Account { get; set; }
+        private AccountInfo Account { get; set; }
         private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
@@ -158,8 +159,8 @@ namespace Hood.Services
                 // Go through the file, and extract key/value pairs of
                 List<Dictionary<string, string>> properties = GetPropertiesFromFile();
 
-                List<PropertyListing<HoodIdentityUser>> feedProperties = new List<PropertyListing<HoodIdentityUser>>();
-                List<PropertyListing<HoodIdentityUser>> siteProperties = _db.Properties
+                List<PropertyListing> feedProperties = new List<PropertyListing>();
+                List<PropertyListing> siteProperties = _db.Properties
                     .Include(p => p.Media)
                     .Include(p => p.FloorPlans)
                     .Include(p => p.Metadata)
@@ -173,7 +174,7 @@ namespace Hood.Services
                     StatusMessage = "Checking property (" + data["ADDRESS_1"] + ", " + data["ADDRESS_2"] + ") information from the BLM file...";
                     Lock.ReleaseWriterLock();
 
-                    var property = new PropertyListing<HoodIdentityUser>();
+                    var property = new PropertyListing();
                     ProcessProperty(property, data, true);
                     feedProperties.Add(property);
                 }
@@ -197,7 +198,7 @@ namespace Hood.Services
                         // Find matching record to update the property.
                         Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
 
-                        var property = await Process(new PropertyListing<HoodIdentityUser>(), data);
+                        var property = await Process(new PropertyListing(), data);
 
                         _db.Properties.Add(property);
                         _db.SaveChanges();
@@ -300,7 +301,7 @@ namespace Hood.Services
             }
         }
 
-        private async Task<PropertyListing<HoodIdentityUser>> Process(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
+        private async Task<PropertyListing> Process(PropertyListing property, Dictionary<string, string> data)
         {
             property = ProcessProperty(property, data);
             property = UpdateMetadata(property, data);
@@ -315,7 +316,7 @@ namespace Hood.Services
             return property;
         }
 
-        private async Task<PropertyListing<HoodIdentityUser>> ProcessDocuments(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
+        private async Task<PropertyListing> ProcessDocuments(PropertyListing property, Dictionary<string, string> data)
         {
             // Documents
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_DOCUMENT") && !k.Contains("TEXT")))
@@ -331,18 +332,18 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.MimeTypeMap.GetMimeType(fi.Extension), fi.Length, new SiteMedia() { Directory = string.Format("property/{0}/", property.Id) });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Name), fi.Length, new MediaObject() { Directory = string.Format("property/{0}/", property.Id) });
                         }
                         if (mediaResult != null)
                         {
                             if (property.InfoDownload != null)
                             {
-                                await _media.DeleteStoredMedia(new SiteMedia(property.InfoDownload));
-                                property.InfoDownload = property.InfoDownload.UpdateUrls(new PropertyMedia(mediaResult)) as SiteMedia;
+                                await _media.DeleteStoredMedia(new MediaObject(property.InfoDownload));
+                                property.InfoDownload = property.InfoDownload.UpdateUrls(new PropertyMedia(mediaResult)) as MediaObject;
                             }
                             else
                             {
@@ -358,7 +359,7 @@ namespace Hood.Services
             }
             return property;
         }
-        private async Task<PropertyListing<HoodIdentityUser>> ProcessFloorPlans(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
+        private async Task<PropertyListing> ProcessFloorPlans(PropertyListing property, Dictionary<string, string> data)
         {
             // Floor plans
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_FLOOR_PLAN") && !k.Contains("TEXT")))
@@ -374,11 +375,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.MimeTypeMap.GetMimeType(fi.Extension), fi.Length, new SiteMedia() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Name), fi.Length, new MediaObject() { Directory = "Property" });
                         }
                         if (mediaResult != null)
                         {
@@ -404,7 +405,7 @@ namespace Hood.Services
             }
             return property;
         }
-        private async Task<PropertyListing<HoodIdentityUser>> ProcessImages(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
+        private async Task<PropertyListing> ProcessImages(PropertyListing property, Dictionary<string, string> data)
         {
             // Images
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")))
@@ -420,11 +421,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.MimeTypeMap.GetMimeType(fi.Extension), fi.Length, new SiteMedia() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Name), fi.Length, new MediaObject() { Directory = "Property" });
                         }
                         if (mediaResult != null)
                         {
@@ -446,7 +447,7 @@ namespace Hood.Services
                             }
                             if (data[key] == property.FeaturedImage?.Filename)
                             {
-                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as SiteMedia;
+                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as MediaObject;
                             }
                             else if (property.FeaturedImage == null)
                             {
@@ -468,12 +469,12 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.MimeTypeMap.GetMimeType("pdf"), fi.Length, new SiteMedia() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType(fileName), fi.Length, new MediaObject() { Directory = "Property" });
                         }
                         if (mediaResult != null)
                         {
@@ -534,7 +535,7 @@ namespace Hood.Services
         {
             try
             {
-                ProcessProperty(new PropertyListing<HoodIdentityUser>(), propertyDetails, true);
+                ProcessProperty(new PropertyListing(), propertyDetails, true);
             }
             catch (Exception)
             {
@@ -655,7 +656,7 @@ namespace Hood.Services
         /// </summary>
         /// <param name="data">Property</param>
         /// <returns></returns>
-        private PropertyListing<HoodIdentityUser> ProcessProperty(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data, bool validatingOnly = false)
+        private PropertyListing ProcessProperty(PropertyListing property, Dictionary<string, string> data, bool validatingOnly = false)
         {
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
@@ -772,14 +773,14 @@ namespace Hood.Services
             return property;
         }
 
-        private string FormatLog(string statusMessage, PropertyListing<HoodIdentityUser> property = null)
+        private string FormatLog(string statusMessage, PropertyListing property = null)
         {
             if (property != null)
                 return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
             return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), statusMessage);
         }
 
-        private PropertyListing<HoodIdentityUser> UpdateMetadata(PropertyListing<HoodIdentityUser> property, Dictionary<string, string> data)
+        private PropertyListing UpdateMetadata(PropertyListing property, Dictionary<string, string> data)
         {
             if (property.Metadata == null)
                 property.Metadata = new List<PropertyMeta>();
@@ -836,7 +837,7 @@ namespace Hood.Services
             return property;
         }
 
-        private PropertyListing<HoodIdentityUser> AddMeta(PropertyListing<HoodIdentityUser> property, string key, string value, string type)
+        private PropertyListing AddMeta(PropertyListing property, string key, string value, string type)
         {
             if (!property.HasMeta(key))
                 property.AddMeta(new PropertyMeta(key, value, type));

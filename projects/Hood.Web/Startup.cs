@@ -1,19 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Hood.Caching;
+using Hood.Extensions;
+using Hood.Filters;
+using Hood.Infrastructure;
+using Hood.IO;
+using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Hood.Extensions;
-using Microsoft.AspNetCore.Http;
-using Hood.Services;
-using Hood.Models;
-using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Web
 {
@@ -46,6 +55,9 @@ namespace Hood.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.ConfigureHoodServices(Configuration);
+
             Configuration.ConfigSetup("Installed:DB", "ConnectionStrings:DefaultConnection");
 
             Configuration.ConfigSetup("Installed:ApplicationInsights", "ApplicationInsights:Key");
@@ -71,9 +83,8 @@ namespace Hood.Web
             // Add framework services.
             if (Configuration.CheckSetup("Installed:DB"))
             {
-                services.AddDbContext<TContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
                 services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
-
 
                 services.AddIdentity<ApplicationUser, IdentityRole>(o =>
                 {
@@ -86,39 +97,6 @@ namespace Hood.Web
                 })
                 .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
-
-                services.AddSingleton<EventsService>();
-                services.AddSingleton<SubscriptionsEventListener>();
-                services.AddSingleton<ContentCategoryCache>();
-                services.AddSingleton<ContentByTypeCache>();
-                services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
-                services.AddSingleton<IHoodCache, HoodCache>();
-                services.AddSingleton<IFTPService, FTPService>();
-                services.AddSingleton<IPropertyImporter, PropertyImporter>();
-                services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
-                services.AddSingleton<IPropertyExporter, PropertyExporter>();
-                services.AddSingleton<IContentExporter, ContentExporter>();
-                services.AddSingleton<IThemesService, ThemesService>();
-                services.AddSingleton<IAddressService, AddressService>();
-                services.AddScoped<ISettingsRepository, SettingsRepository>();
-                services.AddScoped<IAccountRepository, AccountRepository>();
-                services.AddScoped<IPropertyRepository, PropertyRepository>();
-                services.AddScoped<IMediaManager<SiteMedia>, MediaManager<SiteMedia>>();
-                services.AddScoped<IContentRepository, ContentRepository>();
-                services.AddScoped<IStripeWebHookService, StripeWebHookService>();
-                services.AddTransient<ISmsSender, SmsSender>();
-                services.AddTransient<IPayPalService, PayPalService>();
-                services.AddTransient<IShoppingCart, ShoppingCart>();
-                services.AddTransient<IStripeService, StripeService>();
-                services.AddTransient<ISubscriptionPlanService, SubscriptionPlanService>();
-                services.AddTransient<ISubscriptionService, SubscriptionService>();
-                services.AddTransient<ICardService, CardService>();
-                services.AddTransient<ICustomerService, CustomerService>();
-                services.AddTransient<IInvoiceService, InvoiceService>();
-                services.AddTransient<IBillingService, BillingService>();
-                services.AddTransient<IEmailSender, EmailSender>();
-                services.AddTransient<FormSenderService>();
-                services.AddTransient<WelcomeEmailSender>();
 
                 services.Configure<RouteOptions>(options =>
                 {
@@ -219,25 +197,6 @@ namespace Hood.Web
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
 
-            if (Configuration.CheckSetup("Installed:DB"))
-            {
-
-                // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859
-                using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-                {
-                    serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
-                    var userManager = app.ApplicationServices.GetService<UserManager<ApplicationUser>>();
-                    var roleManager = app.ApplicationServices.GetService<RoleManager<IdentityRole>>();
-                    var options = new DbContextOptionsBuilder<HoodDbContext>();
-                    options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]);
-                    var db = new HoodDbContext(options.Options);
-                    db.EnsureSetup(userManager, roleManager);
-
-                    // Initialise events
-                    serviceScope.ServiceProvider.GetService<SubscriptionsEventListener>().Configure();
-                }
-            }
-
             app.UseStaticFiles(new StaticFileOptions()
             {
                 OnPrepareResponse =
@@ -258,7 +217,7 @@ namespace Hood.Web
 
             if (Configuration.CheckSetup("Installed:DB"))
             {
-                app.UseIdentity();
+                app.UseAuthentication();
             }
 
             app.UseSession();

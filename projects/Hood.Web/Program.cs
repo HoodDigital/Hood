@@ -1,5 +1,13 @@
-﻿using Microsoft.AspNetCore;
+﻿using Hood.Models;
+using Hood.Services;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace Hood.Web
 {
@@ -7,12 +15,36 @@ namespace Hood.Web
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            var host = BuildWebHost(args);
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var config = services.GetService<IConfiguration>();
+                    scope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
+                    var userManager = services.GetService<UserManager<ApplicationUser>>();
+                    var roleManager = services.GetService<RoleManager<IdentityRole>>();
+                    var options = new DbContextOptionsBuilder<HoodDbContext>();
+                    options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]);
+                    var db = new HoodDbContext(options.Options);
+                    db.EnsureSetup(userManager, roleManager);
+
+                    // Initialise events
+                    services.GetService<SubscriptionsEventListener>().Configure();
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred seeding the DB.");
+                }
+            }
+            host.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
+             WebHost.CreateDefaultBuilder(args)
+                 .UseStartup<Startup>()
+                 .Build();
     }
 }

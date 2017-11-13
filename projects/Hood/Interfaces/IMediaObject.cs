@@ -18,6 +18,12 @@ namespace Hood.Interfaces
         string MediumUrl { get; set; }
         string LargeUrl { get; set; }
         string UniqueId { get; set; }
+
+        string DownloadUrl { get; }
+        string DownloadUrlHttps { get; }
+
+        string Icon { get; }
+        string FormattedSize { get; }
     }
 
 }

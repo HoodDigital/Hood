@@ -26,7 +26,7 @@ namespace Hood.IO
         {
 
             // Get a reference to the assembly that contains the view components
-            var assembly = typeof(Hood.HoodStartup).Assembly;
+            var assembly = typeof(EmbeddedFiles).Assembly;
             // Create an EmbeddedFileProvider for that assembly
             var embeddedFileProvider = new EmbeddedFileProvider(
                 assembly,

@@ -4,7 +4,6 @@ using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
-using Hood.Models.Api;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -26,22 +25,22 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class ContentController : Controller
     {
-        private readonly UserManager<HoodIdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ContentCategoryCache _categories;
         private readonly IContentRepository _content;
         private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
-        private readonly IMediaManager<SiteMedia> _media;
+        private readonly IMediaManager<MediaObject> _media;
         private readonly IAccountRepository _auth;
 
         public ContentController(
             IAccountRepository auth,
             IContentRepository content,
             ContentCategoryCache categories,
-            UserManager<HoodIdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             ISettingsRepository settings,
             IBillingService billing,
-            IMediaManager<SiteMedia> media,
+            IMediaManager<MediaObject> media,
             IHostingEnvironment env)
         {
             _auth = auth;
@@ -85,8 +84,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/gallery/")]
         public IActionResult EditorGallery(int id)
         {
-            var content = _content.GetContentByID(id);
-            var model = _settings.ToContentApi(content);
+            var model = _content.GetContentByID(id);
             return View(model);
         }
 
@@ -118,7 +116,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                HoodIdentityUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 Content content = new Content
                 {
                     AllowComments = true,
@@ -539,7 +537,7 @@ namespace Hood.Areas.Admin.Controllers
 
             try
             {
-                SiteMedia mediaResult = null;
+                MediaObject mediaResult = null;
                 if (files != null)
                 {
                     if (files.Count == 0)
@@ -551,7 +549,7 @@ namespace Hood.Areas.Admin.Controllers
 
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, new SiteMedia() { Directory = content.ContentType.ToTitleCase() });
+                        mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = content.ContentType.ToTitleCase() });
                         await _content.AddImage(content, new ContentMedia(mediaResult));
                     }
                 }
@@ -594,7 +592,7 @@ namespace Hood.Areas.Admin.Controllers
                 ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
                 if (media != null)
                 {
-                    content.FeaturedImage = new SiteMedia(media);
+                    content.FeaturedImage = new ContentMedia(media);
                     _content.Update(content);
                 }
             }
@@ -607,7 +605,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PagedList<Content> content = _content.GetPagedContent(request, type, category, null, null, published);
 
-            Response response = new Response(content.Items.Select(c => _settings.ToContentApi(c)).ToArray(), content.Count);
+            Response response = new Response(content.Items.ToArray(), content.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
@@ -616,45 +614,35 @@ namespace Hood.Areas.Admin.Controllers
             return Json(response, settings);
         }
 
-        public JsonResult GetById(int id)
-        {
-            IList<Content> content = new List<Content>
-            {
-                _content.GetContentByID(id)
-            };
-            var ups = content.Select(c => _settings.ToContentApi(c));
-            return Json(ups.ToArray());
-        }
-
-        public MediaApi GetFeaturedImage(int id)
+        public IMediaObject GetFeaturedImage(int id)
         {
             try
             {
                 Content content = _content.GetContentByID(id);
                 if (content != null && content.FeaturedImage != null)
-                    return new MediaApi(content.FeaturedImage, _settings);
+                    return content.FeaturedImage;
                 else
                     throw new Exception("No featured image found");
             }
             catch (Exception)
             {
-                return MediaApi.Blank(_settings.GetMediaSettings());
+                return ContentMedia.Blank;
             }
         }
 
-        public MediaApi GetMetaImage(int id, string field)
+        public IMediaObject GetMetaImage(int id, string field)
         {
             try
             {
                 Content content = _content.GetContentByID(id);
                 if (content != null)
-                    return new MediaApi(content.GetMeta(field).Get<IMediaObject>(), _settings);
+                    return content.GetMeta(field).Get<IMediaObject>();
                 else
                     throw new Exception("No featured image found");
             }
             catch (Exception)
             {
-                return MediaApi.Blank(_settings.GetMediaSettings());
+                return new ContentMedia(MediaObject.Blank);
             }
         }
 

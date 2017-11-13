@@ -5,38 +5,11 @@ using System.Linq;
 using Hood.Interfaces;
 using Hood.Extensions;
 using Hood.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
-    public partial class Subscription : SubscriptionBase
-    {
-        public List<UserSubscription> Users { get; set; }
-        public int SubscriberCount
-        {
-            get
-            {
-                if (Users == null)
-                    return 0;
-                else
-                    return Users.Count;
-            }
-        }
-    }
-    public partial class Subscription<TUser> : BaseEntity where TUser : IHoodUser
-    {
-        public List<UserSubscription<TUser>> Users { get; set; }
-        public int SubscriberCount
-        {
-            get
-            {
-                if (Users == null)
-                    return 0;
-                else
-                    return Users.Count;
-            }
-        }
-    }
-    public abstract class SubscriptionBase : BaseEntity
+    public partial class Subscription :  BaseEntity
     {
         public string StripeId { get; set; }
         public string Name { get; set; }
@@ -58,6 +31,31 @@ namespace Hood.Models
         public string StatementDescriptor { get; set; }
         public int? TrialPeriodDays { get; set; }
 
+        public List<UserSubscription> Users { get; set; }
+
+        [NotMapped]
+        public int SubscriberCount
+        {
+            get
+            {
+                if (Users == null)
+                    return 0;
+                else
+                    return Users.Count;
+            }
+        }
+        [NotMapped]
+        public int ActiveSubscribers
+        {
+            get
+            {
+                if (Users == null)
+                    return 0;
+                else
+                    return Users.Where(u => u.Status == "active" || u.Status == "trialing").Count();
+            }
+        }
+        [NotMapped]
         public string Price
         {
             get
@@ -65,6 +63,7 @@ namespace Hood.Models
                 return ((double)Amount / 100).ToString("C");
             }
         }
+        [NotMapped]
         public string FullPrice
         {
             get

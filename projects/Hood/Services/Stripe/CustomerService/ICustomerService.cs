@@ -32,7 +32,7 @@ namespace Hood.Services
         /// <param name="token"></param>
         /// <param name="planId"></param>
         /// <returns></returns>
-        Task<StripeCustomer> CreateCustomer(HoodIdentityUser user, string token, string planId = null);
+        Task<StripeCustomer> CreateCustomer(ApplicationUser user, string token, string planId = null);
 
         /// <summary>
         /// Deletes the customer asynchronous.

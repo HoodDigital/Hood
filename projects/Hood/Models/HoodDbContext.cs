@@ -8,47 +8,7 @@ namespace Hood.Models
     /// In order to use the Hood functionality on the site, you must call the 'void Configure(DbContextOptionsBuilder optionsBuilder)' function in the OnConfiguring() method, and then call the 'void CreateModels(ModelBuilder builder)' function in the OnModelCreating() method.
     /// </summary>
     /// <param name="optionsBuilder"></param>
-    public class HoodDbContext<TUser> : IdentityDbContext<TUser, IdentityRole, string> where TUser : HoodIdentityUser
-    {
-        public HoodDbContext(DbContextOptions options)
-            : base(options)
-        {
-        }
-
-        // Identity
-        public DbSet<UserAccessCode<TUser>> AccessCodes { get; set; }
-        public DbSet<Address<TUser>> Addresses { get; set; }
-        public DbSet<SiteMedia> Media { get; set; }
-
-        // Content
-        public DbSet<Subscription<TUser>> Subscriptions { get; set; }
-        public DbSet<UserSubscription<TUser>> UserSubscriptions { get; set; }
-
-        // Options
-        public DbSet<Option> Options { get; set; }
-
-        // Content
-        public DbSet<Content<TUser>> Content { get; set; }
-        public DbSet<ContentCategory<TUser>> ContentCategories { get; set; }
-        public DbSet<ContentTag<TUser>> ContentTags { get; set; }
-
-        // Property
-        public DbSet<PropertyListing<TUser>> Properties { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-            DbContextExtensions.ConfigureForHood(optionsBuilder);
-        }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-            DbContextExtensions.CreateHoodModels(builder);
-        }
-    }
-
-    public class HoodDbContext : IdentityDbContext<HoodIdentityUser, IdentityRole, string>
+    public class HoodDbContext : IdentityDbContext<ApplicationUser>
     {
 
         public HoodDbContext(DbContextOptions options)
@@ -59,7 +19,7 @@ namespace Hood.Models
         // Identity
         public DbSet<UserAccessCode> AccessCodes { get; set; }
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<SiteMedia> Media { get; set; }
+        public DbSet<MediaObject> Media { get; set; }
 
         // Content
         public DbSet<Subscription> Subscriptions { get; set; }

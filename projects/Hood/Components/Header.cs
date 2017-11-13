@@ -16,7 +16,7 @@ namespace Hood.ViewComponents
 
         public IViewComponentResult Invoke()
         {
-            HeaderModel<HoodIdentityUser> model = new HeaderModel<HoodIdentityUser>()
+            HeaderModel model = new HeaderModel()
             {
                 Pages = _content.GetContentByType("page"),
                 Subscription = HttpContext.GetAccountInfo()

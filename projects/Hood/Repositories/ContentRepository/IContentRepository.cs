@@ -1,7 +1,6 @@
 ﻿using Hood.Enums;
 using Hood.Infrastructure;
 using Hood.Models;
-using Hood.Models.Api;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;

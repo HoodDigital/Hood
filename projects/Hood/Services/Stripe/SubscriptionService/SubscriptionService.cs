@@ -10,13 +10,13 @@ using Hood.Models;
 
 namespace Hood.Services
 {
-    public class SubscriptionService
+    public class SubscriptionService : ISubscriptionService
     {
         private IStripeService _stripe;
-        private UserManager<HoodIdentityUser> _userManager;
+        private UserManager<ApplicationUser> _userManager;
 
         public SubscriptionService(IStripeService stripe,
-                                   UserManager<HoodIdentityUser> userManager)
+                                   UserManager<ApplicationUser> userManager)
         {
             _stripe = stripe;
             _userManager = userManager;

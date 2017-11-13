@@ -364,7 +364,7 @@ namespace Hood.Services
         public async Task<TMediaObject> RefreshMedia(TMediaObject media, string tempDirectory)
         {
             // copy record of original files into new object
-            var old = new SiteMedia();
+            var old = new MediaObject();
             media.CopyProperties(old);
 
             // download the orignal file, and save it to temp.

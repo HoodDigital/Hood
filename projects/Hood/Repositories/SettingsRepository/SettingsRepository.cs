@@ -1,9 +1,7 @@
 ﻿using Hood.Caching;
 using Hood.Extensions;
 using Hood.Infrastructure;
-using Hood.Interfaces;
 using Hood.Models;
-using Hood.Models.Api;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +20,16 @@ namespace Hood.Services
     {
         public static object scriptLock = new object();
 
-        private readonly HoodDbContext _db;
+        private HoodDbContext _context;
+
+        private HoodDbContext _db { get
+            {
+                var options = new DbContextOptionsBuilder<HoodDbContext>();
+                options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+                _context = new HoodDbContext(options.Options);
+                return _context;
+            }
+        }
         private readonly IConfiguration _config;
         private IHoodCache _cache { get; set; }
 
@@ -65,11 +72,9 @@ namespace Hood.Services
         private const string SystemSettingsKey = "system_settings";
 
 
-        public SettingsRepository(HoodDbContext db,
-                                 IConfiguration config,
+        public SettingsRepository(IConfiguration config,
                                  IHoodCache memoryCache)
         {
-            _db = db;
             _config = config;
             _cache = memoryCache;
         }
@@ -509,21 +514,6 @@ namespace Hood.Services
             return null;
         }
 
-        public ContentApi ToContentApi(Content content)
-        {
-            return new ContentApi(content, this);
-        }
-
-        public PropertyListingApi ToPropertyListingApi(PropertyListing property)
-        {
-            return new PropertyListingApi(property, this);
-        }
-
-        public ApplicationUserApi ToApplicationUserApi(IHoodUser user)
-        {
-            return new ApplicationUserApi(user, this);
-        }
-
         public string ReplacePlaceholders(string text)
         {
             var basics = GetBasicSettings();
@@ -692,21 +682,6 @@ namespace Hood.Services
         public Task ProcessCaptchaOrThrowAsync(HttpRequest request)
         {
             throw new NotImplementedException();
-        }
-
-        public ContentApi ToContentApi(Content content)
-        {
-            return null;
-        }
-
-        public PropertyListingApi ToPropertyListingApi(PropertyListing property)
-        {
-            return null;
-        }
-
-        public ApplicationUserApi ToApplicationUserApi(IHoodUser user)
-        {
-            return null;
         }
     }
 

@@ -2,10 +2,8 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
-using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
-using Hood.Models.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -313,7 +311,7 @@ namespace Hood.Services
                 if (content.Media == null)
                     content.Media = new List<ContentMedia>();
                 content.Media.Add(media);
-                _db.Media.Add(new SiteMedia(media));
+                _db.Media.Add(new MediaObject(media));
                 _db.Content.Update(content);
                 await _db.SaveChangesAsync();
                 _events.triggerContentChanged(this);
@@ -540,11 +538,10 @@ namespace Hood.Services
                 {
                     foreach (var content in GetContentByType(type.Type).OrderByDescending(c => c.PublishDate))
                     {
-                        var c = _settings.ToContentApi(content);
                         nodes.Add(new SitemapNode()
                         {
-                            Url = urlHelper.AbsoluteUrl(c.Url.TrimStart('/')),
-                            LastModified = c.PublishDate,
+                            Url = urlHelper.AbsoluteUrl(content.Url.TrimStart('/')),
+                            LastModified = content.PublishDate,
                             Frequency = SitemapFrequency.Weekly,
                             Priority = 0.7
                         });

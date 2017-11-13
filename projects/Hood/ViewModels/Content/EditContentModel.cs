@@ -11,7 +11,7 @@ namespace Hood.Models
         public List<ContentCategory> Categories { get; set; }
         public List<string> Templates { get; set; }
         public IEnumerable<Subscription> Subscriptions { get; set; }
-        public IList<HoodIdentityUser> Authors { get; internal set; }
+        public IList<ApplicationUser> Authors { get; internal set; }
         public OperationResult SaveResult { get; internal set; }
     }
 

@@ -20,7 +20,7 @@ namespace Hood.Services
         // Services
         private IFTPService _ftp;
         private IConfiguration _config;
-        private IMediaManager<SiteMedia> _media;
+        private IMediaManager<MediaObject> _media;
         private PropertySettings _propertySettings;
         private ISettingsRepository _settings;
         private IEmailSender _email;
@@ -29,12 +29,12 @@ namespace Hood.Services
         // Members
         private ReaderWriterLock Lock { get; set; }
         private PropertyExporterReport Status { get; set; }
-        private AccountInfo<HoodIdentityUser> Account { get; set; }
+        private AccountInfo Account { get; set; }
         private string _tempFolder { get; set; }
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
 
-        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<SiteMedia> media, ISettingsRepository site, IEmailSender email)
+        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<MediaObject> media, ISettingsRepository site, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;
@@ -107,7 +107,7 @@ namespace Hood.Services
                 Status.Tasks = Status.Total + 6;
                 Lock.ReleaseWriterLock();
 
-                List<PropertyListing<HoodIdentityUser>> properties = new List<PropertyListing<HoodIdentityUser>>();
+                List<PropertyListing> properties = new List<PropertyListing>();
 
                 foreach (var item in items)
                 {
@@ -143,7 +143,7 @@ namespace Hood.Services
                                 tempMedia.Property = null;
                                 tempMedia.PropertyId = 0;
                                 if (item.Media == null)
-                                    item.Media = new List<PropertyMedia<HoodIdentityUser>>();
+                                    item.Media = new List<PropertyMedia>();
                                 item.Media.Add(tempMedia);
                             }
 
@@ -156,7 +156,7 @@ namespace Hood.Services
                                 tempMedia.Property = null;
                                 tempMedia.PropertyId = 0;
                                 if (item.FloorPlans == null)
-                                    item.FloorPlans = new List<PropertyFloorplan<HoodIdentityUser>>();
+                                    item.FloorPlans = new List<PropertyFloorplan>();
                                 item.FloorPlans.Add(tempMedia);
                             }
 
@@ -168,7 +168,7 @@ namespace Hood.Services
                                 tempMeta.Property = null;
                                 tempMeta.PropertyId = 0;
                                 if (item.Metadata == null)
-                                    item.Metadata = new List<PropertyMeta<HoodIdentityUser>>();
+                                    item.Metadata = new List<PropertyMeta>();
                                 item.Metadata.Add(tempMeta);
                             }
 

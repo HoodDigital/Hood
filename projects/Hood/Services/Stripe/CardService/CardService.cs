@@ -9,10 +9,10 @@ namespace Hood.Services
     public class CardService : ICardService
     {
         private IStripeService _stripe;
-        private UserManager<HoodIdentityUser> _userManager;
+        private UserManager<ApplicationUser> _userManager;
 
         public CardService(IStripeService stripe,
-                           UserManager<HoodIdentityUser> userManager)
+                           UserManager<ApplicationUser> userManager)
         {
             _stripe = stripe;
             _userManager = userManager;

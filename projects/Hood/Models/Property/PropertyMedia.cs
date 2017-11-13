@@ -1,21 +1,16 @@
-﻿using Hood.Interfaces;
+﻿using Hood.Core;
+using Hood.Enums;
+using Hood.Extensions;
+using Hood.Interfaces;
+using Hood.Services;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
-    public partial class PropertyMedia : PropertyMedia<HoodIdentityUser>
+    public partial class PropertyMedia : PropertyMediaBase
     {
-        public PropertyMedia()
-        : base()
-        { }
-
-        public PropertyMedia(IMediaObject media)
-            : base(media)
-        { }
-    }
-    public partial class PropertyMedia<TUser> : PropertyMediaBase where TUser : IHoodUser
-    {
-        public PropertyListing<TUser> Property { get; internal set; }
+        public PropertyListing Property { get; internal set; }
         public int PropertyId { get; internal set; }
 
         public PropertyMedia()
@@ -26,20 +21,9 @@ namespace Hood.Models
             : base(media)
         { }
     }
-
-    public partial class PropertyFloorplan : PropertyFloorplan<HoodIdentityUser>
+    public partial class PropertyFloorplan : PropertyMediaBase
     {
-        public PropertyFloorplan()
-            : base()
-        { }
-
-        public PropertyFloorplan(IMediaObject media)
-            : base(media)
-        { }
-    }
-    public partial class PropertyFloorplan<TUser> : PropertyMediaBase where TUser : IHoodUser
-    {
-        public PropertyListing<TUser> Property { get; internal set; }
+        public PropertyListing Property { get; internal set; }
         public int PropertyId { get; internal set; }
 
         public PropertyFloorplan()
@@ -88,6 +72,84 @@ namespace Hood.Models
         public string MediumUrl { get; set; }
         public string LargeUrl { get; set; }
         public string UniqueId { get; set; }
+
+        [NotMapped]
+        public virtual string DownloadUrl => Url.Replace("https://", "http://");
+        [NotMapped]
+        public virtual string DownloadUrlHttps => Url.Replace("http://", "https://");
+        [NotMapped]
+        public virtual string Icon
+        {
+            get
+            {
+                GenericFileType type = GenericFileType.Unknown;
+                string output = "";
+                if (Enum.TryParse(GeneralFileType, out type))
+                {
+                    switch (type)
+                    {
+                        case GenericFileType.Image:
+                            output = SmallUrl;
+                            break;
+                        case GenericFileType.Excel:
+                            return "/lib/hood/images/icons/excel.png";
+                        case GenericFileType.PDF:
+                            return "/lib/hood/images/icons/pdf.png";
+                        case GenericFileType.PowerPoint:
+                            return "/lib/hood/images/icons/powerpoint.png";
+                        case GenericFileType.Word:
+                            return "/lib/hood/images/icons/word.png";
+                        case GenericFileType.Photoshop:
+                            return "/lib/hood/images/icons/photoshop.png";
+                        case GenericFileType.Unknown:
+                        default:
+                            return "/lib/hood/images/icons/file.png";
+                    }
+                }
+                if (!output.IsSet())
+                {
+                    output = NoImageUrl;
+                }
+                return output;
+            }
+        }
+        [NotMapped]
+        public static string NoImageUrl
+        {
+            get
+            {
+                var output = "";
+                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                if (siteSettings != null)
+                {
+                    var mediaSettings = siteSettings.GetMediaSettings();
+                    output = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                }
+                return output;
+            }
+        }
+        [NotMapped]
+        public virtual string FormattedSize => (FileSize / 1024).ToString() + "Kb";
+
+        public static IMediaObject Blank
+        {
+            get
+            {
+                var noImg = NoImageUrl;
+                MediaObject ret = new MediaObject
+                {
+                    FileSize = 0,
+                    Filename = "no-image.jpg",
+                    SmallUrl = noImg,
+                    MediumUrl = noImg,
+                    LargeUrl = noImg,
+                    ThumbUrl = noImg,
+                    Url = noImg,
+                    BlobReference = "N/A"
+                };
+                return ret;
+            }
+        }
 
     }
 }

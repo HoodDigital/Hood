@@ -12,7 +12,7 @@ namespace Hood.Models
         private readonly IConfiguration _config;
         private readonly ISettingsRepository _settings;
 
-        private Dictionary<string, Lazy<Dictionary<int, Content<HoodIdentityUser>>>> bySlug;
+        private Dictionary<string, Lazy<Dictionary<int, Content>>> bySlug;
         private readonly ContentCategoryCache _categories;
         private readonly EventsService _events;
 
@@ -33,7 +33,7 @@ namespace Hood.Models
             ResetCache();
         }
 
-        public Content<HoodIdentityUser> GetById(string contentType, int id)
+        public Content GetById(string contentType, int id)
         {
             if (!bySlug.ContainsKey(contentType))
                 return null;
@@ -44,17 +44,17 @@ namespace Hood.Models
 
         public void ResetCache()
         {
-            var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
+            var options = new DbContextOptionsBuilder<HoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            var db = new DefaultHoodDbContext(options.Options);
+            var db = new HoodDbContext(options.Options);
 
             ContentSettings contentSettings = _settings.GetContentSettings();
-            bySlug = new Dictionary<string, Lazy<Dictionary<int, Content<HoodIdentityUser>>>>();
+            bySlug = new Dictionary<string, Lazy<Dictionary<int, Content>>>();
             foreach (var type in contentSettings.Types.Where(t => t.Enabled && t.CachedByType))
             {
                 bySlug.Add(
                     type.Type,
-                    new Lazy<Dictionary<int, Content<HoodIdentityUser>>>(() => db.Content.Where(c => c.ContentType == type.Type).ToDictionary(c => c.Id))
+                    new Lazy<Dictionary<int, Content>>(() => db.Content.Where(c => c.ContentType == type.Type).ToDictionary(c => c.Id))
                 );
             }
         }

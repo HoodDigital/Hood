@@ -1,11 +1,10 @@
-﻿using Hood.Models.Api;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Hood.Models
 {
-    public class HomePageModel<TUser> where TUser : IHoodUser
+    public class HomePageModel
     {
-        public List<ContentApi<TUser>> News { get; set; }
-        public List<ContentApi<TUser>> Testimonial { get; internal set; }
+        public List<Content> News { get; set; }
+        public List<Content> Testimonial { get; internal set; }
     }
 }

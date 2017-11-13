@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Hood.Infrastructure;
 using Hood.Models;
-using Microsoft.Extensions.Configuration;
-using Hood.Infrastructure;
-using Hood.Models.Api;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -36,10 +35,6 @@ namespace Hood.Services
         string GetVersion();
         Task ProcessCaptchaOrThrowAsync(HttpRequest request);
         string ReplacePlaceholders(string adminNoficationSubject);
-
-        ContentApi ToContentApi(IContentBase content);
-        PropertyListingApi ToPropertyListingApi(IPropertyListingBase property);
-        ApplicationUserApi ToApplicationUserApi(IHoodUser user);
     }
 
 }

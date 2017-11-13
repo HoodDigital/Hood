@@ -5,9 +5,9 @@ namespace Hood.Services
 {
     public class UserSubscriptionChangeEventArgs : EventArgs
     {
-        public UserSubscription<HoodIdentityUser> Subscription { get; set; }
+        public UserSubscription Subscription { get; set; }
 
-        public UserSubscriptionChangeEventArgs(UserSubscription<HoodIdentityUser> subsctription)
+        public UserSubscriptionChangeEventArgs(UserSubscription subsctription)
         {
             Subscription = subsctription;
         }
