@@ -6,8 +6,7 @@
     query += Model.Filters.search.IsSet() ? "&Filters.search=" + Model.Filters.search : "";
     query += Model.Filters.Type.IsSet() ? "&Filters.type=" + Model.Filters.Type : "";
     query += Model.Filters.PlanningType.IsSet() ? "&Filters.planning=" + Model.Filters.PlanningType : "";
-    query += Model.Filters.MinBedrooms.HasValue ? "&Filters.MinBedrooms=" + Model.Filters.MinBedrooms : "";
-    query += Model.Filters.MaxBedrooms.HasValue ? "&Filters.MaxBedrooms=" + Model.Filters.MaxBedrooms : "";
+    query += Model.Filters.Bedrooms.HasValue ? "&Filters.Bedrooms=" + Model.Filters.Bedrooms : "";
     query += Model.Filters.MinPremium.HasValue ? "&Filters.MinPremium=" + Model.Filters.MinPremium : "";
     query += Model.Filters.MaxPremium.HasValue ? "&Filters.MaxPremium=" + Model.Filters.MaxPremium : "";
     query += Model.Filters.MinPrice.HasValue ? "&Filters.MinPrice=" + Model.Filters.MinPrice : "";

@@ -24,19 +24,11 @@
             <div class="col-sm-6 col-md-3">
                 <div class="well">
                     <h4 class="no-margin">Bedrooms</h4>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MinBedrooms">
+                    <select class="form-control m-t-lg half" asp-for="Filters.Bedrooms">
                         <option value="">Show All</option>
                         @for (int i = 0; i < 13; i++)
                         {
-                            <option value="@i">@(i)+</option>
-                        }
-
-                    </select>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MaxBedrooms">
-                        <option value="">Show All</option>
-                        @for (int i = 0; i < 13; i++)
-                        {
-                            <option value="@i">up to @(i)</option>
+                            <option value="@i">@(i)</option>
                         }
                     </select>
                 </div>
