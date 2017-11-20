@@ -67,6 +67,12 @@ $.hood.App = {
         Colorbox: true,
         Parallax: true,
         LoadTweets: true,
+        ContactForms: true,
+        FitVids: true,
+        Accordion: true,
+        SkillsBars: true, 
+        Counters: true,
+        Uploaders: true,
         Header: {
             Enabled: true,
             Type: 'basic',
@@ -141,20 +147,30 @@ $.hood.App = {
             if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds = $.extend($.hood.App.Options.VideoBackgrounds, options.VideoBackgrounds || {});
             if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
         }
+
         $.hood.App.Loader.Init();
+
         if ($.hood.App.Options.Header.Enabled)
             $.hood.App.Header.Init();
-
-        $.hood.App.Accordion();
-        $.hood.App.Counters();
 
         if ($.hood.App.Options.Scroll.Functions)
             $.hood.App.Scroll.Functions();
 
-        $.hood.App.SkillsBars();
-        $.hood.App.ResizeVideos();
-        $.hood.App.ContactForms.Init();
-        $.hood.App.Uploaders.Init();
+
+        if ($.hood.App.Options.Accordion)
+            $.hood.App.Accordion();
+        if ($.hood.App.Options.Counters)
+            $.hood.App.Counters();
+        if ($.hood.App.Options.SkillsBars)
+            $.hood.App.SkillsBars();
+        if ($.hood.App.Options.FitVids)
+            $.hood.App.ResizeVideos();
+
+        if ($.hood.App.Options.ContactForms)
+            $.hood.App.ContactForms.Init();
+
+        if ($.hood.App.Options.Uploaders)
+            $.hood.App.Uploaders.Init();
 
         if ($.hood.App.Options.Mailchimp.Enabled)
             $.hood.App.Mailchimp.Init();
@@ -715,7 +731,7 @@ $.hood.App = {
                     $.hood.App.Options.Mailchimp.onSuccess();
                 } else {
                     $.hood.App.Options.Mailchimp.onFail();
-               }
+                }
             });
             return false;
         }

@@ -10749,7 +10749,6 @@ a.full-box-link {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  -webkit-flex-flow: row wrap;
   align-items: center;
 }
 .row-full {
@@ -10758,7 +10757,6 @@ a.full-box-link {
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  -webkit-flex-flow: row wrap;
   align-items: stretch;
 }
 .v-middle {

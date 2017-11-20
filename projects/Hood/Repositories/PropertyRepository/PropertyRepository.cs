@@ -155,8 +155,7 @@ namespace Hood.Services
                                       || searchTerms.Any(s => n.Lease != null && n.Lease.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Location != null && n.Location.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Planning != null && n.Planning.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Reference != null && n.Reference.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Metadata.Any(m => m.BaseValue != null && m.BaseValue.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)));
+                                      || searchTerms.Any(s => n.Reference != null && n.Reference.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
             }
 
             // sort the collection and then output it.

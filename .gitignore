@@ -248,12 +248,6 @@ bower_components/
 /projects/Hood.Web/Temporary
 /projects/Hood.Web/Temporary/*
 
-# Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
-/projects/Hood.Web/Areas/
-/projects/Hood.Web/Areas/*
-/projects/Hood.Web/Views
-/projects/Hood.Web/Views/*
-
 # Ignore all hood wwwroot gulp processed content.
 /projects/Hood.Web/wwwroot/hood/dist
 /projects/Hood.Web/wwwroot/hood/src
