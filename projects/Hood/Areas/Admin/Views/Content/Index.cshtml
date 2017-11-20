@@ -1,0 +1,127 @@
+@model ContentListModel
+
+@inject ContentCategoryCache _categories
+@{
+    ViewBag.Title = Model.Type.Title;
+    var categories = _categories.TopLevel(Model.Type.Type);
+}
+@section buttons {
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button> <ul class="dropdown-menu">
+            @if (Model.Type.IsPublic)
+            {
+                <li>
+                    <a class="" href="@string.Format("/{0}/", Model.Type.Slug)" target="_blank">
+                        <i class="fa fa-desktop m-r-sm"></i>
+                        Preview @Model.Type.TypeNamePlural Page
+                    </a>
+                </li>
+            }
+            @if (Model.Type.IsPublic && User.IsInRole("Admin"))
+            {
+                <li class="divider"></li>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <li>
+                    <a class="warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.Type.TypeNamePlural.ToLower() from the site!">
+                        <i class="fa fa-trash m-r-sm"></i>
+                        Delete All
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+    <button class="btn btn-success create-content" data-type="@Model.Type.Slug"><i class="fa fa-thumb-tack m-r-sm"></i>Create New</button>
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Content" asp-route-type="@Model.Type.Type" asp-route-area="Admin">
+                <i class="fa @Model.Type.Icon m-r-xs"></i>
+                @Model.Type.TypeNamePlural
+            </a>
+        </li>
+    </ol>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#items" aria-expanded="false"> @Model.Type.Title</a></li>
+        <li class=""><a data-toggle="tab" href="#categories" aria-expanded="false"> @Model.Type.TypeName Categories</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="items" class="tab-pane active">
+            <div class="panel-body">
+                <form>
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-4">
+                            <select class="form-control manage-content-change" name="manage-content-sort" id="manage-content-sort" data-selected="PublishDateDesc">
+                                <option value="PublishDateDesc">Recently Published</option>
+                                <option value="PublishDate">Published Date (Oldest-Newest)</option>
+                                <option value="DateDesc">Newest First</option>
+                                <option value="Date">Oldest First</option>
+                                <option value="Title">By Title (A-Z)</option>
+                                <option value="TitleDesc">By Title (Z-A)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control manage-content-change" name="manage-content-category" id="manage-content-category" data-selected="">
+                                <option value="">Show All</option>
+                                @Html.CategorySelectOptions(categories, true)
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input name="manage-content-search" id="manage-content-search" type="text" placeholder="Search" class="form-control">
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary manage-content-click"> Search!</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <hr />
+                <div id="manage-content-list" data-type="@Model.Type.Type" class="border-box-sizing"></div>
+                <div class="manage-content-pager text-center m-lg"></div>
+            </div>
+        </div>
+        <div id="categories" class="tab-pane">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="hood-inline categorylist" data-url="@Url.Action("CategoryList")"></div>
+                    </div>
+                    <div class="col-sm-4">
+                        <form id="add-category-form" class="well">
+                            <h4>Add a category...</h4>
+                            <hr />
+                            <input id="Add-ContentType" name="ContentType" type="hidden" value="@Model.Type.Type" />
+                            <div class="blade-field">
+                                <label class="control-label" for="Add-DisplayName">Category</label>
+                                <div>
+                                    <input class="form-control" type="text" id="Add-DisplayName" name="DisplayName" />
+                                </div>
+                            </div>
+                            <div class="blade-field">
+                                <label class="control-label" for="Add-ParentCategoryId">Parent Category</label>
+                                <div>
+                                    <select class="form-control" id="Add-ParentCategoryId" name="ParentCategoryId">
+                                        <option>No Parent</option>
+                                        @Html.CategorySelectOptions(categories)
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="blade-field">
+                                <button type="button" class="btn btn-primary add-category"><i class="fa fa-save"></i> Add Category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@{ await Html.RenderPartialAsync("_ListTemplate"); }

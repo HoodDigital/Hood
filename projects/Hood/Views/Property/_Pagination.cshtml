@@ -1,0 +1,43 @@
+@model ListPropertyModel
+@{
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    string urlFormat = "/{0}?Filters.page={1}{2}";
+    var query = "&Filters.pageSize=" + Model.Filters.pageSize;
+    query += Model.Filters.search.IsSet() ? "&Filters.search=" + Model.Filters.search : "";
+    query += Model.Filters.Type.IsSet() ? "&Filters.type=" + Model.Filters.Type : "";
+    query += Model.Filters.PlanningType.IsSet() ? "&Filters.planning=" + Model.Filters.PlanningType : "";
+    query += Model.Filters.Bedrooms.HasValue ? "&Filters.Bedrooms=" + Model.Filters.Bedrooms : "";
+    query += Model.Filters.MinPremium.HasValue ? "&Filters.MinPremium=" + Model.Filters.MinPremium : "";
+    query += Model.Filters.MaxPremium.HasValue ? "&Filters.MaxPremium=" + Model.Filters.MaxPremium : "";
+    query += Model.Filters.MinPrice.HasValue ? "&Filters.MinPrice=" + Model.Filters.MinPrice : "";
+    query += Model.Filters.MaxPrice.HasValue ? "&Filters.MaxPrice=" + Model.Filters.MaxPrice : "";
+    query += Model.Filters.MinRent.HasValue ? "&Filters.MinRent=" + Model.Filters.MinRent : "";
+    query += Model.Filters.MaxRent.HasValue ? "&Filters.MaxRent=" + Model.Filters.MaxRent : "";
+    query += Model.Filters.sort.IsSet() ? "&Filters.sort=" + Model.Filters.sort : "";
+}
+<ul class="pagination">
+    @if (Model.Properties.CurrentPage > 1)
+    {
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug, 1, query)" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug, Model.Properties.CurrentPage - 1, query)" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-left"></i></span></a></li>
+    }
+    @for (int i = Model.Properties.CurrentPage - 2; i <= Model.Properties.CurrentPage + 2; i++)
+    {
+        if (i > 0 && i <= Model.Properties.Pages)
+        {
+            if (i == Model.Properties.CurrentPage)
+            {
+                <li class="active"><a href="@string.Format(urlFormat, _propertySettings.Slug, i, query)">@i</a></li>
+            }
+            else
+            {
+                <li><a href="@string.Format(urlFormat, _propertySettings.Slug, i, query)">@i</a></li>
+            }
+        }
+    }
+    @if (Model.Properties.CurrentPage < Model.Properties.Pages)
+    {
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug, Model.Properties.CurrentPage + 1, query)" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-right"></i></span></a></li>
+        <li><a href="@string.Format(urlFormat, _propertySettings.Slug,  Model.Properties.Pages + 1, query)" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>
+    }
+</ul>

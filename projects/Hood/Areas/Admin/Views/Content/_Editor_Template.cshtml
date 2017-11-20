@@ -1,0 +1,37 @@
+@model EditContentModel
+<h5>Choose the template</h5>
+<div class="ibox-content">
+    <fieldset class="form-horizontal">
+        <div class="form-group">
+            <label for="Meta:Settings.Template" class="col-sm-3 control-label">
+                Template:
+            </label>
+            <div class="col-sm-9">
+                <select class="form-control" data-selected="@Model.Content.GetMeta("Settings.Template").GetStringValue()" id="Meta:Settings.Template" name="Meta:Settings.Template">
+                    @foreach (string template in Model.Templates)
+                    {
+                        <option value="@string.Format("_{0}", template)">@template</option>
+                    }
+                </select>
+                <strong class="text-warning inline-block m-t-xs"><i class="fa fa-exclamation-triangle m-r-xs"></i>Be careful! Changing the template will reset all template settings!</strong>
+            </div>
+        </div>
+    </fieldset>
+</div>
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Template.")).Count() > 0)
+{
+    <h5>Template Settings</h5>
+    <div class="ibox-content">
+        <fieldset class="form-horizontal">
+            @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("Template.")).OrderBy(cm => cm.Name))
+            {
+                await Html.RenderPartialAsync("_MetaEditor_Template", (object)cm);
+            }
+        </fieldset>
+    </div>
+}
+else
+{
+    <h5>Choose a template...</h5>
+    <p>Change your template above, once you save, the new template will be loaded and you can edit the content of the template here.</p>
+}

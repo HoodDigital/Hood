@@ -1,0 +1,54 @@
+@model PropertyListing
+@{
+    var papi = _settings.ToPropertyListingApi(Model);
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+<div class="col-md-4 col-sm-6 col-xs-12 mb-30">
+    <div class="thumbnail">
+        <a href="@Model.Url"><fixedImage src="@papi.FeaturedImage.MediumUrl" class="img img-md img-full content-feature-@Model.Id" /></a>
+        <div class="caption">
+            <a href="@Model.Url">
+                <h3>@Model.Title</h3>
+            </a>
+            <h4>@Model.Title</h4>
+            <p class="text-muted">@_propertySettings.GetPlanningFromType(Model.Planning)</p>
+            @if (_propertySettings.ShowAskingPrice)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@papi.FormattedAskingPrice</p>
+                    <p>
+                        Asking Price:
+                    </p>
+                </div>
+            }
+            @if (_propertySettings.ShowRent)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@papi.FormattedRent</p>
+                    <p>
+                       Rent:
+                    </p>
+                </div>
+            }
+            @if (_propertySettings.ShowPremium)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@papi.FormattedPremium</p>
+                    <p>
+                        Premium:
+                    </p>
+                </div>
+            }
+            @if (_propertySettings.ShowFees)
+            {
+                <div class="ratings text-left">
+                    <p class="pull-right">@papi.FormattedFees</p>
+                    <p>
+                        Fees:
+                    </p>
+                </div>
+            }
+            <p><a href="@Model.Url" class="btn btn-primary" role="button">Learn more...</a></p>
+        </div>
+    </div>
+</div>

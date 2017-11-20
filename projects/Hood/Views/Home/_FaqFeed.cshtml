@@ -1,0 +1,30 @@
+@model ContentListModel
+
+@if (Model.Posts.Count == 0)
+{
+    await Html.RenderPartialAsync("_NoResults");
+}
+else
+{
+    <div class="panel-group" id="faq-accordion" role="tablist" aria-multiselectable="true">
+
+        @foreach (ContentApi content in Model.Posts.Items.Select(c => _settings.ToContentApi(c)))
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="@string.Format("faq-heading-{0}", content.Id)">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="@string.Format("#faq-accordion-{0}", content.Id)" href="@string.Format("#faq-accordion-{0}", content.Id)" aria-expanded="false" aria-controls="@string.Format("faq-accordion-{0}", content.Id)">
+                            @content.Title
+                        </a>
+                    </h4>
+                </div>
+                <div id="@string.Format("faq-accordion-{0}", content.Id)" class="panel-collapse collapse" role="tabpanel" aria-labelledby="@string.Format("faq-heading-{0}", content.Id)">
+                    <div class="panel-body">
+                        @content.Excerpt
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    await Html.RenderPartialAsync("_Pagination");
+}

@@ -1,0 +1,11 @@
+@model Exception
+@{
+    ViewData["Title"] = "Oops!";
+}
+<h2 class="text-danger">Unfortunately, something seems to have gone wrong...</h2>
+<p class="lead">If this error continues to occur, please let us know so we can get it rectified as soon as possible. Thank you!</p>
+
+<div class="alert alert-info m-t-lg">
+    <h3 class="no-margin"><i class="fa fa-info-circle m-r-sm"></i>So, what happened exactly?</h3>
+    <p class="m-t-md">@Model.Message</p>
+</div>

@@ -1,0 +1,50 @@
+@inject IConfiguration _config
+
+@inject IContentRepository _content
+@{
+    AccountInfo account = Context.GetAccountInfo();
+    ApplicationUserApi uapi = _settings.ToApplicationUserApi(account.User);
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
+    Layout = null;
+}
+<div class="dropdown profile-element">
+    <div class="big-logo-element">
+        <a asp-action="Index" asp-controller="Home" asp-area="Admin"><img src="~/lib/hood/images/hood-cms.svg" alt="HoodCMS - Content Managed" /></a>
+    </div>
+    <div class="p-md text-center">
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
+            <span>
+                <fixedImage src="@uapi.Avatar.SmallUrl" class="img-xs img-circle sidebar-avatar @uapi.Id" />
+            </span>
+            <span class="clear">
+                <span class="block m-t-xs">
+                    Logged in as<br />
+                    <strong class="font-bold">@uapi.UserName</strong>
+                    <i class="fa fa-caret-down"></i>
+                </span>
+            </span>
+        </a>
+        <ul class="dropdown-menu m-l-md">
+            <li>
+                <a asp-action="Index" asp-controller="Manage">
+                    <i class="fa fa-cogs m-r-xs"></i>Manage Account
+                </a>
+            </li>
+            <li>
+                <a asp-action="ChangePassword" asp-controller="Manage">
+                    <i class="fa fa-lock m-r-xs"></i>Change Password
+                </a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="javascript:document.getElementById('logoutForm').submit()">
+                    <i class="fa fa-sign-out m-r-xs"></i>Log out
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="logo-element">
+    <a asp-action="Index" asp-controller="Home" asp-area="Admin"><img src="~/lib/hood/images/h-black.svg" alt="HoodCMS - Content Managed" /></a>
+</div>

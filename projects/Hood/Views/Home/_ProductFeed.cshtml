@@ -1,0 +1,52 @@
+@model ContentListModel
+
+<div class="row">
+    <div class="col-sm-8">
+        @if (Model.Posts.Count == 0)
+        {
+            await Html.RenderPartialAsync("_NoResults");
+        }
+        else
+        {
+            @foreach (var content in Model.Posts.Items)
+            {
+                var capi = _settings.ToContentApi(content);
+                var product = new Product(content);
+                <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
+                    <div class="thumbnail">
+                        @if (content.FeaturedImage != null)
+                        {
+                            <a href="@capi.Url"><fixedImage src="@capi.FeaturedImage.MediumUrl" class="post-media content-feature-@content.Id" style="@capi.GetImageStyle()" /></a>
+                        }
+                        <div class="caption">
+                            <h3><a href="@capi.Url">@content.Title</a></h3>
+                            <p>
+                                <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.Type.Type.ToLower(), content.Author.UserName)">@content.Author.FullName</a></span>
+                                <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
+                            </p>
+                            <span class="pull-right">
+                                <a class="btn btn-sm btn-default cart-add" data-id="@content.Id">Add to cart</a>
+                            </span>
+                            <p>@product.Price</p>
+                            @if (content.Categories != null && content.Categories.Count != 0)
+                            {
+                                foreach (var category in content.Categories)
+                                {
+                                    <span><a href="@string.Format("/{0}/category/{1}/", Model.Type.Type, category.Category.Slug)">@category.Category.DisplayName</a></span>
+                                }
+                            }
+                            else
+                            {
+                                <span>Uncategorised</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            await Html.RenderPartialAsync("_Pagination");
+        }
+    </div>
+    <div class="col-sm-4">
+        @{ await Html.RenderPartialAsync("_Sidebar"); }
+    </div>
+</div>

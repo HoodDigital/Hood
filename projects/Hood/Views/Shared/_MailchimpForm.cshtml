@@ -1,0 +1,18 @@
+@model MailchimpFormModel
+<h4>Sign up for the mailing list...</h4>
+<form id="mailchimp-signup-form">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" class="form-control required" asp-for="Email" placeholder="Email">
+    </div>
+    <div class="form-group">
+        <label for="first">First name</label>
+        <input type="text" class="form-control" asp-for="FirstName" placeholder="First name">
+    </div>
+    <div class="form-group">
+        <label for="last">Last name</label>
+        <input type="text" class="form-control" asp-for="LastName" placeholder="Last name">
+    </div>
+    <button class="btn btn-primary" id="mail-signup" type="submit">Sign up</button>
+</form>

@@ -1,0 +1,18 @@
+@model EditContentModel
+
+@{
+    var mapi = _settings.ToContentApi(Model.Content);
+}
+<div class="form-horizontal">
+    @if (Model.Type.ShowImage)
+    {
+        <div class="form-group">
+            <label class="col-sm-4 control-label pt-15">Featured Image</label>
+            <div class="col-sm-8">
+                <fixedImage src="@mapi.FeaturedImage.SmallUrl" class="img-xs img-circle m-r-sm content-feature-@mapi.Id" id="content-blade-avatar" />
+                <attacher dataid="@mapi.Id" entity="Content" field="FeaturedImage" type="image" refresh="/admin/content/getfeaturedimage" tag="content-feature-@mapi.Id" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
+                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Content" asp-area="Admin" asp-route-id="@mapi.Id" data-complete="$.hood.Uploader.RefreshImage('.content-feature-@mapi.Id', '/admin/content/getfeaturedimage', @mapi.Id)"><i class="fa fa-trash"></i></a>
+            </div>
+        </div>
+    }
+</div>

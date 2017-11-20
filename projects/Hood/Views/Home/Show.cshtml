@@ -1,0 +1,166 @@
+@model ContentModel
+
+@{
+    SeoSettings _seoSettings = _settings.GetSeo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+
+    var cmTitle = Model.Content.GetMeta("SEO.Meta.Title");
+    var cmDesc = Model.Content.GetMeta("SEO.Meta.Description");
+    string metaTitle = Model.Content.Title + " - " + _basicSettings.SiteTitle;
+    string metaDesc = Model.Content.Excerpt;
+    if (!cmTitle.GetStringValue().IsNullOrEmpty())
+    {
+        metaTitle = cmTitle.GetStringValue();
+    }
+    if (!cmDesc.GetStringValue().IsNullOrEmpty())
+    {
+        metaDesc = cmDesc.GetStringValue();
+    }
+    ViewBag.Title = metaTitle;
+    ContentApi mapi = _settings.ToContentApi(Model.Content);
+    ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
+    if (Model.Type.ShowDesigner)
+    {
+        ViewData["DesignerUrl"] = string.Format("{0}?editMode=true", mapi.Url);
+        ViewData["ExitDesignerUrl"] = mapi.Url;
+    }
+    ViewData["Content"] = mapi;
+    Layout = "_Blank";
+    @switch (Model.Type.BaseName)
+    {
+        case "Event":
+            Layout = "_EventLayout";
+            break;
+        case "FAQ":
+            Layout = "_FaqLayout";
+            break;
+        case "News":
+            Layout = "_NewsLayout";
+            break;
+        case "Page":
+            Layout = "_Page";
+            break;
+        case "Portfolio":
+            Layout = "_PortfolioLayout";
+            break;
+        case "Product":
+            Layout = "_ProductLayout";
+            break;
+        case "Team":
+            Layout = "_TeamLayout";
+            break;
+        case "Testimonial":
+            Layout = "_TestimonialLayout";
+            break;
+        default:
+            break;
+    }
+    string template = null;
+    if (Model.Type.Templates)
+    {
+        template = Model.Content.GetMeta("Settings.Template").Get<string>();
+        if (template.IsSet())
+        {
+            Layout = template;
+        }
+    }
+
+    string url = Context.GetSiteUrl(true, true);
+    if (_seoSettings.CanonicalUrl.IsSet())
+    {
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+    }
+}
+@section metas {
+    <meta name="description" content="@metaDesc" />
+    <meta property="og:author" content="@mapi.Author.FullName" />
+    <meta property="og:title" content="@metaTitle" />
+    @if (mapi.FeaturedImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@mapi.FeaturedImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@mapi.FeaturedImage.LargeUrl" />
+        <meta name="twitter:image" content="@mapi.FeaturedImage.LargeUrl" />
+    }
+    else
+    {
+        <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+        <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+        <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+    }
+    <meta property="og:description" content="@metaDesc" />
+    <meta name="twitter:title" content="@metaTitle" />
+    <meta name="twitter:description" content="@metaDesc" />
+}
+@if (template.IsSet())
+{
+    await Html.RenderPartialAsync("_EditableContent");
+}
+else
+{
+    switch (Model.Type.BaseName)
+    {
+        case "Event":
+            await Html.RenderPartialAsync("_EventView");
+            break;
+        case "Faq":
+            await Html.RenderPartialAsync("_FaqView");
+            break;
+        case "Job":
+            await Html.RenderPartialAsync("_JobView");
+            break;
+        case "News":
+            await Html.RenderPartialAsync("_NewsView");
+            break;
+        case "Portfolio":
+            await Html.RenderPartialAsync("_PortfolioView");
+            break;
+        case "Product":
+            await Html.RenderPartialAsync("_ProductView");
+            break;
+        case "Team":
+            await Html.RenderPartialAsync("_TeamView");
+            break;
+        case "Testimonial":
+            await Html.RenderPartialAsync("_TestimonialView");
+            break;
+        case "Page":
+        default:
+            await Html.RenderPartialAsync("_EditableContent");
+            break;
+    }
+}
+@if (Model.EditMode && (User.IsInRole("Admin") || User.IsInRole("Editor")))
+{
+    await Html.RenderPartialAsync("_DesignerBar");
+    @section styles {
+        <environment names="Development,Staging,ErrorTesting">
+            <link rel="stylesheet" href="~/lib/dragula/dist/dragula.css" />
+            <link rel="stylesheet" href="~/lib/hood/src/css/designer.css" />
+        </environment>
+        <environment names="Production,PreProduction">
+            <link rel="stylesheet" href="~/lib/dragula/dist/dragula.min.css" />
+            <link rel="stylesheet" href="~/lib/hood/dist/css/designer.min.css" />
+        </environment>
+    }
+    @section scripts {
+        <script src="~/lib/dragula/dist/dragula.min.js"></script>
+        <script src="~/lib/dropzone/dist/min/dropzone.min.js"></script>
+        <script src="~/lib/tinymce/tinymce.min.js"></script>
+        <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
+        <script src="~/lib/kendo-ui-core/js/kendo.ui.core.min.js"></script>
+        <environment names="Development,Staging,ErrorTesting">
+            <script src="~/lib/hood/src/js/includes/datalist.js"></script>
+            <script src="~/lib/hood/src/js/includes/pager.js"></script>
+            <script src="~/lib/hood/src/js/includes/uploader.js"></script>
+            <script src="~/lib/hood/src/js/includes/media.js"></script>
+            <script src="~/lib/hood/src/js/includes/designer.js"></script>
+        </environment>
+        <environment names="Production,PreProduction">
+            <script src="~/lib/hood/dist/js/includes/datalist.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/pager.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/uploader.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/media.min.js"></script>
+            <script src="~/lib/hood/dist/js/includes/designer.min.js"></script>
+        </environment>
+    }
+}

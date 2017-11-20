@@ -1,0 +1,71 @@
+
+@model EditSubscriptionModel
+@{
+    ViewBag.Title = "Edit " + Model.Subscription.Name;
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-route-area="Admin">
+                <i class="fa fa-building m-r-xs"></i>
+                Subscriptions
+            </a>
+        </li>
+        <li class="active">
+            <strong>@ViewBag.Title</strong>
+        </li>
+    </ol>
+}
+<form method="post">
+    <div class="wrapper wrapper-content" id="edit-subscription" data-id="@Model.Subscription.Id">
+        <div class="row">
+            <div class="col-md-8">
+                @if (Model.SaveResult != null)
+                {
+                    @if (Model.SaveResult.Succeeded)
+                    {
+                        <div class="alert alert-success alert-dismissable">
+                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                            <i class="fa fa-thumbs-up m-r-xs"></i><strong>Saved!</strong> The Property has been saved.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning alert-dismissable">
+                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                            <i class="fa fa-meh-o m-r-xs"></i><strong>Saved!</strong> The Property has been saved, but with issues. <a role="button" data-toggle="collapse" href="#errors" aria-expanded="false" aria-controls="errors" class="txt-color-orangeDark">Show Issues</a>
+                            <div id="errors" class="collapse">
+                                <ul class="m-t-md">
+                                    @foreach (Hood.Infrastructure.OperationError error in Model.SaveResult.Errors)
+                                    {
+                                        <li>@error.Description</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                }
+                @{ await Html.RenderPartialAsync("_Editor_Subscription", Model.Subscription); }
+            </div>
+            <div class="col-md-4">
+                <div class="widget-head-color-box black-bg p-lg image-heading">
+                    <div class="m-b-md text-center">
+                        <h4 class="font-bold no-margins text-white">
+                            <span>@Model.Subscription.Name</span>
+                        </h4>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save m-r-xs"></i> Save Subscription</button>
+                </div>
+                <div class="ibox float-e-margins">
+                    <div>
+                        <div class="ibox-content">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
