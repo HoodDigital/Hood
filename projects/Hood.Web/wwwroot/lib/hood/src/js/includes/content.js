@@ -235,9 +235,6 @@ $.hood.Content = {
                 // delete functionality
                 $.post('/admin/content/' + $this.data('id') + '/delete', null, function (data) {
                     if (data.Success) {
-                        if (!$('#manage-content-list').doesExist())
-                            window.location = '/admin/content/' + $this.data('type') + '/manage/';
-                        $.hood.Content.Manage.Refresh();
                         $.hood.Blades.Close();
                         swal({
                             title: "Deleted!",
@@ -245,6 +242,9 @@ $.hood.Content = {
                             timer: 1300,
                             type: "success"
                         });
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal({
                             title: "Error!",
@@ -278,14 +278,15 @@ $.hood.Content = {
                 // delete functionality
                 $.post('/admin/content/' + $this.data('id') + '/publish', null, function (data) {
                     if (data.Success) {
-                        $.hood.Content.Manage.Refresh();
-                        $.hood.Blades.Close();
                         swal({
                             title: "Published!",
                             text: "The item has now been published.",
                             timer: 1300,
                             type: "success"
                         });
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal({
                             title: "Error!",
@@ -318,14 +319,15 @@ $.hood.Content = {
             if (isConfirm) {
                 $.post('/admin/content/' + $this.data('id') + '/archive', null, function (data) {
                     if (data.Success) {
-                        $.hood.Content.Manage.Refresh();
-                        $.hood.Blades.Close();
                         swal({
                             title: "Archived!",
                             text: "The item has now been archived.",
                             timer: 1300,
                             type: "success"
                         });
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal({
                             title: "Error!",
@@ -395,8 +397,10 @@ $.hood.Content = {
                 submitUrl: '/admin/content/add',
                 submitFunction: function (data) {
                     if (data.Success) {
-                        $('#manage-content-list').data('hoodDataList').Refresh();
                         swal("Created!", "The content has now been created!", "success");
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal("Error", "There was a problem creating the content:\n\n" + data.Errors, "error");
                     }

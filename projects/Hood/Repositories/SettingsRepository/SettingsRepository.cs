@@ -22,10 +22,12 @@ namespace Hood.Services
 
         private HoodDbContext _context;
 
-        private HoodDbContext _db { get
+        private HoodDbContext _db
+        {
+            get
             {
                 var options = new DbContextOptionsBuilder<HoodDbContext>();
-                options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+                options.UseSqlServer(ConnectionString);
                 _context = new HoodDbContext(options.Options);
                 return _context;
             }
@@ -71,7 +73,6 @@ namespace Hood.Services
         private const string BasicSettingsKey = "basic_settings";
         private const string SystemSettingsKey = "system_settings";
 
-
         public SettingsRepository(IConfiguration config,
                                  IHoodCache memoryCache)
         {
@@ -116,8 +117,11 @@ namespace Hood.Services
         {
             try
             {
+                var options = new DbContextOptionsBuilder<HoodDbContext>();
+                options.UseSqlServer(ConnectionString);
+                _context = new HoodDbContext(options.Options);
                 string cacheKey = typeof(Option).ToString() + "." + key;
-                Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
+                Option option = _context.Options.Where(o => o.Id == key).FirstOrDefault();
                 if (option == null)
                 {
                     option = new Option()
@@ -129,12 +133,9 @@ namespace Hood.Services
                     return returnVal;
                 }
                 option.Value = JsonConvert.SerializeObject(value);
-                bool ret = _db.SaveChanges() == 1;
-                if (ret)
-                {
-                    _cache.Remove(cacheKey);
-                }
-                return ret;
+                int updated = _context.SaveChanges();
+                _cache.Remove(cacheKey);
+                return updated == 1;
             }
 
             catch (DbUpdateException ex)
@@ -525,6 +526,8 @@ namespace Hood.Services
             var version = typeof(SettingsRepository).Assembly.GetName().Version;
             return string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
         }
+
+        public string ConnectionString { get { return _config.GetConnectionString("DefaultConnection"); } }
     }
 
     public class SettingsRepositoryStub : ISettingsRepository

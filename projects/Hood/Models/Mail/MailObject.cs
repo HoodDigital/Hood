@@ -16,8 +16,6 @@ namespace Hood.Services
             _body = new StringWriter();
         }
 
-
-
         private StringWriter _body;
         public string Html
         {
@@ -47,7 +45,6 @@ namespace Hood.Services
                 _body.Write(value);
             }
         }
-
 
         public void AddH1(string content, string colour = "#222222", string align = "left")
         {

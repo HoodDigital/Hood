@@ -1,4 +1,5 @@
-﻿using Hood.Models;
+﻿using Hood.Extensions;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -15,30 +16,8 @@ namespace Hood.Web
     {
         public static void Main(string[] args)
         {
-            var host = BuildWebHost(args);
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var config = services.GetService<IConfiguration>();
-                    scope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
-                    var userManager = services.GetService<UserManager<ApplicationUser>>();
-                    var roleManager = services.GetService<RoleManager<IdentityRole>>();
-                    var options = new DbContextOptionsBuilder<HoodDbContext>();
-                    options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]);
-                    var db = new HoodDbContext(options.Options);
-                    db.EnsureSetup(userManager, roleManager);
-
-                    // Initialise events
-                    services.GetService<SubscriptionsEventListener>().Configure();
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
-                }
-            }
+            IWebHost host = BuildWebHost(args);
+            host.SeedHoodData<ApplicationDbContext>();
             host.Run();
         }
 

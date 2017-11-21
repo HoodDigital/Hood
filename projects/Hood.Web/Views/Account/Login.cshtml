@@ -1,0 +1,61 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model LoginViewModel
+
+@inject IContentRepository _content
+@{
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    string description = "Log In - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = "Log In - " + _basicSettings.CompanyName;
+    if (_seoSettings.Login != null)
+    {
+        description = _seoSettings.Login.Description.IsSet() ? _seoSettings.Login.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Log In - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.Login.Title.IsSet() ? _seoSettings.Login?.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Log In - " + _basicSettings.CompanyName;
+    }
+    ViewData["Title"] = title;
+    Layout = "_LoginLayout";
+}
+@section metas {
+    <meta name="description" content="@description" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+}
+<div class="login-block-header">
+    <h2>Sign In</h2>
+    @{ await Html.RenderPartialAsync("_LoginSocials"); }
+    <p>Don't Have Account? Click <a asp-action="Register">Sign Up</a> to create one.</p>
+</div>
+<form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="" role="form">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+
+    <div class="form-group">
+        <label asp-for="Username" class="control-label"></label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+            <input asp-for="Username" class="form-control" placeholder="Your email address" />
+        </div>
+        <span asp-validation-for="Username" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+            <input asp-for="Password" class="form-control" placeholder="Your password" />
+        </div>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <p><button type="submit" class="btn btn-block">Log In</button></p>
+    <p class="text-center">
+        <a asp-action="ForgotPassword">Forgot your password?</a>
+    </p>
+
+</form>

@@ -1,0 +1,19 @@
+@model EditContentModel
+@if (Model.Type.BaseName != "Page" && 
+     Model.Type.BaseName != "Product" && 
+     Model.Type.BaseName != "Team" && 
+     Model.Type.BaseName != "Slider" &&
+     Model.Content.Metadata.Where(c => c.Name.ToLower().StartsWith("content." + Model.Type.BaseName.ToLower() + ".")).Count() > 0)
+{ 
+    <li class=""><a data-toggle="tab" href="#type" aria-expanded="false"> @Model.Type.BaseName Settings</a></li>
+}
+@if (Model.Type.Templates)
+{ <li class=""><a data-toggle="tab" href="#template" aria-expanded="false"> Template Settings</a></li> }
+@if (Model.Type.Gallery)
+{ <li class=""><a data-toggle="tab" href="#media" aria-expanded="false"> Images &amp; Media</a></li> }
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
+{ <li class=""><a data-toggle="tab" href="#seo" aria-expanded="false"> SEO Settings</a></li>}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
+{ <li class=""><a data-toggle="tab" href="#custom" aria-expanded="false"> Custom Fields</a></li> }
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0 || Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
+{ <li class=""><a data-toggle="tab" href="#settings" aria-expanded="false"> Other Settings</a></li> }

@@ -116,7 +116,8 @@ namespace Hood.Models
             get
             {
                 var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
-                return Id == siteSettings.GetBasicSettings().Homepage;
+                BasicSettings basicSettings = siteSettings.GetBasicSettings();
+                return Id == basicSettings.Homepage;
             }
         }
         public string GetImageStyle(string imageType = "Featured")
@@ -143,9 +144,9 @@ namespace Hood.Models
         public string FeaturedImageJson { get; set; }
 
         [NotMapped]
-        public ContentMedia FeaturedImage
+        public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : null; }
+            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : ContentMedia.Blank; }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
         }
 
@@ -230,6 +231,13 @@ namespace Hood.Models
                     return true;
             }
             return false;
+        }
+        public Content Clean()
+        {
+            Author.Content = null;
+            Author.Properties = null;
+            Author.Addresses = null;
+            return this;
         }
     }
 }

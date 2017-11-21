@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hood.Core
 {
-    class EngineContext
+    public class EngineContext
     {
         #region Methods
 

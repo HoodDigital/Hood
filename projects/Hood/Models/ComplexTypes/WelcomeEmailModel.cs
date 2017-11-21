@@ -1,16 +1,20 @@
 ﻿using System;
 using Hood.Services;
+using Hood.Extensions;
 
 namespace Hood.Models
 {
     public class WelcomeEmailModel : IEmailSendable
     {
-        public WelcomeEmailModel(ApplicationUser user)
+        public WelcomeEmailModel(ApplicationUser user, string confirmationLink = null)
         {
             User = user;
+            ConfirmationLink = confirmationLink;
         }
 
         public ApplicationUser User { get; set; }
+        public string ConfirmationLink { get; set; }
+
         public MailObject WriteToMessage(MailObject message)
         {
             message.Subject = User.ReplacePlaceholders(message.Subject);
@@ -18,6 +22,11 @@ namespace Hood.Models
             message.Html = User.ReplacePlaceholders(message.Html);
             message.PreHeader = User.ReplacePlaceholders(message.PreHeader);
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
+            if (ConfirmationLink.IsSet())
+            {
+                message.AddParagraph("Please confirm your account by clicking the link below, we just need to make sure you are a real person.");
+                message.AddCallToAction("Confirm your account", ConfirmationLink);
+            }
             return message;
         }
     }

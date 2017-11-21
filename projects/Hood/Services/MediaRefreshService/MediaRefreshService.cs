@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Hood.Core;
 
 namespace Hood.Services
 {
@@ -21,11 +22,8 @@ namespace Hood.Services
         public MediaRefreshService(
             IHostingEnvironment env,
             IConfiguration config,
-            IMediaManager<MediaObject> media,
-            ISettingsRepository site,
-            IEmailSender email)
+            ISettingsRepository settings)
         {
-            _email = email;
             _config = config;
             Lock = new ReaderWriterLock();
             Total = 0;
@@ -36,8 +34,8 @@ namespace Hood.Services
             Cancelled = false;
             Succeeded = false;
             StatusMessage = "Not running...";
-            _settings = site;
-            _media = media;
+            _settings = settings;
+            _media = new MediaManager<MediaObject>(config, settings);
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(MediaRefreshService) + "\\";
         }
 
@@ -52,7 +50,6 @@ namespace Hood.Services
         private bool Cancelled { get; set; }
         private HoodDbContext _db { get; set; }
         private bool _killFlag;
-        private readonly IEmailSender _email;
         private HttpContext _context;
 
         private string TempFolder { get; set; }
@@ -75,6 +72,9 @@ namespace Hood.Services
                 var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new HoodDbContext(options.Options);
+
+                _media = new MediaManager<MediaObject>(_config, _settings);
+
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(RefreshAllMedia);
@@ -206,7 +206,9 @@ namespace Hood.Services
                 };
                 message.AddH1(_settings.ReplacePlaceholders("Complete!"));
                 message.AddParagraph(_settings.ReplacePlaceholders("All media files have been successfully refreshed on " + _context.GetSiteUrl()));
-                await _email.NotifyRoleAsync(message, "SuperUser");
+
+                IEmailSender emailSender = EngineContext.Current.Resolve<IEmailSender>();
+                await emailSender.NotifyRoleAsync(message, "SuperUser");
 
                 // Clean the temp directory...
                 CleanTempFolder();

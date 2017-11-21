@@ -1,0 +1,41 @@
+@model PagedList<Content>
+
+@inject IContentRepository _content
+@if (Model != null && Model.Count > 0)
+{
+    <div class="sidebar-widget">
+        <h4>Recently Added</h4>
+        <hr />
+        @foreach (Content content in Model.Items)
+        {
+            <div class="media">
+                <div class="media-left media-top">
+                    <a href="@content.Url">
+                        <fixedImage src="@content.FeaturedImage.ThumbUrl" class="media-object img-xxs @string.Format("content-image-{0}", content.Id)" style="@content.GetImageStyle()" />
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h5 class="media-heading"><a class="title-link" href="@content.Url">@content.Title</a></h5>
+                    @switch (content.ContentType)
+                    {
+                        case "news":
+                        case "blog":
+                            <small>
+                                <i class="m-r-xs fa fa-user"></i><a asp-action="Author" asp-route-author="@content.Author.UserName" asp-route-type="@content.ContentType">@content.Author.FullName</a>
+                                <i class="m-r-xs m-l-sm fa fa-clock-o"></i> @content.PublishDate.ToLongDateString()
+                            </small>
+
+                            break;
+                        default:
+                            <small>
+                                <i class="m-r-xs fa fa-user"></i>@content.Author.FullName
+                                <i class="m-r-xs m-l-sm fa fa-clock-o"></i>@content.PublishDate.ToLongDateString()
+                            </small>
+                            break;
+                    }
+                </div>
+            </div>
+            <hr />
+        }
+    </div>
+}

@@ -1,0 +1,291 @@
+@model ContentListModel
+
+@inject ContentCategoryCache _categories
+@{
+    ViewBag.Title = Model.Type.Title;
+    var categories = _categories.TopLevel(Model.Type.Type);
+}
+@section buttons {
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button> <ul class="dropdown-menu">
+            @if (Model.Type.IsPublic)
+            {
+                <li>
+                    <a class="" href="@string.Format("/{0}/", Model.Type.Slug)" target="_blank">
+                        <i class="fa fa-desktop m-r-sm"></i>
+                        Preview @Model.Type.TypeNamePlural Page
+                    </a>
+                </li>
+            }
+            @if (Model.Type.IsPublic && User.IsInRole("Admin"))
+            {
+                <li class="divider"></li>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+                <li>
+                    <a class="warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.Type.TypeNamePlural.ToLower() from the site!">
+                        <i class="fa fa-trash m-r-sm"></i>
+                        Delete All
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+    <button class="btn btn-success create-content" data-type="@Model.Type.Slug"><i class="fa fa-thumb-tack m-r-sm"></i>Create New</button>
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Content" asp-route-type="@Model.Type.Type" asp-route-area="Admin">
+                <i class="fa @Model.Type.Icon m-r-xs"></i>
+                @Model.Type.TypeNamePlural
+            </a>
+        </li>
+    </ol>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#items" aria-expanded="false"> @Model.Type.Title</a></li>
+        <li class=""><a data-toggle="tab" href="#categories" aria-expanded="false"> @Model.Type.TypeName Categories</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="items" class="tab-pane active">
+            <div class="panel-body">
+                <form>
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-4">
+                            <select class="form-control manage-content-change" name="sort" id="sort" data-selected="@Model.Sort">
+                                <option value="PublishDateDesc">Recently Published</option>
+                                <option value="PublishDate">Published Date (Oldest-Newest)</option>
+                                <option value="DateDesc">Newest First</option>
+                                <option value="Date">Oldest First</option>
+                                <option value="Title">By Title (A-Z)</option>
+                                <option value="TitleDesc">By Title (Z-A)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control manage-content-change" name="category" id="category" data-selected="@Model.Category">
+                                <option value="">Show All</option>
+                                @Html.CategorySelectOptions(categories, true)
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input name="search" id="search" type="text" placeholder="Search" class="form-control" value="@Model.Search">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary"> Search!</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <hr />
+                @foreach (var content in Model.Posts.Items)
+                {
+                    <div class="forum-item data-item">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="media">
+                                    @if (Model.Type.ShowImage)
+                                    {
+                                        <div class="media-left media-middle">
+                                            <a href="/admin/content/@content.Id/edit/">
+                                                <figure class="img-xs content-feature-@content.Id hood-image" style="background-image:url(@content.FeaturedImage.ThumbUrl)">
+                                                    <img src="@content.FeaturedImage.ThumbUrl" alt="@content.Title">
+                                                </figure>
+                                            </a>
+                                        </div>
+                                    }
+                                    <div class="media-body">
+                                        <a class="forum-item-title" href="/admin/content/@content.Id/edit/">
+                                            @content.Title
+                                            @if (content.IsHomepage)
+                                            {
+                                                <span class="label label-success">Homepage</span>
+                                            }
+                                            @if (content.Status == 1)
+                                            {
+                                                <small class="txt-color-magenta">@content.StatusString</small>
+                                            }
+                                            else
+                                            {
+                                                @if (content.Status == 3)
+                                                {
+                                                    <small class="txt-color-orangeDark">@content.StatusString</small>
+                                                }
+                                                else
+                                                {
+                                                    @if (content.PublishPending)
+                                                    {
+                                                        <small class="txt-color-orange">@content.StatusString</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <small class="txt-color-greenLight">@content.StatusString</small>
+                                                    }
+                                                }
+                                            }
+                                        </a>
+                                        <small>Created on <i class="fa fa-clock-o"></i> @content.CreatedOn.ToDisplay()</small><br />
+                                        @if (Model.Type.HasPage)
+                                        {
+                                            <small class="font-bold"><a href="@content.Url" target="_blank">@content.Url</a></small>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1 visible-lg">
+                                <span class="small font-bold">Status</span>
+                                <div class="tag-list">
+                                    @if (content.Status == 1)
+                                    {
+                                        <span class="tag-item">Draft</span>
+                                    }
+                                    else if (content.Status == 2)
+                                    {
+                                        <span class="tag-item bg-color-green txt-color-white">Published</span>
+                                    }
+                                    else if (content.Status == 3)
+                                    {
+                                        <span class="tag-item bg-color-purple txt-color-white">Archived</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-1 visible-lg visible-md">
+                                <span class="small font-bold">Author</span>
+                                <div class="tag-list">
+                                    <span class="tag-item">@content.Author.FullName</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 visible-lg">
+                                <span class="small font-bold">Categories</span>
+                                <div class="tag-list">
+                                    @if (content.Categories.Count == 0)
+                                    {
+                                        <span class="tag-item">Not in a category.</span>
+                                    }
+                                    @foreach (var category in content.Categories)
+                                    {
+                                        <span class="tag-item">@category.Category.DisplayName</span>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-2 action-buttons">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        @if (!content.IsHomepage)
+                                        {
+                                            @if (Model.Type.BaseName == "Page")
+                                            {
+                                                <li>
+                                                    <a class="hood-inline-task" href="/admin/content/@content.Id/sethomepage" data-complete="$.hood.Content.Manage.Refresh()">
+                                                        <i class="fa fa-home m-r-sm"></i>
+                                                        <span>
+                                                            Set as Homepage
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            }
+                                        }
+                                        @if (Model.Type.ShowDesigner)
+                                        {
+                                            <li>
+                                                <a href="@content.Url?editMode=true">
+                                                    <i class="fa fa-pencil m-r-sm"></i>
+                                                    <span>
+                                                        Design
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        }
+                                        @if (Model.Type.HasPage)
+                                        {
+                                            <li>
+                                                <a href="@content.Url" target="_blank">
+                                                    <i class="fa fa-search m-r-sm"></i>
+                                                    <span>
+                                                        Go
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        }
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a class="delete-content" data-id="@content.Id">
+                                                <i class="fa fa-trash-o m-r-sm"></i>
+                                                <span>
+                                                    Delete
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                @if ((content.Status == 1) || (content.Status == 3))
+                                {
+                                    <a class="publish-content btn btn-primary" data-id="@content.Id">
+                                        <i class="fa fa-thumbs-up m-r-xs"></i>
+                                        <span>
+                                            Publish
+                                        </span>
+                                    </a>
+                                }
+                                else if (content.Status == 2)
+                                {
+                                    <a class="archive-content btn btn-danger" data-id="@content.Id">
+                                        <i class="fa fa-archive m-r-xs"></i>
+                                        <span>
+                                            Archive
+                                        </span>
+                                    </a>
+                                }
+                                <a class="btn-success btn action-button" href="/admin/content/@content.Id/edit"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="text-center">
+                    @{ await Html.RenderPartialAsync("_Pagination"); }
+                </div>
+            </div>
+        </div>
+        <div id="categories" class="tab-pane">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <div class="hood-inline categorylist" data-url="@Url.Action("CategoryList")"></div>
+                    </div>
+                    <div class="col-sm-4">
+                        <form id="add-category-form" class="well">
+                            <h4>Add a category...</h4>
+                            <hr />
+                            <input id="Add-ContentType" name="ContentType" type="hidden" value="@Model.Type.Type" />
+                            <div class="blade-field">
+                                <label class="control-label" for="Add-DisplayName">Category</label>
+                                <div>
+                                    <input class="form-control" type="text" id="Add-DisplayName" name="DisplayName" />
+                                </div>
+                            </div>
+                            <div class="blade-field">
+                                <label class="control-label" for="Add-ParentCategoryId">Parent Category</label>
+                                <div>
+                                    <select class="form-control" id="Add-ParentCategoryId" name="ParentCategoryId">
+                                        <option>No Parent</option>
+                                        @Html.CategorySelectOptions(categories)
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="blade-field">
+                                <button type="button" class="btn btn-primary add-category"><i class="fa fa-save"></i> Add Category</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

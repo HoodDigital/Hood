@@ -50,8 +50,8 @@ namespace Hood.Models
                 return output;
             }
         }
-        public bool IsDelivery { get { return Id == User.DeliveryAddress?.Id; } }
-        public bool IsBilling { get { return Id == User.BillingAddress?.Id; } }
+        public bool IsDelivery { get { return User != null ? Id == User.DeliveryAddress?.Id : false; } }
+        public bool IsBilling { get { return User != null ? Id == User.BillingAddress?.Id : false; } }
 
     }
 }

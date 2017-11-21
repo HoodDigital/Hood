@@ -47,6 +47,20 @@ namespace Hood.Services
             return new EmailAddress(fromEmail, fromName);
         }
 
+        public async Task<int> SendEmailAsync(string to, string subject, string body, EmailAddress from = null, string toName = null)
+        {
+            MailObject message = new MailObject
+            {
+                Html = body,
+                Text = body,
+                To = new EmailAddress(to, toName),
+                ToName = toName,
+                Subject = subject,
+                PreHeader = subject
+            };
+            return await SendEmailAsync(message, Models.MailSettings.PlainTemplate, from);
+        }
+
         public async Task<int> SendEmailAsync(MailObject message, string template = Models.MailSettings.PlainTemplate, EmailAddress from = null)
         {
             SendGridClient client = GetMailClient();
@@ -61,7 +75,7 @@ namespace Hood.Services
             var response = await client.SendEmailAsync(msg);
             var body = response.DeserializeResponseBody(response.Body);
             if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
-                return 1;            
+                return 1;
 
             return 0;
         }
@@ -76,7 +90,7 @@ namespace Hood.Services
                 var msg = MailHelper.CreateSingleEmail(from, email, subject, textContent, htmlContent);
                 var response = await client.SendEmailAsync(msg);
                 var body = response.DeserializeResponseBody(response.Body);
-                if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode== HttpStatusCode.OK)
+                if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
                     sent++;
             }
             return sent;
@@ -100,6 +114,5 @@ namespace Hood.Services
             var emails = users.Select(u => new EmailAddress(u.Email, u.FullName)).ToArray();
             return await SendEmailAsync(emails, subject, htmlContent, textContent);
         }
-
     }
 }

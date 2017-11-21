@@ -89,7 +89,7 @@ namespace Hood.Extensions
 
         public static bool IsSet(this string str)
         {
-            return !string.IsNullOrEmpty(str);
+            return !string.IsNullOrEmpty(str) && !string.Equals("null", str) && !string.Equals("\"null\"", str);
         }
         /// <summary>
         /// Use the current thread's culture info for conversion

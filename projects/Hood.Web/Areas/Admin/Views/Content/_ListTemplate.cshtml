@@ -1,0 +1,145 @@
+@model ContentListModel
+
+@{ 
+    var _basics = _settings.GetBasicSettings();
+}
+<div class="forum-item data-item">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="media">
+                @if (Model.Type.ShowImage)
+                {
+                    <div class="media-left media-middle">
+                        <a href="/admin/content/${ Id }/edit/">
+                            <figure class="img-xs content-feature-${ Id } hood-image" style="background-image:url(${ FeaturedImage.ThumbUrl })">
+                                <img src="${ FeaturedImage.ThumbUrl }" alt="${ Title }">
+                            </figure>
+                        </a>
+                    </div>
+                }
+                <div class="media-body">
+                    <a class="forum-item-title" href="/admin/content/${ Id }/edit/">
+                        ${ Title }
+                        #if (IsHomepage) {#
+                        <span class="label label-success">Homepage</span>
+                        #}#
+                        #if (Status == 1) {#
+                        <small class="txt-color-magenta">#= StatusString #</small>
+                        #} else {#
+                        #if (Status == 3) {#
+                        <small class="txt-color-orangeDark">#= StatusString #</small>
+                        #} else {#
+                        #if (PublishPending) {#
+                        <small class="txt-color-orange">${ StatusString }</small>
+                        #} else {#
+                        <small class="txt-color-greenLight">${ StatusString }</small>
+                        #}#
+                        #}#
+                        #}#
+                    </a>
+                    <small>Created on <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(CreatedOn), "ddd d, MMMM yyyy at hh:mm tt") #</small><br />
+                    @if (Model.Type.HasPage)
+                    {
+                        <small class="font-bold"><a href="${ Url }" target="_blank">${ Url }</a></small>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1 visible-lg">
+            <span class="small font-bold">Status</span>
+            <div class="tag-list">
+                #if (Status == 1) {#
+                <span class="tag-item">Draft</span>
+                #} else if (Status == 2) {#
+                <span class="tag-item bg-color-green txt-color-white">Published</span>
+                #} else if (Status == 3) {#
+                <span class="tag-item bg-color-purple txt-color-white">Archived</span>
+                #}#
+            </div>
+        </div>
+        <div class="col-md-1 visible-lg visible-md">
+            <span class="small font-bold">Author</span>
+            <div class="tag-list">
+                <span class="tag-item">${ Author.FullName }</span>
+            </div>
+        </div>
+        <div class="col-md-2 visible-lg">
+            <span class="small font-bold">Categories</span>
+            <div class="tag-list">
+                #if (Categories.length==0) {#
+                <span class="tag-item">Not in a category.</span>
+                #}#
+                #for (i=0; i<Categories.length; i++) {#
+                        <span class="tag-item">#= Categories[i] #</span>
+                    #}#
+            </div>
+        </div>
+        <div class="col-md-2 action-buttons">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    #if (!IsHomepage) {#
+                    @if (Model.Type.BaseName == "Page")
+                    {
+                        <li>
+                            <a class="hood-inline-task" href="/admin/content/${ Id }/sethomepage" data-complete="$.hood.Content.Manage.Refresh()">
+                                <i class="fa fa-home m-r-sm"></i>
+                                <span>
+                                    Set as Homepage
+                                </span>
+                            </a>
+                        </li>
+                    }
+                    #}#
+                    @if (Model.Type.ShowDesigner)
+                    {
+                        <li>
+                            <a href="${ Url }?editMode=true">
+                                <i class="fa fa-pencil m-r-sm"></i>
+                                <span>
+                                    Design
+                                </span>
+                            </a>
+                        </li>
+                    }
+                    @if (Model.Type.HasPage)
+                    {
+                        <li>
+                            <a href="${ Url }" target="_blank">
+                                <i class="fa fa-search m-r-sm"></i>
+                                <span>
+                                    Go
+                                </span>
+                            </a>
+                        </li>
+                    }
+                    <li class="divider"></li>
+                    <li>
+                        <a class="delete-content" data-id="${ Id }">
+                            <i class="fa fa-trash-o m-r-sm"></i>
+                            <span>
+                                Delete
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            #if ((Status == 1) || (Status == 3)) {#
+            <a class="publish-content btn btn-primary" data-id="${ Id }">
+                <i class="fa fa-thumbs-up m-r-xs"></i>
+                <span>
+                    Publish
+                </span>
+            </a>
+            #} else if (Status == 2) {#
+            <a class="archive-content btn btn-danger" data-id="${ Id }">
+                <i class="fa fa-archive m-r-xs"></i>
+                <span>
+                    Archive
+                </span>
+            </a>
+            #}#
+            <a class="btn-success btn action-button" href="/admin/content/${ Id }/edit"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
+        </div>
+    </div>
+</div>

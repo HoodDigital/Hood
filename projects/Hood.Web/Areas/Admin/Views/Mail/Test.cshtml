@@ -1,0 +1,20 @@
+@model Response
+@{
+    ViewData["Title"] = "Dashboard";
+}
+@if (Model.Success)
+{
+    <div class="alert alert-success">
+        <h3 class="no-margin">Success!</h3>
+        <p class="m-t-lg m-b-md">The test mail was successfully sent.</p>
+        <p><a asp-action="Mail" asp-controller="Settings" class="btn btn-success">Return to mail settings</a></p>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        <h3 class="no-margin">Uh oh!</h3>
+        <p class="m-t-lg m-b-md">@Model.Exception.Message</p>
+        <p><a asp-action="Mail" asp-controller="Settings" class="btn btn-danger">Return to mail settings</a></p>
+    </div>
+}

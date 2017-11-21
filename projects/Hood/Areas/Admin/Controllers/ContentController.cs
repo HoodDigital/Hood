@@ -53,12 +53,17 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/{type}/manage/")]
-        public IActionResult Index(string type)
+        public IActionResult Index(ListFilters request, string search, string sort, string type, string category, bool published = false)
         {
             var contentType = _settings.GetContentSettings().GetContentType(type);
+            PagedList<Content> content = _content.GetPagedContent(request, contentType.Type, category, null, null, published);
             ContentListModel nhm = new ContentListModel()
             {
-                Type = contentType
+                Type = contentType,
+                Posts = content,
+                Search = search, 
+                Sort = sort, 
+                Filters = request
             };
             return View(nhm);
         }
@@ -605,7 +610,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PagedList<Content> content = _content.GetPagedContent(request, type, category, null, null, published);
 
-            Response response = new Response(content.Items.ToArray(), content.Count);
+            Response response = new Response(content.Items.Select(c => c.Clean()).ToArray(), content.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,

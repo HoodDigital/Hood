@@ -1,0 +1,12 @@
+@model EditContentModel
+<div class="form-group">
+    <label class="control-label">Author/Owner</label>
+    <div>
+        <select class="form-control" data-selected="@Model.Content.AuthorId" id="AuthorId" name="AuthorId">
+            @foreach (ApplicationUser author in Model.Authors)
+            {
+                <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
+            }
+        </select>
+    </div>
+</div>

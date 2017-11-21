@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
-    public partial class Option : BaseEntity
+    public partial class Option
     {
         [Key]
-        public new string Id { get; set; }
+        public string Id { get; set; }
         public string Value { get; set; }
     }
 }
