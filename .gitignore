@@ -268,3 +268,9 @@ bower_components/
 /projects/Hood.Web/wwwroot/js/site.packaged.js
 /projects/Hood.Web/wwwroot/js/site.min.js
 /projects/Hood.Web/wwwroot/css
+
+# Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
+ -/projects/Hood.Web/Areas/
+ -/projects/Hood.Web/Areas/*
+ -/projects/Hood.Web/Views
+ -/projects/Hood.Web/Views/*
