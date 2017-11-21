@@ -137,13 +137,26 @@
                                     <div>
                                         <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
                                     </div>
-                                    <p class="font-xs url-preview">
-                                        URL Preview:
-                                        <br />
-                                        <a class="font-sm" href="@Url.AbsoluteUrl(Model.Content.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Content.Slug</span></strong></a>
-                                        <br />
-                                        Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
-                                    </p>
+                                    @if (Model.Content.IsHomepage)
+                                    {
+                                        <p class="font-xs url-preview">
+                                            URL Preview:
+                                            <br />
+                                            <a class="font-sm" href="@Url.AbsoluteUrl()" target="_blank"><strong>@Url.AbsoluteUrl()</strong></a>
+                                            <br />
+                                            Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
+                                        </p>
+                                    }
+                                    else
+                                    {
+                                        <p class="font-xs url-preview">
+                                            URL Preview:
+                                            <br />
+                                            <a class="font-sm" href="@Url.AbsoluteUrl(Model.Content.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Content.Slug</span></strong></a>
+                                            <br />
+                                            Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
+                                        </p>
+                                    }
                                 </div>
                                 <hr />
                             }

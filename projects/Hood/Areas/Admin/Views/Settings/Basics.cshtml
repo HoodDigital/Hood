@@ -196,9 +196,9 @@
                     <div>
                         <select asp-for="Homepage" class="form-control">
                             <option value="">Default Homepage</option>
-                            @foreach (var page in pages)
+                            @foreach (var content in pages)
                             {
-                            <option value="@page.PageId">@page.Title</option>
+                            <option value="@content.PageId">@content.Title</option>
                             }
                         </select>
                     </div>
@@ -223,9 +223,9 @@
                     <div>
                         <select asp-for="LockoutModeHoldingPage" class="form-control">
                             <option value="">Default Holding Page</option>
-                            @foreach (var page in pages)
+                            @foreach (var content in pages)
                             {
-                                <option value="@page.PageId">@page.Title</option>
+                                <option value="@content.PageId">@content.Title</option>
                             }
                         </select>
                     </div>
