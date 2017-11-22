@@ -30,7 +30,8 @@ namespace Hood.Areas.Admin.Controllers
         #region "FTPPropertyImporter"
 
         [HttpPost]
-        [Route("admin/property/import/feed/trigger/")]
+        [Route("admin/property/import/feed/trigger")]
+        [AllowAnonymous]
         public IActionResult TriggerFeed()
         {
             var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
