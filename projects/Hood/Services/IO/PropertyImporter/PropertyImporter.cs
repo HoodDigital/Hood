@@ -16,6 +16,7 @@ using Geocoding.Google;
 using Hood.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Hood.Core;
 
 namespace Hood.Services
 {
@@ -23,7 +24,7 @@ namespace Hood.Services
     {
         private IFTPService _ftp;
         private IConfiguration _config;
-        private IMediaManager<SiteMedia> _media;
+        private IMediaManager<MediaObject> _media;
         private PropertySettings _propertySettings;
         private ISettingsRepository _settings;
         private IHttpContextAccessor _context;
@@ -33,7 +34,7 @@ namespace Hood.Services
             IHostingEnvironment env,
             IHttpContextAccessor context,
             IConfiguration config,
-            IMediaManager<SiteMedia> media,
+            IMediaManager<MediaObject> media,
             ISettingsRepository site,
             IAddressService address)
         {
@@ -87,7 +88,7 @@ namespace Hood.Services
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
         private ApplicationUser User { get; set; }
-        private DefaultHoodDbContext _db { get; set; }
+        private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
 
@@ -117,9 +118,9 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = _settings.GetPropertySettings();
                 // Get a new instance of the HoodDbContext for this import.
-                var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
+                var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                _db = new DefaultHoodDbContext(options.Options);
+                _db = new HoodDbContext(options.Options);
 
                 var userManager = context.RequestServices.GetService<UserManager<ApplicationUser>>();
                 User = userManager.FindByNameAsync("PropertyImporter").Result;
@@ -353,18 +354,18 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.MimeTypeMap.GetMimeType(fi.Extension), fi.Length, new SiteMedia() { Directory = string.Format("property/{0}/", property.Id) });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = string.Format("property/{0}/", property.Id) });
                         }
                         if (mediaResult != null)
                         {
                             if (property.InfoDownload != null)
                             {
-                                await _media.DeleteStoredMedia(new SiteMedia(property.InfoDownload));
-                                property.InfoDownload = property.InfoDownload.UpdateUrls(new PropertyMedia(mediaResult)) as SiteMedia;
+                                await _media.DeleteStoredMedia(new MediaObject(property.InfoDownload));
+                                property.InfoDownload = property.InfoDownload.UpdateUrls(new PropertyMedia(mediaResult)) as MediaObject;
                             }
                             else
                             {
@@ -396,11 +397,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.MimeTypeMap.GetMimeType(fi.Extension), fi.Length, new SiteMedia() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = "Property" });
                         }
                         if (mediaResult != null)
                         {
@@ -442,11 +443,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.MimeTypeMap.GetMimeType(fi.Extension), fi.Length, new SiteMedia() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = "Property" });
                         }
                         if (mediaResult != null)
                         {
@@ -468,7 +469,7 @@ namespace Hood.Services
                             }
                             if (data[key] == property.FeaturedImage?.Filename)
                             {
-                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as SiteMedia;
+                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as MediaObject;
                             }
                             else if (property.FeaturedImage == null)
                             {
@@ -490,12 +491,12 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        SiteMedia mediaResult = null;
+                        MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.MimeTypeMap.GetMimeType("pdf"), fi.Length, new SiteMedia() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, new MediaObject() { Directory = "Property" });
                         }
                         if (mediaResult != null)
                         {
