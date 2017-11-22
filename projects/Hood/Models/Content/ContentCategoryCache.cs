@@ -1,4 +1,5 @@
-﻿using Hood.Services;
+﻿using Hood.Enums;
+using Hood.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -60,7 +61,7 @@ namespace Hood.Models
                             ParentCategoryId = d.ParentCategoryId,
                             ParentCategory = d.ParentCategory,
                             Children = d.Children,
-                            Count = d.Content.Count(),
+                            Count = d.Content.Where(c => c.Content.Status == (int)Status.Published).Count(),
                         };
                 return q.ToDictionary(c => c.Id);
             });
@@ -84,7 +85,7 @@ namespace Hood.Models
                                     ParentCategoryId = d.ParentCategoryId,
                                     ParentCategory = d.ParentCategory,
                                     Children = d.Children,
-                                    Count = d.Content.Count(),
+                                    Count = d.Content.Where(c => c.Content.Status == (int)Status.Published).Count(),
                                 };
                         return q.ToDictionary(c => c.Slug);
                     })
@@ -125,9 +126,9 @@ namespace Hood.Models
                     .SelectMany(c => GetAllCategoriesIncludingChildren(c.Children)));
         }
 
-        public IEnumerable<string> GetSuggestions(string query)
+        public IEnumerable<ContentCategory> GetSuggestions(string type)
         {
-            return byKey.Value.Values.Where(c => c.DisplayName.ToLowerInvariant().Contains(query)).Select(c => c.DisplayName);
+            return bySlug[type].Value.Values;
         }
 
     }

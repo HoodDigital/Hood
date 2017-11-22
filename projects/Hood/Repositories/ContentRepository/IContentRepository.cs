@@ -41,6 +41,8 @@ namespace Hood.Services
         IEnumerable<ContentCategory> GetCategories(int contentId);
         Task<OperationResult<ContentCategory>> AddCategory(ContentCategory category);
         Task<OperationResult<ContentCategory>> AddCategory(string value, string type);
+        Task<OperationResult> AddCategoryToContent(int contentId, int categoryId);
+        OperationResult RemoveCategoryFromContent(int contentId, int categoryId);
         Task<OperationResult> DeleteCategory(int categoryId);
         Task<OperationResult> UpdateCategory(ContentCategory model);
 
@@ -52,6 +54,5 @@ namespace Hood.Services
         Task<List<LinqToTwitter.Status>> GetTweets(string name, int count);
         List<Country> AllCountries();
         Country GetCountry(string name);
-        
     }
 }

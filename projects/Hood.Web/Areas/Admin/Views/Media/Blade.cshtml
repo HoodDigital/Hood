@@ -1,0 +1,83 @@
+@model MediaObject
+@{
+    Layout = null;
+}
+<div class="sidebar-container">
+    <form id="edit-media-form" asp-antiforgery="true" autocomplete="off">
+        <div class="sidebar-title image" style="background-image:url(@Model.LargeUrl)">
+            <button type="button" class="close close-blade"><span>&times;</span></button>
+            <h3 class="font-bold no-margins text-white">
+                @Model.GeneralFileType File
+            </h3>
+            <p><i class="fa fa-file"></i> &nbsp;&nbsp;@Model.Filename</p>
+            @if (Model.GeneralFileType != "Directory")
+            {
+                if (Model.GeneralFileType == "Image")
+                {
+                    <div class="btn-group">
+                        <button data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true">Download <span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a target="_blank" href="@Model.ThumbUrl"><i class="fa fa-save"></i> Download Thumbnail</a></li>
+                            <li><a target="_blank" href="@Model.SmallUrl"><i class="fa fa-save"></i> Download Small</a></li>
+                            <li><a target="_blank" href="@Model.MediumUrl"><i class="fa fa-save"></i> Download Medium</a></li>
+                            <li><a target="_blank" href="@Model.LargeUrl"><i class="fa fa-save"></i> Download Large</a></li>
+                            <li class="divider"></li>
+                            <li><a target="_blank" href="@Model.DownloadUrlHttps"><i class="fa fa-save"></i> Download Original</a></li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <a target="_blank" href="@Model.DownloadUrlHttps" class="btn btn-xs btn-default"><i class="fa fa-save"></i> Download</a>
+                }
+            }
+            <action hood-id="@Model.Id" hood-type="media" hood-action="delete" class="btn btn-xs btn-danger"></action>
+        </div>
+        <div class="blade-field">
+            @if (Model.GeneralFileType == "Image")
+            {
+                <showField db-field="cuFirstName" field-type="text" field-name="Thumbnail Url" db-value="@Model.ThumbUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Small Url" db-value="@Model.SmallUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Medium Url" db-value="@Model.MediumUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Large Url" db-value="@Model.LargeUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Original Url" db-value="@Model.DownloadUrlHttps" />
+            }
+            else
+            {
+                <showField db-field="cuFirstName" field-type="text" field-name="Url" db-value="@Model.DownloadUrl" />
+                <showField db-field="cuFirstName" field-type="text" field-name="Https Url" db-value="@Model.DownloadUrlHttps" />
+            }
+        </div>
+        <div class="blade-field">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th colspan="2">
+                            About this file...
+                        </th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td><strong>File Size</strong></td>
+                    <td>@Model.FormattedSize</td>
+                </tr>
+                <tr>
+                    <td><strong>Directory</strong></td>
+                    <td>@Model.Directory</td>
+                </tr>
+                <tr>
+                    <td><strong>Blob Reference</strong></td>
+                    <td>@Model.BlobReference</td>
+                </tr>
+                <tr>
+                    <td><strong>Uploaded Date</strong></td>
+                    <td>@Model.CreatedOn</td>
+                </tr>
+                <tr>
+                    <td><strong>Unique ID</strong></td>
+                    <td>@Model.UniqueId</td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>

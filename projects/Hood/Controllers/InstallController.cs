@@ -26,7 +26,7 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken()]
         public IActionResult Install(string reason)
         {
-            if (!_config.CheckSetup("Installed"))
+            if (!_config.IsDatabaseConfigured())
                 _applicationLifetime.StopApplication();
 
             ViewData["Restarting"] = "App is restarting... please do not refresh the page.";

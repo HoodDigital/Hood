@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Core
 {
@@ -24,13 +25,8 @@ namespace Hood.Core
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration root of the application</param>
         /// <returns>Service provider</returns>
-        IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration);
-
-        /// <summary>
-        /// Configure HTTP request pipeline
-        /// </summary>
-        /// <param name="application">Builder for configuring an application's request pipeline</param>
-        void ConfigureRequestPipeline(IApplicationBuilder application);
+        IServiceProvider ConfigureServices<TDbContext>(IServiceCollection services, IConfiguration configuration)
+            where TDbContext : DbContext;
 
         /// <summary>
         /// Resolve dependency

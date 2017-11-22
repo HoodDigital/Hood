@@ -85,6 +85,31 @@ namespace Hood.Extensions
             return html.Raw(htmlOutput);
         }
 
+
+        public static IHtmlContent AddToCategoryTree(this IHtmlHelper html, IEnumerable<ContentCategory> categories, Content content, string contentSlug, int startingLevel = 0)
+        {
+            string htmlOutput = string.Empty;
+
+            if (categories != null && categories.Count() > 0)
+            {
+                foreach (var category in categories)
+                {
+                    
+                    htmlOutput += "<div class=\"checkbox\">";
+                    for (int i = 0; i < startingLevel; i++)
+                    {
+                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                    }
+                    htmlOutput += string.Format("<input class=\"styled category-check\" id=\"category-check-{1}\" name=\"category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", content.Id, category.Id, content.IsInCategory(category.Id) ? "checked" : "");
+                    htmlOutput += string.Format("<label for=\"category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
+                    htmlOutput += "</div>";
+                    htmlOutput += html.AddToCategoryTree(category.Children, content, contentSlug, startingLevel + 1);
+                }
+            }
+
+            return html.Raw(htmlOutput);
+        }
+
         public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type)
         {
             if (!message.IsSet())

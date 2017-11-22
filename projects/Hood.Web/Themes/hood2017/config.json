@@ -1,38 +1,38 @@
 {
-    "Name": "hood2017",
-    "ThemeFullName": "Hood 2017",
-    "ThemeBaseColour": "#C33610",
-    "Author": "Hood - Digital Architects.",
-    "PreviewImage": "https://hood.blob.core.windows.net/hood/bootstrap.png",
-    "Public": "true",
-    "Gulp": {
-        "js": {
-            "includes": [
-                "/lib/jquery/dist/jquery.min.js",
-                "/lib/bootstrap/dist/js/bootstrap.min.js",
-                "/lib/jquery-validation/dist/jquery.validate.min.js",
-                "/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"
-            ],
-            "scripts": [
-                "/lib/FitVids/jquery.fitvids.js",
-                "/lib/hood/js/includes/globals.js",
-                "/lib/hood/js/includes/stringhelpers.js",
-                "/lib/hood/js/includes/alerts.js",
-                "/lib/hood/js/includes/helpers.js",
-                "/lib/hood/js/includes/forms.js",
-                "/lib/hood/js/includes/handlers.js",
-                "/lib/hood/js/includes/pager.js",
-                "/lib/hood/js/includes/validator.js",
-                "/lib/hood/js/includes/modals.js",
-                "/lib/hood/js/includes/inline.js",
-                "/lib/hood/js/includes/addresses.js",
-                "/lib/hood/js/includes/cart.js",
-                "/lib/hood/js/app.js",
-                "/themes/default/js/scripts.js"
-            ]
-        },
-        "less": [
-            "/themes/default/less/styles.less"
-        ]
-    }
+  "Name": "hood2017",
+  "ThemeFullName": "Hood 2017",
+  "ThemeBaseColour": "#C33610",
+  "Author": "Hood - Digital Architects.",
+  "PreviewImage": "https://hood.blob.core.windows.net/hood/hood-bg.jpg",
+  "Public": "true",
+  "Gulp": {
+    "js": {
+      "includes": [
+        "/lib/jquery/dist/jquery.min.js",
+        "/lib/bootstrap/dist/js/bootstrap.min.js",
+        "/lib/jquery-validation/dist/jquery.validate.min.js",
+        "/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"
+      ],
+      "scripts": [
+        "/lib/FitVids/jquery.fitvids.js",
+        "/lib/hood/js/includes/globals.js",
+        "/lib/hood/js/includes/stringhelpers.js",
+        "/lib/hood/js/includes/alerts.js",
+        "/lib/hood/js/includes/helpers.js",
+        "/lib/hood/js/includes/forms.js",
+        "/lib/hood/js/includes/handlers.js",
+        "/lib/hood/js/includes/pager.js",
+        "/lib/hood/js/includes/validator.js",
+        "/lib/hood/js/includes/modals.js",
+        "/lib/hood/js/includes/inline.js",
+        "/lib/hood/js/includes/addresses.js",
+        "/lib/hood/js/includes/cart.js",
+        "/lib/hood/js/app.js",
+        "/themes/default/js/scripts.js"
+      ]
+    },
+    "less": [
+      "/themes/default/less/styles.less"
+    ]
+  }
 }

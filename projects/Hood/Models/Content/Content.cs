@@ -160,11 +160,11 @@ namespace Hood.Models
                 return "";
             }
         }
-        public bool IsInCategory(string category)
+        public bool IsInCategory(int categoryId)
         {
             if (Categories == null)
                 return false;
-            return Categories.Select(c => c.Category.DisplayName).Contains(category);
+            return Categories.Select(c => c.Category.Id).Contains(categoryId);
         }
         public void AddTag(string value)
         {

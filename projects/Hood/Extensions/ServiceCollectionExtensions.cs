@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using Hood.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Extensions
 {
@@ -17,84 +18,24 @@ namespace Hood.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Add services to the application and configure service provider
+        /// Add required Hood services to the application and configure service provider.
         /// </summary>
+        /// <typeparam name="TDbContext">The database context for your application, for a basic Hood CMS setup, simply inherit the type HoodDbContext on your DbContext.</typeparam>
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration root of the application</param>
         /// <returns>Configured service provider</returns>
-        public static IServiceProvider ConfigureHoodServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceProvider ConfigureHoodServices<TDbContext>(this IServiceCollection services, IConfiguration configuration)
+            where TDbContext : DbContext
         {
             //add accessor to HttpContext
-            services.AddHttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //create, initialize and configure the engine
             var engine = EngineContext.Create();
             engine.Initialize(services);
-            var serviceProvider = engine.ConfigureServices(services, configuration);
+            var serviceProvider = engine.ConfigureServices<TDbContext>(services, configuration);
 
             return serviceProvider;
-        }
-
-        /// <summary>
-        /// Create, bind and register as service the specified configuration parameters 
-        /// </summary>
-        /// <typeparam name="TConfig">Configuration parameters</typeparam>
-        /// <param name="services">Collection of service descriptors</param>
-        /// <param name="configuration">Set of key/value application configuration properties</param>
-        /// <returns>Instance of configuration parameters</returns>
-        public static TConfig ConfigureStartupConfig<TConfig>(this IServiceCollection services, IConfiguration configuration) where TConfig : class, new()
-        {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-
-            //create instance of config
-            var config = new TConfig();
-
-            //bind it to the appropriate section of configuration
-            configuration.Bind(config);
-
-            //and register it as a service
-            services.AddSingleton(config);
-
-            return config;
-        }
-
-        /// <summary>
-        /// Register HttpContextAccessor
-        /// </summary>
-        /// <param name="services">Collection of service descriptors</param>
-        public static void AddHttpContextAccessor(this IServiceCollection services)
-        {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        }
-
-        /// <summary>
-        /// Adds services required for anti-forgery support
-        /// </summary>
-        /// <param name="services">Collection of service descriptors</param>
-        public static void AddAntiForgery(this IServiceCollection services)
-        {
-            //override cookie name
-            services.AddAntiforgery(options =>
-            {
-                options.Cookie.Name = ".Nop.Antiforgery";
-            });
-        }
-
-        /// <summary>
-        /// Adds services required for application session state
-        /// </summary>
-        /// <param name="services">Collection of service descriptors</param>
-        public static void AddHttpSession(this IServiceCollection services)
-        {
-            services.AddSession(options =>
-            {
-                options.Cookie.Name = ".Nop.Session";
-                options.Cookie.HttpOnly = true;
-            });
         }
     }
 }

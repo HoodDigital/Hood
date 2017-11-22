@@ -1,0 +1,66 @@
+@model PagedList<ApplicationUser>
+@inject IAccountRepository _auth;
+@{
+    ViewBag.Title = "Manage Subscribers";
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-route-area="Admin">
+                <i class="fa fa-building m-r-xs"></i>
+                Subscriptions
+            </a>
+        </li>
+        <li class="active">
+            <strong>@ViewBag.Title</strong>
+        </li>
+    </ol>
+}
+<div class="m-b-lg">
+    <form method="get">
+        <div class="row m-b-sm m-t-sm">
+            <div class="col-md-4">
+                <h4>Sort</h4>
+                @{
+                    var items = (await _auth.GetSubscriptionPlansAsync()).OrderBy(c => c.Level).Select(c => new SelectListItem() { Value = c.StripeId.ToString(), Text = c.Name });
+                }
+                <select class="form-control manage-subscriber-change" name="subscription" id="subscription" asp-items="items"></select>
+            </div>
+            <div class="col-md-4">
+                <h4>Sort</h4>
+                <select class="form-control manage-subscriber-change" name="sort" id="sort" data-selected="PublishDateDesc">
+                    <optgroup label="Subscriber">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="name+desc">Name (Z-A)</option>
+                        <option value="date+desc">Added Date (Newest)</option>
+                        <option value="date">Added Date (Oldest)</option>
+                    </optgroup>
+                    <optgroup label="Price">
+                        <option value="price+desc">Price (£££-£)</option>
+                        <option value="price">Price (£-£££)</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <h4>Search</h4>
+                <div class="input-group">
+                    <input name="search" id="search" type="text" placeholder="Search" class="form-control">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary"> Search!</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@if (Model?.Count > 0)
+{
+    foreach (var user in Model.Items)
+    {
+        await Html.RenderPartialAsync("_User_Record", user);
+    }
+    await Html.RenderPartialAsync("_SubscribersPager");
+}

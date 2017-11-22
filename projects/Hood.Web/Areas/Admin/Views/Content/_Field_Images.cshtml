@@ -1,0 +1,14 @@
+@model EditContentModel
+<div class="form-horizontal">
+    @if (Model.Type.ShowImage)
+    {
+        <div class="form-group">
+            <label class="col-sm-4 control-label pt-15">Featured Image</label>
+            <div class="col-sm-8">
+                <fixedImage src="@Model.Content.FeaturedImage.SmallUrl" class="img-xs img-circle m-r-sm content-feature-@Model.Content.Id" id="content-blade-avatar" />
+                <attacher dataid="@Model.Content.Id" entity="Content" field="FeaturedImage" type="image" refresh="/admin/content/getfeaturedimage" tag="content-feature-@Model.Content.Id" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
+                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Content" asp-area="Admin" asp-route-id="@Model.Content.Id" data-complete="$.hood.Uploader.RefreshImage('.content-feature-@Model.Content.Id', '/admin/content/getfeaturedimage', @Model.Content.Id)"><i class="fa fa-trash"></i></a>
+            </div>
+        </div>
+    }
+</div>

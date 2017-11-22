@@ -181,41 +181,6 @@ $.hood.Content = {
             });
         }
     },
-    Manage: {
-        Init: function () {
-            $('#manage-content-list').hoodDataList({
-                url: '/admin/content/get',
-                params: function () {
-                    return {
-                        search: $('#manage-content-search').val(),
-                        sort: $('#manage-content-sort').val(),
-                        category: $('#manage-content-category').val(),
-                        type: $('#manage-content-list').data('type')
-                    };
-                },
-                pageSize: 12,
-                pagers: '.manage-content-pager',
-                template: '#manage-content-template',
-                dataBound: function () { },
-                refreshOnChange: ".manage-content-change",
-                refreshOnClick: ".manage-content-click",
-                serverAction: "GET"
-            });
-
-
-        },
-        Filter: function () {
-            return {
-                search: $('#manage-content-search').val(),
-                sort: $('#manage-content-sort').val()
-            };
-        },
-        Refresh: function () {
-            if ($('#manage-content-list').doesExist())
-                $('#manage-content-list').data('hoodDataList').Refresh();
-            $.hood.Blades.Reload();
-        }
-    },
     Delete: function (e) {
         var $this = $(this);
         swal({
@@ -235,9 +200,6 @@ $.hood.Content = {
                 // delete functionality
                 $.post('/admin/content/' + $this.data('id') + '/delete', null, function (data) {
                     if (data.Success) {
-                        if (!$('#manage-content-list').doesExist())
-                            window.location = '/admin/content/' + $this.data('type') + '/manage/';
-                        $.hood.Content.Manage.Refresh();
                         $.hood.Blades.Close();
                         swal({
                             title: "Deleted!",
@@ -245,6 +207,9 @@ $.hood.Content = {
                             timer: 1300,
                             type: "success"
                         });
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal({
                             title: "Error!",
@@ -278,14 +243,15 @@ $.hood.Content = {
                 // delete functionality
                 $.post('/admin/content/' + $this.data('id') + '/publish', null, function (data) {
                     if (data.Success) {
-                        $.hood.Content.Manage.Refresh();
-                        $.hood.Blades.Close();
                         swal({
                             title: "Published!",
                             text: "The item has now been published.",
                             timer: 1300,
                             type: "success"
                         });
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal({
                             title: "Error!",
@@ -318,14 +284,15 @@ $.hood.Content = {
             if (isConfirm) {
                 $.post('/admin/content/' + $this.data('id') + '/archive', null, function (data) {
                     if (data.Success) {
-                        $.hood.Content.Manage.Refresh();
-                        $.hood.Blades.Close();
                         swal({
                             title: "Archived!",
                             text: "The item has now been archived.",
                             timer: 1300,
                             type: "success"
                         });
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal({
                             title: "Error!",
@@ -395,8 +362,10 @@ $.hood.Content = {
                 submitUrl: '/admin/content/add',
                 submitFunction: function (data) {
                     if (data.Success) {
-                        $('#manage-content-list').data('hoodDataList').Refresh();
                         swal("Created!", "The content has now been created!", "success");
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, 500);
                     } else {
                         swal("Error", "There was a problem creating the content:\n\n" + data.Errors, "error");
                     }
@@ -424,16 +393,6 @@ $.hood.Content = {
 
             $('body').on('click', '#add-content-category', this.Categories.AddCategory);
             $('body').on('click', '.remove-category', this.Categories.RemoveCategory);
-
-            var xhr;
-            new autoComplete({
-                selector: 'input.autocomplete-category',
-                source: function (term, response) {
-                    try { xhr.abort(); } catch (e) { }
-                    xhr = $.getJSON('/admin/content/categorysuggestions/', { query: term }, function (data) { response(data); });
-                }
-            });
-
         },
         Categories: {
             AddCategory: function () {

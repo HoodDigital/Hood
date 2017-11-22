@@ -1,4 +1,5 @@
 @model EditContentModel
+@inject ContentCategoryCache _categories
 @{
     ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Content.Title;
 }
@@ -72,7 +73,7 @@
 }
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="editor">
-        <form method="post" id="edit-content" data-id="@Model.Content.Id">
+        <form method="post" id="edit-content" data-id="@Model.Content.Id" data-type="@Model.Content.ContentType">
             <input type="hidden" id="Id" name="Id" value="@Model.Content.Id" />
             <input type="hidden" id="Views" name="Views" value="@Model.Content.Views" />
             <div class="row">
@@ -110,16 +111,30 @@
                             <div class="editor-box">
                                 <h5>Categories</h5>
                                 <div class="hood-inline categories" data-url="@Url.Action("Categories")"></div>
-                                <div class="form-group">
-                                    <label class="control-label">Add to a category</label>
-                                    <div class="input-group">
-                                        <input name="content-category-name" id="content-category-name" type="text" placeholder="Enter a new (or existing) category..." class="form-control autocomplete-category">
-                                        <span class="input-group-btn">
-                                            <button type="button" id="add-content-category" class="btn btn-primary" data-url="@Url.Action("AddCategoryToContent")"> Add!</button>
-                                        </span>
-                                    </div>
-                                    <p><small>Note: Type the first three letters of a category to get suggestions.</small></p>
-                                </div>
+                                @{
+                                    _categories.ResetCache();
+                                    var categories = _categories.TopLevel(Model.Type.Type);
+                                    Layout = null;
+                                }
+                                @if (categories.Count() > 0)
+                                {
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="2">
+                                                    Categories
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        @Html.AddToCategoryTree(categories, Model.Content.Id, Model.Type.Slug)
+                                    </table>
+                                }
+                                else
+                                {
+                                    <h4>Categories</h4>
+                                    <hr />
+                                    <p>No categories added yet. To add a category, simply add category on the right or a @Model.Type.TypeName to a new category name in the editor.</p>
+                                }
                             </div>
                         }
                         <div class="editor-box">

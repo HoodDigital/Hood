@@ -1059,5 +1059,40 @@ namespace Hood.Services
                 return _db.Content.SingleOrDefault(c => c.Slug == slug && c.Id != id) == null;
             return _db.Content.SingleOrDefault(c => c.Slug == slug) == null;
         }
+
+        public async Task<OperationResult> AddCategoryToContent(int contentId, int categoryId)
+        {
+            Content content = GetContentByID(contentId, true);
+
+            if (content.IsInCategory(categoryId)) // Content is already in!
+                return new OperationResult(true);
+
+            var category = await _db.ContentCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
+            if (category == null)
+                throw new Exception("The category does not exist.");
+
+            content.Categories.Add(new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id });
+
+            return Update(content);
+
+        }
+
+        public OperationResult RemoveCategoryFromContent(int contentId, int categoryId)
+        {
+            Content content = GetContentByID(contentId, true);
+
+            if (!content.IsInCategory(categoryId))// Content is already out!
+                return new OperationResult(true);
+
+            var cat = content.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
+
+            if (cat == null)// Content is already out!
+                return new OperationResult(true);
+
+            content.Categories.Remove(cat);
+
+            return Update(content);
+
+        }
     }
 }

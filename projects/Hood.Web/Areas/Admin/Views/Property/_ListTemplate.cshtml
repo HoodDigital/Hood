@@ -1,0 +1,76 @@
+<script id="manage-property-template" type="text/template">
+    <div class="forum-item data-item">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <a href="/admin/content/edit/${ Id }">
+                            <figure class="img-xs content-feature-${ Id } hood-image" style="background-image:url(${ FeaturedImage.ThumbUrl })">
+                                <img src="${ FeaturedImage.ThumbUrl }" alt="${ Title }">
+                            </figure>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <a class="forum-item-title" href="/admin/property/edit/${ Id }">
+                            ${ Title }
+                            #if (Status == 1) {#
+                            <small class="txt-color-magenta">#= StatusString #</small>
+                            #} else {#
+                            #if (Status == 3) {#
+                            <small class="txt-color-orangeDark">#= StatusString #</small>
+                            #} else {#
+                            #if (PublishPending) {#
+                            <small class="txt-color-orange">${ StatusString }</small>
+                            #} else {#
+                            <small class="txt-color-greenLight">${ StatusString }</small>
+                            #}#
+                            #}#
+                            #}#
+                        </a>
+                        <small><i class="fa fa-map-pin m-r-xs"></i>${SingleLineAddress}</small><br />
+                        <small><i class="fa fa-clock-o"></i> Created on #= kendo.toString(new Date(CreatedOn), "ddd d, MMMM yyyy at hh:mm tt") #</small><br />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <span class="small font-bold">Agent</span>
+                <div class="tag-list">
+                    <span class="tag-item">${ Agent.UserName }</span>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <span class="small font-bold">Status</span>
+                <div class="tag-list">
+                    #if (Status == 1) {#
+                    <span class="label label-default">Draft</span>
+                    #} else if (Status == 2) {#
+                    <span class="label label-info">Published</span>
+                    #} else if (Status == 3) {#
+                    <span class="label label-danger">Archived</span>
+                    #}#
+                </div>
+            </div>
+            <div class="col-md-1">
+                <span class="small font-bold">Rent</span>
+                <div class="tag-list">
+                    <span class="tag-item">${ FormattedRent }</span>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <span class="small font-bold">Premium</span>
+                <div class="tag-list">
+                    <span class="tag-item">${ FormattedPremium }</span>
+                </div>
+            </div>
+            <div class="col-md-3 action-buttons">
+                <a class="btn-default btn btn-sm action-button" href="/admin/property/edit/${ Id }"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
+                #if ((Status == 1) || (Status == 3)) {#
+                <a class="btn-success btn btn-sm action-button publish-property" data-id="${ Id }"><i class="fa fa-thumbs-up"></i><span>&nbsp;Publish</span></a>
+                #} else if (Status == 2) {#
+                <a class="btn-warning btn btn-sm action-button archive-property" data-id="${ Id }"><i class="fa fa-archive"></i><span>&nbsp;Archive</span></a>
+                #}#
+                <a class="btn-danger btn btn-sm action-button delete-property" data-id="${ Id }"><i class="fa fa-trash-o"></i><span>&nbsp;Delete</span></a>
+            </div>
+        </div>
+    </div>
+</script>

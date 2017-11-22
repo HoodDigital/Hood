@@ -14,6 +14,16 @@ using Hood.Models;
 using Hood.Caching;
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
+using Hood.Infrastructure;
+using Newtonsoft.Json.Serialization;
+using Hood.Filters;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Hood.IO;
+using Hood.Extensions;
 
 namespace Hood.Core
 {
@@ -28,18 +38,15 @@ namespace Hood.Core
             return context != null ? context.RequestServices : ServiceProvider;
         }
 
-        public void ConfigureRequestPipeline(IApplicationBuilder application)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration)
+        public IServiceProvider ConfigureServices<TDbContext>(IServiceCollection services, IConfiguration configuration)
+            where TDbContext : DbContext
         {
             var builder = new ContainerBuilder();
 
             //register engine
             builder.RegisterInstance(this).As<IEngine>().SingleInstance();
 
+            services.AddSingleton(configuration);
 
             services.AddSingleton<EventsService>();
             services.AddSingleton<SubscriptionsEventListener>();
@@ -74,6 +81,122 @@ namespace Hood.Core
 
             //populate Autofac container builder with the set of registered service descriptors
             builder.Populate(services);
+
+            services.AddMvc();
+
+            services.Configure<RazorViewEngineOptions>(options =>
+            {
+                options.FileProviders.Add(EmbeddedFiles.GetProvider());
+                if (configuration.IsDatabaseConfigured())
+                {
+                    options.ViewLocationExpanders.Add(new ViewLocationExpander());
+                }
+            });
+
+            // Add framework services.
+            if (configuration.IsDatabaseConfigured())
+            {
+                services.AddDbContext<TDbContext>(options => options.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
+                services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
+
+                services.AddIdentity<ApplicationUser, IdentityRole>(o =>
+                {
+                    // configure identity options
+                    o.Password.RequireDigit = configuration["Identity:Password:RequireDigit"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireDigit"]) : true;
+                    o.Password.RequireLowercase = configuration["Identity:Password:RequireLowercase"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireLowercase"]) : false;
+                    o.Password.RequireUppercase = configuration["Identity:Password:RequireUppercase"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireUppercase"]) : false;
+                    o.Password.RequireNonAlphanumeric = configuration["Identity:Password:RequireNonAlphanumeric"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireNonAlphanumeric"]) : true;
+                    o.Password.RequiredLength = configuration["Identity:Password:RequiredLength"].IsSet() ? int.Parse(configuration["Identity:Password:RequiredLength"]) : 6;
+                })
+                .AddEntityFrameworkStores<HoodDbContext>()
+                .AddDefaultTokenProviders();
+
+                services.Configure<RouteOptions>(options =>
+                {
+                    options.ConstraintMap.Add("cms", typeof(CmsUrlConstraint));
+                    options.LowercaseUrls = true;
+                });
+
+                services.Configure<MvcJsonOptions>(opt =>
+                {
+                    var resolver = opt.SerializerSettings.ContractResolver;
+                    if (resolver != null)
+                    {
+                        var res = resolver as DefaultContractResolver;
+                        res.NamingStrategy = null;  // <<!-- this removes the camelcasing
+                    }
+                });
+
+                services.Configure<MvcOptions>(options =>
+                {
+                    // Global filters
+                    options.Filters.Add(typeof(AccountFilter));
+                    options.Filters.Add(typeof(LockoutModeFilter));
+
+                    options.CacheProfiles.Add("Year",
+                        new CacheProfile
+                        {
+                            Location = ResponseCacheLocation.Client,
+                            Duration = 31536000
+                        });
+                    options.CacheProfiles.Add("Month",
+                        new CacheProfile
+                        {
+                            Location = ResponseCacheLocation.Client,
+                            Duration = 2629000
+                        });
+                    options.CacheProfiles.Add("Week",
+                        new CacheProfile
+                        {
+                            Location = ResponseCacheLocation.Client,
+                            Duration = 604800
+                        });
+                    options.CacheProfiles.Add("Day",
+                        new CacheProfile
+                        {
+                            Location = ResponseCacheLocation.Client,
+                            Duration = 86400
+                        });
+                    options.CacheProfiles.Add("Hour",
+                        new CacheProfile
+                        {
+                            Location = ResponseCacheLocation.Client,
+                            Duration = 3600
+                        });
+                    options.CacheProfiles.Add("HalfHour",
+                         new CacheProfile
+                         {
+                             Location = ResponseCacheLocation.Client,
+                             Duration = 1800
+                         });
+                    options.CacheProfiles.Add("TenMinutes",
+                         new CacheProfile
+                         {
+                             Location = ResponseCacheLocation.Client,
+                             Duration = 600
+                         });
+
+                });
+
+            }
+            else
+            {
+                services.AddScoped<ISettingsRepository, SettingsRepositoryStub>();
+            }
+
+            services.AddAntiforgery(options =>
+            {
+                options.Cookie.Name = ".Hood.Antiforgery";
+            });
+
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".Hood.Session";
+                options.Cookie.HttpOnly = true;
+            });
+
+            services.AddApplicationInsightsTelemetry(configuration);
+
 
             //create service provider
             _serviceProvider = new AutofacServiceProvider(builder.Build());

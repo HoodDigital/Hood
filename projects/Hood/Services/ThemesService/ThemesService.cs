@@ -21,10 +21,10 @@ namespace Hood.Services
             IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
             {
                 ["Name"] = "default",
-                ["ThemeFullName"] = "Default Bootstrap Theme",
+                ["ThemeFullName"] = "Default",
                 ["ThemeBaseColour"] = "#C33610",
                 ["Author"] = "Hood - Digital Architects.",
-                ["PreviewImage"] = "https://hood.blob.core.windows.net/hood/bootstrap.png",
+                ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
                 ["Public"] = "true"
             };
             _configs.Add("default", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());

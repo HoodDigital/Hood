@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using System;
+﻿using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace Hood.Extensions
+namespace Hood.Middleware
 {
     public class EnforceHttpsMiddleware
     {
@@ -26,18 +24,6 @@ namespace Hood.Extensions
             {
                 await _next(context);
             }
-        }
-    }
-
-    public static class AppBuilderExtensions
-    {
-        public static IApplicationBuilder UseHttpsEnforcement(this IApplicationBuilder app)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-            return app.UseMiddleware<EnforceHttpsMiddleware>();
         }
     }
 }

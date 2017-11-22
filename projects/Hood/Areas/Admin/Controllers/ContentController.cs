@@ -188,33 +188,13 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/content/{id}/categories/add/")]
-        public async Task<IActionResult> AddCategoryToContent(int id, string category)
+        [Route("admin/content/categories/add/")]
+        public async Task<IActionResult> AddCategoryToContent(int contentId, int categoryId)
         {
             try
             {
                 // User must have an organisation.
-                Content content = _content.GetContentByID(id, true);
-                if (content == null)
-                    return NotFound();
-                AccountInfo account = HttpContext.GetAccountInfo();
-
-                // check if category is on club already
-                if (!category.IsSet())
-                    throw new Exception("You need to enter a category!");
-                if (content.IsInCategory(category.Trim().ToTitleCase()))
-                    throw new Exception("The content is already in the " + category + " category.");
-
-
-                // check if it exists in the db, if not add it. 
-                var categoryResult = await _content.AddCategory(category, content.ContentType);
-                if (content.Categories == null)
-                    content.Categories = new List<ContentCategoryJoin>();
-                // add it to the model object.
-                if (categoryResult.Succeeded)
-                    content.Categories.Add(new ContentCategoryJoin() { CategoryId = categoryResult.Item.Id, ContentId = content.Id });
-
-                var contentResult = _content.Update(content);
+                await _content.AddCategoryToContent(contentId, categoryId);
                 _categories.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
@@ -225,24 +205,15 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [Route("admin/content/{id}/categories/remove/")]
-        public IActionResult RemoveCategory(int id, string category)
+        [Route("admin/content/categories/remove/")]
+        public IActionResult RemoveCategory(int contentId, int categoryId)
         {
             try
             {
-                // User must have an organisation.
-                Content content = _content.GetContentByID(id, true);
-                if (content == null)
-                    return NotFound();
-
-                // check if category is on club already
-                if (!content.IsInCategory(category))
-                    throw new Exception("The club is not in the " + category + " category.");
-
-                var cc = content.Categories.Find(m => m.Category.DisplayName == category);
-                content.Categories.Remove(cc);
-                var clubResult = _content.Update(content);
+                _content.RemoveCategoryFromContent(contentId, categoryId);
                 _categories.ResetCache();
+                // If we reached here, display the organisation home.
+                return Json(new { Success = true });
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
             }
@@ -689,9 +660,10 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult CategorySuggestions(string query)
+        [Route("admin/content/categories/suggestions/{type}/")]
+        public IActionResult CategorySuggestions(string type)
         {
-            IEnumerable<string> suggestions = _categories.GetSuggestions(query);
+            var suggestions = _categories.GetSuggestions(type).Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
             return Json(suggestions.ToArray());
         }
 

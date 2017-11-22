@@ -1,0 +1,62 @@
+@model EditPropertyModel
+@{
+    ViewBag.Title = "Edit " + Model.Property.Title;
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+@section buttons {
+    <a class="btn btn-sm btn-default" href="@Model.Property.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+    <a class="btn btn-sm btn-danger delete-property" data-id="@Model.Property.Id"><i class="fa fa-trash m-r-xs"></i>Delete</a>
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Property" asp-route-area="Admin">
+                <i class="fa fa-building m-r-xs"></i>
+                Properties
+            </a>
+        </li>
+        <li class="active">
+            <strong>@ViewBag.Title</strong>
+        </li>
+    </ol>
+}
+<form method="post">
+    <div class="wrapper wrapper-content" id="edit-property" data-id="@Model.Property.Id">
+        <div class="row">
+            <div class="col-md-8">
+                @if (Model.SaveResult != null)
+                {
+                    @if (Model.SaveResult.Succeeded)
+                    {
+                        <div class="alert alert-success alert-dismissable">
+                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                            <i class="fa fa-thumbs-up m-r-xs"></i><strong>Saved!</strong> The Property has been saved.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning alert-dismissable">
+                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                            <i class="fa fa-meh-o m-r-xs"></i><strong>Saved!</strong> The Property has been saved, but with issues. <a role="button" data-toggle="collapse" href="#errors" aria-expanded="false" aria-controls="errors" class="txt-color-orangeDark">Show Issues</a>
+                            <div id="errors" class="collapse">
+                                <ul class="m-t-md">
+                                    @foreach (Hood.Infrastructure.OperationError error in Model.SaveResult.Errors)
+                                    {
+                                        <li>@error.Description</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                }
+                @{ await Html.RenderPartialAsync("_Editor_Property", Model.Property); }
+            </div>
+            <div class="col-md-4">
+                @{ await Html.RenderPartialAsync("_Editor_Sidebar"); }
+            </div>
+        </div>
+    </div>
+</form>

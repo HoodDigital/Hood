@@ -1,0 +1,17 @@
+@model EditContentModel
+<h5>@Model.Type.BaseName Settings</h5>
+<div class="ibox-content">
+    <fieldset class="form-horizontal">
+        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.ToLower().StartsWith("content." + Model.Type.BaseName.ToLower() + ".")).OrderBy(cm => cm.Name))
+        {
+            <div class="form-group">
+                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                        @cm.Name.ToLower().Replace("content." + Model.Type.BaseName.ToLower() + ".", "").ToSentenceCase().ToTitleCase():
+                    </label>
+                <div class="col-sm-9">
+                    @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+                </div>
+            </div>
+        }
+    </fieldset>
+</div>
