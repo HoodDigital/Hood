@@ -23,6 +23,7 @@ namespace Hood.Models
         public string PlanningType { get; set; }
         public string FeesDisplay { get; set; }
         public string LeaseStatuses { get; set; }
+        public string TriggerAuthKey { get; set; }
         public bool ShowBedrooms { get; set; }
         public bool ShowRentDecimals { get; set; }
         public bool ShowAskingPriceDecimals { get; set; }

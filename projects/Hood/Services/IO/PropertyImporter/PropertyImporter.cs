@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using Hood.Interfaces;
 using Geocoding.Google;
 using Hood.Enums;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hood.Services
 {
@@ -24,11 +26,13 @@ namespace Hood.Services
         private IMediaManager<SiteMedia> _media;
         private PropertySettings _propertySettings;
         private ISettingsRepository _settings;
+        private IHttpContextAccessor _context;
 
         public PropertyImporter(
-            IFTPService ftp, 
-            IHostingEnvironment env, 
-            IConfiguration config, 
+            IFTPService ftp,
+            IHostingEnvironment env,
+            IHttpContextAccessor context,
+            IConfiguration config,
             IMediaManager<SiteMedia> media,
             ISettingsRepository site,
             IAddressService address)
@@ -57,6 +61,7 @@ namespace Hood.Services
             _settings = site;
             _propertySettings = site.GetPropertySettings();
             _media = media;
+            _context = context;
             _address = address;
         }
 
@@ -81,7 +86,7 @@ namespace Hood.Services
         private bool Cancelled { get; set; }
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
-        private AccountInfo Account { get; set; }
+        private ApplicationUser User { get; set; }
         private DefaultHoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
@@ -109,13 +114,25 @@ namespace Hood.Services
                 RemoteList = new List<string>();
                 Errors = new List<string>();
                 Warnings = new List<string>();
-                Account = context.GetAccountInfo();
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = _settings.GetPropertySettings();
                 // Get a new instance of the HoodDbContext for this import.
                 var options = new DbContextOptionsBuilder<DefaultHoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new DefaultHoodDbContext(options.Options);
+
+                var userManager = context.RequestServices.GetService<UserManager<ApplicationUser>>();
+                User = userManager.FindByNameAsync("PropertyImporter").Result;
+                if (User == null)
+                {
+                    var identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter" }, Guid.NewGuid().ToString()).Result;
+                    if (!identityResult.Succeeded)
+                        throw new Exception("Could not load the PropertyImporter user account.");
+                    User = userManager.FindByNameAsync("PropertyImporter").Result;
+                    if (User == null)
+                        throw new Exception("Could not load the PropertyImporter user account.");
+                }
+
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(ImportFromFTP);
@@ -191,7 +208,7 @@ namespace Hood.Services
 
                 foreach (var propertyRef in newProperties)
                 {
-
+                    CheckForCancel();
                     try
                     {
                         // Find matching record to update the property.
@@ -222,6 +239,7 @@ namespace Hood.Services
 
                 foreach (var propertyRef in existingProperties)
                 {
+                    CheckForCancel();
                     Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
 
                     try
@@ -257,8 +275,10 @@ namespace Hood.Services
                 // Clean any from the DB that have been removed from the BLM file.
                 foreach (var property in extraneous)
                 {
+                    CheckForCancel();
                     try
                     {
+
                         _db.Properties.Remove(property);
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
@@ -302,6 +322,8 @@ namespace Hood.Services
 
         private async Task<PropertyListing> Process(PropertyListing property, Dictionary<string, string> data)
         {
+            CheckForCancel();
+
             property = ProcessProperty(property, data);
             property = UpdateMetadata(property, data);
 
@@ -657,6 +679,7 @@ namespace Hood.Services
         /// <returns></returns>
         private PropertyListing ProcessProperty(PropertyListing property, Dictionary<string, string> data, bool validatingOnly = false)
         {
+            CheckForCancel();
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
             DateTime create = DateTime.Now;
@@ -684,7 +707,7 @@ namespace Hood.Services
             property.Number = data["ADDRESS_1"];
             property.Address1 = data["ADDRESS_2"];
             property.Address2 = data["ADDRESS_3"];
-            property.AgentId = Account.User.Id;
+            property.AgentId = User.Id;
             property.AllowComments = false;
             property.AgentInfo = data["ADMINISTRATION_FEE"];
             property.Areas = "";
@@ -696,13 +719,13 @@ namespace Hood.Services
             property.ContactName = "";
             property.Country = "United Kingdom";
             property.County = "";
-            property.CreatedBy = Account.User.UserName;
+            property.CreatedBy = User.UserName;
             property.CreatedOn = create;
             property.Description = data["DESCRIPTION"];
             property.Fees = decimal.Parse(data["LET_BOND"]);
             property.FeesDisplay = "{0}";
             property.Floors = "";
-            property.LastEditedBy = Account.User.UserName;
+            property.LastEditedBy = User.UserName;
             property.LastEditedOn = update;
             property.Lease = leaseStatus;
             property.ListingType = listingType;
@@ -751,7 +774,7 @@ namespace Hood.Services
                             StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
-                            break; 
+                            break;
                         default:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
@@ -847,6 +870,14 @@ namespace Hood.Services
 
         #region "Externals"
 
+        public bool IsRunning()
+        {
+            bool running = false;
+            Lock.AcquireWriterLock(Timeout.Infinite);
+            running = Running;
+            Lock.ReleaseWriterLock();
+            return running;
+        }
         public bool IsComplete()
         {
             bool running = false;
@@ -881,8 +912,8 @@ namespace Hood.Services
                 Updated = Updated,
                 ToAdd = ToAdd,
                 ToDelete = ToDelete,
-                ToUpdate = ToUpdate, 
-                Errors = Errors, 
+                ToUpdate = ToUpdate,
+                Errors = Errors,
                 Warnings = Warnings
             };
             Lock.ReleaseWriterLock();
