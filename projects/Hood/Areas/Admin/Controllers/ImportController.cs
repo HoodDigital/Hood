@@ -8,13 +8,19 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class ImportController : Controller
     {
-        private IPropertyImporter _propertyImporterFTP;
-        private IPropertyExporter _propertyExporter;
-        private IContentExporter _contentExporter;
-        private IFTPService _ftp;
+        private readonly IPropertyImporter _propertyImporterFTP;
+        private readonly IPropertyExporter _propertyExporter;
+        private readonly IContentExporter _contentExporter;
+        private readonly ISettingsRepository _settings;
+        private readonly IFTPService _ftp;
 
-        public ImportController(IFTPService ftp, IPropertyImporter propertyImporterFTP, IContentExporter contentExporter, IPropertyExporter propertyExporter)
+        public ImportController(IFTPService ftp, 
+            ISettingsRepository settings,
+            IPropertyImporter propertyImporterFTP, 
+            IContentExporter contentExporter, 
+            IPropertyExporter propertyExporter)
         {
+            _settings = settings;
             _ftp = ftp;
             _propertyImporterFTP = propertyImporterFTP;
             _contentExporter = contentExporter;
@@ -22,6 +28,20 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #region "FTPPropertyImporter"
+
+        [HttpPost]
+        [Route("admin/property/import/feed/trigger")]
+        [AllowAnonymous]
+        public IActionResult TriggerFeed()
+        {
+            var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
+            if (Request.Headers["Auth"] == triggerAuth && !_propertyImporterFTP.IsRunning())
+            {
+                _propertyImporterFTP.RunUpdate(HttpContext);
+                return StatusCode(200);
+            }
+            return StatusCode(401);
+        }
 
         [Route("admin/property/import/ftp/")]
         public IActionResult PropertyFTP()
