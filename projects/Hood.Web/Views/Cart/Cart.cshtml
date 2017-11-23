@@ -1,0 +1,103 @@
+@model Cart
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-md-12">
+        @if (Model.OrderLines.Count == 0)
+            {
+            <div class="alert alert-info">
+                <p class="text-center">There are no items in your cart.</p>
+            </div>
+        }
+        else
+        {
+            <table class="table checkout no-margin">
+                <tr class="gray-bg">
+                    <th class="hidden-xs"></th>
+                    <th>Product</th>
+                    <th class="hidden-xs text-center">Price</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="total-column">Total</th>
+                </tr>
+                @foreach (CartItem item in Model.OrderLines)
+                {
+                    <tr>
+                        <td class="hidden-xs">
+                            <a href="@item.Url">
+                                <fixedImage src="@item.Image.ThumbUrl" class="content-feature-thumb"></fixedImage>
+                            </a>
+                        </td>
+                        <td>
+                            <h6>
+                                <a class="cart-remove" data-id="@item.ProductID"><i class="fa fa-times-circle"></i></a>&nbsp;&nbsp;
+                                <a href="@item.Url">@item.Title</a>
+                            </h6>
+                        </td>
+                        <td class="hidden-xs text-center">
+                            @if (item.DiscountPercentage > 0)
+                            {
+                                <span class="strikethrough">@item.Price.ToString("C")</span> 
+                                <span class="text-success">@item.DiscountedPrice.ToString("C") <small>@item.DiscountPercentage.ToString("G2")% off!</small></span>
+                            }
+                            else
+                            {
+                                @item.Price.ToString("C")
+                            }
+                            @if (item.TaxPercentage > 0)
+                            {
+                                <span class="text-danger"><small>Inc. @item.TaxPercentage.ToString("G2")% VAT - @item.Tax.ToString("C")</small></span>
+                            }
+                            else
+                            {
+                                <span class="text-success"><small>No VAT.</small></span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a class="cart-update" data-id="@item.ProductID" data-change="-1"><i class="fa fa-minus-square"></i></a>
+                            &nbsp;&nbsp;@item.Quantity&nbsp;&nbsp;
+                            <a class="cart-update" data-id="@item.ProductID" data-change="1"><i class="fa fa-plus-square"></i></a>&nbsp;&nbsp;
+                        </td>
+                        <td class="total-column text-center">
+                            @if (item.DiscountPercentage > 0)
+                            {
+                                <span class="strikethrough">@item.LineSubTotal.ToString("C")</span>
+                                <span class="text-success">@item.LineTotal.ToString("C") <small>@item.DiscountPercentage.ToString("G2")% off!</small></span>
+                            }
+                            else
+                            {
+                                @item.LineSubTotal.ToString("C")
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+            <table class="table">
+                <tr class="no-border">
+                    <th class="text-right">Cart Subtotal:</th>
+                    <td class="total-column text-center">@Model.SubTotal.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th class="text-right text-success">Total Savings:</th>
+                    <td class="total-column text-center text-success">@Model.DiscountCart.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th class="text-right text-warning">Delivery:</th>
+                    <td class="total-column text-center text-warning">@Model.Delivery.ToString("C")</td>
+                </tr>
+                <tr class="shop-Cart-totalprice">
+                    <th class="text-right">Total:</th>
+                    <td class="total-column text-center">@Model.Total.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th class="text-right text-danger">Inc. VAT:</th>
+                    <td class="total-column text-center text-danger">@Model.Tax.ToString("C")</td>
+                </tr>
+                <tr>
+                    <th class="text-right text-info">Ex VAT Price:</th>
+                    <td class="total-column text-center text-info">@Model.PreTaxTotal.ToString("C")</td>
+                </tr>
+            </table>
+        }
+    </div>
+</div>

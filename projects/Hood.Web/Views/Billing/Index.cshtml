@@ -1,0 +1,95 @@
+@model BillingHomeModel
+@{
+    ViewBag.Title = "Billing";
+    ViewBag.Intro = "This is the billing area, where customers can see their previous invoices, update their subcsriptions and credit card information.";
+}
+@{ await Html.RenderPartialAsync("_BillingMessage", Model.Message); }
+<div class="row">
+    <div class="col-md-7">
+        @if (Model.NextInvoice != null)
+        {
+            <div class="panel panel-default panel-success">
+                <div class="panel-heading">Your next payment</div>
+                <div class="panel-body">
+                    @{ await Html.RenderPartialAsync("_Invoice", Model.NextInvoice); }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <p><i class="fa fa-info-circle m-r-xs"></i>You have no upcoming payments...</p>
+            </div>
+        }
+        @if (Model.Invoices != null && Model.Invoices.Count() != 0)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading">Your previous invoices</div>
+                <div class="panel-body">
+                    <div class="accordion">
+                        @foreach (Stripe.StripeInvoice invoice in Model.Invoices)
+                        {
+                            await Html.RenderPartialAsync("_Invoice", invoice);
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You have no invoices to show...</p>
+            </div>
+        }
+    </div>
+    <div class="col-md-5">
+        @if (Model.User?.Subscriptions?.Count > 0)
+        {
+            <div class="panel panel-default panel-warning">
+                <div class="panel-heading">Your Subscriptions</div>
+                <div class="panel-body">
+                    @foreach (var itm in Model.User?.Subscriptions.OrderByDescending(s => s.LastUpdated))
+                    {
+                        await Html.RenderPartialAsync("_Subscription", itm);
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You do not have any active subscriptions.</p>
+                <p><a asp-action="New" asp-controller="Subscriptions" class="btn btn-xs btn-success"><i class="fa fa-user-plus m-r-xs"></i>Upgrade</a></p>
+            </div>
+        }
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <a asp-action="AddCard" asp-controller="Billing" class="btn btn-xs btn-success pull-right"><i class="fa fa-credit-card m-r-xs"></i>Add Card</a>
+                Your Cards
+            </div>
+            <div class="panel-body">
+                @if (Model.Customer != null && Model.Customer.Sources != null && Model.Customer.Sources.Data.Count != 0)
+                {
+                    <div class="accordion">
+                    @foreach (Stripe.Source itm in Model.Customer.Sources.Data)
+                    {
+                        switch (itm.Type)
+                        {
+                            case Stripe.SourceType.Card:
+                                itm.Card.Customer = Model.Customer;
+                                await Html.RenderPartialAsync("_Card", itm.Card);
+                                break;
+                        }
+                    }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You do not have any saved cards.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

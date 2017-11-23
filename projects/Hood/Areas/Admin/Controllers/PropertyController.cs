@@ -51,9 +51,25 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/manage/")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(ListPropertyModel model)
         {
-            return View();
+            var propertySettings = _settings.GetPropertySettings();
+            if (!propertySettings.Enabled || !propertySettings.ShowList)
+                return NotFound();
+
+            if (model == null)
+                model = new ListPropertyModel();
+            if (model.Filters == null)
+                model.Filters = new PropertyFilters();
+
+            PagedList<PropertyListing> properties = await _property.GetPagedProperties(model.Filters, false);
+            model.Locations = await _property.GetLocations(model.Filters);
+            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
+            PropertySettings settings = _settings.GetPropertySettings();
+            model.Properties = properties;
+            model.Types = settings.GetListingTypes();
+            model.PlanningTypes = settings.GetPlanningTypes();
+            return View(model);
         }
 
         [Route("admin/property/gallery/{id}/")]
@@ -190,30 +206,6 @@ namespace Hood.Areas.Admin.Controllers
         {
             await _property.DeleteAll();
             return RedirectToAction("Index");
-        }
-
-        [HttpGet]
-        [Route("admin/property/get")]
-        public async Task<JsonResult> Get(ListFilters filters, string type, string planning, bool all = false, bool published = false)
-        {
-            string agent = User.Identity.Name;
-            if (all && User.IsInRole("Admin"))
-                agent = null;
-
-            PropertyFilters propertyFilters = new PropertyFilters();
-            filters.CopyProperties(propertyFilters);
-            propertyFilters.Agent = agent;
-            propertyFilters.Type = type;
-            propertyFilters.PlanningType = planning;
-
-            PagedList<PropertyListing> properties = await _property.GetPagedProperties(propertyFilters, published);
-            Response response = new Response(properties.Items.ToArray(), properties.Count);
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            };
-            return Json(response, settings);
         }
 
         [HttpPost]

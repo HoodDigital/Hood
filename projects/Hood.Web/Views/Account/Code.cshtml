@@ -1,0 +1,53 @@
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model EnterCodeViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
+@inject IContentRepository _content
+@{
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+    string description = "Validate your Email - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = "Validate your Email - " + _basicSettings.CompanyName;
+    if (_seoSettings.Login != null)
+    {
+        description = _seoSettings.SignUp.Description.IsSet() ? _seoSettings.SignUp.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Validate your Email - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.SignUp.Title.IsSet() ? _seoSettings.SignUp.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Validate your Email - " + _basicSettings.CompanyName;
+    }
+    ViewData["Title"] = title;
+    Layout = "_LoginLayout";
+}
+@section metas {
+    <meta name="description" content="@description" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+}
+<div class="login-block-header">
+    <h2>@ViewData["Title"]</h2>
+    <p>We have sent you a six digit code via email, please enter this code to confirm your email address and continue setting up your account.</p>
+</div>
+<form method="post">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <input asp-for="UserId" type="hidden" />
+
+    <div class="form-group">
+        <label asp-for="Code" class="control-label"></label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-hashtag"></i></span>
+            <input asp-for="Code" class="form-control code-mask" placeholder="Your email address" />
+        </div>
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <p><button type="submit" class="btn btn-block">Confirm your email</button></p>
+        </div>
+    </div>
+</form>

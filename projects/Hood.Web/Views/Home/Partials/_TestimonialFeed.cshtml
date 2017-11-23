@@ -1,0 +1,22 @@
+@model ContentListModel
+
+@if (Model.Posts.Count == 0)
+{
+    await Html.RenderPartialAsync("_NoResults");
+}
+else
+{
+    <div class="row">
+        @foreach (Content content in Model.Posts.Items)
+        {
+            <div class="col-md-offset-2 col-md-8 mb-30">
+                <div class="testimonial">
+                    <blockquote>@content.Excerpt</blockquote>
+                    <p class="testimonial-author">@content.Title</p>
+                    <p class="testimonial-company">@content.GetMetaValue("CompanyName")</p>
+                </div>
+            </div>
+        }
+    </div>
+    await Html.RenderPartialAsync("_Pagination");
+}
