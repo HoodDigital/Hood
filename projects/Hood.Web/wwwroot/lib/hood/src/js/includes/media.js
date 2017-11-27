@@ -23,7 +23,7 @@ $.hood.Media = {
                         directory: $('#media-directory').val()
                     };
                 },
-                pageSize: 12,
+                pageSize: 36,
                 pagers: '.media-pager',
                 template: '#media-template',
                 dataBound: function () { },

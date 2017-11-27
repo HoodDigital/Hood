@@ -1,10 +1,11 @@
-﻿using Hood.Models;
+﻿using Hood.BaseTypes;
+using Hood.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Entities
 {
-    public abstract partial class BaseEntity
+    public abstract partial class BaseEntity : SaveableModel
     {
         /// <summary>
         /// Gets or sets the entity identifier

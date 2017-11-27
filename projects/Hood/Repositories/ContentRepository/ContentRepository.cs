@@ -56,7 +56,7 @@ namespace Hood.Services
             content.Pages = content.Count / filters.pageSize;
             if (content.Pages < 1)
                 content.Pages = 1;
-            if ((content.Pages * filters.pageSize) < content.Count)
+            if (content.Count % filters.pageSize > 0)
             {
                 content.Pages++;
             }

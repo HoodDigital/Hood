@@ -8,7 +8,7 @@
     <a asp-action="ResetMedia" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
+    <p class="no-margin">
         Settings for uploading media to the site.
     </p>
 }
@@ -49,8 +49,7 @@
                 <p>
                     Settings for uploading media to the site.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <form method="post" id="settings-form">
                     <fieldset class="form-horizontal">
                         <div class="form-group">

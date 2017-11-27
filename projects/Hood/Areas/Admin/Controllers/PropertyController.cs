@@ -90,87 +90,93 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
-            var model = await GetEditModel(_property.GetPropertyById(id, true));
+            var model = await ReloadProperty(_property.GetPropertyById(id, true));
             return View(model);
         }
 
         [HttpPost()]
         [Route("admin/property/edit/{id}/")]
-        public async Task<ActionResult> Edit(EditPropertyModelSend post)
+        public async Task<ActionResult> Edit(PropertyListing post)
         {
-            var model = await Save(post);
-            return View(model);
-        }
-
-        [HttpPost()]
-        [Route("admin/property/save/{id}/")]
-        public async Task<OperationResult> SaveBlade(EditPropertyModelSend post)
-        {
-            var model = await Save(post);
-            return model.SaveResult;
-        }
-
-        private async Task<EditPropertyModel> Save(EditPropertyModelSend post)
-        {
-            var property = _property.GetPropertyById(post.Id, true);
-            post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
-            post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
-            // Try to map the address (Only works with UK)
-            if (post.Postcode != property.Postcode)
+            try
+            {
+                post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
+                post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
+                post.LastEditedBy = User.Identity.Name;
+                post.LastEditedOn = DateTime.Now;
                 post.SetLocation(_address.GeocodeAddress(post));
-            post.CopyProperties(property);
-            property.AgentId = post.AgentId;
-            var type = _settings.GetPropertySettings().GetPlanningFromType(post.Planning);
-            if (property.HasMeta("PlanningDescription"))
-                property.UpdateMeta("PlanningDescription", type);
-            else
-            {
-                if (property.Metadata == null)
-                    property.Metadata = new List<PropertyMeta>();
-                property.AddMeta(new PropertyMeta("PlanningDescription", type));
-            }
 
-            // if the site's edit form has special properties, add them to metas:
-            foreach (var val in Request.Form)
-            {
-                if (val.Key.StartsWith("Meta:"))
+                OperationResult result = _property.UpdateProperty(post);
+
+                // Try to map the address (Only works with UK)
+                var property = _property.GetPropertyById(post.Id, true);
+                var type = _settings.GetPropertySettings().GetPlanningFromType(post.Planning);
+
+                if (property.HasMeta("PlanningDescription"))
+                    property.UpdateMeta("PlanningDescription", type);
+                else
                 {
-                    // bosh we have a meta
-                    if (property.HasMeta(val.Key.Replace("Meta:", "")))
+                    if (property.Metadata == null)
+                        property.Metadata = new List<PropertyMeta>();
+                    property.AddMeta(new PropertyMeta("PlanningDescription", type));
+                }
+
+                // if the site's edit form has special properties, add them to metas:
+                foreach (var val in Request.Form)
+                {
+                    if (val.Key.StartsWith("Meta:"))
                     {
-                        property.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
-                    }
-                    else
-                    {
-                        // Add it...
-                        property.AddMeta(new PropertyMeta()
+                        // bosh we have a meta
+                        if (property.HasMeta(val.Key.Replace("Meta:", "")))
                         {
-                            PropertyId = property.Id,
-                            Name = val.Key.Replace("Meta:", ""),
-                            Type = "System.String",
-                            BaseValue = JsonConvert.SerializeObject(val.Value)
-                        });
+                            property.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                        }
+                        else
+                        {
+                            // Add it...
+                            property.AddMeta(new PropertyMeta()
+                            {
+                                PropertyId = property.Id,
+                                Name = val.Key.Replace("Meta:", ""),
+                                Type = "System.String",
+                                BaseValue = JsonConvert.SerializeObject(val.Value)
+                            });
+                        }
                     }
                 }
-            }
 
-            property.LastEditedBy = User.Identity.Name;
-            property.LastEditedOn = DateTime.Now;
-            OperationResult result = _property.UpdateProperty(property);
-            var model = await GetEditModel(property);
-            model.SaveResult = result;
-            return model;
-        }
-        private async Task<EditPropertyModel> GetEditModel(PropertyListing listing)
-        {
-            EditPropertyModel model = new EditPropertyModel()
+
+                result = _property.UpdateProperty(property);
+                if (result.Succeeded)
+                {
+                    var model = await ReloadProperty(post);
+                    model.SaveMessage = "Saved";
+                    model.MessageType = AlertType.Success;
+                    return View(model);
+                }
+                else
+                {
+                    var model = await ReloadProperty(post);
+                    model.SaveMessage = "Something went wrong while saving: " + result.ErrorString;
+                    model.MessageType = AlertType.Success;
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
             {
-                Property = listing
-            };
+                var model = await ReloadProperty(post);
+                model.SaveMessage = "An error occurred: " + ex.Message;
+                model.MessageType = AlertType.Danger;
+                return View(model);
+            }
+        }
+        private async Task<PropertyListing> ReloadProperty(PropertyListing listing)
+        {
+            listing = _property.GetPropertyById(listing.Id, true);
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
-            model.Agents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
-            return model;
+            listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
+            return listing;
         }
 
 
@@ -498,15 +504,11 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/property/media/remove/{id}/{mediaId}")]
-        public IActionResult RemoveMedia(int id, int mediaId)
+        public async Task<IActionResult> RemoveMedia(int id, int mediaId)
         {
             try
             {
-                PropertyListing property = _property.GetPropertyById(id, true);
-                PropertyMedia media = property.Media.Find(m => m.Id == mediaId);
-                if (media != null)
-                    property.Media.Remove(media);
-                _property.UpdateProperty(property);
+                PropertyListing property = await _property.RemoveMediaAsync(id, mediaId);
             }
             catch (Exception)
             { }
@@ -515,15 +517,11 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/property/floorplan/remove/{id}/{mediaId}")]
-        public IActionResult RemoveFloorplan(int id, int mediaId)
+        public async Task<IActionResult> RemoveFloorplan(int id, int mediaId)
         {
             try
             {
-                PropertyListing property = _property.GetPropertyById(id, true);
-                PropertyFloorplan media = property.FloorPlans.Find(m => m.Id == mediaId);
-                if (media != null)
-                    property.FloorPlans.Remove(media);
-                _property.UpdateProperty(property);
+                PropertyListing property = await _property.RemoveFloorplanAsync(id, mediaId);
             }
             catch (Exception)
             { }

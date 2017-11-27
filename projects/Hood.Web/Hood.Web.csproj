@@ -70,7 +70,6 @@
     <EmbeddedResource Include="Areas\Admin\Views\Media\Insert.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Media\Select.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Media\_Filters.cshtml" />
-    <EmbeddedResource Include="Areas\Admin\Views\Media\_List.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Property\Create.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Property\Edit.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Property\EditorFloorplans.cshtml" />

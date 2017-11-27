@@ -76,6 +76,8 @@ body {
                         margin-right: 10px;
                         color: @hood-yellow;
                         vertical-align: middle;
+                        text-align: center;
+                        width: 20px;
 
                         @media (min-width:768px) {
                             display: inline-block;
@@ -173,6 +175,10 @@ body {
         }
     }
 
+    .page-heading {
+        padding: 5px;
+    }
+
     div.main-content {
         position: absolute;
         left: 70px;
@@ -186,11 +192,72 @@ body {
             left: @sidebar-width;
         }
 
+        .nav-tabs {
+            padding-left: @grid-gutter-width;
+
+            > li {
+
+                > a {
+                    margin-right: 3px;
+                    background-color: fade(white, 30%);
+                    color: black;
+                    font-weight: bold;
+
+                    &:hover {
+                        color: black;
+                        border-color: transparent;
+                    }
+                }
+
+                &.active {
+                    > a {
+                        background-color: white;
+                        border-color: white;
+                    }
+                }
+            }
+        }
+
+        .alert {
+            margin-bottom: @grid-gutter-width;
+        }
+
         div.content-body {
-            padding: 10px;
+            background-color: #dfdfdf;
+            padding: @grid-gutter-width / 2;
 
             @media (min-width:768px) {
-                padding: 25px;
+                padding: @grid-gutter-width;
+            }
+
+            .panel-body {
+                padding: @grid-gutter-width * 2;
+                background-color: white;
+                border-radius: @border-radius-base;
+                margin-bottom: @grid-gutter-width;
+
+                > h4:first-child {
+                    background-color: #f5f5f5;
+                    margin: -30px;
+                    margin-bottom: 14px;
+                    padding: 15px 30px;
+                    border-radius: 4px 4px 0 0;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                &.small {
+                    padding: 15px;
+
+                    > h4:first-child {
+                        margin: -15px;
+                        margin-bottom: 15px;
+                        padding: 10px 15px;
+                        font-size: 13px;
+                    }
+                }
             }
         }
     }

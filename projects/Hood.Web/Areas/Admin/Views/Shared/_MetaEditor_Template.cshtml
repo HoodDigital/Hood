@@ -17,7 +17,7 @@
                 break;
             case "Body":
             case "WYSIWYG":
-                <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control tinymce-simple">@Model.GetStringValue()</textarea>
+                <textarea id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" class="form-control tinymce-content">@Model.GetStringValue()</textarea>
                 break;
             case "Url":
                 <input id="@string.Format("Meta:{0}", Model.Name).ToSeoUrl()" name="@string.Format("Meta:{0}", Model.Name)" type="text" value="@Model.GetStringValue()" class="form-control" />

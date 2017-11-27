@@ -9,62 +9,58 @@
 }
 <div class="row">
     <div class="col-sm-8">
-        <div class="wrapper wrapper-content">
-            <div class="ibox">
-                <div class="ibox-title">
-                    <div class="row m-b-sm m-t-sm">
-                        @foreach (KeyValuePair<string, IConfiguration> themeSel in themesSource.ThemeConfigs)
-                        {
-                            string activeClass = "";
-                            bool active = false;
-                            try
+        <div class="row">
+            @foreach (KeyValuePair<string, IConfiguration> themeSel in themesSource.ThemeConfigs)
+            {
+                string activeClass = "";
+                bool active = false;
+                try
+                {
+                    var themeConf = themeSel.Value;
+                    active = theme["name"] == themeConf["Name"];
+                    if (active)
+                    {
+                        activeClass = "active";
+                    }
+                }
+                catch { }
+                <div class="col-md-6 col-lg-4">
+                    <div class="thumbnail @activeClass">
+                        <figure class="img img-wide img-full" style="background-image:url(@themeSel.Value["PreviewImage"]);">
+                            <img src="@themeSel.Value["PreviewImage"]" alt="@themeSel.Value["ThemeFullName"]" />
+                        </figure>
+                        <div class="caption">
+                            <h4 class="no-margin">@themeSel.Value["ThemeFullName"] <small>(@themeSel.Value["name"])</small></h4>
+                            <p>by <strong>@themeSel.Value["Author"]</strong></p>
+                            @if (!active)
                             {
-                                var themeConf = themeSel.Value;
-                                active = theme["name"] == themeConf["Name"];
-                                if (active)
-                                {
-                                    activeClass = "active";
-                                }
+                            <a class="btn-success btn btn-sm btn-block activate-theme" data-name="@themeSel.Value["name"]">Activate Theme</a>
                             }
-                            catch { }
-                            <div class="col-md-6 col-lg-4">
-                                <div class="theme-selector @activeClass">
-                                    <div class="theme-selector-image" style="background-image:url(@themeSel.Value["PreviewImage"]);">
-                                        <img src="@themeSel.Value["PreviewImage"]" alt="@themeSel.Value["ThemeFullName"]" />
-                                    </div>
-                                    <div class="theme-selector-title">
-                                        @if (!active)
-                                        {
-                                            <a class="pull-right btn-primary btn btn-sm activate-theme" data-name="@themeSel.Value["name"]">Activate</a>
-                                        }
-                                        <h3>@themeSel.Value["ThemeFullName"] <small>(@themeSel.Value["name"])</small></h3>
-                                        <p>by <strong>@themeSel.Value["Author"]</strong></p>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+                            else
+                            {
+                            <span class="btn-disabled btn-default btn btn-block btn-sm" data-name="@themeSel.Value["name"]">Currently Active</span>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
     <div class="col-sm-4">
-        <div class="right-column">
+        <div class="panel-body">
             @if (theme != null)
             {
-                <div class="editor-box">
-                    <h4>Current theme: <strong>@theme["Name"]</strong></h4>
-                    <p>@theme["ThemeFullName"]</p>
-                </div>
+                <h4 class="text-center">Current theme: <strong>@theme["ThemeFullName"]</strong></h4>
+                <p>Theme currently selected: <strong>@_settings["Hood.Settings.Theme"]</strong></p>
+                <p></p>
             }
             else
             {
-                <div class="editor-box">
-                    <h4>There is no theme currently active.</h4>
-                    <h5>Theme currently selected: @_settings["Hood.Settings.Theme"]</h5>
-                    <p>There is no active theme currently, this could be due to no theme being selected, or an issue with the installation of the currently selected theme.</p>
-                </div>
+                <h4 class="text-center">There is no theme currently active.</h4>
+                <h5>Theme currently selected: @_settings["Hood.Settings.Theme"]</h5>
+                <p>There is no active theme currently, this could be due to no theme being selected, or an issue with the installation of the currently selected theme.</p>
             }
+            <hr />
             @if (_settings != null)
             {
                 <div class="editor-box">
@@ -82,6 +78,7 @@
                             }
                         </p>*@
                 </div>
+                <hr />
                 <div class="editor-box">
                     <h5>Under Construction Page</h5>
                     <p>You can activate an Under Construction page, which will show instead of the site, this is useful during maintenance periods.</p>

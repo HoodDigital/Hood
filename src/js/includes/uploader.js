@@ -15,23 +15,29 @@ $.hood.Uploader = {
         $('body').on('click', '.hood-image-switch', $.hood.Uploader.Load.Switch);
     },
     Switching: null,
+    Current: {
+        Attach: null
+    },
     Load: {
         Attach: function (e) {
-            params = {
+            $.hood.Uploader.Attacher = {
                 Id: $(this).data('id'),
                 Entity: $(this).data('entity'),
                 Field: $(this).data('field'),
                 Type: $(this).data('type'),
                 Refresh: $(this).data('refresh'),
-                Tag: $(this).data('tag')
+                Tag: $(this).data('tag'),
+                Title: $(this).attr('title'),
+                JsonField: $(this).data('json')
             }
-            $.hood.Modals.Open('/admin/media/attach/', params, '.hood-image-attach', $.proxy(function () {
-                $('#attach-media-title').html($(this).attr('title'))
+            $.hood.Modals.Open('/admin/media/attach/', $.hood.Uploader.Attacher, '.hood-image-attach', $.proxy(function () {
+                $('#attach-media-title').html($.hood.Uploader.Attacher.Title)
                 $('body').off('click', '.attach-media-select', $.hood.Uploader.Complete.Attach);
                 $('body').on('click', '.attach-media-select', $.hood.Uploader.Complete.Attach);
                 $.hood.Media.Manage.Init();
                 $.hood.Media.Upload.Init();
             }, this));
+
         },
         Insert: function (editor) {
             editor.addButton('hoodimage', {
@@ -89,7 +95,8 @@ $.hood.Uploader = {
     Complete: {
         Attach: function (e) {
             $(this).data('temp', $(this).html());
-            $(this).addClass('loading').append('<i class="fa fa-refresh fa-spin m-l-sm"></i>');
+            $(this).addClass('loading').append('<i class="fa fa-refresh fa-spin"></i>');
+            var $image = $('.' + $.hood.Uploader.Attacher.Tag);
             params = {
                 Id: $(this).data('id'),
                 Entity: $(this).data('entity'),
@@ -99,17 +106,19 @@ $.hood.Uploader = {
             $.post('/admin/media/attach/', params, $.proxy(function (data) {
                 if (data.Success) {
                     $.hood.Alerts.Success("Attached!");
-                    if (!$.hood.Helpers.IsNullOrUndefined($(this).data('tag')) && !$.hood.Helpers.IsNullOrUndefined($(this).data('refresh'))) {
-                        $image = $('.' + $(this).data('tag'));
-                        $image.addClass('loading');
-                        $.get($(this).data('refresh'), { id: $(this).data('id') }, $.proxy(function (data) {
-                            $image = $('.' + $(this).data('tag'));
-                            $image.css({
-                                'background-image': 'url(' + data.SmallUrl + ')'
-                            });
-                            $image.find('img').attr('src', data.SmallUrl);
-                            $image.removeClass('loading');
-                        }, this));
+                    $image.addClass('loading');
+                    icon = data.Media.Icon;
+                    if (data.Media.GeneralFileType == "Image") {
+                        icon = data.Media.MediumUrl;
+                    }
+                    $image.css({
+                        'background-image': 'url(' + icon + ')'
+                    });
+                    $image.find('img').attr('src', icon);
+                $image.removeClass('loading');
+                    if (!$.hood.Helpers.IsNullOrUndefined($.hood.Uploader.Attacher.JsonField)) {
+                        $jsonField = $('#' + $.hood.Uploader.Attacher.JsonField);
+                        $jsonField.val(data.Json);
                     }
                 } else {
                     $.hood.Alerts.Error(data.Errors, "Error attaching.");

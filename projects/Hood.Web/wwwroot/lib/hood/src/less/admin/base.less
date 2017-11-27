@@ -1,22 +1,14 @@
-﻿﻿﻿﻿body {
+﻿﻿﻿﻿﻿﻿﻿﻿body {
     font-family: @admin-font;
 }
 
-h4, h5, h6 {
-    font-weight: 100;
-    font-size: 22px;
-    margin-top: 0;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #dddddd;
-}
-
-h5 {
-    font-size: 18px;
-}
-
-h6 {
-    font-size: 15px;
+h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
+    margin-top: 0;
+}
+
+.thumbnail {
+    overflow: hidden;
 }
 
 .modal-lg {
@@ -45,37 +37,39 @@ h6 {
 }
 
 /* TABLE VIEWS */
+
 .data-item {
-    padding: 10px 0;
-    margin-bottom: 2px;
-    border-bottom: 1px solid #eee;
-}
+    padding: 8px 15px;
+    margin-bottom: 7px;
+    background-color: #f6f6f6;
+    border-radius: 4px;
 
-.data-item .inline-drop {
-    margin-top: 15px;
-    margin-bottom: 0px;
-}
+    .inline-drop {
+        margin-top: 15px;
+        margin-bottom: 0px;
+    }
 
-.data-item .tag-list {
-    padding-top: 3px;
-}
+    .tag-list {
+        padding-top: 3px;
+    }
 
-.data-item .tag-item {
-    background: #f3f3f4;
-    padding: 2px 6px;
-    font-size: 10px;
-}
+    .tag-item {
+        background: #d1d1d1;
+        padding: 2px 6px;
+        font-size: 10px;
+        border-radius: 4px;
+    }
 
-.data-item .action-buttons {
-    padding-top: 10px;
-    text-align: right;
-}
+    .action-buttons {
+        text-align: right;
+    }
 
-.data-item h4 {
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    h4 {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .action-button span {
@@ -197,12 +191,6 @@ div.hood-inline {
     font-size: 30px;
 }
 
-p.url-preview {
-    text-align: center;
-    background-color: #ECFFEC;
-    padding: 10px 2px;
-}
-
 @media (max-width: 1200px) {
     .action-button span {
         display: none !important;
@@ -245,10 +233,13 @@ field {
 
 .modal-header {
     background-color: #262626;
+    color: #d9b50b;
 }
 
 .modal-header h4 {
     color: #fff;
+    padding-bottom: 5px;
+    border-bottom: 0;
 }
 
 
@@ -307,7 +298,6 @@ field {
     padding-top: 15px;
     margin-left: (@sidebar-width - 190px) / 2;
     border-radius: 3px;
-    background-color: @hood-yellow;
     width: 190px;
 }
 
@@ -320,7 +310,7 @@ field {
     width: 0;
     position: absolute;
     pointer-events: none;
-    border-bottom-color: @hood-yellow;
+    border-bottom-color: white;
     border-width: 10px;
     margin-left: -10px;
 }
@@ -363,6 +353,7 @@ body.mini-nav.fixed-sidebar .profile-element,
 .k-grid-content {
     min-height: 150px;
 }
+
 
 @media all and (min-width: 768px) {
     .hood-image.user-content-image, .hood-image.team-content-image {

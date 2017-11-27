@@ -1,9 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using Hood.Interfaces;
 
 namespace Hood.Models
 {
+    public class MediaResponse : Response
+    {
+        public MediaResponse(Array data, int count, string message = "Succeeded!")
+            : base(data, count, message)
+        { }
+        public MediaResponse(string errors)
+            : base(errors)
+        { }
+        public MediaResponse(bool success, string message = "Succeeded!")
+            : base(success, message)
+        { }
+        public MediaResponse(bool success, IMediaObject media)
+            : base(success)
+        {
+            Media = media;
+            Json = media.GetJson();
+        }
+        public MediaResponse(Exception ex)
+               : base(ex)
+        { }
+
+        public IMediaObject Media { get; set; }
+        public string Json { get; set; }
+    }
+
     public class Response
     {
         public Array Data { get; set; }

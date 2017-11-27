@@ -6,6 +6,7 @@
         $('body').removeClass('body-small')
     }
 
+
     $.hood.Helpers.InitIboxes('body');
     $.hood.Helpers.InitMetisMenu('#side-menu');
 
@@ -15,6 +16,10 @@
     });
     $('.right-sidebar-toggle').click(function () {
         $('#right-sidebar').toggleClass('sidebar-open');
+    });
+
+    $(".alert.auto-dismiss").fadeTo(2000, 500).slideUp(500, function () {
+        $(".alert.auto-dismiss").slideUp(500);
     });
 
     $('.sidebar-container').slimScroll({
@@ -46,9 +51,15 @@
         else
             $("body").removeClass("mini-nav")
     }
-
-    $('.sidebar-toggle').click(function () {
+   $('.sidebar-toggle').click(function () {
         $("body").toggleClass("mini-nav");
+        if ($("body").hasClass("mini-nav")) {
+            $(this).children('.fa').removeClass('fa-list');
+            $(this).children('.fa').addClass('fa-bars');
+        } else {
+            $(this).children('.fa').addClass('fa-list');
+            $(this).children('.fa').removeClass('fa-bars');
+        }
         SmoothlyMenu();
         if (typeof (Storage) !== "undefined") {
             if ($("body").hasClass("mini-nav"))
@@ -223,6 +234,16 @@ function WinMove() {
         .disableSelection();
 }
 
+function Resize() {
+    if ($(window).width() > 768) {
+        $('.content-body').css({
+            'min-height': $(window).height() - 216
+        });
+    }
+}
+$(window).resize(Resize);
+Resize();
+
 if (!$.hood)
     $.hood = {}
 $.hood.Admin = {
@@ -266,7 +287,7 @@ $.hood.Admin = {
 
         tinymce.init({
             selector: '.tinymce-simple-admin',
-            height: 150,
+            height: 500,
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
@@ -282,6 +303,22 @@ $.hood.Admin = {
 
         tinymce.init({
             selector: '.tinymce-simple',
+            height: 150,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor media',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media contextmenu paste code'
+            ],
+            menubar: false,
+            toolbar: 'bold italic | bullist numlist | undo redo | link',
+            link_class_list: $.hood.LinkClasses,
+            image_class_list: $.hood.ImageClasses,
+            content_css: [
+            ]
+        });
+
+        tinymce.init({
+            selector: '.tinymce-basic',
             height: 150,
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',

@@ -1,7 +1,10 @@
 @model PropertyListing
-<div class="forum-item data-item">
-    <div class="row">
-        <div class="col-md-4">
+@{
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+<div class="data-item">
+    <div class="row row-center">
+        <div class="col-md-5">
             <div class="media">
                 <div class="media-left media-middle">
                     <a href="/admin/content/edit/@Model.Id">
@@ -42,12 +45,6 @@
             </div>
         </div>
         <div class="col-md-1">
-            <span class="small font-bold">Agent</span>
-            <div class="tag-list">
-                <span class="tag-item">@Model.Agent.UserName</span>
-            </div>
-        </div>
-        <div class="col-md-1">
             <span class="small font-bold">Status</span>
             <div class="tag-list">
                 @if (Model.Status == 1)
@@ -64,26 +61,38 @@
                 }
             </div>
         </div>
-        <div class="col-md-1">
-            <span class="small font-bold">Rent</span>
-            <div class="tag-list">
-                <span class="tag-item">@Model.FormattedRent</span>
+        <div class="col-md-3">
+            <div class="row">
+                @if (_propertySettings.ShowRent)
+                {
+                    <div class="col-md-4">
+                        <span class="small font-bold">Rent</span>
+                        <div class="tag-list">
+                            <span class="tag-item">@Model.FormattedRent</span>
+                        </div>
+                    </div>
+                }
+                @if (_propertySettings.ShowAskingPrice)
+                {
+                    <div class="col-md-4">
+                        <span class="small font-bold">Asking Price</span>
+                        <div class="tag-list">
+                            <span class="tag-item">@Model.FormattedAskingPrice</span>
+                        </div>
+                    </div>
+                }
+                @if (_propertySettings.ShowPremium)
+                {
+                    <div class="col-md-4">
+                        <span class="small font-bold">Premium</span>
+                        <div class="tag-list">
+                            <span class="tag-item">@Model.FormattedPremium</span>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
-        <div class="col-md-1">
-            <span class="small font-bold">Asking Price</span>
-            <div class="tag-list">
-                <span class="tag-item">@Model.FormattedAskingPrice</span>
-            </div>
-        </div>
-        <div class="col-md-1">
-            <span class="small font-bold">Premium</span>
-            <div class="tag-list">
-                <span class="tag-item">@Model.FormattedPremium</span>
-            </div>
-        </div>
-        <div class="col-md-3 action-buttons">
-            <a class="btn-default btn btn-sm action-button" href="/admin/property/edit/@Model.Id"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
+        <div class="col-md-3 action-buttons pull-right">
             @if ((Model.Status == 1) || (Model.Status == 3))
             {
                 <a class="btn-success btn btn-sm action-button publish-property" data-id="@Model.Id"><i class="fa fa-thumbs-up"></i><span>&nbsp;Publish</span></a>
@@ -92,7 +101,28 @@
             {
                 <a class="btn-warning btn btn-sm action-button archive-property" data-id="@Model.Id"><i class="fa fa-archive"></i><span>&nbsp;Archive</span></a>
             }
-            <a class="btn-danger btn btn-sm action-button delete-property" data-id="@Model.Id"><i class="fa fa-trash-o"></i><span>&nbsp;Delete</span></a>
+            <a class="btn-default btn btn-sm action-button" href="/admin/property/edit/@Model.Id"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a href="@Model.Url" target="_blank">
+                            <i class="fa fa-search m-r-sm"></i>
+                            <span>
+                                Preview
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="delete-property" data-id="@Model.Id">
+                            <i class="fa fa-trash-o m-r-sm"></i>
+                            <span>
+                                Delete
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

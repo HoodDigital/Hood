@@ -43,7 +43,6 @@ $.hood.Helpers = {
         if (a === null || typeof (a) === "undefined" || a === "") {
             rc = true;
         }
-
         return rc;
     },
     IsEventSupported: function (eventName) {

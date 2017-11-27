@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using System;
+using Hood.Enums;
 using Hood.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -13,7 +14,9 @@ namespace Hood.Extensions
         {
             string filename = ContentDispositionHeaderValue
                       .Parse(file.ContentDisposition)
-                      .FileName.ToString();
+                      .FileName
+                      .ToString()
+                      .Trim('"');
             return filename;
         }
 

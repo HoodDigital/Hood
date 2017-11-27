@@ -201,7 +201,7 @@ namespace Hood.Models
         {
             ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
             if (cm != null)
-                return cm.ToString();
+                return cm.GetStringValue();
             return null;
         }
         public void UpdateMeta<T>(string name, T value)

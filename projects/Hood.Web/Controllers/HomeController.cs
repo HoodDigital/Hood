@@ -19,7 +19,7 @@ namespace Hood.Controllers
 
         public override IActionResult Index()
         {
-            return base.View();
+            return base.Index();
         }
 
         public IActionResult About()

@@ -1,9 +1,10 @@
 ﻿using Hood.Enums;
+using Hood.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.BaseTypes
 {
-    public abstract class SaveableModel
+    public abstract class SaveableModel : ISaveableModel
     {
         [NotMapped]
         public string SaveMessage { get; set; }

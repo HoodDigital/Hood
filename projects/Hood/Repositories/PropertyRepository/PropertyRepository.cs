@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public class PropertyRepository: IPropertyRepository
+    public class PropertyRepository : IPropertyRepository
     {
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
@@ -71,6 +71,7 @@ namespace Hood.Services
                     .Include(p => p.FloorPlans)
                     .Include(p => p.Agent)
                     .Include(p => p.Metadata)
+                    .AsNoTracking()
                     .FirstOrDefault(c => c.Id == id);
 
                 _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
@@ -227,7 +228,7 @@ namespace Hood.Services
             properties.Pages = properties.Count / filters.pageSize;
             if (properties.Pages < 1)
                 properties.Pages = 1;
-            if ((properties.Pages * filters.pageSize) < properties.Count)
+            if (properties.Count % filters.pageSize > 0)
             {
                 properties.Pages++;
             }
@@ -245,8 +246,9 @@ namespace Hood.Services
         {
             try
             {
-                _db.Update(property);
+                var changes = _db.Update(property);
                 _db.SaveChanges();
+                _db.Entry(property).State = EntityState.Detached;
                 ClearPropertyCache(property.Id);
                 return new OperationResult<PropertyListing>(property);
             }
@@ -376,6 +378,26 @@ namespace Hood.Services
             _cache.Remove("Property:Recent");
             if (id.HasValue)
                 _cache.Remove("Property:Listing:" + id.ToString());
+        }
+
+        public async Task<PropertyListing> RemoveMediaAsync(int id, int mediaId)
+        {
+            var property = await _db.Properties.Include(p => p.Media).SingleOrDefaultAsync(p => p.Id == id);
+            var media = property.Media.SingleOrDefault(m => m.Id == mediaId);
+            if (media != null)
+                property.Media.Remove(media);
+            await _db.SaveChangesAsync();
+            return property;
+        }
+
+        public async Task<PropertyListing> RemoveFloorplanAsync(int id, int mediaId)
+        {
+            var property = await _db.Properties.Include(p => p.FloorPlans).SingleOrDefaultAsync(p => p.Id == id);
+            var media = property.FloorPlans.SingleOrDefault(m => m.Id == mediaId);
+            if (media != null)
+                property.FloorPlans.Remove(media);
+            await _db.SaveChangesAsync();
+            return property;
         }
     }
 }

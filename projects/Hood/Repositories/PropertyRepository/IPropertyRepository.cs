@@ -21,6 +21,7 @@ namespace Hood.Services
         Task<OperationResult<PropertyListing>> AddFloorplan(PropertyListing property, PropertyFloorplan media);
         Task<List<PropertyListing>> GetFeatured();
         Task<List<PropertyListing>> GetRecent();
-       
+        Task<PropertyListing> RemoveMediaAsync(int id, int mediaId);
+        Task<PropertyListing> RemoveFloorplanAsync(int id, int mediaId);
     }
 }

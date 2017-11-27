@@ -7,9 +7,9 @@
     <a asp-action="ResetSEO" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
-        SEO is a marketing discipline focused on growing visibility in organic (non-paid) search engine results. SEO encompasses both the technical and creative elements required to improve rankings, drive traffic, and increase awareness in search engines.
-    </p>
+<p class="no-margin">
+    SEO is a marketing discipline focused on growing visibility in organic (non-paid) search engine results. SEO encompasses both the technical and creative elements required to improve rankings, drive traffic, and increase awareness in search engines.
+</p>
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">
@@ -28,8 +28,7 @@
                     You can set titles and descriptions that will show up on search engine results, and add keywords and images to increase your potential traffic.
                     Setting the following will create fallbacks for your site to use if you do not set individual page titles and descriptions.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <fieldset class="form-horizontal">
                     <h5>Settings &amp; Analytics</h5>
                     <div class="form-group">
@@ -82,8 +81,7 @@
                 <p>
                     Setting the following will add meta titles and descriptions for the standard pages of the site.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Home Page</h5>
                 <fieldset class="form-horizontal">
                     <div class="form-group">
@@ -103,8 +101,7 @@
                         <div class="col-sm-8"><input asp-for="Home.CanonicalUrl" type="text" class="form-control" /></div>
                     </div>
                 </fieldset>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Contact Page</h5>
                 <fieldset class="form-horizontal">
                     <div class="form-group">
@@ -124,8 +121,7 @@
                         <div class="col-sm-8"><input asp-for="Contact.CanonicalUrl" type="text" class="form-control" /></div>
                     </div>
                 </fieldset>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Login Page</h5>
                 <fieldset class="form-horizontal">
                     <div class="form-group">
@@ -145,8 +141,7 @@
                         <div class="col-sm-8"><input asp-for="Contact.CanonicalUrl" type="text" class="form-control" /></div>
                     </div>
                 </fieldset>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Sign Up Page</h5>
                 <fieldset class="form-horizontal">
                     <div class="form-group">
@@ -174,8 +169,7 @@
                 <p>
                     Here you can set what Social Media networks are linked and displayed on your site. Remember linking more of these will provide you with direct links to these services.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <fieldset class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-3 control-label" asp-for="Twitter"></label>
@@ -222,8 +216,7 @@
                 <p>
                     The Open Graph protocol, allows you to add images and rich content to your pages, that will help them to show up in the facebook or other social feeds correctly. For Twitter - see Twitter Cards.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <fieldset class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-3 control-label" asp-for="OgTitle"></label>
@@ -273,8 +266,7 @@
                 <p>
                     With Twitter Cards, you can attach rich photos, videos and media experience to Tweets that drive traffic to your website. Simply add a few lines of HTML to your webpage, and users who Tweet links to your content will have a “Card” added to the Tweet that’s visible to all of their followers.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <fieldset class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-3 control-label" asp-for="TwitterCardTitle"></label>

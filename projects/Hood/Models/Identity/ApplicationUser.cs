@@ -7,10 +7,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
 using Hood.Interfaces;
+using Hood.BaseTypes;
+using Hood.Enums;
 
 namespace Hood.Models
 {
-    public partial class ApplicationUser : IdentityUser
+    public partial class ApplicationUser : IdentityUser, ISaveableModel
     { 
         [Display(Name = "First name")]
         public string FirstName { get; set; }
@@ -136,5 +138,9 @@ namespace Hood.Models
         public List<PropertyListing> Properties { get; set; }
         public List<UserSubscription> Subscriptions { get; set; }
 
+        [NotMapped]
+        public AlertType MessageType { get; set; }
+        [NotMapped]
+        public string SaveMessage { get; set; }
     }
 }

@@ -10943,6 +10943,15 @@ a.full-box-link {
 .img img {
   display: none !important;
 }
+.hood-image.loading i,
+.img.loading i {
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+}
 .hood-image.loading:before,
 .img.loading:before {
   content: '';

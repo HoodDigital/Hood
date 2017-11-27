@@ -4,11 +4,11 @@
     <fieldset class="form-horizontal">
         <div class="form-group">
             <label class="col-sm-3 control-label">@Model.Type.TitleName:</label>
-            <div class="col-sm-9"><input id="Title" name="Title" value="@Model.Content.Title" type="text" class="form-control" /></div>
+            <div class="col-sm-8"><input id="Title" name="Title" value="@Model.Content.Title" type="text" class="form-control" /></div>
         </div>
         <div class="form-group">
             <label class="col-sm-3 control-label">@Model.Type.ExcerptName:</label>
-            <div class="col-sm-9">
+            <div class="col-sm-8">
                 @if (Model.Type.MultiLineExcerpt)
                 {
                     <textarea id="Excerpt" name="Excerpt" class="form-control">@Model.Content.Excerpt</textarea>
@@ -20,15 +20,15 @@
             </div>
         </div>
         <input type="hidden" id="Tags" name="Tags" value="@Model.Content.TagString" />
-        @*<div class="form-group">
+                @*<div class="form-group">
             <label class="col-sm-3 control-label">Tags:</label>
-            <div class="col-sm-9">
+                <div class="col-sm-8">
                 <input id="Tags" name="Tags" value="@Model.Content.TagString" type="text" class="form-control" data-role="tagsinput" />
             </div>
         </div>*@
         <div class="form-group">
             <label class="col-sm-3 control-label">Show in featured list:</label>
-            <div class="col-sm-9">
+            <div class="col-sm-8">
                 <div class="checkbox">
                     <input class="styled" id="Featured" name="Featured" type="checkbox" value="true" @(Model.Content.Featured ? "checked" : "") />
                     <label for="Featured">Featured</label>

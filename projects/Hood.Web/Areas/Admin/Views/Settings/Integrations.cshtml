@@ -7,9 +7,9 @@
     <a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
-        Choose what other services are used with your site from a selection of other plugins and APIs.
-    </p>
+<p class="no-margin">
+    Choose what other services are used with your site from a selection of other plugins and APIs.
+</p>
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">
@@ -22,8 +22,7 @@
                 <p>
                     Turn on or off site features such as comments by <a href="http://www.disqus.com/">Disqus</a> or chat by <a href="http://www.unbeatable.com/">Unbeatable</a>.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Google API</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -43,8 +42,7 @@
                         <input asp-for="GoogleMapsApiKey" class="form-control">
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Google Recaptcha (Invisible)</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -64,8 +62,7 @@
                         <input asp-for="GoogleRecaptchaSecretKey" class="form-control">
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Mail Chimp</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -85,8 +82,7 @@
                         <input asp-for="MailchimpListId" class="form-control">
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Loader Animation</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -127,8 +123,7 @@
                         </select>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Hood CDN</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -136,8 +131,7 @@
                         <label asp-for="UseCDN"></label>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Twitter</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -151,8 +145,7 @@
                         <input asp-for="TwitterId" class="form-control">
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Disqus</h5>
                 <div class="form-group">
                     <div class="checkbox">
@@ -166,8 +159,7 @@
                         <input asp-for="DisqusId" class="form-control">
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Chat</h5>
                 <div class="form-group">
                     <div class="checkbox">

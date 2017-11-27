@@ -82,8 +82,101 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<ActionResult> Edit(EditContentModelSend post)
         {
-            var model = await Save(post, false);
-            return View(model);
+            var content = _content.GetContentByID(post.Id, true);
+            try
+            {
+                post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
+                post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
+                post.CopyProperties(content);
+                content.AuthorId = post.AuthorId;
+                content.Featured = post.Featured;
+                content.LastEditedBy = User.Identity.Name;
+                content.LastEditedOn = DateTime.Now;
+
+                if (content.Slug.IsSet())
+                {
+                    if (!_content.CheckSlug(content.Slug, content.Id))
+                        throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                }
+                else
+                {
+                    var generator = new KeyGenerator();
+                    content.Slug = generator.UrlSlug();
+                    while (!_content.CheckSlug(content.Slug))
+                        content.Slug = generator.UrlSlug();
+                }
+
+                List<string> tags = post.Tags?.Split(',').ToList();
+                if (tags == null)
+                    tags = new List<string>();
+                foreach (string tag in tags)
+                {
+                    // check if it exists in the db, if not add it. 
+                    var tagResult = await _content.AddTag(tag);
+
+                    // add it to the model object.
+                    if (tagResult.Succeeded)
+                        content.AddTag(tagResult.Item.Value);
+                }
+                if (content.Tags != null)
+                {
+                    var extraneous = content.Tags.Where(p => !tags.Select(t => t.Trim().ToTitleCase()).Any(p2 => p2 == p.TagId)).Select(s => s.TagId).ToArray();
+                    for (int i = 0; i < extraneous.Count(); i++)
+                        content.RemoveTag(extraneous[i]);
+                }
+                var _contentSettings = _settings.GetContentSettings();
+                var type = _contentSettings.GetContentType(content.ContentType);
+                // update  meta values
+                var oldTemplate = content.GetMeta("Settings.Template").GetStringValue();
+                foreach (var val in Request.Form)
+                {
+                    if (val.Key.StartsWith("Meta:"))
+                    {
+                        // bosh we have a meta
+                        if (content.HasMeta(val.Key.Replace("Meta:", "")))
+                        {
+                            content.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                        }
+                        else
+                        {
+                            // Add it...
+                            var metaDetails = type.GetMetaDetails(val.Key.Replace("Meta:", ""));
+                            content.AddMeta(new ContentMeta()
+                            {
+                                ContentId = content.Id,
+                                Name = metaDetails.Name,
+                                Type = metaDetails.Type,
+                                BaseValue = JsonConvert.SerializeObject(val.Value)
+                            });
+
+                        }
+                    }
+                }
+                var currentTemplate = content.GetMeta("Settings.Template").GetStringValue();
+                // check if new template has been selected
+                if (oldTemplate.IsSet() && currentTemplate.IsSet() && oldTemplate != currentTemplate)
+                {
+                    // delete all template metas that do not exist in the new template, and add any that are missing
+                    List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, type.TemplateFolder);
+                    _content.UpdateTemplateMetas(content, newMetas);
+                }
+
+
+                OperationResult result = _content.Update(content);
+
+                EditContentModel model = await GetEditorModel(content);
+                model.Content.SaveMessage = "Saved!";
+                model.Content.MessageType = AlertType.Success;
+                return View(model);
+
+            }
+            catch (Exception ex)
+            {
+                EditContentModel model = await GetEditorModel(content);
+                model.Content.SaveMessage = "There was a problem saving: " + ex.Message;
+                model.Content.MessageType = AlertType.Danger;
+                return View(model);
+            }
         }
 
         [Route("admin/content/{id}/gallery/")]
@@ -562,18 +655,13 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/media/setfeatured/{mediaId}")]
         public IActionResult SetFeatured(int id, int mediaId)
         {
-            try
+            Content content = _content.GetContentByID(id, true);
+            ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
+            if (media != null)
             {
-                Content content = _content.GetContentByID(id, true);
-                ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
-                if (media != null)
-                {
-                    content.FeaturedImage = new ContentMedia(media);
-                    _content.Update(content);
-                }
+                content.FeaturedImage = new MediaObject(media);
+                _content.Update(content);
             }
-            catch (Exception)
-            { }
             return RedirectToAction("Edit", new { id = id });
         }
 
@@ -672,105 +760,6 @@ namespace Hood.Areas.Admin.Controllers
         //}
 
         #region "Helpers"
-
-        private async Task<EditContentModel> Save(EditContentModelSend post, bool retainBody)
-        {
-            var content = _content.GetContentByID(post.Id, true);
-            try
-            {
-                if (retainBody)
-                    post.Body = content.Body;
-                post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
-                post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
-                post.CopyProperties(content);
-                content.AuthorId = post.AuthorId;
-                content.Featured = post.Featured;
-                content.LastEditedBy = User.Identity.Name;
-                content.LastEditedOn = DateTime.Now;
-
-                if (content.Slug.IsSet())
-                {
-                    if (!_content.CheckSlug(content.Slug, content.Id))
-                        throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
-                }
-                else
-                {
-                    var generator = new KeyGenerator();
-                    content.Slug = generator.UrlSlug();
-                    while (!_content.CheckSlug(content.Slug))
-                        content.Slug = generator.UrlSlug();
-                }
-
-                List<string> tags = post.Tags?.Split(',').ToList();
-                if (tags == null)
-                    tags = new List<string>();
-                foreach (string tag in tags)
-                {
-                    // check if it exists in the db, if not add it. 
-                    var tagResult = await _content.AddTag(tag);
-
-                    // add it to the model object.
-                    if (tagResult.Succeeded)
-                        content.AddTag(tagResult.Item.Value);
-                }
-                if (content.Tags != null)
-                {
-                    var extraneous = content.Tags.Where(p => !tags.Select(t => t.Trim().ToTitleCase()).Any(p2 => p2 == p.TagId)).Select(s => s.TagId).ToArray();
-                    for (int i = 0; i < extraneous.Count(); i++)
-                        content.RemoveTag(extraneous[i]);
-                }
-                var _contentSettings = _settings.GetContentSettings();
-                var type = _contentSettings.GetContentType(content.ContentType);
-                // update  meta values
-                var oldTemplate = content.GetMeta("Settings.Template").GetStringValue();
-                foreach (var val in Request.Form)
-                {
-                    if (val.Key.StartsWith("Meta:"))
-                    {
-                        // bosh we have a meta
-                        if (content.HasMeta(val.Key.Replace("Meta:", "")))
-                        {
-                            content.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
-                        }
-                        else
-                        {
-                            // Add it...
-                            var metaDetails = type.GetMetaDetails(val.Key.Replace("Meta:", ""));
-                            content.AddMeta(new ContentMeta()
-                            {
-                                ContentId = content.Id,
-                                Name = metaDetails.Name,
-                                Type = metaDetails.Type,
-                                BaseValue = JsonConvert.SerializeObject(val.Value)
-                            });
-
-                        }
-                    }
-                }
-                var currentTemplate = content.GetMeta("Settings.Template").GetStringValue();
-                // check if new template has been selected
-                if (oldTemplate.IsSet() && currentTemplate.IsSet() && oldTemplate != currentTemplate)
-                {
-                    // delete all template metas that do not exist in the new template, and add any that are missing
-                    List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, type.TemplateFolder);
-                    _content.UpdateTemplateMetas(content, newMetas);
-                }
-
-
-                OperationResult result = _content.Update(content);
-
-                EditContentModel model = await GetEditorModel(content);
-                model.SaveResult = result;
-                return model;
-
-            }
-            catch (Exception ex)
-            {
-                EditContentModel model = await GetEditorModel(content);
-                model.SaveResult = new OperationResult(ex.Message);
-                return model;
-            }
-        }
 
         private async Task<EditContentModel> GetEditorModel(Content content)
         {

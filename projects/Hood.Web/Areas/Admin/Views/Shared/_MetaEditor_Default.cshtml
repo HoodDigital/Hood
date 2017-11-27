@@ -62,13 +62,13 @@
                     <div class="col-xs-6">
                         <div class="input-group time">
                             <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-                            <select data-selected="@val.Hour.ToString("00")" class="form-control inline-time hour-value" data-field="@string.Format("Meta:{0}", Model.Name)">
+                            <select data-selected="@val.Hour.ToString("00")" class="form-control inline-date hour-value" data-field="@string.Format("Meta:{0}", Model.Name)">
                                 @for (int i = 0; i < 24; i++)
                                 {
                                     <option value="@i.ToString("00")">@i.ToString("00")</option>
                                 }
                             </select>
-                            <select data-selected="@val.Minute.ToString("00")" class="form-control inline-time minute-value" data-field="@string.Format("Meta:{0}", Model.Name)">
+                            <select data-selected="@val.Minute.ToString("00")" class="form-control inline-date minute-value" data-field="@string.Format("Meta:{0}", Model.Name)">
                                 @for (int i = 0; i < 60; i++)
                                 {
                                     <option value="@i.ToString("00")">@i.ToString("00")</option>
@@ -103,7 +103,7 @@
 
 
             case "Hood.WYSIWYG":
-                <textarea id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" class="tinymce-simple">@Model.GetStringValue()</textarea>
+                <textarea id="@string.Format("Meta:{0}", Model.Name)" name="@string.Format("Meta:{0}", Model.Name)" class="tinymce-content">@Model.GetStringValue()</textarea>
                 break;
 
             default:

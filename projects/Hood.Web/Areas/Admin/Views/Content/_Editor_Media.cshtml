@@ -1,6 +1,8 @@
 @model EditContentModel
 <h5>Attached Images</h5>
-<hr />
+<div class="hood-inline refresh gallery media-list m-b-md" data-url="@Url.Action("EditorGallery")">
+    @{ await Html.RenderPartialAsync("EditorGallery", Model.Content); }
+</div>
 <div id="gallery-actions" class="row">
     <div class="col-xs-12">
         <span class="btn btn-success" id="content-gallery-add">
@@ -17,7 +19,4 @@
     </div>
 </div>
 <div id="content-gallery-upload" class="media-upload text-center" data-id="@Model.Content.Id">
-</div>
-<div class="hood-inline refresh gallery" data-url="@Url.Action("EditorGallery")">
-    @{ await Html.RenderPartialAsync("EditorGallery", Model.Content); }
 </div>

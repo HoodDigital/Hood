@@ -371,14 +371,6 @@ $.hood.Content = {
                     }
                 }
             });
-            var xhr;
-            new autoComplete({
-                selector: 'input.autocomplete-category',
-                source: function (term, response) {
-                    try { xhr.abort(); } catch (e) { }
-                    xhr = $.getJSON('/admin/content/categorysuggestions/', { query: term }, function (data) { response(data); });
-                }
-            });
         }
     },
     Edit: {
@@ -391,23 +383,29 @@ $.hood.Content = {
             if ($('#designer-window').doesExist())
                 this.Designer.Init();
 
-            $('body').on('click', '#add-content-category', this.Categories.AddCategory);
-            $('body').on('click', '.remove-category', this.Categories.RemoveCategory);
+            $('body').on('change', '.category-check', this.Categories.ToggleCategory);
         },
         Categories: {
-            AddCategory: function () {
-                $.post($(this).data('url'), { category: $('#content-category-name').val() }, function (data) {
-                    if (data.Success) {
-                        $.hood.Alerts.Success("Added category.");
-                    } else {
-                        $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
-                    }
-                    $.hood.Inline.Refresh(".categories");
-                });
+            ToggleCategory: function () {
+                if ($(this).is(':checked')) {
+                    $.post('/admin/content/categories/add/', { categoryId: $(this).val(), contentId: $(this).data('id') }, function (data) {
+                        if (data.Success) {
+                            $.hood.Alerts.Success("Added category.");
+                        } else {
+                            $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
+                        }
+                    });
+                } else {
+                    $.post('/admin/content/categories/remove/', { categoryId: $(this).val(), contentId: $(this).data('id') }, function (data) {
+                        if (data.Success) {
+                            $.hood.Alerts.Success("Removed category.");
+                        } else {
+                            $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
+                        }
+                    });
+                }
+
             },
-            RemoveCategory: function () {
-                alert('not implemented');
-            }
         },
         Designer: {
             Window: $('#designer-window'),

@@ -223,7 +223,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/media/attach/")]
-        public async Task<Response> Attach(AttachMediaModel attach)
+        public async Task<MediaResponse> Attach(AttachMediaModel attach)
         {
             try
             {
@@ -248,7 +248,7 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(Content).ToString() + ".Single." + contentId;
                         _cache.Remove(cacheKey);
-                        return new Response(true);
+                        return new MediaResponse(true, media);
 
                     case "ApplicationUser":
 
@@ -266,7 +266,7 @@ namespace Hood.Areas.Admin.Controllers
                         cacheKey = typeof(ApplicationUser).ToString() + ".Single." + attach.Id;
                         _cache.Remove(cacheKey);
                         await _db.SaveChangesAsync();
-                        return new Response(true);
+                        return new MediaResponse(true, media);
 
                     case "PropertyListing":
 
@@ -286,7 +286,7 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
                         _cache.Remove(cacheKey);
-                        return new Response(true);
+                        return new MediaResponse(true, media);
 
                     case "ContentMeta":
 
@@ -298,16 +298,16 @@ namespace Hood.Areas.Admin.Controllers
                             throw new Exception("Could not update the database");
                         cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
                         _cache.Remove(cacheKey);
-                        return new Response(true);
+                        return new MediaResponse(true, media);
 
                     default:
-                        return new Response(false);
+                        return new MediaResponse(false);
                 }
 
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                return new MediaResponse(ex.Message);
             }
         }
 

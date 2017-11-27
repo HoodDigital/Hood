@@ -110,7 +110,7 @@ namespace Hood.Extensions
             return html.Raw(htmlOutput);
         }
 
-        public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type)
+        public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = true)
         {
             if (!message.IsSet())
                 return null;
@@ -118,14 +118,14 @@ namespace Hood.Extensions
             switch (type)
             {
                 case AlertType.Success:
-                    return html.Raw(string.Format("<div class='alert alert-success'><i class='fa fa-thumbs-up m-r-sm'></i>{0}</div>", message));
+                    return html.Raw(string.Format("<div class='alert alert-success {1}'><i class='fa fa-thumbs-up m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
                 case AlertType.Warning:
-                    return html.Raw(string.Format("<div class='alert alert-warning'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message));
+                    return html.Raw(string.Format("<div class='alert alert-warning {1}'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
                 case AlertType.Danger:
-                    return html.Raw(string.Format("<div class='alert alert-danger'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message));
+                    return html.Raw(string.Format("<div class='alert alert-danger {1}'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
                 case AlertType.Info:
                 default:
-                    return html.Raw(string.Format("<div class='alert alert-info'><i class='fa fa-info-circle m-r-sm'></i>{0}</div>", message));
+                    return html.Raw(string.Format("<div class='alert alert-info {1}'><i class='fa fa-info-circle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
             }
 
         }

@@ -6,16 +6,14 @@
     @RenderSection("buttons", required: false)
     <a href="javascript:document.getElementById('settings-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
 }
+@Html.BootstrapAlert(Model.SaveMessage, Model.MessageType)
+@RenderSection("alerts", required: false)
 <div class="row">
     <div class="col-md-4 col-md-push-8">
-        @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType)
-        @RenderSection("alerts", required: false)
-        <div class="right-column">
-            <div class="m-b-md">
-                <h5>
-                    @ViewData["Title"]
-                </h5>
-            </div>
+        <div class="panel-body">
+            <h4 class="text-center">
+                @ViewData["Title"]
+            </h4>
             <div>
                 @RenderSection("description", required: false)
             </div>

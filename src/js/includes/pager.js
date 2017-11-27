@@ -9,7 +9,7 @@ $.hood.Pager = function (element, options) {
         defaultClass: '',
         textClass: '',
         baseClass: 'pagination pagination-sm',
-        noItemTemplate: '<div class="alert alert-info text-center">No items to display.</div>'
+        noItemTemplate: '<span class="no-items">No items to display.</span>'
     }, options || {});
     if (this.Options.dataSource != null)
         this.Options.dataSource.bind("change", $.proxy(function (e) {

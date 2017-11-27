@@ -1,4 +1,5 @@
-﻿using Hood.Core;
+﻿using Hood.BaseTypes;
+using Hood.Core;
 using Hood.Entities;
 using Hood.Enums;
 using Hood.Extensions;
@@ -60,18 +61,18 @@ namespace Hood.Models
         // Featured Images
         public string FeaturedImageJson { get; set; }
         [NotMapped]
-        public MediaObject FeaturedImage
+        public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : null; }
+            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank; }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
         }
 
         // Media
         public string InfoDownloadJson { get; set; }
         [NotMapped]
-        public MediaObject InfoDownload
+        public IMediaObject InfoDownload
         {
-            get { return InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : null; }
+            get { return InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : MediaObject.Blank; }
             set { InfoDownloadJson = JsonConvert.SerializeObject(value); }
         }
 
@@ -117,6 +118,9 @@ namespace Hood.Models
         // Agent 
         public string AgentId { get; set; }
         public ApplicationUser Agent { get; set; }
+
+        [NotMapped]
+        public List<ApplicationUser> AvailableAgents { get; set; }
 
         public List<PropertyMeta> Metadata { get; set; }
         public List<PropertyMedia> Media { get; set; }

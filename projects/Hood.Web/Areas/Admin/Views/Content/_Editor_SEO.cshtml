@@ -8,7 +8,7 @@
                 <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
                     @cm.Name.Replace("SEO.Meta.", "").ToSentenceCase():
                 </label>
-                <div class="col-sm-9">
+                <div class="col-sm-8">
                     @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
                     @cm.Name.Replace("SEO.Twitter.", "").ToSentenceCase():
                 </label>
-                <div class="col-sm-9">
+                <div class="col-sm-8">
                     @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
                     @cm.Name.Replace("SEO.Facebook.", "").ToSentenceCase():
                 </label>
-                <div class="col-sm-9">
+                <div class="col-sm-8">
                     @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
                 </div>
             </div>

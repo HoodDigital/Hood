@@ -1,11 +1,12 @@
-@model EditPropertyModel
+@model PropertyListing
 @{
-    ViewBag.Title = "Edit " + Model.Property.Title;
+    ViewBag.Title = "Edit " + Model.Title;
     PropertySettings _propertySettings = _settings.GetPropertySettings();
 }
 @section buttons {
-    <a class="btn btn-sm btn-default" href="@Model.Property.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
-    <a class="btn btn-sm btn-danger delete-property" data-id="@Model.Property.Id"><i class="fa fa-trash m-r-xs"></i>Delete</a>
+    <a class="btn btn-sm btn-danger delete-property" data-id="@Model.Id"><i class="fa fa-trash m-r-xs"></i>Delete</a>
+    <a class="btn btn-sm btn-info" href="@Model.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+    <a href="javascript:document.getElementById('edit-property').submit()" class="btn btn-success btn-sm"><i class="fa fa-save m-r-sm"></i>Save</a>
 }
 @section breadcrumbs {
     <ol class="breadcrumb">
@@ -23,40 +24,17 @@
         </li>
     </ol>
 }
-<form method="post">
-    <div class="wrapper wrapper-content" id="edit-property" data-id="@Model.Property.Id">
-        <div class="row">
-            <div class="col-md-8">
-                @if (Model.SaveResult != null)
-                {
-                    @if (Model.SaveResult.Succeeded)
-                    {
-                        <div class="alert alert-success alert-dismissable">
-                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-                            <i class="fa fa-thumbs-up m-r-xs"></i><strong>Saved!</strong> The Property has been saved.
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning alert-dismissable">
-                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-                            <i class="fa fa-meh-o m-r-xs"></i><strong>Saved!</strong> The Property has been saved, but with issues. <a role="button" data-toggle="collapse" href="#errors" aria-expanded="false" aria-controls="errors" class="txt-color-orangeDark">Show Issues</a>
-                            <div id="errors" class="collapse">
-                                <ul class="m-t-md">
-                                    @foreach (Hood.Infrastructure.OperationError error in Model.SaveResult.Errors)
-                                    {
-                                        <li>@error.Description</li>
-                                    }
-                                </ul>
-                            </div>
-                        </div>
-                    }
-                }
-                @{ await Html.RenderPartialAsync("_Editor_Property", Model.Property); }
-            </div>
-            <div class="col-md-4">
-                @{ await Html.RenderPartialAsync("_Editor_Sidebar"); }
-            </div>
+<form method="post" id="edit-property" data-id="@Model.Id">
+    @if (Model.SaveMessage.IsSet())
+    {
+        @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+    }
+    <div class="row">
+        <div class="col-md-8">
+            @{ await Html.RenderPartialAsync("_Editor_Property"); }
+        </div>
+        <div class="col-md-4">
+            @{ await Html.RenderPartialAsync("_Editor_Sidebar"); }
         </div>
     </div>
 </form>

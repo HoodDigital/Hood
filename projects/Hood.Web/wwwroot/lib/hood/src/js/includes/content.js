@@ -384,7 +384,6 @@ $.hood.Content = {
                 this.Designer.Init();
 
             $('body').on('change', '.category-check', this.Categories.ToggleCategory);
-            $('body').on('click', '.remove-category', this.Categories.RemoveCategory);
         },
         Categories: {
             ToggleCategory: function () {

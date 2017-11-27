@@ -1,0 +1,108 @@
+.media-list {
+    background-color: @gray-lighter;
+    padding-top: @grid-gutter-width;
+    padding-left: @grid-gutter-width / 2;
+    padding-right: @grid-gutter-width / 2;
+    border-radius: @border-radius-base;
+
+    figure.attach-media-select {
+        cursor: pointer;
+    }
+
+    .thumbnail {
+        display: block;
+        padding: @thumbnail-padding;
+        margin-bottom: @grid-gutter-width;
+        line-height: @line-height-base;
+        background-color: @thumbnail-bg;
+        border: 0;
+        border-radius: @thumbnail-border-radius;
+        .transition(border .2s ease-in-out);
+        overflow: hidden;
+
+        &:hover {
+            background-color: #f6f6f6;
+        }
+
+        > img,
+        > .img,
+        a > img {
+            &:extend(.img-responsive);
+            margin-top: -@thumbnail-padding;
+            margin-left: -@thumbnail-padding;
+            margin-right: -@thumbnail-padding;
+            margin-bottom: @thumbnail-padding;
+            max-width: none !important;
+            width: auto !important;
+        }
+        // Add a hover state for linked versions only
+        a&:hover,
+        a&:focus,
+        a&.active {
+            border-color: @link-color;
+        }
+        // Image captions
+        .caption {
+            padding: @thumbnail-caption-padding;
+            color: @thumbnail-caption-color;
+        }
+    }
+
+    .k-loading-mask {
+        position: relative;
+        display: block;
+        background: lighten(@hood-yellow, 40%);
+        border: 1px solid @hood-yellow;
+        width: auto !important;
+        padding: @grid-gutter-width / 2 @grid-gutter-width;
+        margin: @grid-gutter-width / 2;
+        margin-top: 0;
+        margin-bottom: @grid-gutter-width;
+        border-radius: @border-radius-base;
+        color: #000000;
+    }
+
+    &:before, &:after {
+        content: " ";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+}
+
+span.no-items {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 7px 6px;
+    display: inline-block;
+}
+
+.directories {
+    .nav-pills {
+        > li {
+            > a {
+                background-color: #ccc;
+                border-radius: @nav-pills-border-radius;
+
+                &:hover,
+                &:focus {
+                    color: black;
+                    background-color: #bbb;
+                }
+            }
+
+            &.active > a {
+                background-color: @hood-yellow;
+                color: white;
+
+                &:hover,
+                &:focus {
+                    color: white;
+                    background-color: darken(@hood-yellow, 10%);
+                }
+            }
+        }
+    }
+}

@@ -24,6 +24,8 @@ namespace Hood.Interfaces
 
         string Icon { get; }
         string FormattedSize { get; }
+
+        string GetJson();
     }
 
 }

@@ -4,6 +4,7 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
+using Newtonsoft.Json;
 using System;
 
 namespace Hood.Models
@@ -112,6 +113,11 @@ namespace Hood.Models
                 };
                 return ret;
             }
+        }
+
+        public string GetJson()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

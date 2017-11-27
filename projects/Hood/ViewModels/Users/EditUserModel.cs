@@ -11,7 +11,7 @@ namespace Hood.Models
         public IList<IdentityRole> AllRoles { get; set; }
     }
 
-    public class SaveProfileModel
+    public class SaveProfileModel : SaveableModel
     {
         public UserProfile User { get; set; }
     }
