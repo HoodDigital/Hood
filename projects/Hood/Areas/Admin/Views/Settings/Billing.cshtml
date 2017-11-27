@@ -7,7 +7,7 @@
     <a asp-action="ResetBilling" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
+    <p class="no-margin">
         Enable or disable the payment systems on the site.
     </p>
 }
@@ -24,8 +24,7 @@
                 <p>
                     Enable or disable the PayPal payment systems on the site.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnablePayPal" class="styled">
@@ -39,8 +38,7 @@
                         <label asp-for="PayPalSandboxMode"></label>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-2 control-label" asp-for="PayPalClientId"></label>
@@ -55,8 +53,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableCart" class="styled">
@@ -72,8 +69,7 @@
                 <p>
                     Enable or disable the stripe payment systems on the site.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableStripe" class="styled">
@@ -87,8 +83,7 @@
                         <label asp-for="EnableStripeTestMode"></label>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="col-sm-2 control-label" asp-for="StripeLiveKey"></label>
@@ -125,8 +120,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableCart" class="styled">
@@ -142,8 +136,7 @@
                 <p>
                     Enable or disable the stripe based subscription systems on the site.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableSubscriptions" class="styled">
@@ -151,29 +144,31 @@
                         <p><small>Note: To enable subscriptions, you must also enable Stripe and supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).</small></p>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body form-horizontal">
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Setup Page:</label>
-                    <div class="col-sm-10">
-                        <input asp-for="SubscriptionCreatePage" class="form-control" />
-                        <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/get ] - <strong>Default: /subscriptions/get</strong></small></p>
+                <hr />
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Setup Page:</label>
+                        <div class="col-sm-10">
+                            <input asp-for="SubscriptionCreatePage" class="form-control" />
+                            <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/get ] - <strong>Default: /subscriptions/get</strong></small></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Upgrade Page:</label>
+                        <div class="col-sm-10">
+                            <input asp-for="SubscriptionUpgradePage" class="form-control" />
+                            <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/change ] - <strong>Default: /subscriptions/change</strong></small></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Addon Page:</label>
+                        <div class="col-sm-10">
+                            <input asp-for="SubscriptionAddonPage" class="form-control" />
+                            <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/addon ] - <strong>Default: /subscriptions/addon</strong></small></p>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Upgrade Page:</label>
-                    <div class="col-sm-10">
-                        <input asp-for="SubscriptionUpgradePage" class="form-control" />
-                        <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/change ] - <strong>Default: /subscriptions/change</strong></small></p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Addon Page:</label>
-                    <div class="col-sm-10">
-                        <input asp-for="SubscriptionAddonPage" class="form-control" />
-                        <p><small>Note: Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/addon ] - <strong>Default: /subscriptions/addon</strong></small></p>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>

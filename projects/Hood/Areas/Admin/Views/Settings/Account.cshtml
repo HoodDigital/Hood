@@ -7,7 +7,7 @@
     <a asp-action="ResetAccount" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
+    <p class="no-margin">
         Enable or disable apsects of the site's registration and account system.
     </p>
 }
@@ -18,13 +18,12 @@
     </ul>
     <div class="tab-content">
         <div id="registration" class="tab-pane active">
-            <div class="panel-body">
+            <div class="panel-body form-horizontal">
                 <strong>Registration Settings</strong>
                 <p>
                     Enable or disable apsects of the site's registration and account system.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableRegistration" class="styled">
@@ -32,8 +31,7 @@
                     </div>
                     <small>Note: Disabling registration will prevent users signing up to your site, you will have to add users manually.</small>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="RegistrationType"></label>
                     <div class="col-sm-8">
@@ -54,13 +52,12 @@
             </div>
         </div>
         <div id="welcome-email" class="tab-pane">
-            <div class="panel-body">
-                <div class="alert alert-info">
-                    <strong>Welcome Email Settings</strong>
-                    <p>This is the content in the user welcome email, the email sent back to the user when they create an account. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}, {USEREMAIL}, {FULLNAME}, {FIRSTNAME}, {LASTNAME}.</p>
-                </div>
-            </div>
-            <div class="panel-body">
+            <div class="panel-body form-horizontal">
+                <strong>Welcome Email Settings</strong>
+                <p>
+                    This is the content in the user welcome email, the email sent back to the user when they create an account. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}, {USEREMAIL}, {FULLNAME}, {FIRSTNAME}, {LASTNAME}.
+                </p>
+                <hr />
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableWelcome" class="styled">
@@ -75,8 +72,7 @@
                     </div>
                     <small>Note: This will copy in the NewAccountNotifications role on the above email.</small>
                 </div>
-            </div>
-            <div class="panel-body form-horizontal">
+                <hr />
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="WelcomeTitle"></label>
                     <div class="col-sm-9">
@@ -92,7 +88,7 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="WelcomeMessage"></label>
                     <div class="col-sm-9">
-                        <textarea asp-for="WelcomeMessage" class="form-control tinymce-simple"></textarea>
+                        <textarea asp-for="WelcomeMessage" class="form-control tinymce-content"></textarea>
                     </div>
                 </div>
             </div>

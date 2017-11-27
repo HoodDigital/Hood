@@ -30,6 +30,10 @@
     </ol>
 }
 <form asp-action="Edit" asp-route-id="@Model.User.Id" method="post" id="edit-user-form" data-id="@Model.User.Id">
+    @if (Model.SaveMessage.IsSet())
+    {
+        @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+    }
     <div class="row">
         <div class="col-md-8">
             <div class="tabs-container m-b-lg">
@@ -183,9 +187,10 @@
                     </div>
                     <div id="subscriptions" class="tab-pane">
                         <div class="panel-body">
-                            <h4>Active Subscriptions</h4>
+                            <h5>Active Subscriptions</h5>
                             <div class="tag-list">
-                                @foreach (var sub in Model.User.Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing"))
+                                @{ var subs = Model.User.Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing"); }
+                                @foreach (var sub in subs)
                                 {
                                     <ul>
                                         <li>
@@ -207,12 +212,16 @@
                                         </li>
                                     </ul>
                                 }
+                                @if (subs.Count() == 0)
+                                {
+                                    @Html.BootstrapAlert("No active subscriptions.", AlertType.Info, false)
+                                }
                             </div>
-                        </div>
-                        <div class="panel-body">
-                            <h4>Inactive Subscriptions</h4>
+                            <hr />
+                            <h5>Inactive Subscriptions</h5>
                             <div class="tag-list">
-                                @foreach (var sub in Model.User.Subscriptions.Where(s => s.Status != "active" && s.Status != "trialing"))
+                                @{ subs = Model.User.Subscriptions.Where(s => s.Status != "active" && s.Status != "trialing"); }
+                                @foreach (var sub in subs)
                                 {
                                     <ul>
                                         <li>
@@ -235,12 +244,17 @@
                                         </li>
                                     </ul>
                                 }
+                                @if (subs.Count() == 0)
+                                {
+                                    @Html.BootstrapAlert("No inactive subscriptions.", AlertType.Info, false)
+                                }
                             </div>
                         </div>
                     </div>
                     <div id="accesscodes" class="tab-pane">
                         <div class="panel-body">
-                            <h4>Access Codes</h4>
+                            <h5>Access Codes</h5>
+
                             <div class="tag-list">
                                 @foreach (var code in Model.User.AccessCodes)
                                 {
@@ -252,6 +266,10 @@
                                         </li>
                                     </ul>
                                 }
+                                @if (Model.User.AccessCodes.Count() == 0)
+                                {
+                                    @Html.BootstrapAlert("No access codes.", AlertType.Info, false)
+                                }
                             </div>
                         </div>
                     </div>
@@ -259,49 +277,56 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="right-column">
-                <div class="editor-box">
-                    <h5>Profile Image</h5>
-                    <fieldset class="form-horizontal">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">Profile Image</label>
-                            <div class="col-sm-8">
-                                <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs img-circle m-r-sm @Model.User.Id" id="user-edit-avatar" />
-                                <attacher dataid="@Model.User.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.User.Id" class="btn btn-xs btn-primary">Choose profile image...</attacher>
-                                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Users" asp-area="Admin" asp-route-id="@Model.User.Id" data-complete="$.hood.Uploader.RefreshImage('.@Model.User.Id', '/admin/users/getavatar', '@Model.User.Id')"><i class="fa fa-trash"></i></a>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-                <div class="editor-box">
-                    <h5>User Roles</h5>
-                    <p>
-                        The user is currently assigned to the following roles:
-                    </p>
-                    <p id="role-list">
-                        @{ await Html.RenderPartialAsync("Roles"); }
-                    </p>
-                    <p><em><small>Click the cross in the role badge to remove the user from the role.</small></em></p>
-                </div>
-                <div class="editor-box">
-                    <h5>Add user to role</h5>
-                    <p>
-                        Choose a role and click 'Add user to role' to add the user to the role:
-                    </p>
-                    <p>
-                        <select id="roleToAdd" name="roleToAdd" class="form-control">
-                            <option value="">--- Select a role to add ---</option>
-                            @foreach (IdentityRole role in Model.AllRoles)
-                            {
-                                <option value="@role.Name">@role.Name</option>
-                            }
-                        </select>
-                    </p>
-                    <p class="text-right">
-                        <button class="btn btn-primary btn-xs add-to-role" data-id="@Model.User.Id"><i class="fa fa-plus"></i>&nbsp;Add user to role</button>
-                    </p>
-                </div>
+            <div class="panel-body">
+                <h4 class="font-bold text-center">
+                    <span>@Model.User.FullName</span>
+                </h4>
+                <p class="no-margin">
+                    <button type="submit" class="btn btn-success btn-block no-margin"><i class="fa fa-save m-r-xs"></i> Save User Profile</button>
+                </p>
             </div>
+            <div class="panel-body small">
+                <h4>Avatar</h4>
+                <fieldset class="form-horizontal">
+                    <div class="form-group row-center">
+                        <label class="col-sm-4 text-right">Avatar</label>
+                        <div class="col-sm-8">
+                            <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs img-circle m-r-sm @Model.User.Id" id="user-edit-avatar" />
+                            <attacher dataid="@Model.User.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.User.Id" class="btn btn-xs btn-primary">Choose profile image...</attacher>
+                            <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Users" asp-area="Admin" asp-route-id="@Model.User.Id" data-complete="$.hood.Uploader.RefreshImage('.@Model.User.Id', '/admin/users/getavatar', '@Model.User.Id')"><i class="fa fa-trash"></i></a>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="panel-body small">
+                <h4>User Roles</h4>
+                <p>
+                    The user is currently assigned to the following roles:
+                </p>
+                <p id="role-list">
+                    @{ await Html.RenderPartialAsync("Roles"); }
+                </p>
+                <p><em><small>Click the cross in the role badge to remove the user from the role.</small></em></p>
+            </div>
+            <div class="panel-body small">
+                <h4>Add user to role</h4>
+                <p>
+                    Choose a role and click 'Add user to role' to add the user to the role:
+                </p>
+                <p>
+                    <select id="roleToAdd" name="roleToAdd" class="form-control">
+                        <option value="">--- Select a role to add ---</option>
+                        @foreach (IdentityRole role in Model.AllRoles)
+                        {
+                            <option value="@role.Name">@role.Name</option>
+                        }
+                    </select>
+                </p>
+                <p class="text-right">
+                    <button class="btn btn-primary btn-xs add-to-role" data-id="@Model.User.Id"><i class="fa fa-plus"></i>&nbsp;Add user to role</button>
+                </p>
+            </div>
+
         </div>
     </div>
 </form>

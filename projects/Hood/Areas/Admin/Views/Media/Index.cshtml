@@ -10,45 +10,36 @@
 </div>
 <div class="panel-body">
     @{ await Html.RenderPartialAsync("_Filters"); }
-</div>
-<div class="panel-body">
-    @{ await Html.RenderPartialAsync("_List"); }
-</div>
-<script id="media-template" class="kendo-template" type="text/template">
-    <div class="forum-item data-item">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="media">
-                    <div class="media-left media-middle">
-                        <figure class="img-xs media-${ Id } hood-image" style="background-image:url(${ Icon });">
-                            <img src="${ Icon }" alt="">
-                        </figure>
-                    </div>
-                    <div class="media-body">
-                        <a class="blade forum-item-title" href="/admin/media/blade/${ Id }">${ Filename }</a>
-                        <small>Uploaded to <strong>${ Directory }</strong> on <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(CreatedOn), "d, MMM yy") # at <i class="fa fa-clock-o"></i> #= kendo.toString(new Date(CreatedOn), "hh:mm tt") #</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xs-6 col-md-2">
-                <span class="small font-bold">${ FormattedSize } file.</span>
-                <div class="tag-list">
-                    <span class="tag-item">${ FileSize } bytes.</span>
-                </div>
-            </div>
-            <div class="col-xs-6 col-md-2">
-                <span class="small font-bold">${ GeneralFileType } file.</span>
-                <div class="tag-list">
-                    <span class="tag-item">${ FileType }</span>
-                </div>
-            </div>
-            <div class="col-md-2 action-buttons">
-                <a class="btn-danger btn btn-sm action-button delete-media" data-id="${ Id }"><i class="fa fa-trash-o"></i><span>&nbsp;Delete</span></a>
-            </div>
+    <div class="row">
+        <div class="col-sm-3">
+            @{ await Html.RenderPartialAsync("_MediaSidebar"); }
+        </div>
+        <div class="col-sm-9">
+            @{ await Html.RenderPartialAsync("_Actions"); }
+            <div id="media-list" class="border-box-sizing media-list"
+                 data-url="/admin/media/get"
+                 data-template="#media-template"
+                 data-pagers=".media-pager"
+                 data-filters="$.hood.Media.Manage.Filter()"
+                 data-onclick=".media-click"
+                 data-onchange=".media-change"></div>
+            <div class="media-pager m-t-sm m-b-sm text-center"></div>
         </div>
     </div>
-</script>
-
-@section scripts {
-
-}
+</div>
+<div id="media-template" class="kendo-template">
+    <div class="col-xs-6 col-sm-3 col-lg-2">
+        <div class="thumbnail text-center">
+            <fixedImage src="${ Icon }" class="img img-full img-square attach-media-select" />
+            <div class="caption">
+                <p class="no-wrap no-margin">
+                    <small><strong>${ Filename }</strong></small>
+                </p>
+                <p class="no-margin">
+                    <small>${ FormattedSize }</small>
+                </p>
+            </div>
+            <a class="full-box-link blade" href="/admin/media/blade/${ Id }">${ Filename }</a>
+        </div>
+    </div>
+</div>

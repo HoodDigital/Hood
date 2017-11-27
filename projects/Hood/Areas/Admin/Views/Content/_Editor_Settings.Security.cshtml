@@ -16,7 +16,7 @@
                     <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
                         Subscription:
                     </label>
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                         @if (subsEnabled && Model.Subscriptions.Count() > 0)
                         {
                             List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(cm.GetStringValue());
@@ -52,7 +52,7 @@
                     <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
                         @cm.Name.Replace("Settings.Security.", "").ToSentenceCase():
                     </label>
-                    <div class="col-sm-9">
+                    <div class="col-sm-8">
                         @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
                     </div>
                 </div>

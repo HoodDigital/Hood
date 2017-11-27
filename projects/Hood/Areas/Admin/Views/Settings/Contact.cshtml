@@ -10,7 +10,7 @@
     <p>
         Set up the contact forms for your site. You will need to have an active SendGrid Api key attached to the site in order for the forms to function, set this in your mail settings, Admin > Settings > Mail Settings.
     </p>
-    <p>
+    <p class="no-margin">
         Here you can set up the contact pages and how the contact form works. Choose whether to forward to a thank you page or not, set up where your contact forms go and what appears on your contact page. Set up how your contact page behaves, where the contact form goes, what happens to the user after they submit it.
     </p>
 }
@@ -23,10 +23,9 @@
     <div class="tab-content">
         <div id="contact" class="tab-pane in active">
             <div class="panel-body form-horizontal">
-                <div class="alert alert-info">
-                    <strong>Form Settings</strong>
-                    <p>Set up how the form works, you can set where the user is sent after the form is submitted, or customise the message displayed when they do. Note the enquiries are not stored, so it is vital you set this up correctly. </p>
-                </div>
+                <strong>Form Settings</strong>
+                <p>Set up how the form works, you can set where the user is sent after the form is submitted, or customise the message displayed when they do. Note the enquiries are not stored, so it is vital you set this up correctly. </p>
+                <hr />
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="Email"></label>
                     <div class="col-sm-9">
@@ -68,10 +67,9 @@
         </div>
         <div id="user" class="tab-pane">
             <div class="panel-body form-horizontal">
-                <div class="alert alert-info">
-                    <strong>User Email Settings</strong>
-                    <p>This is the content in the user email, the email sent back to the user when they submit an enquiry. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}.</p>
-                </div>
+                <strong>User Email Settings</strong>
+                <p>This is the content in the user email, the email sent back to the user when they submit an enquiry. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}.</p>
+                <hr />
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="Title"></label>
                     <div class="col-sm-9">
@@ -87,17 +85,16 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="Message"></label>
                     <div class="col-sm-9">
-                        <input asp-for="Message" class="form-control tinymce-simple">
+                        <input asp-for="Message" class="form-control tinymce-content">
                     </div>
                 </div>
             </div>
         </div>
         <div id="notifications" class="tab-pane">
             <div class="panel-body form-horizontal">
-                <div class="alert alert-info">
-                    <strong>Notification Settings</strong>
-                    <p>Set up the mail sent to the notofication address when an enquiry is sent. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}.</p>
-                </div>
+                <strong>Notification Settings</strong>
+                <p>Set up the mail sent to the notofication address when an enquiry is sent. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}.</p>
+                <hr />
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="AdminNoficationTitle"></label>
                     <div class="col-sm-9">
@@ -113,7 +110,7 @@
                 <div class="form-group">
                     <label class="col-sm-3 control-label" asp-for="AdminNoficationMessage"></label>
                     <div class="col-sm-9">
-                        <input asp-for="AdminNoficationMessage" class="form-control tinymce-simple">
+                        <input asp-for="AdminNoficationMessage" class="form-control tinymce-content">
                     </div>
                 </div>
             </div>

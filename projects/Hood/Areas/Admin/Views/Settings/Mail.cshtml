@@ -7,9 +7,9 @@
     <a asp-action="ResetMail" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
-        Settings for site's email connections.
-    </p>
+<p class="no-margin">
+    Settings for site's email connections.
+</p>
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">
@@ -24,8 +24,7 @@
                 <p>
                     Settings for site's email connections.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <form method="post" id="settings-form">
                     <fieldset class="form-horizontal">
                         <div class="form-group">
@@ -72,8 +71,7 @@
                         </div>
                     </fieldset>
                 </form>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Previews</h5>
                 <p>
                     Preview how your emails will look...
@@ -84,8 +82,7 @@
                     <a class="btn btn-warning" asp-action="Warning" asp-controller="Mail" asp-area="Admin" target="_blank">Warning Message</a>
                     <a class="btn btn-danger" asp-action="Danger" asp-controller="Mail" asp-area="Admin" target="_blank">Danger Message</a>
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>
                     Send a test email
                 </h5>

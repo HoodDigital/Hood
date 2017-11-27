@@ -2,14 +2,14 @@
 @{
     Layout = null;
 }
-<div class="sidebar-container" id="content-field-observable" data-id="@Model.ContentCategoryId">
+<div class="sidebar-container" id="content-field-observable" data-id="@Model.Id">
     <div class="sidebar-title">
         <button type="button" class="close close-blade"><span>&times;</span></button>
         <h3><i class="fa fa-thumb-tack"></i> Edit Category.</h3>
         <small><i class="fa fa-plus-circle"></i> Edit the '@Model.DisplayName' category.</small>
     </div>
     <form id="edit-category-form">
-        <input asp-for="ContentCategoryId" type="hidden" />
+        <input asp-for="Id" type="hidden" />
         <input asp-for="ContentType" type="hidden" />
         <div class="blade-field">
             <label asp-for="DisplayName" class="control-label"></label>

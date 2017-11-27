@@ -9,8 +9,8 @@
     <a asp-action="ResetBasics" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
 }
 @section description {
-    <p>
-        Here you can set up the basic key settings for the site. NOTE: If you are using your site for commercial purposes it is a requirement that you include a contact address and phone number in your terms and conditions.
+    <p class="no-margin">
+        Here you can set up the basic key settings for the site.<br /><br />NOTE: If you are using your site for commercial purposes it is a requirement that you include a contact address and phone number in your terms and conditions.
     </p>
 }
 <div class="tabs-container">
@@ -27,8 +27,7 @@
                 <p>
                     If you use your website for commercial purposes, it is good practice to include a contact name and address in your terms and conditions. However this is not required, and if you leave it blank, this will not appear.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <label class="control-label" asp-for="SiteTitle"></label>
                     <div>
@@ -73,8 +72,7 @@
                 <p>
                     If you use your website for commercial purposes, it is good practice to include a contact name and address in your terms and conditions. However this is not required, and if you leave it blank, this will not appear.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="row">
                     <div class="col-xs-3">
                         <div class="form-group">
@@ -143,8 +141,7 @@
                 <p>
                     If you use your website for commercial purposes, it is good practice to include a contact name and address in your terms and conditions. However this is not required, and if you leave it blank, this will not appear.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
@@ -189,8 +186,7 @@
                 <p>
                     General site settings, enable/disable access and set your homepage.
                 </p>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <div class="form-group">
                     <label class="control-label" asp-for="Homepage"></label>
                     <div>
@@ -198,13 +194,12 @@
                             <option value="">Default Homepage</option>
                             @foreach (var content in pages)
                             {
-                            <option value="@content.PageId">@content.Title</option>
+                                <option value="@content.PageId">@content.Title</option>
                             }
                         </select>
                     </div>
                 </div>
-            </div>
-            <div class="panel-body">
+                <hr />
                 <h5>Lockout Mode (Holding Page / Beta Access)</h5>
                 <div class="form-group">
                     <div class="checkbox">

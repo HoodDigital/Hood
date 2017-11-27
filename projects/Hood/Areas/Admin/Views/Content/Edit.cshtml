@@ -4,31 +4,13 @@
     ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Content.Title;
 }
 @section buttons {
-    <div class="btn-group">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog m-r-sm"></i><span class="caret"></span></button>
-        <ul class="dropdown-menu dropdown-menu-right">
-            @if (Model.Type.ShowPreview)
-            {
-                <li><a href="#editor" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-edit m-r-xs"></i>Editor</a></li>
-            }
-            @if (Model.Type.ShowDesigner)
-            {
-                <li><a href="@string.Format("{0}?editMode=true", Model.Content.Url)"><i class="fa fa-pencil m-r-xs"></i>Designer</a></li>
-            }
-            @if (Model.Type.ShowPreview)
-            {
-                <li><a href="#designer" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-edit m-r-xs"></i>Quick Preview</a></li>
-            }
-            @if (Model.Type.HasPage)
-            {
-                <li><a href="@Model.Content.Url"><i class="fa fa-desktop m-r-xs" target="_blank"></i>Preview</a></li>
-            }
-            <li><a class="delete-content" data-id="@Model.Content.Id" data-type="@Model.Type.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a></li>
-        </ul>
-    </div>
-    <a href="javascript:document.getElementById('edit-content').submit()" class="btn btn-success">
-        <i class="fa fa-save m-r-sm"></i>Save
-    </a>
+    <a class="btn btn-sm btn-danger delete-content" data-id="@Model.Content.Id" data-type="@Model.Type.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a>
+    <a class="btn btn-sm btn-info" href="@Model.Content.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+    @if (Model.Type.ShowDesigner)
+    {
+        <a class="btn btn-sm btn-default" href="@string.Format("{0}?editMode=true", Model.Content.Url)"><i class="fa fa-pencil m-r-xs"></i>Designer</a>
+    }
+    <a href="javascript:document.getElementById('edit-content').submit()" class="btn btn-success btn-sm"><i class="fa fa-save m-r-sm"></i>Save</a>
 }
 @section breadcrumbs {
     <ol class="breadcrumb">
@@ -46,30 +28,9 @@
         </li>
     </ol>
 }
-@if (Model.SaveResult != null)
+@if (Model.Content.SaveMessage.IsSet())
 {
-    @if (Model.SaveResult.Succeeded)
-    {
-        <div class="alert alert-success alert-dismissable">
-            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-            <i class="fa fa-thumbs-up m-r-xs"></i><strong>Saved!</strong> The @Model.Type.TypeName has been saved.
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-danger alert-dismissable">
-            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
-            <i class="fa fa-meh-o m-r-xs"></i><strong>Not saved!</strong> The @Model.Type.TypeName has not been saved, there were issues... <a role="button" data-toggle="collapse" href="#errors" aria-expanded="false" aria-controls="errors" class="txt-color-red">Show Issues</a>
-            <div id="errors" class="collapse">
-                <ul class="m-t-md">
-                    @foreach (Hood.Infrastructure.OperationError error in Model.SaveResult.Errors)
-                    {
-                        <li>@error.Description</li>
-                    }
-                </ul>
-            </div>
-        </div>
-    }
+    @Html.BootstrapAlert(Model.Content.SaveMessage, Model.Content.MessageType);
 }
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="editor">
@@ -98,114 +59,119 @@
                     }
                 </div>
                 <div class="col-md-4">
-                    <div class="right-column">
-                        @if (Model.Type.ShowImage || Model.Type.ShowBanner)
-                        {
-                            <div class="editor-box">
-                                <h5>Images</h5>
-                                @{ await Html.RenderPartialAsync("_Field_Images"); }
-                            </div>
-                        }
-                        @if (Model.Type.ShowCategories)
-                        {
-                            <div class="editor-box">
-                                <h5>Categories</h5>
-                                <div class="hood-inline categories" data-url="@Url.Action("Categories")"></div>
-                                @{
-                                    _categories.ResetCache();
-                                    var categories = _categories.TopLevel(Model.Type.Type);
-                                    Layout = null;
-                                }
-                                @if (categories.Count() > 0)
+                    <div class="panel-body">
+                        <h4 class="font-bold text-center">
+                            <span>@Model.Content.Title</span>
+                        </h4>
+                        <p class="text-center">
+                            <small>@Html.Raw(Model.Content.StatusString)</small>
+                        </p>
+                        <p>
+                            <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save m-r-xs"></i> Save @Model.Type.TypeName</button>
+                        </p>
+                    </div>
+                    @if (Model.Content.ContentType == "page")
+                    {
+                        <div class="panel-body small">
+                            <h4 class="">Slug &amp; Url</h4>
+                            <div class="form-group no-margin">
+                                <label for="Slug" class="control-label">Slug</label>
+                                <div>
+                                    <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
+                                </div>
+                                @if (Model.Content.IsHomepage)
                                 {
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th colspan="2">
-                                                    Categories
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        @Html.AddToCategoryTree(categories, Model.Content.Id, Model.Type.Slug)
-                                    </table>
+                                    <div class="font-xs url-preview">
+                                        URL Preview:
+                                        <br />
+                                        <a class="font-sm" href="@Url.AbsoluteUrl()" target="_blank"><strong>@Url.AbsoluteUrl()</strong></a>
+                                        <br />
+                                        Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
+                                    </div>
                                 }
                                 else
                                 {
-                                    <h4>Categories</h4>
-                                    <hr />
-                                    <p>No categories added yet. To add a category, simply add category on the right or a @Model.Type.TypeName to a new category name in the editor.</p>
+                                    <div class="font-xs url-preview">
+                                        URL Preview:
+                                        <br />
+                                        <a class="font-sm" href="@Url.AbsoluteUrl(Model.Content.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Content.Slug</span></strong></a>
+                                        <br />
+                                        Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
+                                    </div>
                                 }
                             </div>
+                        </div>
+                    }
+                    else
+                    {
+                        if (Model.Type.UrlFormatting == "news")
+                        {
+                            <div class="panel-body small">
+                                <h4 class="">Slug &amp; Url</h4>
+                                <div class="form-group no-margin">
+                                    <label for="Slug" class="control-label">Slug</label>
+                                    <div>
+                                        <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
+                                    </div>
+                                </div>
+                            </div>
                         }
-                        <div class="editor-box">
-                            <h5>
-                                @if (Model.Content.ContentType == "page")
-                                {
-                                    <span>Url &amp; </span>
+                        else
+                        {
+                            <input id="Slug" name="Slug" type="hidden" value="@Model.Content.Slug" />
+                        }
+                    }
+                    @if (Model.Type.ShowImage || Model.Type.ShowBanner)
+                    { <div class="panel-body small">
+                        <h4 class="">Images</h4>
+                        @{ await Html.RenderPartialAsync("_Field_Images"); }
+                    </div>
+                            }
+                    @if (Model.Type.ShowCategories)
+                    {
+                        <div class="panel-body small">
+                            <h4>Categories</h4>
+                            <div class="category-list">
+                                @{
+                                    _categories.ResetCache();
+                                    var categories = _categories.TopLevel(Model.Type.Type);
                                 }
-                                Publish Settings
-                            </h5>
-                            @if (Model.Content.ContentType == "page")
-                            {
-                                <div class="form-group">
-                                    <label for="Slug" class="control-label">Slug</label>
-                                    <div>
-                                        <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
-                                    </div>
-                                    @if (Model.Content.IsHomepage)
-                                    {
-                                        <p class="font-xs url-preview">
-                                            URL Preview:
-                                            <br />
-                                            <a class="font-sm" href="@Url.AbsoluteUrl()" target="_blank"><strong>@Url.AbsoluteUrl()</strong></a>
-                                            <br />
-                                            Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
-                                        </p>
+                                @if (categories.Count() > 0)
+                                {
+                                    @Html.AddToCategoryTree(categories, Model.Content, Model.Type.Slug)
+                                }
+                                else
+                                {
+                                    <p>No categories added yet. To add a category, go back to the @Model.Type.TypeName list and select @Model.Type.TypeName Categories.</p>
+                                }
+                            </div>
+                        </div>
                                     }
-                                    else
-                                    {
-                                        <p class="font-xs url-preview">
-                                            URL Preview:
-                                            <br />
-                                            <a class="font-sm" href="@Url.AbsoluteUrl(Model.Content.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Content.Slug</span></strong></a>
-                                            <br />
-                                            Note: Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
-                                        </p>
-                                    }
-                                </div>
-                                <hr />
-                            }
-                            else
-                            {
-                                <div class="form-group">
-                                    <label for="Slug" class="control-label">Slug</label>
-                                    <div>
-                                        <input id="Slug" name="Slug" class="form-control restrict-to-page-slug" value="@Model.Content.Slug" />
-                                    </div>
-                                </div>
-                            }
-                            @if (Model.Type.BaseName == "News" || Model.Type.BaseName == "Event")
-                            {
-                                <div class="form-group">
-                                    <label for="Meta:Settings.SubType" class="control-label">Post type</label>
-                                    <select name="Meta:Settings.SubType" id="Meta:Settings.SubType" type="text" class="form-control" data-selected="@Model.Content.GetMetaValue("Settings.SubType")">
-                                        <option value="">Standard Post</option>
-                                        <option value="Video">Video Post</option>
-                                        <option value="Slides">Slide Show Post</option>
-                                    </select>
-                                    <p><small>Note: With a video post you must supply a video embed code for the video. For sliders, you must add more than one image to the gallery.</small></p>
-                                </div>
-                            }
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    @{ await Html.RenderPartialAsync("_Field_Author"); }
-                                </div>
-                                <div class="col-xs-12">
-                                    @{ await Html.RenderPartialAsync("_Field_Status"); }
-                                </div>
-                                <div class="col-xs-12">
-                                    @{ await Html.RenderPartialAsync("_Field_PublishDate"); }
-                                </div>
+                    <div class="panel-body small">
+                        <h4>
+                            Settings
+                        </h4>
+                        @if (Model.Type.BaseName == "News" || Model.Type.BaseName == "Event")
+                        {
+                            <div class="form-group">
+                                <label for="Meta:Settings.SubType" class="control-label">Post type</label>
+                                <select name="Meta:Settings.SubType" id="Meta:Settings.SubType" type="text" class="form-control" data-selected="@Model.Content.GetMetaValue("Settings.SubType")">
+                                    <option value="">Standard Post</option>
+                                    <option value="Video">Video Post</option>
+                                    <option value="Slides">Slide Show Post</option>
+                                </select>
+                                <p><small>Note: With a video post you must supply a video embed code for the video. For sliders, you must add more than one image to the gallery.</small></p>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @{ await Html.RenderPartialAsync("_Field_Author"); }
+                            </div>
+                            <div class="col-xs-12">
+                                @{ await Html.RenderPartialAsync("_Field_Status"); }
+                            </div>
+                            <div class="col-xs-12">
+                                @{ await Html.RenderPartialAsync("_Field_PublishDate"); }
                             </div>
                         </div>
                     </div>
@@ -218,5 +184,5 @@
         <div role="tabpanel" class="tab-pane" id="designer">
             @{ await Html.RenderPartialAsync("_Designer"); }
         </div>
-    }
+                }
 </div>

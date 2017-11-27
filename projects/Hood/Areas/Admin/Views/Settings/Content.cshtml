@@ -46,8 +46,7 @@
                             <p>
                                 Here you can set what types of content you want to show up on the website. You can activate them as full sections or simply as types to be shown in custom areas.
                             </p>
-                        </div>
-                        <div class="panel-body">
+                            <br />
                             <fieldset class="form-horizontal">
                                 <input type="hidden" asp-for="Types[i].Search" />
                                 <div class="form-group">
@@ -96,7 +95,7 @@
                                         }
                                         else
                                         {
-                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.Types[i].BaseName == "Page" ? "disabled" : "") />
+                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.Types[i].BaseName= ="Page" ? "disabled" : "" ) />
                                             <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
                                         }
                                     </div>
@@ -130,7 +129,7 @@
                                         }
                                         else
                                         {
-                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.Types[i].BaseName == "Page" ? "disabled" : "") />
+                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.Types[i].BaseName= ="Page" ? "disabled" : "" ) />
                                             <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: This is how your type is stored in the database. <br />&nbsp;<span class="text-danger">WARNING: Changing this will affect external linking, and may cause data loss.</span></b></small></p>
                                         }
                                     </div>
@@ -178,8 +177,7 @@
                             <p>
                                 Here you can set what types of content you want to show up on the website. You can activate them as full sections or simply as types to be shown in custom areas.
                             </p>
-                        </div>
-                        <div class="panel-body">
+                        <hr />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Title Field Name:</label>
@@ -208,8 +206,8 @@
                                     <div class="col-sm-9">
                                         <select asp-for="Types[i].UrlFormatting" class="form-control">
                                             <option value="">Default</option>
-                                            <option value="news">News with Slug</option>
-                                            <option value="news-title">News with Title</option>
+                                            <option value="news">Id Value with Slug</option>
+                                            <option value="news-title">Id Value with Title</option>
                                         </select>
                                     </div>
                                 </div>
@@ -316,8 +314,7 @@
                             <p>
                                 Here you can set what types of content you want to show up on the website. You can activate them as full sections or simply as types to be shown in custom areas.
                             </p>
-                        </div>
-                        <div class="panel-body">
+                            <hr />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Title (Meta):</label>
@@ -340,8 +337,7 @@
                             <p>
                                 Here you can add extra fields to the content type, that can be used to display data in templates etc.
                             </p>
-                        </div>
-                        <div class="panel-body">
+                            <hr />
                             <input asp-for="Types[i].CustomFieldsJson" type="hidden" id="fields-@i" value="@Model.Types[i].CustomFieldsJson" />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
@@ -378,8 +374,7 @@
                                 </div>
 
                             </fieldset>
-                        </div>
-                        <div class="panel-body">
+                            <hr />
                             @if (Model.Types[i].CustomFields?.Count > 0)
                             {
                                 <table class="table table-striped">
@@ -430,8 +425,6 @@
     }
 
     <div role="tabpanel" class="tab-pane active" id="#types-home">
-        <br />
-        <br />
         <div class="alert alert-info text-center">
             <h1>Choose a content type to edit.</h1>
             <p>Select a content type to edit on the right...</p>

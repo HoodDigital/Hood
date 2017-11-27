@@ -15,36 +15,46 @@
                     @{ await Html.RenderPartialAsync("_Filters"); }
                 </div>
                 <div class="panel-body">
-                    @{ await Html.RenderPartialAsync("_List"); }
+                    <div class="row">
+                        <div class="col-sm-3">
+                            @{ await Html.RenderPartialAsync("_MediaSidebar"); }
+                        </div>
+                        <div class="col-sm-9">
+                            @{ await Html.RenderPartialAsync("_Actions"); }
+                            <div id="media-list" class="border-box-sizing media-list"
+                                 data-url="/admin/media/get"
+                                 data-template="#media-template"
+                                 data-pagers=".media-pager"
+                                 data-filters="$.hood.Media.Manage.Filter()"
+                                 data-onclick=".media-click"
+                                 data-onchange=".media-change"></div>
+                            <div class="media-pager m-t-sm m-b-sm text-center"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     <div id="media-template" class="kendo-template">
-        <div class="col-xs-6 col-sm-4 col-lg-3">
+        <div class="col-xs-6 col-sm-3 col-lg-2">
             <div class="thumbnail text-center">
-                @if (mediaSettings.AzureScheme == "https")
-                {
-                    <fixedImage src="${ LargeUrl }" class="img img-full img-square media-select" data-tag="@Model.Tag" data-url="${ DownloadUrlHttps }" />
-                }
-                else
-                {
-                    <fixedImage src="${ LargeUrl }" class="img img-full img-square media-select" data-tag="@Model.Tag" data-url="${ DownloadUrl }" />
-                }
-                <p class="no-wrap">
-                    <small>${ Filename }</small>
-                </p>
-                <p class="no-margin">
-                    <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ SmallUrl }">
-                        Small
-                    </a>
-                    <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ MediumUrl }">
-                        Med
-                    </a>
-                    <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ LargeUrl }">
-                        Large
-                    </a>
-                </p>
+                <fixedImage src="${ Icon }" class="img img-full img-square media-insert" data-tag="@Model.Tag" data-url="${ Url }" />
+                <div class="caption">
+                    <p class="no-wrap">
+                        <small>${ Filename }</small>
+                    </p>
+                    <p class="no-margin">
+                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ SmallUrl }">
+                            Small
+                        </a>
+                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ MediumUrl }">
+                            Med
+                        </a>
+                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ LargeUrl }">
+                            Large
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
