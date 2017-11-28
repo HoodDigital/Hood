@@ -669,7 +669,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PagedList<Content> content = _content.GetPagedContent(request, type, category, null, null, published);
 
-            Response response = new Response(content.Items.Select(c => c.Clean()).ToArray(), content.Count);
+            Response response = new Response(content.Select(c => c.Clean()).ToArray(), content.Count);
             JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,

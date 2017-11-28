@@ -1,44 +1,95 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Hood.Models
+namespace System.Collections.Generic
 {
     /// <summary>
-    /// Provides an IEnumerable structure that can be used in paging applications.
+    /// Paged list
     /// </summary>
-    public interface IPagedList<T> : IList<T>
+    /// <typeparam name="T">T</typeparam>
+    [Serializable]
+    public class PagedList<T> : List<T>, IPagedList<T>
     {
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="source">source</param>
+        /// <param name="pageIndex">Page index</param>
+        /// <param name="pageSize">Page size</param>
+        public PagedList(IQueryable<T> source, int pageIndex, int pageSize)
+        {
+            this.Reload(source, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="source">source</param>
+        /// <param name="pageIndex">Page index</param>
+        /// <param name="pageSize">Page size</param>
+        public PagedList(IList<T> source, int pageIndex, int pageSize)
+        {
+            this.Reload(source, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// Sets the current IEnumerable with the items passed in as the value, using the pagesize and index of the current list.
+        /// </summary>
+        public IEnumerable<T> Items
+        {
+            set
+            {
+                this.Reload(value, this.PageIndex, this.PageSize);
+            }
+        }
+
+        private void Reload(IEnumerable<T> source, int pageIndex, int pageSize)
+        {
+            var total = source.Count();
+            this.TotalCount = total;
+            this.TotalPages = total / pageSize;
+
+            if (total % pageSize > 0)
+                TotalPages++;
+
+            this.PageSize = pageSize;
+            this.PageIndex = pageIndex;
+            this.AddRange(source.Skip(pageIndex * pageSize).Take(pageSize).ToList());
+        }
+
         /// <summary>
         /// Page index
         /// </summary>
-        int PageIndex { get; }
+        [FromQuery(Name = "page")]
+        public int PageIndex { get; set; }
         /// <summary>
         /// Page size
         /// </summary>
-        int PageSize { get; }
+        [FromQuery(Name = "pageSize")]
+        public int PageSize { get; set; }
         /// <summary>
         /// Total count
         /// </summary>
-        int TotalCount { get; }
+        public int TotalCount { get; private set; }
         /// <summary>
         /// Total pages
         /// </summary>
-        int TotalPages { get; }
+        public int TotalPages { get; private set; }
         /// <summary>
         /// Has previous page
         /// </summary>
-        bool HasPreviousPage { get; }
+        public bool HasPreviousPage
+        {
+            get { return (PageIndex > 0); }
+        }
         /// <summary>
-        /// Has next age
+        /// Has next page
         /// </summary>
-        bool HasNextPage { get; }
-    }
-
-    public class PagedList<TObject>
-    {
-        public int Count { get; set; }
-        public int? PageSize { get; set; }
-        public int Pages { get; set; }
-        public int CurrentPage { get; set; }
-        public IEnumerable<TObject> Items { get; set; }
+        public bool HasNextPage
+        {
+            get { return (PageIndex + 1 < TotalPages); }
+        }
     }
 }

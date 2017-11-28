@@ -225,13 +225,9 @@ namespace Hood.Services
             var propertiesQuery = GetProperties(filters, published);
             properties.Items = (await propertiesQuery.ToListAsync()).Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize);
             properties.Count = propertiesQuery.Count();
-            properties.Pages = properties.Count / filters.pageSize;
+            properties.Pages = (int)Math.Ceiling((double)properties.Count / filters.pageSize);
             if (properties.Pages < 1)
                 properties.Pages = 1;
-            if (properties.Count % filters.pageSize > 0)
-            {
-                properties.Pages++;
-            }
             properties.CurrentPage = filters.page;
             properties.PageSize = filters.pageSize;
             return properties;

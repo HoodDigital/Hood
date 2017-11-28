@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -87,7 +88,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<JsonResult> Get(ListFilters request, string search, string sort)
         {
             PagedList<Subscription> subs = await _auth.GetPagedSubscriptions(request, search, sort);
-            Response response = new Response(subs.Items.ToArray(), subs.Count);
+            Response response = new Response(subs.ToArray(), subs.Count);
             return Json(response);
         }
     

@@ -52,65 +52,50 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/")]
         public async Task<IActionResult> Index(UserSearchModel model)
         {
+            IList<ApplicationUser> users = new List<ApplicationUser>();
             if (!string.IsNullOrEmpty(model.Role))
             {
-                model.Items = await _userManager.GetUsersInRoleAsync(model.Role);
+                users = await _userManager.GetUsersInRoleAsync(model.Role);
             }
             else
             {
-                model.Items = await _userManager.Users.ToListAsync();
+                users = await _userManager.Users.ToListAsync();
             }
             if (!string.IsNullOrEmpty(model.Search))
             {
                 string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                model.Items = model.Items.Where(n => searchTerms.Any(s => n.UserName.ToLower().Contains(s.ToLower()))).ToList();
+                users = users.Where(n => searchTerms.Any(s => n.UserName.ToLower().Contains(s.ToLower()))).ToList();
             }
-            switch (model.Sort)
+            switch (model.Order)
             {
                 case "UserName":
-                    model.Items = model.Items.OrderBy(n => n.UserName).ToList();
+                    users = users.OrderBy(n => n.UserName).ToList();
                     break;
                 case "Email":
-                    model.Items = model.Items.OrderBy(n => n.Email).ToList();
+                    users = users.OrderBy(n => n.Email).ToList();
                     break;
                 case "LastName":
-                    model.Items = model.Items.OrderBy(n => n.LastName).ToList();
+                    users = users.OrderBy(n => n.LastName).ToList();
                     break;
                 case "LastLogOn":
-                    model.Items = model.Items.OrderByDescending(n => n.LastLogOn).ToList();
+                    users = users.OrderByDescending(n => n.LastLogOn).ToList();
                     break;
 
                 case "UserNameDesc":
-                    model.Items = model.Items.OrderByDescending(n => n.UserName).ToList();
+                    users = users.OrderByDescending(n => n.UserName).ToList();
                     break;
                 case "EmailDesc":
-                    model.Items = model.Items.OrderByDescending(n => n.Email).ToList();
+                    users = users.OrderByDescending(n => n.Email).ToList();
                     break;
                 case "LastNameDesc":
-                    model.Items = model.Items.OrderByDescending(n => n.LastName).ToList();
+                    users = users.OrderByDescending(n => n.LastName).ToList();
                     break;
 
                 default:
-                    model.Items = model.Items.OrderBy(n => n.UserName).ToList();
+                    users = users.OrderBy(n => n.UserName).ToList();
                     break;
             }
-            if (!model.PageSize.HasValue || model.PageSize == 0)
-                model.PageSize = 2;
-            if (model.CurrentPage == 0)
-                model.CurrentPage = 1;
-
-            model.Pages = model.Items.Count() / model.PageSize.Value;
-            if (model.Pages < 1)
-                model.Pages = 1;
-            if (model.Items.Count() % model.PageSize.Value > 0)
-            {
-                model.Pages++;
-            }
-
-            model.Items = model.Items
-                .Skip((model.CurrentPage - 1) * model.PageSize.Value)
-                .Take(model.PageSize.Value);
-
+            model.Items =  users;
             return View(model);
         }
 

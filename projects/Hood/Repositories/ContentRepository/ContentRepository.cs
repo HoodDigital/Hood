@@ -52,14 +52,10 @@ namespace Hood.Services
             PagedList<Content> content = new PagedList<Content>();
             IOrderedQueryable<Content> contentQuery = GetContent(filters.search, filters.sort, type, category, filter, author, publishedOnly);
             content.Items = contentQuery.ToList().Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize);
-            content.Count = contentQuery.Count();
-            content.Pages = content.Count / filters.pageSize;
+            content.Count = contentQuery.Count(); 
+            content.Pages = (int)Math.Ceiling((double)content.Count / filters.pageSize);
             if (content.Pages < 1)
                 content.Pages = 1;
-            if (content.Count % filters.pageSize > 0)
-            {
-                content.Pages++;
-            }
             content.CurrentPage = filters.page;
             content.PageSize = filters.pageSize;
             return content;
