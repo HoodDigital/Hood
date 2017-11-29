@@ -20,13 +20,10 @@ $.hood.Content = {
             $('.slug-display').html($(this).val());
         });
 
-        if ($('#manage-content-list').doesExist())
-            this.Manage.Init();
         if ($('#edit-content').doesExist())
             this.Edit.Init();
         if ($('#add-field-form').doesExist())
             this.Meta.Init();
-
     },
     Types: {
         AddField: function () {
@@ -208,7 +205,7 @@ $.hood.Content = {
                             type: "success"
                         });
                         setTimeout(function () {
-                            window.location = window.location;
+                            window.location = data.Url;
                         }, 500);
                     } else {
                         swal({
@@ -250,7 +247,7 @@ $.hood.Content = {
                             type: "success"
                         });
                         setTimeout(function () {
-                            window.location = window.location;
+                            window.location = data.Url;
                         }, 500);
                     } else {
                         swal({
@@ -291,7 +288,7 @@ $.hood.Content = {
                             type: "success"
                         });
                         setTimeout(function () {
-                            window.location = window.location;
+                            window.location = data.Url;
                         }, 500);
                     } else {
                         swal({
@@ -317,7 +314,6 @@ $.hood.Content = {
                     text: "The content has now been cloned just forwarding you to the new content...",
                     type: "success"
                 });
-                $.hood.Content.Manage.Refresh();
                 $.hood.Blades.Close();
             } else {
                 swal({
@@ -347,24 +343,24 @@ $.hood.Content = {
             });
             $('#create-content-form').hoodValidator({
                 validationRules: {
-                    cpTitle: {
+                    Title: {
                         required: true
                     },
-                    cpExcept: {
+                    Except: {
                         required: true
                     },
-                    cpPublishDate: {
+                    PublishDate: {
                         required: true,
                         ukdate: true
                     }
                 },
                 submitButtonTag: $('#create-content-submit'),
-                submitUrl: '/admin/content/add',
+                submitUrl: '/admin/content/create',
                 submitFunction: function (data) {
                     if (data.Success) {
                         swal("Created!", "The content has now been created!", "success");
                         setTimeout(function () {
-                            window.location = window.location;
+                            window.location = data.Url;
                         }, 500);
                     } else {
                         swal("Error", "There was a problem creating the content:\n\n" + data.Errors, "error");

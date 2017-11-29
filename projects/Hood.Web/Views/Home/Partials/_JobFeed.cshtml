@@ -1,12 +1,12 @@
-@model ContentListModel
-@if (Model.Posts.Count == 0)
+@model ContentModel
+@if (Model.List.Count == 0)
 {
     await Html.RenderPartialAsync("_NoResults");
 }
 else
 {
     <div class="panel-group" id="job-accordion" role="tablist" aria-multiselectable="true">
-        @foreach (Content content in Model.Posts.Items)
+        @foreach (Content content in Model.List)
         {
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="@string.Format("job-heading-{0}", content.Id)">

@@ -4,7 +4,7 @@
 *@
 @{
 }
-<div id="designer-bar" data-upload="@Model.Type.TypeNamePlural">
+<div id="designer-bar" data-upload="@Model.ContentType.TypeNamePlural">
     <p>
         <a class="btn btn-danger admin back-to-edit" asp-action="Edit" asp-controller="Content" asp-route-id="@Model.Content.Id" asp-area="Admin"><i class="fa fa-step-backward m-r-xs"></i>Exit</a>
         <a class="btn btn-warning admin open-full" asp-action="Show" asp-controller="Content" asp-route-id="@Model.Content.Id" asp-route-editMode="true" target="_top"><i class="fa fa-arrows-alt m-r-xs"></i>Full Editor</a>

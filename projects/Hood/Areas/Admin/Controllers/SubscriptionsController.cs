@@ -42,16 +42,16 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/subscriptions/")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index(SubscriptionSearchModel model)
         {
-            return View();
+            model = await _auth.GetPagedSubscriptionPlans(model);
+            return View(model);
         }
 
         [Route("admin/subscribers/")]
-        public async Task<IActionResult> Subscribers(ListFilters filters, string subscription)
+        public async Task<IActionResult> Subscribers(SubscriberSearchModel model)
         {
-            var model = await _auth.GetPagedSubscribers(filters, subscription);
-            ViewData["Subscription"] = subscription;
+            model = await _auth.GetPagedSubscribers(model);
             return View(model);
         }
 
@@ -81,15 +81,6 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Create()
         {
             return View();
-        }
-
-        [HttpGet]
-        [Route("admin/subscriptions/get")]
-        public async Task<JsonResult> Get(ListFilters request, string search, string sort)
-        {
-            PagedList<Subscription> subs = await _auth.GetPagedSubscriptions(request, search, sort);
-            Response response = new Response(subs.ToArray(), subs.Count);
-            return Json(response);
         }
     
         [HttpPost]

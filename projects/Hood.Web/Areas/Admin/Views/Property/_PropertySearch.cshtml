@@ -1,4 +1,4 @@
-@model ListPropertyModel
+@model PropertySearchModel
 
 @{
     PropertySettings _propertySettings = _settings.GetPropertySettings();
@@ -7,11 +7,11 @@
     <div class="row no-margin">
         <div class="panel-body small">
             <h4>Search</h4>
-            <input type="text" class="form-control" placeholder="Search our portfolio..." asp-for="Filters.search" />
+            <input type="text" class="form-control" placeholder="Search our portfolio..." asp-for="Search" />
         </div>
         <div class="panel-body small">
             <h4>Type</h4>
-            <select class="form-control" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Filters.Type">
+            <select class="form-control" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
                 <option value="">Show All</option>
             </select>
         </div>
@@ -19,7 +19,7 @@
         {
             <div class="panel-body small">
                 <h4>Bedrooms</h4>
-                <select class="form-control half" asp-for="Filters.Bedrooms">
+                <select class="form-control half" asp-for="Bedrooms">
                     <option value="">Show All</option>
                     @for (int i = 0; i < 13; i++)
                     {
@@ -32,12 +32,12 @@
         {
             <div class="panel-body small">
                 <h4>Rent</h4>
-                <select class="form-control half" asp-for="Filters.MinRent">
+                <select class="form-control half" asp-for="MinRent">
                     <option value="">Show All</option>
                     <option value="0">£ 0</option>
                     <option value="100">£ 100</option>
                 </select>
-                <select class="form-control half" asp-for="Filters.MaxRent">
+                <select class="form-control half" asp-for="MaxRent">
                     <option value="">Show All</option>
                     <option value="0">£ 0</option>
                     <option value="100">£ 100</option>
@@ -48,12 +48,12 @@
         {
             <div class="panel-body small">
                 <h4>Asking Price</h4>
-                <select class="form-control half" asp-for="Filters.MinRent">
+                <select class="form-control half" asp-for="MinRent">
                     <option value="">Show All</option>
                     <option value="0">£ 0</option>
                     <option value="100">£ 100</option>
                 </select>
-                <select class="form-control half" asp-for="Filters.MaxRent">
+                <select class="form-control half" asp-for="MaxRent">
                     <option value="">Show All</option>
                     <option value="0">£ 0</option>
                     <option value="100">£ 100</option>
@@ -64,12 +64,12 @@
         {
             <div class="panel-body small">
                 <h4>Premium</h4>
-                <select class="form-control half" asp-for="Filters.MinRent">
+                <select class="form-control half" asp-for="MinRent">
                     <option value="">Show All</option>
                     <option value="0">£ 0</option>
                     <option value="100">£ 100</option>
                 </select>
-                <select class="form-control half" asp-for="Filters.MaxRent">
+                <select class="form-control half" asp-for="MaxRent">
                     <option value="">Show All</option>
                     <option value="0">£ 0</option>
                     <option value="100">£ 100</option>
@@ -78,13 +78,13 @@
         }
         <div class="panel-body small">
             <h4>Planning</h4>
-            <select class="form-control" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="Filters.PlanningType">
+            <select class="form-control" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
                 <option value="">Show All</option>
             </select>
         </div>
         <div class="panel-body small">
             <h4>Organise by</h4>
-            <select class="form-control" asp-for="Filters.sort">
+            <select class="form-control" asp-for="Order">
                 <optgroup label="Property">
                     <option value="name">Name (A-Z)</option>
                     <option value="name+desc">Name (Z-A)</option>

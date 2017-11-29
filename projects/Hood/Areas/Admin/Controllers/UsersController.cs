@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -50,7 +51,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/users/")]
-        public async Task<IActionResult> Index(UserSearchModel model)
+        public async Task<IActionResult> Index(UserSearchModel model, EditorMessage? message)
         {
             IList<ApplicationUser> users = new List<ApplicationUser>();
             if (!string.IsNullOrEmpty(model.Role))
@@ -95,7 +96,8 @@ namespace Hood.Areas.Admin.Controllers
                     users = users.OrderBy(n => n.UserName).ToList();
                     break;
             }
-            model.Items =  users;
+            model.Reload(users, model.PageIndex, model.PageSize);
+            model.AddEditorMessage(message);
             return View(model);
         }
 

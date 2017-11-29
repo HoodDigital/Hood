@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Html;
 
-namespace System.Collections.Generic
+namespace Hood.Interfaces
 {
-    /// <summary>
-    /// Provides an IEnumerable structure that can be used in paging applications.
-    /// </summary>
-    public interface IPagedList<T> 
+    public interface IPageableModel
     {
-        List<T> List { get; set; }
         /// <summary>
         /// Page index
         /// </summary>
@@ -32,6 +28,10 @@ namespace System.Collections.Generic
         /// Has next age
         /// </summary>
         bool HasNextPage { get; }
-    }
 
+        /// <summary>
+        /// Querystring for pagers.
+        /// </summary>
+        string GetPageUrl(int pageIndex);
+    }
 }

@@ -10,7 +10,7 @@ namespace Hood.Services
     public interface IContentRepository
     {
         // Content CRUD
-        PagedList<Content> GetPagedContent(ListFilters filters, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true);
+        Task<ContentModel> GetPagedContent(ContentModel model, bool publishedOnly = true);
         List<Content> GetContentByType(string type, string categorySlug = null, bool publishedOnly = true);
         Content GetContentByID(int id, bool clearCache = false);
         OperationResult Add(Content content);

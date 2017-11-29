@@ -350,22 +350,10 @@ namespace Hood.Services
         {
             return await GetSubscriptionPlans().Where(s => s.Public && s.Addon).ToListAsync();
         }
-        public async Task<PagedList<Subscription>> GetPagedSubscriptions(ListFilters filters, string search, string sort)
+        public async Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model)
         {
-            PagedList<Subscription> model = new PagedList<Subscription>();
-            var subs = GetSubscriptionPlans(search, sort, true);
-            model.Items = await subs.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToListAsync();
-            model.Count = subs.Count();
-            model.Pages = model.Count / filters.pageSize;
-            if (model.Pages < 1)
-                model.Pages = 1;
-            if ((model.Pages * filters.pageSize) < model.Count)
-            {
-                model.Pages++;
-            }
-            model.CurrentPage = filters.page;
-            if (filters.pageSize != 5)
-                model.PageSize = filters.pageSize;
+            var subs = await GetSubscriptionPlans(model.Search, model.Order, true).ToListAsync();
+            model.List = subs;
             return model;
         }
         public async Task<OperationResult> UpdateSubscription(Subscription subscription)
@@ -479,22 +467,10 @@ namespace Hood.Services
             }
             return users;
         }
-        public async Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription)
+        public async Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model)
         {
-            PagedList<ApplicationUser> model = new PagedList<ApplicationUser>();
-            var subs = GetSubscribers(subcription, filters.search, filters.sort);
-            model.Items = await subs.Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize).ToListAsync();
-            model.Count = subs.Count();
-            model.Pages = model.Count / filters.pageSize;
-            if (model.Pages < 1)
-                model.Pages = 1;
-            if ((model.Pages * filters.pageSize) < model.Count)
-            {
-                model.Pages++;
-            }
-            model.CurrentPage = filters.page;
-            if (filters.pageSize != 5)
-                model.PageSize = filters.pageSize;
+            var subs = await GetSubscribers(model.Subscription, model.Search, model.Order).ToListAsync();
+            model.List = subs;
             return model;
         }
         public async Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId)

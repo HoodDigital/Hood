@@ -1,19 +1,19 @@
-@model IContentModel
+@model ContentModel
 @inject ContentCategoryCache _categories
 @{
-    var categories = _categories.TopLevel(Model.Type.Type);
+    var categories = _categories.TopLevel(Model.ContentType.Type);
 }
-@if (Model.Type.ShowCategories)
+@if (Model.ContentType.ShowCategories)
 {
     <div class="sidebar-widget m-b-lg">
         <h4>Categories</h4>
         <hr />
         @if (categories.Count() > 0)
         {
-            @Html.ContentCategoryTree(categories, Model.Type.Slug);
+            @Html.ContentCategoryTree(categories, Model.ContentType.Slug);
         }
         <ul>
-            <li><a href="/@Model.Type.Slug">Show All</a></li>
+            <li><a href="/@Model.ContentType.Slug">Show All</a></li>
         </ul>
     </div>
 }

@@ -17,10 +17,7 @@ namespace Hood.Controllers
         {
         }
 
-        public override IActionResult Index()
-        {
-            return base.Index();
-        }
+        public override async Task<IActionResult> Index() => await base.Index();
 
         public IActionResult About()
         {

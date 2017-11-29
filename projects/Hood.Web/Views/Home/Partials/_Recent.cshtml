@@ -1,12 +1,11 @@
 @model PagedList<Content>
-
 @inject IContentRepository _content
-@if (Model != null && Model.Count > 0)
+@if (Model != null && Model.List.Count > 0)
 {
     <div class="sidebar-widget">
         <h4>Recently Added</h4>
         <hr />
-        @foreach (Content content in Model.Items)
+        @foreach (Content content in Model.List)
         {
             <div class="media">
                 <div class="media-left media-top">

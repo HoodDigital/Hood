@@ -51,7 +51,7 @@
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_Images.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_PublishDate.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_Status.cshtml" />
-    <EmbeddedResource Include="Areas\Admin\Views\Content\_Pagination.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\Views\Shared\_Pagination.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Home\Index.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Home\Theme.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Import\ContentExport.cshtml" />
@@ -226,7 +226,6 @@
     <EmbeddedResource Include="Views\Property\Index.cshtml" />
     <EmbeddedResource Include="Views\Property\Modal.cshtml" />
     <EmbeddedResource Include="Views\Property\Show.cshtml" />
-    <EmbeddedResource Include="Views\Property\_Pagination.cshtml" />
     <EmbeddedResource Include="Views\Property\_PropertyView.cshtml" />
     <EmbeddedResource Include="Views\Shared\Error.cshtml" />
     <EmbeddedResource Include="Views\Shared\ErrorCode.cshtml" />
@@ -271,6 +270,12 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Update="Views\Shared\_Pagination.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

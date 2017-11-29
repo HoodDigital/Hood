@@ -1,4 +1,4 @@
-@model ListPropertyModel
+@model PropertySearchModel
 
 @{
     PropertySettings _propertySettings = _settings.GetPropertySettings();
@@ -8,13 +8,13 @@
         <div class="col-sm-6 col-md-3">
             <div class="well">
                 <h4 class="no-margin">Search</h4>
-                <input type="text" class="form-control m-t-lg" placeholder="Search our portfolio..." asp-for="Filters.search" />
+                <input type="text" class="form-control m-t-lg" placeholder="Search our portfolio..." asp-for="Search" />
             </div>
         </div>
         <div class="col-sm-6 col-md-3">
             <div class="well">
                 <h4 class="no-margin">Type</h4>
-                <select class="form-control m-t-lg" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Filters.Type">
+                <select class="form-control m-t-lg" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
                     <option value="">Show All</option>
                 </select>
             </div>
@@ -24,7 +24,7 @@
             <div class="col-sm-6 col-md-3">
                 <div class="well">
                     <h4 class="no-margin">Bedrooms</h4>
-                    <select class="form-control m-t-lg half" asp-for="Filters.Bedrooms">
+                    <select class="form-control m-t-lg half" asp-for="Bedrooms">
                         <option value="">Show All</option>
                         @for (int i = 0; i < 13; i++)
                         {
@@ -39,12 +39,12 @@
             <div class="col-sm-6 col-md-3">
                 <div class="well">
                     <h4 class="no-margin">Rent</h4>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MinRent">
+                    <select class="form-control m-t-lg half" asp-for="MinRent">
                         <option value="">Show All</option>
                         <option value="0">£ 0</option>
                         <option value="100">£ 100</option>
                     </select>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MaxRent">
+                    <select class="form-control m-t-lg half" asp-for="MaxRent">
                         <option value="">Show All</option>
                         <option value="0">£ 0</option>
                         <option value="100">£ 100</option>
@@ -57,12 +57,12 @@
             <div class="col-sm-6 col-md-3">
                 <div class="well">
                     <h4 class="no-margin">Asking Price</h4>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MinRent">
+                    <select class="form-control m-t-lg half" asp-for="MinRent">
                         <option value="">Show All</option>
                         <option value="0">£ 0</option>
                         <option value="100">£ 100</option>
                     </select>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MaxRent">
+                    <select class="form-control m-t-lg half" asp-for="MaxRent">
                         <option value="">Show All</option>
                         <option value="0">£ 0</option>
                         <option value="100">£ 100</option>
@@ -75,12 +75,12 @@
             <div class="col-sm-6 col-md-3">
                 <div class="well">
                     <h4 class="no-margin">Premium</h4>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MinRent">
+                    <select class="form-control m-t-lg half" asp-for="MinRent">
                         <option value="">Show All</option>
                         <option value="0">£ 0</option>
                         <option value="100">£ 100</option>
                     </select>
-                    <select class="form-control m-t-lg half" asp-for="Filters.MaxRent">
+                    <select class="form-control m-t-lg half" asp-for="MaxRent">
                         <option value="">Show All</option>
                         <option value="0">£ 0</option>
                         <option value="100">£ 100</option>
@@ -91,7 +91,7 @@
         <div class="col-sm-6 col-md-3">
             <div class="well">
                 <h4 class="no-margin">Planning</h4>
-                <select class="form-control m-t-lg" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="Filters.PlanningType">
+                <select class="form-control m-t-lg" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
                     <option value="">Show All</option>
                 </select>
             </div>
@@ -99,7 +99,7 @@
         <div class="col-sm-6 col-md-3">
             <div class="well">
                 <h4 class="no-margin">Organise by</h4>
-                <select class="form-control m-t-lg" asp-for="Filters.sort">
+                <select class="form-control m-t-lg" asp-for="Order">
                     <optgroup label="Property">
                         <option value="name">Name (A-Z)</option>
                         <option value="name+desc">Name (Z-A)</option>

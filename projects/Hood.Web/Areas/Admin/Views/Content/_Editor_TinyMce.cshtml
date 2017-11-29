@@ -1,8 +1,8 @@
 @model EditContentModel
-@if (Model.Type.ShowEditor)
+@if (Model.ContentType.ShowEditor)
 {
     if (User.IsInRole("Admin")){
-        switch (Model.Type.EditorType)
+        switch (Model.ContentType.EditorType)
         {
             case "full":
                 <textarea id="Body" name="Body" class="tinymce-full-admin">@Model.Content.Body</textarea>
@@ -13,7 +13,7 @@
                 break;
         }
     } else {
-        switch (Model.Type.EditorType)
+        switch (Model.ContentType.EditorType)
         {
             case "full":
                 <textarea id="Body" name="Body" class="tinymce-full">@Model.Content.Body</textarea>

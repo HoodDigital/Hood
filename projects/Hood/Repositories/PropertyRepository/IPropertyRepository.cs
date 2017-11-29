@@ -9,8 +9,8 @@ namespace Hood.Services
     public interface IPropertyRepository
     {
         OperationResult<PropertyListing> Add(PropertyListing property);
-        Task<PagedList<PropertyListing>> GetPagedProperties(PropertyFilters propertyFilters, bool published = true);
-        Task<List<MapMarker>> GetLocations(PropertyFilters filters);
+        Task<PropertySearchModel> GetPagedProperties(PropertySearchModel propertyFilters, bool published = true);
+        Task<List<MapMarker>> GetLocations(PropertySearchModel filters);
         PropertyListing GetPropertyById(int id, bool nocache = false);
         void ClearField(int id, string field);
         OperationResult Delete(int id);

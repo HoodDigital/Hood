@@ -53,28 +53,23 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/{type}/manage/")]
-        public IActionResult Index(ListFilters request, string search, string sort, string type, string category, bool published = false)
+        public async Task<IActionResult> Index(ContentModel model, EditorMessage? message)
         {
-            var contentType = _settings.GetContentSettings().GetContentType(type);
-            PagedList<Content> content = _content.GetPagedContent(request, contentType.Type, category, null, null, published);
-            ContentListModel nhm = new ContentListModel()
-            {
-                Type = contentType,
-                Posts = content,
-                Search = search, 
-                Sort = sort, 
-                Filters = request
-            };
-            return View(nhm);
+            var qry = Request.Query;
+            model = await _content.GetPagedContent(model, false);
+            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            model.AddEditorMessage(message);
+            return View(model);
         }
 
         [Route("admin/content/{id}/edit/")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
             var content = _content.GetContentByID(id, true);
             if (content == null)
                 return NotFound();
             EditContentModel model = await GetEditorModel(content);
+            model.Content.AddEditorMessage(message);
             return View(model);
         }
 
@@ -202,54 +197,39 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/create/")]
         public IActionResult Create(string type)
         {
-            ContentListModel mcm = new ContentListModel()
+            Content model = new Content()
             {
+                PublishDate = DateTime.Now,
                 Type = _settings.GetContentSettings().GetContentType(type)
             };
-            return View(mcm);
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<Response> Add(CreateContentModel model)
+        [Route("admin/content/create/")]
+        public async Task<Response> Create(Content model)
         {
             try
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-                Content content = new Content
-                {
-                    AllowComments = true,
-                    AuthorId = user.Id,
-                    Body = "",
-                    CreatedBy = user.UserName,
-                    CreatedOn = DateTime.Now,
-                    Excerpt = model.cpExcept,
-                    LastEditedBy = user.UserName,
-                    LastEditedOn = DateTime.Now,
-                    ContentType = model.cpType,
-                    Public = true,
-                    ShareCount = 0,
-                    PublishDate = new DateTime(model.cpPublishDate.Year, model.cpPublishDate.Month, model.cpPublishDate.Day, model.cpPublishHour, model.cpPublishMinute, 0),
-                    Status = model.cpStatus,
-                    Title = model.cpTitle,
-                    Views = 0
-                };
-                OperationResult result = _content.Add(content);
+                model.AllowComments = true;
+                model.AuthorId = user.Id;
+                model.Body = "";
+                model.CreatedBy = user.UserName;
+                model.CreatedOn = DateTime.Now;
+                model.LastEditedBy = user.UserName;
+                model.LastEditedOn = DateTime.Now;
+                model.Public = true;
+                model.ShareCount = 0;
+                model.Views = 0;
+                OperationResult result = _content.Add(model);
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.ErrorString);
                 }
-                if (model.cpCategory.IsSet())
-                {
-                    var categoryResult = await _content.AddCategory(model.cpCategory, content.ContentType);
-                    if (content.Categories == null)
-                        content.Categories = new List<ContentCategoryJoin>();
-                    // add it to the model object.
-                    if (categoryResult.Succeeded)
-                        content.Categories.Add(new ContentCategoryJoin() { CategoryId = categoryResult.Item.Id, ContentId = content.Id });
-                    _content.Update(content);
-                }
-                return new Response(true);
-
+                var response = new Response(true, "Published successfully.");
+                response.Url = Url.Action("Edit", new { id = model.Id, message = EditorMessage.Created });
+                return response;
             }
             catch (Exception ex)
             {
@@ -263,7 +243,7 @@ namespace Hood.Areas.Admin.Controllers
             var content = _content.GetContentByID(id);
             EditContentModel model = new EditContentModel()
             {
-                Type = _settings.GetContentSettings().GetContentType(content.ContentType),
+                ContentType = _settings.GetContentSettings().GetContentType(content.ContentType),
                 Content = content
             };
             return View(model);
@@ -272,12 +252,9 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/{type}/")]
         public IActionResult CategoryList(string type)
         {
-            var contentType = _settings.GetContentSettings().GetContentType(type);
-            ContentListModel nhm = new ContentListModel()
-            {
-                Type = contentType
-            };
-            return View(nhm);
+            ContentModel model = new ContentModel();
+            model.ContentType = _settings.GetContentSettings().GetContentType(type);
+            return View(model);
         }
 
         [HttpPost]
@@ -517,7 +494,9 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult<Content> result = _content.SetStatus(id, Status.Published);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Published successfully.");
+                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Published });
+                    return response;
                 }
                 else
                 {
@@ -538,7 +517,9 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult<Content> result = _content.SetStatus(id, Status.Archived);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Archived successfully.");
+                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Archived });
+                    return response;
                 }
                 else
                 {
@@ -557,10 +538,14 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                var content = _content.GetContentByID(id);
+                var type = content.ContentType;
                 OperationResult result = _content.Delete(id);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Deleted!");
+                    response.Url = Url.Action("Index", new { type = type, message = EditorMessage.Deleted });
+                    return response;
                 }
                 else
                 {
@@ -581,7 +566,9 @@ namespace Hood.Areas.Admin.Controllers
                 var model = _settings.GetBasicSettings(false);
                 model.Homepage = id;
                 _settings.Set("Hood.Settings.Basic", model);
-                return new Response(true);
+                var response = new Response(true, "The image has been cleared!");
+                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.HomepageSet });
+                return response;
             }
             catch (Exception ex)
             {
@@ -648,7 +635,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id, message = EditorMessage.MediaRemoved });
         }
 
         [HttpGet]
@@ -662,20 +649,7 @@ namespace Hood.Areas.Admin.Controllers
                 content.FeaturedImage = new MediaObject(media);
                 _content.Update(content);
             }
-            return RedirectToAction("Edit", new { id = id });
-        }
-
-        public JsonResult Get(ListFilters request, string search, string sort, string type, string category, bool published = false)
-        {
-            PagedList<Content> content = _content.GetPagedContent(request, type, category, null, null, published);
-
-            Response response = new Response(content.Select(c => c.Clean()).ToArray(), content.Count);
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            };
-            return Json(response, settings);
+            return RedirectToAction("Edit", new { id = id, message = EditorMessage.ImageUpdated });
         }
 
         public IMediaObject GetFeaturedImage(int id)
@@ -717,7 +691,9 @@ namespace Hood.Areas.Admin.Controllers
                 Content content = _content.GetContentByID(id);
                 content.FeaturedImage = null;
                 _content.Update(content);
-                return new Response(true, "The image has been cleared!");
+                var response = new Response(true, "The image has been cleared!");
+                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+                return response;
             }
             catch (Exception ex)
             {
@@ -732,7 +708,9 @@ namespace Hood.Areas.Admin.Controllers
                 var content = _content.GetContentByID(id);
                 content.UpdateMeta(field, "");
                 _content.Update(content);
-                return new Response(true, "Cleared!");
+                var response = new Response(true, "The data has been cleared!");
+                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.ImageUpdated });
+                return response;
             }
             catch (Exception ex)
             {
@@ -745,7 +723,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteAll(string type)
         {
             await _content.DeleteAll(type);
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { message = EditorMessage.Deleted });
         }
 
         [Route("admin/content/categories/suggestions/{type}/")]
@@ -765,7 +743,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             EditContentModel model = new EditContentModel()
             {
-                Type = _settings.GetContentSettings().GetContentType(content.ContentType),
+                ContentType = _settings.GetContentSettings().GetContentType(content.ContentType),
                 Content = content
             };
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
@@ -773,11 +751,11 @@ namespace Hood.Areas.Admin.Controllers
             model.Authors = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
 
             // Templates
-            if (model.Type.Templates)
-                model = GetTemplates(model, model.Type.TemplateFolder);
+            if (model.ContentType.Templates)
+                model = GetTemplates(model, model.ContentType.TemplateFolder);
 
             // Special type features.
-            switch (model.Type.BaseName)
+            switch (model.ContentType.BaseName)
             {
                 case "Page":
                     model = await GetPageEditorFeatures(model);

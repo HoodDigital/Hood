@@ -51,24 +51,20 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/manage/")]
-        public async Task<IActionResult> Index(ListPropertyModel model)
+        public async Task<IActionResult> Index(PropertySearchModel model, EditorMessage? message)
         {
             var propertySettings = _settings.GetPropertySettings();
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
-            if (model == null)
-                model = new ListPropertyModel();
-            if (model.Filters == null)
-                model.Filters = new PropertyFilters();
+            model = await _property.GetPagedProperties(model, true);
 
-            PagedList<PropertyListing> properties = await _property.GetPagedProperties(model.Filters, false);
-            model.Locations = await _property.GetLocations(model.Filters);
+            model.Locations = await _property.GetLocations(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             PropertySettings settings = _settings.GetPropertySettings();
-            model.Properties = properties;
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
+            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -88,9 +84,10 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/property/edit/{id}/")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
             var model = await ReloadProperty(_property.GetPropertyById(id, true));
+            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -211,7 +208,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteAll()
         {
             await _property.DeleteAll();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { message = EditorMessage.Deleted });
         }
 
         [HttpPost]
@@ -297,7 +294,9 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult result = _property.Delete(id);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Deleted!");
+                    response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                    return response;
                 }
                 else
                 {
@@ -319,7 +318,9 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult<PropertyListing> result = _property.SetStatus(id, Status.Published);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Published successfully.");
+                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Published });
+                    return response;
                 }
                 else
                 {
@@ -341,7 +342,9 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult<PropertyListing> result = _property.SetStatus(id, Status.Archived);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Archived successfully.");
+                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Archived });
+                    return response;
                 }
                 else
                 {
@@ -499,7 +502,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id, message = EditorMessage.ImageUpdated });
         }
 
         [HttpGet]
@@ -512,7 +515,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id, message = EditorMessage.MediaRemoved });
         }
 
         [HttpGet]
@@ -525,7 +528,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id });
+            return RedirectToAction("Edit", new { id = id, message = EditorMessage.MediaRemoved });
         }
 
 

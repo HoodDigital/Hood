@@ -10,11 +10,11 @@
     Use this page to manage what content types are available on your site.
     <!-- Nav tabs -->
     <ul class="nav nav-pills nav-stacked m-t-lg" role="tablist">
-        @for (int i = 0; i < Model.Types.Count(); i++)
+        @for (int i = 0; i < Model.ContentTypes.Count(); i++)
         {
             <li role="presentation">
                 <a href="@string.Format("#collapse_{0}", i.ToString())" aria-controls="@string.Format("collapse_{0}", i.ToString())" role="tab" data-toggle="tab">
-                    @if (Model.Types[i].Enabled)
+                    @if (Model.ContentTypes[i].Enabled)
                     {
                         <span class="pull-right label label-success"><i class="fa fa-thumbs-up m-r-xs"></i></span>
                     }
@@ -22,14 +22,14 @@
                     {
                         <span class="pull-right label label-danger"><i class="fa fa-thumbs-down m-r-xs"></i></span>
                     }
-                    @Model.Types[i].Title
+                    @Model.ContentTypes[i].Title
                 </a>
             </li>
         }
     </ul>
 }
 <div class="tab-content">
-    @for (int i = 0; i < Model.Types.Count(); i++)
+    @for (int i = 0; i < Model.ContentTypes.Count(); i++)
     {
         <div role="tabpanel" class="tab-pane" id="@string.Format("collapse_{0}", i.ToString())">
             <div class="tabs-container">
@@ -61,7 +61,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Base Type (System):</label>
                                     <div class="col-sm-9">
-                                        @if (Model.Types[i].BaseName == "Page")
+                                        @if (Model.ContentTypes[i].BaseName == "Page")
                                         {
                                             <input asp-for="Types[i].BaseName" class="form-control" type="hidden">
                                             <input asp-for="Types[i].BaseName" class="form-control" disabled>
@@ -88,14 +88,14 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Url Slug:</label>
                                     <div class="col-sm-9">
-                                        @if (Model.Types[i].BaseName == "Page")
+                                        @if (Model.ContentTypes[i].BaseName == "Page")
                                         {
                                             <input asp-for="Types[i].Slug" class="form-control" type="hidden">
                                             <input asp-for="Types[i].Slug" class="form-control" disabled>
                                         }
                                         else
                                         {
-                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.Types[i].BaseName= ="Page" ? "disabled" : "" ) />
+                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.ContentTypes[i].BaseName= ="Page" ? "disabled" : "" ) />
                                             <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
                                         }
                                     </div>
@@ -122,14 +122,14 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Type Variable:</label>
                                     <div class="col-sm-9">
-                                        @if (Model.Types[i].BaseName == "Page")
+                                        @if (Model.ContentTypes[i].BaseName == "Page")
                                         {
                                             <input asp-for="Types[i].Type" class="form-control" type="hidden">
                                             <input asp-for="Types[i].Type" class="form-control" disabled>
                                         }
                                         else
                                         {
-                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.Types[i].BaseName= ="Page" ? "disabled" : "" ) />
+                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.ContentTypes[i].BaseName= ="Page" ? "disabled" : "" ) />
                                             <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: This is how your type is stored in the database. <br />&nbsp;<span class="text-danger">WARNING: Changing this will affect external linking, and may cause data loss.</span></b></small></p>
                                         }
                                     </div>
@@ -173,7 +173,7 @@
                     </div>
                     <div id="@string.Format("editor_{0}", i.ToString())" class="tab-pane">
                         <div class="panel-body">
-                            <strong>Editor Settings: @Model.Types[i].Title</strong>
+                            <strong>Editor Settings: @Model.ContentTypes[i].Title</strong>
                             <p>
                                 Here you can set what types of content you want to show up on the website. You can activate them as full sections or simply as types to be shown in custom areas.
                             </p>
@@ -338,7 +338,7 @@
                                 Here you can add extra fields to the content type, that can be used to display data in templates etc.
                             </p>
                             <hr />
-                            <input asp-for="Types[i].CustomFieldsJson" type="hidden" id="fields-@i" value="@Model.Types[i].CustomFieldsJson" />
+                            <input asp-for="Types[i].CustomFieldsJson" type="hidden" id="fields-@i" value="@Model.ContentTypes[i].CustomFieldsJson" />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Name:</label>
@@ -375,7 +375,7 @@
 
                             </fieldset>
                             <hr />
-                            @if (Model.Types[i].CustomFields?.Count > 0)
+                            @if (Model.ContentTypes[i].CustomFields?.Count > 0)
                             {
                                 <table class="table table-striped">
                                     <thead>
@@ -384,7 +384,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="field-list-@i">
-                                        @foreach (var floor in Model.Types[i].CustomFields)
+                                        @foreach (var floor in Model.ContentTypes[i].CustomFields)
                                         {
                                             <tr>
                                                 <td class="col-xs-8"><strong>@floor.Name</strong> @floor.Type</td>

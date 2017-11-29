@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Testing.Data;
 using Testing.Models;
 using Testing.Services;
+using Hood.Models;
 
 namespace Testing
 {

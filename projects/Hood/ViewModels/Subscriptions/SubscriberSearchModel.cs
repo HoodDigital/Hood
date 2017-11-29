@@ -1,19 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using Hood.Extensions;
+﻿using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Hood.Models
+namespace Hood.Services
 {
-    public class UserSearchModel : PagedList<ApplicationUser>, IPageableModel
+    public class SubscriberSearchModel : PagedList<ApplicationUser>, IPageableModel
     {
+        [FromQuery(Name = "subscription")]
+        public string Subscription { get; set; }
         [FromQuery(Name = "sort")]
         public string Order { get; set; }
-        [FromQuery(Name = "role")]
-        public string Role { get; set; }
         [FromQuery(Name = "search")]
         public string Search { get; set; }
 
@@ -21,9 +20,10 @@ namespace Hood.Models
         {
             var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
             query += Search.IsSet() ? "&search=" + Search : "";
-            query += Role.IsSet() ? "&role=" + Role : "";
+            query += Subscription.IsSet() ? "&subscription=" + Subscription : "";
             query += Order.IsSet() ? "&sort=" + Order : "";
             return query;
         }
+
     }
 }

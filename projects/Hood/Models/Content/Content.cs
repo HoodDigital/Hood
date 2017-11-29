@@ -15,7 +15,10 @@ namespace Hood.Models
     public partial class Content : BaseEntity
     {
         // Content
+        [Required]
         public string Title { get; set; }
+
+        [Required]
         public string Excerpt { get; set; }
         public string Body { get; set; }
         public string Slug { get; set; }
@@ -28,6 +31,8 @@ namespace Hood.Models
 
         // Content Type
         public string ContentType { get; set; }
+        [NotMapped]
+        public ContentType Type { get; set; }
 
         // Publish Status
         public int Status { get; set; }
@@ -53,9 +58,46 @@ namespace Hood.Models
         public bool Featured { get; set; }
 
         // MVVM Helpers
-        public int PublishHour => PublishDate.Hour;
-        public int PublishMinute => PublishDate.Minute;
-        public string PublishDatePart => PublishDate.ToShortDateString();
+        [NotMapped]
+        public string PublishDatePart
+        {
+            get
+            {
+                return PublishDate.ToShortDateString();
+            }
+            set
+            {
+                    DateTime dt = DateTime.Now;
+                    if (DateTime.TryParse(value, out dt))
+                    {
+                    PublishDate = new DateTime(dt.Year, dt.Month, dt.Day, PublishDate.Hour, PublishDate.Minute, PublishDate.Second);
+                    }
+            }
+        }
+        [NotMapped]
+        public int PublishHours
+        {
+            get
+            {
+                return PublishDate.Hour;
+            }
+            set
+            {
+                PublishDate = new DateTime(PublishDate.Year, PublishDate.Month, PublishDate.Day, value, PublishDate.Minute, PublishDate.Second);
+            }
+        }
+        [NotMapped]
+        public int PublishMinutes
+        {
+            get
+            {
+                return PublishDate.Minute;
+            }
+            set
+            {
+                PublishDate = new DateTime(PublishDate.Year, PublishDate.Month, PublishDate.Day, PublishDate.Hour, value, PublishDate.Second);
+            }
+        }
 
         // Formatted Members
         public string StatusString
@@ -96,6 +138,10 @@ namespace Hood.Models
                 var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
                 ContentSettings _contentSettings = siteSettings.GetContentSettings();
                 ContentType type = _contentSettings.GetContentType(ContentType);
+
+                if (type == null)
+                    return string.Format("/{0}/{1}", ContentType, Id);
+
                 if (type.BaseName == "Page")
                 {
                     return string.Format("/{0}", Slug);

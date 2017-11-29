@@ -1,15 +1,15 @@
 @model EditContentModel
-<h5>@Model.Content.ContentType.ToTitleCase() @Model.Type.TitleName</h5>
+<h5>@Model.Content.ContentType.ToTitleCase() @Model.ContentType.TitleName</h5>
 <div class="ibox-content">
     <fieldset class="form-horizontal">
         <div class="form-group">
-            <label class="col-sm-3 control-label">@Model.Type.TitleName:</label>
+            <label class="col-sm-3 control-label">@Model.ContentType.TitleName:</label>
             <div class="col-sm-8"><input id="Title" name="Title" value="@Model.Content.Title" type="text" class="form-control" /></div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">@Model.Type.ExcerptName:</label>
+            <label class="col-sm-3 control-label">@Model.ContentType.ExcerptName:</label>
             <div class="col-sm-8">
-                @if (Model.Type.MultiLineExcerpt)
+                @if (Model.ContentType.MultiLineExcerpt)
                 {
                     <textarea id="Excerpt" name="Excerpt" class="form-control">@Model.Content.Excerpt</textarea>
                 }

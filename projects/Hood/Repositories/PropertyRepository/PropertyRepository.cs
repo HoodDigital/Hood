@@ -78,7 +78,7 @@ namespace Hood.Services
                 return property;
             }
         }
-        private IQueryable<PropertyListing> GetProperties(PropertyFilters propertyFilters, bool published)
+        private IQueryable<PropertyListing> GetProperties(PropertySearchModel propertyFilters, bool published)
         {
             IQueryable<PropertyListing> properties = _db.Properties
                 .Include(p => p.Media)
@@ -141,10 +141,10 @@ namespace Hood.Services
                 properties = properties.Where(n => n.AskingPrice <= propertyFilters.MaxPrice.Value);
 
             // search the collection
-            if (!string.IsNullOrEmpty(propertyFilters.search))
+            if (!string.IsNullOrEmpty(propertyFilters.Search))
             {
 
-                string[] searchTerms = propertyFilters.search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] searchTerms = propertyFilters.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 properties = properties.Where(n => searchTerms.Any(s => n.Title != null && n.Title.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Address1 != null && n.Address1.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Address2 != null && n.Address2.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -160,9 +160,9 @@ namespace Hood.Services
             }
 
             // sort the collection and then output it.
-            if (!string.IsNullOrEmpty(propertyFilters.sort))
+            if (!string.IsNullOrEmpty(propertyFilters.Order))
             {
-                switch (propertyFilters.sort)
+                switch (propertyFilters.Order)
                 {
                     case "name":
                     case "title":
@@ -219,22 +219,14 @@ namespace Hood.Services
             }
             return properties;
         }
-        public async Task<PagedList<PropertyListing>> GetPagedProperties(PropertyFilters filters, bool published = true)
+        public async Task<PropertySearchModel> GetPagedProperties(PropertySearchModel model, bool published = true)
         {
-            PagedList<PropertyListing> properties = new PagedList<PropertyListing>();
-            var propertiesQuery = GetProperties(filters, published);
-            properties.Items = (await propertiesQuery.ToListAsync()).Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize);
-            properties.Count = propertiesQuery.Count();
-            properties.Pages = (int)Math.Ceiling((double)properties.Count / filters.pageSize);
-            if (properties.Pages < 1)
-                properties.Pages = 1;
-            properties.CurrentPage = filters.page;
-            properties.PageSize = filters.pageSize;
-            return properties;
+            var propertiesQuery = await GetProperties(model, published).ToListAsync();
+            model.List = propertiesQuery;
+            return model;
         }
-        public Task<List<MapMarker>> GetLocations(PropertyFilters filters)
+        public Task<List<MapMarker>> GetLocations(PropertySearchModel filters)
         {
-            PagedList<PropertyListing> properties = new PagedList<PropertyListing>();
             var propertiesQuery = GetProperties(filters, true);
             return propertiesQuery.AsNoTracking().Select(p => new MapMarker(p, p.Title, p.Id.ToString(), p.Url)).ToListAsync();
         }

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Hood.Infrastructure;
+using Hood.BaseTypes;
 
 namespace Hood.Models
 {
     public partial class EditContentModel
     {
         public Content Content { get; set; }
-        public ContentType Type { get; set; }
+        public ContentType ContentType { get; set; }
         public List<ContentCategory> Categories { get; set; }
         public List<string> Templates { get; set; }
         public IEnumerable<Subscription> Subscriptions { get; set; }

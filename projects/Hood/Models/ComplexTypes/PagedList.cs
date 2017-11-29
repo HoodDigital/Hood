@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Hood.BaseTypes;
+using Hood.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +12,20 @@ namespace System.Collections.Generic
     /// </summary>
     /// <typeparam name="T">T</typeparam>
     [Serializable]
-    public class PagedList<T> : List<T>, IPagedList<T>
+    public partial class PagedList<T> : SaveableModel, IPagedList<T>
     {
+        private List<T> _list;
         /// <summary>
-        /// Ctor
+        /// Constructor
+        /// </summary>
+        public PagedList()
+        {
+            PageSize = 20;
+            PageIndex = 1;
+        }
+
+        /// <summary>
+        /// Constructor
         /// </summary>
         /// <param name="source">source</param>
         /// <param name="pageIndex">Page index</param>
@@ -23,8 +35,20 @@ namespace System.Collections.Generic
             this.Reload(source, pageIndex, pageSize);
         }
 
+        public List<T> List
+        {
+            set
+            {
+                Reload(value, this.PageIndex, this.PageSize);
+            }
+            get
+            {
+                return _list;
+            }
+        }
+
         /// <summary>
-        /// Ctor
+        /// Constructor
         /// </summary>
         /// <param name="source">source</param>
         /// <param name="pageIndex">Page index</param>
@@ -34,29 +58,24 @@ namespace System.Collections.Generic
             this.Reload(source, pageIndex, pageSize);
         }
 
-        /// <summary>
-        /// Sets the current IEnumerable with the items passed in as the value, using the pagesize and index of the current list.
-        /// </summary>
-        public IEnumerable<T> Items
+        public IPagedList<T> Reload(IPagedList<T> source)
         {
-            set
-            {
-                this.Reload(value, this.PageIndex, this.PageSize);
-            }
+            Reload(source.List, source.PageIndex, source.PageSize);
+            return this;
         }
 
-        private void Reload(IEnumerable<T> source, int pageIndex, int pageSize)
+        public IPagedList<T> Reload(IEnumerable<T> source, int pageIndex, int pageSize)
         {
             var total = source.Count();
             this.TotalCount = total;
-            this.TotalPages = total / pageSize;
-
-            if (total % pageSize > 0)
-                TotalPages++;
-
+            this.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+            if (pageIndex > TotalPages)
+                pageIndex = TotalPages;
             this.PageSize = pageSize;
             this.PageIndex = pageIndex;
-            this.AddRange(source.Skip(pageIndex * pageSize).Take(pageSize).ToList());
+            _list = new List<T>();
+            _list.AddRange(source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList());
+            return this;
         }
 
         /// <summary>

@@ -47,18 +47,11 @@ namespace Hood.Services
         }
 
         // Content CRUD
-        public PagedList<Content> GetPagedContent(ListFilters filters, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
+        public async Task<ContentModel> GetPagedContent(ContentModel model, bool publishedOnly = true)
         {
-            PagedList<Content> content = new PagedList<Content>();
-            IOrderedQueryable<Content> contentQuery = GetContent(filters.search, filters.sort, type, category, filter, author, publishedOnly);
-            content.Items = contentQuery.ToList().Skip((filters.page - 1) * filters.pageSize).Take(filters.pageSize);
-            content.Count = contentQuery.Count(); 
-            content.Pages = (int)Math.Ceiling((double)content.Count / filters.pageSize);
-            if (content.Pages < 1)
-                content.Pages = 1;
-            content.CurrentPage = filters.page;
-            content.PageSize = filters.pageSize;
-            return content;
+            var content = await GetContent(model.Search, model.Order, model.Type, model.Category, model.Filter, model.AuthorName, publishedOnly).ToListAsync();
+            model.List = content;
+            return model;
         }
         private IOrderedQueryable<Content> GetContent(string search, string sort, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
         {

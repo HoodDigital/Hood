@@ -94,7 +94,7 @@ $.hood.Property = {
                 $.post('/admin/property/delete', { id: $this.data('id') }, function (data) {
                     if (data.Success) {
                         if (!$('#manage-property-list').doesExist())
-                            window.location = '/admin/property/manage';
+                            window.location = data.Url;
                         $.hood.Property.Manage.Refresh();
                         $.hood.Blades.Close();
                         swal({
@@ -137,7 +137,7 @@ $.hood.Property = {
                 $.post('/admin/property/publish', { id: $this.data('id') }, function (data) {
                     if (data.Success) {
                         if (!$('#manage-property-list').doesExist())
-                            window.location = '/admin/property/manage';
+                            window.location = data.Url;
                         $.hood.Property.Manage.Refresh();
                         $.hood.Blades.Close();
                         swal({
@@ -180,7 +180,7 @@ $.hood.Property = {
                 $.post('/admin/property/archive', { id: $this.data('id') }, function (data) {
                     if (data.Success) {
                         if (!$('#manage-property-list').doesExist())
-                            window.location = '/admin/property/manage';
+                            window.location = data.Url;
                         $.hood.Property.Manage.Refresh();
                         $.hood.Blades.Close();
                         swal({

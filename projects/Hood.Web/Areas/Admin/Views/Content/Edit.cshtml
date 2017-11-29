@@ -1,12 +1,12 @@
 @model EditContentModel
 @inject ContentCategoryCache _categories
 @{
-    ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Content.Title;
+    ViewBag.Title = "Edit " + Model.ContentType.TypeName + ": " + Model.Content.Title;
 }
 @section buttons {
-    <a class="btn btn-sm btn-danger delete-content" data-id="@Model.Content.Id" data-type="@Model.Type.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a>
+    <a class="btn btn-sm btn-danger delete-content" data-id="@Model.Content.Id" data-type="@Model.ContentType.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a>
     <a class="btn btn-sm btn-info" href="@Model.Content.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
-    @if (Model.Type.ShowDesigner)
+    @if (Model.ContentType.ShowDesigner)
     {
         <a class="btn btn-sm btn-default" href="@string.Format("{0}?editMode=true", Model.Content.Url)"><i class="fa fa-pencil m-r-xs"></i>Designer</a>
     }
@@ -18,9 +18,9 @@
             <a href="/admin">Home</a>
         </li>
         <li>
-            <a asp-action="Index" asp-controller="Content" asp-route-type="@Model.Type.Type" asp-route-area="Admin">
-                <i class="fa @Model.Type.Icon m-r-xs"></i>
-                @Model.Type.TypeNamePlural
+            <a asp-action="Index" asp-controller="Content" asp-route-type="@Model.ContentType.Type" asp-route-area="Admin">
+                <i class="fa @Model.ContentType.Icon m-r-xs"></i>
+                @Model.ContentType.TypeNamePlural
             </a>
         </li>
         <li class="active">
@@ -39,7 +39,7 @@
             <input type="hidden" id="Views" name="Views" value="@Model.Content.Views" />
             <div class="row">
                 <div class="col-md-8">
-                    @switch (Model.Type.BaseName)
+                    @switch (Model.ContentType.BaseName)
                     {
                         case "Product":
                             await Html.RenderPartialAsync("_Edit_Product");
@@ -67,7 +67,7 @@
                             <small>@Html.Raw(Model.Content.StatusString)</small>
                         </p>
                         <p>
-                            <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save m-r-xs"></i> Save @Model.Type.TypeName</button>
+                            <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save m-r-xs"></i> Save @Model.ContentType.TypeName</button>
                         </p>
                     </div>
                     @if (Model.Content.ContentType == "page")
@@ -104,7 +104,7 @@
                     }
                     else
                     {
-                        if (Model.Type.UrlFormatting == "news")
+                        if (Model.ContentType.UrlFormatting == "news")
                         {
                             <div class="panel-body small">
                                 <h4 class="">Slug &amp; Url</h4>
@@ -121,28 +121,28 @@
                             <input id="Slug" name="Slug" type="hidden" value="@Model.Content.Slug" />
                         }
                     }
-                    @if (Model.Type.ShowImage || Model.Type.ShowBanner)
+                    @if (Model.ContentType.ShowImage || Model.ContentType.ShowBanner)
                     { <div class="panel-body small">
                         <h4 class="">Images</h4>
                         @{ await Html.RenderPartialAsync("_Field_Images"); }
                     </div>
                             }
-                    @if (Model.Type.ShowCategories)
+                    @if (Model.ContentType.ShowCategories)
                     {
                         <div class="panel-body small">
                             <h4>Categories</h4>
                             <div class="category-list">
                                 @{
                                     _categories.ResetCache();
-                                    var categories = _categories.TopLevel(Model.Type.Type);
+                                    var categories = _categories.TopLevel(Model.ContentType.Type);
                                 }
                                 @if (categories.Count() > 0)
                                 {
-                                    @Html.AddToCategoryTree(categories, Model.Content, Model.Type.Slug)
+                                    @Html.AddToCategoryTree(categories, Model.Content, Model.ContentType.Slug)
                                 }
                                 else
                                 {
-                                    <p>No categories added yet. To add a category, go back to the @Model.Type.TypeName list and select @Model.Type.TypeName Categories.</p>
+                                    <p>No categories added yet. To add a category, go back to the @Model.ContentType.TypeName list and select @Model.ContentType.TypeName Categories.</p>
                                 }
                             </div>
                         </div>
@@ -151,7 +151,7 @@
                         <h4>
                             Settings
                         </h4>
-                        @if (Model.Type.BaseName == "News" || Model.Type.BaseName == "Event")
+                        @if (Model.ContentType.BaseName == "News" || Model.ContentType.BaseName == "Event")
                         {
                             <div class="form-group">
                                 <label for="Meta:Settings.SubType" class="control-label">Post type</label>
@@ -179,7 +179,7 @@
             </div>
         </form>
     </div>
-    @if (Model.Type.ShowPreview)
+    @if (Model.ContentType.ShowPreview)
     {
         <div role="tabpanel" class="tab-pane" id="designer">
             @{ await Html.RenderPartialAsync("_Designer"); }

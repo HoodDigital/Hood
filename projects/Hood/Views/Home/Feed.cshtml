@@ -1,12 +1,11 @@
-@model ContentListModel
-
+@model ContentModel
 @{
-    string title =  Model.Type.MetaTitle.IsSet() ? Model.Type.MetaTitle : Model.Type.Title;
+    string title =  Model.ContentType.MetaTitle.IsSet() ? Model.ContentType.MetaTitle : Model.ContentType.Title;
     ViewData["Title"] = title;
     var Feed = "_Feed";
     Layout = "_Layout";
 
-    switch (Model.Type.BaseName)
+    switch (Model.ContentType.BaseName)
     {
         case "Event":
             Feed = "_NewsFeed";
@@ -52,14 +51,14 @@
 
 }
 @section metas {
-    <meta name="description" content="@Model.Type.Description" />
+    <meta name="description" content="@Model.ContentType.Description" />
     <meta property="og:author" content="@_seoSettings.OgAuthor" />
     <meta property="og:title" content="@title" />
     <meta property="og:image" content="@_seoSettings.OgImageUrl" />
     <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
-    <meta property="og:description" content="@Model.Type.Description" />
+    <meta property="og:description" content="@Model.ContentType.Description" />
     <meta name="twitter:title" content="@title" />
-    <meta name="twitter:description" content="@Model.Type.Description" />
+    <meta name="twitter:description" content="@Model.ContentType.Description" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
 @{ await Html.RenderPartialAsync(Feed); }

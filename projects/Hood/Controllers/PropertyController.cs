@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using System.Linq;
 using Hood.Enums;
+using System.Collections.Generic;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers
@@ -34,24 +35,20 @@ namespace Hood.Controllers
             _env = env;
         }
 
-        public async Task<IActionResult> Index(ListPropertyModel model)
+        public async Task<IActionResult> Index(PropertySearchModel model)
         {
             var propertySettings = _settings.GetPropertySettings();
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
-            if (model == null)
-                model = new ListPropertyModel();
-            if (model.Filters == null)
-                model.Filters = new PropertyFilters();
+            model = await _property.GetPagedProperties(model, true);
 
-            PagedList<PropertyListing> properties = await _property.GetPagedProperties(model.Filters, true);
-            model.Locations = await _property.GetLocations(model.Filters);
+            model.Locations = await _property.GetLocations(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             PropertySettings settings = _settings.GetPropertySettings();
-            model.Properties = properties;
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
+
             return View(model);
         }
 

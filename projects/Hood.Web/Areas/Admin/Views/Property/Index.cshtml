@@ -1,4 +1,4 @@
-@model ListPropertyModel
+@model PropertySearchModel
 @{
     ViewBag.Title = "Manage Properties";
     PropertySettings _propertySettings = _settings.GetPropertySettings();
@@ -17,16 +17,29 @@
     }
     <button class="btn btn-sm btn-success create-property"><i class="fa fa-plus-circle m-r-sm"></i>Create New</button>
 }
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
 <div class="row">
     <div class="col-sm-12 col-lg-9">
         <div class="panel-body">
-            @foreach (var property in Model.Properties.Items)
+            @if (Model.List.Count > 0)
             {
-                await Html.RenderPartialAsync("_ListTemplate", property);
+                @foreach (var property in Model.List)
+                {
+                    await Html.RenderPartialAsync("_ListTemplate", property);
+                }
+                <div class="text-center m-t-md">
+                    @{ await Html.RenderPartialAsync("_Pagination"); }
+                </div>
             }
-            <div class="text-center m-t-md">
-                @{ await Html.RenderPartialAsync("_Pagination"); }
-            </div>
+            else
+            {
+                <div class="alert alert-info">
+                    <p class="text-center m-t-xs m-b-lg">There are no properties yet, click "Create New" to add your first property.</p>
+                </div>
+            }
        </div>
     </div>
     <div class="col-sm-4 col-lg-3">

@@ -1,15 +1,15 @@
 @model EditContentModel
-@if (Model.Type.BaseName != "Page" && 
-     Model.Type.BaseName != "Product" && 
-     Model.Type.BaseName != "Team" && 
-     Model.Type.BaseName != "Slider" &&
-     Model.Content.Metadata.Where(c => c.Name.ToLower().StartsWith("content." + Model.Type.BaseName.ToLower() + ".")).Count() > 0)
+@if (Model.ContentType.BaseName != "Page" && 
+     Model.ContentType.BaseName != "Product" && 
+     Model.ContentType.BaseName != "Team" && 
+     Model.ContentType.BaseName != "Slider" &&
+     Model.Content.Metadata.Where(c => c.Name.ToLower().StartsWith("content." + Model.ContentType.BaseName.ToLower() + ".")).Count() > 0)
 { 
-    <li class=""><a data-toggle="tab" href="#type" aria-expanded="false"> @Model.Type.BaseName Settings</a></li>
+    <li class=""><a data-toggle="tab" href="#type" aria-expanded="false"> @Model.ContentType.BaseName Settings</a></li>
 }
-@if (Model.Type.Templates)
+@if (Model.ContentType.Templates)
 { <li class=""><a data-toggle="tab" href="#template" aria-expanded="false"> Template Settings</a></li> }
-@if (Model.Type.Gallery)
+@if (Model.ContentType.Gallery)
 { <li class=""><a data-toggle="tab" href="#media" aria-expanded="false"> Images &amp; Media</a></li> }
 @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
 { <li class=""><a data-toggle="tab" href="#seo" aria-expanded="false"> SEO Settings</a></li>}

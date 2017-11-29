@@ -5,20 +5,20 @@
         {
             <a href="@Model.Previous.Url" class="item-prev">
                 <i class="fa fa-long-arrow-left"></i>
-                Previous @Model.Type.TypeName
+                Previous @Model.ContentType.TypeName
             </a>
         }
     </div>
     <div class="col-xs-4 text-center">
-        <a href="/@Model.Type.Type.ToLower()">
-            Back to @Model.Type.Title
+        <a href="/@Model.ContentType.Type.ToLower()">
+            Back to @Model.ContentType.Title
         </a>
     </div>
     <div class="col-xs-4 text-right">
         @if (Model.Next != null)
         {
             <a href="@Model.Next.Url" class="item-prev">
-                Next @Model.Type.TypeName
+                Next @Model.ContentType.TypeName
                 <i class="fa fa-long-arrow-right"></i>
             </a>
         }

@@ -1,4 +1,4 @@
-@model ListPropertyModel
+@model PropertySearchModel
 
 @{
     ViewData["Title"] = "Properties";
@@ -62,25 +62,25 @@
     <div class="ptb-60 row">
         <div class="col-sm-6">
             <div class="p-xs">
-                Showing <strong>@((Model.Properties.CurrentPage - 1) * Model.Properties.PageSize + 1)</strong> -
+                Showing <strong>@((Model.PageIndex - 1) * Model.PageSize + 1)</strong> -
                 <strong>
-                    @if ((Model.Properties.CurrentPage * Model.Properties.PageSize) >= Model.Properties.Count)
+                    @if ((Model.PageIndex * Model.PageSize) >= Model.List.Count)
                     {
-                        @Model.Properties.Count
+                        @Model.List.Count
                     }
                     else
                     {
-                        @(Model.Properties.CurrentPage * Model.Properties.PageSize)
+                        @(Model.PageIndex * Model.PageSize)
                     }
                 </strong>
-                of @Model.Properties.Count products
+                of @Model.List.Count products
             </div>
         </div>
         <div class="col-sm-6 text-right">@{ await Html.RenderPartialAsync("_Pagination"); }</div>
     </div>
-    @if (Model.Properties.Count == 0)
+    @if (Model.List.Count == 0)
     {
-        @if (string.IsNullOrEmpty(Model.Filters.search))
+        @if (string.IsNullOrEmpty(Model.Search))
         {
             <div class="row text-center">
                 <div class="col-md-8 col-md-offset-2">
@@ -96,7 +96,7 @@
                 <div class="col-md-8 col-md-offset-2">
                     <h3 class="h4">We couldn't find anything!</h3>
                     <div class="spacer-15"></div>
-                    <p class="lead">Your search '@Model.Filters.search' did not return any results. Please try searching for something else.</p>
+                    <p class="lead">Your search '@Model.Search' did not return any results. Please try searching for something else.</p>
                 </div>
             </div>
         }
@@ -104,7 +104,7 @@
     else
     {
         <div class="row">
-            @foreach (var content in Model.Properties.Items)
+            @foreach (var content in Model.List)
             {
                 await Html.RenderPartialAsync("_PropertyCard", content);
             }

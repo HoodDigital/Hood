@@ -37,6 +37,7 @@ namespace Hood.Models
         public string Errors { get; set; }
         public string Message { get; set; }
         public bool Success { get; set; }
+        public string Url { get; set; }
         public Exception Exception { get; set; }
 
         public Response(Array data, int count, string message = "Succeeded!")

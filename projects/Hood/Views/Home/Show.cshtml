@@ -17,14 +17,14 @@
     }
     ViewBag.Title = metaTitle;
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
-    if (Model.Type.ShowDesigner)
+    if (Model.ContentType.ShowDesigner)
     {
         ViewData["DesignerUrl"] = string.Format("{0}?editMode=true", Model.Content.Url);
         ViewData["ExitDesignerUrl"] = Model.Content.Url;
     }
     ViewData["Content"] = Model.Content;
     Layout = "_Blank";
-    @switch (Model.Type.BaseName)
+    @switch (Model.ContentType.BaseName)
     {
         case "Event":
             Layout = "_EventLayout";
@@ -54,7 +54,7 @@
             break;
     }
     string template = null;
-    if (Model.Type.Templates)
+    if (Model.ContentType.Templates)
     {
         template = Model.Content.GetMeta("Settings.Template").Get<string>();
         if (template.IsSet())
@@ -95,7 +95,7 @@
 }
 else
 {
-    switch (Model.Type.BaseName)
+    switch (Model.ContentType.BaseName)
     {
         case "Event":
             await Html.RenderPartialAsync("_EventView");

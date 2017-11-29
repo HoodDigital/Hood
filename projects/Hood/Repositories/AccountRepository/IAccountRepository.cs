@@ -31,14 +31,14 @@ namespace Hood.Services
         Task<List<Subscription>> GetSubscriptionPlansAsync();
         Task<List<Subscription>> GetSubscriptionPlanLevels();
         Task<List<Subscription>> GetSubscriptionPlanAddons();
-        Task<PagedList<Subscription>> GetPagedSubscriptions(ListFilters filters, string search, string sort);
+        Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model);
         Task<Subscription> GetSubscriptionPlanById(int id);
         Task<Subscription> GetSubscriptionPlanByStripeId(string stripeId);
         Task<OperationResult> DeleteSubscriptionPlan(int id);
         Task<OperationResult> UpdateSubscription(Subscription model);
 
         // User Subscriptions
-        Task<PagedList<ApplicationUser>> GetPagedSubscribers(ListFilters filters, string subcription);
+        Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model);
         Task<UserSubscription> SaveUserSubscription(UserSubscription newUserSub);
         Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub);
         Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId);

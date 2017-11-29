@@ -41,21 +41,21 @@ namespace Hood.Controllers
         }
 
         [ResponseCache(CacheProfileName = "Day")]
-        public virtual IActionResult Index()
+        public virtual async Task<IActionResult> Index()
         {
             BasicSettings basicSettings = _settings.GetBasicSettings();
 
             if (basicSettings.LockoutMode && ControllerContext.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
             {
                 if (basicSettings.LockoutModeHoldingPage.HasValue)
-                    return Show(basicSettings.LockoutModeHoldingPage.Value);
+                    return await Show(basicSettings.LockoutModeHoldingPage.Value);
                 else
                     return View("~/Views/Home/Holding.cshtml");
             }
             else
             {
                 if (basicSettings.Homepage.HasValue)
-                    return Show(basicSettings.Homepage.Value);
+                    return await Show(basicSettings.Homepage.Value);
                 else
                     return View();
             }
@@ -64,30 +64,20 @@ namespace Hood.Controllers
         #region "Content"
 
         [ResponseCache(CacheProfileName = "Hour")]
-        public virtual IActionResult Feed(string type, string search, string sort = "PublishDateDesc", int page = 1, int size = 12)
+        public virtual async Task<IActionResult> Feed(ContentModel model, string type)
         {
-            ListFilters filters = new ListFilters()
-            {
-                search = search,
-                sort = sort,
-                page = page,
-                pageSize = size
-            };
-            PagedList<Content> content = _content.GetPagedContent(filters, type, null, null, null, true);
-            ContentListModel model = new ContentListModel()
-            {
-                Posts = content,
-                Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, type),
-                Type = _settings.GetContentSettings().GetContentType(type)
-            };
-            if (!model.Type.Enabled || !model.Type.IsPublic)
+            model.Type = type;
+            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
-            model.Search = filters.search;
+
+            model = await _content.GetPagedContent(model, true);
+            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
             return View("Feed", model);
         }
 
         [ResponseCache(CacheProfileName = "Day")]
-        public virtual IActionResult Show(int id, bool editMode = false)
+        public virtual async Task<IActionResult> Show(int id, bool editMode = false)
         {
             if (id == 0)
                 return NotFound();
@@ -100,12 +90,13 @@ namespace Hood.Controllers
             if (model.Content == null)
                 return NotFound();
 
-            model.Type = _settings.GetContentSettings().GetContentType(model.Content.ContentType);
+            model.Type = model.Content.ContentType;
+            model.ContentType = _settings.GetContentSettings().GetContentType(model.Content.ContentType);
 
-            if (model.Type == null || !model.Type.Enabled || !model.Type.HasPage)
+            if (model.Type == null || !model.ContentType.Enabled || !model.ContentType.HasPage)
                 return NotFound();
 
-            ContentNeighbours cn = _content.GetNeighbourContent(id, model.Type.Type);
+            ContentNeighbours cn = _content.GetNeighbourContent(id, model.ContentType.Type);
             model.Previous = cn.Previous;
             model.Next = cn.Next;
 
@@ -113,7 +104,7 @@ namespace Hood.Controllers
             if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && model.Content.Status != (int)Status.Published)
                 return NotFound();
 
-            if (model.Type.BaseName == "Page")
+            if (model.ContentType.BaseName == "Page")
             {
                 // if admin only, and not logged in as admin hide.
                 if (model.Content.GetMeta("Settings.Security.AdminOnly") != null)
@@ -142,7 +133,7 @@ namespace Hood.Controllers
                 }
             }
 
-            model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
+            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = model.Type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
 
             foreach (ContentMeta cm in model.Content.Metadata)
             {
@@ -153,51 +144,27 @@ namespace Hood.Controllers
 
         [ResponseCache(CacheProfileName = "Hour")]
         [Route("{type}/author/{author}/")]
-        public virtual IActionResult Author(string author, string type, string search, string sort = "PublishDateDesc", int page = 1, int size = 12)
+        public virtual async Task<IActionResult> Author(ContentModel model, string type)
         {
-            ListFilters filters = new ListFilters()
-            {
-                search = search,
-                sort = sort,
-                page = page,
-                pageSize = size
-            };
-            PagedList<Content> content = _content.GetPagedContent(filters, type, null, author, null, true);
-            ContentListModel model = new ContentListModel()
-            {
-                Posts = content,
-                Type = _settings.GetContentSettings().GetContentType(type)
-            };
-            if (!model.Type.Enabled || !model.Type.IsPublic)
+            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
-            model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
-            model.Search = filters.search;
-            model.Author = _auth.GetUserById(author);
+
+            model = await _content.GetPagedContent(model, true);
+            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
             return View("Feed", model);
         }
 
         [ResponseCache(CacheProfileName = "Hour")]
         [Route("{type}/category/{category}/")]
-        public virtual IActionResult Category(string type, string category, string search, string sort = "PublishDateDesc", int page = 1, int size = 12)
+        public virtual async Task<IActionResult> Category(ContentModel model, string type)
         {
-            ListFilters filters = new ListFilters()
-            {
-                search = search,
-                sort = sort,
-                page = page,
-                pageSize = size
-            };
-            PagedList<Content> content = _content.GetPagedContent(filters, type, category, null, null, true);
-            ContentListModel model = new ContentListModel()
-            {
-                Posts = content,
-                Type = _settings.GetContentSettings().GetContentType(type)
-            };
-            if (model.Type == null || !model.Type.Enabled || !model.Type.IsPublic)
+            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
-            model.Recent = _content.GetPagedContent(new ListFilters() { page = 1, pageSize = 5, sort = "PublishDateDesc" }, model.Type.Type);
-            model.Search = filters.search;
-            model.Category = _categories.FromSlug(model.Type.Type, category).DisplayName;
+
+            model = await _content.GetPagedContent(model, true);
+            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
             return View("Feed", model);
         }
 
