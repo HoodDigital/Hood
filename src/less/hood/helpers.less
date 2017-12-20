@@ -234,22 +234,25 @@ a.full-box-link {
     z-index: 1;
 }
 
-.row-center {
-    display: -webkit-box; 
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    align-items: center;
-}
+@media (min-width: 768px) {
 
-.row-full {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    align-items: stretch;
+    .row-center {
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        align-items: center;
+    }
+
+    .row-full {
+        display: -webkit-box;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        align-items: stretch;
+    }
 }
 
 .v-middle {
