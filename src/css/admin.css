@@ -12773,6 +12773,16 @@ body nav.sidebar {
   top: 0;
   z-index: 100;
 }
+body nav.sidebar .scroll-area {
+  overflow-y: auto;
+  overflow-x: visible;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 60px;
+  z-index: 100;
+}
 @media (min-width: 768px) {
   body nav.sidebar {
     width: 280px;
@@ -12786,15 +12796,19 @@ body nav.sidebar .profile-element {
     display: block;
   }
 }
-body nav.sidebar .profile-element .big-logo-element {
+body nav.sidebar .big-logo-element {
   background-color: #d9b50b;
   padding: 16px 0;
   color: white;
   text-align: center;
   font-size: 18px;
   font-weight: 600;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
-body nav.sidebar .profile-element .big-logo-element img {
+body nav.sidebar .big-logo-element img {
   height: 26px;
 }
 body nav.sidebar .logo-element {
@@ -12805,6 +12819,10 @@ body nav.sidebar .logo-element {
   text-align: center;
   font-size: 18px;
   font-weight: 600;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 body nav.sidebar .logo-element img {
   height: 27px;
@@ -12997,6 +13015,9 @@ body.mini-nav nav.sidebar .profile-element {
 }
 body.mini-nav nav.sidebar .logo-element {
   display: block;
+}
+body.mini-nav nav.sidebar .big-logo-element {
+  display: none;
 }
 body.mini-nav nav.sidebar ul.side-menu li {
   display: block;

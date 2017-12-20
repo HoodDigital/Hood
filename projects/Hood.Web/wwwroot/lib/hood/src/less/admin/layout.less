@@ -8,6 +8,17 @@ body {
         top: 0;
         z-index: 100;
 
+        .scroll-area {
+            overflow-y: auto;
+            overflow-x: visible;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 60px;
+            z-index: 100;
+        }
+
         @media (min-width:768px) {
             width: @sidebar-width;
         }
@@ -18,18 +29,22 @@ body {
             @media (min-width:768px) {
                 display: block;
             }
+        }
 
-            .big-logo-element {
-                background-color: @hood-yellow;
-                padding: 16px 0;
-                color: white;
-                text-align: center;
-                font-size: 18px;
-                font-weight: 600;
+        .big-logo-element {
+            background-color: @hood-yellow;
+            padding: 16px 0;
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
 
-                img {
-                    height: 26px;
-                }
+            img {
+                height: 26px;
             }
         }
 
@@ -41,6 +56,10 @@ body {
             text-align: center;
             font-size: 18px;
             font-weight: 600;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
 
             img {
                 height: 27px;
@@ -272,6 +291,10 @@ body {
 
             .logo-element {
                 display: block;
+            }
+
+            .big-logo-element {
+                display: none;
             }
 
             ul.side-menu {
