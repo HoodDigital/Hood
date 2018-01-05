@@ -1,6 +1,6 @@
 @model UserSubscription
 <div class="panel panel-default no-margin accordion-section">
-    <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-us-{0}", Model.UserSubscriptionId)">
+    <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-us-{0}", Model.Id)">
         <span class="pull-right">
             @switch (Model.Status)
             {
@@ -41,7 +41,7 @@
         </span>
         Subscription - @Model.Subscription.Name
     </div>
-    <div id="@string.Format("#collapse-us-{0}", Model.UserSubscriptionId)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-us-{0}", Model.UserSubscriptionId)">
+    <div id="@string.Format("#collapse-us-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-us-{0}", Model.Id)">
         <div class="panel-body">
             <dl class="dl-horizontal">
                 @if (Model.CancelAtPeriodEnd)
@@ -99,12 +99,12 @@
                 {
                     if (Model.CancelAtPeriodEnd)
                     {
-                        <a class="btn btn-xs btn-success" asp-action="Reactivate" asp-controller="Subscriptions" asp-route-id="@Model.UserSubscriptionId">Re-Activate</a>
-                        <a class="btn btn-xs btn-danger" asp-action="Remove" asp-controller="Subscriptions" asp-route-id="@Model.UserSubscriptionId">Delete</a>
+                        <a class="btn btn-xs btn-success" asp-action="Reactivate" asp-controller="Subscriptions" asp-route-id="@Model.Id">Re-Activate</a>
+                        <a class="btn btn-xs btn-danger" asp-action="Remove" asp-controller="Subscriptions" asp-route-id="@Model.Id">Delete</a>
                     }
                     else
                     {
-                        <a class="btn btn-xs btn-danger" asp-action="Cancel" asp-controller="Subscriptions" asp-route-id="@Model.UserSubscriptionId">Cancel</a>
+                        <a class="btn btn-xs btn-danger" asp-action="Cancel" asp-controller="Subscriptions" asp-route-id="@Model.Id">Cancel</a>
                     }
                 }
             </p>

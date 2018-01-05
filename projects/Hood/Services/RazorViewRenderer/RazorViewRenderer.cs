@@ -39,8 +39,9 @@ namespace Hood.Services
         public async Task<string> Render<TModel>(string name, TModel model)
         {
             var actionContext = GetActionContext();
-
-            var viewEngineResult = _viewEngine.GetView("~/", name, false);
+            if (!name.StartsWith("~"))
+                name = "~" + (name.StartsWith("/") ? name : "/" + name);
+            var viewEngineResult = _viewEngine.GetView("", name, false);
 
             if (!viewEngineResult.Success)
             {

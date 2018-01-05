@@ -25,14 +25,23 @@ namespace Hood.Models
         public string LeaseStatuses { get; set; }
         public string TriggerAuthKey { get; set; }
         public bool ShowBedrooms { get; set; }
-        public bool ShowRentDecimals { get; set; }
-        public bool ShowAskingPriceDecimals { get; set; }
-        public bool ShowPremiumDecimals { get; set; }
-        public bool ShowFeesDecimals { get; set; }
         public bool ShowRent { get; set; }
+        public bool ShowRentDecimals { get; set; }
+        public int RentMinimum { get; set; }
+        public int RentMaximum { get; set; }
+        public int RentIncrement { get; set; }
         public bool ShowAskingPrice { get; set; }
+        public bool ShowAskingPriceDecimals { get; set; }
+        public int AskingPriceMinimum { get; set; }
+        public int AskingPriceMaximum { get; set; }
+        public int AskingPriceIncrement { get; set; }
         public bool ShowPremium { get; set; }
+        public bool ShowPremiumDecimals { get; set; }
+        public int PremiumMinimum { get; set; }
+        public int PremiumMaximum { get; set; }
+        public int PremiumIncrement { get; set; }
         public bool ShowFees { get; set; }
+        public bool ShowFeesDecimals { get; set; }
         public FTPImporterSettings FTPImporterSettings { get; set; }
 
         public PropertySettings()
@@ -45,6 +54,15 @@ namespace Hood.Models
             ShowAskingPrice = true;
             ShowItem = true;
             ShowList = true;
+            RentMinimum = 0;
+            RentMaximum = 1000000;
+            AskingPriceMinimum = 0;
+            AskingPriceMaximum = 10000000;
+            PremiumMinimum = 0;
+            PremiumMaximum = 1000000;
+            RentIncrement = 10000;
+            AskingPriceIncrement = 50000;
+            PremiumIncrement = 10000;
             Enabled = false;
             PriceDisplays = PropertyDetails.PriceQualifiers.OrderBy(c => c.Value).Select(p => p.Value).Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(a), sb => sb.ToString());
             RentDisplays = PropertyDetails.RentFrequency.OrderBy(c => c.Value).Select(p => p.Value).Aggregate(new StringBuilder(), (sb, a) => sb.AppendLine(a), sb => sb.ToString());

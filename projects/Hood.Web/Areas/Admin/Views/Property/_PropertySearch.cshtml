@@ -11,7 +11,7 @@
         </div>
         <div class="panel-body small">
             <h4>Type</h4>
-            <select class="form-control" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
+            <select class="form-control submit-on-change" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
                 <option value="">Show All</option>
             </select>
         </div>
@@ -19,7 +19,7 @@
         {
             <div class="panel-body small">
                 <h4>Bedrooms</h4>
-                <select class="form-control half" asp-for="Bedrooms">
+                <select class="form-control half submit-on-change" asp-for="Bedrooms">
                     <option value="">Show All</option>
                     @for (int i = 0; i < 13; i++)
                     {
@@ -32,15 +32,19 @@
         {
             <div class="panel-body small">
                 <h4>Rent</h4>
-                <select class="form-control half" asp-for="MinRent">
+                <select class="form-control half submit-on-change" asp-for="MinRent">
                     <option value="">Show All</option>
-                    <option value="0">£ 0</option>
-                    <option value="100">£ 100</option>
+                    @for (int i = _propertySettings.RentMinimum; i <= _propertySettings.RentMaximum; i = i + _propertySettings.RentIncrement)
+                    {
+                        <option value="@i">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                    }
                 </select>
-                <select class="form-control half" asp-for="MaxRent">
+                <select class="form-control half submit-on-change" asp-for="MaxRent">
                     <option value="">Show All</option>
-                    <option value="0">£ 0</option>
-                    <option value="100">£ 100</option>
+                    @for (int i = _propertySettings.RentMinimum; i <= _propertySettings.RentMaximum; i = i + _propertySettings.RentIncrement)
+                    {
+                        <option value="@i">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                    }
                 </select>
             </div>
         }
@@ -48,15 +52,19 @@
         {
             <div class="panel-body small">
                 <h4>Asking Price</h4>
-                <select class="form-control half" asp-for="MinRent">
+                <select class="form-control half submit-on-change" asp-for="MinPrice">
                     <option value="">Show All</option>
-                    <option value="0">£ 0</option>
-                    <option value="100">£ 100</option>
+                    @for (int i = _propertySettings.AskingPriceMinimum; i <= _propertySettings.AskingPriceMaximum; i = i + _propertySettings.AskingPriceIncrement)
+                    {
+                        <option value="@i">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                    }
                 </select>
-                <select class="form-control half" asp-for="MaxRent">
+                <select class="form-control half submit-on-change" asp-for="MaxPrice">
                     <option value="">Show All</option>
-                    <option value="0">£ 0</option>
-                    <option value="100">£ 100</option>
+                    @for (int i = _propertySettings.AskingPriceMinimum; i <= _propertySettings.AskingPriceMaximum; i = i + _propertySettings.AskingPriceIncrement)
+                    {
+                        <option value="@i">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                    }
                 </select>
             </div>
         }
@@ -64,27 +72,31 @@
         {
             <div class="panel-body small">
                 <h4>Premium</h4>
-                <select class="form-control half" asp-for="MinRent">
+                <select class="form-control half submit-on-change" asp-for="MinPremium">
                     <option value="">Show All</option>
-                    <option value="0">£ 0</option>
-                    <option value="100">£ 100</option>
+                    @for (int i = _propertySettings.PremiumMinimum; i <= _propertySettings.PremiumMaximum; i = i + _propertySettings.PremiumIncrement)
+                    {
+                        <option value="@i">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                    }
                 </select>
-                <select class="form-control half" asp-for="MaxRent">
+                <select class="form-control half submit-on-change" asp-for="MaxPremium">
                     <option value="">Show All</option>
-                    <option value="0">£ 0</option>
-                    <option value="100">£ 100</option>
+                    @for (int i = _propertySettings.PremiumMinimum; i <= _propertySettings.PremiumMaximum; i = i + _propertySettings.PremiumIncrement)
+                    {
+                        <option value="@i">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                    }
                 </select>
             </div>
         }
         <div class="panel-body small">
             <h4>Planning</h4>
-            <select class="form-control" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
+            <select class="form-control submit-on-change" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
                 <option value="">Show All</option>
             </select>
         </div>
         <div class="panel-body small">
             <h4>Organise by</h4>
-            <select class="form-control" asp-for="Order">
+            <select class="form-control submit-on-change" asp-for="Order">
                 <optgroup label="Property">
                     <option value="name">Name (A-Z)</option>
                     <option value="name+desc">Name (Z-A)</option>

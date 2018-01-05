@@ -1,20 +1,20 @@
-﻿using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using Hood.Caching;
+using Hood.Core;
+using Hood.Extensions;
+using Hood.Infrastructure;
+using Hood.Models;
+using Hood.Services;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using Hood.Models;
-using Hood.Services;
 using System;
-using Hood.Caching;
-using Hood.Infrastructure;
 using System.Collections.Generic;
-using Hood.Extensions;
-using Hood.ViewModels;
-using Hood.Core;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
@@ -220,7 +220,6 @@ namespace Hood.Controllers
         }
 
         #endregion
-
 
         #region "Basic Registration"
 

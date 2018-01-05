@@ -63,7 +63,7 @@
                         else
                         {
 
-                            <a class="btn btn-md btn-default" asp-action="Upgrade" asp-route-id="@currentSub.UserSubscriptionId" asp-route-plan="@plan.Id">
+                            <a class="btn btn-md btn-default" asp-action="Upgrade" asp-route-id="@currentSub.Id" asp-route-plan="@plan.Id">
                                 @if (plan.Amount > currentSub.Subscription.Amount)
                                 {
                                     <span>Upgrade</span>

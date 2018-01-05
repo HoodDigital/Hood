@@ -1,4 +1,4 @@
-﻿@using Testing.Views.Manage
+﻿@using Hood.Views.Manage
 @inject SignInManager<ApplicationUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();

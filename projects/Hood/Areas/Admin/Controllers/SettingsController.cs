@@ -7,6 +7,7 @@ using Hood.Models;
 using System;
 using Hood.Caching;
 using Geocoding.Google;
+using Hood.Enums;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -449,11 +450,12 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/settings/mail/")]
         [Authorize(Roles = "Admin,Editor,Manager")]
-        public IActionResult Mail()
+        public IActionResult Mail(EditorMessage? status)
         {
             MailSettings model = _settings.GetMailSettings(true);
             if (model == null)
                 model = new MailSettings();
+            model.AddEditorMessage(status);
             return View(model);
         }
         [HttpPost]

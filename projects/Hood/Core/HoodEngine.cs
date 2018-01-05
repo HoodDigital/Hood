@@ -52,7 +52,6 @@ namespace Hood.Core
             services.AddSingleton<SubscriptionsEventListener>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
-            services.AddSingleton<IRazorViewRenderer, RazorViewRenderer>();
             services.AddSingleton<IHoodCache, HoodCache>();
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IPropertyImporter, PropertyImporter>();
@@ -62,12 +61,6 @@ namespace Hood.Core
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<ISettingsRepository, SettingsRepository>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IPropertyRepository, PropertyRepository>();
-            services.AddScoped<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
-            services.AddScoped<IContentRepository, ContentRepository>();
-            services.AddScoped<IStripeWebHookService, StripeWebHookService>();
-            services.AddTransient<ISmsSender, SmsSender>();
             services.AddTransient<IStripeService, StripeService>();
             services.AddTransient<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddTransient<ISubscriptionService, SubscriptionService>();
@@ -75,9 +68,16 @@ namespace Hood.Core
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<IBillingService, BillingService>();
-            services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<FormSenderService>();
             services.AddTransient<WelcomeEmailSender>();
+            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IPropertyRepository, PropertyRepository>();
+            services.AddScoped<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
+            services.AddScoped<IContentRepository, ContentRepository>();
+            services.AddScoped<IStripeWebHookService, StripeWebHookService>();
+            services.AddScoped<ISmsSender, SmsSender>();
+            services.AddScoped<IEmailSender, EmailSender>();
 
             //populate Autofac container builder with the set of registered service descriptors
             builder.Populate(services);

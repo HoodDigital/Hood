@@ -49,7 +49,7 @@
                 <form>
                     <div class="row m-b-sm m-t-sm">
                         <div class="col-md-4">
-                            <select class="form-control" asp-for="Order" name="sort">
+                            <select class="form-control submit-on-change" asp-for="Order" name="sort">
                                 <option value="PublishDateDesc">Recently Published</option>
                                 <option value="PublishDate">Published Date (Oldest-Newest)</option>
                                 <option value="DateDesc">Newest First</option>
@@ -59,7 +59,7 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <select class="form-control" asp-for="Category" name="category" data-selected="@Model.Category">
+                            <select class="form-control submit-on-change" asp-for="Category" name="category" data-selected="@Model.Category">
                                 <option value="">Show All</option>
                                 @Html.CategorySelectOptions(categories, true)
                             </select>

@@ -17,6 +17,18 @@ namespace Hood.BaseTypes
             {
                 switch (message.Value)
                 {
+                    case EditorMessage.Succeeded:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Operation completed successfully.";
+                        break;
+                    case EditorMessage.Sent:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Message sent successfully.";
+                        break;
+                    case EditorMessage.ErrorSending:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "There was a problem sending the message.";
+                        break;
                     case EditorMessage.Created:
                         MessageType = AlertType.Success;
                         SaveMessage = "Created successfully.";

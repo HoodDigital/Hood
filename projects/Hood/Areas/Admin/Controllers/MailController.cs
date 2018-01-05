@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Hood.Models;
 using System.Threading.Tasks;
 using SendGrid.Helpers.Mail;
+using Hood.Enums;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -71,11 +72,11 @@ namespace Hood.Areas.Admin.Controllers
                 mail.Subject = "Test email from HoodCMS";
                 mail.PreHeader = "This is a test email from HoodCMS.";
                 await _email.SendEmailAsync(mail, template);
-                return View(new Response(true));
+                return RedirectToAction("Mail", "Settings", new { status = EditorMessage.Sent });
             }
             catch (Exception ex)
             {
-                return View(new Response(ex));
+                return RedirectToAction("Mail", "Settings", new { status = EditorMessage.ErrorSending });
             }
         }
 

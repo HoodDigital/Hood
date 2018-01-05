@@ -44,7 +44,6 @@
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Editor_Type.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Default.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Page.cshtml" />
-    <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Product.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Slider.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Edit_Team.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Content\_Field_Author.cshtml" />
@@ -101,7 +100,6 @@
     <EmbeddedResource Include="Areas\Admin\Views\Shared\_AdminLayout.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Shared\_AdminScripts.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Shared\_AdminStyles.cshtml" />
-    <EmbeddedResource Include="Areas\Admin\Views\Shared\_LoginPartial.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Shared\_MetaEditor_Default.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Shared\_MetaEditor_Template.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Shared\_SettingsLayout.cshtml" />
@@ -117,7 +115,6 @@
     <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Subscribers.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\Webhook.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\_Editor_Subscription.cshtml" />
-    <EmbeddedResource Include="Areas\Admin\Views\Subscriptions\_SubscribersPager.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Users\Blade.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Users\Create.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Users\Edit.cshtml" />
@@ -125,23 +122,6 @@
     <EmbeddedResource Include="Areas\Admin\Views\Users\Roles.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\_ViewImports.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\_ViewStart.cshtml" />
-    <EmbeddedResource Include="Views\Account\AccessDenied.cshtml" />
-    <EmbeddedResource Include="Views\Account\Code.cshtml" />
-    <EmbeddedResource Include="Views\Account\ConfirmEmail.cshtml" />
-    <EmbeddedResource Include="Views\Account\ConfirmRequired.cshtml" />
-    <EmbeddedResource Include="Views\Account\Create.cshtml" />
-    <EmbeddedResource Include="Views\Account\ExternalLoginConfirmation.cshtml" />
-    <EmbeddedResource Include="Views\Account\ExternalLoginFailure.cshtml" />
-    <EmbeddedResource Include="Views\Account\Finish.cshtml" />
-    <EmbeddedResource Include="Views\Account\ForgotPassword.cshtml" />
-    <EmbeddedResource Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
-    <EmbeddedResource Include="Views\Account\Lockout.cshtml" />
-    <EmbeddedResource Include="Views\Account\Login.cshtml" />
-    <EmbeddedResource Include="Views\Account\Register.cshtml" />
-    <EmbeddedResource Include="Views\Account\ResetPassword.cshtml" />
-    <EmbeddedResource Include="Views\Account\ResetPasswordConfirmation.cshtml" />
-    <EmbeddedResource Include="Views\Account\SendCode.cshtml" />
-    <EmbeddedResource Include="Views\Account\VerifyCode.cshtml" />
     <EmbeddedResource Include="Views\Address\Create.cshtml" />
     <EmbeddedResource Include="Views\Address\Edit.cshtml" />
     <EmbeddedResource Include="Views\Address\Index.cshtml" />
@@ -162,11 +142,6 @@
     <EmbeddedResource Include="Views\Blocks\Separator.json" />
     <EmbeddedResource Include="Views\Blocks\TitleBlock.cshtml" />
     <EmbeddedResource Include="Views\Blocks\TitleBlock.json" />
-    <EmbeddedResource Include="Views\Cart\Cart.cshtml" />
-    <EmbeddedResource Include="Views\Cart\Checkout.cshtml" />
-    <EmbeddedResource Include="Views\Cart\Failure.cshtml" />
-    <EmbeddedResource Include="Views\Cart\MiniCart.cshtml" />
-    <EmbeddedResource Include="Views\Cart\Success.cshtml" />
     <EmbeddedResource Include="Views\Components\Header\Default.cshtml" />
     <EmbeddedResource Include="Views\Home\Feed.cshtml" />
     <EmbeddedResource Include="Views\Home\Index.cshtml" />
@@ -215,14 +190,7 @@
     <EmbeddedResource Include="Views\Layouts\_PropertyLayout.cshtml" />
     <EmbeddedResource Include="Views\Layouts\_TeamLayout.cshtml" />
     <EmbeddedResource Include="Views\Layouts\_TestimonialLayout.cshtml" />
-    <EmbeddedResource Include="Views\Manage\AddPhoneNumber.cshtml" />
-    <EmbeddedResource Include="Views\Manage\ChangePassword.cshtml" />
-    <EmbeddedResource Include="Views\Manage\Index.cshtml" />
-    <EmbeddedResource Include="Views\Manage\ManageLogins.cshtml" />
     <EmbeddedResource Include="Views\Manage\Profile.cshtml" />
-    <EmbeddedResource Include="Views\Manage\RemoveLogin.cshtml" />
-    <EmbeddedResource Include="Views\Manage\SetPassword.cshtml" />
-    <EmbeddedResource Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <EmbeddedResource Include="Views\Property\Index.cshtml" />
     <EmbeddedResource Include="Views\Property\Modal.cshtml" />
     <EmbeddedResource Include="Views\Property\Show.cshtml" />
@@ -240,7 +208,6 @@
     <EmbeddedResource Include="Views\Shared\_Email_Layout.cshtml" />
     <EmbeddedResource Include="Views\Shared\_Email_PreHeader.cshtml" />
     <EmbeddedResource Include="Views\Shared\_Footer.cshtml" />
-    <EmbeddedResource Include="Views\Shared\_LoginPartial.cshtml" />
     <EmbeddedResource Include="Views\Shared\_LoginScripts.cshtml" />
     <EmbeddedResource Include="Views\Shared\_LoginSocials.cshtml" />
     <EmbeddedResource Include="Views\Shared\_LoginStyles.cshtml" />
@@ -272,10 +239,4 @@
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
   
-  <ItemGroup>
-    <Content Update="Views\Shared\_Pagination.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

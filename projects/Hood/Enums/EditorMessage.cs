@@ -15,6 +15,9 @@ namespace Hood.Enums
         Error,
         HomepageSet,
         Archived,
-        Published
+        Published,
+        Succeeded,
+        Sent,
+        ErrorSending
     }
 }
