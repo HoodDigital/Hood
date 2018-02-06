@@ -64,11 +64,21 @@ namespace Hood.Controllers
                 Property = _property.GetPropertyById(id)
             };
 
+            if (um.Property == null)
+                return RedirectToAction("NotFound");
+
             // if not admin, and not published, hide.
             if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && um.Property.Status != (int)Status.Published)
-                return NotFound();
+                return RedirectToAction("NotFound");
 
             return View(um);
+        }
+
+
+        [Route("property/not-found")]
+        public IActionResult NotFound(int id)
+        {
+            return View();
         }
 
         [Route("property/modal")]
