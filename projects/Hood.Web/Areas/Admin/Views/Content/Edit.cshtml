@@ -122,11 +122,12 @@
                         }
                     }
                     @if (Model.ContentType.ShowImage || Model.ContentType.ShowBanner)
-                    { <div class="panel-body small">
-                        <h4 class="">Images</h4>
-                        @{ await Html.RenderPartialAsync("_Field_Images"); }
-                    </div>
-                            }
+                    {
+                        <div class="panel-body small">
+                            <h4 class="">Images</h4>
+                            @{ await Html.RenderPartialAsync("_Field_Images"); }
+                        </div>
+                    }
                     @if (Model.ContentType.ShowCategories)
                     {
                         <div class="panel-body small">
@@ -146,7 +147,7 @@
                                 }
                             </div>
                         </div>
-                                    }
+                    }
                     <div class="panel-body small">
                         <h4>
                             Settings
@@ -184,5 +185,5 @@
         <div role="tabpanel" class="tab-pane" id="designer">
             @{ await Html.RenderPartialAsync("_Designer"); }
         </div>
-                }
+    }
 </div>

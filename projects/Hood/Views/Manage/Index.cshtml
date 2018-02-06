@@ -1,105 +1,212 @@
 @model IndexViewModel
 @{
-    ViewData["Title"] = "Manage your account";
-    var integrations = _settings.GetIntegrationSettings();
+    ViewData["Title"] = "Profile";
+    ViewData.AddActivePage(ManageNavPages.Index);
 }
-@Html.Raw(ViewData["StatusMessage"])
-<div class="row">
-    <div class="col-sm-4">
-        <ul class="nav nav-pills nav-stacked" role="tablist">
-            <li role="presentation" class="active"><a href="#password" aria-controls="password" role="tab" data-toggle="tab">Password</a></li>
-            <li role="presentation"><a href="#addresses" aria-controls="logins" role="tab" data-toggle="tab">Addresses</a></li>
-            <li role="presentation"><a href="#logins" aria-controls="logins" role="tab" data-toggle="tab">External Logins</a></li>
-            <li role="presentation"><a href="#roles" aria-controls="roles" role="tab" data-toggle="tab">Roles</a></li>
-            <li role="presentation"><a href="#security" aria-controls="security" role="tab" data-toggle="tab">Security</a></li>
-        </ul>
+@section avatar {
+    <div class="text-center m-b-lg">
+        <fixedImage src="@Model.Avatar?.SmallUrl" class="img img-sm @string.Format("avatar-{0}", Model.UserId)"></fixedImage>
     </div>
-    <div class="col-sm-8">
-        <div class="tabs">
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="password">
-                    <h4>Password</h4>
-                    <hr class="m-b-lg" />
-                    @if (Model.HasPassword)
-                    {
-                        <p>Your account has a local password set, you can change it here, simply click the button below to change your password.</p>
-                        <a asp-controller="Manage" asp-action="ChangePassword" class="btn btn-md btn-default">Change Password</a>
-                    }
-                    else
-                    {
-                        <p>Your account does not have a local password set, you can add one here, then you can log into the site, without using your social media access token.</p>
-                        <a asp-controller="Manage" asp-action="SetPassword" class="btn btn-md btn-default">Create Password</a>
-                    }
-                </div>
-                <div role="tabpanel" class="tab-pane" id="addresses">
-                    <span class="pull-right">
-                        <a class="btn btn-success btn-xs add-new-address">Add new address <i class="fa fa-plus-circle"></i></a>
-                    </span>
-                    <h4>Your Addresses</h4>
-                    <hr class="m-b-lg" />
-                    <div class="hood-inline address-list" data-url="@Url.Action("Index", "Address")"></div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="logins">
-                    <h4>External Logins (@Model.Logins.Count)</h4>
-                    <hr class="m-b-lg" />
-                    <p>You currently have the following social logins activated on this account:</p>
-                    <ul>
-                        @foreach (UserLoginInfo login in Model.Logins)
-                        {
-                            <li>@login.LoginProvider</li>
-                        }
-                    </ul>
-                    <p>To manage your external logins please click the 'Manage Social Logins' button below.</p>
-                    <a asp-controller="Manage" asp-action="ManageLogins" class="btn btn-md btn-default">Manage Social Logins</a>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="roles">
-                    <h4>Roles</h4>
-                    <hr class="m-b-lg" />
-                    <p>You are currenty in the following roles:</p>
-                    <ul>
-                        @foreach (string role in Model.Roles)
-                        {
-                            <li>@role</li>
-                        }
-                    </ul>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="security">
-                    <h4>Two-Factor Authentication</h4>
-                    <hr class="m-b-lg" />
-                    @if (Model.TwoFactor)
-                    {
-                        <form asp-controller="Manage" asp-action="DisableTwoFactorAuthentication" method="post" class="form-horizontal">
+}
+<ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active"><a href="#basics" aria-controls="password" role="tab" data-toggle="tab">Basic Details</a></li>
+    <li role="presentation"><a href="#roles" aria-controls="socials" role="tab" data-toggle="tab">Roles</a></li>
+    <li role="presentation"><a href="#socials" aria-controls="socials" role="tab" data-toggle="tab">Socials</a></li>
+    <li role="presentation"><a href="#avatar" aria-controls="avatar" role="tab" data-toggle="tab">Avatar</a></li>
+    <li role="presentation"><a href="#bio" aria-controls="bio" role="tab" data-toggle="tab">Bio</a></li>
+</ul>
+@Html.Partial("_StatusMessage", Model.StatusMessage)
+<hr class="m-b-lg" />
+<form method="post">
 
-                            Enabled [<button type="submit" class="btn-link btn-bracketed">Disable</button>]
-                        </form>
-                    }
-                    else
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="tabs">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="basics">
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Username"></label>
+                        <div class="col-sm-9">
+                            <input asp-for="Username" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Email"></label>
+                        <div class="col-sm-9">
+                            @if (Model.IsEmailConfirmed)
+                            {
+                                <div class="input-group">
+                                    <input asp-for="Email" class="form-control" />
+                                    <span class="input-group-addon" aria-hidden="true"><span class="glyphicon glyphicon-ok text-success"></span></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <input asp-for="Email" class="form-control" />
+                                <button asp-action="SendVerificationEmail" class="btn btn-link">Send verification email</button>
+                            }
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="PhoneNumber"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="PhoneNumber">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.FirstName"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.FirstName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.LastName"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.LastName">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.JobTitle"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.JobTitle">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.CompanyName"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.CompanyName">
+                        </div>
+                    </div>
+                </fieldset>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.EmailOptin"></label>
+                        <div class="col-sm-9">
+                            <div class="checkbox">
+                                <input asp-for="Profile.EmailOptin" class="styled">
+                                <label asp-for="Profile.EmailOptin">Recieve updates and latest news from us.</label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.ClientCode"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.ClientCode">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.VATNumber"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.VATNumber">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="roles">
+                @if (Model.Roles.Count > 0)
+                {
+                    <p>Your account has been assigned the following roles:</p>
+                    @foreach (var role in Model.Roles)
                     {
-                        <form asp-controller="Manage" asp-action="EnableTwoFactorAuthentication" method="post" class="form-horizontal">
-                            Disabled [<button type="submit" class="btn-link btn-bracketed">Enable</button>]
-                        </form>
+                        <p><i class="fa fa-check m-r-sm"></i>@role.CamelCaseToString()</p>
                     }
-                    <hr class="m-lg" />
-                    <h5>Phone Number:</h5>
-                    <p>
-                        Phone Numbers can used as a second factor of verification in two-factor authentication.
-                        See <a href="http://go.microsoft.com/fwlink/?LinkID=532713">this article</a>
-                        for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-                    </p>
-                    @(Model.PhoneNumber ?? "None")
-                    @if (Model.PhoneNumber != null)
-                    {
-                        <a asp-controller="Manage" asp-action="AddPhoneNumber" class="btn-bracketed">Change</a>
-                        <form asp-controller="Manage" asp-action="RemovePhoneNumber" method="post">
-                            [<button type="submit" class="btn-link">Remove</button>]
-                        </form>
-                    }
-                    else
-                    {
-                        <a asp-controller="Manage" asp-action="AddPhoneNumber" class="btn-bracketed">Add</a>
-                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        Your account has not been assigned to any roles just yet.
+                    </div>
+                }
+            </div>
+            <div role="tabpanel" class="tab-pane" id="socials">
+                <h4>Social Media Accounts</h4>
+                <hr class="m-b-lg" />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.Facebook"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.Facebook">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.GooglePlus"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.GooglePlus">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.LinkedIn"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.LinkedIn">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.Twitter"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.Twitter">
+                        </div>
+                    </div>
+                </fieldset>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.TwitterHandle"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.TwitterHandle">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.WebsiteUrl"></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" asp-for="Profile.WebsiteUrl">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="avatar">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <fixedImage src="@Model.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId)"></fixedImage>
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading">Change your profile image</h4>
+                        <p>You can set your own profile image, click the upload button below to begin.</p>
+                        <p><a class="btn btn-default" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })" data-preview="@string.Format(".avatar-{0}", Model.UserId)">Upload</a></p>
+                    </div>
                 </div>
+                <div id="avatar-total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="opacity: 0;">
+                    <div class="progress-bar progress-bar-dark" style="width:0%;" data-dz-uploadprogress=""></div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="bio">
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.Bio"></label>
+                        <div class="col-sm-9">
+                            <textarea type="text" class="form-control" asp-for="Profile.Bio" rows="10"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Profile.Notes"></label>
+                        <div class="col-sm-9">
+                            <textarea type="text" class="form-control" asp-for="Profile.Notes"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
         </div>
     </div>
-</div>
+    <hr class="m-b-lg" />
+    <button type="submit" class="btn btn-success">Save Profile</button>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

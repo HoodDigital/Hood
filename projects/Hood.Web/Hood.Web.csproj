@@ -3,11 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>Hood.Web</UserSecretsId>
+    <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Shared\_Subscriptions_CurrentInfo.cshtml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
@@ -119,7 +124,6 @@
     <EmbeddedResource Include="Areas\Admin\Views\Users\Create.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Users\Edit.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\Users\Index.cshtml" />
-    <EmbeddedResource Include="Areas\Admin\Views\Users\Roles.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\_ViewImports.cshtml" />
     <EmbeddedResource Include="Areas\Admin\Views\_ViewStart.cshtml" />
     <EmbeddedResource Include="Views\Address\Create.cshtml" />
@@ -190,7 +194,6 @@
     <EmbeddedResource Include="Views\Layouts\_PropertyLayout.cshtml" />
     <EmbeddedResource Include="Views\Layouts\_TeamLayout.cshtml" />
     <EmbeddedResource Include="Views\Layouts\_TestimonialLayout.cshtml" />
-    <EmbeddedResource Include="Views\Manage\Profile.cshtml" />
     <EmbeddedResource Include="Views\Property\Index.cshtml" />
     <EmbeddedResource Include="Views\Property\Modal.cshtml" />
     <EmbeddedResource Include="Views\Property\Show.cshtml" />
@@ -233,6 +236,10 @@
     <EmbeddedResource Include="Views\Templates\_Page.cshtml" />
     <EmbeddedResource Include="Views\_ViewImports.cshtml" />
     <EmbeddedResource Include="Views\_ViewStart.cshtml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="Views\Shared\_Subscriptions_CurrentInfo.cshtml" />
   </ItemGroup>
   
   <ItemGroup>

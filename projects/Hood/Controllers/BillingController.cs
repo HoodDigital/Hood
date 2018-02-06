@@ -135,12 +135,11 @@ namespace Hood.Controllers
                 BillingMessage bm = BillingMessage.Null;
                 if (Enum.TryParse(ex.Message, out bm))
                 {
-                    model.Message = bm;
+                    model.AddBillingMessage(bm);
                 }
                 else
                 {
-                    model.Message = BillingMessage.StripeError;
-                    model.MessageText = ex.Message;
+                    model.AddBillingMessage(BillingMessage.StripeError);
                 }
                 return View(model);
             }

@@ -29,7 +29,7 @@ namespace Hood.Services
         // Subscription Plans
         Task<OperationResult> AddSubscriptionPlan(Subscription subscription);
         Task<List<Subscription>> GetSubscriptionPlansAsync();
-        Task<List<Subscription>> GetSubscriptionPlanLevels();
+        Task<List<Subscription>> GetSubscriptionPlanLevels(string category = null);
         Task<List<Subscription>> GetSubscriptionPlanAddons();
         Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model);
         Task<Subscription> GetSubscriptionPlanById(int id);

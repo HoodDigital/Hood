@@ -1,5 +1,8 @@
-﻿using Hood.Models;
+﻿using Hood.Caching;
+using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -15,12 +18,19 @@ namespace Hood.Filters
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAccountRepository _auth;
 
-        public AccountFilter(ILoggerFactory loggerFactory, 
-                                  IAccountRepository auth,
-                                  UserManager<ApplicationUser> userManager)
+        public AccountFilter(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            HoodDbContext db,
+            IHttpContextAccessor contextAccessor,
+            IHoodCache cache,
+            ISettingsRepository settings,
+            ISettingsRepository site,
+            IBillingService billing,
+            ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<AccountFilter>();
-            _auth = auth;
+            _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
             _userManager = userManager;
         }
 

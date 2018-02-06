@@ -73,6 +73,7 @@ $.hood.App = {
         SkillsBars: true, 
         Counters: true,
         Uploaders: true,
+        PaymentPages: true,
         Header: {
             Enabled: true,
             Type: 'basic',
@@ -156,6 +157,8 @@ $.hood.App = {
         if ($.hood.App.Options.Scroll.Functions)
             $.hood.App.Scroll.Functions();
 
+        if ($.hood.App.Options.PaymentPages)
+            $.hood.App.PaymentPages.Init();
 
         if ($.hood.App.Options.Accordion)
             $.hood.App.Accordion();
@@ -868,6 +871,28 @@ $.hood.App = {
                 }
                 $($("#avatar-upload").data('preview')).removeClass('loading');
             });
+        }
+    }, 
+    PaymentPages: {
+        Init: function () {
+            $('body').on('click', '.btn.price-select[data-target][data-value]', $.hood.App.PaymentPages.PriceSelect);
+            $('body').on('click', '.change-price-option', $.hood.App.PaymentPages.ChangePrice);
+        },
+        ChangePrice: function () {
+            $('#price-panel').collapse('show');
+            $('#billing-panel').collapse('hide');
+            $('#confirm-panel').collapse('hide');
+        },
+        PriceSelect: function () {
+            var $this = $(this);
+            targetId = '#' + $this.data('target');
+            $(targetId).val($this.data('value'));
+            $(".selected-price-text").html($(targetId).find(":selected").text());
+            $('.price-select[data-target="' + $this.data('target') + '"]').each(function () { $(this).html($(this).data('temp')).removeClass('active'); });
+            $('.price-select[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).data('temp', $(this).html()).html('Selected').addClass('active') });;
+            $('#price-panel').collapse('hide');
+            $('#billing-panel').collapse('show');
+            $('#confirm-panel').collapse('hide');
         }
     }
 };

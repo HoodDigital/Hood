@@ -13,6 +13,7 @@ namespace Hood.Models
     {
         public static void ConfigureForHood(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.EnableSensitiveDataLogging(true);
         }
         public static void CreateHoodModels(ModelBuilder builder)
         {
@@ -30,6 +31,7 @@ namespace Hood.Models
             builder.Entity<Subscription>().ToTable("HoodSubscriptions");
             builder.Entity<SubscriptionFeature>().ToTable("HoodSubscriptionFeatures");
             builder.Entity<UserSubscription>().ToTable("HoodUserSubscriptions");
+            builder.Entity<Subscription>().Property("Category").HasColumnName("Colour");
             builder.Entity<UserSubscription>().Property("Id").HasColumnName("UserSubscriptionId");
             builder.Entity<UserSubscription>().HasOne(pt => pt.User).WithMany(p => p.Subscriptions).HasForeignKey(pt => pt.UserId);
             builder.Entity<UserSubscription>().HasOne(pt => pt.Subscription).WithMany(t => t.Users).HasForeignKey(pt => pt.SubscriptionId);
@@ -75,6 +77,8 @@ namespace Hood.Models
 
             builder.Entity<PropertyFloorplan>().ToTable("HoodPropertyFloorplans");
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
+
+            
         }
         public static bool AllMigrationsApplied(this HoodDbContext context)
         {

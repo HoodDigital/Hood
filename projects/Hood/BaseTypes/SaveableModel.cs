@@ -69,5 +69,69 @@ namespace Hood.BaseTypes
             }
         }
 
+        public void AddBillingMessage(BillingMessage? message)
+        {
+            switch (message)
+            {
+                case BillingMessage.Error:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "There was an error updating or changing your subscription.Please try again. An unspecified error occurred.";
+                    break;
+                case BillingMessage.SubscriptionCreated:
+                    MessageType = AlertType.Success;
+                    SaveMessage = "Your subscription has been created and is ready to use right away!";
+                    break;
+                case BillingMessage.SubscriptionExists:
+                    MessageType = AlertType.Warning;
+                    SaveMessage = "You are already actively subscribed to this subscription plan!";
+                    break;
+                case BillingMessage.SubscriptionReactivated:
+                    MessageType = AlertType.Success;
+                    SaveMessage = "Your subscription has been re-activated. Changes to your access will be active right away.";
+                    break;
+                case BillingMessage.SubscriptionUpdated:
+                    MessageType = AlertType.Success;
+                    SaveMessage = "Your subscription has been updated. Changes to your access will be active right away.";
+                    break;
+                case BillingMessage.SubscriptionCancelled:
+                    MessageType = AlertType.Warning;
+                    SaveMessage = "Your subscription has been cancelled. You will no longer be billed, however your access will continue until your current billing cycle ends.";
+                    break;
+                case BillingMessage.SubscriptionEnded:
+                    MessageType = AlertType.Info;
+                    SaveMessage = "Your subscription has been ended. Changes to your access will be active right away.";
+                    break;
+                case BillingMessage.NoCustomerObject:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "There was an error updating or changing your subscription. Please try again. Could not create your Stripe customer reference.";
+                    break;
+                case BillingMessage.NoStripeId:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "There was an error updating or changing your subscription. Please try again. There is no Stripe account linked to your account.";
+                    break;
+                case BillingMessage.NoSubscription:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "There was an error updating or changing your subscription. Please try again.<br />There is no Stripe account linked to your account.";
+                    break;
+                case BillingMessage.NoPaymentSource:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "You cannot access this without an active subscription, please upgrade your account to view this area.";
+                    break;
+                case BillingMessage.UpgradeRequired:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "You cannot upgrade your account as you do not have a valid payment source, please enter a valid credit or debit card to create your subscription.";
+                    break;
+                case BillingMessage.InvalidToken:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "You cannot access this with your current subscription, please upgrade your subscription to view this area.";
+                    break;
+                case BillingMessage.StripeError:
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "There was an error updating or changing your subscription. Please try again.";
+                    break;
+            }
+
+        }
+
     }
 }

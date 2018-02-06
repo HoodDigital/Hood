@@ -19,32 +19,19 @@
         </li>
     </ol>
 }
-<div class="m-b-lg">
+<div class="panel-body">
     <form method="get">
         <div class="row m-b-sm m-t-sm">
-            <div class="col-md-4">
-                <h4>Sort</h4>
+            <div class="col-md-6">
+                <h4>Subscription</h4>
                 @{
                     var items = (await _auth.GetSubscriptionPlansAsync()).OrderBy(c => c.Level).Select(c => new SelectListItem() { Value = c.StripeId.ToString(), Text = c.Name });
                 }
-                <select class="form-control" asp-for="Subscription" asp-items="items"></select>
-            </div>
-            <div class="col-md-4">
-                <h4>Sort</h4>
-                <select class="form-control" asp-for="Order">
-                    <optgroup label="Subscriber">
-                        <option value="name">Name (A-Z)</option>
-                        <option value="name+desc">Name (Z-A)</option>
-                        <option value="date+desc">Added Date (Newest)</option>
-                        <option value="date">Added Date (Oldest)</option>
-                    </optgroup>
-                    <optgroup label="Price">
-                        <option value="price+desc">Price (£££-£)</option>
-                        <option value="price">Price (£-£££)</option>
-                    </optgroup>
+                <select class="form-control submit-on-change" asp-for="Subscription" asp-items="items">
+                    <option value="">Show All</option>
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h4>Search</h4>
                 <div class="input-group">
                     <input asp-for="Search" type="text" placeholder="Search" class="form-control">
@@ -56,11 +43,13 @@
         </div>
     </form>
 </div>
-@if (Model?.Count > 0)
-{
-    foreach (var user in Model)
+<div class="panel-body">
+    @if (Model.List.Count > 0)
     {
-        await Html.RenderPartialAsync("_User_Record", user);
+        foreach (var user in Model.List)
+        {
+            await Html.RenderPartialAsync("_User_Record", user);
+        }
+        await Html.RenderPartialAsync("_Pagination");
     }
-    await Html.RenderPartialAsync("_SubscribersPager");
-}
+</div>

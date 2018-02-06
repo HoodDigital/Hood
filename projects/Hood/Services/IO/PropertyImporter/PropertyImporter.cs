@@ -467,11 +467,14 @@ namespace Hood.Services
 
                                 property.Media.Add(new PropertyMedia(mediaResult));
                             }
-                            if (data[key] == property.FeaturedImage?.Filename)
+                            if (property.FeaturedImageJson != null)
                             {
-                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as MediaObject;
+                                if (data[key] == property.FeaturedImage?.Filename)
+                                {
+                                    property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as MediaObject;
+                                }
                             }
-                            else if (property.FeaturedImage == null)
+                            else
                             {
                                 // add it.
                                 property.FeaturedImage = mediaResult;

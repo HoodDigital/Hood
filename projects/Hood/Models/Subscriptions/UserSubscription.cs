@@ -35,5 +35,7 @@ namespace Hood.Models
 
         public bool Tiered => Subscription != null ? !Subscription.Addon : false;
         public int Level => Subscription != null ? Subscription.Level : 0;
+
+        public bool IsActive => Status == "trialing" || Status == "active";
     }
 }

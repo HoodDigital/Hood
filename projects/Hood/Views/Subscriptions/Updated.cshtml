@@ -11,7 +11,10 @@
     </div>
 </div>
 <div class="container">
-    @{ await Html.RenderPartialAsync("_BillingMessage", Model.Message); }
+    @if (Model.SaveMessage.IsSet())
+    {
+        @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+    }
     @if (Model.Customer?.Sources?.Data?.Count == 0)
     {
         <div class="row">

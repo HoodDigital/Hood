@@ -16,15 +16,16 @@ namespace Hood.Areas.Admin.Controllers
 
         public ImportController(IFTPService ftp, 
             ISettingsRepository settings,
-            IPropertyImporter propertyImporterFTP, 
-            IContentExporter contentExporter, 
-            IPropertyExporter propertyExporter)
+            IPropertyImporter propertyImporterFTP 
+            //IContentExporter contentExporter, 
+            //IPropertyExporter propertyExporter
+            )
         {
             _settings = settings;
             _ftp = ftp;
             _propertyImporterFTP = propertyImporterFTP;
-            _contentExporter = contentExporter;
-            _propertyExporter = propertyExporter;
+            //_contentExporter = contentExporter;
+            //_propertyExporter = propertyExporter;
         }
 
         #region "FTPPropertyImporter"
@@ -78,71 +79,71 @@ namespace Hood.Areas.Admin.Controllers
 
         #endregion
 
-        #region "Content"
+        //#region "Content"
 
-        [Route("admin/content/export/")]
-        public IActionResult ContentExport()
-        {
-            return View();
-        }
+        //[Route("admin/content/export/")]
+        //public IActionResult ContentExport()
+        //{
+        //    return View();
+        //}
 
-        [HttpPost]
-        [Route("admin/content/export/start/")]
-        public IActionResult ContentExportStart()
-        {
-            _contentExporter.Kill();
-            _contentExporter.ExportContent(HttpContext);
-            return Json(new { success = true });
-        }
+        //[HttpPost]
+        //[Route("admin/content/export/start/")]
+        //public IActionResult ContentExportStart()
+        //{
+        //    _contentExporter.Kill();
+        //    _contentExporter.ExportContent(HttpContext);
+        //    return Json(new { success = true });
+        //}
 
-        [HttpPost]
-        [Route("admin/content/export/cancel/")]
-        public IActionResult ContentExportCancel()
-        {
-            _contentExporter.Kill();
-            return Json(new { success = true });
-        }
+        //[HttpPost]
+        //[Route("admin/content/export/cancel/")]
+        //public IActionResult ContentExportCancel()
+        //{
+        //    _contentExporter.Kill();
+        //    return Json(new { success = true });
+        //}
 
-        [Route("admin/content/export/status/")]
-        public IActionResult ContentExportStatus()
-        {
-            return Json(_contentExporter.Report());
-        }
+        //[Route("admin/content/export/status/")]
+        //public IActionResult ContentExportStatus()
+        //{
+        //    return Json(_contentExporter.Report());
+        //}
 
-        #endregion
+        //#endregion
 
-        #region "Properties"
+        //#region "Properties"
 
-        [Route("admin/properties/export/")]
-        public IActionResult PropertiesExport()
-        {
-            return View();
-        }
+        //[Route("admin/properties/export/")]
+        //public IActionResult PropertiesExport()
+        //{
+        //    return View();
+        //}
 
-        [HttpPost]
-        [Route("admin/properties/export/start/")]
-        public IActionResult PropertiesExportStart()
-        {
-            _propertyExporter.Kill();
-            _propertyExporter.ExportProperties(HttpContext);
-            return Json(new { success = true });
-        }
+        //[HttpPost]
+        //[Route("admin/properties/export/start/")]
+        //public IActionResult PropertiesExportStart()
+        //{
+        //    _propertyExporter.Kill();
+        //    _propertyExporter.ExportProperties(HttpContext);
+        //    return Json(new { success = true });
+        //}
 
-        [HttpPost]
-        [Route("admin/properties/export/cancel/")]
-        public IActionResult PropertiesExportCancel()
-        {
-            _propertyExporter.Kill();
-            return Json(new { success = true });
-        }
+        //[HttpPost]
+        //[Route("admin/properties/export/cancel/")]
+        //public IActionResult PropertiesExportCancel()
+        //{
+        //    _propertyExporter.Kill();
+        //    return Json(new { success = true });
+        //}
 
-        [Route("admin/properties/export/status/")]
-        public IActionResult PropertiesExportStatus()
-        {
-            return Json(_propertyExporter.Report());
-        }
+        //[Route("admin/properties/export/status/")]
+        //public IActionResult PropertiesExportStatus()
+        //{
+        //    return Json(_propertyExporter.Report());
+        //}
 
-        #endregion
+        //#endregion
 
 
     }

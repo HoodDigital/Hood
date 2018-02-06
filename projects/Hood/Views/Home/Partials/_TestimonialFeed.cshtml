@@ -1,13 +1,13 @@
 @model ContentModel
 
-@if (Model.Posts.Count == 0)
+@if (Model.List.Count == 0)
 {
     await Html.RenderPartialAsync("_NoResults");
 }
 else
 {
     <div class="row">
-        @foreach (Content content in Model.Posts.Items)
+        @foreach (Content content in Model.List)
         {
             <div class="col-md-offset-2 col-md-8 mb-30">
                 <div class="testimonial">

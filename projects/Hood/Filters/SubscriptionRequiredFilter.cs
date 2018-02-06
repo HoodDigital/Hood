@@ -1,6 +1,8 @@
-﻿using Hood.Extensions;
+﻿using Hood.Caching;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +28,17 @@ namespace Hood.Filters
         /// <param name="Ids">The Ids of the subscription which you are checking for.</param>
         /// <param name="AddonsRequired">The Ids of the addon subscription which you are checking for. These will be checked for first and then the user is redirected to the purchase addon page if not present.</param>        /// 
         /// <param name="MinimumSubscription">The miminum tiered subscription level that is required. If set with SubscriptionIds, will require both (a matched Id and a minimum level of this parameter). This will also override the Tiered parameter, as a tiered subscription will be required to need a subscription above a minimum tier.</param>
-        public SubscriptionRequiredAttribute(string SubscriptionIds = "", string AddonsRequired = "", string Roles = "") : base(typeof(SubscriptionRequiredAttributeImpl))
+        public SubscriptionRequiredAttribute(string SubscriptionIds = "", string Categories = "", string AddonsRequired = "", string Roles = "") : base(typeof(SubscriptionRequiredAttributeImpl))
         {
             if (SubscriptionIds == null)
                 SubscriptionIds = "";
             var Ids = SubscriptionIds.Split(',').ToList();
             Ids.RemoveAll(str => string.IsNullOrEmpty(str));
+
+            if (Categories == null)
+                Categories = "";
+            var CategoryList = Categories.Split(',').ToList();
+            CategoryList.RemoveAll(str => string.IsNullOrEmpty(str));
 
             if (Roles == null)
                 Roles = "";
@@ -43,7 +50,7 @@ namespace Hood.Filters
             var Addons = AddonsRequired.Split(',').ToList();
             Addons.RemoveAll(str => string.IsNullOrEmpty(str));
 
-            Arguments = new object[] { Ids.ToArray(), Addons.ToArray(), RoleOverrides.ToArray(), };
+            Arguments = new object[] { Ids.ToArray(), CategoryList.ToArray(), Addons.ToArray(), RoleOverrides.ToArray(), };
         }
 
         private class SubscriptionRequiredAttributeImpl : IActionFilter
@@ -53,27 +60,33 @@ namespace Hood.Filters
             private readonly ISettingsRepository _settings;
             private readonly List<string> _ids;
             private readonly List<string> _addons;
+            private readonly List<string> _categories;
             private readonly List<string> _roles;
             private readonly UserManager<ApplicationUser> _userManager;
             private readonly IAccountRepository _auth;
             private readonly RoleManager<IdentityRole> _roleManager;
 
             public SubscriptionRequiredAttributeImpl(
+                HoodDbContext db,
                 IAccountRepository auth,
                 ILoggerFactory loggerFactory,
                 IBillingService billing,
-                ISettingsRepository site,
+                IHttpContextAccessor contextAccessor,
+                IHoodCache cache,
+                ISettingsRepository settings,
                 RoleManager<IdentityRole> roleManager,
                 UserManager<ApplicationUser> userManager,
                 string[] Ids,
+                string[] CategoryList,
                 string[] Addons,
                 string[] RoleOverrides)
             {
-                _auth = auth;
+                _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
                 _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
                 _billing = billing;
-                _settings = site;
+                _settings = settings;
                 _ids = Ids.ToList();
+                _categories = CategoryList.ToList();
                 _userManager = userManager;
                 _roleManager = roleManager;
                 _addons = Addons.ToList();
@@ -102,6 +115,23 @@ namespace Hood.Filters
                         baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
                     else
                         baseUri.Query = queryToAppend;
+                    result = new RedirectResult(baseUri.ToString());
+                }
+
+                // Set the redirect location
+                IActionResult categoryResult = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent()});
+                if (_categories.Count == 1)
+                    categoryResult = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent(), category = _categories[0] });
+                if (billingSettings.SubscriptionCreatePage.IsSet())
+                {
+                    UriBuilder baseUri = new UriBuilder(context.HttpContext.GetSiteUrl() + billingSettings.SubscriptionCreatePage.TrimStart('/'));
+                    string queryToAppend = string.Format("returnUrl={0}", context.HttpContext.Request.Path.ToUriComponent());
+                    if (baseUri.Query != null && baseUri.Query.Length > 1)
+                        baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
+                    else
+                        baseUri.Query = queryToAppend;
+                    if (_categories.Count == 1)
+                        baseUri.Query += "&category=" + _categories[0];
                     result = new RedirectResult(baseUri.ToString());
                 }
 
@@ -153,6 +183,13 @@ namespace Hood.Filters
                 if (!_account.HasTieredSubscription)
                 {
                     context.Result = result;
+                    return;
+                }
+
+                // If a category is set, then check that one of the user's subscriptions has that category.
+                if (_categories.Count > 0 && !_categories.Any(i => _account.IsSubscribedToCategory(i)))
+                {
+                    context.Result = categoryResult;
                     return;
                 }
 

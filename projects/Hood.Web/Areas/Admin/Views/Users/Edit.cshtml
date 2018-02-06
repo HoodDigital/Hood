@@ -89,21 +89,6 @@
                             <hr />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.Phone"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.Phone">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.Mobile"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.Mobile">
-                                    </div>
-                                </div>
-                            </fieldset>
-                            <hr />
-                            <fieldset class="form-horizontal">
-                                <div class="form-group">
                                     <label class="col-sm-4 control-label" asp-for="User.ClientCode"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.ClientCode">
@@ -300,33 +285,18 @@
             </div>
             <div class="panel-body small">
                 <h4>User Roles</h4>
-                <p>
-                    The user is currently assigned to the following roles:
-                </p>
-                <p id="role-list">
-                    @{ await Html.RenderPartialAsync("Roles"); }
-                </p>
-                <p><em><small>Click the cross in the role badge to remove the user from the role.</small></em></p>
+                <div class="category-list">
+                    @foreach (var role in Model.AllRoles)
+                    {
+                        <div class="checkbox">
+                            <input class="styled role-check" id="role-check-@role.Id" name="role-check-@role.Id" type="checkbox" data-id="@Model.User.Id" value="@role" @(Model.Roles.Contains(role.Name) ? "checked" : "")>
+                            <label for="category-check-@role.Id">
+                                @role.Name.CamelCaseToString()
+                            </label>
+                        </div>
+                    }
+                </div>
             </div>
-            <div class="panel-body small">
-                <h4>Add user to role</h4>
-                <p>
-                    Choose a role and click 'Add user to role' to add the user to the role:
-                </p>
-                <p>
-                    <select id="roleToAdd" name="roleToAdd" class="form-control">
-                        <option value="">--- Select a role to add ---</option>
-                        @foreach (IdentityRole role in Model.AllRoles)
-                        {
-                            <option value="@role.Name">@role.Name</option>
-                        }
-                    </select>
-                </p>
-                <p class="text-right">
-                    <button class="btn btn-primary btn-xs add-to-role" data-id="@Model.User.Id"><i class="fa fa-plus"></i>&nbsp;Add user to role</button>
-                </p>
-            </div>
-
         </div>
     </div>
 </form>

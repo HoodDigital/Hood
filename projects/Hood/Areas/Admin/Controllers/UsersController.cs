@@ -160,18 +160,6 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        [HttpGet]
-        [Route("admin/users/roles/")]
-        public async Task<IActionResult> Roles(string id)
-        {
-            EditUserModel um = new EditUserModel()
-            {
-                User = _auth.GetUserById(id)
-            };
-            um.Roles = await _userManager.GetRolesAsync(um.User);
-            return View(um);
-        }
-
         [Route("admin/users/reset/")]
         [HttpPost]
         public async Task<Response> ResetPassword(string id, string password)

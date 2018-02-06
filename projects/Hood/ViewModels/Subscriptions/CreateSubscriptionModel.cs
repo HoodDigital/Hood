@@ -13,6 +13,10 @@ namespace Hood.Models
 
         public string Currency { get; set; }
 
+        [Display(Name = "Subscription Category",
+              Description = "A user can only subscribe to one of each category. Think of categories as products, with different subscription levels.")]
+        public string Category { get; set; }
+
         [Display(Name = "Charge Interval",
                 Description = "The time period in which the subscription cycle is measured.")]
         public string Interval { get; set; }

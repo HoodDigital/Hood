@@ -14,6 +14,10 @@ namespace Hood.Models
         {
             return ActiveSubscriptions.Select(a => a.StripeId).Contains(id);
         }
+        public bool IsSubscribedToCategory(string category)
+        {
+            return ActiveSubscriptions.Select(a => a.Subscription.Category).Contains(category);
+        }
         public bool Subscribed
         {
             get

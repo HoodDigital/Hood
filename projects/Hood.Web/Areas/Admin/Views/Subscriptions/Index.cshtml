@@ -43,12 +43,21 @@
         {
             <div class="forum-item data-item">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-5">
                         <div class="media">
                             <a class="forum-item-title" href="/admin/subscriptions/edit/@plan.Id">
                                 @plan.Name
                             </a>
-                            <small>Created on <i class="fa fa-clock-o"></i> @plan.Created.ToDisplay()</small><br />
+                            <div class="tag-list">
+                                @if (!plan.Addon)
+                                {
+                                    <span class="tag-item">@plan.Category - Tiered: Level @plan.Level</span>
+                                }
+                                else
+                                {
+                                    <span class="tag-item">@plan.Category - Addon</span>
+                                }
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-1">
@@ -61,19 +70,6 @@
                         <span class="small font-bold">Subscribers</span>
                         <div class="tag-list">
                             <span class="tag-item">@plan.ActiveSubscribers</span>
-                        </div>
-                    </div>
-                    <div class="col-md-1">
-                        <span class="small font-bold">Type</span>
-                        <div class="tag-list">
-                            @if (!plan.Addon)
-                            {
-                                <span class="tag-item">Tiered: Level @plan.Level</span>
-                            }
-                            else
-                            {
-                                <span class="tag-item">Addon</span>
-                            }
                         </div>
                     </div>
                     <div class="col-md-2">

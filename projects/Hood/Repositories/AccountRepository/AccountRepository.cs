@@ -44,12 +44,12 @@ namespace Hood.Services
         }
 
         // Users
-        public AccountInfo LoadAccountInfo(string userId) 
+        public AccountInfo LoadAccountInfo(string userId)
         {
             AccountInfo result = new AccountInfo();
             result = new AccountInfo()
             {
-                User = GetUserById(userId)            
+                User = GetUserById(userId, false)
             };
             if (result.User != null)
             {
@@ -342,9 +342,14 @@ namespace Hood.Services
         {
             return await GetSubscriptionPlans().ToListAsync();
         }
-        public async Task<List<Subscription>> GetSubscriptionPlanLevels()
+        public async Task<List<Subscription>> GetSubscriptionPlanLevels(string category = null)
         {
-            return await GetSubscriptionPlans().Where(s => s.Public && !s.Addon).OrderBy(s => s.Level).ToListAsync();
+            var subs = GetSubscriptionPlans().Where(s => s.Public && !s.Addon);
+            if (category.IsSet())
+            {
+                subs = subs.Where(s => s.Category == category);
+            }
+            return await subs.OrderBy(s => s.Level).ToListAsync();
         }
         public async Task<List<Subscription>> GetSubscriptionPlanAddons()
         {
@@ -787,7 +792,7 @@ namespace Hood.Services
                 sw.WriteLine("[System] " + ex.Message);
                 if (ex.InnerException != null)
                 {
-                    sw.WriteLine("[System] " + ex.InnerException.Message); 
+                    sw.WriteLine("[System] " + ex.InnerException.Message);
                 }
             }
             return sw.ToString();

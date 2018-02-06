@@ -1,9 +1,11 @@
-﻿using Hood.Extensions;
+﻿using Hood.Caching;
+using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -29,7 +31,12 @@ namespace Hood.Areas.Admin.Controllers
 
         public SubscriptionsController(
             UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            HoodDbContext db,
+            IHoodCache cache,
             IAccountRepository auth,
+            IHttpContextAccessor contextAccessor,
+            ISettingsRepository settings,
             ISettingsRepository site,
             IBillingService billing,
             IHostingEnvironment env)
@@ -58,10 +65,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
-            EditSubscriptionModel model = new EditSubscriptionModel()
-            {
-                Subscription = await _auth.GetSubscriptionPlanById(id)
-            };
+            var model = await _auth.GetSubscriptionPlanById(id);
             return View(model);
         }
 
@@ -69,12 +73,18 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<ActionResult> Edit(Subscription model)
         {
-            EditSubscriptionModel esm = new EditSubscriptionModel()
+            try
             {
-                SaveResult = await _auth.UpdateSubscription(model),
-                Subscription = model
-            };
-            return View(esm);
+                await _auth.UpdateSubscription(model);
+                model.SaveMessage = "Subscription saved.";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
+            return View(model);
         }
 
         [Route("admin/subscriptions/create/")]
@@ -82,7 +92,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             return View();
         }
-    
+
         [HttpPost]
         [Route("admin/subscriptions/add")]
         public async Task<Response> Add(CreateSubscriptionModel model)

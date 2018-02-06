@@ -1,14 +1,16 @@
-﻿@{ 
-    Layout = "_BasicLayout";
+﻿@{
+    Layout = "_Layout";
 }
-
-<h2>Manage your account</h2>
-
-<div>
-    <h4>Change your account settings</h4>
-    <hr />
+<div class="jumbotron">
+    <div class="container">
+        <h1>Manage your account</h1>
+        <p>Change your account settings</p>
+    </div>
+</div>
+<div class="container">
     <div class="row">
         <div class="col-md-3">
+            @RenderSection("avatar", required: false)
             @await Html.PartialAsync("_ManageNav")
         </div>
         <div class="col-md-9">
@@ -20,4 +22,4 @@
 @section Scripts {
     @RenderSection("Scripts", required: false)
 }
-        
+

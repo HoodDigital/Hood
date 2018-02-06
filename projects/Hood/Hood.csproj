@@ -23,6 +23,7 @@
     <NeutralLanguage>en-GB</NeutralLanguage>
     <PackageTags>ASP.NET MVC EntityFramework CMS</PackageTags>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,6 +50,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
+    <EmbeddedResource Include="Views\**\*.cshtml" />
+    <EmbeddedResource Include="Views\**\*.json" />
   </ItemGroup>
 
   <ItemGroup>

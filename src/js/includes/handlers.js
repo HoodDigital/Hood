@@ -7,12 +7,17 @@ $.hood.Handlers = {
         $('body').on('click', '.btn.click-select[data-target][data-value]', $.hood.Handlers.ClickSelect);
         $('body').on('click', '.click-select[data-target][data-value]', $.hood.Handlers.ClickSelect);
         $('body').on('click', '.slide-link', $.hood.Handlers.SlideToAnchor);
+
         $('body').on('change', 'input[type=checkbox][data-input]', $.hood.Handlers.CheckboxChange);
+        $('body').on('change', '.submit-on-change', $.hood.Handlers.SubmitOnChange);
 
         $('select[data-selected]').each($.hood.Handlers.SelectSetup);
         // date/time meta editor
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
+    },
+    SubmitOnChange: function (e) {
+        $(this).parents('form').submit();
     },
     DateChange: function (e) {
         // update the date element attached to the field's attach
@@ -48,7 +53,7 @@ $.hood.Handlers = {
             $(this).val(selected);
         }
     },
-ClickSelect: function () {
+    ClickSelect: function () {
         var $this = $(this);
         targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));

@@ -1,206 +1,75 @@
 @model SubscriptionModel
-
+@inject IAccountRepository _subs
 @{
     BillingSettings settings = _settings.GetBillingSettings();
-    ViewBag.Title = "You need a subscription...";
+    ViewBag.Title = "Choose your package";
+    var plans = await _subs.GetSubscriptionPlanLevels();
+    ViewData["plans"] = plans;
 }
-@if (Model.Message == Hood.Enums.BillingMessage.StripeError)
-{
-    <div class="row">
-        <div class="col-xs-12 text-center">
-            <div class="alert alert-danger">
-                <p>
-                    <i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />There was an error updating or changing your subscription. Please try again.<br />
-                    <strong>@Model.MessageText</strong>
-                </p>
-            </div>
-        </div>
-    </div>
-}
-else
-{
-    await Html.RenderPartialAsync("_BillingMessage", Model.Message);
-}
-@if (Model.Plans?.Count <= 0)
-{
-    <div class="alert alert-warning text-center">
-        <p><i class="fa fa-info-circle fa-4x m-r-xs"></i><br />There are no subscription plans added to the site yet.</p>
-    </div>
-}
-else
-{
-    <div class="row">
-        @foreach (Subscription plan in Model.Plans.OrderBy(p => p.Amount))
+<section class="page-section">
+    <div class="container">
+        @if (Model.SaveMessage.IsSet())
         {
-            <div class="col-md-4 mb-30">
-                <div class="thumbnail">
-                    <div class="text-center">
-                        <h4>@plan.Name</h4>
+            @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+        }
+        <h3 class="large">Finish your account setup</h3>
+        <p class="m-b-lg">To take advantage of one of our paid packages, you will need to add a payment method. You can try our paid packages for free, as our monthly packages come with 30 days free, and of course you can cancel at any time!</p>
+        @if (Model.Plans?.Count <= 0)
+        {
+            <div class="alert alert-warning text-center">
+                <p><i class="fa fa-info-circle fa-4x m-r-xs"></i><br />There are no subscription plans added to the site yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="">
+                    <div class="" role="tab" id="headingOne">
+                        <h4 class="">
+                            Choose your package
+                        </h4>
                     </div>
-                    <hr>
-                    <div class="p-md text-center">
-                        <div class="font-lg">@plan.Price</div>
-                        <div class="font-md">per @plan.Interval</div>
-                    </div>
-                    <hr>
-                    <div class="p-lg">
-                        @plan.Description
-                    </div>
-                    <hr>
-                    <div class="p-lg text-center">
-                        @if (Model.CurrentSubscription != null && plan.StripeId == Model.CurrentSubscription.StripePlan.Id)
-                    {
-                            <p class="no-margin">You are curently on this package.</p>
-                            if (!Model.CurrentSubscription.CancelAtPeriodEnd)
-                            {
-                                <p><small class="text-success">Next charge: @plan.Price on @Model.CurrentSubscription.CurrentPeriodEnd.Value.ToShortDateString()</small></p>
-                            }
-                            else
-                            {
-                                <p><small class="text-warning">Cancelling on @Model.CurrentSubscription.CurrentPeriodEnd.Value.ToShortDateString()</small></p>
-                            }
+                    <div id="price-panel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        @if (Model.Category.IsSet())
+                        {
+                            await Html.RenderPartialAsync("_Subscriptions_Table");
                         }
                         else
                         {
-                            <a class="btn btn-md btn-default click-select" data-target="PlanId" data-value="@plan.Id">Choose this</a>
+                            @foreach (string category in Model.Plans.Select(p => p.Category).Distinct())
+                            {
+                                <h1>@category Packages</h1>
+                                var ptModel = Model;
+                                ptModel.Category = category;
+                                await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
+                            }
                         }
+                    </div>
+                </div>
+                <div class="">
+                    <div class="" role="tab" id="headingTwo">
+                        <h4 class="">
+                            Enter your billing details
+                        </h4>
+                    </div>
+                    <div id="billing-panel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        @{ await Html.RenderPartialAsync("_PaymentForm"); }
+                    </div>
+                </div>
+                <div class="">
+                    <div class="" role="tab" id="headingThree">
+                        <h4 class="">
+                            Confirm &amp; Pay
+                        </h4>
+                    </div>
+                    <div id="confirm-panel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        @{ await Html.RenderPartialAsync("_Confirmation"); }
                     </div>
                 </div>
             </div>
         }
     </div>
-    <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-            <div class="well">
-                <form asp-action="New" method="POST" id="payment-form">
-                    <input asp-for="returnUrl" type="hidden" />
-                    <div class="payment-errors"></div>
-                    <div class="form-group">
-                        <label class="control-label">Choose Your Package:</label>
-                        <div class="input-group">
-                            <select asp-for="PlanId" class="form-control">
-                                @foreach (Subscription plan in Model.Plans.OrderBy(p => p.Amount))
-                                {
-                                    if (Model.CurrentSubscription != null && plan.StripeId == Model.CurrentSubscription.StripePlan.Id)
-                                    {
-                                    }
-                                    else
-                                    {
-                                        <option value="@plan.Id">@plan.Name - @plan.FullPrice</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <h3>Pay with </h3>
-
-                    @if (Model.Customer != null && Model.Customer.Sources != null)
-                    {
-                        foreach (var itm in Model.Customer.Sources.Data)
-                        {
-                            switch (itm.Type)
-                            {
-                                case Stripe.SourceType.Card:
-                                    <p>
-                                        <label for="@itm.Card.Id">
-                                            <input type="radio" name="CardId" value="@itm.Id" id="@itm.Id" />
-                                            @switch (itm.Card.Brand)
-                                            {
-                                                case "Visa":
-                                                    <img class="card-icon m-r-xs" src="~/lib/hood/images/cards/visa.png" />
-                                                    break;
-                                                case "American Express":
-                                                    <img class="card-icon m-r-xs" src="~/lib/hood/images/cards/AmericanExpress.png" />
-                                                    break;
-                                                case "MasterCard":
-                                                    <img class="card-icon m-r-xs" src="~/lib/hood/images/cards/MasterCard.png" />
-                                                    break;
-                                                case "Discover":
-                                                    <img class="card-icon m-r-xs" src="~/lib/hood/images/cards/Discover.png" />
-                                                    break;
-                                                case "JCB":
-                                                    <img class="card-icon m-r-xs" src="~/lib/hood/images/cards/JCB.png" />
-                                                    break;
-                                                case "Diners Club":
-                                                    <img class="card-icon m-r-xs" src="~/lib/hood/images/cards/DinersClub.png" />
-                                                    break;
-                                            }
-                                            <span>Card ending in <strong>@itm.Card.Last4</strong></span>
-                                            @if (itm.Id == Model.Customer?.DefaultSourceId)
-                                            {
-                                                <span class="label label-default">Default</span>
-                                            }
-                                        </label>
-                                    </p>
-
-                                    break;
-
-                            }
-                        }
-                    }
-                    <p>
-                        <label for="new-card">
-                            <input type="radio" name="CardId" value="" id="new-card" checked />
-                            <span>Enter a new card...</span>
-                        </label>
-                    </p>
-
-                    <div class="collapse in" id="new-card-form">
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <div class="form-group">
-                                    <label class="control-label">Card Number:</label>
-                                    <div class="input-group">
-                                        <input size="20" data-stripe="number" class="form-control" placeholder="Card number..." />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <div class="form-group">
-                                    <label class="control-label">Billing Postcode</label>
-                                    <div class="input-group">
-                                        <input data-stripe="address_zip" class="form-control" placeholder="Zip or Postal Code..." />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-6">
-                                <div class="form-group">
-                                    <label class="control-label">Expiry Date:</label>
-                                    <div class="input-group">
-                                        <select data-stripe="exp_month">
-                                            @for (int i = 1; i < 13; i++)
-                                            {
-                                                <option value="@i.ToString("D2")">@i.ToString("D2")</option>
-                                            }
-                                        </select>
-                                        <span> / </span>
-                                        <select data-stripe="exp_year">
-                                            @for (int i = DateTime.Now.Year; i < DateTime.Now.Year + 15; i++)
-                                            {
-                                                <option value="@i">@i</option>
-                                            }
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xs-6">
-                                <div class="form-group">
-                                    <label class="control-label">CVC</label>
-                                    <div class="input-group">
-                                        <input data-stripe="cvc" class="form-control" placeholder="CVC Security Number..." />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <input type="submit" class="submit btn btn-primary" value="Submit Payment" />
-                </form>
-            </div>
-        </div>
-    </div>
-}
+</section>
 @section scripts {
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
     <script type="text/javascript">
@@ -232,6 +101,7 @@ else
             } else {
                 $('#new-card-form').hide();
             }
+            $('#skip-to-confirm').hide();
         });
 
         function stripeResponseHandler(status, response) {
@@ -241,7 +111,7 @@ else
             if (response.error) { // Problem!
 
                 // Show the errors on the form:
-                $form.find('.payment-errors').text(response.error.message);
+                $form.find('.payment-errors').addClass('active').text(response.error.message);
                 $form.find('.submit').prop('disabled', false); // Re-enable submission
 
             } else { // Token was created!
@@ -251,9 +121,23 @@ else
 
                 // Insert the token ID into the form so it gets submitted to the server:
                 $form.append($('<input type="hidden" name="StripeToken" id="StripeToken">').val(token));
+                $form.find('.payment-errors').addClass('success').text("Card details validated with stripe, ready to continue...");
+                $form.find('.submit').hide(); // Re-enable submission
+                $('#price-panel').collapse('hide');
+                $('#billing-panel').collapse('hide');
+                $('#confirm-panel').collapse('show');
+                $('#skip-to-confirm').show();
 
-                // Submit the form:
-                $form.get(0).submit();
+                // Wire up the skip button.
+                $('#skip-to-confirm').click(function () {
+                    $('#billing-panel').collapse('hide');
+                    $('#confirm-panel').collapse('show');
+                })
+
+                // Wire up the confirm button.
+                $('#confirm-and-pay').click(function () {
+                    $form.get(0).submit();
+                })
             }
         };
     </script>

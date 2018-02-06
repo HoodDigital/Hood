@@ -32,7 +32,7 @@
                     @Html.Raw(Model.Property.ToFormat(AddressFormat.MultiLine))
                 </p>
                 <a class="btn btn-block m-t-lg btn-default" href="@string.Format("/contact?subject={0}#contact-form", Model.Property.ToFormat(AddressFormat.SingleLine))">Make an Enquiry</a>
-                @if (Model.Property.InfoDownloadId != null)
+                @if (Model.Property.InfoDownload != null)
                 {
                     <a class="btn btn-block btn-default m-t-lg" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
                 }

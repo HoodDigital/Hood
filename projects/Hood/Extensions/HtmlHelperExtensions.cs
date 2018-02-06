@@ -2,13 +2,36 @@
 using Hood.Models;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Net;
 
 namespace Hood.Extensions
 {
     public static class HtmlHelperExtensions
     {
+        public static IHtmlContent DescriptionFor<TModel, TValue>(this IHtmlHelper<TModel> html, Expression<Func<TModel, TValue>> expression)
+        {
+            if (html == null) throw new ArgumentNullException(nameof(html));
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+
+            var modelExplorer = ExpressionMetadataProvider.FromLambdaExpression(expression, html.ViewData, html.MetadataProvider);
+            if (modelExplorer == null) throw new InvalidOperationException($"Failed to get model explorer for {ExpressionHelper.GetExpressionText(expression)}");
+            return new HtmlString(string.Format("<a class='text-info description' data-toggle='popover' data-placement='left' data-content='{0}' title='{1}'><i class='fa fa-question-circle'></i></a>", WebUtility.HtmlEncode(modelExplorer.Metadata.Description), WebUtility.HtmlEncode(modelExplorer.Metadata.DisplayName)));
+        }
+
+        public static IHtmlContent DescriptionTextFor<TModel, TValue>(this IHtmlHelper<TModel> html, Expression<Func<TModel, TValue>> expression)
+        {
+            if (html == null) throw new ArgumentNullException(nameof(html));
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+
+            var modelExplorer = ExpressionMetadataProvider.FromLambdaExpression(expression, html.ViewData, html.MetadataProvider);
+            if (modelExplorer == null) throw new InvalidOperationException($"Failed to get model explorer for {ExpressionHelper.GetExpressionText(expression)}");
+            return new HtmlString(WebUtility.HtmlEncode(modelExplorer.Metadata.Description));
+        }
         public static IHtmlContent ContentCategoryTree(this IHtmlHelper html, IEnumerable<ContentCategory> categories, string contentSlug)
         {
             string htmlOutput = string.Empty;

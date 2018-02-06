@@ -63,14 +63,20 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
+            var profile = new UserProfile();
+            profile.SetProfile(user);
 
             var model = new IndexViewModel
             {
+                UserId = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = StatusMessage
+                StatusMessage = StatusMessage,
+                Avatar = user.Avatar,
+                Profile = profile, 
+                Roles = await _userManager.GetRolesAsync(user)
             };
 
             return View(model);
@@ -84,60 +90,37 @@ namespace Hood.Controllers
             {
                 return View(model);
             }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var email = user.Email;
-            if (model.Email != email)
-            {
-                var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
-                if (!setEmailResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
-                }
-            }
-
-            var phoneNumber = user.PhoneNumber;
-            if (model.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-                }
-            }
-
-            StatusMessage = "Your profile has been updated";
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Profile()
-        {
-            EditUserModel um = new EditUserModel()
-            {
-                User = _auth.GetUserById(_userManager.GetUserId(User))
-            };
-            um.Roles = await _userManager.GetRolesAsync(um.User);
-            um.AllRoles = _auth.GetAllRoles();
-            return View(um);
-        }
-
-        [HttpPost]
-        public IActionResult Profile(EditUserModel model)
-        {
-            EditUserModel um = new EditUserModel()
-            {
-                User = _auth.GetUserById(_userManager.GetUserId(User))
-            };
             try
             {
-                model.User.CopyProperties(um.User);
-                _auth.UpdateUser(um.User);
+
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    throw new Exception($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+
+                var email = user.Email;
+                if (model.Email != email)
+                {
+                    var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+                    if (!setEmailResult.Succeeded)
+                    {
+                        throw new Exception($"Unexpected error setting email for user with ID '{user.Id}'.");
+                    }
+                }
+
+                var phoneNumber = user.PhoneNumber;
+                if (model.PhoneNumber != phoneNumber)
+                {
+                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                    if (!setPhoneResult.Succeeded)
+                    {
+                        throw new Exception($"Unexpected error setting phone number for user with ID '{user.Id}'.");
+                    }
+                }
+
+                user.SetProfile(model.Profile);
+                _auth.UpdateUser(user);
                 model.SaveMessage = "Saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -145,8 +128,12 @@ namespace Hood.Controllers
             {
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
+                return View(model);
             }
-            return View(model);
+
+            model.SaveMessage = "Your profile has been updated";
+            model.MessageType = Enums.AlertType.Success;
+            return RedirectToAction(nameof(Index));
         }
 
         [Route("manage/upload/avatar")]
@@ -178,7 +165,6 @@ namespace Hood.Controllers
                 return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
             }
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using Hood.Enums;
 using Hood.Extensions;
-using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Identity;
 using Hood.Interfaces;
-using Hood.BaseTypes;
-using Hood.Enums;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Hood.Models
 {
-    public partial class ApplicationUser : IdentityUser, ISaveableModel
-    { 
+    public partial class ApplicationUser : IdentityUser, ISaveableModel, IUserProfile
+    {
         [Display(Name = "First name")]
         public string FirstName { get; set; }
 
@@ -28,10 +27,6 @@ namespace Hood.Models
 
         [Display(Name = "Subscribe to newsletter?")]
         public bool EmailOptin { get; set; }
-
-        public string Phone { get; set; }
-
-        public string Mobile { get; set; }
 
         [Display(Name = "Twitter URL")]
         public string Twitter { get; set; }
@@ -104,7 +99,8 @@ namespace Hood.Models
         public string DeliveryAddressJson { get; set; }
 
         [NotMapped]
-        public string FullName {
+        public string FullName
+        {
             get
             {
                 if (FirstName.IsSet() && LastName.IsSet())
@@ -142,5 +138,59 @@ namespace Hood.Models
         public AlertType MessageType { get; set; }
         [NotMapped]
         public string SaveMessage { get; set; }
+
+        public void SetProfile(IUserProfile profile)
+        {
+            profile.CopyProperties(this);
+        }
+
+        public bool HasActiveSubscription(string category)
+        {
+            var subs = Subscriptions;
+            if (category.IsSet())
+                subs = subs.Where(s => s.Subscription.Category == category).ToList();
+            foreach (var sub in subs)
+                if (sub.IsActive)
+                    return true;
+            return false;
+        }
+        public UserSubscription GetActiveSubscription(string category)
+        {
+            var subs = Subscriptions;
+            if (category.IsSet())
+                subs = subs.Where(s => s.Subscription.Category == category).ToList();
+            foreach (var sub in subs)
+                if (sub.IsActive)
+                    return sub;
+            return null;
+        }
+        public bool IsSubscribed(int subscriptionId, bool requireActiveOrTrial = true)
+        {
+            foreach (var sub in Subscriptions)
+            {
+                if (sub.SubscriptionId == subscriptionId)
+                {
+                    if (requireActiveOrTrial && sub.IsActive)
+                        return true;
+                    if (!requireActiveOrTrial)
+                        return true;
+                }
+            }
+            return false;
+        }
+        public UserSubscription GetSubscription(int subscriptionId, bool requireActiveOrTrial = true)
+        {
+            foreach (var sub in Subscriptions)
+            {
+                if (sub.SubscriptionId == subscriptionId)
+                {
+                    if (requireActiveOrTrial && sub.IsActive)
+                        return sub;
+                    if (!requireActiveOrTrial)
+                        return sub;
+                }
+            }
+            return null;
+        }
     }
 }

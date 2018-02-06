@@ -53,7 +53,7 @@ $.hood.Handlers = {
             $(this).val(selected);
         }
     },
-ClickSelect: function () {
+    ClickSelect: function () {
         var $this = $(this);
         targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));

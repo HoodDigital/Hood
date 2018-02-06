@@ -4,7 +4,7 @@ namespace Hood.Models
 {
     public static class Roles
     {
-        private static readonly string[] roles = { "SuperUser", "Admin", "Editor", "Manager", "SEO", "ContactFormNotifications", "NewAccountNotifications" };
+        private static readonly string[] roles = { "SuperUser", "Admin", "Editor", "Manager", "ContactFormNotifications", "NewAccountNotifications" };
 
         public static string SuperUser { get { return roles[0]; } }
         public static string Admin { get { return roles[1]; } }

@@ -4,40 +4,9 @@ $.hood.Users = {
     Init: function () {
         $('body').on('click', '.delete-user', this.Delete);
         $('body').on('click', '.create-user', this.Create.Init);
-        $('body').on('click', '.add-to-role', this.Edit.AddToRole);
-        $('body').on('click', '.remove-from-role', this.Edit.RemoveFromRole);
         $('body').on('change', '#cuGeneratePassword', this.Create.GeneratePassword);
-        if ($('#manage-users-list').doesExist())
-            this.Manage.Init();
-        if ($('#edit-user-form').doesExist())
-            this.Edit.Init();
-    },
-    Manage: {
-        Init: function () {
-            $('#manage-users-list').hoodDataList({
-                url: '/admin/users/get',
-                params: $.hood.Users.Manage.Filter,
-                pageSize: 12,
-                pagers: '.manage-users-pager',
-                template: '#manage-users-template',
-                dataBound: function () { },
-                refreshOnChange: ".manage-users-change",
-                refreshOnClick: ".manage-users-click",
-                serverAction: "GET"
-            });
-        },
-        Filter: function () {
-            return {
-                search: $('#manage-users-search').val(),
-                status: $('#manage-users-status').val(),
-                sort: $('#manage-users-sort').val(),
-                role: $('#manage-users-role').val()
-            };
-        },
-        Refresh: function () {
-            if ($('#manage-users-list').doesExist())
-                $('#manage-users-list').data('hoodDataList').Refresh()
-        }
+        $('body').on('change', '.role-check', this.Edit.ToggleRole);
+        $('body').on('click', '.reset-password', this.ResetPassword);
     },
     Delete: function (e) {
         var $this = $(this);
@@ -54,22 +23,22 @@ $.hood.Users = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
+            function (isConfirm) {
+                if (isConfirm) {
 
-                // delete functionality
-                $.post('/admin/users/delete', { id: $this.data('id') }, function (data) {
-                    if (data.Success) {
-                        $('#manage-users-list').data('hoodDataList').Refresh();
-                        swal("Deleted", "The user has now been removed from the website.", "success");
-                    } else {
-                        swal("Error", "There was a problem deleting the user:\n\n" + data.Errors, "error");
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+                    // delete functionality
+                    $.post('/admin/users/delete', { id: $this.data('id') }, function (data) {
+                        if (data.Success) {
+                            $('#manage-users-list').data('hoodDataList').Refresh();
+                            swal("Deleted", "The user has now been removed from the website.", "success");
+                        } else {
+                            swal("Error", "There was a problem deleting the user:\n\n" + data.Errors, "error");
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Create: {
         Init: function (e) {
@@ -115,7 +84,7 @@ $.hood.Users = {
                     cuPassword: {
                         required: true
                     }
-                },                
+                },
                 submitButtonTag: $('#create-user-submit'),
                 submitUrl: '/admin/users/add',
                 submitFunction: function (data) {
@@ -137,9 +106,6 @@ $.hood.Users = {
         }
     },
     Edit: {
-        Init: function () {
-            $('body').on('click', '.reset-password', this.ResetPassword);
-        },
         ResetPassword: function () {
             swal({
                 title: "Reset password",
@@ -164,54 +130,25 @@ $.hood.Users = {
                 });
             });
         },
-        AddToRole: function () {
-            $userID = $(this).data('id');
-            $.post('/admin/users/addtorole/', { id: $(this).data('id'), role: $('#roleToAdd').val() }, function (data) {
-                if (data.Success) {
-                    $.hood.Users.LoadRoles('#role-list', $userID);
-                    swal({
-                        title: "Added!",
-                        text: "The user has now been added to the new role.",
-                        timer: 1300,
-                        type: "success"
-                    });
-                } else {
-                    swal({
-                        title: "Error!",
-                        text: "There was a problem adding the user to the role:\n\n" + data.Errors,
-                        timer: 1300,
-                        type: "error"
-                    });
-                }
-            });
-        },
-        RemoveFromRole: function () {
-            $userID =  $(this).data('id');
-            $.post('/admin/users/removefromrole/', { id: $(this).data('id'), role: $(this).data('role') }, function (data) {
-                if (data.Success) {
-                    $.hood.Users.LoadRoles('#role-list', $userID);
-                    swal({
-                        title: "Removed!",
-                        text: "The user has now been removed from the role.",
-                        timer: 1300,
-                        type: "success"
-                    });
-                } else {
-                    swal({
-                        title: "Error!",
-                        text: "There was a problem removing the user from the role:\n\n" + data.Errors,
-                        timer: 1300,
-                        type: "error"
-                    });
-                }
-            });
+        ToggleRole: function () {
+            if ($(this).is(':checked')) {
+                $.post('/admin/users/addtorole/', { id: $(this).data('id'), role: $(this).val() }, function (data) {
+                    if (data.Success) {
+                        $.hood.Alerts.Success("Added user to role.");
+                    } else {
+                        $.hood.Alerts.Error("Couldn't add the user to the role: " + data.Error);
+                    }
+                });
+            } else {
+                $.post('/admin/users/removefromrole/', { id: $(this).data('id'), role: $(this).val() }, function (data) {
+                    if (data.Success) {
+                        $.hood.Alerts.Success("Removed user from role.");
+                    } else {
+                        $.hood.Alerts.Error("Couldn't remove the user from the role: " + data.Error);
+                    }
+                });
+            }
         }
-    },
-    LoadRoles: function (tag, id) {
-        $this = $(tag);
-        $.get('/admin/users/roles/', { id: id }, function (data) {
-             $this.html(data);
-        });
     }
 }
 $.hood.Users.Init();

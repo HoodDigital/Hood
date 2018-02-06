@@ -36,51 +36,43 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/subscriptions/")]
-        [SubscriptionRequired(Roles: "SuperUser")]
-        public IActionResult Index()
-        {
-            AccountInfo account = HttpContext.GetAccountInfo();
-            SubscriptionModel model = new SubscriptionModel();
-            return View(model);
-        }
-
-        [HttpGet]
-        [Route("account/billing/updated/")]
-        public async Task<IActionResult> Updated(int plan, BillingMessage? message = null)
+        [SubscriptionRequired(Roles: "SuperUser", Categories: "Hosting")]
+        public async Task<IActionResult> Index(BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel()
             {
                 User = account.User,
                 Plans = await _auth.GetSubscriptionPlanLevels(),
-                Addons = await _auth.GetSubscriptionPlanAddons(),
-                Message = message,
-                CurrentPlan = await _auth.GetSubscriptionPlanById(plan)
+                Addons = await _auth.GetSubscriptionPlanAddons()
             };
+            model.AddBillingMessage(message);
             return View(model);
         }
 
         [HttpGet]
         [Route("account/subscriptions/change/")]
         [SubscriptionRequired(Roles: "SuperUser")]
-        public async Task<IActionResult> Change(BillingMessage? message = null)
+        public async Task<IActionResult> Change(string category, BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel()
             {
                 User = account.User,
-                Plans = await _auth.GetSubscriptionPlanLevels(),
-                Addons = await _auth.GetSubscriptionPlanAddons(),
-                Message = message
+                Category = category,
+                Plans = await _auth.GetSubscriptionPlanLevels(category),
+                Addons = await _auth.GetSubscriptionPlanAddons()
             };
+            model.AddBillingMessage(message);
             return View(model);
         }
 
         [HttpGet]
         [Route("account/subscriptions/new/")]
-        public async Task<IActionResult> New(string returnUrl = null, BillingMessage? message = null)
+        public async Task<IActionResult> New(string category, string returnUrl = null, BillingMessage? message = null)
         {
-            SubscriptionModel model = await GetCreateModel(returnUrl);
+            SubscriptionModel model = await GetCreateModel(category, returnUrl);
+            model.AddBillingMessage(message);
             return View(model);
         }
 
@@ -98,16 +90,15 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                model = await GetCreateModel(returnUrl);
+                model = await GetCreateModel(model.Category, returnUrl);
                 BillingMessage bm = BillingMessage.Null;
                 if (Enum.TryParse(ex.Message, out bm))
                 {
-                    model.Message = bm;
+                    model.AddBillingMessage(bm);
                 }
                 else
                 {
-                    model.Message = BillingMessage.StripeError;
-                    model.MessageText = ex.Message;
+                    model.AddBillingMessage(BillingMessage.StripeError);
                 }
                 return View(model);
             }
@@ -115,25 +106,13 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/subscriptions/addon/")]
-        public async Task<IActionResult> Addon(string required, string returnUrl = null, BillingMessage? message = null)
+        public async Task<IActionResult> Addon(string category, string required, string returnUrl = null, BillingMessage? message = null)
         {
-            SubscriptionModel model = await GetCreateModel(returnUrl);
+            SubscriptionModel model = await GetCreateModel(category, returnUrl);
+            model.AddBillingMessage(message);
             return View(model);
         }
 
-        private async Task<SubscriptionModel> GetCreateModel(string returnUrl)
-        {
-            AccountInfo account = HttpContext.GetAccountInfo();
-            SubscriptionModel model = new SubscriptionModel()
-            {
-                User = account.User,
-                Plans = await _auth.GetSubscriptionPlanLevels(),
-                Addons = await _auth.GetSubscriptionPlanAddons(),
-                Customer = await _auth.LoadCustomerObject(account.User.StripeId, true)
-            };
-            ViewData["ReturnUrl"] = returnUrl;
-            return model;
-        }
 
         [HttpGet]
         [Route("account/subscriptions/upgrade/")]
@@ -224,16 +203,30 @@ namespace Hood.Controllers
                 return new StatusCodeResult(202);
             }
         }
+
+        private async Task<SubscriptionModel> GetCreateModel(string category, string returnUrl)
+        {
+            AccountInfo account = HttpContext.GetAccountInfo();
+            SubscriptionModel model = new SubscriptionModel()
+            {
+                User = account.User,
+                Category = category,
+                Plans = await _auth.GetSubscriptionPlanLevels(category),
+                Addons = await _auth.GetSubscriptionPlanAddons(),
+                Customer = await _auth.LoadCustomerObject(account.User.StripeId, true)
+            };
+            ViewData["ReturnUrl"] = returnUrl;
+            return model;
+        }
         private string FormatLog(string v)
         {
             return DateTime.Now.ToShortDateString() + " - " + DateTime.Now.ToShortTimeString() + ": " + v + Environment.NewLine;
         }
-
         private string GetReturnUrl(BillingMessage? message, int? planId, string returnUrl, string errors = null)
         {
             if (!returnUrl.IsSet())
             {
-                returnUrl = Url.Action("Updated", "Subscriptions");
+                returnUrl = Url.Action("Change", "Subscriptions");
             }
             var newParams = new Dictionary<string, string>();
             if (message.HasValue)
@@ -247,6 +240,7 @@ namespace Hood.Controllers
             var uri = returnUrl.AddParameterToUrl(newParams);
             return uri.ToString();
         }
+
     }
 
 }

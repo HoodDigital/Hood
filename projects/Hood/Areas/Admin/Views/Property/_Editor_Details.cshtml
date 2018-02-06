@@ -35,19 +35,26 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Bedrooms:</label>
-                <div class="col-sm-8">
-                    <select class="form-control" asp-for="Bedrooms">
-                        <option value="">N/A</option>
-                        <option value="0">Studio</option>
-                        @for (int i = 1; i < 15; i++)
-                        {
-                            <option value="@i">@i.ToString("0")</option>
-                        }
-                    </select>
+            @if (_propertySettings.ShowBedrooms)
+            {
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Bedrooms:</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" asp-for="Bedrooms">
+                            <option value="">N/A</option>
+                            <option value="0">Studio</option>
+                            @for (int i = 1; i < 15; i++)
+                            {
+                                <option value="@i">@i.ToString("0")</option>
+                            }
+                        </select>
+                    </div>
                 </div>
-            </div>
+            }
+            else
+            {
+                <input asp-for="Bedrooms" type="hidden">
+            }
             <div class="form-group">
                 <label class="col-sm-3 control-label">Planning Classification:</label>
                 <div class="col-sm-8">

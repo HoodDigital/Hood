@@ -61,6 +61,7 @@ namespace Hood.Core
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<ISettingsRepository, SettingsRepository>();
+            services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
             services.AddTransient<IStripeService, StripeService>();
             services.AddTransient<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddTransient<ISubscriptionService, SubscriptionService>();
@@ -73,7 +74,6 @@ namespace Hood.Core
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
-            services.AddScoped<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
             services.AddScoped<IContentRepository, ContentRepository>();
             services.AddScoped<IStripeWebHookService, StripeWebHookService>();
             services.AddScoped<ISmsSender, SmsSender>();

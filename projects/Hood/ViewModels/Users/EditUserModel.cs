@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using Hood.Extensions;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
@@ -16,7 +17,7 @@ namespace Hood.Models
         public UserProfile User { get; set; }
     }
 
-    public class UserProfile
+    public class UserProfile : IUserProfile
     {
         public string FirstName { get; set; }
 
@@ -54,6 +55,10 @@ namespace Hood.Models
 
         public string Notes { get; set; }
 
+        public void SetProfile(IUserProfile profile)
+        {
+            profile.CopyProperties(this);
+        }
     }
 
 }
