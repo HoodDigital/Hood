@@ -18,6 +18,9 @@ namespace Hood.Enums
         Published,
         Succeeded,
         Sent,
-        ErrorSending
+        ErrorSending,
+        NotFound,
+        ErrorDuplicating,
+        Duplicated
     }
 }

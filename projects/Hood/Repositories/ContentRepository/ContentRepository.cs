@@ -191,7 +191,7 @@ namespace Hood.Services
             }
             return content;
         }
-        public Content GetContentByID(int id, bool clearCache = false)
+        public Content GetContentByID(int id, bool clearCache = false, bool track = true)
         {
             string cacheKey = typeof(Content).ToString() + ".Single." + id;
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
@@ -310,6 +310,59 @@ namespace Hood.Services
             {
                 return new OperationResult(ex.Message) as OperationResult<Content>;
             }
+        }
+        public Content DuplicateContent(int id)
+        {
+            var clone = _db.Content
+                                 .AsNoTracking()
+                                 .SingleOrDefault(c => c.Id == id);
+            if (clone == null)
+                return null;
+
+            clone.Id = 0;
+            clone.Title += " - Copy";
+            clone.Slug += "-copy";
+
+            _db.Content.Add(clone);
+            _db.SaveChanges();
+
+            var copyObject = _db.Content
+                                .AsNoTracking()
+                                .Include(p => p.Categories).ThenInclude(c => c.Category)
+                                .Include(p => p.Tags).ThenInclude(t => t.Tag)
+                                .Include(p => p.Media)
+                                .Include(p => p.Metadata)
+                                .SingleOrDefault(c => c.Id == id);
+
+            clone.Categories = new List<ContentCategoryJoin>();
+            foreach (var c in copyObject.Categories)
+            {
+                clone.Categories.Add(new ContentCategoryJoin() { ContentId = clone.Id, CategoryId = c.CategoryId });
+            }
+            clone.Tags = new List<ContentTagJoin>();
+            foreach (var c in copyObject.Tags)
+            {
+                clone.Tags.Add(new ContentTagJoin() { ContentId = clone.Id, TagId = c.TagId });
+            }
+            clone.Media = new List<ContentMedia>();
+            foreach (var c in copyObject.Media)
+            {
+                var newMedia = new ContentMedia();
+                c.CopyProperties(newMedia);
+                newMedia.Id = 0;
+                clone.Media.Add(newMedia);
+            }
+            clone.Metadata = new List<ContentMeta>();
+            foreach (var c in copyObject.Metadata)
+            {
+                var newMeta = new ContentMeta();
+                c.CopyProperties(newMeta);
+                newMeta.Id = 0;
+                clone.Metadata.Add(newMeta);
+            }
+            _db.SaveChanges();
+
+            return clone;
         }
 
         // Content Views

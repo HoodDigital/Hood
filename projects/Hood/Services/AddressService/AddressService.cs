@@ -23,16 +23,16 @@ namespace Hood.Services
                 return null;
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
-            IEnumerable<Address> addresses = geocoder.Geocode(
+            IEnumerable<Address> addresses = geocoder.GeocodeAsync(
                 address.Number.IsSet() ? string.Format("{0} {1}", address.Number, address.Address1) : address.Address1, 
                 address.City, 
                 address.County, 
                 address.Postcode, 
                 address.Country
-            );
+            ).Result;
             if (addresses.Count() == 0)
             {
-                addresses = geocoder.Geocode(address.Postcode);
+                addresses = geocoder.GeocodeAsync(address.Postcode).Result;
                 if (addresses.Count() == 0)
                     return null;
             }

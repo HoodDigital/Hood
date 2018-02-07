@@ -12,13 +12,14 @@ namespace Hood.Services
         // Content CRUD
         Task<ContentModel> GetPagedContent(ContentModel model, bool publishedOnly = true);
         List<Content> GetContentByType(string type, string categorySlug = null, bool publishedOnly = true);
-        Content GetContentByID(int id, bool clearCache = false);
+        Content GetContentByID(int id, bool clearCache = false, bool track = true);
         OperationResult Add(Content content);
         OperationResult Update(Content content);
         OperationResult Delete(int id);
         OperationResult<Content> SetStatus(int id, Status status);
         Task<OperationResult> DeleteAll(string type);
         Task<OperationResult<Content>> AddImage(Content content, ContentMedia contentMedia);
+        Content DuplicateContent(int id);
 
         // Content Views
         List<Content> GetRecent(string type, string categorySlug = null);

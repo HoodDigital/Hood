@@ -2,7 +2,7 @@
 @inject IContentRepository _content
 @{
     AccountInfo account = Context.GetAccountInfo();
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
     Layout = null;
     PropertySettings _propertySettings = _settings.GetPropertySettings();
@@ -57,9 +57,9 @@
                 <a><i class="fa fa-file"></i><span class="nav-label">Content</span> <span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level collapse" style="height: 0px;">
                     @foreach (ContentType ct in sideTypes)
-            {
-                if (ct.Type == "property")
-                {
+                    {
+                        if (ct.Type == "property")
+                        {
                             <li>
                                 <a asp-action="Index" asp-controller="Property" asp-route-area="Admin">
                                     <i class="fa fa-building"></i>
@@ -103,7 +103,7 @@
                             </a>
                         </li>
                         @if (User.IsInRole("Admin"))
-                {
+                        {
                             <li>
                                 <a asp-action="Webhook" asp-controller="Subscriptions">
                                     <i class="fa fa-download"></i>Test Webhooks
@@ -123,7 +123,7 @@
                     <i class="fa fa-paint-brush"></i><span class="nav-label">Theme</span>
                 </a>
             </li>
-            @if (User.IsInRole("Admin") || User.IsInRole("SEO"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
                 <li>
                     <a asp-action="Seo" asp-controller="Settings" asp-route-area="Admin">
@@ -131,7 +131,7 @@
                     </a>
                 </li>
             }
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
                 <li>
                     <a asp-action="Index" asp-controller="Users">
@@ -232,7 +232,7 @@
                             </a>
                         </li>
                         @if (User.IsInRole("Admin"))
-                {
+                        {
                             <li class="divider"></li>
                             <li>
                                 <a asp-action="Advanced" asp-controller="Settings" asp-route-area="Admin">

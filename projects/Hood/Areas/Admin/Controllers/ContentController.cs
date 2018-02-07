@@ -558,6 +558,21 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [Route("admin/content/{id}/duplicate")]
+        public IActionResult Duplicate(int id)
+        {
+            try
+            {
+                var newContent = _content.DuplicateContent(id);
+
+                return RedirectToAction("Edit", new { message = EditorMessage.Duplicated, newContent.Id });
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Edit", new { message = EditorMessage.ErrorDuplicating, id });
+            }
+        }
+
         [Route("admin/content/{id}/sethomepage")]
         public Response SetHomepage(int id)
         {

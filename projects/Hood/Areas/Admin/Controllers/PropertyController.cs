@@ -87,6 +87,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
             var model = await ReloadProperty(_property.GetPropertyById(id, true));
+            model.AutoGeocode = true;
             model.AddEditorMessage(message);
             return View(model);
         }
@@ -101,7 +102,9 @@ namespace Hood.Areas.Admin.Controllers
                 post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
                 post.LastEditedBy = User.Identity.Name;
                 post.LastEditedOn = DateTime.Now;
-                post.SetLocation(_address.GeocodeAddress(post));
+
+                if (post.AutoGeocode)
+                    post.SetLocation(_address.GeocodeAddress(post));
 
                 OperationResult result = _property.UpdateProperty(post);
 

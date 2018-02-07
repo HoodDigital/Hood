@@ -21,13 +21,25 @@ namespace Hood.BaseTypes
                         MessageType = AlertType.Success;
                         SaveMessage = "Operation completed successfully.";
                         break;
+                    case EditorMessage.NotFound:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "Could not find the item requested in the database.";
+                        break;
                     case EditorMessage.Sent:
                         MessageType = AlertType.Success;
                         SaveMessage = "Message sent successfully.";
                         break;
                     case EditorMessage.ErrorSending:
-                        MessageType = AlertType.Success;
+                        MessageType = AlertType.Danger;
                         SaveMessage = "There was a problem sending the message.";
+                        break;
+                    case EditorMessage.Duplicated:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "The content has been duplicated, you are now viewing the copied item.";
+                        break;
+                    case EditorMessage.ErrorDuplicating:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "There was a problem duplicating the content.";
                         break;
                     case EditorMessage.Created:
                         MessageType = AlertType.Success;

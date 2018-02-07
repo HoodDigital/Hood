@@ -262,6 +262,8 @@ namespace Hood.Models
         }
         [NotMapped]
         public bool PublishPending { get; set; }
+        [NotMapped]
+        public bool AutoGeocode { get; set; }
 
         public PropertyMeta GetMeta(string name)
         {

@@ -6,6 +6,7 @@
 @section buttons {
     <a class="btn btn-sm btn-danger delete-content" data-id="@Model.Content.Id" data-type="@Model.ContentType.Type"><i class="fa fa-trash m-r-xs"></i>Delete</a>
     <a class="btn btn-sm btn-info" href="@Model.Content.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+    <a class="btn btn-sm btn-default" asp-action="Duplicate" asp-route-id="@Model.Content.Id"><i class="fa fa-copy m-r-xs"></i>Duplicate</a>
     @if (Model.ContentType.ShowDesigner)
     {
         <a class="btn btn-sm btn-default" href="@string.Format("{0}?editMode=true", Model.Content.Url)"><i class="fa fa-pencil m-r-xs"></i>Designer</a>

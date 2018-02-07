@@ -20,15 +20,15 @@
             </div>
             <hr />
             @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Lookup Address</label>
-                    <div class="col-sm-8">
-                        <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." />
-                    </div>
-                </div>
-                <hr />
-            }
+    {
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Lookup Address</label>
+            <div class="col-sm-8">
+                <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." autocomplete="off" />
+            </div>
+        </div>
+        <hr />
+}
             <div class="form-group">
                 <label class="col-sm-3 control-label" asp-for="Number"></label>
                 <div class="col-sm-8"><input asp-for="Number" type="text" class="form-control" /></div>
@@ -55,22 +55,36 @@
                     <select class="form-control" asp-for="Country">
                         <option value="">-- Choose a country --</option>
                         @foreach (var itm in _data.AllCountries())
-                        {
-                            if (itm.Name == "United Kingdom")
-                            {
-                                <option value="@itm.Name" selected>@itm.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@itm.Name">@itm.Name</option>
-                            }
-                        }
+                {
+                    if (itm.Name == "United Kingdom")
+                    {
+                        <option value="@itm.Name" selected>@itm.Name</option>
+            }
+            else
+            {
+                <option value="@itm.Name">@itm.Name</option>
+    }
+}
                     </select>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">Postcode</label>
                 <div class="col-sm-8"><input asp-for="Postcode" type="text" class="form-control" /></div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Auto locate address?</label>
+                <div class="col-sm-8">
+                    <div class="checkbox">
+                        <input asp-for="AutoGeocode" class="styled">
+                        <label asp-for="AutoGeocode">Use the Google Address Service to lookup your address from the postcode/address information provided, and get a map Latitude/Longitude reference to use with Google Maps.</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Latitude/Longitude</label>
+                <div class="col-sm-4"><input asp-for="Latitude" type="text" class="form-control" /></div>
+                <div class="col-sm-4"><input asp-for="Longitude" type="text" class="form-control" /></div>
             </div>
         </fieldset>
         <hr />

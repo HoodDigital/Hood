@@ -29,12 +29,12 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
-    <PackageReference Include="linqtotwitter" Version="4.2.0-beta2" />
-    <PackageReference Include="PayPal" Version="1.9.1" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="linqtotwitter" Version="5.0.0-beta1" />
     <PackageReference Include="Stripe.net" Version="11.7.1" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
-    <PackageReference Include="Geocoding.net" Version="3.6.1" />
+    <PackageReference Include="Geocoding.Core" Version="4.0.1" />
+    <PackageReference Include="Geocoding.Google" Version="4.0.1" />
     <PackageReference Include="BundlerMinifier.Core" Version="2.6.362" />
     <PackageReference Include="MailChimp.Net.V3" Version="3.0.0" />
     <PackageReference Include="Sendgrid" Version="9.9.0" />
@@ -58,16 +58,6 @@
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <None Remove="node_modules\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Views\Property\NotFound.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Views\Property\NotFound.cshtml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
