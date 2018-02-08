@@ -247,14 +247,16 @@ $.hood.Property = {
                 submitUrl: '/admin/property/add',
                 submitFunction: function (data) {
                     if (data.Success) {
-                        $('#manage-property-list').data('hoodDataList').Refresh();
                         swal("Created!", "The property has now been created!", "success");
+                        setTimeout(function () {
+                            window.location = data.Url;
+                        }, 500);
                     } else {
-                        swal("Error", "There was a problem creating the property:\n\n" + data.Errors, "error");
+                        swal("Error", "There was a problem creating the content:\n\n" + data.Errors, "error");
                     }
                 }
             });
-            $.hood.Handlers.Addresses.InitAutocomplete();
+            $.hood.Google.Addresses.InitAutocomplete();
         }
     },
     Edit: {

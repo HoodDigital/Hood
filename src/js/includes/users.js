@@ -6,7 +6,7 @@ $.hood.Users = {
         $('body').on('click', '.create-user', this.Create.Init);
         $('body').on('change', '#cuGeneratePassword', this.Create.GeneratePassword);
         $('body').on('change', '.role-check', this.Edit.ToggleRole);
-        $('body').on('click', '.reset-password', this.ResetPassword);
+        $('body').on('click', '.reset-password', this.Edit.ResetPassword);
     },
     Delete: function (e) {
         var $this = $(this);
