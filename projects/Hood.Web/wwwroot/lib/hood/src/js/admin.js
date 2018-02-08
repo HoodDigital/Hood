@@ -10,11 +10,11 @@
     $.hood.Helpers.InitIboxes('body');
     $.hood.Helpers.InitMetisMenu('#side-menu');
 
-    $('.close-canvas-menu').click(function () {
+    $('.close-canvas-menu').on('click', function () {
         $("body").toggleClass("mini-nav");
         SmoothlyMenu();
     });
-    $('.right-sidebar-toggle').click(function () {
+    $('.right-sidebar-toggle').on('click', function () {
         $('#right-sidebar').toggleClass('sidebar-open');
     });
 
@@ -28,7 +28,7 @@
         wheelStep: 10
     });
 
-    $('.open-small-chat').click(function () {
+    $('.open-small-chat').on('click', function () {
         $(this).children().toggleClass('fa-comments').toggleClass('fa-remove');
         $('.small-chat-box').toggleClass('active');
     });
@@ -38,7 +38,7 @@
         railOpacity: 0.4
     });
 
-    $('.check-link').click(function () {
+    $('.check-link').on('click', function () {
         var button = $(this).find('i');
         var label = $(this).next('span');
         button.toggleClass('fa-check-square').toggleClass('fa-square-o');
@@ -51,7 +51,7 @@
         else
             $("body").removeClass("mini-nav")
     }
-   $('.sidebar-toggle').click(function () {
+    $('.sidebar-toggle').on('click', function () {
         $("body").toggleClass("mini-nav");
         if ($("body").hasClass("mini-nav")) {
             $(this).children('.fa').removeClass('fa-list');

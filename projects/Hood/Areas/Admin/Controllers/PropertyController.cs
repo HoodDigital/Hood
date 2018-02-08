@@ -57,7 +57,7 @@ namespace Hood.Areas.Admin.Controllers
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
-            model = await _property.GetPagedProperties(model, true);
+            model = await _property.GetPagedProperties(model, false);
 
             model.Locations = await _property.GetLocations(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
@@ -274,13 +274,14 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
                 result = _property.UpdateProperty(property);
+
                 if (!result.Succeeded)
                 {
                     throw new Exception(result.ErrorString);
                 }
-
-                return new Response(true);
-
+                var response = new Response(true, "Published successfully.");
+                response.Url = Url.Action("Edit", new { id = property.Id, message = EditorMessage.Created });
+                return response;
             }
             catch (Exception ex)
             {
