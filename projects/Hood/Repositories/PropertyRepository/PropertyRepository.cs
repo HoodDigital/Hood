@@ -92,19 +92,24 @@ namespace Hood.Services
 
             if (!string.IsNullOrEmpty(propertyFilters.Transaction))
             {
-                if (propertyFilters.Transaction == "Rent")
+
+                if (propertyFilters.Transaction == "Student")
                 {
-                    properties = properties.Where(n => n.ListingType == "Long Term" ||
-                                                       n.ListingType == "Short Term" ||
-                                                       n.ListingType == "Student" ||
-                                                       n.ListingType == "Long Term");
+                    properties = properties.Where(n => n.ListingType == "Student");
+                }
+                else if (propertyFilters.Transaction == "Sale")
+                {
+                    properties = properties.Where(n => n.ListingType == "Commercial" ||
+                                                       n.ListingType == "Lease for sale" ||
+                                                       n.ListingType == "Sale");
                 }
                 else
                 {
                     properties = properties.Where(n => n.ListingType == "Not Specified" ||
-                                                       n.ListingType == "Commercial" ||
-                                                       n.ListingType == "Lease for sale" ||
-                                                       n.ListingType == "Sale");
+                                                       n.ListingType == "Sub-lease" ||
+                                                       n.ListingType == "Long Term" ||
+                                                       n.ListingType == "Short Term" ||
+                                                       n.ListingType == "Long Term");
                 }
             }
             else

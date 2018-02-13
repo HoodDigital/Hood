@@ -13,6 +13,17 @@
         </div>
         <div class="col-sm-6 col-md-3">
             <div class="well">
+                <h4 class="no-margin">Transaction</h4>
+                <select class="form-control m-t-lg" asp-for="Transaction">
+                    <option value="" selected>Show All</option>
+                    <option value="Rent">to Rent</option>
+                    <option value="Sale">to Buy</option>
+                    <option value="Student">for Students</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
                 <h4 class="no-margin">Type</h4>
                 <select class="form-control m-t-lg" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
                     <option value="">Show All</option>
@@ -20,74 +31,74 @@
             </div>
         </div>
         @if (_propertySettings.ShowBedrooms)
-        {
-            <div class="col-sm-6 col-md-3">
-                <div class="well">
-                    <h4 class="no-margin">Bedrooms</h4>
-                    <select class="form-control m-t-lg half" asp-for="Bedrooms">
-                        <option value="">Show All</option>
-                        @for (int i = 0; i < 13; i++)
-                        {
-                            <option value="@i">@(i)</option>
-                        }
-                    </select>
-                </div>
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Bedrooms</h4>
+                <select class="form-control m-t-lg half" asp-for="Bedrooms">
+                    <option value="">Show All</option>
+                    @for (int i = 0; i < 13; i++)
+                {
+                    <option value="@i">@(i)</option>
+            }
+                </select>
             </div>
-        }
+        </div>
+}
         @if (_propertySettings.ShowRent)
-        {
-            <div class="col-sm-6 col-md-3">
-                <div class="well">
-                    <h4 class="no-margin">Rent</h4>
-                    <select class="form-control m-t-lg half" asp-for="MinRent">
-                        <option value="">Show All</option>
-                        <option value="0">£ 0</option>
-                        <option value="100">£ 100</option>
-                    </select>
-                    <select class="form-control m-t-lg half" asp-for="MaxRent">
-                        <option value="">Show All</option>
-                        <option value="0">£ 0</option>
-                        <option value="100">£ 100</option>
-                    </select>
-                </div>
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Rent</h4>
+                <select class="form-control m-t-lg half" asp-for="MinRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+                <select class="form-control m-t-lg half" asp-for="MaxRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
             </div>
-        }
+        </div>
+}
         @if (_propertySettings.ShowAskingPrice)
-        {
-            <div class="col-sm-6 col-md-3">
-                <div class="well">
-                    <h4 class="no-margin">Asking Price</h4>
-                    <select class="form-control m-t-lg half" asp-for="MinRent">
-                        <option value="">Show All</option>
-                        <option value="0">£ 0</option>
-                        <option value="100">£ 100</option>
-                    </select>
-                    <select class="form-control m-t-lg half" asp-for="MaxRent">
-                        <option value="">Show All</option>
-                        <option value="0">£ 0</option>
-                        <option value="100">£ 100</option>
-                    </select>
-                </div>
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Asking Price</h4>
+                <select class="form-control m-t-lg half" asp-for="MinRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+                <select class="form-control m-t-lg half" asp-for="MaxRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
             </div>
-        }
+        </div>
+}
         @if (_propertySettings.ShowPremium)
-        {
-            <div class="col-sm-6 col-md-3">
-                <div class="well">
-                    <h4 class="no-margin">Premium</h4>
-                    <select class="form-control m-t-lg half" asp-for="MinRent">
-                        <option value="">Show All</option>
-                        <option value="0">£ 0</option>
-                        <option value="100">£ 100</option>
-                    </select>
-                    <select class="form-control m-t-lg half" asp-for="MaxRent">
-                        <option value="">Show All</option>
-                        <option value="0">£ 0</option>
-                        <option value="100">£ 100</option>
-                    </select>
-                </div>
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Premium</h4>
+                <select class="form-control m-t-lg half" asp-for="MinRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+                <select class="form-control m-t-lg half" asp-for="MaxRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
             </div>
-        }
+        </div>
+}
         <div class="col-sm-6 col-md-3">
             <div class="well">
                 <h4 class="no-margin">Planning</h4>

@@ -62,7 +62,18 @@
     <div class="ptb-60 row">
         <div class="col-sm-6">
             <div class="p-xs">
-                Showing <strong>@((Model.PageIndex - 1) * Model.PageSize + 1)</strong> -
+                Showing 
+                <strong>
+                    @{
+                        var start = ((Model.PageIndex - 1) * Model.PageSize + 1);
+                        if (start < 0)
+                        {
+                            start = 0;
+                        }
+                    }
+                    @(start)
+                </strong>
+                -
                 <strong>
                     @if ((Model.PageIndex * Model.PageSize) >= Model.TotalCount)
                     {
