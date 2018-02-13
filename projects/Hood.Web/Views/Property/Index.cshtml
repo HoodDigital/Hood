@@ -64,16 +64,16 @@
             <div class="p-xs">
                 Showing <strong>@((Model.PageIndex - 1) * Model.PageSize + 1)</strong> -
                 <strong>
-                    @if ((Model.PageIndex * Model.PageSize) >= Model.List.Count)
+                    @if ((Model.PageIndex * Model.PageSize) >= Model.TotalCount)
                     {
-                        @Model.List.Count
+                        @Model.TotalCount
                     }
                     else
                     {
                         @(Model.PageIndex * Model.PageSize)
                     }
                 </strong>
-                of @Model.List.Count products
+                of @Model.TotalCount
             </div>
         </div>
         <div class="col-sm-6 text-right">@{ await Html.RenderPartialAsync("_Pagination"); }</div>

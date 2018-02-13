@@ -27,6 +27,11 @@
                         </a>
                     </li>
                     <li>
+                        <a class="changelog-badge text-success externalTrigger">
+                            <i class="fa fa-flag"></i><span class="nav-label m-l-sm">Latest Updates</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="javascript:document.getElementById('logoutForm').submit()">
                             <i class="fa fa-sign-out"></i><span class="nav-label m-l-sm">Log out</span>
                         </a>
@@ -75,5 +80,13 @@
     </div>
     @{ await Html.RenderPartialAsync("_AdminScripts"); }
     @RenderSection("scripts", required: false)
+    <script>
+        var HW_config = {
+            selector: ".changelog-badge",
+            account: "yjw8Mx",
+            trigger: ".externalTrigger"
+        }
+    </script>
+    <script async src="//cdn.headwayapp.co/widget.js"></script>
 </body>
 </html>

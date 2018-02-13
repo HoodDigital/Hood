@@ -1,5 +1,7 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,16 @@ namespace Hood.Models
 {
     public class PropertySearchModel : PagedList<PropertyListing>, IPageableModel
     {
+        public PropertySearchModel()
+        {
+            var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+            var propertySettings = siteSettings.GetPropertySettings();
+            PageSize = propertySettings.DefaultPageSize;
+            if (PageSize <= 0)
+                PageSize = 20;
+            PageIndex = 1;
+        }
+
         public string Order { get; set; }
         public string Search { get; set; }
 

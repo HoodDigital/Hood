@@ -43,6 +43,7 @@ namespace Hood.Models
         public bool ShowFees { get; set; }
         public bool ShowFeesDecimals { get; set; }
         public FTPImporterSettings FTPImporterSettings { get; set; }
+        public int DefaultPageSize { get; set; }
 
         public PropertySettings()
         {
