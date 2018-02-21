@@ -181,7 +181,11 @@ body {
                     ul.nav-third-level {
                         li {
                             a {
-                                color: darken(@sidebar-link-color, 8%);
+                                color: darken(@sidebar-link-color, 15%);
+
+                                i {
+                                    color: darken(@sidebar-link-color, 15%);
+                                }
 
                                 @media (min-width:768px) {
                                     padding: 11px 20px 11px 55px;
@@ -285,6 +289,10 @@ body {
         nav.sidebar {
             width: 70px;
 
+            .scroll-area {
+                overflow: visible;
+            }
+
             .profile-element {
                 display: none;
             }
@@ -340,6 +348,16 @@ body {
                             &.active {
                                 border-left: 0px;
                                 background-color: #0a0a0a;
+                            }
+
+                            ul.nav-third-level {
+                                li {
+                                    a {
+                                        @media (min-width:768px) {
+                                            padding: 11px 20px 11px 25px;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

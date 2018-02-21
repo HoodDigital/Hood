@@ -19422,7 +19422,10 @@ body nav.sidebar ul.side-menu li ul.nav-second-level li.active {
   background-color: #0a0a0a;
 }
 body nav.sidebar ul.side-menu li ul.nav-second-level ul.nav-third-level li a {
-  color: #8f9cb1;
+  color: #7a89a3;
+}
+body nav.sidebar ul.side-menu li ul.nav-second-level ul.nav-third-level li a i {
+  color: #7a89a3;
 }
 @media (min-width: 768px) {
   body nav.sidebar ul.side-menu li ul.nav-second-level ul.nav-third-level li a {
@@ -19503,6 +19506,9 @@ body div.main-content div.content-body .panel-body.small > h4:first-child {
 body.mini-nav nav.sidebar {
   width: 70px;
 }
+body.mini-nav nav.sidebar .scroll-area {
+  overflow: visible;
+}
 body.mini-nav nav.sidebar .profile-element {
   display: none;
 }
@@ -19547,6 +19553,11 @@ body.mini-nav nav.sidebar ul.side-menu li ul.nav-second-level li a i {
 body.mini-nav nav.sidebar ul.side-menu li ul.nav-second-level li.active {
   border-left: 0px;
   background-color: #0a0a0a;
+}
+@media (min-width: 768px) {
+  body.mini-nav nav.sidebar ul.side-menu li ul.nav-second-level li ul.nav-third-level li a {
+    padding: 11px 20px 11px 25px;
+  }
 }
 body.mini-nav nav.sidebar ul.side-menu li.active {
   border-left: 0px;
