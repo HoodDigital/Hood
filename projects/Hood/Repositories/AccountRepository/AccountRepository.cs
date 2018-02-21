@@ -884,5 +884,67 @@ namespace Hood.Services
             return userSub;
         }
 
+
+        public object GetStatistics()
+        {
+            var totalUsers = _db.Users.Count();
+            var totalAdmins = _userManager.GetUsersInRoleAsync("Admin").Result.Count;
+            var data = _db.Users.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month }).ToList();
+
+            var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
+            var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
+
+            var days = new List<KeyValuePair<string, int>>();
+            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
+            {
+                var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
+                var count = dayvalue != null ? dayvalue.count : 0;
+                days.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
+
+            }
+
+            var months = new List<KeyValuePair<string, int>>();
+            for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
+            {
+                var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
+                var count = monthvalue != null ? monthvalue.count : 0;
+                months.Add(new KeyValuePair<string, int>(dt.ToString("dd MMM"), count));
+            }
+
+            return new { totalUsers, totalAdmins, days, months };
+        }
+
+        public object GetSubscriptionStatistics()
+        {
+            var total = _db.UserSubscriptions.Count();
+            var trials = _db.UserSubscriptions.Where(c => c.Status == "trialing").Count();
+            var active = _db.UserSubscriptions.Where(c => c.Status == "active").Count();
+
+            var data = _db.UserSubscriptions.Where(c => c.Created.HasValue).Select(c => new { date = c.Created.Value.Date, month = c.Created.Value.Month }).ToList();
+
+            var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
+            var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
+
+            var days = new List<KeyValuePair<string, int>>();
+            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
+            {
+                var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
+                var count = dayvalue != null ? dayvalue.count : 0;
+                days.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
+
+            }
+
+            var months = new List<KeyValuePair<string, int>>();
+            for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
+            {
+                var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
+                var count = monthvalue != null ? monthvalue.count : 0;
+                months.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
+            }
+
+
+            return new { total, trials, active, days, months };
+        }
+
     }
 }

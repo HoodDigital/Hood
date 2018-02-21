@@ -28,6 +28,11 @@ $(document).ready(function () {
         wheelStep: 10
     });
 
+    $('[data-plugin="counter"]').counterUp({
+        delay: 10,
+        time: 3000
+    });
+
     $('.open-small-chat').on('click', function () {
         $(this).children().toggleClass('fa-comments').toggleClass('fa-remove');
         $('.small-chat-box').toggleClass('active');

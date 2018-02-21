@@ -392,5 +392,46 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return property;
         }
+
+        public object GetStatistics()
+        {
+            var totalPosts = _db.Properties.Count();
+            var totalPublished = _db.Properties.Where(c => c.Status == (int)Status.Published && c.PublishDate < DateTime.Now).Count();
+            var data = _db.Properties.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToList();
+
+            var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
+            var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
+            var publishedByDate = data.GroupBy(p => p.pubdate).Select(g => new { name = g.Key, count = g.Count() });
+            var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
+
+            var days = new List<KeyValuePair<string, int>>();
+            var publishDays = new List<KeyValuePair<string, int>>();
+            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
+            {
+                var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
+                var count = dayvalue != null ? dayvalue.count : 0;
+                days.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
+
+                dayvalue = publishedByDate.SingleOrDefault(c => c.name == day.Date);
+                count = dayvalue != null ? dayvalue.count : 0;
+                publishDays.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
+            }
+
+            var months = new List<KeyValuePair<string, int>>();
+            var publishMonths = new List<KeyValuePair<string, int>>();
+            for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
+            {
+                var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
+                var count = monthvalue != null ? monthvalue.count : 0;
+                months.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
+
+                monthvalue = publishedByMonth.SingleOrDefault(c => c.name == dt.Month);
+                count = monthvalue != null ? monthvalue.count : 0;
+                publishMonths.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
+            }
+
+            return new { totalPosts, totalPublished, days, months, publishDays, publishMonths };
+        }
+
     }
 }

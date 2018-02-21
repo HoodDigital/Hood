@@ -55,5 +55,9 @@ namespace Hood.Services
         string UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
         string RemoveUserSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
         UserSubscription FindUserSubscriptionByStripeId(string id);
+
+        // Stats
+        object GetStatistics();
+        object GetSubscriptionStatistics();
     }
 }

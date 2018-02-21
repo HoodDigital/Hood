@@ -61,7 +61,7 @@
                         <div class="col-md-4">
                             <select class="form-control submit-on-change" asp-for="Category" name="category" data-selected="@Model.Category">
                                 <option value="">Show All</option>
-                                @Html.CategorySelectOptions(categories, true)
+                                @Html.CategorySelectOptions(categories, Model.Category, true)
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -272,7 +272,7 @@
                                 <div>
                                     <select class="form-control" id="Add-ParentCategoryId" name="ParentCategoryId">
                                         <option>No Parent</option>
-                                        @Html.CategorySelectOptions(categories)
+                                        @Html.CategorySelectOptions(categories, "")
                                     </select>
                                 </div>
                             </div>

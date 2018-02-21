@@ -23,5 +23,8 @@ namespace Hood.Services
         Task<List<PropertyListing>> GetRecent();
         Task<PropertyListing> RemoveMediaAsync(int id, int mediaId);
         Task<PropertyListing> RemoveFloorplanAsync(int id, int mediaId);
+
+        // Stats
+        object GetStatistics();
     }
 }

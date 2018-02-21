@@ -15,6 +15,7 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
         private readonly IContentRepository _content;
+        private readonly IPropertyRepository _properties;
         private readonly ISettingsRepository _settings;
         private readonly IAccountRepository _auth;
         private readonly IRazorViewRenderer _renderer;
@@ -27,7 +28,8 @@ namespace Hood.Areas.Admin.Controllers
                               UserManager<ApplicationUser> userManager,
                               IConfiguration conf,
                               IHostingEnvironment env,
-                              ISettingsRepository site,
+                              ISettingsRepository settings,
+                              IPropertyRepository properties,
                               IContentRepository content,
                               IRazorViewRenderer renderer,
                               IEmailSender email)
@@ -36,8 +38,9 @@ namespace Hood.Areas.Admin.Controllers
             _config = conf;
             _env = env;
             _content = content;
-            _settings = site;
+            _settings = settings;
             _renderer = renderer;
+            _properties = properties;
             _email = email;
             _categories = categories;
             _userManager = userManager;
@@ -54,6 +57,18 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Theme()
         {
             return View();
+        }
+
+        [Route("admin/stats/")]
+        [Authorize(Roles = "Admin,Manager")]
+        public IActionResult Stats()
+        {
+            var content = _content.GetStatistics();
+            var users = _auth.GetStatistics();
+            var subs = _auth.GetSubscriptionStatistics();
+            var properties = _properties.GetStatistics();
+
+            return Json(new { content, users, subs, properties });
         }
 
     }

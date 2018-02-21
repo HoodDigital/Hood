@@ -167,7 +167,7 @@ $.hood.Content = {
                             swal({
                                 title: "Error!",
                                 text: "There was a problem deleting the field: " + data.Errors,
-                                timer: 1300,
+                                timer: 5000,
                                 type: "error"
                             });
                         }
@@ -211,7 +211,7 @@ $.hood.Content = {
                         swal({
                             title: "Error!",
                             text: "There was a problem deleting the content: " + data.Errors,
-                            timer: 1300,
+                            timer: 5000,
                             type: "error"
                         });
                     }
@@ -253,7 +253,7 @@ $.hood.Content = {
                         swal({
                             title: "Error!",
                             text: "There was a problem publishing the item: " + data.Errors,
-                            timer: 1300,
+                            timer: 5000,
                             type: "error"
                         });
                     }
@@ -294,7 +294,7 @@ $.hood.Content = {
                         swal({
                             title: "Error!",
                             text: "There was a problem archiving the item: " + data.Errors,
-                            timer: 1300,
+                            timer: 5000,
                             type: "error"
                         });
                     }
@@ -319,7 +319,7 @@ $.hood.Content = {
                 swal({
                     title: "Error!",
                     text: "There was a problem cloning the content: " + data.Errors,
-                    timer: 1300,
+                    timer: 5000,
                     type: "error"
                 });
             }

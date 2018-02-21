@@ -284,8 +284,6 @@ namespace Hood.Areas.Admin.Controllers
                 _categories.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
-                // If we reached here, display the organisation home.
-                return Json(new { Success = true });
             }
             catch (Exception ex)
             {
@@ -375,7 +373,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                return new Response("Have you made sure this has no sub-categories attached to it, you cannot delete a category until you remove all the sub-categories from it");
             }
         }
 
@@ -492,10 +490,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 OperationResult<Content> result = _content.SetStatus(id, Status.Published);
+                var content = _content.GetContentByID(id);
                 if (result.Succeeded)
                 {
                     var response = new Response(true, "Published successfully.");
-                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Published });
+                    response.Url = Url.Action("Index", new { type = content.ContentType, message = EditorMessage.Published });
                     return response;
                 }
                 else
@@ -515,10 +514,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 OperationResult<Content> result = _content.SetStatus(id, Status.Archived);
+                var content = _content.GetContentByID(id);
                 if (result.Succeeded)
                 {
                     var response = new Response(true, "Archived successfully.");
-                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Archived });
+                    response.Url = Url.Action("Index", new { type= content.ContentType, message = EditorMessage.Archived });
                     return response;
                 }
                 else

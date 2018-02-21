@@ -54,7 +54,7 @@ namespace Hood.Extensions
             return html.Raw(htmlOutput);
         }
 
-        public static IHtmlContent CategorySelectOptions(this IHtmlHelper html, IEnumerable<ContentCategory> categories, bool useSlug = false, int startingLevel = 0)
+        public static IHtmlContent CategorySelectOptions(this IHtmlHelper html, IEnumerable<ContentCategory> categories, string selectedValue, bool useSlug = false, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
             if (categories != null && categories.Count() > 0)
@@ -62,16 +62,20 @@ namespace Hood.Extensions
                 foreach (var category in categories)
                 {
                     if (useSlug)
-                        htmlOutput += "<option value=\"" + category.Slug + "\">";
+                    {
+                        htmlOutput += "<option value=\"" + category.Slug + "\"" + (selectedValue == category.Slug ? " selected" : "") + ">";
+                    }
                     else
-                        htmlOutput += "<option value=\"" + category.Id + "\">";
+                    {
+                        htmlOutput += "<option value=\"" + category.Id  + "\"" + (selectedValue == category.Id.ToString() ? " selected" : "") + ">";
+                    }
                     for (int i = 0; i < startingLevel; i++)
                     {
                         htmlOutput += "- ";
                     }
                     htmlOutput += string.Format("{0} ({1})", category.DisplayName, category.Count);
                     htmlOutput += "</option>";
-                    htmlOutput += html.CategorySelectOptions(category.Children, useSlug, startingLevel + 1);
+                    htmlOutput += html.CategorySelectOptions(category.Children, selectedValue, useSlug, startingLevel + 1);
                 }
             }
             return html.Raw(htmlOutput);

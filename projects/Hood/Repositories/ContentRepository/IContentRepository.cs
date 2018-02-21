@@ -55,5 +55,9 @@ namespace Hood.Services
         Task<List<LinqToTwitter.Status>> GetTweets(string name, int count);
         List<Country> AllCountries();
         Country GetCountry(string name);
+
+        //Stats
+        object GetStatistics();
+
     }
 }
