@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,17 @@ namespace Hood.Extensions
             return app.UseMiddleware<EnforceHttpsMiddleware>();
         }
 
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
+        /// <summary>
+        /// Configure Hood, using the default setup, can be configured to add custom routes and priority routes if required.
+        /// </summary>
+        /// <param name="app">The application builder object.</param>
+        /// <param name="env">The app's hosting enviromnent object.</param>
+        /// <param name="loggerFactory">The app's logger factory object.</param>
+        /// <param name="config">Your app configuration root object.</param>
+        /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
+        /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
+        /// <returns></returns>
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config, Action<IRouteBuilder> customRoutes = null, Action<IRouteBuilder> priorityRoutes = null)
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
@@ -87,6 +98,8 @@ namespace Hood.Extensions
             {
                 app.UseMvc(routes =>
                 {
+                    priorityRoutes?.Invoke(routes);
+
                     // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
                     routes.MapRoute(
                         name: "ContentCheck",
@@ -97,10 +110,18 @@ namespace Hood.Extensions
                         name: "areaRoute",
                         template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-                    routes.MapRoute(
+                    if (customRoutes == null)
+                    {
+                        routes.MapRoute(
                         name: "default-fallback",
                         template: "{controller=Home}/{action=Index}/{id?}");
+                    }
+                    else
+                    {
+                        customRoutes?.Invoke(routes);
+                    }
                 });
+
             }
 
             return app;
