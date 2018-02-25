@@ -62,7 +62,7 @@
     <div class="ptb-60 row">
         <div class="col-sm-6">
             <div class="p-xs">
-                Showing 
+                Showing
                 <strong>
                     @{
                         var start = ((Model.PageIndex - 1) * Model.PageSize + 1);
@@ -117,11 +117,13 @@
         <div class="row">
             @foreach (var content in Model.List)
             {
-                await Html.RenderPartialAsync("_PropertyCard", content);
+                <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
+                    @{ await Html.RenderPartialAsync("_PropertyCard", content);}
+                </div>
             }
         </div>
         <div class="text-center">
-            @{   await Html.RenderPartialAsync("_Pagination");}
+            @{ await Html.RenderPartialAsync("_Pagination");}
         </div>
     }
 </div>

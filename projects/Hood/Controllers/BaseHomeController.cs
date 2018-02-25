@@ -76,6 +76,25 @@ namespace Hood.Controllers
             return View("Feed", model);
         }
 
+        // Add your custom actions and site functionality here, or create new controllers, do whatever!
+        [ResponseCache(CacheProfileName = "Hour")]
+        [Route("{type}/load-more/")]
+        public async Task<IActionResult> LoadMore(string type, string search, string sort = "PublishDateDesc", int page = 1, int size = 12)
+        {
+            ContentModel model = new ContentModel()
+            {
+                Search = search,
+                Order = sort,
+                PageIndex = page,
+                PageSize = size
+            };
+            model = await _content.GetPagedContent(model, true);
+            model.ContentType = _settings.GetContentSettings().GetContentType(type);
+            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
+                return NotFound();
+            return View("LoadMore", model);
+        }
+
         [ResponseCache(CacheProfileName = "Day")]
         public virtual async Task<IActionResult> Show(int id, bool editMode = false)
         {

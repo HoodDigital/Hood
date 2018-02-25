@@ -155,14 +155,16 @@
     </div>
     @if (Model.Similar != null && Model.Similar.Count > 0)
     {
-        <div class="row">
-            <h4>Some of our other properties</h4>
-            <div class="portfolio-carousel owl-carousel owl-theme">
+    <div class="row">
+        <h4>Some of our other properties</h4>
+        <div class="portfolio-carousel owl-carousel owl-theme">
+            <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
                 @foreach (var similar in Model.Similar)
-                {
-                    await Html.RenderPartialAsync("_PropertyCard", similar);
-                }
+            {
+                await Html.RenderPartialAsync("_PropertyCard", similar);
+            }
             </div>
         </div>
+    </div>
     }
 </div>

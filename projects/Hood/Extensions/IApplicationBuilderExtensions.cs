@@ -55,14 +55,9 @@ namespace Hood.Extensions
             app.UseStaticFiles(new StaticFileOptions()
             {
                 OnPrepareResponse =
-                    r =>
+                    ctx =>
                     {
-                        string path = r.File.PhysicalPath;
-                        if (path.EndsWith(".css") || path.EndsWith(".js") || path.EndsWith(".gif") || path.EndsWith(".jpg") || path.EndsWith(".png") || path.EndsWith(".svg"))
-                        {
-                            TimeSpan maxAge = new TimeSpan(7, 0, 0, 0);
-                            r.Context.Response.Headers.Append("Cache-Control", "max-age=" + maxAge.TotalSeconds.ToString("0"));
-                        }
+                        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
                     }
             });
 

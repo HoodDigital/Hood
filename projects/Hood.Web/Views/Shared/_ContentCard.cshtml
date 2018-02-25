@@ -1,0 +1,12 @@
+﻿@model Content
+<div class="thumbnail">
+    <a href="@Model.Url"><fixedImage src="@Model.FeaturedImage.MediumUrl" class="img img-md img-full content-feature-@Model.Id" /></a>
+    <div class="caption">
+        <a href="@Model.Url">
+            <h3>@Model.Title</h3>
+        </a>
+        <h4>@Model.Title</h4>
+        <p class="text-muted">@Model.Excerpt</p>
+        <p><a href="@Model.Url" class="btn btn-primary" role="button">Learn more...</a></p>
+    </div>
+</div>

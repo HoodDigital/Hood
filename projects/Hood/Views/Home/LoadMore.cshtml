@@ -1,0 +1,19 @@
+@model ContentModel
+@{
+    Layout = null;
+}
+@if (Model.List.Count() > 0)
+{
+    foreach (Content content in Model.List)
+    {
+        switch (Model.ContentType.BaseName)
+        {
+            // Add more cases to used different partials for other content types.
+            case "News":
+            default:
+                await Html.RenderPartialAsync("_ContentCard", content);
+                break;
+        }
+    }
+    await Html.RenderPartialAsync("_LoadMoreBlock");
+}
