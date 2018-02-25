@@ -8,10 +8,11 @@
     {
         switch (Model.ContentType.BaseName)
         {
-            // Add more cases to used different partials for other content types.
             case "News":
-            default:
-                await Html.RenderPartialAsync("_ContentCard", content);
+                await Html.RenderPartialAsync("_NewsCard", content);
+                break;
+            case "Portfolio":
+                await Html.RenderPartialAsync("_PortfolioCard", content);
                 break;
         }
     }
