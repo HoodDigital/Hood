@@ -29,8 +29,6 @@ To install Hood JS & LESS, run the following command in the command line (bower 
 ```
 bower install --save hood
 ```
-### Visual Studio template
-Download the latest version of the Visual Studio Template from the Hood.Template project, [here](https://github.com/HoodDigital/Hood.Demo).
 
 ## Full documentation
-Is coming soon to [Hood.Docs](https://github.com/HoodDigital/Hood.Docs).
+Is coming soon.
