@@ -43,6 +43,7 @@ namespace Hood.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             app.UseHood(env, loggerFactory, config);
+            app.UseDefaultRoutesForHood(config);
         }
     }
 }

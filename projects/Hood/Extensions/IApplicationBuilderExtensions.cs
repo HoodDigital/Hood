@@ -83,6 +83,11 @@ namespace Hood.Extensions
 
             app.UseSession();
 
+            return app;
+        }
+
+        public static IApplicationBuilder UseDefaultRoutesForHood(this IApplicationBuilder app, IConfiguration config)
+        {
             if (!config.IsDatabaseConfigured())
             {
                 app.UseMvc(routes =>
@@ -98,8 +103,6 @@ namespace Hood.Extensions
             {
                 app.UseMvc(routes =>
                 {
-                    priorityRoutes?.Invoke(routes);
-
                     // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
                     routes.MapRoute(
                         name: "ContentCheck",
@@ -110,20 +113,11 @@ namespace Hood.Extensions
                         name: "areaRoute",
                         template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-                    if (customRoutes == null)
-                    {
-                        routes.MapRoute(
+                    routes.MapRoute(
                         name: "default-fallback",
                         template: "{controller=Home}/{action=Index}/{id?}");
-                    }
-                    else
-                    {
-                        customRoutes?.Invoke(routes);
-                    }
                 });
-
             }
-
             return app;
         }
     }
