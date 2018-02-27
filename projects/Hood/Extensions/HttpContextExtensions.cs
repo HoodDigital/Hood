@@ -1,5 +1,6 @@
 ﻿using Hood.Models;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -7,6 +8,17 @@ namespace Hood.Extensions
 {
     public static class HttpContextExtensions
     {
+        public static void Set<T>(this HttpContext context, string key, T value)
+        {
+            context.Items[key] = JsonConvert.SerializeObject(value);
+        }
+
+        public static T Get<T>(this HttpContext context, string key)
+        {
+            var value = context.Items[key] as string;
+            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
+        }
+
         public static AccountInfo GetAccountInfo(this HttpContext context)
         {
             return context.Items["AccountInfo"] as AccountInfo;
