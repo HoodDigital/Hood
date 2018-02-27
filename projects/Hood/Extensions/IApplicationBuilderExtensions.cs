@@ -33,7 +33,7 @@ namespace Hood.Extensions
         /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
         /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
         /// <returns></returns>
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config, Action<IRouteBuilder> customRoutes = null, Action<IRouteBuilder> priorityRoutes = null)
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
