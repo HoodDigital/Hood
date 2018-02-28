@@ -33,7 +33,7 @@ namespace Hood.Extensions
         /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
         /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
         /// <returns></returns>
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config, TimeSpan sessionTimeout)
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
@@ -81,21 +81,23 @@ namespace Hood.Extensions
                 app.UseAuthentication();
             }
 
+            int timeout = 60;
+            var builder = new CookieBuilder()
+            {
+                Name = config["Session:CookieName"].IsSet() ? config["Session:CookieName"] : ".Hood.Session"
+            };
+            if (int.TryParse(config["Session:Timeout"], out timeout))
+                builder.Expiration = TimeSpan.FromMinutes(timeout);
+            else
+                builder.Expiration = TimeSpan.FromMinutes(60);
+
             app.UseSession(new SessionOptions()
             {
-                IdleTimeout = ,
-                Cookie = new CookieBuilder()
-                {
-                    Name = "Hood.Session",
-                    Expiration = new TimeSpan(1, 0, 0)
-                }
+                IdleTimeout = builder.Expiration.Value,
+                Cookie = builder
             });
 
             return app;
-        }
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
-        {
-            return app.UseHood(env, loggerFactory, config, new TimeSpan(1, 0, 0));
         }
 
         public static IApplicationBuilder UseDefaultRoutesForHood(this IApplicationBuilder app, IConfiguration config)

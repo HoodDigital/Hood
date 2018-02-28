@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Hood.IO;
 using Hood.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Hood.Core
 {
@@ -102,6 +103,11 @@ namespace Hood.Core
                 services.AddIdentity<ApplicationUser, IdentityRole>(o =>
                 {
                     // configure identity options
+                    o.User.RequireUniqueEmail = true;
+
+                    o.SignIn.RequireConfirmedEmail = false;
+                    o.SignIn.RequireConfirmedPhoneNumber = false;
+
                     o.Password.RequireDigit = configuration["Identity:Password:RequireDigit"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireDigit"]) : true;
                     o.Password.RequireLowercase = configuration["Identity:Password:RequireLowercase"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireLowercase"]) : false;
                     o.Password.RequireUppercase = configuration["Identity:Password:RequireUppercase"].IsSet() ? bool.Parse(configuration["Identity:Password:RequireUppercase"]) : false;
@@ -110,6 +116,37 @@ namespace Hood.Core
                 })
                 .AddEntityFrameworkStores<HoodDbContext>()
                 .AddDefaultTokenProviders();
+
+                services.AddAntiforgery(options =>
+                {
+                    options.Cookie.Name = configuration["Antiforgery:CookieName"].IsSet() ? configuration["Antiforgery:CookieName"] : ".Hood.Antiforgery";
+                });
+
+                int sessionTimeout = 60;
+                services.ConfigureApplicationCookie(options =>
+                {
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.Cookie.Name = configuration["Identity:CookieName"].IsSet() ? configuration["Identity:CookieName"] : ".Hood.Authentication";
+                    options.Cookie.HttpOnly = true;
+                    if (int.TryParse(configuration["Session:Timeout"], out sessionTimeout))
+                        options.ExpireTimeSpan = TimeSpan.FromMinutes(sessionTimeout);
+                    else
+                        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
+                    // ReturnUrlParameter requires `using Microsoft.AspNetCore.Authentication.Cookies;`
+                    options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                    options.SlidingExpiration = true;
+                });
+                services.AddSession(options =>
+                {
+                    options.Cookie.Name = configuration["Session:CookieName"].IsSet() ? configuration["Session:CookieName"] : ".Hood.Session";
+                    options.Cookie.HttpOnly = true;
+                    if (int.TryParse(configuration["Session:Timeout"], out sessionTimeout))
+                        options.Cookie.Expiration = TimeSpan.FromMinutes(sessionTimeout);
+                    else
+                        options.Cookie.Expiration = TimeSpan.FromMinutes(60);
+                });
 
                 services.Configure<RouteOptions>(options =>
                 {
@@ -183,17 +220,6 @@ namespace Hood.Core
             {
                 services.AddScoped<ISettingsRepository, SettingsRepositoryStub>();
             }
-
-            services.AddAntiforgery(options =>
-            {
-                options.Cookie.Name = ".Hood.Antiforgery";
-            });
-
-            services.AddSession(options =>
-            {
-                options.Cookie.Name = ".Hood.Session";
-                options.Cookie.HttpOnly = true;
-            });
 
             services.AddApplicationInsightsTelemetry(configuration);
 
