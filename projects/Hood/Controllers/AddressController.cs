@@ -44,14 +44,12 @@ namespace Hood.Controllers
             _address = address;
         }
 
-        [Route("account/addresses/")]
         public ActionResult Index()
         {
             var user = _auth.GetCurrentUser(false);
             return View(user);
         }
 
-        [Route("account/addresses/create/")]
         public ActionResult Create()
         {
             string userID = _userManager.GetUserId(User);
@@ -60,7 +58,6 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [Route("account/addresses/create/")]
         public IActionResult Create(Address address)
         {
             try
@@ -88,14 +85,12 @@ namespace Hood.Controllers
             }
         }
 
-        [Route("account/addresses/edit/")]
         public ActionResult Edit(int id)
         {
             return View(_auth.GetAddressById(id));
         }
 
         [HttpPost]
-        [Route("account/addresses/edit/")]
         public IActionResult Edit(Address address)
         {
             try
@@ -113,7 +108,6 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [Route("account/addresses/delete/")]
         public ActionResult Delete(int id)
         {
             try
@@ -131,7 +125,6 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [Route("account/addresses/setbilling/")]
         public ActionResult SetBilling(int id)
         {
             try
@@ -147,7 +140,6 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [Route("account/addresses/setdelivery/")]
         public ActionResult SetDelivery(int id)
         {
             try

@@ -110,6 +110,23 @@ namespace Hood.Extensions
                         defaults: new { controller = "Home", action = "Show" });
 
                     routes.MapRoute(
+                         name: "manage",
+                         template: "account/manage/{action=Index}/{id?}",
+                         defaults: new { controller = "Manage" }
+                    );
+
+                    routes.MapRoute(
+                         name: "billing",
+                         template: "account/billing/{action=Index}/{id?}",
+                         defaults: new { controller = "Billing" }
+                    );
+
+                    routes.MapRoute(
+                         name: "subscriptions",
+                         template: "account/subscriptions/{action=Index}/{id?}",
+                         defaults: new { controller = "Subscriptions" }
+                    );
+                    routes.MapRoute(
                         name: "areaRoute",
                         template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 

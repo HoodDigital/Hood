@@ -74,7 +74,6 @@ namespace Hood.Controllers
             return View(um);
         }
 
-
         [Route("property/not-found")]
         public IActionResult NotFound(int id)
         {

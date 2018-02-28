@@ -35,7 +35,6 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [Route("account/subscriptions/")]
         [SubscriptionRequired(Roles: "SuperUser", Categories: "Hosting")]
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
@@ -51,7 +50,6 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [Route("account/subscriptions/change/")]
         [SubscriptionRequired(Roles: "SuperUser")]
         public async Task<IActionResult> Change(string category, BillingMessage? message = null)
         {
@@ -68,7 +66,6 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [Route("account/subscriptions/new/")]
         public async Task<IActionResult> New(string category, string returnUrl = null, BillingMessage? message = null)
         {
             SubscriptionModel model = await GetCreateModel(category, returnUrl);
@@ -78,7 +75,6 @@ namespace Hood.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("account/subscriptions/new/")]
         public async Task<IActionResult> New(SubscriptionModel model, string returnUrl = null)
         {
             try
@@ -105,7 +101,6 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [Route("account/subscriptions/addon/")]
         public async Task<IActionResult> Addon(string category, string required, string returnUrl = null, BillingMessage? message = null)
         {
             SubscriptionModel model = await GetCreateModel(category, returnUrl);
@@ -115,7 +110,6 @@ namespace Hood.Controllers
 
 
         [HttpGet]
-        [Route("account/subscriptions/upgrade/")]
         [SubscriptionRequired]
         public async Task<IActionResult> Upgrade(int id, int plan)
         {
@@ -133,7 +127,6 @@ namespace Hood.Controllers
             }
         }
 
-        [Route("account/subscriptions/cancel/")]
         [SubscriptionRequired]
         public async Task<IActionResult> Cancel(int id)
         {
@@ -151,7 +144,6 @@ namespace Hood.Controllers
             }
         }
 
-        [Route("account/subscriptions/remove/")]
         [SubscriptionRequired]
         public async Task<IActionResult> Remove(int id)
         {
@@ -169,7 +161,6 @@ namespace Hood.Controllers
             }
         }
 
-        [Route("account/subscriptions/reactivate/")]
         [SubscriptionRequired]
         public async Task<IActionResult> Reactivate(int id)
         {
@@ -189,7 +180,6 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("stripe/webhooks")]
         public StatusCodeResult WebHooks()
         {
             var json = new StreamReader(Request.Body).ReadToEnd();

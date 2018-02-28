@@ -55,7 +55,6 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [Route("account/billing/")]
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
@@ -88,7 +87,6 @@ namespace Hood.Controllers
             }
         }
 
-        [Route("account/billing/cards/add/")]
         public async Task<IActionResult> AddCard()
         {
             ApplicationUser user = await _userManager.GetUserAsync(User);
@@ -97,7 +95,6 @@ namespace Hood.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("account/billing/cards/add/")]
         public async Task<IActionResult> AddCard(SubscriptionModel model, string returnUrl = null)
         {
             try
@@ -146,7 +143,6 @@ namespace Hood.Controllers
         }
 
         [StripeAccountRequired]
-        [Route("account/billing/cards/set-default/")]
         public async Task<IActionResult> SetDefaultCard(string uid)
         {
             try
@@ -162,7 +158,6 @@ namespace Hood.Controllers
         }
 
         [StripeAccountRequired]
-        [Route("account/billing/cards/delete/")]
         public async Task<IActionResult> DeleteCard(string uid)
         {
             try

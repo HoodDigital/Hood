@@ -43,6 +43,7 @@ namespace Hood.Controllers
         [ResponseCache(CacheProfileName = "Day")]
         public virtual async Task<IActionResult> Index()
         {
+
             BasicSettings basicSettings = _settings.GetBasicSettings();
 
             if (basicSettings.LockoutMode && ControllerContext.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
