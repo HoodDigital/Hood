@@ -135,7 +135,6 @@ namespace Hood.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Route("manage/upload/avatar")]
         public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
