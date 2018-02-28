@@ -1,8 +1,4 @@
 @model EditContentModel
-@{ 
-    var editorClass = string.Format("tinymce-{0}{1}", Model.ContentType.EditorType, User.IsInRole("Admin") ? "-admin" : "");
-
-}
 @if (Model.ContentType.ShowEditor)
 {
     <h5 class="m-t-lg">Content</h5>
@@ -17,12 +13,12 @@
         </div>
         <div class="collapse" id="showHideEditor">
             <div class="m-t-lg">
-                <textarea id="Body" name="Body" class="@editorClass">@Model.Content.Body</textarea>
+                @{ await Html.RenderPartialAsync("_Editor_TinyMce");}
             </div>
         </div>
     }
     else
     {
-        <textarea id="Body" name="Body" class="@editorClass">@Model.Content.Body</textarea>
+        await Html.RenderPartialAsync("_Editor_TinyMce");
     }
 }
