@@ -33,7 +33,7 @@ namespace Hood.Extensions
         /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
         /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
         /// <returns></returns>
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config, TimeSpan sessionTimeout)
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
@@ -81,9 +81,21 @@ namespace Hood.Extensions
                 app.UseAuthentication();
             }
 
-            app.UseSession();
+            app.UseSession(new SessionOptions()
+            {
+                IdleTimeout = ,
+                Cookie = new CookieBuilder()
+                {
+                    Name = "Hood.Session",
+                    Expiration = new TimeSpan(1, 0, 0)
+                }
+            });
 
             return app;
+        }
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
+        {
+            return app.UseHood(env, loggerFactory, config, new TimeSpan(1, 0, 0));
         }
 
         public static IApplicationBuilder UseDefaultRoutesForHood(this IApplicationBuilder app, IConfiguration config)
@@ -105,9 +117,9 @@ namespace Hood.Extensions
                 {
                     // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
                     routes.MapRoute(
-                        name: "ContentCheck",
-                        template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
-                        defaults: new { controller = "Home", action = "Show" });
+                    name: "ContentCheck",
+                    template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
+                    defaults: new { controller = "Home", action = "Show" });
 
                     routes.MapRoute(
                          name: "manage",
