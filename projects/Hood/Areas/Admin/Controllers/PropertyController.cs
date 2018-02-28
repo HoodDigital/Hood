@@ -215,6 +215,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Route("admin/property/add/")]
         public async Task<Response> Add(CreatePropertyModel model)
         {
             try
@@ -452,6 +453,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Route("admin/property/getmedia/")]
         public IMediaObject GetMedia(int id, string type)
         {
             try
@@ -477,6 +479,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Route("admin/property/clearfield/")]
         public Response ClearField(int id, string field)
         {
             try

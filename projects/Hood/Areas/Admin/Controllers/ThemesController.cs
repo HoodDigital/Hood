@@ -18,6 +18,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost()]
+        [Route("admin/themes/activate/")]
         public Response Activate(string name)
         {
             try

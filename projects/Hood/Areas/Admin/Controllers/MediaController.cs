@@ -61,6 +61,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Route("admin/media/get/")]
         public async Task<JsonResult> Get(ListFilters request, string search, string sort, string type, string directory, string container = "mediaitem")
         {
             IList<MediaObject> media = new List<MediaObject>();
@@ -117,6 +118,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Route("admin/media/getdirectories/")]
         public async Task<IEnumerable<string>> GetDirectories(bool normalised = false)
         {
             List<string> dirs = await _db.Media.Select(u => u.Directory).Distinct().OrderBy(s => s).ToListAsync();
@@ -125,6 +127,7 @@ namespace Hood.Areas.Admin.Controllers
             return dirs;
         }
 
+        [Route("admin/media/adddirectory/")]
         public async Task<Response> AddDirectory(string directory)
         {
             try
@@ -155,6 +158,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Route("admin/media/getbyid/")]
         public async Task<JsonResult> GetById(int id)
         {
             IList<MediaObject> media = await _db.Media.Where(u => u.Id == id).ToListAsync();
@@ -162,6 +166,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost()]
+        [Route("admin/media/delete/")]
         public async Task<Response> Delete(int id)
         {
             try

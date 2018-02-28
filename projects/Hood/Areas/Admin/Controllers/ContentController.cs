@@ -591,12 +591,6 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        /// <summary>
-        /// This adds images to the club gallery.
-        /// </summary>
-        /// <param name="clubSlug">The SEO slug for the club</param>
-        /// <returns></returns>
-        [Authorize]
         [Route("admin/content/{id}/upload/gallery")]
         public async Task<IActionResult> UploadToGallery(List<IFormFile> files, int id)
         {
@@ -667,6 +661,7 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Edit", new { id = id, message = EditorMessage.ImageUpdated });
         }
 
+        [Route("admin/content/getfeaturedimage/{id}")]
         public IMediaObject GetFeaturedImage(int id)
         {
             try
@@ -683,6 +678,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [Route("admin/content/getmetaimage/{id}")]
         public IMediaObject GetMetaImage(int id, string field)
         {
             try
@@ -699,6 +695,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [Route("admin/content/clearimage/{id}")]
         public Response ClearImage(int id)
         {
             try
@@ -716,6 +713,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [Route("admin/content/clearmeta/{id}")]
         public Response ClearMeta(int id, string field)
         {
             try
@@ -748,13 +746,9 @@ namespace Hood.Areas.Admin.Controllers
             return Json(suggestions.ToArray());
         }
 
-        //public IActionResult TagSuggestions(string query)
-        //{
-        //}
-
         #region "Helpers"
 
-        private async Task<EditContentModel> GetEditorModel(Content content)
+        protected async Task<EditContentModel> GetEditorModel(Content content)
         {
             EditContentModel model = new EditContentModel()
             {
@@ -780,7 +774,7 @@ namespace Hood.Areas.Admin.Controllers
             return model;
         }
 
-        private async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
+        protected async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
         {
             var result = _settings.SubscriptionsEnabled();
             if (result.Succeeded)
@@ -791,7 +785,7 @@ namespace Hood.Areas.Admin.Controllers
             return model;
         }
 
-        private EditContentModel GetTemplates(EditContentModel model, string templateDirectory)
+        protected EditContentModel GetTemplates(EditContentModel model, string templateDirectory)
         {
             string[] templateDirs = {
                     _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",

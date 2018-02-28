@@ -494,11 +494,13 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #region "Caching" 
+        [Route("admin/settings/removecacheitem/")]
         public IActionResult RemoveCacheItem(string key)
         {
             _cache.Remove(key);
             return RedirectToAction("Advanced");
         }
+        [Route("admin/settings/resetcache/")]
         public IActionResult ResetCache()
         {
             _cache.ResetCache();

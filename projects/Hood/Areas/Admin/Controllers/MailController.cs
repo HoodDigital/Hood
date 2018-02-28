@@ -106,8 +106,7 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-
-        private MailObject GetDemoMail()
+        protected MailObject GetDemoMail()
         {
             MailObject mail = new MailObject()
             {
