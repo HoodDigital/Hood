@@ -119,34 +119,33 @@ namespace Hood.Extensions
                 {
                     // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
                     routes.MapRoute(
-                    name: "ContentCheck",
-                    template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
-                    defaults: new { controller = "Home", action = "Show" });
-
+                        name: "Content",
+                        template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
+                        defaults: new { controller = "Home", action = "Show" }
+                    );
                     routes.MapRoute(
-                         name: "manage",
+                         name: "Manage",
                          template: "account/manage/{action=Index}/{id?}",
                          defaults: new { controller = "Manage" }
                     );
-
                     routes.MapRoute(
-                         name: "billing",
+                         name: "Billing",
                          template: "account/billing/{action=Index}/{id?}",
                          defaults: new { controller = "Billing" }
                     );
-
                     routes.MapRoute(
-                         name: "subscriptions",
+                         name: "Subscriptions",
                          template: "account/subscriptions/{action=Index}/{id?}",
                          defaults: new { controller = "Subscriptions" }
                     );
                     routes.MapRoute(
-                        name: "areaRoute",
-                        template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
+                        name: "Areas",
+                        template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                    );
                     routes.MapRoute(
-                        name: "default-fallback",
-                        template: "{controller=Home}/{action=Index}/{id?}");
+                        name: "Default",
+                        template: "{controller=Home}/{action=Index}/{id?}"
+                    );
                 });
             }
             return app;
