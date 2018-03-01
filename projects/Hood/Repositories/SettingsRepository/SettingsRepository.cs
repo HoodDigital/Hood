@@ -117,9 +117,6 @@ namespace Hood.Services
         {
             try
             {
-                var options = new DbContextOptionsBuilder<HoodDbContext>();
-                options.UseSqlServer(ConnectionString);
-                _context = new HoodDbContext(options.Options);
                 string cacheKey = typeof(Option).ToString() + "." + key;
                 Option option = _context.Options.Where(o => o.Id == key).FirstOrDefault();
                 if (option == null)
@@ -129,13 +126,15 @@ namespace Hood.Services
                         Id = key,
                         Value = JsonConvert.SerializeObject(value)
                     };
-                    bool returnVal = Add(option);
-                    return returnVal;
+                    _context.Options.Add(option);
+                    _cache.Remove(cacheKey);
+                    _context.SaveChanges();
+                    return true;
                 }
                 option.Value = JsonConvert.SerializeObject(value);
-                int updated = _context.SaveChanges();
                 _cache.Remove(cacheKey);
-                return updated == 1;
+                _context.SaveChanges();
+                return true;
             }
 
             catch (DbUpdateException ex)
@@ -187,32 +186,6 @@ namespace Hood.Services
                 }
                 else
                     throw new Exception("Sorry, your reCaptcha validation failed, no captcha response found.");
-            }
-        }
-
-        private bool Add(Option option)
-        {
-            try
-            {
-                _db.Options.Add(option);
-                bool ret = _db.SaveChanges() == 1;
-                if (ret)
-                {
-                    string cacheKey = typeof(Option).ToString() + "." + option.Id;
-                    _cache.Add(cacheKey, option);
-                }
-                return ret;
-            }
-            catch (DbUpdateException ex)
-            {
-                if (ex.InnerException is SqlException innerException && innerException.Number == 2627)
-                {
-                    throw new Exception("There is already an option with that key in the database.");
-                }
-                else
-                {
-                    throw;
-                }
             }
         }
 
