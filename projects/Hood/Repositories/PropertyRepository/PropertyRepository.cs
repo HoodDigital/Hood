@@ -102,7 +102,7 @@ namespace Hood.Services
                 }
                 else
                 {
-                    properties = properties.Where(n => n.ListingType != "Commercial" && n.ListingType != "Student");
+                    properties = properties.Where(n => n.ListingType != "Sale" && n.ListingType != "Student");
                 }
             }
             else
