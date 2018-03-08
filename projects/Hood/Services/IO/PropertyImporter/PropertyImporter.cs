@@ -739,7 +739,7 @@ namespace Hood.Services
                 if (decimal.TryParse(data["LET_BOND"], out fees))
                 {
                     property.Fees = fees;
-                    property.FeesDisplay = "{0} deposit.";
+                    property.FeesDisplay = "{0} deposit";
                 }
             }
 
