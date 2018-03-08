@@ -183,7 +183,7 @@ namespace Hood.Models
 
         public static Dictionary<int, string> PriceQualifiers = new Dictionary<int, string>()
         {
-            { 0,  "Default" },
+            { 0,  "{0}" },
             { 1,  "POA" },
             { 2,  "{0} (Guide)" },
             { 3,  "{0} (Fixed)" },

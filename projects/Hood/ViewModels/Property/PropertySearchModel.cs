@@ -23,8 +23,19 @@ namespace Hood.Models
         public string Order { get; set; }
         public string Search { get; set; }
 
+        /// <summary>
+        /// Specify the exact filter term for listing type - cannot be used in conjunction with Transaction, which specifies generally. 
+        /// </summary>
         public string Type { get; set; }
+
+        /// <summary>
+        /// Generalised filter term for Sale/Student/Rental - cannot be used in conjunction with Type, which specifies exactly.
+        /// </summary>
         public string Transaction { get; set; }
+
+        /// <summary>
+        /// Filter by planning type.
+        /// </summary>
         public string PlanningType { get; set; }
         public string Location { get; set; }
         public int? Bedrooms { get; set; }
@@ -37,6 +48,10 @@ namespace Hood.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string Agent { get; set; }
+
+        /// <summary>
+        /// Filter by availability for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.
+        /// </summary>
         public string Status { get; set; }
 
         public List<string> Types { get; set; }

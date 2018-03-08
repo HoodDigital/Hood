@@ -76,26 +76,74 @@ namespace Hood.Models
             set { InfoDownloadJson = JsonConvert.SerializeObject(value); }
         }
 
-        // Settings
+        /// <summary>
+        /// The type of listing - Sale/Rental/Student/Short Term/Long Term/Sub-Lease/Commercial etc.
+        /// </summary>
         public string ListingType { get; set; }
+
+        /// <summary>
+        /// Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.
+        /// </summary>
         public string LeaseStatus { get; set; }
+
+        /// <summary>
+        /// The property type according to RightMove. House/Terraced/Bungalow etc.
+        /// </summary>
         public string PropertyType { get; set; }
+
+        /// <summary>
+        /// (Deprecated) Size of property. Currently unused.
+        /// </summary> 
         public string Size { get; set; }
+
+        /// <summary>
+        /// Number of bedrooms available.
+        /// </summary>
         public int Bedrooms { get; set; }
-        public string Floors { get; set; }
+
+        /// <summary>
+        /// Confidential flag, can be used to show confidentiality agreement, or restric to certain areas of the site.
+        /// </summary>
         public bool Confidential { get; set; }
+
+        /// <summary>
+        /// Featured flag, can be used to show on featured areas of the site.
+        /// </summary>
         public bool Featured { get; set; }
 
-        // Descriptions
+
+        /// <summary>
+        /// Quick description of the property.
+        /// </summary>
         public string ShortDescription { get; set; }
+        /// <summary>
+        /// Detailed HTML description of the property.
+        /// </summary>
         public string Description { get; set; }
+        /// <summary>
+        /// (Optional) Additional information about the property in general. 
+        /// </summary>
         public string Additional { get; set; }
+        /// <summary>
+        /// (Optional) Additional information about the lease. 
+        /// </summary>
         public string Lease { get; set; }
+        /// <summary>
+        /// (Optional) Additional information about the area. 
+        /// </summary>
         public string Areas { get; set; }
+        /// <summary>
+        /// (Optional) Additional information about the location. 
+        /// </summary>
         public string Location { get; set; }
+        /// <summary>
+        /// (Optional) Additional information about or for the agent. 
+        /// </summary>
         public string AgentInfo { get; set; }
 
-        // Planning
+       /// <summary>
+       /// Planning Classifcation A1/A2/A3 etc.
+       /// </summary>
         public string Planning { get; set; }
 
         // Prices
@@ -192,7 +240,11 @@ namespace Hood.Models
         }
 
 
-        // Calculated
+        /// <summary>
+        /// Restricted field, used for JSON floor areas.
+        /// </summary>
+        public string Floors { get; set; }
+
         [NotMapped]
         public List<FloorArea> FloorAreas
         {

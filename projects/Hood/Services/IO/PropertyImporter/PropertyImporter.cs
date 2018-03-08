@@ -685,26 +685,70 @@ namespace Hood.Services
         {
             CheckForCancel();
 
-            string[] format = { "yyyy-MM-dd hh:mm:ss" };
-            DateTime create = DateTime.Now;
-            DateTime update = DateTime.Now;
-            DateTime available = DateTime.Now;
-            if (DateTime.TryParseExact(data["CREATE_DATE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
-                create = date;
-            if (DateTime.TryParseExact(data["UPDATE_DATE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
-                update = date;
-            if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out date))
-                available = date;
+            property.Reference = data["AGENT_REF"];
+
+            property.LastEditedBy = User.UserName;
+            property.LastEditedOn = DateTime.Now;
+
+            if (property.UserVars != "IMPORTED")
+            {
+                property.CreatedBy = User.UserName;
+                property.CreatedOn = DateTime.Now;
+            }
 
             if (!int.TryParse(data["BEDROOMS"], out int bedrooms))
                 bedrooms = 0;
+            property.Bedrooms = bedrooms;
 
-            string rentFreq = PropertyDetails.RentFrequency[int.Parse(data["LET_RENT_FREQUENCY"])];
-            string propertyType = PropertyDetails.PropertyTypes[int.Parse(data["PROP_SUB_ID"])];
+
             string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
-            string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
-            string listingType = PropertyDetails.ListingTypes[int.Parse(data["LET_TYPE_ID"])];
+
+            string propertyType = PropertyDetails.PropertyTypes[int.Parse(data["PROP_SUB_ID"])];
+            property.PropertyType = propertyType;
+
+            int transactionType = int.Parse(data["TRANS_TYPE_ID"]);
+            if (transactionType == 1)
+            {
+                // Property is for sale, not rent.
+                property.ListingType = "Sale";
+
+                decimal price = 0;
+                if (decimal.TryParse(data["PRICE"], out price))
+                {
+                    property.AskingPrice = price;
+
+                    string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
+                    property.AskingPriceDisplay = priceQual;
+                }
+            }
+            else
+            {
+                string listingType = PropertyDetails.ListingTypes[int.Parse(data["LET_TYPE_ID"])];
+                property.ListingType = listingType;
+
+                decimal rent = 0;
+                if (decimal.TryParse(data["PRICE"], out rent))
+                {
+                    property.Rent = rent;
+
+                    string rentFreq = PropertyDetails.RentFrequency[int.Parse(data["LET_RENT_FREQUENCY"])];
+                    property.RentDisplay = rentFreq;
+                }
+
+                decimal fees = 0;
+                if (decimal.TryParse(data["LET_BOND"], out fees))
+                {
+                    property.Fees = fees;
+                    property.FeesDisplay = "{0} deposit.";
+                }
+            }
+
+            // Whether it is sold/let etc.
             string leaseStatus = PropertyDetails.LeaseStatuses[int.Parse(data["STATUS_ID"])];
+            property.LeaseStatus = leaseStatus;
+
+            // Set planning as DwellingHouses as standard - as no planning information comes via BLM feed.
+            property.Planning = "C3";
 
             // Update the PropertyListing object.
             property.Additional = "";
@@ -715,36 +759,15 @@ namespace Hood.Services
             property.AllowComments = false;
             property.AgentInfo = data["ADMINISTRATION_FEE"];
             property.Areas = "";
-            property.AskingPrice = 0;
-            property.AskingPriceDisplay = "{0} deposit.";
-            property.Bedrooms = bedrooms;
             property.City = data["TOWN"];
             property.Confidential = false;
             property.ContactName = "";
             property.Country = "United Kingdom";
             property.County = "";
-            property.CreatedBy = User.UserName;
-            property.CreatedOn = create;
             property.Description = data["DESCRIPTION"];
-            property.Fees = decimal.Parse(data["LET_BOND"]);
-            property.FeesDisplay = "{0}";
-            property.Floors = "";
-            property.LastEditedBy = User.UserName;
-            property.LastEditedOn = update;
-            property.Lease = leaseStatus;
-            property.ListingType = listingType;
-            property.Location = "";
-            property.Notes = "";
-            property.Planning = "C3";
             property.Postcode = data["POSTCODE1"] + " " + data["POSTCODE2"];
-            property.Premium = 0;
-            property.PremiumDisplay = "";
-            property.PropertyType = propertyType;
             property.Public = true;
             property.PublishDate = DateTime.Now;
-            property.Reference = data["AGENT_REF"];
-            property.Rent = decimal.Parse(data["PRICE"]);
-            property.RentDisplay = rentFreq;
             property.ShareCount = 0;
             property.Status = data["PUBLISHED_FLAG"] == "1" ? (int)Status.Published : (int)Status.Archived;
             property.ShortDescription = data["SUMMARY"];
@@ -752,8 +775,10 @@ namespace Hood.Services
             property.SystemNotes = "";
             property.Tags = "";
             property.Title = data["DISPLAY_ADDRESS"];
-            property.UserVars = "IMPORTED";
             property.Views = 0;
+
+            property.UserVars = "IMPORTED";
+
 
             // Geocode
             if (!validatingOnly)
@@ -813,8 +838,10 @@ namespace Hood.Services
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
             DateTime available = DateTime.Now;
+
             if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
                 available = date;
+
             if (!property.HasMeta("LetDate"))
                 property.AddMeta(new PropertyMeta() { Name = "LetDate", BaseValue = JsonConvert.SerializeObject(available), Type = "System.DateTime" });
             else
