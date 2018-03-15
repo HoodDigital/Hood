@@ -12,6 +12,7 @@
         </a>
     }
     <a class="btn btn-default reset-password"><i class="fa fa-lock"></i> Reset Password</a>
+    <a class="btn btn-warning" asp-action="Impersonate" asp-route-id="@Model.User.Id"><i class="fa fa-user-secret"></i> Impersonate</a>
     <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
 }
 @section breadcrumbs {

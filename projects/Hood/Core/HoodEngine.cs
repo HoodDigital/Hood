@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Hood.IO;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
 namespace Hood.Core
 {
@@ -162,6 +163,22 @@ namespace Hood.Core
                         var res = resolver as DefaultContractResolver;
                         res.NamingStrategy = null;  // <<!-- this removes the camelcasing
                     }
+                });
+
+                services.Configure<SecurityStampValidatorOptions>(options => // different class name
+                {
+                    options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
+                    options.OnRefreshingPrincipal = context =>             // new property name
+                    {
+                        var originalUserIdClaim = context.CurrentPrincipal.FindFirst("OriginalUserId");
+                        var isImpersonatingClaim = context.CurrentPrincipal.FindFirst("IsImpersonating");
+                        if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
+                        {
+                            context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
+                            context.NewPrincipal.Identities.First().AddClaim(isImpersonatingClaim);
+                        }
+                        return Task.FromResult(0);
+                    };
                 });
 
                 services.Configure<MvcOptions>(options =>

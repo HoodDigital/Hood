@@ -39,6 +39,15 @@
                 </a>
             </li>
             <li class="divider"></li>
+            @if (User.IsImpersonating())
+            {
+                <li>
+                    <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin" class="admin">
+                        <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
+                    </a>
+                </li>
+            }
+            <li class="divider"></li>
             <li>
                 <a asp-action="Index" asp-controller="Manage" class="admin">
                     <i class="fa fa-cogs"></i>Manage Account

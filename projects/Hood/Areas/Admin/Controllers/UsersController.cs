@@ -3,6 +3,7 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -22,6 +24,7 @@ namespace Hood.Areas.Admin.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IAccountRepository _auth;
         private readonly IContentRepository _content;
@@ -34,6 +37,7 @@ namespace Hood.Areas.Admin.Controllers
             HoodDbContext db,
             IAccountRepository auth,
             UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             IEmailSender email,
             ISettingsRepository site,
@@ -42,6 +46,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _signInManager = signInManager;
             _auth = auth;
             _db = db;
             _email = email;
@@ -422,5 +427,43 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        public async Task<IActionResult> Impersonate(string id)
+        {
+            if (!id.IsSet())
+                RedirectToAction("Index", new { message = EditorMessage.Error });
+
+            var impersonatedUser = await _userManager.FindByIdAsync(id);
+            var userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
+
+            userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetUserId()));
+            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
+
+            // sign out the current user
+            await _signInManager.SignOutAsync();
+
+            await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, userPrincipal); // <-- This has changed from the previous version.
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> StopImpersonation()
+        {
+            if (!User.Identity.IsAuthenticated)
+                throw new Exception("You are not impersonating now. Can't stop impersonation!");
+
+            if (!User.IsImpersonating())
+                throw new Exception("You are not impersonating now. Can't stop impersonation!");
+
+            var originalUserId = User.FindFirst("OriginalUserId").Value;
+
+            var originalUser = await _userManager.FindByIdAsync(originalUserId);
+
+            await _signInManager.SignOutAsync();
+
+            await _signInManager.SignInAsync(originalUser, isPersistent: true);
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

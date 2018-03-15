@@ -2,7 +2,7 @@
 @inject IContentRepository _content
 @model HeaderModel
 @{
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     AccountInfo _account = Context.GetAccountInfo();
 }
 <header class="header" id="header">
@@ -53,7 +53,15 @@
                                                 <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs img-circle sidebar-avatar @string.Format("avatar-{0}", Model.User.Id)" />
                                             </div>
                                             <div class="media-body media-middle">
-                                                Logged in as<br />
+                                                @if (User.IsImpersonating())
+                                                {
+                                                    <span>Impersonating</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Logged in as</span>
+                                                }
+                                                <br />
                                                 <strong class="font-bold">@Model.User.FullName</strong>
                                             </div>
                                         </div>
@@ -81,6 +89,15 @@
                                             <i class="fa fa-lock m-r-xs"></i>Change Password
                                         </a>
                                     </li>
+                                    <li class="divider"></li>
+                                    @if (User.IsImpersonating())
+                                    {
+                                        <li>
+                                            <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin" class="admin">
+                                                <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
+                                            </a>
+                                        </li>
+                                    }
                                     <li class="divider"></li>
                                     <li>
                                         <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm" class="navbar-right"></form>
