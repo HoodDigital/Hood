@@ -17225,22 +17225,6 @@ a.full-box-link {
   cursor: pointer;
   z-index: 1;
 }
-.row-center {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  align-items: center;
-}
-.row-full {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  align-items: stretch;
-}
 .v-middle {
   position: absolute;
   top: 50%;
@@ -19103,7 +19087,7 @@ field {
 .profile-element .dropdown-menu {
   margin-top: -34px;
   padding-top: 15px;
-  margin-left: 45px;
+  margin-left: 52.5px;
   border-radius: 3px;
   width: 190px;
 }
@@ -19278,7 +19262,7 @@ body nav.sidebar .scroll-area {
 }
 @media (min-width: 768px) {
   body nav.sidebar {
-    width: 280px;
+    width: 295px;
   }
 }
 body nav.sidebar .profile-element {
@@ -19446,7 +19430,7 @@ body div.main-content {
 }
 @media (min-width: 768px) {
   body div.main-content {
-    left: 280px;
+    left: 295px;
   }
 }
 body div.main-content .nav-tabs {
@@ -19601,7 +19585,7 @@ body nav.top-bar {
 }
 @media (min-width: 768px) {
   body nav.top-bar {
-    left: 280px;
+    left: 295px;
   }
 }
 body nav.top-bar .welcome-message {

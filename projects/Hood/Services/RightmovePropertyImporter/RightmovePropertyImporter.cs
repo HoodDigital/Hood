@@ -20,7 +20,7 @@ using Hood.Core;
 
 namespace Hood.Services
 {
-    public class PropertyImporter : IPropertyImporter
+    public class RightmovePropertyImporter : IRightmovePropertyImporter
     {
         private IFTPService _ftp;
         private IConfiguration _config;
@@ -29,7 +29,7 @@ namespace Hood.Services
         private ISettingsRepository _settings;
         private IHttpContextAccessor _context;
 
-        public PropertyImporter(
+        public RightmovePropertyImporter(
             IFTPService ftp,
             IHostingEnvironment env,
             IHttpContextAccessor context,
@@ -58,7 +58,7 @@ namespace Hood.Services
             Errors = new List<string>();
             Warnings = new List<string>();
             StatusMessage = "Not running...";
-            TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(PropertyImporter) + "\\";
+            TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(RightmovePropertyImporter) + "\\";
             _settings = site;
             _propertySettings = site.GetPropertySettings();
             _media = media;
@@ -279,8 +279,19 @@ namespace Hood.Services
                     CheckForCancel();
                     try
                     {
+                        // Property has been sold or let, mark it as such.
+                        // It will be the user's responsibility to remove any old properties that are not required from the site manually.
 
-                        _db.Properties.Remove(property);
+                        if (property.ListingType == "Sale")
+                        {
+                            property.LeaseStatus = "Sold";
+                        }
+                        else
+                        {
+                            property.LeaseStatus = "Let";
+                        }
+
+                        _db.Properties.Update(property);
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Deleted++;
@@ -685,6 +696,8 @@ namespace Hood.Services
         {
             CheckForCancel();
 
+            property.Status = data["PUBLISHED_FLAG"] == "1" ? (int)Status.Published : (int)Status.Archived;
+
             property.Reference = data["AGENT_REF"];
 
             property.LastEditedBy = User.UserName;
@@ -769,7 +782,6 @@ namespace Hood.Services
             property.Public = true;
             property.PublishDate = DateTime.Now;
             property.ShareCount = 0;
-            property.Status = data["PUBLISHED_FLAG"] == "1" ? (int)Status.Published : (int)Status.Archived;
             property.ShortDescription = data["SUMMARY"];
             property.Size = "";
             property.SystemNotes = "";

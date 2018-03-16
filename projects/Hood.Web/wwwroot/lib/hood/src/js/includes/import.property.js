@@ -8,7 +8,7 @@ $.hood.Import = {
             $('#runUpdate').click(function () {
                 //$(this).addLoader();
                 $.ajax({
-                    url: "/admin/property/import/ftp/start/",
+                    url: "/admin/property/import/rightmove/start/",
                     type: "POST",
                     error: function (jqXHR, textStatus, errorThrown) {
                         $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -24,7 +24,7 @@ $.hood.Import = {
             $('#cancel').click(function () {
                 //$(this).addLoader();
                 $.ajax({
-                    url: "/admin/property/import/ftp/cancel/",
+                    url: "/admin/property/import/rightmove/cancel/",
                     type: "POST",
                     error: function (jqXHR, textStatus, errorThrown) {
                         $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -40,7 +40,7 @@ $.hood.Import = {
         },
         Update: function () {
             $.ajax({
-                url: "/admin/property/import/ftp/status/",
+                url: "/admin/property/import/rightmove/status/",
                 type: "POST",
                 error: function (jqXHR, textStatus, errorThrown) {
                     $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);

@@ -60,6 +60,16 @@
                     <span class="label label-danger">Archived</span>
                 }
             </div>
+            <div class="tag-list">
+                @if (Model.LeaseStatus.Contains("Available"))
+                {
+                    <span class="label label-success">@Model.LeaseStatus</span>
+                }
+                else if (Model.Status == 2)
+                {
+                    <span class="label label-danger">@Model.LeaseStatus</span>
+                }
+            </div>
         </div>
         <div class="col-md-3">
             <div class="row">

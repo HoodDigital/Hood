@@ -148,11 +148,24 @@
                         <li class="">
                             <a><i class="fa fa-upload"></i>Import <span class="fa arrow"></span></a>
                             <ul class="nav nav-third-level collapse">
+                                <li>
+                                    <a>
+                                        <i class="fa fa-upload"></i>Import Content <small class="label label-info m-l-xs">Coming Soon</small>
+                                    </a>
+                                </li>
+                                @if (_propertySettings.Enabled)
+                                {
+                                    <li>
+                                        <a>
+                                            <i class="fa fa-upload"></i>Import Properties <small class="label label-info m-l-xs">Coming Soon</small>
+                                        </a>
+                                    </li>
+                                }
                                 @if (_propertySettings.FTPImporterSettings != null && _propertySettings.Enabled && _propertySettings.FTPImporterSettings.UseFTP)
                                 {
                                     <li>
                                         <a asp-action="PropertyFTP" asp-controller="Import">
-                                            <i class="fa fa-upload"></i>Import Properties (FTP)
+                                            <i class="fa fa-upload"></i>Import Properties (Rightmove)
                                         </a>
                                     </li>
                                 }

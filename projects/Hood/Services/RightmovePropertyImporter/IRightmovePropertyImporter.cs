@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Hood.Services
 {
-    public interface IPropertyImporter
+    public interface IRightmovePropertyImporter
     {
         bool IsComplete();
         bool IsRunning();

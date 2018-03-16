@@ -8,7 +8,7 @@ namespace Hood.Areas.Admin.Controllers
     [Authorize(Roles = "Admin,Editor,Manager")]
     public class ImportController : Controller
     {
-        private readonly IPropertyImporter _propertyImporterFTP;
+        private readonly IRightmovePropertyImporter _rightmove;
         private readonly IPropertyExporter _propertyExporter;
         private readonly IContentExporter _contentExporter;
         private readonly ISettingsRepository _settings;
@@ -16,19 +16,19 @@ namespace Hood.Areas.Admin.Controllers
 
         public ImportController(IFTPService ftp, 
             ISettingsRepository settings,
-            IPropertyImporter propertyImporterFTP 
+            IRightmovePropertyImporter rightmove 
             //IContentExporter contentExporter, 
             //IPropertyExporter propertyExporter
             )
         {
             _settings = settings;
             _ftp = ftp;
-            _propertyImporterFTP = propertyImporterFTP;
+            _rightmove = rightmove;
             //_contentExporter = contentExporter;
             //_propertyExporter = propertyExporter;
         }
 
-        #region "FTPPropertyImporter"
+        #region "RightmovePropertyImporter"
 
         [HttpPost]
         [Route("admin/property/import/feed/trigger")]
@@ -36,43 +36,43 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult TriggerFeed()
         {
             var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
-            if (Request.Headers["Auth"] == triggerAuth && !_propertyImporterFTP.IsRunning())
+            if (Request.Headers["Auth"] == triggerAuth && !_rightmove.IsRunning())
             {
-                _propertyImporterFTP.RunUpdate(HttpContext);
+                _rightmove.RunUpdate(HttpContext);
                 return StatusCode(200);
             }
             return StatusCode(401);
         }
 
-        [Route("admin/property/import/ftp/")]
+        [Route("admin/property/import/rightmove/")]
         public IActionResult PropertyFTP()
         {
             return View();
         }
 
         [HttpPost]
-        [Route("admin/property/import/ftp/start/")]
+        [Route("admin/property/import/rightmove/start/")]
         public IActionResult PropertyFTPStart()
         {
-            _propertyImporterFTP.Kill();
-            _propertyImporterFTP.RunUpdate(HttpContext);
+            _rightmove.Kill();
+            _rightmove.RunUpdate(HttpContext);
             return Json(new { success = true });
         }
 
         [HttpPost]
-        [Route("admin/property/import/ftp/cancel/")]
+        [Route("admin/property/import/rightmove/cancel/")]
         public IActionResult PropertyFTPCancel()
         {
-            _propertyImporterFTP.Kill();
+            _rightmove.Kill();
             return Json(new { success = true });
         }
 
-        [Route("admin/property/import/ftp/status/")]
+        [Route("admin/property/import/rightmove/status/")]
         public IActionResult PropertyFTPStatus()
         {
             return Json(new
             {
-                Importer = _propertyImporterFTP.Report(),
+                Importer = _rightmove.Report(),
                 Ftp = _ftp.Report()
             });
         }
