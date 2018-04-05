@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Hood.Models.Payments;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -11,11 +12,11 @@ namespace Hood.Models
 {
     public static class DbContextExtensions
     {
-        public static void ConfigureForHood(DbContextOptionsBuilder optionsBuilder)
+        public static void ConfigureForHood(this DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging(true);
         }
-        public static void CreateHoodModels(ModelBuilder builder)
+        public static void CreateHoodModels(this ModelBuilder builder)
         {
             // Identity
             builder.Entity<Option>().ToTable("HoodOptions");
@@ -79,6 +80,29 @@ namespace Hood.Models
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
 
             
+        }
+        public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction
+        {
+            builder.Entity<T>().Property<string>("CardIdentifier").HasField("_CardIdentifier").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("MerchantSessionKey").HasField("_MerchantSessionKey").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("Reusable").HasField("_Reusable").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("Save").HasField("_Save").UsePropertyAccessMode(PropertyAccessMode.Field);
+
+            builder.Entity<T>().Property<string>("BillingNumber").HasField("_BillingNumber").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingAddress1").HasField("_BillingAddress1").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingAddress2").HasField("_BillingAddress2").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingCity").HasField("_BillingCity").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingCounty").HasField("_BillingCounty").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingCountry").HasField("_BillingCountry").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingPostcode").HasField("_BillingPostcode").UsePropertyAccessMode(PropertyAccessMode.Field);
+
+            builder.Entity<T>().Property<string>("ShippingNumber").HasField("_ShippingNumber").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingAddress1").HasField("_ShippingAddress1").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingAddress2").HasField("_ShippingAddress2").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingCity").HasField("_ShippingCity").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingCounty").HasField("_ShippingCounty").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingCountry").HasField("_ShippingCountry").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingPostcode").HasField("_BillingPostcode").UsePropertyAccessMode(PropertyAccessMode.Field);
         }
         public static bool AllMigrationsApplied(this HoodDbContext context)
         {
