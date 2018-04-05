@@ -236,14 +236,5 @@ namespace Hood.Controllers
             ViewData["error"] = "The token you have entered is not valid.";
             return View();
         }
-
-        [Route("sagepay")]
-        public string TestSagePayObject()
-        {
-            return JsonConvert.SerializeObject(new SagePayTransaction(), new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            });
-        }
     }
 }
