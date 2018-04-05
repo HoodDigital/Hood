@@ -2,6 +2,7 @@
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
+using Hood.Models.Payments;
 using Hood.Services;
 using MailChimp.Net.Core;
 using Microsoft.AspNetCore.Diagnostics;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -233,6 +235,15 @@ namespace Hood.Controllers
             ViewData["token"] = token;
             ViewData["error"] = "The token you have entered is not valid.";
             return View();
+        }
+
+        [Route("sagepay")]
+        public string TestSagePayObject()
+        {
+            return JsonConvert.SerializeObject(new SagePayTransaction(), new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
         }
     }
 }
