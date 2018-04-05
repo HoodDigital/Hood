@@ -177,11 +177,7 @@ namespace Hood.Models.Payments
 
         [NotMapped]
         [JsonIgnore]
-        public DateTime SessionKey { get; set; }
-
-        [NotMapped]
-        [JsonIgnore]
-        public DateTime SessionExpiry { get; set; }
+        public SagePayMerchantSessionKey MerchantSession { get; set; }
 
         #endregion
 
