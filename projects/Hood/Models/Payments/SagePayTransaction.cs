@@ -175,6 +175,14 @@ namespace Hood.Models.Payments
         [NonSerialized]
         private bool _Save;
 
+        [NotMapped]
+        [JsonIgnore]
+        public DateTime SessionKey { get; set; }
+
+        [NotMapped]
+        [JsonIgnore]
+        public DateTime SessionExpiry { get; set; }
+
         #endregion
 
         #region "Amount"
