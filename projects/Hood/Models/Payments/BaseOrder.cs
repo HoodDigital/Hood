@@ -1,5 +1,6 @@
 ﻿using Hood.Entities;
 using Hood.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -38,19 +39,31 @@ namespace Hood.Models.Payments
                 _BillingPostcode = value.Postcode;
             }
         }
+        [NonSerialized]
         private string _BillingNumber;
+        [NonSerialized]
         private string _BillingAddress1;
+        [NonSerialized]
         private string _BillingAddress2;
+        [NonSerialized]
         private string _BillingCity;
+        [NonSerialized]
         private string _BillingCounty;
+        [NonSerialized]
         private string _BillingCountry;
+        [NonSerialized]
         private string _BillingPostcode;
+
+        [JsonIgnore]
+        public bool UseBilling { get; set; }
 
         [NotMapped]
         public TAddress ShippingAddress
         {
             get
             {
+                if (UseBilling)
+                    return default(TAddress);
                 return new TAddress()
                 {
                     Number = _ShippingNumber,
@@ -73,12 +86,20 @@ namespace Hood.Models.Payments
                 _ShippingPostcode = value.Postcode;
             }
         }
+
+        [NonSerialized]
         private string _ShippingNumber;
+        [NonSerialized]
         private string _ShippingAddress1;
+        [NonSerialized]
         private string _ShippingAddress2;
+        [NonSerialized]
         private string _ShippingCity;
+        [NonSerialized]
         private string _ShippingCounty;
+        [NonSerialized]
         private string _ShippingCountry;
+        [NonSerialized]
         private string _ShippingPostcode;
 
     }
