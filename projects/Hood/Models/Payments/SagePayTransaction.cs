@@ -101,6 +101,24 @@ namespace Hood.Models.Payments
         public SagePayAmount Amount { get; set; }
 
         /// <summary>
+        /// The total amount for the transaction that includes any sale or surcharge values.
+        /// </summary>
+        [NonSerialized]
+        private int _TotalAmount;
+
+        /// <summary>
+        /// The sale amount associated with the cost of goods or services for the transaction.
+        /// </summary>
+        [NonSerialized]
+        private int _SaleAmount;
+
+        /// <summary>
+        /// The surcharge amount added to the transaction as per the settings of the account.
+        /// </summary>
+        [NonSerialized]
+        private int _SurchargeAmount;
+
+        /// <summary>
         /// Provides information regarding the AVS/CV2 check results.
         /// </summary>
         [NotMapped]
