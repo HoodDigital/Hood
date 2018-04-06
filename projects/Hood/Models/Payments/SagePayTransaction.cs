@@ -7,83 +7,9 @@ using System.Text;
 
 namespace Hood.Models.Payments
 {
-    public partial class SagePayTransaction : BaseOrder<SagePayAddress>
+    public partial class SagePayTransaction : SagePayTransactionBase
     {
-        /// <summary>
-        /// Sage Pay’s unique reference for this transaction.
-        /// </summary>
-        public string TransactionId { get; set; }
-
-        /// <summary>
-        /// The type of the transaction (e.g. Payment, Deferred, Repeat or Refund.)
-        /// </summary>
-        public string TransactionType { get; set; }
-
-        /// <summary>
-        /// Your unique reference for this transaction. Maximum of 40 characters.
-        /// </summary>
-        public string VendorTxCode => Id;
-
-        /// <summary>
-        /// A brief description of the goods or services purchased.
-        /// </summary>
-        public string Description { get; set; }
-
-        /// <summary>
-        ///  Identifies the customer has ticked a box to indicate that they wish to receive tax back on their donation. 
-        /// </summary>
-        public string GiftAid { get; set; }
-
-        /// <summary>
-        /// Use this field to override your default account level 3-D Secure settings.
-        /// <para>UseMSPSetting - Use default MySagePay settings.</para>
-        /// <para>Force - Apply authentication even if turned off. </para>
-        /// <para>Disable - Disable authentication and rules.</para>
-        /// <para>ForceIgnoringRules - Apply authentication but ignore rules.</para>
-        /// </summary>
-        public string Apply3DSecure { get; set; }
-
-        /// <summary>
-        ///  Use this field to override your default account level AVS CVC settings. 
-        /// <para>UseMSPSetting - Use default MySagePay settings.</para>
-        /// <para>Force - Apply authentication even if turned off. </para>
-        /// <para>Disable - Disable authentication and rules.</para>
-        /// <para>ForceIgnoringRules - Apply authentication but ignore rules.</para>
-        /// </summary>
-        public string ApplyAvsCvcCheck { get; set; }
-
-        /// <summary>
-        /// Provides information regarding the AVS/CV2 check results.
-        /// </summary>
-        [NotMapped]
-        public SagePayAVSCheck AvsCvcCheck { get; set; }
-
-        /// <summary>
-        /// Customer’s first names.
-        /// </summary>
-        [JsonProperty(PropertyName = "customerFirstName")]
-        public string FirstName { get; set; }
-
-        /// <summary>
-        /// Customer’s last name.
-        /// </summary>
-        [JsonProperty(PropertyName = "customerLastName")]
-        public string LastName { get; set; }
-
-        /// <summary>
-        /// Customer’s email address.
-        /// </summary>
-        public string Email { get; set; }
-
-        /// <summary>
-        /// Customer’s phone number.
-        /// </summary>
-        public string Phone { get; set; }
-
-        /// <summary>
-        /// This can be used to send the unique reference for the partner that referred the merchant to Sage Pay. Maximum of 40 characters.
-        /// </summary>
-        public string ReferrerId { get; set; }
+        #region "Response"
 
         /// <summary>
         /// Result of transaction registration. 
@@ -121,7 +47,7 @@ namespace Hood.Models.Payments
         /// </summary>
         public string BankAuthorisationCode { get; set; }
 
-        #region "Payment Method Object"
+        #endregion
 
         /// <summary>
         /// Payment method for this transaction.
@@ -136,52 +62,33 @@ namespace Hood.Models.Payments
                     Card = new SagePayCard()
                     {
                         CardIdentifier = _CardIdentifier,
-                        MerchantSessionKey = _MerchantSessionKey,
+                        CardType = _CardType,
                         Reusable = _Reusable,
-                        Save = _Save
+                        ExpiryDate = _ExpiryDate,
+                        LastFourDigits = _LastFourDigits
                     }
                 };
             }
             set
             {
                 _CardIdentifier = value.Card.CardIdentifier;
-                _MerchantSessionKey = value.Card.MerchantSessionKey;
+                _CardType = value.Card.CardType;
                 _Reusable = value.Card.Reusable;
-                _Save = value.Card.Save;
+                _ExpiryDate = value.Card.ExpiryDate;
+                _LastFourDigits = value.Card.LastFourDigits;
             }
         }
 
-        /// <summary>
-        /// The merchant session key used to generate the cardIdentifier.
-        /// </summary>
-        [NonSerialized]
-        private string _MerchantSessionKey;
-
-        /// <summary>
-        /// The unique reference of the card you want to charge.
-        /// </summary>
         [NonSerialized]
         private string _CardIdentifier;
-
-        /// <summary>
-        ///  A flag to indicate the card identifier is reusable, i.e. it has been created previously. 
-        /// </summary>
+        [NonSerialized]
+        private string _CardType;
         [NonSerialized]
         private bool _Reusable;
-
-        /// <summary>
-        /// A flag to indicate that you want to save the card identifier, i.e. make it reusable. 
-        /// </summary>
         [NonSerialized]
-        private bool _Save;
-
-        [NotMapped]
-        [JsonIgnore]
-        public SagePayMerchantSessionKey MerchantSession { get; set; }
-
-        #endregion
-
-        #region "Amount"
+        private string _ExpiryDate;
+        [NonSerialized]
+        private string _LastFourDigits;
 
         /// <summary>
         ///  The currency of the amount in 3 letter ISO 4217 format. e.g. GBP for Pound Sterling.
@@ -191,44 +98,20 @@ namespace Hood.Models.Payments
         /// <summary>
         /// Provides information regarding the transaction amount. This is only returned in GET requests.
         /// </summary>
+        public SagePayAmount Amount { get; set; }
+
+        /// <summary>
+        /// Provides information regarding the AVS/CV2 check results.
+        /// </summary>
         [NotMapped]
-        public SagePayAmount Amount
-        {
-            get
-            {
-                return new SagePayAmount()
-                {
-                    SaleAmount = _SaleAmount,
-                    SurchargeAmount = _SurchargeAmount,
-                    TotalAmount = _TotalAmount
-                };
-            }
-            set
-            {
-                _SaleAmount = value.SaleAmount;
-                _SurchargeAmount = value.SurchargeAmount;
-                _TotalAmount = value.TotalAmount;
-            }
-        }
+        public SagePayAVSCheck AvsCvcCheck { get; set; }
 
         /// <summary>
-        /// The total amount for the transaction that includes any sale or surcharge values.
+        /// Provides information regarding the AVS/CV2 check results.
         /// </summary>
-        [NonSerialized]
-        private int _TotalAmount;
+        [NotMapped]
+        [JsonProperty(PropertyName = "3DSecure")]
+        public SagePay3DSecureCheck Response3DSecure { get; set; }
 
-        /// <summary>
-        /// The sale amount associated with the cost of goods or services for the transaction.
-        /// </summary>
-        [NonSerialized]
-        private int _SaleAmount;
-
-        /// <summary>
-        /// The surcharge amount added to the transaction as per the settings of the account.
-        /// </summary>
-        [NonSerialized]
-        private int _SurchargeAmount;
-
-        #endregion
     }
 }

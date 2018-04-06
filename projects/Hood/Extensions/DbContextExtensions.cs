@@ -81,7 +81,7 @@ namespace Hood.Models
 
             
         }
-        public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction
+        public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransactionBae
         {
             builder.Entity<T>().Property<string>("CardIdentifier").HasField("_CardIdentifier").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<string>("MerchantSessionKey").HasField("_MerchantSessionKey").UsePropertyAccessMode(PropertyAccessMode.Field);

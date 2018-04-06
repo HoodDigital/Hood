@@ -1,7 +1,12 @@
 ﻿namespace Hood.Models.Payments
 {
-    public partial class SagePayCard
+    public partial class SagePayCardRequest
     {
+        /// <summary>
+        /// The merchant session key used to generate the cardIdentifier.
+        /// </summary>
+        public string MerchantSessionKey { get; set; }
+
         /// <summary>
         /// The unique reference of the card you want to charge.
         /// </summary>
@@ -13,19 +18,8 @@
         public bool Reusable { get; set; }
 
         /// <summary>
-        /// The type of the card (Visa, MasterCard, American Express etc.).
+        /// A flag to indicate that you want to save the card identifier, i.e. make it reusable. 
         /// </summary>
-        public string CardType { get; set; }
-
-        /// <summary>
-        /// The last 4 digits of the card.
-        /// </summary>
-        public string LastFourDigits { get; set; }
-
-        /// <summary>
-        /// The expiry date of the card in MMYY format.
-        /// </summary>
-        public string ExpiryDate { get; set; }
-
+        public bool Save { get; set; }
     }
 }
