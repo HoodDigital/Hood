@@ -81,12 +81,13 @@ namespace Hood.Models
 
             
         }
-        public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransactionBae
+        public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction
         {
             builder.Entity<T>().Property<string>("CardIdentifier").HasField("_CardIdentifier").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("MerchantSessionKey").HasField("_MerchantSessionKey").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("CardType").HasField("_CardType").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ExpiryDate").HasField("_ExpiryDate").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("LastFourDigits").HasField("_LastFourDigits").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<bool>("Reusable").HasField("_Reusable").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<bool>("Save").HasField("_Save").UsePropertyAccessMode(PropertyAccessMode.Field);
 
             builder.Entity<T>().Property<int>("TotalAmount").HasField("_TotalAmount").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<int>("SaleAmount").HasField("_SaleAmount").UsePropertyAccessMode(PropertyAccessMode.Field);
