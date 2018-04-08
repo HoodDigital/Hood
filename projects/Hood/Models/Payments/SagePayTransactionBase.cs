@@ -65,5 +65,13 @@ namespace Hood.Models.Payments
         /// This can be used to send the unique reference for the partner that referred the merchant to Sage Pay. Maximum of 40 characters.
         /// </summary>
         public string ReferrerId { get; set; }
+
+        /// <summary>
+        /// Merchant Session object, for passing the merchant session key and expiry between views and controllers. Not mapped or serialized with the object.
+        /// </summary>
+        [JsonIgnore]
+        [NotMapped]
+        public SagePayMerchantSessionKey MerchantSession { get; set; }
+
     }
 }
