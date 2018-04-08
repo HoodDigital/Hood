@@ -1,4 +1,5 @@
-﻿using Hood.Models.Payments;
+﻿using Hood.Interfaces;
+using Hood.Models.Payments;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -78,36 +79,13 @@ namespace Hood.Models
 
             builder.Entity<PropertyFloorplan>().ToTable("HoodPropertyFloorplans");
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
-
-            
         }
         public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction
         {
-            builder.Entity<T>().Property<string>("CardIdentifier").HasField("_CardIdentifier").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("CardType").HasField("_CardType").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ExpiryDate").HasField("_ExpiryDate").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("LastFourDigits").HasField("_LastFourDigits").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<bool>("Reusable").HasField("_Reusable").UsePropertyAccessMode(PropertyAccessMode.Field);
-
-            builder.Entity<T>().Property<int>("TotalAmount").HasField("_TotalAmount").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<int>("SaleAmount").HasField("_SaleAmount").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<int>("SurchargeAmount").HasField("_SurchargeAmount").UsePropertyAccessMode(PropertyAccessMode.Field);
-
-            builder.Entity<T>().Property<string>("BillingNumber").HasField("_BillingNumber").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingAddress1").HasField("_BillingAddress1").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingAddress2").HasField("_BillingAddress2").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingCity").HasField("_BillingCity").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingCounty").HasField("_BillingCounty").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingCountry").HasField("_BillingCountry").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingPostcode").HasField("_BillingPostcode").UsePropertyAccessMode(PropertyAccessMode.Field);
-
-            builder.Entity<T>().Property<string>("ShippingNumber").HasField("_ShippingNumber").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingAddress1").HasField("_ShippingAddress1").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingAddress2").HasField("_ShippingAddress2").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingCity").HasField("_ShippingCity").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingCounty").HasField("_ShippingCounty").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingCountry").HasField("_ShippingCountry").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingPostcode").HasField("_ShippingPostcode").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("PaymentMethodJson").HasField("_PaymentMethodJson").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("AmountJson").HasField("_AmountJson").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("BillingAddressJson").HasField("_BillingAddressJson").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingNumberJson").HasField("_ShippingNumberJson").UsePropertyAccessMode(PropertyAccessMode.Field);
         }
         public static bool AllMigrationsApplied(this HoodDbContext context)
         {

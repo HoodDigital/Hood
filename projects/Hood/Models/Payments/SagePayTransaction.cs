@@ -1,4 +1,5 @@
 ﻿using Hood.Entities;
+using Hood.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -55,40 +56,12 @@ namespace Hood.Models.Payments
         [NotMapped]
         public SagePayPaymentMethod PaymentMethod
         {
-            get
-            {
-                return new SagePayPaymentMethod()
-                {
-                    Card = new SagePayCard()
-                    {
-                        CardIdentifier = _CardIdentifier,
-                        CardType = _CardType,
-                        Reusable = _Reusable,
-                        ExpiryDate = _ExpiryDate,
-                        LastFourDigits = _LastFourDigits
-                    }
-                };
-            }
-            set
-            {
-                _CardIdentifier = value.Card.CardIdentifier;
-                _CardType = value.Card.CardType;
-                _Reusable = value.Card.Reusable;
-                _ExpiryDate = value.Card.ExpiryDate;
-                _LastFourDigits = value.Card.LastFourDigits;
-            }
+            get { return _PaymentMethodJson.IsSet() ? JsonConvert.DeserializeObject<SagePayPaymentMethod>(_PaymentMethodJson) : null; }
+            set { _PaymentMethodJson = JsonConvert.SerializeObject(value); }
         }
 
         [NonSerialized]
-        private string _CardIdentifier;
-        [NonSerialized]
-        private string _CardType;
-        [NonSerialized]
-        private bool _Reusable;
-        [NonSerialized]
-        private string _ExpiryDate;
-        [NonSerialized]
-        private string _LastFourDigits;
+        private string _PaymentMethodJson;
 
         /// <summary>
         ///  The currency of the amount in 3 letter ISO 4217 format. e.g. GBP for Pound Sterling.
@@ -98,38 +71,41 @@ namespace Hood.Models.Payments
         /// <summary>
         /// Provides information regarding the transaction amount. This is only returned in GET requests.
         /// </summary>
-        public SagePayAmount Amount { get; set; }
+        [NotMapped]
+        public SagePayAmount Amount
+        {
+            get { return _AmountJson.IsSet() ? JsonConvert.DeserializeObject<SagePayAmount>(_AmountJson) : null; }
+            set { _AmountJson = JsonConvert.SerializeObject(value); }
+        }
 
-        /// <summary>
-        /// The total amount for the transaction that includes any sale or surcharge values.
-        /// </summary>
         [NonSerialized]
-        private int _TotalAmount;
-
-        /// <summary>
-        /// The sale amount associated with the cost of goods or services for the transaction.
-        /// </summary>
-        [NonSerialized]
-        private int _SaleAmount;
-
-        /// <summary>
-        /// The surcharge amount added to the transaction as per the settings of the account.
-        /// </summary>
-        [NonSerialized]
-        private int _SurchargeAmount;
+        private string _AmountJson;
 
         /// <summary>
         /// Provides information regarding the AVS/CV2 check results.
         /// </summary>
         [NotMapped]
-        public SagePayAVSCheck AvsCvcCheck { get; set; }
+        public SagePayAVSCheck AvsCvcCheck
+        {
+            get { return _AvsCvcCheckJson.IsSet() ? JsonConvert.DeserializeObject<SagePayAVSCheck>(_AvsCvcCheckJson) : null; }
+            set { _AvsCvcCheckJson = JsonConvert.SerializeObject(value); }
+        }
+
+        [NonSerialized]
+        private string _AvsCvcCheckJson;
 
         /// <summary>
         /// Provides information regarding the AVS/CV2 check results.
         /// </summary>
         [NotMapped]
         [JsonProperty(PropertyName = "3DSecure")]
-        public SagePay3DSecureCheck Response3DSecure { get; set; }
+        public SagePay3DSecureCheck Response3DSecure
+        {
+            get { return _Response3DSecure.IsSet() ? JsonConvert.DeserializeObject<SagePay3DSecureCheck>(_Response3DSecure) : null; }
+            set { _Response3DSecure = JsonConvert.SerializeObject(value); }
+        }
 
+        [NonSerialized]
+        private string _Response3DSecure;
     }
 }
