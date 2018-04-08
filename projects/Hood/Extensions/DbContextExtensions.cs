@@ -85,7 +85,7 @@ namespace Hood.Models
             builder.Entity<T>().Property<string>("PaymentMethodJson").HasField("_PaymentMethodJson").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<string>("AmountJson").HasField("_AmountJson").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<string>("BillingAddressJson").HasField("_BillingAddressJson").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingNumberJson").HasField("_ShippingNumberJson").UsePropertyAccessMode(PropertyAccessMode.Field);
+            builder.Entity<T>().Property<string>("ShippingAddressJson").HasField("_ShippingAddressJson").UsePropertyAccessMode(PropertyAccessMode.Field);
         }
         public static bool AllMigrationsApplied(this HoodDbContext context)
         {

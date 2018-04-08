@@ -28,7 +28,7 @@ namespace Hood.Models.Payments
         [NotMapped]
         public TAddress ShippingAddress
         {
-            get { return _ShippingAddressJson.IsSet() ? JsonConvert.DeserializeObject<TAddress>(_ShippingAddressJson) : new TAddress(); }
+            get { return !UseBilling && _ShippingAddressJson.IsSet() ? JsonConvert.DeserializeObject<TAddress>(_ShippingAddressJson) : new TAddress(); }
             set { _ShippingAddressJson = JsonConvert.SerializeObject(value); }
         }
         [NonSerialized]
