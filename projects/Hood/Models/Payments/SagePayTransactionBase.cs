@@ -37,7 +37,13 @@ namespace Hood.Models.Payments
         /// <summary>
         ///  Identifies the customer has ticked a box to indicate that they wish to receive tax back on their donation. 
         /// </summary>
-        public string GiftAid { get; set; }
+        public bool GiftAid { get; set; }
+
+        /// <summary>
+        /// The method used to capture card data. [Ecommerce] 
+        /// </summary>
+        [NotMapped]
+        public string EntryMethod => "Ecommerce";
 
         /// <summary>
         /// Customer’s first names.
