@@ -38,9 +38,10 @@ namespace Hood.Areas.Admin.Controllers
 
         #region "RightmovePropertyImporter"
 
-        [Route("admin/property/import/feed/trigger")]
+        [HttpPost]
+        [Route("admin/property/import/rightmove/trigger")]
         [AllowAnonymous]
-        public IActionResult TriggerFeed()
+        public IActionResult RightmovePropertyImporterTrigger()
         {
             var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_rightmove.IsRunning())
