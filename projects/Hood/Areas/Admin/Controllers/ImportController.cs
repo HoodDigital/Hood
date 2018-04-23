@@ -1,6 +1,11 @@
-﻿using Hood.Services;
+﻿using Hood.Extensions;
+using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -13,16 +18,19 @@ namespace Hood.Areas.Admin.Controllers
         private readonly IContentExporter _contentExporter;
         private readonly ISettingsRepository _settings;
         private readonly IFTPService _ftp;
+        private readonly IHostingEnvironment _env;
 
         public ImportController(IFTPService ftp, 
             ISettingsRepository settings,
-            IRightmovePropertyImporter rightmove 
+            IRightmovePropertyImporter rightmove,
+            IHostingEnvironment env
             //IContentExporter contentExporter, 
             //IPropertyExporter propertyExporter
             )
         {
             _settings = settings;
             _ftp = ftp;
+            _env = env;
             _rightmove = rightmove;
             //_contentExporter = contentExporter;
             //_propertyExporter = propertyExporter;
@@ -30,17 +38,28 @@ namespace Hood.Areas.Admin.Controllers
 
         #region "RightmovePropertyImporter"
 
-        [HttpPost]
         [Route("admin/property/import/feed/trigger")]
         [AllowAnonymous]
         public IActionResult TriggerFeed()
         {
             var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
-            if (Request.Headers["Auth"] == triggerAuth && !_rightmove.IsRunning())
+            if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_rightmove.IsRunning())
             {
                 _rightmove.RunUpdate(HttpContext);
                 return StatusCode(200);
             }
+
+            StringWriter logWriter = new StringWriter();
+            logWriter.WriteLine("Unauthorized attempt from " + HttpContext.Connection.RemoteIpAddress.ToString());
+            logWriter.WriteLine("Auth Header: " + Request.Headers["Auth"]);
+            logWriter.WriteLine("Rightmove Importer Status: " + (_rightmove.IsRunning() ? "True" : "False"));
+            var report = _rightmove.Report();
+            var status = JsonConvert.SerializeObject(report);
+            logWriter.WriteLine("Rightmove Importer Report: ");
+            logWriter.Write(status.ToFormattedJson());
+
+            _env.WriteLogToFile<IRightmovePropertyImporter>(logWriter.ToString());
+
             return StatusCode(401);
         }
 
