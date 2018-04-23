@@ -52,6 +52,7 @@ namespace Hood.Areas.Admin.Controllers
 
             StringWriter logWriter = new StringWriter();
             logWriter.WriteLine("Unauthorized attempt from " + HttpContext.Connection.RemoteIpAddress.ToString());
+            logWriter.WriteLine("Auth Key: " + triggerAuth);
             logWriter.WriteLine("Auth Header: " + Request.Headers["Auth"]);
             logWriter.WriteLine("Rightmove Importer Status: " + (_rightmove.IsRunning() ? "True" : "False"));
             var report = _rightmove.Report();
