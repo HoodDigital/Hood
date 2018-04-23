@@ -79,23 +79,24 @@ namespace Hood.Extensions
             if (config.IsDatabaseConfigured())
             {
                 app.UseAuthentication();
+
+                int timeout = 60;
+                var builder = new CookieBuilder()
+                {
+                    Name = config["Session:CookieName"].IsSet() ? config["Session:CookieName"] : ".Hood.Session"
+                };
+                if (int.TryParse(config["Session:Timeout"], out timeout))
+                    builder.Expiration = TimeSpan.FromMinutes(timeout);
+                else
+                    builder.Expiration = TimeSpan.FromMinutes(60);
+
+                app.UseSession(new SessionOptions()
+                {
+                    IdleTimeout = builder.Expiration.Value,
+                    Cookie = builder
+                });
             }
 
-            int timeout = 60;
-            var builder = new CookieBuilder()
-            {
-                Name = config["Session:CookieName"].IsSet() ? config["Session:CookieName"] : ".Hood.Session"
-            };
-            if (int.TryParse(config["Session:Timeout"], out timeout))
-                builder.Expiration = TimeSpan.FromMinutes(timeout);
-            else
-                builder.Expiration = TimeSpan.FromMinutes(60);
-
-            app.UseSession(new SessionOptions()
-            {
-                IdleTimeout = builder.Expiration.Value,
-                Cookie = builder
-            });
 
             return app;
         }
