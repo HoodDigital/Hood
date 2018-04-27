@@ -73,7 +73,13 @@
     <meta name="description" content="@metaDesc" />
     <meta property="og:author" content="@Model.Content.Author.FullName" />
     <meta property="og:title" content="@metaTitle" />
-    @if (Model.Content.FeaturedImage.DownloadUrl.IsSet())
+    @if (Model.Content.ShareImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@Model.Content.ShareImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@Model.Content.ShareImage.LargeUrl" />
+        <meta name="twitter:image" content="@Model.Content.ShareImage.LargeUrl" />
+    }
+    else if (Model.Content.FeaturedImage.DownloadUrl.IsSet())
     {
         <meta property="og:image" content="@Model.Content.FeaturedImage.LargeUrl" />
         <meta property="og:image:secure_url" content="@Model.Content.FeaturedImage.LargeUrl" />
