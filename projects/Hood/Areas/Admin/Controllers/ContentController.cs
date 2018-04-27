@@ -678,6 +678,23 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [Route("admin/content/getsharerimage/{id}")]
+        public IMediaObject GetSharerImage(int id)
+        {
+            try
+            {
+                Content content = _content.GetContentByID(id);
+                if (content != null && content.ShareImage != null)
+                    return content.ShareImage;
+                else
+                    throw new Exception("No sharer image found");
+            }
+            catch (Exception)
+            {
+                return ContentMedia.Blank;
+            }
+        }
+
         [Route("admin/content/getmetaimage/{id}")]
         public IMediaObject GetMetaImage(int id, string field)
         {
@@ -702,6 +719,24 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Content content = _content.GetContentByID(id);
                 content.FeaturedImage = null;
+                _content.Update(content);
+                var response = new Response(true, "The image has been cleared!");
+                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
+        }
+
+        [Route("admin/content/clearsharerimage/{id}")]
+        public Response ClearSharerImage(int id)
+        {
+            try
+            {
+                Content content = _content.GetContentByID(id);
+                content.ShareImage = null;
                 _content.Update(content);
                 var response = new Response(true, "The image has been cleared!");
                 response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });

@@ -187,13 +187,21 @@ namespace Hood.Models
         public List<ContentMeta> Metadata { get; set; }
         public List<ContentMedia> Media { get; set; }
         public List<ContentTagJoin> Tags { get; set; }
-        public string FeaturedImageJson { get; set; }
 
+        public string FeaturedImageJson { get; set; }
         [NotMapped]
         public IMediaObject FeaturedImage
         {
             get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : ContentMedia.Blank; }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
+        }
+
+        public string ShareImageJson { get; set; }
+        [NotMapped]
+        public IMediaObject ShareImage
+        {
+            get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(ShareImageJson) : ContentMedia.Blank; }
+            set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
 
         [NotMapped]

@@ -2,12 +2,23 @@
 <div class="form-horizontal">
     @if (Model.ContentType.ShowImage)
     {
+    <div class="form-group row-center">
+        <label class="col-sm-4 text-right">Featured Image</label>
+        <div class="col-sm-8">
+            <fixedImage src="@Model.Content.FeaturedImage.SmallUrl" class="img-xs img-circle m-r-sm content-feature-@Model.Content.Id" id="content-blade-avatar" />
+            <attacher dataid="@Model.Content.Id" entity="Content" field="FeaturedImage" type="image" refresh="/admin/content/getfeaturedimage" tag="content-feature-@Model.Content.Id" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
+            <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Content" asp-area="Admin" asp-route-id="@Model.Content.Id" data-complete="$.hood.Uploader.RefreshImage('.content-feature-@Model.Content.Id', '/admin/content/getfeaturedimage', @Model.Content.Id)"><i class="fa fa-trash"></i></a>
+        </div>
+    </div>
+    }
+    @if (Model.ContentType.ShowBanner)
+    {
         <div class="form-group no-margin row-center">
-            <label class="col-sm-4 text-right">Featured Image</label>
+            <label class="col-sm-4 text-right">Share Image</label>
             <div class="col-sm-8">
-                <fixedImage src="@Model.Content.FeaturedImage.SmallUrl" class="img-xs img-circle m-r-sm content-feature-@Model.Content.Id" id="content-blade-avatar" />
-                <attacher dataid="@Model.Content.Id" entity="Content" field="FeaturedImage" type="image" refresh="/admin/content/getfeaturedimage" tag="content-feature-@Model.Content.Id" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
-                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Content" asp-area="Admin" asp-route-id="@Model.Content.Id" data-complete="$.hood.Uploader.RefreshImage('.content-feature-@Model.Content.Id', '/admin/content/getfeaturedimage', @Model.Content.Id)"><i class="fa fa-trash"></i></a>
+                <fixedImage src="@Model.Content.ShareImage.SmallUrl" class="img-xs img-circle m-r-sm content-share-@Model.Content.Id" id="content-blade-avatar" />
+                <attacher dataid="@Model.Content.Id" entity="Content" field="ShareImage" type="image" refresh="/admin/content/getshareimage" tag="content-share-@Model.Content.Id" title="Choose a share image." class="btn btn-xs btn-primary">Choose...</attacher>
+                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearShareImage" asp-controller="Content" asp-area="Admin" asp-route-id="@Model.Content.Id" data-complete="$.hood.Uploader.RefreshImage('.content-share-@Model.Content.Id', '/admin/content/getshareimage', @Model.Content.Id)"><i class="fa fa-trash"></i></a>
             </div>
         </div>
     }

@@ -248,6 +248,9 @@ namespace Hood.Areas.Admin.Controllers
                             case "FeaturedImage":
                                 content.FeaturedImage = new ContentMedia(media);
                                 break;
+                            case "ShareImage":
+                                content.ShareImage = new ContentMedia(media);
+                                break;
                         }
 
                         await _db.SaveChangesAsync();
