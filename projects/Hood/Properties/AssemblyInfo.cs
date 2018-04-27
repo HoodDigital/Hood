@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Hood Digital Ltd.")]
 [assembly: AssemblyProduct("Hood")]
 [assembly: AssemblyTitle("HoodCMS")]
-[assembly: AssemblyCopyright("© 2017 Hood Digital Ltd.")]
+[assembly: AssemblyCopyright("© 2015-2018 Hood Digital Ltd.")]
 [assembly: AssemblyDescription("The Hood CMS is a full content management system providing a solid backbone to any website. Created by Hood's Digital Architects, George Whysall and Thomas Burwood.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
