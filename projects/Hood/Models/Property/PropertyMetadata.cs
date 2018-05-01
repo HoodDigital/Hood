@@ -1,7 +1,4 @@
-﻿using Hood.Interfaces;
-using System;
-
-namespace Hood.Models
+﻿namespace Hood.Models
 {
     public class PropertyMeta : MetadataBase
     {

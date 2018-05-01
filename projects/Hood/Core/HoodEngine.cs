@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
-using Hood.Interfaces;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hood.Services;

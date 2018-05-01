@@ -1,7 +1,5 @@
-﻿using Hood.Interfaces;
-using Hood.Models.Payments;
+﻿using Hood.Models.Payments;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Stripe;
-using Hood.Enums;
 using Hood.BaseTypes;
 
 namespace Hood.Models

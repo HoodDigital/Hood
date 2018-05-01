@@ -1,5 +1,4 @@
 ﻿using System;
-using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Html;
 using Geocoding;

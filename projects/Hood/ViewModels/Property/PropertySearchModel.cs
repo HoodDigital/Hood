@@ -2,9 +2,7 @@
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
-using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Hood.Models
 {

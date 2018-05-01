@@ -1,16 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Hood.Caching;
+using Hood.Enums;
+using Hood.Extensions;
+using Hood.Filters;
+using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Hood.Models;
-using Hood.Services;
 using Stripe;
-using Hood.Extensions;
-using Hood.Filters;
-using Hood.Enums;
-using Hood.Caching;
+using System;
+using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {

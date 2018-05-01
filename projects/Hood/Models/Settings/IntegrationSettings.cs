@@ -55,26 +55,6 @@ namespace Hood.Models
         [Display(Name = "Script for Chat Plugin")]
         public string ChatCode { get; set; }
 
-        // Mailchimp
-        [Display(Name = "Enable Mailchimp")]
-        public bool EnableMailchimp { get; set; }
-        [Display(Name = "Mailchimp Api Key")]
-        public string MailchimpApiKey { get; set; }
-        public string MailchimpDataCenter
-        {
-            get
-            {
-                return string.IsNullOrWhiteSpace(MailchimpApiKey)
-                    ? string.Empty
-                    : MailchimpApiKey.Substring(
-                        MailchimpApiKey.LastIndexOf("-", StringComparison.Ordinal) + 1,
-                        MailchimpApiKey.Length - MailchimpApiKey.LastIndexOf("-", StringComparison.Ordinal) - 1);
-            }
-        }
-        public string MailchimpAuthHeader => $"apikey {MailchimpApiKey}";
-        [Display(Name = "Mailchimp List Id")]
-        public string MailchimpListId { get; set; }
-
         public IntegrationSettings()
         {
             UseCDN = false;

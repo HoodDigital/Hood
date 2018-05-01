@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Stripe;
 using System;
-using System.Threading.Tasks;
 
 namespace Hood.Services
 {

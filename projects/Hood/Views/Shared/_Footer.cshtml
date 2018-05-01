@@ -5,13 +5,6 @@
     SeoSettings _seoSettings = _settings.GetSeo();
 }
 <hr />
-@if (_plugins.EnableMailchimp)
-{
-    <div class="container">
-        @{ await Html.RenderPartialAsync("_MailchimpForm", new MailchimpFormModel()); }
-    </div>
-    <hr />
-}
 <footer class="footer pb-60">
     <div class="container">
         <p class="address no-margin">
