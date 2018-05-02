@@ -1,7 +1,5 @@
 ﻿using Hood.Extensions;
-using LinqToTwitter;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Hood.Models

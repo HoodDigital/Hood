@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Hood.Infrastructure;
-using Hood.BaseTypes;
 
 namespace Hood.Models
 {

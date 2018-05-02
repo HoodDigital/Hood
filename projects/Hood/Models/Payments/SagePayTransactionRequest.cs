@@ -1,9 +1,5 @@
-﻿using Hood.Entities;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Hood.Models.Payments
 {

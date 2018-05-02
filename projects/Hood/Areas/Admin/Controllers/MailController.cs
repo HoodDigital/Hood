@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Hood.Models;
 using System.Threading.Tasks;
 using SendGrid.Helpers.Mail;
 using Hood.Enums;

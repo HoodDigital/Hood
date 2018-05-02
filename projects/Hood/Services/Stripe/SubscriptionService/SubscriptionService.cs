@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Stripe;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
-using Hood.Extensions;
 using Hood.Models;
 
 namespace Hood.Services

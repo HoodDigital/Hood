@@ -1,7 +1,5 @@
 ﻿using Hood.BaseTypes;
-using Hood.Models;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Entities

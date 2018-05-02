@@ -1,7 +1,5 @@
 ﻿using Hood.Entities;
-using Hood.Interfaces;
 using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {

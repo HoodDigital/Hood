@@ -1,5 +1,4 @@
-﻿using Hood.Extensions;
-using Hood.Interfaces;
+﻿using Hood.Interfaces;
 using Newtonsoft.Json;
 
 namespace Hood.Extensions

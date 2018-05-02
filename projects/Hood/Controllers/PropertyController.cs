@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using System.Linq;
 using Hood.Enums;
-using System.Collections.Generic;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers

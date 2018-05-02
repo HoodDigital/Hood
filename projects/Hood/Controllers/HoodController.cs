@@ -1,24 +1,13 @@
-﻿using Hood.Enums;
-using Hood.Extensions;
-using Hood.Interfaces;
+﻿using Hood.Extensions;
 using Hood.Models;
-using Hood.Models.Payments;
 using Hood.Services;
-using MailChimp.Net.Core;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -72,90 +61,9 @@ namespace Hood.Controllers
             }
         }
 
-        [Route("hood/signup/mailchimp/")]
-        public async Task<Response> Mailchimp(MailchimpFormModel model)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    IntegrationSettings _integrationSettings = _settings.GetIntegrationSettings();
-                    var listId = _integrationSettings.MailchimpListId;
-                    var member = new MailChimp.Net.Models.Member { EmailAddress = model.Email, Status = MailChimp.Net.Models.Status.Subscribed };
-                    if (model.FirstName.IsSet())
-                        member.MergeFields.Add("FNAME", model.FirstName);
-                    if (model.LastName.IsSet())
-                        member.MergeFields.Add("LNAME", model.LastName);
-
-                    var handler = new HttpClientHandler();
-                    if (handler.SupportsAutomaticDecompression)
-                    {
-                        handler.AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate;
-                    }
-
-                    var client = new HttpClient(handler)
-                    {
-                        BaseAddress = new Uri($"https://{_integrationSettings.MailchimpDataCenter}.api.mailchimp.com/3.0/lists/")
-                    };
-                    client.DefaultRequestHeaders.Add("Authorization", _integrationSettings.MailchimpAuthHeader);
-                    var memberString = JsonConvert.SerializeObject(
-                        member,
-                        new JsonSerializerSettings()
-                        {
-                            NullValueHandling = NullValueHandling.Ignore
-                        }
-                    );
-                    using (client)
-                    {
-                        var memberId = member.Id ?? Hash(member.EmailAddress.ToLower());
-                        var response = await client.PutAsync(
-                            $"{listId}/members/{memberId}",
-                            new StringContent(memberString)
-                        ).ConfigureAwait(false);
-                        await response.EnsureSuccessMailChimpAsync().ConfigureAwait(false);
-                        var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    }
-
-                    return new Response(true);
-                }
-                else
-                {
-                    throw new Exception("There is something wrong with the information you have entered.");
-                }
-            }
-            catch (MailChimpException ex)
-            {
-                ModelState.AddModelError("Error Saving", ex.Message);
-                return new Response(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("Error Saving", ex.Message);
-                return new Response(ex.Message);
-            }
-        }
-        private string Hash(string emailAddress)
-        {
-            using (var md5 = MD5.Create()) return md5.GetHash(emailAddress.ToLower());
-        }
-
         [ResponseCache(CacheProfileName = "TenMinutes")]
         [Route("hood/tweets/")]
         public IActionResult TwitterFeed()
-        {
-            return View();
-        }
-
-        [ResponseCache(CacheProfileName = "Month")]
-        [Route("terms/")]
-        public IActionResult Terms()
-        {
-            return View();
-        }
-
-        [ResponseCache(CacheProfileName = "Month")]
-        [Route("privacy/")]
-        public IActionResult Privacy()
         {
             return View();
         }

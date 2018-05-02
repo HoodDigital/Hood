@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using Hood.Interfaces;
 using Hood.Extensions;
 
 namespace Hood.Controllers

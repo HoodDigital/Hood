@@ -1,5 +1,4 @@
 ﻿using Hood.Entities;
-using Hood.Interfaces;
 using System;
 
 namespace Hood.Models

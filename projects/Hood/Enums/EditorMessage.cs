@@ -1,9 +1,4 @@
-﻿using Hood.BaseTypes;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Hood.Enums
+﻿namespace Hood.Enums
 {
     public enum EditorMessage
     {

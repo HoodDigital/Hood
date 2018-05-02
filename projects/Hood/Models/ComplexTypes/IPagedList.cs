@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace System.Collections.Generic
+﻿namespace System.Collections.Generic
 {
     /// <summary>
     /// Provides an IEnumerable structure that can be used in paging applications.

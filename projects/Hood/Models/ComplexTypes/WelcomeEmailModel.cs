@@ -1,5 +1,4 @@
-﻿using System;
-using Hood.Services;
+﻿using Hood.Services;
 using Hood.Extensions;
 
 namespace Hood.Models

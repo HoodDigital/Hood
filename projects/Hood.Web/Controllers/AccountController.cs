@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Hood.Models;
+﻿using Hood.Models;
 using Hood.Services;
-using Microsoft.AspNetCore.Mvc;
-using Hood.ViewModels;
 using Hood.Caching;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

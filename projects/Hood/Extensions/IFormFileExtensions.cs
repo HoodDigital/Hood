@@ -1,5 +1,4 @@
-﻿using System;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
