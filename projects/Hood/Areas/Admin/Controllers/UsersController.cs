@@ -497,12 +497,12 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             // Add users
-            stats.SiteTotal = _db.Users.Count();
+            stats.SiteTotal = _db.Users.Where(u => u.Email != null).Count();
             foreach (var user in _db.Users)
             {
                 if (user.Email.IsSet())
                 {
-                    var exists = await mailchimpManager.Members.ExistsAsync(integrations.MailchimpUserListId, user.Email);
+                    var exists = await mailchimpManager.Members.ExistsAsync(integrations.MailchimpUserListId, user.Email, falseIfUnsubscribed: false);
                     if (!exists)
                     {
                         var member = new MailChimp.Net.Models.Member()
@@ -517,6 +517,12 @@ namespace Hood.Areas.Admin.Controllers
                 }
             }
 
+            // show currently [unsubscribed] users
+            var unsubscribed = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
+            {
+                Status = MailChimp.Net.Models.Status.Unsubscribed
+            }).ConfigureAwait(false);
+            stats.UnsubscribedUsers = unsubscribed.Select(m => m.EmailAddress).ToList();
             return View(stats);
         }
     }

@@ -1,4 +1,7 @@
-﻿namespace Hood.ViewModels
+﻿using Hood.Models;
+using System.Collections.Generic;
+
+namespace Hood.ViewModels
 {
     public class MailchimpSyncStats
     {
@@ -6,6 +9,18 @@
         public int Deleted { get; set; }
         public int SiteTotal { get; set; }
         public int MailchimpTotal { get; set; }
+        public List<string> UnsubscribedUsers { get; set; }
+
+        public string UnsubscribedUserList
+        {
+            get
+            {
+                var output = "";
+                foreach (var user in UnsubscribedUsers)
+                    output += string.Format("{0};", user);
+                return output;
+            }
+        }
 
         public MailchimpSyncStats()
         {
