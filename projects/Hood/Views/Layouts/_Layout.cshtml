@@ -1,6 +1,12 @@
 @{ 
     BasicSettings _basicSettings  = _settings.GetBasicSettings();
     SeoSettings _seoSettings = _settings.GetSeo();
+
+    var pageTitle = ViewData["PageTitle"] as string;
+    if (pageTitle.IsSet())
+    {
+        ViewData["Title"] += " - " + pageTitle;
+    }
 }
 <!DOCTYPE html>
 <html lang="en-gb" xml:lang="en">

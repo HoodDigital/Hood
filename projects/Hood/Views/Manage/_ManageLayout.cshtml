@@ -1,6 +1,9 @@
 @{
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     Layout = "_BasicLayout";
+
     ViewData["SubTitle"] = ViewData["Title"];
+    ViewData["PageTitle"] = (ViewData["Title"] as string) + (_basicSettings.SiteTitle.IsSet() ? " - " + _basicSettings.SiteTitle : "");
     ViewData["Title"] = "Manage your account";
 }
 <div class="container">
