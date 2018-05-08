@@ -1,12 +1,8 @@
 @{
     Layout = "_BasicLayout";
+    ViewData["SubTitle"] = ViewData["Title"];
+    ViewData["Title"] = "Manage your account";
 }
-<div class="jumbotron">
-    <div class="container">
-        <h1>Manage your account</h1>
-        <p>Change your account settings</p>
-    </div>
-</div>
 <div class="container">
     <div class="row">
         <div class="col-md-3">
@@ -18,7 +14,6 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     @RenderSection("Scripts", required: false)
 }
