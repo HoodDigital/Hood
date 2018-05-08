@@ -34,20 +34,6 @@
                     </a>
                 </li>
             }
-            @if ((ViewData["EditUrl"] != null) || (ViewData["EditUrl"] != null) || (ViewData["EditUrl"] != null))
-            {
-                <li class="divider"></li>
-            }
-            <li class="divider"></li>
-            @if (User.IsImpersonating())
-            {
-                <li>
-                    <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin" class="admin">
-                        <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
-                    </a>
-                </li>
-                <li class="divider"></li>
-            }
             <li>
                 <a asp-action="Index" asp-controller="Manage" class="admin">
                     <i class="fa fa-cogs"></i>Manage Account
@@ -59,6 +45,15 @@
                 </a>
             </li>
             <li class="divider"></li>
+            @if (User.IsImpersonating())
+            {
+                <li>
+                    <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin" class="admin">
+                        <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
+                    </a>
+                </li>
+                <li class="divider"></li>
+            }
             <li>
                 <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="adminLogoutForm" class="navbar-right"></form>
                 <a href="javascript:document.getElementById('adminLogoutForm').submit()">
