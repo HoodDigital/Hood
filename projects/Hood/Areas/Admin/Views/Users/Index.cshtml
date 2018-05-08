@@ -1,9 +1,12 @@
 @model UserSearchModel
 @{
+    IntegrationSettings _integrations = _settings.GetIntegrationSettings();
     ViewBag.Title = "Website Users";
 }
 @section buttons {
-    <a class="btn btn-warning btn-sm warning-alert" asp-action="SyncToMailchimp" data-warning="Are you sure? This will sync ALL site users with the assigned Mailchimp list. Any extraneous users will be REMOVED from the mailchimp list."><i class="fa fa-refresh m-r-sm"></i>Sync List to Mailchimp</a>
+    @if (_integrations.EnableMailchimp && _integrations.MailchimpApiKey.IsSet() && _integrations.MailchimpUserListId.IsSet()) {
+        <a class="btn btn-warning btn-sm warning-alert" asp-action="SyncToMailchimp" data-warning="Are you sure? This will sync ALL site users with the assigned Mailchimp list. Any extraneous users will be REMOVED from the mailchimp list."><i class="fa fa-refresh m-r-sm"></i>Sync List to Mailchimp</a>
+    }
     <button class="btn btn-success btn-sm create-user"><i class="fa fa-user-plus m-r-sm"></i>Create New User</button>
 }
 @if (Model.SaveMessage.IsSet())
