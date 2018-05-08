@@ -3,6 +3,10 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
+using Hood.ViewModels;
+using MailChimp.Net;
+using MailChimp.Net.Core;
+using MailChimp.Net.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -331,6 +335,7 @@ namespace Hood.Areas.Admin.Controllers
                         };
                         message.AddH1("Account Created!");
                         message.AddParagraph("Your account has been set up on the " + _settings.GetSiteTitle() + " website.");
+                        message.AddParagraph("Name: <strong>" + user.FullName + "</strong>");
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
                         await _email.SendEmailAsync(message);
@@ -343,8 +348,9 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
-                return new Response(true);
-
+                var response = new Response(true, "Published successfully.");
+                response.Url = Url.Action("Edit", new { id = user.Id, message = EditorMessage.Created });
+                return response;
             }
             catch (Exception ex)
             {
@@ -412,7 +418,9 @@ namespace Hood.Areas.Admin.Controllers
                 IdentityResult result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    var response = new Response(true, "Published successfully.");
+                    response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                    return response;
                 }
                 else
                 {
@@ -463,6 +471,53 @@ namespace Hood.Areas.Admin.Controllers
             await _signInManager.SignInAsync(originalUser, isPersistent: true);
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [Route("admin/users/sync/mailchimp/")]
+        public async Task<IActionResult> SyncToMailchimp()
+        {
+            var stats = new MailchimpSyncStats();
+
+            var integrations = _settings.GetIntegrationSettings();
+            var mailchimpManager = new MailChimpManager(integrations.MailchimpApiKey);
+
+            // delete users
+            stats.MailchimpTotal = await mailchimpManager.Members.GetTotalItems(integrations.MailchimpUserListId, MailChimp.Net.Models.Status.Undefined).ConfigureAwait(false);
+            var members = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
+            {
+                Status = MailChimp.Net.Models.Status.Undefined
+            }).ConfigureAwait(false);
+            foreach (var member in members)
+            {
+                if (!_db.Users.Any(u => u.Email == member.EmailAddress))
+                {
+                    await mailchimpManager.Members.DeleteAsync(integrations.MailchimpUserListId, member.EmailAddress);
+                    stats.Deleted++;
+                }
+            }
+
+            // Add users
+            stats.SiteTotal = _db.Users.Count();
+            foreach (var user in _db.Users)
+            {
+                if (user.Email.IsSet())
+                {
+                    var exists = await mailchimpManager.Members.ExistsAsync(integrations.MailchimpUserListId, user.Email);
+                    if (!exists)
+                    {
+                        var member = new MailChimp.Net.Models.Member()
+                        {
+                            EmailAddress = user.Email,
+                            Status = MailChimp.Net.Models.Status.Subscribed,
+                            StatusIfNew = MailChimp.Net.Models.Status.Subscribed                            
+                        };
+                        await mailchimpManager.Members.AddOrUpdateAsync(integrations.MailchimpUserListId, member);
+                        stats.Added++;
+                    }
+                }
+            }
+
+            return View(stats);
         }
     }
 }

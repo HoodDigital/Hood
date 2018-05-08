@@ -25,12 +25,19 @@ $.hood.Users = {
         },
             function (isConfirm) {
                 if (isConfirm) {
-
                     // delete functionality
                     $.post('/admin/users/delete', { id: $this.data('id') }, function (data) {
                         if (data.Success) {
-                            $('#manage-users-list').data('hoodDataList').Refresh();
-                            swal("Deleted", "The user has now been removed from the website.", "success");
+                            swal({
+                                title: "Deleted!",
+                                text: "The user has now been removed from the website.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                            setTimeout(function () {
+                                window.location = data.Url;
+                            }, 500);
+                            swal("Deleted", "", "success");
                         } else {
                             swal("Error", "There was a problem deleting the user:\n\n" + data.Errors, "error");
                         }
@@ -89,8 +96,15 @@ $.hood.Users = {
                 submitUrl: '/admin/users/add',
                 submitFunction: function (data) {
                     if (data.Success) {
-                        $('#manage-users-list').data('hoodDataList').Refresh();
-                        swal("Created!", "The user has now been created and can log in right away!", "success");
+                        swal({
+                            title: "Created!",
+                            text: "The user has now been created and can log in right away.",
+                            timer: 1300,
+                            type: "success"
+                        });
+                        setTimeout(function () {
+                            window.location = data.Url;
+                        }, 500);
                     } else {
                         swal("Error", "There was a problem creating the user:\n\n" + data.Errors, "error");
                     }

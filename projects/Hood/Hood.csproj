@@ -60,4 +60,8 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Areas\Admin\Views\Users\SyncToMailchimp.cshtml" />
+  </ItemGroup>
+
 </Project>

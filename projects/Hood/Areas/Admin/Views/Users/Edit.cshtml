@@ -30,6 +30,10 @@
         </li>
     </ol>
 }
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
 <form asp-action="Edit" asp-route-id="@Model.User.Id" method="post" id="edit-user-form" data-id="@Model.User.Id">
     @if (Model.SaveMessage.IsSet())
     {

@@ -1,0 +1,27 @@
+@model MailchimpSyncStats
+@{
+    IntegrationSettings _integrations = _settings.GetIntegrationSettings();
+    ViewBag.Title = "Synced Users to Mailchimp List";
+}
+@section buttons {
+    <a class="btn btn-sm btn-primary" asp-action="Index" asp-controller="Users" asp-area="Admin"><i class="fa fa-list-ol m-r-sm"></i>Back to List</a>
+}
+<div class="panel-body">
+    <h4 class="font-bold">
+        <span>Activity</span>
+    </h4>
+    <div>
+        <div class="well-lg">
+            <p>Total Users: <strong>@Model.SiteTotal</strong></p>
+            <p>Mailchimp List Members: <strong>@Model.MailchimpTotal</strong></p>
+            <p>
+                Added:
+                <strong>@Model.Added</strong>
+            </p>
+            <p>
+                Deleted:
+                <strong>@Model.Deleted</strong>
+            </p>
+        </div>
+    </div>
+</div>
