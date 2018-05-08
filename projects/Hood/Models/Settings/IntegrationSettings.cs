@@ -29,6 +29,14 @@ namespace Hood.Models
         [Display(Name = "Disqus ID")]
         public string DisqusId { get; set; }
 
+        // Mailchimp
+        [Display(Name = "Enable Mailchimp")]
+        public bool EnableMailchimp { get; set; }
+        [Display(Name = "Mailchimp Api Key")]
+        public string MailchimpApiKey { get; set; }
+        [Display(Name = "Mailchimp User List Id (Sync your site users to this list)")]
+        public string MailchimpUserListId { get; set; }
+
         // Google Maps Api
         [Display(Name = "Enable Google Geocoding (Location finding for addresses)")]
         public bool EnableGoogleGeocoding { get; set; }
