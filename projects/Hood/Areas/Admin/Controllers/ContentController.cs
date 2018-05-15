@@ -581,7 +581,7 @@ namespace Hood.Areas.Admin.Controllers
                 var model = _settings.GetBasicSettings(false);
                 model.Homepage = id;
                 _settings.Set("Hood.Settings.Basic", model);
-                var response = new Response(true, "The image has been cleared!");
+                var response = new Response(true, "The homepage has now been set.");
                 response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.HomepageSet });
                 return response;
             }

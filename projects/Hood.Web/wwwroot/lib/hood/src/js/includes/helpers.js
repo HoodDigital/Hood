@@ -45,6 +45,13 @@ $.hood.Helpers = {
         }
         return rc;
     },
+    IsSet: function (a) {
+        var rc = false;
+        if (a === null || typeof (a) === "undefined" || a === "") {
+            rc = true;
+        }
+        return !rc;
+    },
     IsEventSupported: function (eventName) {
         var el = document.createElement('div');
         eventName = 'on' + eventName;

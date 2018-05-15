@@ -58,6 +58,11 @@ $.hood.Inline = {
             if ($(this).attr("data-complete")) {
                 eval($(this).data('complete'));
             }
+            if (!data.Url.IsNullOrUndefined()) {
+                setTimeout(function () {
+                    window.location = data.Url;
+                }, 500);
+            }
         }, e.currentTarget))
         .fail(function (data) {
             $.hood.Alerts.Error("There was an error processing the AJAX request:<br/><strong>" + urlLoad + "</strong>");
