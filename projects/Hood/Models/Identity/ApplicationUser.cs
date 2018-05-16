@@ -76,6 +76,9 @@ namespace Hood.Models
         public string Notes { get; set; }
         public string SystemNotes { get; set; }
 
+        [Display(Name = "Forum Signature")]
+        public string ForumSignature { get; set; }
+
         public string StripeId { get; set; }
 
         // Login logs and times
@@ -131,8 +134,14 @@ namespace Hood.Models
 
         public List<UserAccessCode> AccessCodes { get; set; }
         public List<Content> Content { get; set; }
+        public List<Forum> Forums { get; set; }
+        public List<Topic> Topics { get; set; }
         public List<PropertyListing> Properties { get; set; }
         public List<UserSubscription> Subscriptions { get; set; }
+
+        public List<Post> Posts { get; set; }
+        public List<Post> EditedPosts { get; set; }
+        public List<Post> DeletedPosts { get; set; }
 
         [NotMapped]
         public AlertType MessageType { get; set; }

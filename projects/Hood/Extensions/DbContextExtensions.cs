@@ -62,6 +62,30 @@ namespace Hood.Models
             builder.Entity<ContentMeta>().HasAlternateKey(ol => new { ol.ContentId, ol.Name });
             builder.Entity<ContentMeta>().HasOne(c => c.Content).WithMany(cc => cc.Metadata).HasForeignKey(au => au.ContentId);
 
+            // Forums
+            builder.Entity<Forum>().ToTable("HoodForums");
+            builder.Entity<Forum>().HasOne(c => c.Author).WithMany(up => up.Forums).HasForeignKey(c => c.AuthorId);
+
+            // Forum Categories
+            builder.Entity<ForumCategory>().ToTable("HoodForumCategories");
+            builder.Entity<ForumCategory>().Property("Id").HasColumnName("ForumCategoryId");
+            builder.Entity<ForumCategoryJoin>().ToTable("HoodForumCategoryJoins");
+            builder.Entity<ForumCategoryJoin>().HasKey(t => new { t.ForumId, t.CategoryId });
+            builder.Entity<ForumCategoryJoin>().HasOne(pt => pt.Category).WithMany(p => p.Forum).HasForeignKey(pt => pt.CategoryId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<ForumCategoryJoin>().HasOne(pt => pt.Forum).WithMany(t => t.Categories).HasForeignKey(pt => pt.ForumId).OnDelete(DeleteBehavior.Cascade);
+            
+            // Forum Topics
+            builder.Entity<Topic>().ToTable("HoodForumTopics");
+            builder.Entity<Topic>().HasOne(c => c.Author).WithMany(up => up.Topics).HasForeignKey(c => c.AuthorId);
+            builder.Entity<Topic>().HasOne(c => c.Forum).WithMany(up => up.Topics).HasForeignKey(c => c.ForumId).OnDelete(DeleteBehavior.Cascade);
+
+            // Forum Posts
+            builder.Entity<Post>().ToTable("HoodForumPosts");
+            builder.Entity<Post>().HasOne(c => c.Author).WithMany(up => up.Posts).HasForeignKey(c => c.AuthorId);
+            builder.Entity<Post>().HasOne(c => c.EditedBy).WithMany(up => up.EditedPosts).HasForeignKey(c => c.EditedById);
+            builder.Entity<Post>().HasOne(c => c.DeletedBy).WithMany(up => up.DeletedPosts).HasForeignKey(c => c.DeletedById);
+            builder.Entity<Post>().HasOne(c => c.Topic).WithMany(up => up.Posts).HasForeignKey(c => c.TopicId).OnDelete(DeleteBehavior.Cascade);
+
             // Property
             builder.Entity<PropertyListing>().ToTable("HoodProperties");
             builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
