@@ -36,6 +36,9 @@ namespace Hood.Models
         public int NumPosts { get; set; }
         public int ModeratedPostCount { get; set; }
 
+        public bool RequireTopicModeration { get; set; }
+        public bool RequirePostModeration { get; set; }
+
         // Topics
         public List<Topic> Topics { get; set; }
 
@@ -47,7 +50,7 @@ namespace Hood.Models
         {
             if (Categories == null)
                 return false;
-            return Categories.Select(c => c.Category.Id).Contains(categoryId);
+            return Categories.Select(c => c.CategoryId).Contains(categoryId);
         }
     }
 }

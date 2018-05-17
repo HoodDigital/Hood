@@ -61,7 +61,7 @@
                 }
             </div>
             <div class="tag-list">
-                @if (Model.LeaseStatus.Contains("Available"))
+                @if (Model.LeaseStatus.IsSet() && Model.LeaseStatus.Contains("Available"))
                 {
                     <span class="label label-success">@Model.LeaseStatus</span>
                 }

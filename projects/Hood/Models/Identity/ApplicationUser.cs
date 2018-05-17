@@ -25,9 +25,6 @@ namespace Hood.Models
         [Display(Name = "Display name")]
         public string DisplayName { get; set; }
 
-        [Display(Name = "Subscribe to newsletter?")]
-        public bool EmailOptin { get; set; }
-
         [Display(Name = "Twitter URL")]
         public string Twitter { get; set; }
 
@@ -43,6 +40,8 @@ namespace Hood.Models
         [Display(Name = "LinkedIn URL")]
         public string LinkedIn { get; set; }
 
+        public bool Anonymous { get; set; }
+
         public string Bio { get; set; }
 
         public string ReplacePlaceholders(string msg)
@@ -55,12 +54,6 @@ namespace Hood.Models
 
         [Display(Name = "Website URL")]
         public string WebsiteUrl { get; set; }
-
-        [Display(Name = "VAT Number")]
-        public string VATNumber { get; set; }
-
-        [Display(Name = "Client Code")]
-        public string ClientCode { get; set; }
 
         public string UserVars { get; set; }
         [NotMapped]
@@ -106,6 +99,10 @@ namespace Hood.Models
         {
             get
             {
+                if (Anonymous)
+                    return "Anonymous";
+                if (DisplayName.IsSet())
+                    return DisplayName;
                 if (FirstName.IsSet() && LastName.IsSet())
                     return FirstName + " " + LastName;
                 else if (FirstName.IsSet() && !LastName.IsSet())

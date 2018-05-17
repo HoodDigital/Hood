@@ -17,6 +17,9 @@ namespace Hood.Models
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
 
+        [NotMapped]
+        public List<ApplicationUser> Authors { get; set; }
+
         // Creator/Editor
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }

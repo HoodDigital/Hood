@@ -14,7 +14,13 @@ namespace Hood.Models
 
         [Required]
         public string Title { get; set; }
+
+        [Required]
         public string Description { get; set; }
+
+        // Moderation
+        public bool Approved { get; set; }
+        public DateTime? ApprovedTime { get; set; }
 
         public int NumPosts { get; set; }
         public int ModeratedPostCount { get; set; }

@@ -81,6 +81,84 @@ namespace Hood.BaseTypes
             }
         }
 
+        public void AddForumMessage(ForumMessage? message)
+        {
+            if (message.HasValue)
+            {
+                switch (message.Value)
+                {
+                    case ForumMessage.PostReported:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "Thank you. The post has been reported to our moderators.";
+                        break;
+                    case ForumMessage.NoPostFound:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "Could not find the post.";
+                        break;
+                    case ForumMessage.NoTopicFound:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "Could not find the topic.";
+                        break;
+                    case ForumMessage.PostDeleted:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "The post has been deleted.";
+                        break;
+                    case ForumMessage.TopicDeleted:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "The topic has been deleted.";
+                        break;
+                    case ForumMessage.Succeeded:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Operation completed successfully.";
+                        break;
+                    case ForumMessage.NotFound:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "Could not find the item requested in the database.";
+                        break;
+                    case ForumMessage.Sent:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Message sent successfully.";
+                        break;
+                    case ForumMessage.ErrorSending:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "There was a problem sending the message.";
+                        break;
+                    case ForumMessage.Created:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Created successfully.";
+                        break;
+                    case ForumMessage.Deleted:
+                        MessageType = AlertType.Warning;
+                        SaveMessage = "Deleted successfully.";
+                        break;
+                    case ForumMessage.ImageUpdated:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Image updated successfully.";
+                        break;
+                    case ForumMessage.MediaRemoved:
+                        MessageType = AlertType.Warning;
+                        SaveMessage = "Media removed successfully.";
+                        break;
+                    case ForumMessage.Saved:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Saved successfully.";
+                        break;
+                    case ForumMessage.Archived:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Archived successfully.";
+                        break;
+                    case ForumMessage.Published:
+                        MessageType = AlertType.Success;
+                        SaveMessage = "Published successfully.";
+                        break;
+                    case ForumMessage.Error:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "An error occurred. If this continues to occur please contact support.";
+                        break;
+                }
+            }
+        }
+
         public void AddBillingMessage(BillingMessage? message)
         {
             switch (message)

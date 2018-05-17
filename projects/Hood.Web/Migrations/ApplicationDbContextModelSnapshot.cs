@@ -74,13 +74,13 @@ namespace Hood.Web.Migrations
 
                     b.Property<bool>("Active");
 
+                    b.Property<bool>("Anonymous");
+
                     b.Property<string>("AvatarJson");
 
                     b.Property<string>("BillingAddressJson");
 
                     b.Property<string>("Bio");
-
-                    b.Property<string>("ClientCode");
 
                     b.Property<string>("CompanyName");
 
@@ -97,8 +97,6 @@ namespace Hood.Web.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("EmailOptin");
 
                     b.Property<string>("Facebook");
 
@@ -158,8 +156,6 @@ namespace Hood.Web.Migrations
                         .HasMaxLength(256);
 
                     b.Property<string>("UserVars");
-
-                    b.Property<string>("VATNumber");
 
                     b.Property<string>("WebsiteUrl");
 
@@ -407,6 +403,10 @@ namespace Hood.Web.Migrations
                     b.Property<bool>("Public");
 
                     b.Property<bool>("Published");
+
+                    b.Property<bool>("RequirePostModeration");
+
+                    b.Property<bool>("RequireTopicModeration");
 
                     b.Property<int>("ShareCount");
 
@@ -879,6 +879,10 @@ namespace Hood.Web.Migrations
 
                     b.Property<bool>("AllowReplies");
 
+                    b.Property<bool>("Approved");
+
+                    b.Property<DateTime?>("ApprovedTime");
+
                     b.Property<string>("AuthorDisplayName");
 
                     b.Property<string>("AuthorId");
@@ -889,7 +893,8 @@ namespace Hood.Web.Migrations
 
                     b.Property<DateTime>("CreatedOn");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
                     b.Property<bool>("Featured");
 

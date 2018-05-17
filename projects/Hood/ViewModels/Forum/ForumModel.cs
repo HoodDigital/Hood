@@ -18,15 +18,7 @@ namespace Hood.Models
         public string AuthorName { get; set; }
 
         // Sidebar Stuff
-        public IEnumerable<ForumCategory> Categories { get; set; }
-
-        // Single Stuff
-        public Forum Content { get; set; }
-        public Forum Previous { get; set; }
-        public Forum Next { get; set; }
-
-        // List Stuff
-        public ApplicationUser Author { get; set; }
+        public List<Forum> Recent { get; set; }
 
         public string GetPageUrl(int pageIndex)
         {

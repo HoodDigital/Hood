@@ -49,8 +49,8 @@ namespace Hood.Services
         // Content CRUD
         public async Task<ContentModel> GetPagedContent(ContentModel model, bool publishedOnly = true)
         {
-            var content = await GetContent(model.Search, model.Order, model.Type, model.Category, model.Filter, model.AuthorName, publishedOnly).ToListAsync();
-            model.List = content;
+            var content = GetContent(model.Search, model.Order, model.Type, model.Category, model.Filter, model.AuthorName, publishedOnly);
+            await model.ReloadAsync(content);
             return model;
         }
         private IOrderedQueryable<Content> GetContent(string search, string sort, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
@@ -129,34 +129,34 @@ namespace Hood.Services
                 {
                     switch (sort)
                     {
-                        case "Title":
+                        case "title":
                             orderedContent = content.OrderBy(n => n.Title);
                             break;
-                        case "Date":
+                        case "date":
                             orderedContent = content.OrderBy(n => n.CreatedOn);
                             break;
-                        case "PublishDate":
+                        case "publish":
                             orderedContent = content.OrderBy(n => n.PublishDate);
                             break;
-                        case "Views":
+                        case "views":
                             orderedContent = content.OrderBy(n => n.Views);
                             break;
 
-                        case "TitleDesc":
+                        case "title+desc":
                             orderedContent = content.OrderByDescending(n => n.Title);
                             break;
-                        case "DateDesc":
+                        case "date+desc":
                             orderedContent = content.OrderByDescending(n => n.CreatedOn);
                             break;
-                        case "PublishDateDesc":
+                        case "publish+desc":
                             orderedContent = content.OrderByDescending(n => n.PublishDate);
                             break;
-                        case "ViewsDesc":
+                        case "views+desc":
                             orderedContent = content.OrderByDescending(n => n.Views);
                             break;
 
                         default:
-                            orderedContent = content.OrderByDescending(n => n.PublishDate).ThenBy(n => n.Id);
+                            orderedContent = content.OrderByDescending(n => n.CreatedOn);
                             break;
                     }
                 }

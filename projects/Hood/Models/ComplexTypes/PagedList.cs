@@ -90,6 +90,18 @@ namespace System.Collections.Generic
             return this;
         }
 
+        public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source)
+        {
+            var total = source.Count();
+            this.TotalCount = total;
+            this.TotalPages = (int)Math.Ceiling((double)total / PageSize);
+            if (PageIndex > TotalPages)
+                PageIndex = TotalPages;
+            _list = new List<T>();
+            _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
+            return this;
+        }
+
         /// <summary>
         /// Page index
         /// </summary>

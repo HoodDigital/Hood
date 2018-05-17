@@ -97,8 +97,6 @@
                     </li>
                 </ul>
             </li>
-
-
             @if (subscriptions.Succeeded)
             {
                 <li class="">
@@ -131,27 +129,24 @@
                 </a>
             </li>
             <li>
-                <a asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
-                    <i class="fa fa-paint-brush"></i><span class="nav-label">Theme</span>
+                <a asp-action="Seo" asp-controller="Settings" asp-route-area="Admin">
+                    <i class="fa fa-tag"></i><span class="nav-label">SEO</span>
                 </a>
             </li>
-            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            @if (User.IsInRole("Admin"))
             {
                 <li>
-                    <a asp-action="Seo" asp-controller="Settings" asp-route-area="Admin">
-                        <i class="fa fa-tag"></i><span class="nav-label">SEO Tools</span>
+                    <a asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
+                        <i class="fa fa-paint-brush"></i><span class="nav-label">Theme</span>
                     </a>
                 </li>
-            }
-            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
-            {
                 <li>
                     <a asp-action="Index" asp-controller="Users">
                         <i class="fa fa-group"></i><span class="nav-label">Users</span>
                     </a>
                 </li>
             }
-            @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+            @if (User.IsInRole("Admin"))
             {
 
                 <li class="">

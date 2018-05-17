@@ -141,7 +141,7 @@ namespace Hood.Models
                         FirstName = "Hood",
                         LastName = "Digital",
                         EmailConfirmed = true,
-                        EmailOptin = false,
+                        Anonymous = false,
                         PhoneNumber = "03309001900",
                         JobTitle = "Website Administrator",
                         LastLogOn = DateTime.Now,

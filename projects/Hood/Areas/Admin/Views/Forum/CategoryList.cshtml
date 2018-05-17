@@ -1,8 +1,8 @@
-@model ContentModel
-@inject ContentCategoryCache _categories
+@model ForumModel
+@inject ForumCategoryCache _categories
 @{
     _categories.ResetCache();
-    var categories = _categories.TopLevel(Model.ContentType.Type);
+    var categories = _categories.TopLevel();
     Layout = null;
 }
 @if (categories.Count() > 0)
@@ -15,12 +15,11 @@
                 </th>
             </tr>
         </thead>
-        @Html.AdminContentCategoryTree(categories, Model.ContentType.Slug)
+        @Html.AdminForumCategoryTree(categories)
     </table>
 }
 else
 {
     <h4>Categories</h4>
-    <p>No categories added yet. To add a category, simply add category on the right or a @Model.ContentType.TypeName to a new category name in the editor.</p>
-
+    <p>No categories added yet. To add a category, simply add category on the right.</p>
 }

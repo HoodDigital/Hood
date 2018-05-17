@@ -95,7 +95,7 @@
                                         }
                                         else
                                         {
-                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.Types[i].BaseName= ="Page" ? "disabled" : "" ) />
+                                            <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" @(Model.Types[i].BaseName == "Page" ? "disabled" : "" ) />
                                             <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
                                         }
                                     </div>
@@ -129,7 +129,7 @@
                                         }
                                         else
                                         {
-                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.Types[i].BaseName= ="Page" ? "disabled" : "" ) />
+                                            <input asp-for="Types[i].Type" class="form-control restrict-to-slug" @(Model.Types[i].BaseName == "Page" ? "disabled" : "" ) />
                                             <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: This is how your type is stored in the database. <br />&nbsp;<span class="text-danger">WARNING: Changing this will affect external linking, and may cause data loss.</span></b></small></p>
                                         }
                                     </div>

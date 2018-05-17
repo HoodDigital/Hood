@@ -8,11 +8,13 @@ $.hood.Content = {
         $('body').on('click', '.create-content', this.Create.Init);
         $('body').on('click', '.publish-content', this.Publish);
         $('body').on('click', '.archive-content', this.Archive);
-        $('body').on('click', '.create-content', this.Create.Init);
-        $('body').on('click', '.edit-category', this.Categories.Edit);
-        $('body').on('click', '.save-category', this.Categories.Save);
-        $('body').on('click', '.add-category', this.Categories.Add);
-        $('body').on('click', '.delete-category', this.Categories.Delete);
+
+        $('body').on('click', '.edit-content-category', this.Categories.Edit);
+        $('body').on('click', '.save-content-category', this.Categories.Save);
+        $('body').on('click', '.add-content-category', this.Categories.Add);
+        $('body').on('click', '.delete-content-category', this.Categories.Delete);
+        $('body').on('change', '.content-category-check', this.Categories.ToggleCategory);
+
         $('body').on('click', '.add-custom-field', this.Types.AddField);
         $('body').on('click', '.delete-custom-field', this.Types.DeleteField);
 
@@ -22,6 +24,7 @@ $.hood.Content = {
 
         if ($('#edit-content').doesExist())
             this.Edit.Init();
+
         if ($('#add-field-form').doesExist())
             this.Meta.Init();
     },
@@ -95,10 +98,10 @@ $.hood.Content = {
         Edit: function (e) {
             var $this = $(this);
             e.preventDefault();
-            $.hood.Blades.OpenWithLoader('.edit-category', '/admin/categories/edit/' + $(this).data('id') + '?type=' + $(this).data('type'), null);
+            $.hood.Blades.OpenWithLoader('.edit-content-category', '/admin/categories/edit/' + $(this).data('id') + '?type=' + $(this).data('type'), null);
         },
         Save: function (e) {
-            $.post('/admin/categories/save/', $('#edit-category-form').serialize(), function (data) {
+            $.post('/admin/categories/save/', $('#edit-content-category-form').serialize(), function (data) {
                 if (data.Success) {
                     $.hood.Inline.Reload('.categorylist');
                     swal({
@@ -118,7 +121,7 @@ $.hood.Content = {
             });
         },
         Add: function (e) {
-            $.post('/admin/categories/add/', $('#add-category-form').serialize(), function (data) {
+            $.post('/admin/categories/add/', $('#add-content-category-form').serialize(), function (data) {
                 if (data.Success) {
                     $.hood.Inline.Reload('.categorylist');
                     swal({
@@ -136,6 +139,26 @@ $.hood.Content = {
                     });
                 }
             });
+        },
+        ToggleCategory: function () {
+            if ($(this).is(':checked')) {
+                $.post('/admin/content/categories/add/', { categoryId: $(this).val(), contentId: $(this).data('id') }, function (data) {
+                    if (data.Success) {
+                        $.hood.Alerts.Success("Added category.");
+                    } else {
+                        $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
+                    }
+                });
+            } else {
+                $.post('/admin/content/categories/remove/', { categoryId: $(this).val(), contentId: $(this).data('id') }, function (data) {
+                    if (data.Success) {
+                        $.hood.Alerts.Success("Removed category.");
+                    } else {
+                        $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
+                    }
+                });
+            }
+
         },
         Delete: function () {
             var $this = $(this);
@@ -372,40 +395,18 @@ $.hood.Content = {
     Edit: {
         Init: function () {
             this.LoadEditors('#edit-content');
+
             $.hood.Content.Upload.InitImageUploader();
 
-
-            //$('body').on('click', '#content-category-submit', this.AddCategory);
             if ($('#designer-window').doesExist())
                 this.Designer.Init();
 
-            $('body').on('change', '.category-check', this.Categories.ToggleCategory);
-        },
-        Categories: {
-            ToggleCategory: function () {
-                if ($(this).is(':checked')) {
-                    $.post('/admin/content/categories/add/', { categoryId: $(this).val(), contentId: $(this).data('id') }, function (data) {
-                        if (data.Success) {
-                            $.hood.Alerts.Success("Added category.");
-                        } else {
-                            $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
-                        }
-                    });
-                } else {
-                    $.post('/admin/content/categories/remove/', { categoryId: $(this).val(), contentId: $(this).data('id') }, function (data) {
-                        if (data.Success) {
-                            $.hood.Alerts.Success("Removed category.");
-                        } else {
-                            $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
-                        }
-                    });
-                }
-
-            },
         },
         Designer: {
             Window: $('#designer-window'),
-            Area: function () { return $('#designer-window').contents().find("#editable-content"); },
+            Area: function () {
+                return $('#designer-window').contents().find("#editable-content");
+            },
             Init: function () {
 
                 $('body').on('change', '#preview-size', function () {

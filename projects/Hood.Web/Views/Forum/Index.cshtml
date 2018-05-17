@@ -1,0 +1,25 @@
+@model ForumModel
+@{
+    ViewData["Title"] = "Our Forums";
+    ViewData["SubTitle"] = "Browse and engage with our interactive forums.";
+    Layout = "_Blank";
+}
+<div class="row">
+    <div class="col-sm-9">
+        @if (Model.List.Count == 0)
+        {
+            await Html.RenderPartialAsync("_Forums_NoResults");
+        }
+        else
+        {
+            @foreach (var forum in Model.List)
+            {
+                await Html.RenderPartialAsync("_Template_Forum", forum);
+            }
+            await Html.RenderPartialAsync("_Pagination");
+        }
+    </div>
+    <div class="col-sm-3">
+        @{ await Html.RenderPartialAsync("_Forums_Sidebar"); }
+    </div>
+</div>

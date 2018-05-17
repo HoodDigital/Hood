@@ -1,0 +1,17 @@
+@model PostModel
+<form method="post">
+    <fieldset class="form-horizontal">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Your message</label>
+            <div class="col-sm-8">
+                <textarea asp-for="Post.Body" type="text" class="form-control tinymce"></textarea>
+                <span asp-validation-for="Post.Body"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-8 col-sm-offset-3">
+                <button type="submit" class="btn btn-primary">Post message</button>
+            </div>
+        </div>
+    </fieldset>
+</form>

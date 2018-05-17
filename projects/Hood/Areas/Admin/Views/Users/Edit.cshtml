@@ -35,10 +35,6 @@
     @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
 }
 <form asp-action="Edit" asp-route-id="@Model.User.Id" method="post" id="edit-user-form" data-id="@Model.User.Id">
-    @if (Model.SaveMessage.IsSet())
-    {
-        @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
-    }
     <div class="row">
         <div class="col-md-8">
             <div class="tabs-container m-b-lg">
@@ -55,54 +51,61 @@
                             <h5>Basic Profile &amp; Contact Info</h5>
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.UserName"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.UserName"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.UserName">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.Email"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.Email"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.Email">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.FirstName"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.FirstName"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.FirstName">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.LastName"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.LastName"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.LastName">
                                     </div>
                                 </div>
+                                <hr />
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.JobTitle"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.JobTitle">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.CompanyName"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.CompanyName"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.CompanyName">
                                     </div>
                                 </div>
-                            </fieldset>
-                            <hr />
-                            <fieldset class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.ClientCode"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.JobTitle"></label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.ClientCode">
+                                        <input type="text" class="form-control" asp-for="User.JobTitle">
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" asp-for="User.ForumSignature"></label>
+                                    <div class="col-sm-8">
+                                        <textarea type="text" class="form-control" asp-for="User.ForumSignature"></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.VATNumber"></label>
+                                    <label class="col-sm-3 control-label">Anonymous:</label>
                                     <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.VATNumber">
+                                        <div class="checkbox">
+                                            <input class="styled" asp-for="User.Anonymous" type="checkbox" />
+                                            <label for="User.Anonymous">
+                                                Anonymous
+                                                <small>
+                                                    <strong><i class="fa fa-info m-l-sm m-r-xs"></i>If set, user will details will not show up in forums or on the site.</strong>
+                                                </small>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </fieldset>
@@ -115,25 +118,25 @@
                             </h5>
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.Facebook"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.Facebook"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.Facebook">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.GooglePlus"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.GooglePlus"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.GooglePlus">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.LinkedIn"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.LinkedIn"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.LinkedIn">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.Twitter"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.Twitter"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.Twitter">
                                     </div>
@@ -142,13 +145,13 @@
                             <hr />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.TwitterHandle"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.TwitterHandle"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.TwitterHandle">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label" asp-for="User.WebsiteUrl"></label>
+                                    <label class="col-sm-3 control-label" asp-for="User.WebsiteUrl"></label>
                                     <div class="col-sm-8">
                                         <input type="text" class="form-control" asp-for="User.WebsiteUrl">
                                     </div>
@@ -279,7 +282,7 @@
                 <h4>Avatar</h4>
                 <fieldset class="form-horizontal">
                     <div class="form-group row-center">
-                        <label class="col-sm-4 text-right">Avatar</label>
+                        <label class="col-sm-3 text-right">Avatar</label>
                         <div class="col-sm-8">
                             <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs img-circle m-r-sm @Model.User.Id" id="user-edit-avatar" />
                             <attacher dataid="@Model.User.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.User.Id" class="btn btn-xs btn-primary">Choose profile image...</attacher>

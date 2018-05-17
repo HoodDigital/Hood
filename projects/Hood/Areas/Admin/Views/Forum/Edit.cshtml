@@ -1,0 +1,107 @@
+@model Forum
+@inject ForumCategoryCache _categories
+@{
+    ViewBag.Title = "Edit: " + Model.Title;
+}
+@section buttons {
+    <a class="btn btn-sm btn-danger delete-forum" data-id="@Model.Id"><i class="fa fa-trash m-r-xs"></i>Delete</a>
+    <a class="btn btn-sm btn-info" href="@Model.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+    <a href="javascript:document.getElementById('edit-forum').submit()" class="btn btn-success btn-sm"><i class="fa fa-save m-r-sm"></i>Save</a>
+}
+@section breadcrumbs {
+    <ol class="breadcrumb">
+        <li>
+            <a href="/admin">Home</a>
+        </li>
+        <li>
+            <a asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
+                <i class="fa fa-comments m-r-xs"></i>
+                Forums
+            </a>
+        </li>
+        <li class="active">
+            <strong>@ViewBag.Title</strong>
+        </li>
+    </ol>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="editor">
+        <form method="post" id="edit-forum" data-id="@Model.Id">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Views" />
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="tabs-container m-b-lg">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> Basics</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            @{await Html.RenderPartialAsync("_Editor_Info"); }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel-body small">
+                        <h4 class="">Forum Settings</h4>
+                        <div class="form-group">
+                            <label class="control-label">Published?</label>
+                            <div>
+                                <select class="form-control" asp-for="Published">
+                                    <option value="true" @(Model.Published ? "selected" : "")>Published &amp; Live</option>
+                                    <option value="false" @(!Model.Published ? "selected" : "")>Archived</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Slug" class="control-label">Slug</label>
+                            <div>
+                                <input asp-for="Slug" class="form-control restrict-to-page-slug" />
+                            </div>
+                            <div class="font-xs url-preview">
+                                URL Preview:
+                                <br />
+                                <a class="font-sm" href="@Url.AbsoluteUrl(Model.Url)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Url.TrimStart('/')</span></strong></a>
+                            </div>
+                        </div>
+                        <div class="form-group no-margin">
+                            <label class="control-label">Author/Owner</label>
+                            <div>
+                                <select class="form-control" asp-for="AuthorId">
+                                    @foreach (ApplicationUser author in Model.Authors)
+                                    {
+                                        <option value="@author.Id" @(author.Id == Model.AuthorId ? "selected" : "")>@author.UserName - @author.FirstName @author.LastName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-body small">
+                        <h4 class="">Images</h4>
+                        @{ await Html.RenderPartialAsync("_Field_Images"); }
+                    </div>
+                    <div class="panel-body small">
+                        <h4>Categories</h4>
+                        <div class="category-list">
+                            @{
+                                _categories.ResetCache();
+                                var categories = _categories.TopLevel();
+                            }
+                            @if (categories.Count() > 0)
+                            {
+                                @Html.AddToCategoryTree(categories, Model)
+                            }
+                            else
+                            {
+                                <p>No categories added yet. To add a category, go back to the forum list and select the Categories tab.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

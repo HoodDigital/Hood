@@ -63,8 +63,11 @@
   <ItemGroup>
     <None Remove="Areas\Admin\Views\Forum\CategoryList.cshtml" />
     <None Remove="Areas\Admin\Views\Forum\Create.cshtml" />
+    <None Remove="Areas\Admin\Views\Forum\Edit.cshtml" />
     <None Remove="Areas\Admin\Views\Forum\EditCategory.cshtml" />
     <None Remove="Areas\Admin\Views\Forum\Index.cshtml" />
+    <None Remove="Areas\Admin\Views\Forum\_Editor_Info.cshtml" />
+    <None Remove="Areas\Admin\Views\Forum\_Field_Images.cshtml" />
     <None Remove="Areas\Admin\Views\Users\SyncToMailchimp.cshtml" />
   </ItemGroup>
 

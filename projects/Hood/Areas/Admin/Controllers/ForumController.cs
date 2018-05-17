@@ -56,7 +56,15 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/forums/manage/")]
         public async Task<IActionResult> Index(ForumModel model, EditorMessage? message)
         {
-            IQueryable<Forum> forums = _db.Forums.Include(f => f.Categories).Include(f => f.Topics);
+            IQueryable<Forum> forums = _db.Forums
+                .Include(f => f.Author)
+                .Include(f => f.Categories)
+                .Include(f => f.Topics);
+
+            if (model.Category.IsSet())
+            {
+                forums = forums.Where(c => c.Categories.Any(cat => cat.Category.Slug == model.Category));
+            }
 
             if (!string.IsNullOrEmpty(model.Search))
             {
@@ -97,7 +105,7 @@ namespace Hood.Areas.Admin.Controllers
                 }
             }
 
-            await model.ReloadAsync(forums, model.PageIndex, model.PageSize);
+            await model.ReloadAsync(forums);
             model.AddEditorMessage(message);
             return View(model);
         }
@@ -105,12 +113,12 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/forums/edit/{id}/")]
         public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
-            var model = await _db.Forums
-                .Include(f => f.Categories)
-                .Include(f => f.Topics)
-                .SingleOrDefaultAsync(f => f.Id == id);
+            var model = await LoadForum(id);
+
             if (model == null)
                 return NotFound();
+
+            model.Authors = await GetAuthorsAsync();
             model.AddEditorMessage(message);
             return View(model);
         }
@@ -123,6 +131,14 @@ namespace Hood.Areas.Admin.Controllers
             {
                 model.LastEditedBy = _userManager.GetUserId(User);
                 model.LastEditedOn = DateTime.Now;
+
+                var author = await _userManager.FindByIdAsync(model.AuthorId);
+                if (author != null)
+                {
+                    model.AuthorId = author.Id;
+                    model.AuthorDisplayName = author.DisplayName;
+                    model.AuthorName = author.FullName;
+                }
 
                 if (model.Slug.IsSet())
                 {
@@ -140,13 +156,24 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Update(model);
                 await _db.SaveChangesAsync();
 
+                model = await LoadForum(model.Id, false);
+                model.Authors = await GetAuthorsAsync();
+
+                model.SaveMessage = "Forum saved.";
+                model.MessageType = AlertType.Success;
+
                 return View(model);
 
             }
             catch (Exception ex)
             {
+                var reload = await _db.Forums.Include(f => f.Categories).SingleOrDefaultAsync(f => f.Id == model.Id);
+                model.Categories = reload.Categories;
+                model.Authors = await GetAuthorsAsync();
+
                 model.SaveMessage = "There was a problem saving: " + ex.Message;
                 model.MessageType = AlertType.Danger;
+
                 return View(model);
             }
         }
@@ -173,7 +200,8 @@ namespace Hood.Areas.Admin.Controllers
                     model.Slug = generator.UrlSlug();
 
                 model.AuthorId = user.Id;
-                model.Body = "";
+                model.AuthorDisplayName = user.DisplayName;
+                model.AuthorName = user.FullName;
 
                 model.CreatedBy = user.UserName;
                 model.CreatedOn = DateTime.Now;
@@ -204,17 +232,14 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/forum/categories/add/")]
+        [Route("admin/forums/categories/add/")]
         public async Task<IActionResult> AddCategory(int forumId, int categoryId)
         {
             try
             {
-                var model = await _db.Forums
-                    .Include(f => f.Categories)
-                    .Include(f => f.Topics)
-                    .SingleOrDefaultAsync(f => f.Id == forumId);
+                var model = await LoadForum(forumId, false);
 
-                if (model.IsInCategory(categoryId)) // Content is already in!
+                if (model.IsInCategory(categoryId))
                     return Json(new { Success = true });
 
                 var category = await _db.ForumCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
@@ -234,22 +259,20 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        [HttpPost]
         [Route("admin/forums/categories/remove/")]
         public async Task<IActionResult> RemoveCategory(int forumId, int categoryId)
         {
             try
             {
-                var model = await _db.Forums
-                    .Include(f => f.Categories)
-                    .Include(f => f.Topics)
-                    .SingleOrDefaultAsync(f => f.Id == forumId);
+                var model = await LoadForum(forumId, false);
 
-                if (!model.IsInCategory(categoryId)) // Content is already in!
+                if (!model.IsInCategory(categoryId))
                     return Json(new { Success = true });
 
                 var cat = model.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
 
-                if (cat == null)// Content is already out!
+                if (cat == null)
                     return Json(new { Success = true });
 
                 model.Categories.Remove(cat);
@@ -266,8 +289,8 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/forums/categories/add/")]
-        public async Task<IActionResult> AddCategory(ForumCategory model)
+        [Route("admin/forums/categories/create/")]
+        public async Task<IActionResult> CreateCategory(ForumCategory model)
         {
             try
             {
@@ -284,7 +307,7 @@ namespace Hood.Areas.Admin.Controllers
                 model.DisplayName = model.DisplayName.Trim().ToTitleCase();
                 model.Slug = model.DisplayName.ToSeoUrl();
                 int counter = 1;
-                while (await _db.ContentCategories.CountAsync(cc => cc.Slug == model.Slug) > 0)
+                while (await _db.ForumCategories.CountAsync(cc => cc.Slug == model.Slug) > 0)
                 {
                     model.Slug = model.DisplayName.ToSeoUrl() + "-" + counter;
                     counter++;
@@ -342,7 +365,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == id);
+                var category = await _db.ForumCategories.FirstOrDefaultAsync(c => c.Id == id);
                 _db.Entry(category).State = EntityState.Deleted;
                 await _db.SaveChangesAsync();
                 return new Response(true);
@@ -360,8 +383,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = await _db.Forums.FindAsync(id);
+                var model = await LoadForum(id, false);
+
                 model.Published = true;
+
                 _db.Forums.Update(model);
                 await _db.SaveChangesAsync();
 
@@ -380,8 +405,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = await _db.Forums.FindAsync(id);
-                model.Published = true;
+                var model = await LoadForum(id, false);
+
+                model.Published = false;
+
                 _db.Forums.Update(model);
                 await _db.SaveChangesAsync();
 
@@ -401,10 +428,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = await _db.Forums
-                    .Include(f => f.Categories)
-                    .Include(f => f.Topics)
-                    .SingleOrDefaultAsync(f => f.Id == id);
+                var model = await LoadForum(id, false);
+
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
 
@@ -423,8 +448,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = await _db.Forums
-                                .SingleOrDefaultAsync(f => f.Id == id);
+                var model = await LoadForum(id, false);
+
                 if (model != null && model.FeaturedImage != null)
                     return model.FeaturedImage;
                 else
@@ -441,8 +466,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = await _db.Forums
-                                .SingleOrDefaultAsync(f => f.Id == id);
+                var model = await LoadForum(id, false);
+
                 if (model != null && model.ShareImage != null)
                     return model.ShareImage;
                 else
@@ -459,8 +484,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = await _db.Forums
-                                .SingleOrDefaultAsync(f => f.Id == id);
+                var model = await LoadForum(id, false);
 
                 model.FeaturedImage = null;
 
@@ -476,13 +500,12 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [Route("admin/forums/clearsharerimage/{id}")]
-        public async Task<Response> ClearSharerImage(int id)
+        [Route("admin/forums/clearshareimage/{id}")]
+        public async Task<Response> ClearShareImage(int id)
         {
             try
             {
-                var model = await _db.Forums
-                                .SingleOrDefaultAsync(f => f.Id == id);
+                var model = await LoadForum(id, false);
 
                 model.ShareImage = null;
 
@@ -505,13 +528,35 @@ namespace Hood.Areas.Admin.Controllers
             return Json(suggestions.ToArray());
         }
 
-        public bool CheckSlug(string slug, int? id = null)
+        private bool CheckSlug(string slug, int? id = null)
         {
             if (id.HasValue)
                 return _db.Forums.SingleOrDefault(c => c.Slug == slug && c.Id != id) == null;
             return _db.Forums.SingleOrDefault(c => c.Slug == slug) == null;
         }
 
+        private async Task<List<ApplicationUser>> GetAuthorsAsync()
+        {
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            var editors = await _userManager.GetUsersInRoleAsync("Editor");
+            var moderators = await _userManager.GetUsersInRoleAsync("Moderator");
+            return editors.Concat(admins).Concat(moderators).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
+        }
+
+        private async Task<Forum> LoadForum(int id, bool includeTopics = false)
+        {
+            if (includeTopics)
+                return await _db.Forums
+                    .Include(f => f.Author)
+                    .Include(f => f.Categories)
+                    .Include(f => f.Topics)
+                    .SingleOrDefaultAsync(f => f.Id == id);
+            else
+                return await _db.Forums
+                    .Include(f => f.Author)
+                    .Include(f => f.Categories)
+                    .SingleOrDefaultAsync(f => f.Id == id);
+        }
     }
 }
 

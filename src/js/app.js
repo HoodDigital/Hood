@@ -6,16 +6,13 @@ $.window = $(window),
     $.header = $('#header'),
     $.headerWrap = $('#header-wrap'),
     $.content = $('#content'),
-    $.footer = $('#footer');
-$.mobileMenu = $('#mobile-menu');
-$.mobileMenuTrigger = $('.mobile-menu-trigger');
-$.background = $('#site-background-image');
-$.sideMenus = $('.side-push-panel');
-$.sideMenuTrigger = $(".side-panel-trigger");
-
-var windowWidth = $.window.width()
-
-stickyHeaderClass = 'sticky-header',
+    $.footer = $('#footer'),
+    $.mobileMenu = $('#mobile-menu'),
+    $.mobileMenuTrigger = $('.mobile-menu-trigger'),
+    $.background = $('#site-background-image'),
+    $.sideMenus = $('.side-push-panel'),
+    $.sideMenuTrigger = $(".side-panel-trigger"),
+    stickyHeaderClass = 'sticky-header',
     mobileMenuOpenClass = 'mobile-menu-open',
     sidePushPanelClass = 'side-push-panel',
     sidePushPanelOpenClass = 'side-panel-open',
@@ -32,8 +29,11 @@ stickyHeaderClass = 'sticky-header',
     retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
     retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
 
-    owlCarousels = $('.owl-carousel-basic');
-owlSliders = $('.owl-slider');
+    owlCarousels = $('.owl-carousel-basic'),
+    owlSliders = $('.owl-slider');
+
+
+var windowWidth = $.window.width()
 
 if (!$.hood)
     $.hood = {}
@@ -70,7 +70,7 @@ $.hood.App = {
         ContactForms: true,
         FitVids: true,
         Accordion: true,
-        SkillsBars: true, 
+        SkillsBars: true,
         Counters: true,
         Uploaders: true,
         PaymentPages: true,
@@ -872,7 +872,7 @@ $.hood.App = {
                 $($("#avatar-upload").data('preview')).removeClass('loading');
             });
         }
-    }, 
+    },
     PaymentPages: {
         Init: function () {
             $('body').on('click', '.btn.price-select[data-target][data-value]', $.hood.App.PaymentPages.PriceSelect);

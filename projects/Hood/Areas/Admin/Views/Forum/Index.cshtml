@@ -35,19 +35,19 @@
         <li class="active"><a data-toggle="tab" href="#items" aria-expanded="false"> Forum Setup</a></li>
         <li class=""><a data-toggle="tab" href="#categories" aria-expanded="false"> Categories</a></li>
     </ul>
-    <div class="tab-forum">
+    <div class="tab-content">
         <div id="items" class="tab-pane active">
             <div class="panel-body">
                 <form>
                     <div class="row m-b-sm m-t-sm">
                         <div class="col-md-4">
                             <select class="form-control submit-on-change" asp-for="Order" name="sort">
-                                <option value="PublishDateDesc">Recently Published</option>
-                                <option value="PublishDate">Published Date (Oldest-Newest)</option>
-                                <option value="DateDesc">Newest First</option>
-                                <option value="Date">Oldest First</option>
-                                <option value="Title">By Title (A-Z)</option>
-                                <option value="TitleDesc">By Title (Z-A)</option>
+                                <option value="date+desc">Newest First</option>
+                                <option value="date">Oldest First</option>
+                                <option value="latest+desc">Latest Activity First</option>
+                                <option value="latest">Oldest Activity First</option>
+                                <option value="name">By Title (A-Z)</option>
+                                <option value="name+desc">By Title (Z-A)</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -75,14 +75,14 @@
                                 <div class="col-md-6">
                                     <div class="media">
                                         <div class="media-left media-middle">
-                                            <a href="/admin/forums/@forum.Id/edit/">
+                                            <a asp-action="Edit" asp-route-id="@forum.Id">
                                                 <figure class="img-xs forum-feature-@forum.Id hood-image" style="background-image:url(@forum.FeaturedImage.ThumbUrl)">
                                                     <img src="@forum.FeaturedImage.ThumbUrl" alt="@forum.Title">
                                                 </figure>
                                             </a>
                                         </div>
                                         <div class="media-body">
-                                            <a class="forum-item-title" href="/admin/forums/@forum.Id/edit/">
+                                            <a class="forum-item-title" asp-action="Edit" asp-route-id="@forum.Id">
                                                 @forum.Title
                                                 @if (!forum.Published)
                                                 {
@@ -114,19 +114,19 @@
                                 <div class="col-md-1 visible-lg visible-md">
                                     <span class="small font-bold">Author</span>
                                     <div class="tag-list">
-                                        <span class="tag-item">@forum.Author.FullName</span>
+                                        <span class="tag-item">@forum.Author?.FullName</span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 visible-lg">
                                     <span class="small font-bold">Categories</span>
                                     <div class="tag-list">
-                                        @if (forum.Categories.Count == 0)
+                                        @if (forum.Categories?.Count == 0)
                                         {
                                             <span class="tag-item">Not in a category.</span>
                                         }
                                         @foreach (var category in forum.Categories)
                                         {
-                                            <span class="tag-item">@category.Category.DisplayName</span>
+                                            <span class="tag-item">@category.Category?.DisplayName</span>
                                         }
                                     </div>
                                 </div>
@@ -149,7 +149,7 @@
                                             </span>
                                         </a>
                                     }
-                                    <a class="btn-default btn btn-sm action-button" href="/admin/forums/@forum.Id/edit">
+                                    <a class="btn-default btn btn-sm action-button" asp-action="Edit" asp-route-id="@forum.Id">
                                         <i class="fa fa-edit m-r-xs"></i>
                                         <span>
                                         Edit</span>

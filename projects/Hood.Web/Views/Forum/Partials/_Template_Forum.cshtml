@@ -1,0 +1,53 @@
+@model Forum
+@{
+    var _account = Context.GetAccountInfo();
+}
+<div class="row">
+    <div class="hidden-xs col-sm-3 col-md-2">
+        <a href="@Model.Url"><fixedImage src="@Model.FeaturedImage.MediumUrl" class="img img-full img-square" /></a>
+    </div>
+    <div class="col-md-6">
+        <h5><a href="@Model.Url">@Model.Title</a></h5>
+        <p class="m-b-xs">
+            <span class="m-r-sm"><i class="fa fa-user"></i> @(Model.Author.DisplayName.IsSet() ? Model.Author.DisplayName : "Anonymous")</span>
+            <span><i class="fa fa-clock-o"></i> @Model.CreatedOn.ToLongDateString() at @Model.CreatedOn.ToShortTimeString()</span>
+        </p>
+        <p class="no-margin">
+            @if (Model.Categories != null && Model.Categories.Count != 0)
+            {
+                foreach (var category in Model.Categories)
+                {
+                    <a class="label label-default" asp-action="Index" asp-route-category="@category.Category.Slug">@category.Category.DisplayName</a>
+                }
+            }
+            else
+            {
+                <span class="label label-default">Uncategorised</span>
+            }
+        </p>
+    </div>
+    <div class="col-md-4">
+        <p class="no-margin">
+            <strong>Topics</strong>
+            @Model.NumTopics
+        </p>
+        <p class="no-margin">
+            <strong>Posts</strong>
+            @Model.NumPosts
+        </p>
+        <p class="no-margin">
+            @if (Model.LastPostId.HasValue)
+            {
+                <span>
+                    Latest Post by <strong>@Model.LastUserDisplayName</strong><br />
+                    at <strong>@Model.LastPosted.Value.ToDisplay()</strong>
+                </span>
+            }
+            else
+            {
+                <span>No posts yet.</span>
+            }
+        </p>
+    </div>
+</div>
+<hr />

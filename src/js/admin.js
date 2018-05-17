@@ -18,7 +18,7 @@ $(document).ready(function () {
         $('#right-sidebar').toggleClass('sidebar-open');
     });
 
-    $(".alert.auto-dismiss").fadeTo(2000, 500).slideUp(500, function () {
+    $(".alert.auto-dismiss").fadeTo(5000, 500).slideUp(500, function () {
         $(".alert.auto-dismiss").slideUp(500);
     });
 

@@ -730,8 +730,8 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [Route("admin/content/clearsharerimage/{id}")]
-        public Response ClearSharerImage(int id)
+        [Route("admin/content/clearshareimage/{id}")]
+        public Response ClearShareImage(int id)
         {
             try
             {

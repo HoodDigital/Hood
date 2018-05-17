@@ -101,8 +101,8 @@ namespace Hood.Extensions
                     htmlOutput += " <small>[" + category.Slug + "]</small>";
                     htmlOutput += "</td>";
                     htmlOutput += "<td class='text-right'>";
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-content-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-content-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
                     htmlOutput += "</td>";
                     htmlOutput += html.AdminContentCategoryTree(category.Children, contentSlug, startingLevel + 1);
                     htmlOutput += "</tr>";
@@ -125,8 +125,8 @@ namespace Hood.Extensions
                     {
                         htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
                     }
-                    htmlOutput += string.Format("<input class=\"styled category-check\" id=\"category-check-{1}\" name=\"category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", content.Id, category.Id, content.IsInCategory(category.Id) ? "checked" : "");
-                    htmlOutput += string.Format("<label for=\"category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
+                    htmlOutput += string.Format("<input class=\"styled content-category-check\" id=\"content-category-check-{1}\" name=\"content-category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", content.Id, category.Id, content.IsInCategory(category.Id) ? "checked" : "");
+                    htmlOutput += string.Format("<label for=\"content-category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
                     htmlOutput += "</div>";
                     htmlOutput += html.AddToCategoryTree(category.Children, content, contentSlug, startingLevel + 1);
                 }
@@ -136,7 +136,7 @@ namespace Hood.Extensions
         }
 
         // Forum Categories
-        public static IHtmlContent ForumCategoryTree(this IHtmlHelper html, IEnumerable<ForumCategory> categories, string contentSlug)
+        public static IHtmlContent ForumCategoryTree(this IHtmlHelper html, IEnumerable<ForumCategory> categories)
         {
             string htmlOutput = string.Empty;
 
@@ -146,10 +146,10 @@ namespace Hood.Extensions
                 foreach (var category in categories)
                 {
                     htmlOutput += "<li>";
-                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("<a href=\"/forums?category={0}\" class=\"forum-category\">", category.Slug);
                     htmlOutput += string.Format("{0} <span>{1}</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";
-                    htmlOutput += html.ForumCategoryTree(category.Children, contentSlug);
+                    htmlOutput += html.ForumCategoryTree(category.Children);
                     htmlOutput += "</li>";
                 }
                 htmlOutput += "</ul>";
@@ -183,7 +183,7 @@ namespace Hood.Extensions
             }
             return html.Raw(htmlOutput);
         }
-        public static IHtmlContent AdminForumCategoryTree(this IHtmlHelper html, IEnumerable<ForumCategory> categories, string contentSlug, int startingLevel = 0)
+        public static IHtmlContent AdminForumCategoryTree(this IHtmlHelper html, IEnumerable<ForumCategory> categories, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
 
@@ -197,23 +197,23 @@ namespace Hood.Extensions
                     {
                         htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
                     }
-                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("<a href=\"/forums/category/{0}/\" class=\"forum-category\">", category.Slug);
                     htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";
                     htmlOutput += " <small>[" + category.Slug + "]</small>";
                     htmlOutput += "</td>";
                     htmlOutput += "<td class='text-right'>";
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-category action-button\" data-id=\"{0}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id);
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-forum-category action-button\" data-id=\"{0}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-forum-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
                     htmlOutput += "</td>";
-                    htmlOutput += html.AdminForumCategoryTree(category.Children, contentSlug, startingLevel + 1);
+                    htmlOutput += html.AdminForumCategoryTree(category.Children, startingLevel + 1);
                     htmlOutput += "</tr>";
                 }
             }
 
             return html.Raw(htmlOutput);
         }
-        public static IHtmlContent AddToCategoryTree(this IHtmlHelper html, IEnumerable<ForumCategory> categories, Forum content, string contentSlug, int startingLevel = 0)
+        public static IHtmlContent AddToCategoryTree(this IHtmlHelper html, IEnumerable<ForumCategory> categories, Forum forum, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
 
@@ -227,10 +227,10 @@ namespace Hood.Extensions
                     {
                         htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
                     }
-                    htmlOutput += string.Format("<input class=\"styled category-check\" id=\"category-check-{1}\" name=\"category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", content.Id, category.Id, content.IsInCategory(category.Id) ? "checked" : "");
-                    htmlOutput += string.Format("<label for=\"category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
+                    htmlOutput += string.Format("<input class=\"styled forum-category-check\" id=\"forum-category-check-{1}\" name=\"forum-category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", forum.Id, category.Id, forum.IsInCategory(category.Id) ? "checked" : "");
+                    htmlOutput += string.Format("<label for=\"forum-category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
                     htmlOutput += "</div>";
-                    htmlOutput += html.AddToCategoryTree(category.Children, content, contentSlug, startingLevel + 1);
+                    htmlOutput += html.AddToCategoryTree(category.Children, forum, startingLevel + 1);
                 }
             }
 

@@ -50,12 +50,12 @@
                     <div class="row m-b-sm m-t-sm">
                         <div class="col-md-4">
                             <select class="form-control submit-on-change" asp-for="Order" name="sort">
-                                <option value="PublishDateDesc">Recently Published</option>
-                                <option value="PublishDate">Published Date (Oldest-Newest)</option>
-                                <option value="DateDesc">Newest First</option>
-                                <option value="Date">Oldest First</option>
-                                <option value="Title">By Title (A-Z)</option>
-                                <option value="TitleDesc">By Title (Z-A)</option>
+                                <option value="publish+desc">Recently Published</option>
+                                <option value="publish">Published Date (Oldest-Newest)</option>
+                                <option value="date+desc">Newest First</option>
+                                <option value="date">Oldest First</option>
+                                <option value="title">By Title (A-Z)</option>
+                                <option value="title+desc">By Title (Z-A)</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -258,7 +258,7 @@
                         <div class="hood-inline categorylist" data-url="@Url.Action("CategoryList")"></div>
                     </div>
                     <div class="col-sm-4">
-                        <form id="add-category-form" class="well">
+                        <form id="add-content-category-form" class="well">
                             <h4>Add a category...</h4>
                             <input id="Add-ContentType" name="ContentType" type="hidden" value="@Model.ContentType.Type" />
                             <div class="form-group">
@@ -277,7 +277,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <button type="button" class="btn btn-primary add-category"><i class="fa fa-save"></i> Add Category</button>
+                                <button type="button" class="btn btn-primary add-content-category"><i class="fa fa-save"></i> Add Category</button>
                             </div>
                         </form>
                     </div>

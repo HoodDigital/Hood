@@ -255,6 +255,24 @@ namespace Hood.Areas.Admin.Controllers
                     Longitude = model.cpLongitude
                 };
 
+                var leaseStatuses = _propertySettings.GetLeaseStatuses();
+                if (leaseStatuses.Count > 0)
+                    property.LeaseStatus = leaseStatuses.FirstOrDefault();
+                else
+                    property.LeaseStatus = "Available";
+
+                var planningTypes = _propertySettings.GetPlanningTypes();
+                if (planningTypes.Count > 0)
+                    property.Planning = planningTypes.FirstOrDefault().Key;
+                else
+                    property.Planning = "VAR";
+
+                var listingTypes = _propertySettings.GetListingTypes();
+                if (listingTypes.Count > 0)
+                    property.ListingType = listingTypes.FirstOrDefault();
+                else
+                    property.ListingType = "Not Specified";
+
                 // Geocode
                 property.SetLocation(_address.GeocodeAddress(property));
 
