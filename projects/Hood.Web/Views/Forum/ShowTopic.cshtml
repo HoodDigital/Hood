@@ -15,6 +15,10 @@
         url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
 }
+@section includes {
+    <script src="~/lib/tinymce/tinymce.min.js"></script>
+    <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
+}
 @section metas {
     <meta name="description" content="@Model.Topic.Forum.Description" />
     <meta property="og:author" content="@Model.Topic.Author.DisplayName" />

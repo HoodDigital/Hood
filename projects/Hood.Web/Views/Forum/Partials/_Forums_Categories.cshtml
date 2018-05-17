@@ -1,14 +1,8 @@
 @inject ForumCategoryCache _categories
-@{
-    var categories = _categories.TopLevel();
-}
 <div class="sidebar-widget m-b-lg">
     <h4>Categories</h4>
     <hr />
-    @if (categories.Count() > 0)
-    {
-        @Html.ForumCategoryTree(categories);
-    }
+    @_categories.ForumCategoryTree(_categories.TopLevel());
     <ul>
         <li><a asp-action="Index">Show All</a></li>
     </ul>

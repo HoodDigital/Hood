@@ -1,11 +1,9 @@
 @model ForumModel
 @inject ForumCategoryCache _categories
 @{
-    _categories.ResetCache();
-    var categories = _categories.TopLevel();
     Layout = null;
 }
-@if (categories.Count() > 0)
+@if (_categories.Count > 0)
 {
     <table class="table table-striped">
         <thead>
@@ -15,7 +13,7 @@
                 </th>
             </tr>
         </thead>
-        @Html.AdminForumCategoryTree(categories)
+        @_categories.AdminForumCategoryTree(_categories.TopLevel())
     </table>
 }
 else

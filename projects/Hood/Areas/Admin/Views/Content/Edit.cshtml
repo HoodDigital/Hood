@@ -139,11 +139,10 @@
                             <div class="category-list">
                                 @{
                                     _categories.ResetCache();
-                                    var categories = _categories.TopLevel(Model.ContentType.Type);
                                 }
-                                @if (categories.Count() > 0)
+                                @if (_categories.Count > 0)
                                 {
-                                    @Html.AddToCategoryTree(categories, Model.Content, Model.ContentType.Slug)
+                                    @_categories.AddToCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.Content, Model.ContentType.Slug)
                                 }
                                 else
                                 {

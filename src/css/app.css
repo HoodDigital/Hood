@@ -12198,11 +12198,24 @@ body {
   font-weight: 100;
   margin-top: 0px;
 }
-.content-category span:before {
+.content-category span:before,
+.forum-category span:before {
   content: '\0028';
 }
-.content-category span:after {
+.content-category span:after,
+.forum-category span:after {
   content: '\0029';
+}
+.forum-post {
+  padding: 15px;
+  border-radius: 4px;
+  background-color: rgba(238, 238, 238, 0.5);
+  border: 1px solid #eeeeee;
+  margin-bottom: 21px;
+}
+.forum-post.highlight {
+  background-color: rgba(240, 173, 78, 0.5);
+  border: 1px solid #f0ad4e;
 }
 
 /*# sourceMappingURL=app.css.map */

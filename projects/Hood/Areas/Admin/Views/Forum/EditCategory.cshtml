@@ -1,4 +1,5 @@
 @model ForumCategory
+@inject ForumCategoryCache _categories
 @{
     Layout = null;
 }
@@ -27,7 +28,7 @@
             <div>
                 <select asp-for="ParentCategoryId" class="form-control">
                     <option>No Parent</option>
-                    @Html.CategorySelectOptions(Model.Categories, Model.ParentCategoryId.ToString())
+                    @_categories.CategorySelectOptions(Model.Categories, Model.ParentCategoryId.ToString())
                 </select>
             </div>
         </div>

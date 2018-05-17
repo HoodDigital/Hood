@@ -1,11 +1,9 @@
 @model ContentModel
 @inject ContentCategoryCache _categories
 @{
-    _categories.ResetCache();
-    var categories = _categories.TopLevel(Model.ContentType.Type);
     Layout = null;
 }
-@if (categories.Count() > 0)
+@if (_categories.Count > 0)
 {
     <table class="table table-striped">
         <thead>
@@ -15,7 +13,7 @@
                 </th>
             </tr>
         </thead>
-        @Html.AdminContentCategoryTree(categories, Model.ContentType.Slug)
+        @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Slug)
     </table>
 }
 else

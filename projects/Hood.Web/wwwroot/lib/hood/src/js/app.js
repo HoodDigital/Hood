@@ -27,11 +27,7 @@ $.window = $(window),
     retinaLogo = $('#logo').find('.retina-logo'),
     retinaLogoImg = retinaLogo.find('img').attr('src'),
     retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
-    retinaMobileLogo = retinaLogo.attr('data-mobile-logo'),
-
-    owlCarousels = $('.owl-carousel-basic'),
-    owlSliders = $('.owl-slider');
-
+    retinaMobileLogo = retinaLogo.attr('data-mobile-logo');
 
 var windowWidth = $.window.width()
 
@@ -55,83 +51,16 @@ $.hood.App = {
             ]
         },
         ShowCookieMessage: !$('body').hasClass('disable-cookies'),
-        Mailchimp: {
-            Enabled: $('#mailchimp-signup-form').length,
-            onSuccess: function () {
-                $.hood.Alerts.Success("You have been successfully added to the mailing list, you can unsubscribe at any time.", "Thank you!", "success", true);
-            },
-            onFail: function () {
-                $.hood.Alerts.Success("There was a problem signing up: " + data.Errors, "Error!", "error", true)
-            }
-        },
+        Forums: true,
         Colorbox: true,
-        Parallax: true,
-        LoadTweets: true,
         ContactForms: true,
         FitVids: true,
         Accordion: true,
-        SkillsBars: true,
         Counters: true,
         Uploaders: true,
         PaymentPages: true,
-        Header: {
-            Enabled: true,
-            Type: 'basic',
-            Settings: {
-                delay: 250,
-                speed: 350,
-                animation: { opacity: 'show' },
-                animationOut: { opacity: 'hide' },
-                cssArrows: false,
-                onShow: $.noop,
-                fullWidthMenuGutter: 30
-            }
-        },
-        Wow: {
-            Enabled: true,
-            Settings: {
-                boxClass: 'wow',
-                animateClass: 'animated',
-                offset: 0,
-                mobile: false,
-                live: true
-            }
-        },
-        OwlCarousel: {
-            Enabled: true,
-            LoadCss: true,
-            Settings: {
-                loop: true,
-                margin: 10,
-                nav: true,
-                responsive: {
-                    0: {
-                        items: 1
-                    },
-                    768: {
-                        items: 3
-                    },
-                    1024: {
-                        items: 5
-                    }
-                }
-            }
-        },
-        VideoBackgrounds: {
-            Enabled: true,
-            Settings: {
-                volume: 1,
-                playbackRate: 1,
-                muted: true,
-                loop: true,
-                autoplay: true,
-                position: '50% 50%',
-                posterType: 'jpg',
-                resizing: true,
-                bgColor: 'transparent',
-                className: ''
-            }
-        },
+        Header: true,
+        RichTextEditors: true,
         LoadSharers: $('#share').length,
         SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"]
     },
@@ -141,17 +70,11 @@ $.hood.App = {
         if (options) {
             if (options.Header) $.hood.App.Options.Header = $.extend($.hood.App.Options.Header, options.Header || {});
             if (options.Header) $.hood.App.Options.Header.Settings = $.extend($.hood.App.Options.Header.Settings, options.Header.Settings || {});
-            if (options.Wow) $.hood.App.Options.Wow = $.extend($.hood.App.Options.Wow, options.Wow || {});
-            if (options.Wow) $.hood.App.Options.Wow.Settings = $.extend($.hood.App.Options.Wow.Settings, options.Wow.Settings || {});
-            if (options.OwlCarousel) $.hood.App.Options.OwlCarousel = $.extend($.hood.App.Options.OwlCarousel, options.OwlCarousel || {});
-            if (options.OwlCarousel) $.hood.App.Options.OwlCarousel.Settings = $.extend($.hood.App.Options.OwlCarousel.Settings, options.OwlCarousel.Settings || {});
-            if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds = $.extend($.hood.App.Options.VideoBackgrounds, options.VideoBackgrounds || {});
-            if (options.VideoBackgrounds) $.hood.App.Options.VideoBackgrounds.Settings = $.extend($.hood.App.Options.VideoBackgrounds.Settings, options.VideoBackgrounds.Settings || {});
         }
 
         $.hood.App.Loader.Init();
 
-        if ($.hood.App.Options.Header.Enabled)
+        if ($.hood.App.Options.Header)
             $.hood.App.Header.Init();
 
         if ($.hood.App.Options.Scroll.Functions)
@@ -162,10 +85,10 @@ $.hood.App = {
 
         if ($.hood.App.Options.Accordion)
             $.hood.App.Accordion();
+
         if ($.hood.App.Options.Counters)
             $.hood.App.Counters();
-        if ($.hood.App.Options.SkillsBars)
-            $.hood.App.SkillsBars();
+
         if ($.hood.App.Options.FitVids)
             $.hood.App.ResizeVideos();
 
@@ -175,26 +98,17 @@ $.hood.App = {
         if ($.hood.App.Options.Uploaders)
             $.hood.App.Uploaders.Init();
 
-        if ($.hood.App.Options.Mailchimp.Enabled)
-            $.hood.App.Mailchimp.Init();
-        if ($.hood.App.Options.OwlCarousel.Enabled)
-            $.hood.App.OwlCarousel();
-        if ($.hood.App.Options.VideoBackgrounds.Enabled)
-            $.hood.App.VideoBackgrounds();
-        if ($.hood.App.Options.LoadTweets)
-            $.hood.App.Tweets();
         if ($.hood.App.Options.Colorbox)
             $.hood.App.Colorbox();
-        if ($.hood.App.Options.Parallax)
-            $.hood.App.Parallax();
+
         if ($.hood.App.Options.LoadSharers)
             $.hood.App.Sharers();
+
         if ($.hood.App.Options.ShowCookieMessage)
             $.hood.App.Cookies();
-        if (!$.mobile) {
-            if ($.hood.App.Options.Wow.Enabled)
-                $.hood.App.Wow();
-        }
+
+        if ($.hood.App.Options.RichTextEditors)
+            $.hood.App.RichTextEditors();
     },
     onInitComplete: function () {
         if ($.hood.App.Options.Scroll.StickyHeader)
@@ -221,8 +135,12 @@ $.hood.App = {
             }
         },
         Complete: function () {
-            $('#loader').fadeOut();
-            $('#preloader').delay($.hood.App.Options.Loader.Delay).fadeOut('slow');
+            $('#loader').fadeOut(100);
+            $('#preloader').delay($.hood.App.Options.Loader.Delay).fadeOut(100);
+            setTimeout(function () {
+                if ($.hood.App.Options.Forums)
+                    $.hood.App.Forums.Init();
+            }, $.hood.App.Options.Loader.Delay + 200);
         },
         AddItem: function (name) {
             $.hood.App.Loader.LoadList.push({
@@ -250,148 +168,9 @@ $.hood.App = {
     },
     Header: {
         Init: function () {
-            switch ($.hood.App.Options.Header.Type) {
-                case 'hover':
-                    if (!$().superfish && !$().superclick) {
-                        $.hood.App.Loader.AddItem('hood-menus');
-                        $.getScript('/lib/superfish/dist/js/superfish.min.js', function () {
-                            $.hood.App.Header.Load();
-                            $.hood.App.Loader.ItemComplete('hood-menus');
-
-                        });
-                    }
-                    else
-                        $.hood.App.Header.Load();
-                    break;
-                case 'click':
-                    if (!$().superfish && !$().superclick) {
-                        $.hood.App.Loader.AddItem('hood-menus');
-                        $.getScript('/lib/superclick/dist/js/superclick.min.js', function () {
-                            $.hood.App.Header.Load();
-                            $.hood.App.Loader.ItemComplete('hood-menus');
-                        });
-                    }
-                    else
-                        $.hood.App.Header.Load();
-                    break;
-                default:
-                    $.hood.App.Header.Load();
-                    break;
-            }
-        },
-        Load: function (type) {
-            if ($.hood.App.Options.Header.Type == 'hover' || $.hood.App.Options.Header.Type == 'click') {
-                $.hood.App.Header.Setup();
-                $.hood.App.Header.MenuFunctions();
-                $.hood.App.Header.FullWidthMenu();
-            }
-            $.hood.App.Header.OverlayMenu();
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
             $.hood.App.Header.Logo();
-        },
-        Setup: function () {
-            if (!$().superfish && !$().superclick) {
-                $.body.addClass('no-superfish');
-                return true;
-            }
-
-            opts = {
-                popUpSelector: 'ul,.mega-menu-content,.top-link-section',
-                delay: $.hood.App.Options.Header.Settings.delay,
-                speed: $.hood.App.Options.Header.Settings.speed,
-                animation: $.hood.App.Options.Header.Settings.animation,
-                animationOut: $.hood.App.Options.Header.Settings.animationOut,
-                cssArrows: $.hood.App.Options.Header.Settings.cssArrows,
-                onShow: function () {
-                    $.hood.App.Options.Header.Settings.onShow();
-                }
-            };
-
-            if ($.hood.App.Options.Header.Type == 'hover') {
-                $('body nav.primary > ul, .top-links > ul').superfish(opts);
-            } else {
-                $('body nav.primary > ul, .top-links > ul').superclick(opts);
-            }
-
-            $('nav.primary-trigger,#overlay-menu-close').click(function () {
-                if ($('nav.primary').find('ul.mobile-primary-menu').length > 0) {
-                    $('nav.primary > ul.mobile-primary-menu, nav.primary > div > ul.mobile-primary-menu').toggleClass("show");
-                } else {
-                    $('nav.primary > ul, nav.primary > div > ul').toggleClass("show");
-                }
-                $.body.toggleClass("primary-menu-open");
-                return false;
-            });
-
-            if ($.mobile.Any()) {
-                $.body.addClass('device-touch');
-            }
-
-            if ($.hood.App.Options.Header.Type != 'hover') {
-                $('body nav.primary > ul input, .top-links > ul input, body nav.primary > ul select, .top-links > ul select, body nav.primary > ul textarea, .top-links > ul input textarea, body nav.primary > ul .keep-open, .top-links > ul .keep-open').on('click', function (e) {
-                    e.stopPropagation();
-                });
-                $('a.sf-with-ul[href]').click(function () {
-                    if ($(this).parents('.sfHover').length)
-                        window.location = $(this).attr('href');
-                })
-            }
-        },
-        Invert: function () {
-            $('nav.primary .mega-menu-content, nav.primary ul ul').each(function (index, element) {
-                var $menuChildElement = $(element),
-                    menuChildOffset = $menuChildElement.offset(),
-                    menuChildWidth = $menuChildElement.width(),
-                    menuChildLeft = menuChildOffset.left;
-                if (windowWidth - (menuChildWidth + menuChildLeft) < 0) {
-                    $menuChildElement.addClass('menu-pos-invert');
-                }
-            });
-        },
-        MenuFunctions: function () {
-
-            $('nav.primary ul li:has(ul)').addClass('sub-menu');
-            $('.top-links ul li:has(ul) > a').append('<i class="fa fa-caret-down"></i>');
-            $('.top-links > ul').addClass('clearfix');
-
-            if ($.mobile.Android()) {
-                $('nav.primary ul li.sub-menu').children('a').on('touchstart', function (e) {
-                    if (!$(this).parent('li.sub-menu').hasClass('sfHover')) {
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            if ($.mobile.Windows()) {
-                if ($().superfish || $().superclick) {
-                    $('nav.primary > ul, .top-links > ul').superfish('destroy').addClass('windows-mobile-menu');
-                } else {
-                    $('nav.primary > ul, .top-links > ul').addClass('windows-mobile-menu');
-                }
-
-                $('nav.primary ul li:has(ul)').append('<a href="#" class="wn-submenu-trigger"><i class="icon-angle-down"></i></a>');
-
-                $('nav.primary ul li.sub-menu').children('a.wn-submenu-trigger').click(function (e) {
-                    $(this).parent().toggleClass('open');
-                    $(this).parent().find('> ul, > .mega-menu-content').stop(true, true).toggle();
-                    return false;
-                });
-            }
-
-        },
-        FullWidthMenu: function () {
-            $('.mega-menu .mega-menu-content').css({ 'width': $.wrapper.width() - 2 * $.hood.App.Options.Header.fullWidthMenuGutter });
-        },
-        OverlayMenu: function () {
-            if ($.body.hasClass('overlay-menu')) {
-                var OverlayMenuItem = $('nav.primary').children('ul').children('li'),
-                    OverlayMenuItemHeight = OverlayMenuItem.outerHeight(),
-                    OverlayMenuItemTHeight = OverlayMenuItem.length * OverlayMenuItemHeight,
-                    firstItemOffset = ($.window.height() - OverlayMenuItemTHeight) / 2;
-
-                $('nav.primary').children('ul').children('li:first-child').css({ 'margin-top': firstItemOffset + 'px' });
-            }
         },
         StickyMenu: function () {
             var headerOffset = 0,
@@ -442,10 +221,7 @@ $.hood.App = {
     },
     Scroll: {
         Init: function () {
-
-
             $.hood.App.Header.StickyMenu();
-
             $.window.on('scroll', function () {
 
                 $('body.open-header.close-header-on-scroll').removeClass("side-header-open");
@@ -543,51 +319,6 @@ $.hood.App = {
             $.hood.App.Loader.ItemComplete('cookies');
         });
     },
-    PushMenu: function () {
-        $.hood.App.Loader.AddItem('jPushMenu');
-        $.getScript('/lib/jPushMenu/js/jPushMenu.js', $.proxy(function () {
-            $('.toggle-menu').jPushMenu();
-            $.hood.App.Loader.ItemComplete('jPushMenu');
-        }, this));
-    },
-    Parallax: function () {
-        //Parallax Function element
-        $('.parallax').each(function () {
-            var $el = $(this);
-            $(window).scroll(function () {
-                parallax($el);
-            });
-            parallax($el);
-        });
-        function parallax($el) {
-            var diff_s = $(window).scrollTop();
-            var parallax_height = $('.parallax').height();
-            var yPos_p = (diff_s * 0.5);
-            var yPos_m = -(diff_s * 0.5);
-            var diff_h = diff_s / parallax_height;
-
-            if ($('.parallax').hasClass('parallax-section1')) {
-                $el.css('top', yPos_p);
-            }
-            if ($('.parallax').hasClass('parallax-section2')) {
-                $el.css('top', yPos_m);
-            }
-            if ($('.parallax').hasClass('parallax-static')) {
-                $el.css('top', (diff_s * 1));
-            }
-            if ($('.parallax').hasClass('parallax-opacity')) {
-                $el.css('opacity', (1 - diff_h * 1));
-            }
-
-            if ($('.parallax').hasClass('parallax-background1')) {
-                $el.css("background-position", 'left' + " " + yPos_p + "px");
-            }
-            if ($('.parallax').hasClass('parallax-background2')) {
-                $el.css("background-position", 'left' + " " + -yPos_p + "px");
-
-            }
-        };
-    },
     Colorbox: function () {
         $.hood.App.Loader.AddItem('colorbox');
         $.getScript('/lib/jquery-colorbox/jquery.colorbox-min.js', $.proxy(function () {
@@ -595,7 +326,6 @@ $.hood.App = {
                 rel: 'gallery',
                 maxWidth: "95%",
                 maxHeight: "95%"
-
             });
             $(".colorbox-iframe").colorbox({
                 iframe: true,
@@ -607,16 +337,7 @@ $.hood.App = {
             $.hood.App.Loader.ItemComplete('colorbox');
         }, this));
     },
-    SkillsBars: function () {
-        // Skills Progressbar Elements
-        $('.skillbar').each(function () {
-            $(this).find('.skillbar-bar').animate({
-                width: $(this).attr('data-percent')
-            }, 2000);
-        });
-    },
     Counters: function () {
-        //Counter
         $('.counter').each(function () {
             var $this = $(this),
                 countTo = $this.attr('data-count');
@@ -631,47 +352,26 @@ $.hood.App = {
                     },
                     complete: function () {
                         $this.text(this.countNum);
-                        //alert('finished');
                     }
                 });
         });
     },
-    OwlCarousel: function () {
-        $.hood.App.Loader.AddItem('owl');
-        $.getScript('/lib/OwlCarousel2/dist/owl.carousel.min.js', function () {
-            owlCarousels.owlCarousel($.hood.App.Options.OwlCarousel.Settings);
-            owlSliders.owlCarousel({
-                loop: true,
-                margin: 0,
-                nav: true,
-                items: 1
-            });
-            $.hood.App.Loader.ItemComplete('owl');
-        });
-    },
-    VideoBackgrounds: function () {
-        $.hood.App.Loader.AddItem('vide');
-        $.getScript('/lib/vide/dist/jquery.vide.min.js', function () {
-            $('.vide, .video-panel, .video-bg').each(function () {
-                $(this).vide($(this).data('path'), $.hood.App.Options.VideoBackgrounds.Settings);
-            });
-            $.hood.App.Loader.ItemComplete('vide');
-        });
-    },
-    Resize: function () {
-        var t = setTimeout(function () {
-            $.hood.App.Header.FullWidthMenu();
-            $.hood.App.Header.OverlayMenu();
-        }, 500);
-        windowWidth = $.window.width();
+    Forums: {
+        Init: function () {
+            // check for highlight.
+            var highlight = $.getUrlVars()['highlight'];
+            if ($.isNumeric(highlight)) {
+                $post = $('#post-' + highlight);
+                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.scrollOffset }, 'slow');
+                $post.addClass('highlight');
+            }
+        }
     },
     ResizeVideos: function () {
-
         if (!$().fitVids) {
             console.log('resizeVideos: FitVids not Defined.');
             return true;
         }
-
         $("#content,#footer,#slider:not(.revslider-wrap),.landing-offer-media,.portfolio-ajax-modal,.mega-menu-column").fitVids({
             customSelector: "iframe[src^='http://www.dailymotion.com/embed'], iframe[src*='maps.google.com'], iframe[src*='google.com/maps']",
             ignore: '.no-fv'
@@ -688,64 +388,6 @@ $.hood.App = {
                 shareIn: "popup"
             });
         }, this));
-    },
-    Tweets: function () {
-        if ($(".hood-tweets").doesExist()) {
-            $.hood.App.Loader.AddItem('tweets');
-            if (typeof kendo !== 'undefined') {
-                $.hood.App.LoadTweets();
-            } else {
-                // for now we need to load kendo to do this
-                $.getScript('http://kendo.cdn.telerik.com/2016.2.714/js/kendo.ui.core.min.js', function () {
-                    $.hood.App.LoadTweets();
-                });
-            }
-        }
-    },
-    LoadTweets: function () {
-        // Load the od' tweets.
-        $.get('/content/tweets', null, function (ret) {
-            data = ret.Data;
-            if (data.length > 0) {
-                // we have tweets.
-                $(".hood-tweets").empty();
-                for (i = 0; i < 6; i++) {
-                    var template = kendo.template($("#hood-tweet-template").html());
-                    var result = template(data[i]); //Execute the template
-                    $(".hood-tweets").append(result); //Append the result
-                }
-            }
-        }).success(function () {
-        }).fail(function () {
-        }).error(function () {
-        }).complete(function () {
-        }).always(function () {
-            $.hood.App.Loader.ItemComplete('tweets');
-        });
-    },
-    Mailchimp: {
-        Init: function () {
-            $('body').on('submit', '#mailchimp-signup-form', $.hood.App.Mailchimp.SendForm);
-        },
-        SendForm: function (e) {
-            data = $(this).serialize();
-            $.post('/hood/signup/mailchimp', data, function (data) {
-                if (data.Success) {
-                    $.hood.App.Options.Mailchimp.onSuccess();
-                } else {
-                    $.hood.App.Options.Mailchimp.onFail();
-                }
-            });
-            return false;
-        }
-    },
-    Wow: function () {
-        $.hood.App.Loader.AddItem('wow');
-        $.getScript('/lib/wowjs/dist/wow.min.js', function () {
-            wow = new WOW($.hood.App.Options.Wow.Settings);
-            wow.init();
-            $.hood.App.Loader.ItemComplete('wow');
-        });
     },
     Uploaders: {
         Init: function () {
@@ -894,9 +536,24 @@ $.hood.App = {
             $('#billing-panel').collapse('show');
             $('#confirm-panel').collapse('hide');
         }
+    },
+    RichTextEditors: function () {
+        tinymce.init({
+            selector: '.tinymce-public',
+            height: 250,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor media',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media contextmenu paste emoticons'
+            ],
+            menubar: false,
+            toolbar: 'styleselect | bold italic | bullist numlist outdent indent | undo redo | link image media emoticons',
+            image_dimensions: false,
+            content_css: [
+            ]
+        });
     }
 };
-
 if ($.hood.Site && $.hood.Site.Init());
 $(window).resize($.hood.App.Resize);
 var googleRecaptchaCallback = function (token) {

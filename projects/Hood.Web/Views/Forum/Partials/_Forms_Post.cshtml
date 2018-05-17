@@ -1,15 +1,15 @@
 @model PostModel
 <form method="post">
-    <fieldset class="form-horizontal">
+    <fieldset>
         <div class="form-group">
-            <label class="col-sm-3 control-label">Your message</label>
-            <div class="col-sm-8">
-                <textarea asp-for="Post.Body" type="text" class="form-control tinymce"></textarea>
+            <label class="control-label">Your message</label>
+            <div class="">
+                <textarea asp-for="Post.Body" type="text" class="form-control tinymce-public" data-apikey="im5cz6mwvyzb4wnmt2m9uylj2oqrlolmxmow161fioddtgy0"></textarea>
                 <span asp-validation-for="Post.Body"></span>
             </div>
         </div>
         <div class="form-group">
-            <div class="col-sm-8 col-sm-offset-3">
+            <div class="text-center">
                 <button type="submit" class="btn btn-primary">Post message</button>
             </div>
         </div>

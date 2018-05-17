@@ -88,11 +88,10 @@
                         <div class="category-list">
                             @{
                                 _categories.ResetCache();
-                                var categories = _categories.TopLevel();
                             }
-                            @if (categories.Count() > 0)
+                            @if (_categories.Count > 0)
                             {
-                                @Html.AddToCategoryTree(categories, Model)
+                                @_categories.AddToCategoryTree(_categories.TopLevel(), Model)
                             }
                             else
                             {

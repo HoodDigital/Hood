@@ -2,7 +2,7 @@
 
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/7j755tgusxqrw6nl/branch/master?svg=true)](https://ci.appveyor.com/project/hooddigital/hood/branch/master)
 [![Visual Studio Version](https://img.shields.io/badge/Visual%20Studio-2017-magenta.svg?colorB=770ca3)](https://www.visualstudio.com/)
-[![Demo](https://img.shields.io/nuget/v/Hood.svg?label=Demo&colorB=eab92d)](http://cms.hooddigital.com/)
+[![Demo](https://img.shields.io/badge/dynamic/json.svg?label=Demo&url=http%3A%2F%2Fcms.hooddigital.com%2Fhood%2Fversion&query=%24.version&colorB=%23eab92d&prefix=v)](http://cms.hooddigital.com/)
 
 
 ## About Hood CMS

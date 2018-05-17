@@ -58,7 +58,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             IQueryable<Forum> forums = _db.Forums
                 .Include(f => f.Author)
-                .Include(f => f.Categories)
+                .Include(f => f.Categories).ThenInclude(c => c.Category)
                 .Include(f => f.Topics);
 
             if (model.Category.IsSet())

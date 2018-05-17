@@ -10,7 +10,7 @@
         <hr />
         @if (categories.Count() > 0)
         {
-            @Html.ContentCategoryTree(categories, Model.ContentType.Slug);
+            @_categories.ContentCategoryTree(categories, Model.ContentType.Slug);
         }
         <ul>
             <li><a href="/@Model.ContentType.Slug">Show All</a></li>

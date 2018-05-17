@@ -1,41 +1,38 @@
 @model Post
-@{ 
+@{
     var _account = Context.GetAccountInfo();
 }
-<div class="row">
-    <div class="col-md-2">
-        <h6>
-            @Model.AuthorDisplayName
-        </h6>
-        <p>
-            @Model.PostedTime.ToDisplay()
-        </p>
-    </div>
-    <div class="col-md-8">
-        <div class="post-content">
-            @Html.Raw(Model.HtmlBody)
+<div class="forum-post" id="@string.Format("post-{0}", Model.Id)">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="post-content">
+                @Html.Raw(Model.HtmlBody)
+            </div>
         </div>
-        <p>
-            <span class="m-r-sm"><i class="fa fa-user"></i> @(Model.Author.DisplayName.IsSet() ? Model.Author.DisplayName : "Anonymous")</span>
-            <span><i class="fa fa-clock-o"></i> @Model.PostedTime.ToLongDateString() at @Model.PostedTime.ToShortTimeString()</span>
-        </p>
-    </div>
-    <div class="col-md-2 text-right">
-        <p>
-            <a class="btn btn-sm btn-info" asp-action="ReportPost" asp-route-id="@Model.Id">Report abuse</a>
-        </p>
-        @if (User.Identity.IsAuthenticated && 
-            (Model.AuthorId == _account.User.Id || 
-              User.IsInRole("Administrator") || 
-              User.IsInRole("Moderator")))
-        {
+        <div class="col-md-2 text-right">
             <p>
-                <a class="btn btn-sm btn-warning" asp-action="EditPost" asp-route-id="@Model.Id">Edit</a>
+                <a class="btn btn-sm btn-info" asp-action="ReportPost" asp-route-id="@Model.Id">Report abuse</a>
             </p>
-            <p>
-                <a class="btn btn-sm btn-danger" asp-action="DeletePost" asp-route-id="@Model.Id">Delete</a>
-            </p>
-        }
+            @if (User.Identity.IsAuthenticated &&
+             (Model.AuthorId == _account.User.Id ||
+               User.IsInRole("Administrator") ||
+               User.IsInRole("Moderator")))
+            {
+                <p>
+                    <a class="btn btn-sm btn-warning" asp-action="EditPost" asp-route-id="@Model.Id">Edit</a>
+                </p>
+                <p>
+                    <a class="btn btn-sm btn-danger" asp-action="DeletePost" asp-route-id="@Model.Id">Delete</a>
+                </p>
+            }
+        </div>
     </div>
+    <hr />
+    <div class="post-content m-b-md">
+        @Html.Raw(Model.Signature)
+    </div>
+    <p class="no-margin">
+        <span class="m-r-sm"><i class="fa fa-user"></i> @(Model.Author.DisplayName.IsSet() ? Model.Author.DisplayName : "Anonymous")</span>
+        <span><i class="fa fa-clock-o"></i> @Model.PostedTime.ToLongDateString() at @Model.PostedTime.ToShortTimeString()</span>
+    </p>
 </div>
-<hr />

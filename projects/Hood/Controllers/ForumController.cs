@@ -226,6 +226,7 @@ namespace Hood.Areas.Controllers
                         .Include(f => f.Forum)
                         .SingleOrDefaultAsync(f => f.Id == model.TopicId);
 
+
             if (model == null || model.Topic == null || model.Topic.Forum == null)
                 return NotFound();
 
@@ -235,19 +236,30 @@ namespace Hood.Areas.Controllers
             if (!model.Topic.Forum.Public && !User.Identity.IsAuthenticated)
                 return View("NotAuthorized", model);
 
-            IQueryable<Post> topics = _db.Posts
+            IQueryable<Post> posts = _db.Posts
                 .Include(p => p.Author)
                 .Include(p => p.Topic).ThenInclude(t => t.Forum)
                 .Where(p => p.TopicId == model.TopicId);
 
-            if (!string.IsNullOrEmpty(model.Search))
+            if (model.HighlightId.HasValue)
             {
-                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                topics = topics.Where(t => searchTerms.Any(s => t.Body != null && t.Body.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => t.AuthorDisplayName != null && t.AuthorDisplayName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+                // page number needs to be set from the highlight. F*** the set pagenumber.
+                int index = posts.Select(p => p.Id).ToList().FindIndex(p => p == model.HighlightId.Value);
+                model.PageIndex = 1 + (index / model.PageSize);
+            }
+            else
+            {
+                // process list as normal
+                if (!string.IsNullOrEmpty(model.Search))
+                {
+                    string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    posts = posts.Where(t => searchTerms.Any(s => t.Body != null && t.Body.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                          || searchTerms.Any(s => t.AuthorDisplayName != null && t.AuthorDisplayName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+                }
+
             }
 
-            await model.ReloadAsync(topics);
+            await model.ReloadAsync(posts);
 
             model.AddForumMessage(message);
             return View("ShowTopic", model);
@@ -415,7 +427,7 @@ namespace Hood.Areas.Controllers
 
                 await _db.SaveChangesAsync();
 
-                return RedirectToAction(nameof(ForumController.Topics), 
+                return RedirectToAction(nameof(ForumController.Topics),
                     new
                     {
                         slug = topic.Forum.Slug,
@@ -475,7 +487,7 @@ namespace Hood.Areas.Controllers
                 message.AddDiv("<hr /><br />");
                 message.AddParagraph("Click below to view the post on the forum:");
                 var url = Url.AbsoluteAction("ShowTopic", "Forum", new { slug = post.Topic.Forum.Slug, title = post.Topic.Title.ToSeoUrl(), id = post.TopicId });
-                message.AddCallToAction("View reported post", string.Format("{0}#post-{1}", url, post.Id), "#f39c12", "center");
+                message.AddCallToAction("View reported post", string.Format("{0}?highlight={1}", url, post.Id), "#f39c12", "center");
 
                 if (_environment.IsDevelopment() || _environment.IsStaging())
                 {

@@ -2,7 +2,6 @@
 @inject ForumCategoryCache _categories
 @{
     ViewBag.Title = "Manage Forums";
-    var categories = _categories.TopLevel();
 }
 @section buttons {
     <a class="btn btn-info btn-sm" href="/forums/" target="_blank">
@@ -53,7 +52,7 @@
                         <div class="col-md-4">
                             <select class="form-control submit-on-change" asp-for="Category" name="category" data-selected="@Model.Category">
                                 <option value="">Show All</option>
-                                @Html.CategorySelectOptions(categories, Model.Category, true)
+                                @_categories.CategorySelectOptions(_categories.TopLevel(), Model.Category, true)
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -213,7 +212,7 @@
                                 <div>
                                     <select class="form-control" id="Add-ParentCategoryId" name="ParentCategoryId">
                                         <option>No Parent</option>
-                                        @Html.CategorySelectOptions(categories, "")
+                                        @_categories.CategorySelectOptions(_categories.TopLevel(), "")
                                     </select>
                                 </div>
                             </div>
