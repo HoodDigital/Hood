@@ -364,7 +364,16 @@ $.hood.App = {
                 $post = $('#post-' + highlight);
                 $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.scrollOffset }, 'slow');
                 $post.addClass('highlight');
+                if ($.getUrlVars()['message'] === "Created")
+                    $post.addClass('created');
             }
+
+            var reply = $.getUrlVars()['reply'];
+            if ($.isNumeric(reply)) {
+                $post = $('#forum-post-form');
+                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.scrollOffset }, 'slow');
+            }
+            
         }
     },
     ResizeVideos: function () {

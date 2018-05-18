@@ -241,6 +241,19 @@ namespace Hood.Areas.Controllers
                 .Include(p => p.Topic).ThenInclude(t => t.Forum)
                 .Where(p => p.TopicId == model.TopicId);
 
+            // Prep for input.
+            model.Post = new Post();
+
+            if (model.ReplyId.HasValue)
+            {
+                model.Post.Reply = await posts.SingleOrDefaultAsync(p => p.Id == model.ReplyId.Value);
+                if (model.Post.Reply != null)
+                {
+                    model.Post.ReplyId = model.ReplyId;
+                    model.Post.Body = string.Format("<blockquote>{0}</blockquote><p></p>", model.Post.Reply.Body);
+                }
+            }
+
             if (model.HighlightId.HasValue)
             {
                 // page number needs to be set from the highlight. F*** the set pagenumber.
@@ -268,10 +281,17 @@ namespace Hood.Areas.Controllers
         [HttpPost]
         [Authorize]
         [Route("forum/{slug}/{id}/{title}/")]
-        public async Task<IActionResult> AddPost(PostModel model)
+        public async Task<IActionResult> AddPost(PostModel model, ForumMessage? message)
         {
             try
             {
+                if (message.HasValue && message == ForumMessage.Created)
+                {
+                    model.MessageType = AlertType.Warning;
+                    model.SaveMessage = "Looks like you pressed refresh, but this will cause your post to be submitted again, if you wish to edit your post, simply click the edit button.";
+                    return await ShowTopic(model, null);
+                }
+
                 model.Topic = await _db.Topics
                          .Include(f => f.Author)
                          .Include(f => f.Forum)
@@ -321,7 +341,6 @@ namespace Hood.Areas.Controllers
                 model.Topic.Forum.LastUserName = user.UserName;
                 model.Topic.Forum.LastUserDisplayName = user.FullName;
 
-
                 model.Topic.LastPosted = DateTime.Now;
                 model.Topic.LastPostId = model.Post.Id;
                 model.Topic.LastUserId = user.Id;
@@ -333,14 +352,23 @@ namespace Hood.Areas.Controllers
                 model.Topic.NumPosts = await _db.Posts.CountAsync(f => f.TopicId == model.TopicId);
 
                 await _db.SaveChangesAsync();
+
+                // Highlight the post we just created, so it is shown on load.#
+                return RedirectToAction(nameof(ForumController.ShowTopic), new
+                {
+                    id = model.Topic.Id,
+                    slug = model.Topic.Forum.Slug,
+                    title = model.Topic.Title.ToSeoUrl(),
+                    message = ForumMessage.Created,
+                    highlight = model.Post.Id
+                });
             }
             catch (Exception ex)
             {
                 model.MessageType = AlertType.Danger;
                 model.SaveMessage = "An error occured while adding your message: " + ex.Message;
+                return await ShowTopic(model, null);
             }
-
-            return await ShowTopic(model, ForumMessage.Created);
         }
 
         #endregion

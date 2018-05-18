@@ -12214,8 +12214,12 @@ body {
   margin-bottom: 21px;
 }
 .forum-post.highlight {
-  background-color: rgba(240, 173, 78, 0.5);
+  background-color: rgba(240, 173, 78, 0.25);
   border: 1px solid #f0ad4e;
+}
+.forum-post.created {
+  background-color: rgba(92, 184, 92, 0.25);
+  border: 1px solid #5cb85c;
 }
 
 /*# sourceMappingURL=app.css.map */

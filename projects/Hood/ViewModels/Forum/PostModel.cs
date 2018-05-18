@@ -19,9 +19,11 @@ namespace Hood.Models
         [FromRoute(Name = "title")]
         public string Title { get; set; }
         [FromQuery(Name = "highlight")]
-        public int? HighlightId { get; set; }
+        public long? HighlightId { get; set; }
         [FromQuery(Name = "edit")]
-        public int? EditId { get; set; }
+        public long? EditId { get; set; }
+        [FromQuery(Name = "reply")]
+        public long? ReplyId { get; set; }
 
         public Post Post { get; set; }
 
@@ -37,8 +39,6 @@ namespace Hood.Models
             var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
             query += Search.IsSet() ? "&search=" + Search : "";
             query += Order.IsSet() ? "&sort=" + Order : "";
-            query += HighlightId.HasValue ? "&highlight=" + HighlightId.Value : "";
-            query += EditId.HasValue ? "&edit=" + EditId.Value : "";
             return query;
         }
 
