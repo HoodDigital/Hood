@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.BaseTypes
 {
-    public abstract class SaveableModel : ISaveableModel
+    public class SaveableModel : ISaveableModel
     {
         [NotMapped]
         public string SaveMessage { get; set; }
@@ -48,6 +48,10 @@ namespace Hood.BaseTypes
                     case EditorMessage.Deleted:
                         MessageType = AlertType.Warning;
                         SaveMessage = "Deleted successfully.";
+                        break;
+                    case EditorMessage.CannotDeleteAdmin:
+                        MessageType = AlertType.Danger;
+                        SaveMessage = "Administrators cannot be deleted. Please remove this account from the Admin or SuperUser roles before deleting.";
                         break;
                     case EditorMessage.ImageUpdated:
                         MessageType = AlertType.Success;

@@ -22,7 +22,7 @@ namespace Hood.Services
                 Currency = currency,                 // "usd" only supported right now
                 Interval = interval,                 // "month" or "year"
                 IntervalCount = intervalCount,       // optional
-                Name = name,
+                Nickname = name,
                 TrialPeriodDays = trialPeriodDays   // amount of time that will lapse before the customer is billed
             };
             myPlan.Metadata.Add("Colour", colour);

@@ -5,7 +5,7 @@
 
 @inject IContentRepository _content
 @{
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     SeoSettings _seoSettings = _settings.GetSeo();
     string description = "Sign up - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
     string title = "Sign up - " + _basicSettings.CompanyName;
@@ -58,6 +58,12 @@
             <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password..." />
         </div>
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <input asp-for="Consent" class="styled" type="checkbox" />
+            <label for="Consent">In order to register, we require your consent to store data relating to your account. For more information please read our <a href="/privacy">Privacy Policy</a>.</label>
+        </div>
     </div>
     <div class="row">
         <div class="col-xs-12 text-center">

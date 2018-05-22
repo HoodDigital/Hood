@@ -27,16 +27,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.8.0" />
+    <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="MailChimp.Net.V3" Version="3.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="linqtotwitter" Version="5.0.0-beta2" />
-    <PackageReference Include="Stripe.net" Version="11.7.1" />
+    <PackageReference Include="Stripe.net" Version="16.1.0" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
     <PackageReference Include="Geocoding.Core" Version="4.0.1" />
     <PackageReference Include="Geocoding.Google" Version="4.0.1" />
-    <PackageReference Include="BundlerMinifier.Core" Version="2.7.385" />
+    <PackageReference Include="BundlerMinifier.Core" Version="2.8.391" />
     <PackageReference Include="Sendgrid" Version="9.9.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.1.1" />
   </ItemGroup>
@@ -114,6 +114,8 @@
     <None Remove="Views\Forum\Partials\_Topics_Sidebar.cshtml" />
     <None Remove="Views\Forum\ShowTopic.cshtml" />
     <None Remove="Views\Forum\Topics.cshtml" />
+    <None Remove="Views\Manage\Delete.cshtml" />
+    <None Remove="Views\Manage\Deleted.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

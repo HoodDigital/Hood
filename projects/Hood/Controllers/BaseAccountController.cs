@@ -250,6 +250,12 @@ namespace Hood.Controllers
                 return NotFound();
 
             ViewData["ReturnUrl"] = returnUrl;
+
+            if (model.Consent)
+            {
+                ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process");
+            }
+
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Username.IsSet() ? model.Username : model.Email, Email = model.Email };

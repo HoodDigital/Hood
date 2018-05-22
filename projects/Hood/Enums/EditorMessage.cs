@@ -16,6 +16,7 @@
         ErrorSending,
         NotFound,
         ErrorDuplicating,
-        Duplicated
+        Duplicated,
+        CannotDeleteAdmin
     }
 }
