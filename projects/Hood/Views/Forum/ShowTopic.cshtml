@@ -7,7 +7,7 @@
     ViewData["SubTitle"] = Model.Topic.Forum.Description;
     ViewData["EditUrl"] = Url.Action("Edit", "Forum", new { area = "Admin", id = Model.Topic.Forum.Id });
     ViewData["Forum"] = Model.Topic.Forum;
-    Layout = "_Blank";
+    Layout = "_ForumLayout";
 
     string url = Context.GetSiteUrl(true, true);
     if (_seoSettings.CanonicalUrl.IsSet())

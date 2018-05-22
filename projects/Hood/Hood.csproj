@@ -114,6 +114,7 @@
     <None Remove="Views\Forum\Partials\_Topics_Sidebar.cshtml" />
     <None Remove="Views\Forum\ShowTopic.cshtml" />
     <None Remove="Views\Forum\Topics.cshtml" />
+    <None Remove="Views\Layouts\_ForumLayout.cshtml" />
     <None Remove="Views\Manage\Delete.cshtml" />
     <None Remove="Views\Manage\Deleted.cshtml" />
   </ItemGroup>

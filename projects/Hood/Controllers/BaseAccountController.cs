@@ -251,7 +251,7 @@ namespace Hood.Controllers
 
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (model.Consent)
+            if (!model.Consent)
             {
                 ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process");
             }
