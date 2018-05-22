@@ -17,7 +17,8 @@ $.hood.Google = {
                 title: $(this).data('marker')
             });
 
-            $(window).resize(function () {
+            $(window).on('resize', function () {
+
                 google.maps.event.trigger(map, 'resize');
             });
             google.maps.event.trigger(map, 'resize');

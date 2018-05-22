@@ -61,6 +61,30 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Views\Forum\Index.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forms_Post.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forms_Topic.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forums_Categories.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forums_NoResults.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forums_Recent.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forums_Search.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Forums_Sidebar.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Posts_NoResults.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Posts_Recent.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Posts_Search.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Posts_Sidebar.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Template_Forum.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Template_Post.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Template_Topic.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Topics_NoResults.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Topics_Recent.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Topics_Search.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Partials\_Topics_Sidebar.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\ShowTopic.cshtml" />
+    <EmbeddedResource Remove="Views\Forum\Topics.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Areas\Admin\Views\Forum\CategoryList.cshtml" />
     <None Remove="Areas\Admin\Views\Forum\Create.cshtml" />
     <None Remove="Areas\Admin\Views\Forum\Edit.cshtml" />
@@ -69,6 +93,93 @@
     <None Remove="Areas\Admin\Views\Forum\_Editor_Info.cshtml" />
     <None Remove="Areas\Admin\Views\Forum\_Field_Images.cshtml" />
     <None Remove="Areas\Admin\Views\Users\SyncToMailchimp.cshtml" />
+    <None Remove="Views\Forum\Index.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forms_Post.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forms_Topic.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forums_Categories.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forums_NoResults.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forums_Recent.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forums_Search.cshtml" />
+    <None Remove="Views\Forum\Partials\_Forums_Sidebar.cshtml" />
+    <None Remove="Views\Forum\Partials\_Posts_NoResults.cshtml" />
+    <None Remove="Views\Forum\Partials\_Posts_Recent.cshtml" />
+    <None Remove="Views\Forum\Partials\_Posts_Search.cshtml" />
+    <None Remove="Views\Forum\Partials\_Posts_Sidebar.cshtml" />
+    <None Remove="Views\Forum\Partials\_Template_Forum.cshtml" />
+    <None Remove="Views\Forum\Partials\_Template_Post.cshtml" />
+    <None Remove="Views\Forum\Partials\_Template_Topic.cshtml" />
+    <None Remove="Views\Forum\Partials\_Topics_NoResults.cshtml" />
+    <None Remove="Views\Forum\Partials\_Topics_Recent.cshtml" />
+    <None Remove="Views\Forum\Partials\_Topics_Search.cshtml" />
+    <None Remove="Views\Forum\Partials\_Topics_Sidebar.cshtml" />
+    <None Remove="Views\Forum\ShowTopic.cshtml" />
+    <None Remove="Views\Forum\Topics.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\Forum\Index.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forms_Post.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forms_Topic.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forums_Categories.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forums_NoResults.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forums_Recent.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forums_Search.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Forums_Sidebar.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Posts_NoResults.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Posts_Recent.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Posts_Search.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Posts_Sidebar.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Template_Forum.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Template_Post.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Template_Topic.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Topics_NoResults.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Topics_Recent.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Topics_Search.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Partials\_Topics_Sidebar.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\ShowTopic.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\Forum\Topics.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

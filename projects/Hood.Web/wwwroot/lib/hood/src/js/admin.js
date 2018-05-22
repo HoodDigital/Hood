@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+﻿$(document).on('ready', function () {
 
     if ($(this).width() < 769) {
         $('body').addClass('body-small')
@@ -131,7 +131,7 @@
         .popover();
 });
 
-$(document).ready(function () {
+$(document).on('ready', function () {
     if (localStorageSupport) {
 
         var collapse = localStorage.getItem("collapse_menu");
@@ -242,7 +242,7 @@ function Resize() {
         });
     }
 }
-$(window).resize(Resize);
+$(window).on('resize', Resize);
 Resize();
 
 if (!$.hood)
@@ -343,7 +343,7 @@ $.hood.Admin = {
 
     },
 };
-$(window).load(function () {
+$(window).on('load', function () {
     $.hood.Admin.Init();
 });
 

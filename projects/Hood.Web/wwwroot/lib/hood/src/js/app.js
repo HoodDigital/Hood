@@ -32,7 +32,8 @@ $.window = $(window),
 var windowWidth = $.window.width()
 
 if (!$.hood)
-    $.hood = {}
+    $.hood = {};
+
 $.hood.App = {
     Options: {
         scrollOffset: 64,
@@ -60,7 +61,7 @@ $.hood.App = {
         Uploaders: true,
         PaymentPages: true,
         Header: true,
-        RichTextEditors: true,
+        RichTextEditors: $('.tinymce-public').length,
         LoadSharers: $('#share').length,
         SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"]
     },
@@ -373,7 +374,7 @@ $.hood.App = {
                 $post = $('#forum-post-form');
                 $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.scrollOffset }, 'slow');
             }
-            
+
         }
     },
     ResizeVideos: function () {

@@ -2,27 +2,24 @@
 @{
     IntegrationSettings _plugins = _settings.GetIntegrationSettings();
 }
-<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+<script src="//code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/waypoints/2.0.3/waypoints.min.js"></script>
+<script src="//unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="~/lib/kendo-ui-core/js/kendo.ui.core.min.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js" asp-append-version="true"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
 <script src="~/lib/hammer.js/hammer.js"></script>
-<script src="~/lib/bootstrap-touch-carousel/dist/js/bootstrap-touch-carousel.js"></script>
 <script src="~/lib/metisMenu/dist/metisMenu.js"></script>
 <script src="~/lib/slimscroll/jquery.slimscroll.min.js"></script>
 <script src="~/lib/dropzone/dist/min/dropzone.min.js"></script>
 <script src="~/lib/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
 <script src="~/lib/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
-<script src="~/lib/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <script src="~/lib/tinymce/tinymce.min.js"></script>
 <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
-<script src="~/lib/sweetalert/dist/sweetalert.min.js"></script>
-<script src="~/lib/javascript-auto-complete/auto-complete.min.js"></script>
-<script src="~/lib/typeahead.js/dist/typeahead.bundle.min.js"></script>
 <script src="~/lib/chart.js/dist/Chart.bundle.min.js"></script>
 <script src="~/lib/counter-up/jquery.counterup.min.js"></script>
+<script src="~/lib/selectize/dist/js/standalone/selectize.min.js"></script>
 <environment names="Development,Staging,ErrorTesting">
     <script src="~/lib/hood/src/js/includes/globals.js"></script>
     <script src="~/lib/hood/src/js/includes/stringhelpers.js"></script>
@@ -51,7 +48,7 @@
 <environment names="Production,PreProduction">
     @if (_settings.GetIntegrationSettings().UseCDN)
     {
-        <script src="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/js/admin.packaged.js", _settings.GetVersion())"></script>
+        <script src="@string.Format("//hood.azureedge.net/cdn/{0}/dist/js/admin.packaged.js", _settings.GetVersion())"></script>
     }
     else
     {
@@ -60,5 +57,5 @@
 </environment>
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {
-    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
+    <script async defer src="@string.Format("//maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
 }

@@ -553,7 +553,7 @@ $.hood.Content = {
         }
     }
 }
-$(window).load(function () {
+$(window).on('load', function () {
     $.hood.Content.Init();
 });
 

@@ -307,7 +307,7 @@ $.hood.Forum = {
         }
     }
 }
-$(window).load(function () {
+$(window).on('load', function () {
     $.hood.Forum.Init();
 });
 
