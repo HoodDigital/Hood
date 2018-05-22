@@ -177,9 +177,9 @@ $.hood.App = {
             var headerOffset = 0;
             if ($.header.length > 0) { headerOffset = $.header.offset().top; }
             header = $.header.height();
-            window = $.window.height() + (2 * header);
+            win = $.window.height() + (2 * header);
             doc = $(document).height();
-            if ($.window.scrollTop() > headerOffset && doc > window) {
+            if ($.window.scrollTop() > headerOffset && doc > win) {
                 $.header.addClass(stickyHeaderClass);
             } else {
                 $.hood.App.Header.RemoveStickyness();
