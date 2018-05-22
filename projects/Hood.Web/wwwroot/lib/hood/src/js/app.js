@@ -174,14 +174,12 @@ $.hood.App = {
             $.hood.App.Header.Logo();
         },
         StickyMenu: function () {
-            var headerOffset = 0,
-                headerWrapOffset = 0,
-                pageMenuOffset = 0;
-
+            var headerOffset = 0;
             if ($.header.length > 0) { headerOffset = $.header.offset().top; }
-            if ($.header.length > 0) { headerWrapOffset = $.headerWrap.offset().top; }
-
-            if ($.window.scrollTop() > headerOffset) {
+            header = $.header.height();
+            window = $.window.height() + (2 * header);
+            doc = $(document).height();
+            if ($.window.scrollTop() > headerOffset && doc > window) {
                 $.header.addClass(stickyHeaderClass);
             } else {
                 $.hood.App.Header.RemoveStickyness();
