@@ -56,6 +56,6 @@ $.hood.Site = {
 }
 
 // Initialise $.hood.App
-$(document).on('ready', $.hood.Site.Ready);
+$($.hood.Site.Ready);
 $(window).on('load', $.hood.Site.Load);
 $(window).on('resize', $.hood.Site.Resize);

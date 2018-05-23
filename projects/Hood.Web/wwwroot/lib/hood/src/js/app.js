@@ -563,7 +563,7 @@ $.hood.App = {
     }
 };
 if ($.hood.Site && $.hood.Site.Init());
-$(window).resize($.hood.App.Resize);
+$(window).on('resize', $.hood.App.Resize);
 var googleRecaptchaCallback = function (token) {
     $.hood.App.ContactForms.Submit($('#g-recaptcha').data('target'));
 }
