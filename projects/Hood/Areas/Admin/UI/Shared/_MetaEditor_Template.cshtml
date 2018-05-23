@@ -1,6 +1,6 @@
 @model IMetadata
 @{
-    string name = Model.Name.Split('.')[Model.Name.Split('.').Length - 2];
+    string name = Model.Name.Split('.')[Model.Name.Split('.').Length - 2].Replace("-", " ").ToTitleCase();
     string type = Model.Name.Split('.')[Model.Name.Split('.').Length - 1];
     var _mediaSettings = _settings.GetMediaSettings();
 }
@@ -8,7 +8,7 @@
     <label for="@string.Format("Meta:{0}", Model.Name)" class="col-sm-3 control-label">
         @name.ToSentenceCase().ToTitleCase()<br /><em class="text-muted">@type.ToSentenceCase()</em>
     </label>
-    <div class="col-sm-9">
+    <div class="col-sm-8">
         @switch (type)
         {
 
