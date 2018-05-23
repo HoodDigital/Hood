@@ -83,7 +83,7 @@ namespace Hood.Filters
 
                 // Subscription required stuff
                 var subscriptionsEnabled = _settings.SubscriptionsEnabled();
-                if (!subscriptionsEnabled.Succeeded)
+                if ((_forum.PostingRequiresSubscription || _forum.ViewingRequiresSubscription) && !subscriptionsEnabled.Succeeded)
                 {
                     throw new Exception(subscriptionsEnabled.ErrorString);
                 }
