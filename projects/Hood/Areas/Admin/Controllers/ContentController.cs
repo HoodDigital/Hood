@@ -825,7 +825,7 @@ namespace Hood.Areas.Admin.Controllers
             Dictionary<string, string> templates = new Dictionary<string, string>();
 
             // Add the base templates:
-            var files = EmbeddedFiles.GetFiles("~/Views/" + templateDirectory + "/");
+            var files = EmbeddedFiles.GetFiles("~/UI/" + templateDirectory + "/");
             foreach (var temp in files)
             {
                 if (temp.EndsWith(".cshtml"))

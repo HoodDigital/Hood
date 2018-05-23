@@ -1,0 +1,35 @@
+@{
+    Layout = "_Layout";
+    Content currentContent = ViewData["Content"] as Content;
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section includes {
+    @RenderSection("includes", required: false)
+}
+@section scripts {
+    @RenderSection("scripts", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<div class="jumbotron">
+    <div class="container">
+        <h1>Local template: @ViewData["Title"]</h1>
+        @if (currentContent != null)
+        {
+            <p>@currentContent.Excerpt</p>
+        }
+        else
+        {
+            <p>@ViewData["SubTitle"]</p>
+        }
+    </div>
+</div>
+<section class="container">
+    @RenderBody()
+</section>
+
+
+
