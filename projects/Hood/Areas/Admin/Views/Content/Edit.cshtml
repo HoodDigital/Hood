@@ -43,24 +43,21 @@
             <input type="hidden" id="Views" name="Views" value="@Model.Content.Views" />
             <div class="row">
                 <div class="col-md-8">
-                    @switch (Model.ContentType.BaseName)
-                    {
-                        case "Product":
-                            await Html.RenderPartialAsync("_Edit_Product");
-                            break;
-                        case "Page":
-                            await Html.RenderPartialAsync("_Edit_Page");
-                            break;
-                        case "Slider":
-                            await Html.RenderPartialAsync("_Edit_Slider");
-                            break;
-                        case "Team":
-                            await Html.RenderPartialAsync("_Edit_Team");
-                            break;
-                        default:
-                            await Html.RenderPartialAsync("_Edit_Default");
-                            break;
-                    }
+                    <div class="tabs-container m-b-lg">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> Basics</a></li>
+                            @{await Html.RenderPartialAsync("_Editor_Meta_Tabs"); }
+                        </ul>
+                        <div class="tab-content">
+                            <div id="info" class="tab-pane active">
+                                <div class="panel-body">
+                                    @{await Html.RenderPartialAsync("_Editor_Titles"); }
+                                </div>
+                            </div>
+                            @{await Html.RenderPartialAsync("_Editor_Meta_TabContent"); }
+                        </div>
+                    </div>
+                    @{await Html.RenderPartialAsync("_Editor_Body"); }
                 </div>
                 <div class="col-md-4">
                     <div class="panel-body">
@@ -183,10 +180,4 @@
             </div>
         </form>
     </div>
-    @if (Model.ContentType.ShowPreview)
-    {
-        <div role="tabpanel" class="tab-pane" id="designer">
-            @{ await Html.RenderPartialAsync("_Designer"); }
-        </div>
-    }
 </div>

@@ -518,7 +518,7 @@ namespace Hood.Areas.Admin.Controllers
                 if (result.Succeeded)
                 {
                     var response = new Response(true, "Archived successfully.");
-                    response.Url = Url.Action("Index", new { type= content.ContentType, message = EditorMessage.Archived });
+                    response.Url = Url.Action("Index", new { type = content.ContentType, message = EditorMessage.Archived });
                     return response;
                 }
                 else
@@ -822,32 +822,47 @@ namespace Hood.Areas.Admin.Controllers
 
         protected EditContentModel GetTemplates(EditContentModel model, string templateDirectory)
         {
-            string[] templateDirs = {
-                    _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
-                    _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
-                };
-            List<string> templates = new List<string>();
+            Dictionary<string, string> templates = new Dictionary<string, string>();
 
             // Add the base templates:
-            foreach (string temp in EmbeddedFiles.GetFiles("~/Views/" + templateDirectory + "/"))
+            var files = EmbeddedFiles.GetFiles("~/Views/" + templateDirectory + "/");
+            foreach (var temp in files)
             {
                 if (temp.EndsWith(".cshtml"))
-                    templates.Add(Path.GetFileNameWithoutExtension(temp).TrimStart('_'));
+                {
+                    var key = Path.GetFileNameWithoutExtension(temp);
+                    var value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
+                    if (!templates.ContainsKey(key))
+                        templates.Add(key, value);
+                }
             }
+
+            string[] templateDirs = {
+                _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
+                _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
+            };
 
             foreach (string str in templateDirs)
             {
                 try
                 {
-                    foreach (string temp in Directory.GetFiles(str))
+                    files = Directory.GetFiles(str);
+                    foreach (var temp in files)
                     {
                         if (temp.EndsWith(".cshtml"))
-                            templates.Add(Path.GetFileNameWithoutExtension(temp).TrimStart('_'));
+                        {
+                            var key = Path.GetFileNameWithoutExtension(temp);
+                            var value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
+                            if (!templates.ContainsKey(key)) 
+                                templates.Add(key, value);
+                        }
                     }
                 }
                 catch { }
             }
-            model.Templates = templates.Distinct().OrderBy(s => s).ToList();
+
+            model.Templates = templates.Distinct().OrderBy(s => s.Key).ToDictionary(t => t.Key, t => t.Value);
+
             return model;
         }
 

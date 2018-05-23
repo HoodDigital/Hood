@@ -1,27 +1,29 @@
 @model EditContentModel
-@if (Model.ContentType.ShowEditor)
+<h4>Content Body</h4>
+<p>This is the main content, and you can edit it with the following rich text editor:</p>
+@if (User.IsInRole("Admin"))
 {
-    if (User.IsInRole("Admin")){
-        switch (Model.ContentType.EditorType)
-        {
-            case "full":
-                <textarea id="Body" name="Body" class="tinymce-full-admin">@Model.Content.Body</textarea>
-                break;
-            case "simple":
-            default:
-                <textarea id="Body" name="Body" class="tinymce-simple-admin">@Model.Content.Body</textarea>
-                break;
-        }
-    } else {
-        switch (Model.ContentType.EditorType)
-        {
-            case "full":
-                <textarea id="Body" name="Body" class="tinymce-full">@Model.Content.Body</textarea>
-                break;
-            case "simple":
-            default:
-                <textarea id="Body" name="Body" class="tinymce-simple">@Model.Content.Body</textarea>
-                break;
-        }
+    switch (Model.ContentType.EditorType)
+    {
+        case "full":
+            <textarea id="Body" name="Body" class="tinymce-full-admin">@Model.Content.Body</textarea>
+            break;
+        case "simple":
+        default:
+            <textarea id="Body" name="Body" class="tinymce-simple-admin">@Model.Content.Body</textarea>
+            break;
+    }
+}
+else
+{
+    switch (Model.ContentType.EditorType)
+    {
+        case "full":
+            <textarea id="Body" name="Body" class="tinymce-full">@Model.Content.Body</textarea>
+            break;
+        case "simple":
+        default:
+            <textarea id="Body" name="Body" class="tinymce-simple">@Model.Content.Body</textarea>
+            break;
     }
 }

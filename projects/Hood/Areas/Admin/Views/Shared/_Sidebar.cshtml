@@ -3,6 +3,7 @@
 @{
     AccountInfo account = Context.GetAccountInfo();
     BasicSettings _basicSettings = _settings.GetBasicSettings();
+    ForumSettings _forumSettings = _settings.GetForumSettings();
     Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
     Layout = null;
     PropertySettings _propertySettings = _settings.GetPropertySettings();
@@ -86,17 +87,19 @@
                     }
                 </ul>
             </li>
-
-            <li class="">
-                <a><i class="fa fa-comments"></i><span class="nav-label">Forums</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse" style="height: 0px;">
-                    <li>
-                        <a asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
-                            <i class="fa fa-cogs"></i>Manage Forums
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            @if (_forumSettings.Enabled)
+            {
+                <li class="">
+                    <a><i class="fa fa-comments"></i><span class="nav-label">Forums</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse" style="height: 0px;">
+                        <li>
+                            <a asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
+                                <i class="fa fa-cogs"></i>Manage Forums
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
             @if (subscriptions.Succeeded)
             {
                 <li class="">
@@ -229,6 +232,11 @@
                         <li>
                             <a asp-action="Content" asp-controller="Settings" asp-route-area="Admin">
                                 <i class="fa fa-tag"></i>Content Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Forum" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-comments"></i>Forum Settings
                             </a>
                         </li>
                         <li>

@@ -7,10 +7,10 @@
             if (Model.ContentType.ShowImage && cm.Name.Contains("Featured"))
             {
                 <div class="form-group">
-                    @if (cm.Name.Contains("Banner"))
+                    @if (cm.Name.Contains("Share"))
                     {
                         <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                            Banner Image @cm.Name.Replace("Settings.Image.Banner.", ""):
+                            Share Image @cm.Name.Replace("Settings.Image.Share.", ""):
                         </label>
                     }
                     else

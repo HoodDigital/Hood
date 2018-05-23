@@ -103,19 +103,10 @@ namespace Hood.Filters
                 // Load the account information from the global context (set in the global AccountFilter)
                 AccountInfo _account = context.HttpContext.GetAccountInfo();
 
-                // Set the redirect location
+                // Set the redirect result for no subscriptions and subscription upgrade required
                 BillingSettings billingSettings = _settings.GetBillingSettings();
-                IActionResult result = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-                if (billingSettings.SubscriptionCreatePage.IsSet())
-                {
-                    UriBuilder baseUri = new UriBuilder(context.HttpContext.GetSiteUrl() + billingSettings.SubscriptionCreatePage.TrimStart('/'));
-                    string queryToAppend = string.Format("returnUrl={0}", context.HttpContext.Request.Path.ToUriComponent());
-                    if (baseUri.Query != null && baseUri.Query.Length > 1)
-                        baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
-                    else
-                        baseUri.Query = queryToAppend;
-                    result = new RedirectResult(baseUri.ToString());
-                }
+                IActionResult result = billingSettings.GetNewSubscriptionUrl(context.HttpContext);
+                IActionResult changeResult = billingSettings.GetChangeSubscriptionUrl(context.HttpContext);
 
                 // Set the redirect location
                 IActionResult categoryResult = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent()});
@@ -132,18 +123,6 @@ namespace Hood.Filters
                     if (_categories.Count == 1)
                         baseUri.Query += "&category=" + _categories[0];
                     result = new RedirectResult(baseUri.ToString());
-                }
-
-                IActionResult changeResult = new RedirectToActionResult("Change", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-                if (billingSettings.SubscriptionUpgradePage.IsSet())
-                {
-                    UriBuilder baseUri = new UriBuilder(context.HttpContext.GetSiteUrl() + billingSettings.SubscriptionUpgradePage.TrimStart('/'));
-                    string queryToAppend = string.Format("returnUrl={0}", context.HttpContext.Request.Path.ToUriComponent());
-                    if (baseUri.Query != null && baseUri.Query.Length > 1)
-                        baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
-                    else
-                        baseUri.Query = queryToAppend;
-                    changeResult = new RedirectResult(baseUri.ToString());
                 }
 
                 // If an addon is required, this takes preference, and should be purchased to continue, as it may be a standalone addon required.

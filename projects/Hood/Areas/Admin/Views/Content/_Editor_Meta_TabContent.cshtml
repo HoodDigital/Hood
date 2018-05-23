@@ -1,12 +1,8 @@
 @model EditContentModel
-
-@if (Model.ContentType.BaseName != "Page" &&
-    Model.ContentType.BaseName != "Product" &&
-    Model.ContentType.BaseName != "Team" &&
-    Model.ContentType.BaseName != "Slider" &&
-    Model.Content.Metadata.Where(c => c.Name.ToLower().StartsWith("content." + Model.ContentType.BaseName.ToLower() + ".")).Count() > 0)
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.ContentType.BaseName + ".")).Count() > 0 || 
+    Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
 {
-    <div id="type" class="tab-pane">
+    <div id="type-settings" class="tab-pane">
         <div class="panel-body">
             @{await Html.RenderPartialAsync("_Editor_Type"); }
         </div>
@@ -14,7 +10,7 @@
 }
 @if (Model.ContentType.Gallery)
 {
-    <div id="media" class="tab-pane">
+    <div id="gallery" class="tab-pane">
         <div class="panel-body">
             @{await Html.RenderPartialAsync("_Editor_Media"); }
         </div>
@@ -22,34 +18,30 @@
 }
 @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
 {
-    <div id="seo" class="tab-pane">
+    <div id="seo-settings" class="tab-pane">
         <div class="panel-body">
             @{await Html.RenderPartialAsync("_Editor_SEO"); }
         </div>
     </div>
 }
-@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
-{
-    <div id="custom" class="tab-pane">
-        <div class="panel-body">
-            @{await Html.RenderPartialAsync("_Editor_CustomFields"); }
-        </div>
-    </div>
-}
 @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0 || Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
 {
-    <div id="settings" class="tab-pane">
+    <div id="image-settings" class="tab-pane">
         <div class="panel-body">
             @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0)
-            { await Html.RenderPartialAsync("_Editor_Settings.Image"); }
+            { await Html.RenderPartialAsync("_Editor_ImageSettings"); }
+        </div>
+    </div>
+    <div id="security-settings" class="tab-pane">
+        <div class="panel-body">
             @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
-            { await Html.RenderPartialAsync("_Editor_Settings.Security"); }
+            { await Html.RenderPartialAsync("_Editor_Security"); }
         </div>
     </div>
 }
 @if (Model.ContentType.Templates)
 {
-    <div id="template" class="tab-pane">
+    <div id="template-settings" class="tab-pane">
         <div class="panel-body">
             @{await Html.RenderPartialAsync("_Editor_Template"); }
         </div>

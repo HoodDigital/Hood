@@ -8,9 +8,9 @@
             </label>
             <div class="col-sm-8">
                 <select class="form-control" data-selected="@Model.Content.GetMeta("Settings.Template").GetStringValue()" id="Meta:Settings.Template" name="Meta:Settings.Template">
-                    @foreach (string template in Model.Templates)
+                    @foreach (var template in Model.Templates)
                     {
-                        <option value="@string.Format("_{0}", template)">@template</option>
+                        <option value="@template.Key">@template.Value</option>
                     }
                 </select>
                 <strong class="text-warning inline-block m-t-xs"><i class="fa fa-exclamation-triangle m-r-xs"></i>Be careful! Changing the template will reset all template settings!</strong>

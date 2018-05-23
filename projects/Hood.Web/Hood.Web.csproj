@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Templates\_Blank.cshtml" />
+    <Content Remove="Views\Templates\_Contact.cshtml" />
+    <Content Remove="Views\Templates\_Testing_Templates.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
   </ItemGroup>
   
@@ -14,6 +20,12 @@
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Views\Templates\_Blank.cshtml" />
+    <EmbeddedResource Include="Views\Templates\_Testing_Templates.cshtml" />
+    <EmbeddedResource Include="Views\Templates\_Contact.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -24,6 +24,7 @@ namespace Hood.Services
         AccountSettings GetAccountSettings(bool noCache = false);
         MediaSettings GetMediaSettings(bool noCache = false);
         MailSettings GetMailSettings(bool noCache = false);
+        ForumSettings GetForumSettings(bool noCache = false);
         SeoSettings GetSeo(bool noCache = false);
         OperationResult StripeEnabled();
         OperationResult PayPalEnabled();

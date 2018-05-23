@@ -1,17 +1,49 @@
 @model EditContentModel
-<h5>@Model.ContentType.BaseName Settings</h5>
-<div class="ibox-content">
-    <fieldset class="form-horizontal">
-        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.ToLower().StartsWith("content." + Model.ContentType.BaseName.ToLower() + ".")).OrderBy(cm => cm.Name))
-        {
-            <div class="form-group">
-                <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                    @cm.Name.ToLower().Replace("content." + Model.ContentType.BaseName.ToLower() + ".", "").ToSentenceCase().ToTitleCase():
-                </label>
-                <div class="col-sm-8">
-                    @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+@{
+    var typeFields = Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.ContentType.BaseName + "."));
+}
+@if (typeFields.Count() > 0)
+{
+    <h5>@Model.ContentType.BaseName Settings</h5>
+    <div class="ibox-content">
+        <fieldset class="form-horizontal">
+            @foreach (ContentMeta cm in typeFields.OrderBy(cm => cm.Name))
+            {
+                <div class="form-group">
+                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                        @cm.Name.Replace("Content." + Model.ContentType.BaseName + ".", "").ToSentenceCase().ToTitleCase():
+                    </label>
+                    <div class="col-sm-8">
+                        @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+                    </div>
                 </div>
-            </div>
-        }
-    </fieldset>
-</div>
+            }
+        </fieldset>
+    </div>
+}
+@{
+    var customFields = Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom."));
+}
+@if (customFields.Count() > 0 && typeFields.Count() > 0)
+{
+    <hr />
+}
+@if (customFields.Count() > 0)
+{
+    <h5>Custom Fields</h5>
+    <div class="ibox-content">
+        <fieldset class="form-horizontal">
+            @foreach (ContentMeta cm in customFields.OrderBy(cm => cm.Name))
+            {
+                <div class="form-group">
+                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                        @cm.Name.Replace("Custom.", "").ToSentenceCase():
+                    </label>
+                    <div class="col-sm-8">
+                        @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+                    </div>
+                </div>
+            }
+        </fieldset>
+    </div>
+}

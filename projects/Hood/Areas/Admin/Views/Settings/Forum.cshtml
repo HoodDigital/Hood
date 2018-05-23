@@ -1,0 +1,148 @@
+@model ForumSettings
+@{
+    ViewData["Title"] = "Forum Settings";
+    Layout = "_SettingsLayout";
+
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    Hood.Infrastructure.OperationResult subResult = _settings.SubscriptionsEnabled();
+    bool subsEnabled = subResult.Succeeded;
+}
+@section buttons {
+    <a asp-action="ResetForum" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
+@section description {
+    <p class="no-margin">
+        Settings for site's forums.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#forum">Forum Settings</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="forum" class="tab-pane active">
+            <div class="panel-body">
+                <h5>
+                    Forum Settings
+                </h5>
+                <p>
+                    Settings for site's forums.
+                </p>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="Enabled" class="styled">
+                        <label asp-for="Enabled"></label>
+                    </div>
+                </div>
+                <hr />
+                <h5>
+                    Viewing Settings
+                </h5>
+                <fieldset>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input asp-for="ViewingRequiresLogin" class="styled">
+                            <label asp-for="ViewingRequiresLogin"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input asp-for="ViewingRequiresSubscription" class="styled">
+                            <label asp-for="ViewingRequiresSubscription"></label>
+                        </div>
+                    </div>
+                    <div class="well well-sm">
+                        <div class="form-group no-margin">
+                            <label asp-for="ViewingSusbcriptions" class="col-sm-3 control-label">
+                                Allowed subscriptions:
+                            </label>
+                            <div class="col-sm-8">
+                                @if (subsEnabled && Model.Subscriptions.Count() > 0)
+                                {
+                                    List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingSusbcriptions.IsSet() ? Model.ViewingSusbcriptions : "[]");
+                                    <p class="m-t-xs">Select subscriptions that can view the forums. <em>If you select none, then then any subscription can (if subscriptions are required).</em></p>
+                                    <input class="form-control checkbox-values" type="hidden" asp-for="ViewingSusbcriptions" />
+                                    @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                                    {
+                                        <div class="checkbox">
+                                            @if (subs == null || !subs.Contains(sub.StripeId))
+                                            {
+                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="ViewingSusbcriptions" id="plan-@sub.StripeId.ToSeoUrl()" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="ViewingSusbcriptions" id="plan-@sub.StripeId.ToSeoUrl()" checked />
+                                            }
+                                            <label for="plan-@sub.StripeId.ToSeoUrl()">
+                                                @sub.Name
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                                }
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </fieldset>
+                <hr />
+                <h5>
+                    Posting Settings
+                </h5>
+                <fieldset>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input asp-for="PostingRequiresLogin" class="styled">
+                            <label asp-for="PostingRequiresLogin"></label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input asp-for="PostingRequiresSubscription" class="styled">
+                            <label asp-for="PostingRequiresSubscription"></label>
+                        </div>
+                    </div>
+                    <div class="well well-sm">
+                        <div class="form-group no-margin">
+                            <label asp-for="PostingSusbcriptions" class="col-sm-3 control-label">
+                                Allowed subscriptions:
+                            </label>
+                            <div class="col-sm-8">
+                                @if (subsEnabled && Model.Subscriptions.Count() > 0)
+                                {
+                                    List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.PostingSusbcriptions.IsSet() ? Model.PostingSusbcriptions : "[]");
+                                    <p class="m-t-xs">Select subscriptions that can post on the forums. <em>If you select none, then then any subscription can (if subscriptions are required).</em></p>
+                                    <input class="form-control checkbox-values" type="hidden" asp-for="PostingSusbcriptions" />
+                                    @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                                    {
+                                        <div class="checkbox">
+                                            @if (subs == null || !subs.Contains(sub.StripeId))
+                                            {
+                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingSusbcriptions" id="post-plan-@sub.StripeId.ToSeoUrl()" />
+                                            }
+                                            else
+                                            {
+                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingSusbcriptions" id="post-plan-@sub.StripeId.ToSeoUrl()" checked />
+                                            }
+                                            <label for="post-plan-@sub.StripeId.ToSeoUrl()">
+                                                @sub.Name
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                                }
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>

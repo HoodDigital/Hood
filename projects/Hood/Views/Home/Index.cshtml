@@ -1,6 +1,7 @@
 @{
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
-    SeoSettings _seoSettings = _settings.GetSeo();
+    var _basicSettings = _settings.GetBasicSettings();
+    var _integrations = _settings.GetIntegrationSettings();
+    var _seoSettings = _settings.GetSeo();
     string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
     string title = _basicSettings.CompanyName.IsSet() ? "Home - " + _basicSettings.CompanyName : _basicSettings.SiteTitle.IsSet() ? "Home - " + _basicSettings.SiteTitle : "Home";
     if (_seoSettings.Home != null)
@@ -23,7 +24,10 @@
     <meta name="twitter:description" content="@description" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
-<div class="bg-color-white">
-    <h3>Latest from our news & twitter</h3>
-    <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")"></div>
-</div>
+@if (_integrations.EnableTwitter)
+{
+    <div class="bg-color-white">
+        <h3>Latest from our news & twitter</h3>
+        <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")"></div>
+    </div>
+}

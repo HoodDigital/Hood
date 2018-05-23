@@ -4,6 +4,7 @@ using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
+using Hood.Filters;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -57,6 +58,7 @@ namespace Hood.Areas.Controllers
         #region "Forum Views"
 
         [Route("forums/")]
+        [ForumAuthorize(AccessRequired: ForumAccess.View)]
         public async Task<IActionResult> Index(ForumModel model, ForumMessage? message)
         {
             IQueryable<Forum> forums = _db.Forums
@@ -113,6 +115,7 @@ namespace Hood.Areas.Controllers
         }
 
         [Route("forum/{slug}")]
+        [ForumAuthorize(AccessRequired: ForumAccess.View)]
         public async Task<IActionResult> Topics(TopicModel model, ForumMessage? message)
         {
             if (model.Forum == null)
@@ -151,7 +154,7 @@ namespace Hood.Areas.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [ForumAuthorize(AccessRequired: ForumAccess.Post)]
         [Route("forum/{slug}")]
         public async Task<IActionResult> AddTopic(TopicModel model)
         {
@@ -218,6 +221,7 @@ namespace Hood.Areas.Controllers
         }
 
         [Route("forum/{slug}/{id}/{title}/")]
+        [ForumAuthorize(AccessRequired: ForumAccess.View)]
         public async Task<IActionResult> ShowTopic(PostModel model, ForumMessage? message)
         {
             if (model.Topic == null)
@@ -281,6 +285,7 @@ namespace Hood.Areas.Controllers
         [HttpPost]
         [Authorize]
         [Route("forum/{slug}/{id}/{title}/")]
+        [ForumAuthorize(AccessRequired: ForumAccess.Post)]
         public async Task<IActionResult> AddPost(PostModel model, ForumMessage? message)
         {
             try

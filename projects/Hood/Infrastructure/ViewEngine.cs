@@ -28,7 +28,7 @@ namespace Hood.Services
             temp.AddRange(GetLocations(""));
             temp.AddRange(GetLocations("/Core"));
             locs = temp.AsEnumerable();
-            context.Values["theme"] = theme;
+            context.Values["Hood.Settings.Theme"] = theme;
         }
 
         protected string[] GetLocations(string baseLocation)
