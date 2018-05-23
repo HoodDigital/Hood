@@ -50,18 +50,14 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
-    <EmbeddedResource Include="Views\**\*.cshtml" />
-    <EmbeddedResource Include="Views\**\*.json" />
+    <EmbeddedResource Include="UI\**\*.cshtml" />
+    <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <None Remove="node_modules\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Areas\Admin\Views\Settings\Forum.cshtml" />
   </ItemGroup>
 
 </Project>

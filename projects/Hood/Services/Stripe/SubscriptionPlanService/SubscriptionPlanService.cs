@@ -23,7 +23,11 @@ namespace Hood.Services
                 Interval = interval,                 // "month" or "year"
                 IntervalCount = intervalCount,       // optional
                 Nickname = name,
-                TrialPeriodDays = trialPeriodDays   // amount of time that will lapse before the customer is billed
+                TrialPeriodDays = trialPeriodDays,   // amount of time that will lapse before the customer is billed
+                Product = new StripePlanProductCreateOptions()
+                {
+                    Name = name
+                }
             };
             myPlan.Metadata.Add("Colour", colour);
             myPlan.Metadata.Add("Description", description);
