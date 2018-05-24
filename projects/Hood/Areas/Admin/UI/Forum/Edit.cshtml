@@ -32,7 +32,24 @@
     <div role="tabpanel" class="tab-pane active" id="editor">
         <form method="post" id="edit-forum" data-id="@Model.Id">
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="NumTopics" />
+            <input type="hidden" asp-for="NumPosts" />
+            <input type="hidden" asp-for="ModeratedPostCount" />
+            <input type="hidden" asp-for="CreatedOn" />
+            <input type="hidden" asp-for="CreatedBy" />
+            <input type="hidden" asp-for="LastEditedOn" />
+            <input type="hidden" asp-for="LastEditedBy" />
+            <input type="hidden" asp-for="LastPosted" />
+            <input type="hidden" asp-for="LastTopicId" />
+            <input type="hidden" asp-for="LastPostId" />
+            <input type="hidden" asp-for="LastUserId" />
+            <input type="hidden" asp-for="LastUserName" />
+            <input type="hidden" asp-for="LastUserDisplayName" />
+            <input type="hidden" asp-for="UserVars" />
+            <input type="hidden" asp-for="Notes" />
+            <input type="hidden" asp-for="SystemNotes" />
             <input type="hidden" asp-for="Views" />
+            <input type="hidden" asp-for="ShareCount" />
             <div class="row">
                 <div class="col-md-8">
                     <div class="tabs-container m-b-lg">
