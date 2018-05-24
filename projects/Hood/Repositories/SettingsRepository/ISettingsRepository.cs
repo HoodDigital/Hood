@@ -10,6 +10,7 @@ namespace Hood.Services
     public interface ISettingsRepository : IConfiguration
     {
         List<string> LockoutAccessCodes { get; }
+        string WysiwygEditorClass { get; }
 
         List<Option> AllSettings();
         bool Delete(string key);

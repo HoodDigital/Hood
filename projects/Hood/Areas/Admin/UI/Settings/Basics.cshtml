@@ -188,6 +188,17 @@
                 </p>
                 <hr />
                 <div class="form-group">
+                    <label class="control-label" asp-for="EditorType"></label>
+                    <div>
+                        <select asp-for="EditorType" class="form-control">
+                            <option value="full">Full</option>
+                            <option value="simple">Simple</option>
+                        </select>
+                        <small>Note: This determines the editors throughout the admin areas, on all content editors. Choose either full featured or simple, which will show bold, italic, and some basic formatting settings.</small>
+                    </div>
+                </div>
+                <hr />
+                <div class="form-group">
                     <label class="control-label" asp-for="Homepage"></label>
                     <div>
                         <select asp-for="Homepage" class="form-control">

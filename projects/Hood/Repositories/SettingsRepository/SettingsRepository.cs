@@ -517,6 +517,14 @@ namespace Hood.Services
         }
 
         public string ConnectionString { get { return _config.GetConnectionString("DefaultConnection"); } }
+
+        public string WysiwygEditorClass
+        {
+            get
+            {
+                return GetBasicSettings().EditorType == "simple" ? "tinymce-simple" : "tinymce-full";
+            }
+        }
     }
 
     public class SettingsRepositoryStub : ISettingsRepository
@@ -550,6 +558,8 @@ namespace Hood.Services
                 throw new NotImplementedException();
             }
         }
+
+        public string WysiwygEditorClass => "tinymce-simple";
 
         public List<Option> AllSettings()
         {
