@@ -5,7 +5,7 @@
   "authors": [
     "George Whysall"
   ],
-  "description": "The Hood CMS is a full content management system providing a solid backbone to any website.",
+  "description": "An ASP.NET Core 2 Content Management System.",
   "main": [
     "./dist/css/admin.min.css",
     "./dist/css/app.min.css",
@@ -57,5 +57,8 @@
     "tinymce": "4.7.13",
     "toastr": "2.1.3",
     "waypoints": "4.0.1"
+  },
+  "resolutions": {
+    "jquery": ">=1.7.1 <4.0.0"
   }
 }
