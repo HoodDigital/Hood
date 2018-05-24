@@ -36,11 +36,11 @@ if (!$.hood)
 
 $.hood.App = {
     Options: {
-        scrollOffset: 64,
         Scroll: {
             StickyHeader: true,
             InitialPosition: false,
             Functions: true,
+            Offset: 64,
             ToTargetSelector: ".scroll-to-target",
             ToTopSelector: '.scroll-top'
         },
@@ -52,18 +52,19 @@ $.hood.App = {
             ]
         },
         ShowCookieMessage: !$('body').hasClass('disable-cookies'),
-        Forums: true,
+        Accordion: true,
+        Alerts: true,
         Colorbox: true,
         ContactForms: true,
-        FitVids: true,
-        Accordion: true,
         Counters: true,
-        Uploaders: true,
-        PaymentPages: true,
+        FitVids: true,
+        Forums: true,
         Header: true,
-        RichTextEditors: $('.tinymce-public').length,
         LoadSharers: $('#share').length,
-        SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"]
+        PaymentPages: true,
+        RichTextEditors: $('.tinymce-public').length,
+        SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"],
+        Uploaders: true
     },
     Init: function (options) {
 
@@ -141,6 +142,8 @@ $.hood.App = {
             setTimeout(function () {
                 if ($.hood.App.Options.Forums)
                     $.hood.App.Forums.Init();
+                if ($.hood.App.Options.Alerts)
+                    $.hood.App.Alerts();
             }, $.hood.App.Options.Loader.Delay + 200);
         },
         AddItem: function (name) {
@@ -236,7 +239,7 @@ $.hood.App = {
                 var $target = $(target);
                 if ($target.doesExist()) {
                     $('html, body').stop().delay(350).animate({
-                        'scrollTop': $target.offset().top - $.hood.App.Options.scrollOffset
+                        'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
                     }, 500, 'swing');
                     history.pushState("", document.title, window.location.pathname + window.location.search);
                 }
@@ -256,7 +259,7 @@ $.hood.App = {
                 var target = this.hash;
                 var $target = $(target);
                 $('html, body').stop().animate({
-                    'scrollTop': $target.offset().top - $.hood.App.Options.scrollOffset
+                    'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
                 }, 900, 'swing');
             });
         }
@@ -300,6 +303,11 @@ $.hood.App = {
             });
             return false;
         }
+    },
+    Alerts: function () {
+        $(".alert.auto-dismiss").fadeTo(5000, 500).slideUp(500, function () {
+            $(".alert.auto-dismiss").slideUp(500);
+        });
     },
     Accordion: function () {
         $('.accordion-title').click(function (e) {
@@ -361,7 +369,7 @@ $.hood.App = {
             var highlight = $.getUrlVars()['highlight'];
             if ($.isNumeric(highlight)) {
                 $post = $('#post-' + highlight);
-                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.scrollOffset }, 'slow');
+                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
                 $post.addClass('highlight');
                 if ($.getUrlVars()['message'] === "Created")
                     $post.addClass('created');
@@ -370,7 +378,7 @@ $.hood.App = {
             var reply = $.getUrlVars()['reply'];
             if ($.isNumeric(reply)) {
                 $post = $('#forum-post-form');
-                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.scrollOffset }, 'slow');
+                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
             }
 
         }
