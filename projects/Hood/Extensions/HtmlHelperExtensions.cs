@@ -31,7 +31,7 @@ namespace Hood.Extensions
             if (modelExplorer == null) throw new InvalidOperationException($"Failed to get model explorer for {ExpressionHelper.GetExpressionText(expression)}");
             return new HtmlString(WebUtility.HtmlEncode(modelExplorer.Metadata.Description));
         }
-        public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = true)
+        public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = true, string cssClass = "")
         {
             if (!message.IsSet())
                 return null;
@@ -39,17 +39,35 @@ namespace Hood.Extensions
             switch (type)
             {
                 case AlertType.Success:
-                    return html.Raw(string.Format("<div class='alert alert-success {1}'><i class='fa fa-thumbs-up m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
+                    return html.Raw(string.Format("<div class='alert alert-success {1} {2}'><i class='fa fa-thumbs-up m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
                 case AlertType.Warning:
-                    return html.Raw(string.Format("<div class='alert alert-warning {1}'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
+                    return html.Raw(string.Format("<div class='alert alert-warning {1} {2}'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
                 case AlertType.Danger:
-                    return html.Raw(string.Format("<div class='alert alert-danger {1}'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
+                    return html.Raw(string.Format("<div class='alert alert-danger {1} {2}'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
                 case AlertType.Info:
                 default:
-                    return html.Raw(string.Format("<div class='alert alert-info {1}'><i class='fa fa-info-circle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : ""));
+                    return html.Raw(string.Format("<div class='alert alert-info {1} {2}'><i class='fa fa-info-circle m-r-sm'></i>{0}</div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
             }
 
         }
+        public static IHtmlContent ContainedBootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = true, string cssClass = "")
+        {
+            if (!message.IsSet())
+                return null;
 
+            switch (type)
+            {
+                case AlertType.Success:
+                    return html.Raw(string.Format("<div class='alert alert-success {1} {2}'><div class='container'><i class='fa fa-thumbs-up m-r-sm'></i>{0}</div></div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
+                case AlertType.Warning:
+                    return html.Raw(string.Format("<div class='alert alert-warning {1} {2}'><div class='container'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div></div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
+                case AlertType.Danger:
+                    return html.Raw(string.Format("<div class='alert alert-danger {1} {2}'><div class='container'><i class='fa fa-exclamation-triangle m-r-sm'></i>{0}</div></div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
+                case AlertType.Info:
+                default:
+                    return html.Raw(string.Format("<div class='alert alert-info {1} {2}'><div class='container'><i class='fa fa-info-circle m-r-sm'></i>{0}</div></div>", message, autoDismiss ? "auto-dismiss" : "", cssClass));
+            }
+
+        }
     }
 }
