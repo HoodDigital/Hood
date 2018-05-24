@@ -1,5 +1,6 @@
 ﻿using Hood.Enums;
 using Hood.Services;
+using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -43,6 +44,8 @@ namespace Hood.Models
                 return null;
             return bySlug[contentType].Value[slug];
         }
+
+        public int Count { get { return byKey.Value.Count; } }
 
         public void ResetCache()
         {
@@ -129,6 +132,124 @@ namespace Hood.Models
         public IEnumerable<ContentCategory> GetSuggestions(string type)
         {
             return bySlug[type].Value.Values;
+        }
+
+        // Html
+        public IHtmlContent ContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentSlug)
+        {
+            string htmlOutput = string.Empty;
+
+            if (startLevel != null && startLevel.Count() > 0)
+            {
+                htmlOutput += "<ul>";
+                foreach (var key in startLevel.Select(c => c.Id))
+                {
+                    // Have to reload from the cache to use the count.
+                    var category = FromKey(key);
+
+                    htmlOutput += "<li>";
+                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("{0} <span>{1}</span>", category.DisplayName, category.Count);
+                    htmlOutput += "</a>";
+                    htmlOutput += ContentCategoryTree(category.Children, contentSlug);
+                    htmlOutput += "</li>";
+                }
+                htmlOutput += "</ul>";
+            }
+
+            var builder = new HtmlString(htmlOutput);
+            return builder;
+        }
+        public IHtmlContent CategorySelectOptions(IEnumerable<ContentCategory> startLevel, string selectedValue, bool useSlug = false, int startingLevel = 0)
+        {
+            string htmlOutput = string.Empty;
+            if (startLevel != null && startLevel.Count() > 0)
+            {
+                foreach (var key in startLevel.Select(c => c.Id))
+                {
+                    // Have to reload from the cache to use the count.
+                    var category = FromKey(key);
+
+                    if (useSlug)
+                    {
+                        htmlOutput += "<option value=\"" + category.Slug + "\"" + (selectedValue == category.Slug ? " selected" : "") + ">";
+                    }
+                    else
+                    {
+                        htmlOutput += "<option value=\"" + category.Id + "\"" + (selectedValue == category.Id.ToString() ? " selected" : "") + ">";
+                    }
+                    for (int i = 0; i < startingLevel; i++)
+                    {
+                        htmlOutput += "- ";
+                    }
+                    htmlOutput += string.Format("{0} ({1})", category.DisplayName, category.Count);
+                    htmlOutput += "</option>";
+                    htmlOutput += CategorySelectOptions(category.Children, selectedValue, useSlug, startingLevel + 1);
+                }
+            }
+
+            var builder = new HtmlString(htmlOutput);
+            return builder;
+        }
+        public IHtmlContent AdminContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentSlug, int startingLevel = 0)
+        {
+            string htmlOutput = string.Empty;
+
+            if (startLevel != null && startLevel.Count() > 0)
+            {
+                foreach (var key in startLevel.Select(c => c.Id))
+                {
+                    // Have to reload from the cache to use the count.
+                    var category = FromKey(key);
+
+                    htmlOutput += "<tr>";
+                    htmlOutput += "<td>";
+                    for (int i = 0; i < startingLevel; i++)
+                    {
+                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                    }
+                    htmlOutput += string.Format("<a href=\"/admin/content/{0}/manage?category={1}\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
+                    htmlOutput += "</a>";
+                    htmlOutput += " <small>[" + category.Slug + "]</small>";
+                    htmlOutput += "</td>";
+                    htmlOutput += "<td class='text-right'>";
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-content-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
+                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-content-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
+                    htmlOutput += "</td>";
+                    htmlOutput += AdminContentCategoryTree(category.Children, contentSlug, startingLevel + 1);
+                    htmlOutput += "</tr>";
+                }
+            }
+
+            var builder = new HtmlString(htmlOutput);
+            return builder;
+        }
+        public IHtmlContent AddToCategoryTree(IEnumerable<ContentCategory> startLevel, Content content, string contentSlug, int startingLevel = 0)
+        {
+            string htmlOutput = string.Empty;
+
+            if (startLevel != null && startLevel.Count() > 0)
+            {
+                foreach (var key in startLevel.Select(c => c.Id))
+                {
+                    // Have to reload from the cache to use the count.
+                    var category = FromKey(key);
+
+                    htmlOutput += "<div class=\"checkbox\">";
+                    for (int i = 0; i < startingLevel; i++)
+                    {
+                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                    }
+                    htmlOutput += string.Format("<input class=\"styled content-category-check\" id=\"content-category-check-{1}\" name=\"content-category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", content.Id, category.Id, content.IsInCategory(category.Id) ? "checked" : "");
+                    htmlOutput += string.Format("<label for=\"content-category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
+                    htmlOutput += "</div>";
+                    htmlOutput += AddToCategoryTree(category.Children, content, contentSlug, startingLevel + 1);
+                }
+            }
+
+            var builder = new HtmlString(htmlOutput);
+            return builder;
         }
 
     }

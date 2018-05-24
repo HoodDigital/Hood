@@ -10,6 +10,7 @@ namespace Hood.Services
     public interface ISettingsRepository : IConfiguration
     {
         List<string> LockoutAccessCodes { get; }
+        string WysiwygEditorClass { get; }
 
         List<Option> AllSettings();
         bool Delete(string key);
@@ -24,6 +25,7 @@ namespace Hood.Services
         AccountSettings GetAccountSettings(bool noCache = false);
         MediaSettings GetMediaSettings(bool noCache = false);
         MailSettings GetMailSettings(bool noCache = false);
+        ForumSettings GetForumSettings(bool noCache = false);
         SeoSettings GetSeo(bool noCache = false);
         OperationResult StripeEnabled();
         OperationResult PayPalEnabled();

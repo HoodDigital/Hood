@@ -1,0 +1,283 @@
+
+@inject IContentRepository _content
+@{
+    AccountInfo account = Context.GetAccountInfo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    ForumSettings _forumSettings = _settings.GetForumSettings();
+    Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
+    Layout = null;
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    var sideTypes = _settings.GetContentSettings().GetAllowedTypes();
+    if (_propertySettings.Enabled)
+    {
+        sideTypes.Add(new ContentType() { Type = "property", TypeNamePlural = "Properties" });
+    }
+    sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
+}
+@{ await Html.RenderPartialAsync("_SidebarHeader"); }
+<div class="scroll-area">
+    <div>
+        <div class="dropdown profile-element">
+            <div class="p-md text-center">
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
+                    <span>
+                        <fixedImage src="@account.User?.Avatar?.SmallUrl" class="img-xs img-circle sidebar-avatar @account.User.Id" />
+                    </span>
+                    <span class="clear">
+                        <span class="block m-t-xs">
+                            Logged in as<br />
+                            <strong class="font-bold">@account.User.UserName</strong>
+                            <i class="fa fa-caret-down"></i>
+                        </span>
+                    </span>
+                </a>
+                <ul class="dropdown-menu m-l-md">
+                    <li>
+                        <a asp-action="Index" asp-controller="Manage">
+                            <i class="fa fa-cogs m-r-xs"></i>Manage Account
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-action="ChangePassword" asp-controller="Manage">
+                            <i class="fa fa-lock m-r-xs"></i>Change Password
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="javascript:document.getElementById('logoutForm').submit()">
+                            <i class="fa fa-sign-out m-r-xs"></i>Log out
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <ul class="nav metisMenu side-menu">
+            @{ await Html.RenderPartialAsync("_ThemeSidebarTop"); }
+            <li class="">
+                <a><i class="fa fa-file"></i><span class="nav-label">Content</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse" style="height: 0px;">
+                    @foreach (ContentType ct in sideTypes)
+                    {
+                        if (ct.Type == "property")
+                        {
+                            <li>
+                                <a asp-action="Index" asp-controller="Property" asp-route-area="Admin">
+                                    <i class="fa fa-building"></i>
+                                    @ct.TypeNamePlural
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a asp-action="Index" asp-controller="Content" asp-route-type="@ct.Type" asp-route-area="Admin">
+                                    <i class="fa @ct.Icon"></i>
+                                    @if (!string.IsNullOrEmpty(_settings[ct.Type + "-page-title"]))
+                                    {
+                                        @_settings[ct.Type + "-page-title"]
+                                    }
+                                    else
+                                    {
+                                        @ct.TypeNamePlural
+                                    }
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </li>
+            @if (_forumSettings.Enabled)
+            {
+                <li class="">
+                    <a><i class="fa fa-comments"></i><span class="nav-label">Forums</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse" style="height: 0px;">
+                        <li>
+                            <a asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
+                                <i class="fa fa-cogs"></i>Manage Forums
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if (subscriptions.Succeeded)
+            {
+                <li class="">
+                    <a><i class="fa fa-money"></i><span class="nav-label">Subscriptions</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse" style="height: 0px;">
+                        <li>
+                            <a asp-action="Index" asp-controller="Subscriptions" asp-route-area="Admin">
+                                <i class="fa fa-refresh"></i>Subscriptions
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Subscribers" asp-controller="Subscriptions" asp-route-area="Admin">
+                                <i class="fa fa-user-plus"></i>Subscribers
+                            </a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li>
+                                <a asp-action="Webhook" asp-controller="Subscriptions">
+                                    <i class="fa fa-download"></i>Test Webhooks
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            <li>
+                <a asp-action="Index" asp-controller="Media" asp-route-area="Admin">
+                    <i class="fa fa-image"></i><span class="nav-label">Media</span>
+                </a>
+            </li>
+            <li>
+                <a asp-action="Seo" asp-controller="Settings" asp-route-area="Admin">
+                    <i class="fa fa-tag"></i><span class="nav-label">SEO</span>
+                </a>
+            </li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li>
+                    <a asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
+                        <i class="fa fa-paint-brush"></i><span class="nav-label">Theme</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-action="Index" asp-controller="Users">
+                        <i class="fa fa-group"></i><span class="nav-label">Users</span>
+                    </a>
+                </li>
+            }
+            @if (User.IsInRole("Admin"))
+            {
+
+                <li class="">
+                    <a><i class="fa fa-refresh"></i><span class="nav-label">Import/Export</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li class="">
+                            <a><i class="fa fa-upload"></i>Import <span class="fa arrow"></span></a>
+                            <ul class="nav nav-third-level collapse">
+                                <li>
+                                    <a>
+                                        <i class="fa fa-upload"></i>Import Content <small class="label label-info m-l-xs">Coming Soon</small>
+                                    </a>
+                                </li>
+                                @if (_propertySettings.Enabled)
+                                {
+                                    <li>
+                                        <a>
+                                            <i class="fa fa-upload"></i>Import Properties <small class="label label-info m-l-xs">Coming Soon</small>
+                                        </a>
+                                    </li>
+                                }
+                                @if (_propertySettings.FTPImporterSettings != null && _propertySettings.Enabled && _propertySettings.FTPImporterSettings.UseFTP)
+                                {
+                                    <li>
+                                        <a asp-action="PropertyFTP" asp-controller="Import">
+                                            <i class="fa fa-upload"></i>Import Properties (Rightmove)
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                        <li class="">
+                            <a>
+                                <i class="fa fa-download"></i>Export
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-third-level collapse">
+                                <li>
+                                    <a>
+                                        <i class="fa fa-download"></i>Export Content <small class="label label-info m-l-xs">Coming Soon</small>
+                                    </a>
+                                </li>
+                                @if (_propertySettings.Enabled)
+                                {
+                                    <li>
+                                        <a>
+                                            <i class="fa fa-download"></i>Export Properties <small class="label label-info m-l-xs">Coming Soon</small>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+
+
+                <li class="">
+                    <a><i class="fa fa-wrench"></i><span class="nav-label">Settings</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse" style="height: 0px;">
+                        <li>
+                            <a asp-action="Account" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-user-plus"></i>Account Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Basics" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-cog"></i>Basic Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Billing" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-money"></i>Billing Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Contact" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-envelope"></i>Contact Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Content" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-tag"></i>Content Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Forum" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-comments"></i>Forum Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Integrations" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-plug"></i>Integrations
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Mail" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-envelope"></i>Mail Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Media" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-picture-o"></i>Media Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-action="Property" asp-controller="Settings" asp-route-area="Admin">
+                                <i class="fa fa-building"></i>Property Settings
+                            </a>
+                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="divider"></li>
+                            <li>
+                                <a asp-action="Advanced" asp-controller="Settings" asp-route-area="Admin">
+                                    <i class="fa fa-exclamation-triangle"></i>Advanced Settings
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @{ await Html.RenderPartialAsync("_ThemeSidebarBottom"); }
+            <li class="landing-link">
+                <a href="/">
+                    <i class="fa fa-desktop"></i><span class="nav-label"><i class="fa fa-external-link pull-right m-t-xs"></i>View Site</span>
+                </a>
+            </li>
+        </ul>
+
+    </div>
+</div>

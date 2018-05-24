@@ -280,6 +280,6 @@ $.hood.Designer = {
         });
     }
 }
-$(window).load(function () {
+$(window).on('load', function () {
     $.hood.Designer.Init();
 });

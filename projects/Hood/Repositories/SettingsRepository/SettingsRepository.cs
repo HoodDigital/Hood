@@ -381,6 +381,22 @@ namespace Hood.Services
             }
         }
 
+        public ForumSettings GetForumSettings(bool noCache = false)
+        {
+            try
+            {
+                ForumSettings ret = Get<ForumSettings>("Hood.Settings.Forum", noCache);
+                if (ret == null)
+                    ret = new ForumSettings();
+                return ret;
+            }
+            catch (Exception)
+            {
+                Delete("Hood.Settings.Forum");
+                return new ForumSettings();
+            }
+        }
+
         public OperationResult StripeEnabled()
         {
             BillingSettings settings = GetBillingSettings();
@@ -501,6 +517,14 @@ namespace Hood.Services
         }
 
         public string ConnectionString { get { return _config.GetConnectionString("DefaultConnection"); } }
+
+        public string WysiwygEditorClass
+        {
+            get
+            {
+                return GetBasicSettings().EditorType == "simple" ? "tinymce-simple" : "tinymce-full";
+            }
+        }
     }
 
     public class SettingsRepositoryStub : ISettingsRepository
@@ -534,6 +558,8 @@ namespace Hood.Services
                 throw new NotImplementedException();
             }
         }
+
+        public string WysiwygEditorClass => "tinymce-simple";
 
         public List<Option> AllSettings()
         {
@@ -598,6 +624,11 @@ namespace Hood.Services
         public MailSettings GetMailSettings(bool noCache = false)
         {
             return new MailSettings();
+        }
+
+        public ForumSettings GetForumSettings(bool noCache = false)
+        {
+            return new ForumSettings();
         }
 
         public MediaSettings GetMediaSettings(bool noCache = false)

@@ -381,51 +381,12 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                // delete the avatar - if it exists.
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
-                string container = typeof(ApplicationUser).Name;
-                var logins = await _userManager.GetLoginsAsync(user);
-                foreach (var li in logins)
-                {
-                    await _userManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
-                }
-                var roles = await _userManager.GetRolesAsync(user);
-                foreach (var role in roles)
-                {
-                    await _userManager.RemoveFromRoleAsync(user, role);
-                }
-                var claims = await _userManager.GetClaimsAsync(user);
-                foreach (var claim in claims)
-                {
-                    await _userManager.RemoveClaimAsync(user, claim);
-                }
+                await _auth.DeleteUserAsync(user);
 
-
-                var userSubs = _auth.GetUserById(user.Id);
-                if (userSubs.Subscriptions != null)
-                {
-                    if (userSubs.Subscriptions.Count > 0)
-                    {
-                        foreach (var sub in userSubs.Subscriptions)
-                        {
-                            var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.CustomerId, sub.StripeId, false);
-                        }
-                        userSubs.Subscriptions.Clear();
-                        _auth.UpdateUser(userSubs);
-                    }
-                }
-
-                IdentityResult result = await _userManager.DeleteAsync(user);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Published successfully.");
-                    response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                var response = new Response(true, "Deleted successfully.");
+                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                return response;
 
             }
             catch (Exception ex)
@@ -509,7 +470,7 @@ namespace Hood.Areas.Admin.Controllers
                         {
                             EmailAddress = user.Email,
                             Status = MailChimp.Net.Models.Status.Subscribed,
-                            StatusIfNew = MailChimp.Net.Models.Status.Subscribed                            
+                            StatusIfNew = MailChimp.Net.Models.Status.Subscribed
                         };
                         await mailchimpManager.Members.AddOrUpdateAsync(integrations.MailchimpUserListId, member);
                         stats.Added++;

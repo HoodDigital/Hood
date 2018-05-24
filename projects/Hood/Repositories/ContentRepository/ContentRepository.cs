@@ -49,8 +49,8 @@ namespace Hood.Services
         // Content CRUD
         public async Task<ContentModel> GetPagedContent(ContentModel model, bool publishedOnly = true)
         {
-            var content = await GetContent(model.Search, model.Order, model.Type, model.Category, model.Filter, model.AuthorName, publishedOnly).ToListAsync();
-            model.List = content;
+            var content = GetContent(model.Search, model.Order, model.Type, model.Category, model.Filter, model.AuthorName, publishedOnly);
+            await model.ReloadAsync(content);
             return model;
         }
         private IOrderedQueryable<Content> GetContent(string search, string sort, string type, string category = null, string filter = null, string author = null, bool publishedOnly = true)
@@ -129,34 +129,34 @@ namespace Hood.Services
                 {
                     switch (sort)
                     {
-                        case "Title":
+                        case "title":
                             orderedContent = content.OrderBy(n => n.Title);
                             break;
-                        case "Date":
+                        case "date":
                             orderedContent = content.OrderBy(n => n.CreatedOn);
                             break;
-                        case "PublishDate":
+                        case "publish":
                             orderedContent = content.OrderBy(n => n.PublishDate);
                             break;
-                        case "Views":
+                        case "views":
                             orderedContent = content.OrderBy(n => n.Views);
                             break;
 
-                        case "TitleDesc":
+                        case "title+desc":
                             orderedContent = content.OrderByDescending(n => n.Title);
                             break;
-                        case "DateDesc":
+                        case "date+desc":
                             orderedContent = content.OrderByDescending(n => n.CreatedOn);
                             break;
-                        case "PublishDateDesc":
+                        case "publish+desc":
                             orderedContent = content.OrderByDescending(n => n.PublishDate);
                             break;
-                        case "ViewsDesc":
+                        case "views+desc":
                             orderedContent = content.OrderByDescending(n => n.Views);
                             break;
 
                         default:
-                            orderedContent = content.OrderByDescending(n => n.PublishDate).ThenBy(n => n.Id);
+                            orderedContent = content.OrderByDescending(n => n.CreatedOn);
                             break;
                     }
                 }
@@ -539,6 +539,39 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             _events.triggerContentChanged(this);
             return new OperationResult(true);
+        }
+        public async Task<OperationResult> AddCategoryToContent(int contentId, int categoryId)
+        {
+            Content content = GetContentByID(contentId, true);
+
+            if (content.IsInCategory(categoryId)) // Content is already in!
+                return new OperationResult(true);
+
+            var category = await _db.ContentCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
+            if (category == null)
+                throw new Exception("The category does not exist.");
+
+            content.Categories.Add(new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id });
+
+            return Update(content);
+
+        }
+        public OperationResult RemoveCategoryFromContent(int contentId, int categoryId)
+        {
+            Content content = GetContentByID(contentId, true);
+
+            if (!content.IsInCategory(categoryId))// Content is already out!
+                return new OperationResult(true);
+
+            var cat = content.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
+
+            if (cat == null)// Content is already out!
+                return new OperationResult(true);
+
+            content.Categories.Remove(cat);
+
+            return Update(content);
+
         }
         #endregion
 
@@ -1102,40 +1135,6 @@ namespace Hood.Services
             return _db.Content.SingleOrDefault(c => c.Slug == slug) == null;
         }
 
-        public async Task<OperationResult> AddCategoryToContent(int contentId, int categoryId)
-        {
-            Content content = GetContentByID(contentId, true);
-
-            if (content.IsInCategory(categoryId)) // Content is already in!
-                return new OperationResult(true);
-
-            var category = await _db.ContentCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
-            if (category == null)
-                throw new Exception("The category does not exist.");
-
-            content.Categories.Add(new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id });
-
-            return Update(content);
-
-        }
-
-        public OperationResult RemoveCategoryFromContent(int contentId, int categoryId)
-        {
-            Content content = GetContentByID(contentId, true);
-
-            if (!content.IsInCategory(categoryId))// Content is already out!
-                return new OperationResult(true);
-
-            var cat = content.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
-
-            if (cat == null)// Content is already out!
-                return new OperationResult(true);
-
-            content.Categories.Remove(cat);
-
-            return Update(content);
-
-        }
 
         public object GetStatistics()
         {

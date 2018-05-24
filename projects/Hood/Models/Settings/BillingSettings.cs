@@ -1,4 +1,7 @@
 ﻿using Hood.BaseTypes;
+using Hood.Extensions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -45,5 +48,35 @@ namespace Hood.Models
         [Display(Name = "Stripe Test Public Key")]
         public string StripeTestPublicKey { get; set; }
 
+        internal IActionResult GetNewSubscriptionUrl(HttpContext context)
+        {
+            var result = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.Request.Path.ToUriComponent() });
+            if (SubscriptionCreatePage.IsSet())
+            {
+                UriBuilder baseUri = new UriBuilder(context.GetSiteUrl() + SubscriptionCreatePage.TrimStart('/'));
+                string queryToAppend = string.Format("returnUrl={0}", context.Request.Path.ToUriComponent());
+                if (baseUri.Query != null && baseUri.Query.Length > 1)
+                    baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
+                else
+                    baseUri.Query = queryToAppend;
+                return new RedirectResult(baseUri.ToString());
+            }
+            return result;
+        }
+        internal IActionResult GetChangeSubscriptionUrl(HttpContext context)
+        {
+            var changeResult = new RedirectToActionResult("Change", "Subscriptions", new { returnUrl = context.Request.Path.ToUriComponent() });
+            if (SubscriptionUpgradePage.IsSet())
+            {
+                UriBuilder baseUri = new UriBuilder(context.GetSiteUrl() + SubscriptionUpgradePage.TrimStart('/'));
+                string queryToAppend = string.Format("returnUrl={0}", context.Request.Path.ToUriComponent());
+                if (baseUri.Query != null && baseUri.Query.Length > 1)
+                    baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
+                else
+                    baseUri.Query = queryToAppend;
+                return new RedirectResult(baseUri.ToString());
+            }
+            return changeResult;
+        }
     }
 }

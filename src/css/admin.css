@@ -9660,64 +9660,9 @@ button.close {
   margin-left: -5px;
   margin-right: -5px;
 }
-.bootstrap-tagsinput {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  display: inline-block;
-  padding: 4px 6px;
-  color: #555;
-  vertical-align: middle;
-  border-radius: 4px;
-  max-width: 100%;
-  line-height: 22px;
-  cursor: text;
-}
-.bootstrap-tagsinput input {
-  border: none;
-  box-shadow: none;
-  outline: none;
-  background-color: transparent;
-  padding: 0 6px;
-  margin: 0;
-  width: auto;
-  max-width: inherit;
-}
-.bootstrap-tagsinput.form-control input::-moz-placeholder {
-  color: #777;
-  opacity: 1;
-}
-.bootstrap-tagsinput.form-control input:-ms-input-placeholder {
-  color: #777;
-}
-.bootstrap-tagsinput.form-control input::-webkit-input-placeholder {
-  color: #777;
-}
-.bootstrap-tagsinput input:focus {
-  border: none;
-  box-shadow: none;
-}
-.bootstrap-tagsinput .tag {
-  margin-right: 2px;
-  color: white;
-}
-.bootstrap-tagsinput .tag [data-role="remove"] {
-  margin-left: 8px;
-  cursor: pointer;
-}
-.bootstrap-tagsinput .tag [data-role="remove"]:after {
-  content: "x";
-  padding: 0px 2px;
-}
-.bootstrap-tagsinput .tag [data-role="remove"]:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-.bootstrap-tagsinput .tag [data-role="remove"]:hover:active {
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-}
 /*!
- * Bootstrap Colorpicker v2.3.5
- * https://itsjaviaguilar.github.io/bootstrap-colorpicker/
+ * Bootstrap Colorpicker v2.5.2
+ * https://itsjavi.com/bootstrap-colorpicker/
  *
  * Originally written by (c) 2012 Stefan Petre
  * Licensed under the Apache License v2.0
@@ -9727,7 +9672,7 @@ button.close {
 .colorpicker-saturation {
   width: 100px;
   height: 100px;
-  background-image: url("../../../bootstrap-colorpicker/dist/img/bootstrap-colorpicker/saturation.png");
+  background-image: url("data:image/png;base64,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");
   cursor: crosshair;
   float: left;
 }
@@ -9775,10 +9720,10 @@ button.close {
   margin-top: -1px;
 }
 .colorpicker-hue {
-  background-image: url("../../../bootstrap-colorpicker/dist/img/bootstrap-colorpicker/hue.png");
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAMAAABw8qpSAAABLFBMVEXqFBb/ABH/ACL/ADH/AEH/AFD/AGD/AG7/AH7/AI3/AJ3/AKz/ALz/AMr/ANv/AOr/APr2AP/mAP/XAP/HAP+4AP+oAP+aAP+JAP97AP9rAP9cAP9MAP8+AP8tAP8fAP8PAP8BAv8AEP8AH/8AL/8APv8ATv8AXP8Abf8Ae/8Ai/8Amv8Aqv8AuP8Ayf8A1/8A5/8A9/8A//gA/+kA/9kA/8oA/7oA/6wA/5sA/40A/30A/24A/14A/1AA/z8A/zEA/yEA/xEB/wMN/wAd/wAs/wA8/wBK/wBb/wBp/wB5/wCI/wCY/wCm/wC3/wDF/wDV/wDk/wD1/wD/+gD/7AD/3AD/zAD/vgD/rQD/nwD/jgD/gAD/cAD/YgD/UQD/QwD/MgD/JAD/FAD4Eg42qAedAAAAh0lEQVR4XgXAg3EDAAAAwI9to7Zt27a1/w49BASFhEVExcQlJKWkZWTl5BUUlZRVVNXUNTS1tHXo1KVbj159+g0YNGTYiFFjxk2YNGXajFlz5i1YtGTZilVr1m3YtGXbjl179h04dOTYiVNnzl24dOXajVt37j149OTZi1dv3n349OXbj19//wOxE1dQ8reGAAAAAElFTkSuQmCC");
 }
 .colorpicker-alpha {
-  background-image: url("../../../bootstrap-colorpicker/dist/img/bootstrap-colorpicker/alpha.png");
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAQAAAAVxWkcAAABr0lEQVR4Xo2VwU0DQQxF7dmRuNIFlzlSAR3QAaXQQdIBJVABFXDcOVAAd67cjJLR07dkhcSrkZKfb/t7bG88rFo3B5gZPMNycItu2xloGV7MWHzM9zuzFWCkmA0nK6AszCUJDW6+mG6R03ncw5v8EMTEvZ2O3AliYjpslblc0RF9LmZYWxURU6aKytWZYsoWCAe+xwOZp1GsEukGiIkYxcQCHck99+gRgB7JncyIB5SGEhP3Yh5P6JwX+u6AnYot104d8DJT7uH7M9JH6OZbimj0vfMVaYnJIZFJDBW9kHlerL2C6JV4mSt7uuo2N57RxnZ+usQjn0R1jwBJBrNO3evJpVYUWsJ/E3UiXRlv24/7YZ04xmEdWlzcKS+B/eapeyMvFd2k0+hRk/T0AmTW8h69s2sjYMsdPntECiILhAeIMZAeH4QvUwfn6ijC0tTV+fT9ky8jM9nK2g7Ly1VjSpKYq6IvsAm7MtNu1orEqa/K3KNvgMFdhfquPfJmp2dbh0/8Gzb6Y22ViaNr6n5410zXdngVhbu6XqdOtWOuin5hjABGp4a2uotZ71MVCfwDBt2/v37yo6AAAAAASUVORK5CYII=");
   display: none;
 }
 .colorpicker-saturation,
@@ -9838,7 +9783,7 @@ button.close {
   height: 10px;
   margin-top: 5px;
   clear: both;
-  background-image: url("../../../bootstrap-colorpicker/dist/img/bootstrap-colorpicker/alpha.png");
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAABkCAQAAAAVxWkcAAABr0lEQVR4Xo2VwU0DQQxF7dmRuNIFlzlSAR3QAaXQQdIBJVABFXDcOVAAd67cjJLR07dkhcSrkZKfb/t7bG88rFo3B5gZPMNycItu2xloGV7MWHzM9zuzFWCkmA0nK6AszCUJDW6+mG6R03ncw5v8EMTEvZ2O3AliYjpslblc0RF9LmZYWxURU6aKytWZYsoWCAe+xwOZp1GsEukGiIkYxcQCHck99+gRgB7JncyIB5SGEhP3Yh5P6JwX+u6AnYot104d8DJT7uH7M9JH6OZbimj0vfMVaYnJIZFJDBW9kHlerL2C6JV4mSt7uuo2N57RxnZ+usQjn0R1jwBJBrNO3evJpVYUWsJ/E3UiXRlv24/7YZ04xmEdWlzcKS+B/eapeyMvFd2k0+hRk/T0AmTW8h69s2sjYMsdPntECiILhAeIMZAeH4QvUwfn6ijC0tTV+fT9ky8jM9nK2g7Ly1VjSpKYq6IvsAm7MtNu1orEqa/K3KNvgMFdhfquPfJmp2dbh0/8Gzb6Y22ViaNr6n5410zXdngVhbu6XqdOtWOuin5hjABGp4a2uotZ71MVCfwDBt2/v37yo6AAAAAASUVORK5CYII=");
   background-position: 0 100%;
 }
 .colorpicker-color div {
@@ -9906,19 +9851,10 @@ button.close {
   margin-top: 0px;
 }
 .colorpicker.colorpicker-horizontal .colorpicker-hue {
-  background-image: url("../../../bootstrap-colorpicker/dist/img/bootstrap-colorpicker/hue-horizontal.png");
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAABCAMAAAAfBfuPAAABLFBMVEXqFBb/ABH/ACL/ADH/AEH/AFD/AGD/AG7/AH7/AI3/AJ3/AKz/ALz/AMr/ANv/AOr/APr2AP/mAP/XAP/HAP+4AP+oAP+aAP+JAP97AP9rAP9cAP9MAP8+AP8tAP8fAP8PAP8BAv8AEP8AH/8AL/8APv8ATv8AXP8Abf8Ae/8Ai/8Amv8Aqv8AuP8Ayf8A1/8A5/8A9/8A//gA/+kA/9kA/8oA/7oA/6wA/5sA/40A/30A/24A/14A/1AA/z8A/zEA/yEA/xEB/wMN/wAd/wAs/wA8/wBK/wBb/wBp/wB5/wCI/wCY/wCm/wC3/wDF/wDV/wDk/wD1/wD/+gD/7AD/3AD/zAD/vgD/rQD/nwD/jgD/gAD/cAD/YgD/UQD/QwD/MgD/JAD/FAD4Eg42qAedAAAAbUlEQVR4XgXAghEDsbxtlrZt27ax/w49ACAYQTGcICmaYTleECVZUTXdMC1Wm93hdLk9Xp8/EAyFI9FYPJFMpTPZXL5QLJUr1Vq90Wy1O91efzAcjSfT2XyxXK03293+cDydL9fb/fF8vT/f3x+LfRNXARMbCAAAAABJRU5ErkJggg==");
 }
 .colorpicker.colorpicker-horizontal .colorpicker-alpha {
-  background-image: url("../../../bootstrap-colorpicker/dist/img/bootstrap-colorpicker/alpha-horizontal.png");
-}
-.colorpicker.colorpicker-hidden {
-  display: none;
-}
-.colorpicker.colorpicker-visible {
-  display: block;
-}
-.colorpicker-inline.colorpicker-visible {
-  display: inline-block;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAKCAQAAADoFTP1AAAB9ElEQVR4XoWTQW4VMRBEu9qWEimL7DhEMp8NF+ASnJJLcAQgE1bcgBUSkYKUuHCrZ9pjeqSU5Yn9LPu7umJQBIIv+k7vIOrtK66L4lmr3pVOrOv3otp619KZ0/KjdNI79L52Uo09FBQWrU0vfe5trezU+hLsoUKd3Repovte+0vbq/7Lj5XbaHECKasR9G4MPlbp+gzZxd6koPEJCkAYC5SjcOTAIIOK90Dja1IfIZ8Z+zAY9jm3b5Ia+MT5sFcqRJrR2AYYA8Kua5BzYRrFPNmD4PQMegGJMOffJJUsWiI3nCHZZjInNdffLWOufzbc3JaboCAVxwmnRHbhLSPwRJ4wU0BRSc6HkECYYVw95nMKgJOcylxrJttE5Ibzf9Xq9GPvP+WX3MiV/MGHfRu/SentRQrfG1GzsIrytdNXucSRKxQNIGHM9YhGFQJcdjNcBZvfJayuYe4Sia1CzwW+19mWOhe37HsxJWKwbu/jluEU15QzAQjAqCEbhMJc78GYV2E0kooHDubUImWkTOhGpgv8PoT8DJG/bzxna4BZ0eOFSOaLADGeSpFsg5AzeaDZIDQQXjZ4y/8ryfzUXBwdELRjTjCNvOeT0rNlrJz90vwy6N9pXXQEluX0inElpPWokSdiLCfiNJJjMKQ8Qsh8GEKQKMo/eiHrNbI9UksAAAAASUVORK5CYII=");
 }
 .colorpicker-right:before {
   left: auto;
@@ -9936,12 +9872,29 @@ button.close {
   border-right: 0;
   border-left: 0;
 }
+.colorpicker.colorpicker-visible,
+.colorpicker-alpha.colorpicker-visible,
+.colorpicker-saturation.colorpicker-visible,
+.colorpicker-hue.colorpicker-visible,
+.colorpicker-selectors.colorpicker-visible {
+  display: block;
+}
+.colorpicker.colorpicker-hidden,
+.colorpicker-alpha.colorpicker-hidden,
+.colorpicker-saturation.colorpicker-hidden,
+.colorpicker-hue.colorpicker-hidden,
+.colorpicker-selectors.colorpicker-hidden {
+  display: none;
+}
+.colorpicker-inline.colorpicker-visible {
+  display: inline-block;
+}
 /*# sourceMappingURL=bootstrap-colorpicker.css.map */
 /* MaterialDesignIcons.com */
 @font-face {
   font-family: "Material Design Icons";
-  src: url("../../../mdi/fonts/materialdesignicons-webfont.eot?v=2.1.19");
-  src: url("../../../mdi/fonts/materialdesignicons-webfont.eot?#iefix&v=2.1.19") format("embedded-opentype"), url("../../../mdi/fonts/materialdesignicons-webfont.woff2?v=2.1.19") format("woff2"), url("../../../mdi/fonts/materialdesignicons-webfont.woff?v=2.1.19") format("woff"), url("../../../mdi/fonts/materialdesignicons-webfont.ttf?v=2.1.19") format("truetype"), url("../../../mdi/fonts/materialdesignicons-webfont.svg?v=2.1.19#materialdesigniconsregular") format("svg");
+  src: url("../../../mdi/fonts/materialdesignicons-webfont.eot?v=2.3.54");
+  src: url("../../../mdi/fonts/materialdesignicons-webfont.eot?#iefix&v=2.3.54") format("embedded-opentype"), url("../../../mdi/fonts/materialdesignicons-webfont.woff2?v=2.3.54") format("woff2"), url("../../../mdi/fonts/materialdesignicons-webfont.woff?v=2.3.54") format("woff"), url("../../../mdi/fonts/materialdesignicons-webfont.ttf?v=2.3.54") format("truetype"), url("../../../mdi/fonts/materialdesignicons-webfont.svg?v=2.3.54#materialdesigniconsregular") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -9988,6 +9941,12 @@ button.close {
 .mdi-account-edit:before {
   content: "\F6BB";
 }
+.mdi-account-group:before {
+  content: "\F848";
+}
+.mdi-account-heart:before {
+  content: "\F898";
+}
 .mdi-account-key:before {
   content: "\F00B";
 }
@@ -9999,6 +9958,9 @@ button.close {
 }
 .mdi-account-multiple:before {
   content: "\F00E";
+}
+.mdi-account-multiple-check:before {
+  content: "\F8C4";
 }
 .mdi-account-multiple-minus:before {
   content: "\F5D3";
@@ -10045,6 +10007,9 @@ button.close {
 .mdi-account-switch:before {
   content: "\F019";
 }
+.mdi-accusoft:before {
+  content: "\F849";
+}
 .mdi-adjust:before {
   content: "\F01A";
 }
@@ -10068,6 +10033,9 @@ button.close {
 }
 .mdi-airplay:before {
   content: "\F01F";
+}
+.mdi-airport:before {
+  content: "\F84A";
 }
 .mdi-alarm:before {
   content: "\F020";
@@ -10120,11 +10088,11 @@ button.close {
 .mdi-alert-outline:before {
   content: "\F02A";
 }
+.mdi-alien:before {
+  content: "\F899";
+}
 .mdi-all-inclusive:before {
   content: "\F6BD";
-}
-.mdi-allo:before {
-  content: "\F801";
 }
 .mdi-alpha:before {
   content: "\F02B";
@@ -10138,7 +10106,10 @@ button.close {
 .mdi-amazon:before {
   content: "\F02D";
 }
-.mdi-amazon-clouddrive:before {
+.mdi-amazon-alexa:before {
+  content: "\F8C5";
+}
+.mdi-amazon-drive:before {
   content: "\F02E";
 }
 .mdi-ambulance:before {
@@ -10171,11 +10142,17 @@ button.close {
 .mdi-animation:before {
   content: "\F5D8";
 }
+.mdi-anvil:before {
+  content: "\F89A";
+}
 .mdi-apple:before {
   content: "\F035";
 }
 .mdi-apple-finder:before {
   content: "\F036";
+}
+.mdi-apple-icloud:before {
+  content: "\F038";
 }
 .mdi-apple-ios:before {
   content: "\F037";
@@ -10195,9 +10172,6 @@ button.close {
 .mdi-apple-keyboard-shift:before {
   content: "\F636";
 }
-.mdi-apple-mobileme:before {
-  content: "\F038";
-}
 .mdi-apple-safari:before {
   content: "\F039";
 }
@@ -10209,6 +10183,9 @@ button.close {
 }
 .mdi-apps:before {
   content: "\F03B";
+}
+.mdi-arch:before {
+  content: "\F8C6";
 }
 .mdi-archive:before {
   content: "\F03C";
@@ -10243,6 +10220,9 @@ button.close {
 .mdi-arrow-collapse-down:before {
   content: "\F791";
 }
+.mdi-arrow-collapse-horizontal:before {
+  content: "\F84B";
+}
 .mdi-arrow-collapse-left:before {
   content: "\F792";
 }
@@ -10251,6 +10231,9 @@ button.close {
 }
 .mdi-arrow-collapse-up:before {
   content: "\F794";
+}
+.mdi-arrow-collapse-vertical:before {
+  content: "\F84C";
 }
 .mdi-arrow-down:before {
   content: "\F045";
@@ -10294,6 +10277,9 @@ button.close {
 .mdi-arrow-expand-down:before {
   content: "\F795";
 }
+.mdi-arrow-expand-horizontal:before {
+  content: "\F84D";
+}
 .mdi-arrow-expand-left:before {
   content: "\F796";
 }
@@ -10302,6 +10288,9 @@ button.close {
 }
 .mdi-arrow-expand-up:before {
   content: "\F798";
+}
+.mdi-arrow-expand-vertical:before {
+  content: "\F84E";
 }
 .mdi-arrow-left:before {
   content: "\F04D";
@@ -10432,6 +10421,9 @@ button.close {
 .mdi-audiobook:before {
   content: "\F067";
 }
+.mdi-augmented-reality:before {
+  content: "\F84F";
+}
 .mdi-auto-fix:before {
   content: "\F068";
 }
@@ -10443,6 +10435,9 @@ button.close {
 }
 .mdi-av-timer:before {
   content: "\F06B";
+}
+.mdi-axe:before {
+  content: "\F8C7";
 }
 .mdi-azure:before {
   content: "\F804";
@@ -10462,6 +10457,9 @@ button.close {
 .mdi-backup-restore:before {
   content: "\F06F";
 }
+.mdi-badminton:before {
+  content: "\F850";
+}
 .mdi-bandcamp:before {
   content: "\F674";
 }
@@ -10479,6 +10477,12 @@ button.close {
 }
 .mdi-barrel:before {
   content: "\F074";
+}
+.mdi-baseball:before {
+  content: "\F851";
+}
+.mdi-baseball-bat:before {
+  content: "\F852";
 }
 .mdi-basecamp:before {
   content: "\F075";
@@ -10531,6 +10535,9 @@ button.close {
 .mdi-battery-charging:before {
   content: "\F084";
 }
+.mdi-battery-charging-10:before {
+  content: "\F89B";
+}
 .mdi-battery-charging-100:before {
   content: "\F085";
 }
@@ -10543,14 +10550,23 @@ button.close {
 .mdi-battery-charging-40:before {
   content: "\F088";
 }
+.mdi-battery-charging-50:before {
+  content: "\F89C";
+}
 .mdi-battery-charging-60:before {
   content: "\F089";
+}
+.mdi-battery-charging-70:before {
+  content: "\F89D";
 }
 .mdi-battery-charging-80:before {
   content: "\F08A";
 }
 .mdi-battery-charging-90:before {
   content: "\F08B";
+}
+.mdi-battery-charging-outline:before {
+  content: "\F89E";
 }
 .mdi-battery-charging-wireless:before {
   content: "\F806";
@@ -10614,6 +10630,9 @@ button.close {
 }
 .mdi-beats:before {
   content: "\F097";
+}
+.mdi-bed-empty:before {
+  content: "\F89F";
 }
 .mdi-beer:before {
   content: "\F098";
@@ -10789,8 +10808,14 @@ button.close {
 .mdi-border-all:before {
   content: "\F0C7";
 }
+.mdi-border-all-variant:before {
+  content: "\F8A0";
+}
 .mdi-border-bottom:before {
   content: "\F0C8";
+}
+.mdi-border-bottom-variant:before {
+  content: "\F8A1";
 }
 .mdi-border-color:before {
   content: "\F0C9";
@@ -10804,8 +10829,14 @@ button.close {
 .mdi-border-left:before {
   content: "\F0CC";
 }
+.mdi-border-left-variant:before {
+  content: "\F8A2";
+}
 .mdi-border-none:before {
   content: "\F0CD";
+}
+.mdi-border-none-variant:before {
+  content: "\F8A3";
 }
 .mdi-border-outside:before {
   content: "\F0CE";
@@ -10813,14 +10844,23 @@ button.close {
 .mdi-border-right:before {
   content: "\F0CF";
 }
+.mdi-border-right-variant:before {
+  content: "\F8A4";
+}
 .mdi-border-style:before {
   content: "\F0D0";
 }
 .mdi-border-top:before {
   content: "\F0D1";
 }
+.mdi-border-top-variant:before {
+  content: "\F8A5";
+}
 .mdi-border-vertical:before {
   content: "\F0D2";
+}
+.mdi-bottle-wine:before {
+  content: "\F853";
 }
 .mdi-bow-tie:before {
   content: "\F677";
@@ -10903,6 +10943,9 @@ button.close {
 .mdi-bullseye:before {
   content: "\F5DD";
 }
+.mdi-bullseye-arrow:before {
+  content: "\F8C8";
+}
 .mdi-bus:before {
   content: "\F0E7";
 }
@@ -10911,6 +10954,9 @@ button.close {
 }
 .mdi-bus-articulated-front:before {
   content: "\F79C";
+}
+.mdi-bus-clock:before {
+  content: "\F8C9";
 }
 .mdi-bus-double-decker:before {
   content: "\F79D";
@@ -10947,6 +10993,9 @@ button.close {
 }
 .mdi-calendar-clock:before {
   content: "\F0F0";
+}
+.mdi-calendar-edit:before {
+  content: "\F8A6";
 }
 .mdi-calendar-multiple:before {
   content: "\F0F1";
@@ -11002,6 +11051,9 @@ button.close {
 .mdi-camera:before {
   content: "\F100";
 }
+.mdi-camera-account:before {
+  content: "\F8CA";
+}
 .mdi-camera-burst:before {
   content: "\F692";
 }
@@ -11016,6 +11068,9 @@ button.close {
 }
 .mdi-camera-gopro:before {
   content: "\F7A0";
+}
+.mdi-camera-image:before {
+  content: "\F8CB";
 }
 .mdi-camera-iris:before {
   content: "\F104";
@@ -11080,6 +11135,9 @@ button.close {
 .mdi-car-hatchback:before {
   content: "\F7A8";
 }
+.mdi-car-limousine:before {
+  content: "\F8CC";
+}
 .mdi-car-pickup:before {
   content: "\F7A9";
 }
@@ -11098,11 +11156,23 @@ button.close {
 .mdi-cards:before {
   content: "\F638";
 }
+.mdi-cards-club:before {
+  content: "\F8CD";
+}
+.mdi-cards-diamond:before {
+  content: "\F8CE";
+}
+.mdi-cards-heart:before {
+  content: "\F8CF";
+}
 .mdi-cards-outline:before {
   content: "\F639";
 }
 .mdi-cards-playing-outline:before {
   content: "\F63A";
+}
+.mdi-cards-spade:before {
+  content: "\F8D0";
 }
 .mdi-cards-variant:before {
   content: "\F6C6";
@@ -11179,8 +11249,14 @@ button.close {
 .mdi-cellphone-link-off:before {
   content: "\F122";
 }
+.mdi-cellphone-message:before {
+  content: "\F8D2";
+}
 .mdi-cellphone-settings:before {
   content: "\F123";
+}
+.mdi-cellphone-text:before {
+  content: "\F8D1";
 }
 .mdi-cellphone-wireless:before {
   content: "\F814";
@@ -11227,6 +11303,9 @@ button.close {
 .mdi-chart-line-variant:before {
   content: "\F7B0";
 }
+.mdi-chart-multiline:before {
+  content: "\F8D3";
+}
 .mdi-chart-pie:before {
   content: "\F12B";
 }
@@ -11248,6 +11327,9 @@ button.close {
 .mdi-check-circle-outline:before {
   content: "\F5E1";
 }
+.mdi-check-outline:before {
+  content: "\F854";
+}
 .mdi-checkbox-blank:before {
   content: "\F12E";
 }
@@ -11259,6 +11341,9 @@ button.close {
 }
 .mdi-checkbox-blank-outline:before {
   content: "\F131";
+}
+.mdi-checkbox-intermediate:before {
+  content: "\F855";
 }
 .mdi-checkbox-marked:before {
   content: "\F132";
@@ -11302,6 +11387,24 @@ button.close {
 .mdi-chemical-weapon:before {
   content: "\F13B";
 }
+.mdi-chess-bishop:before {
+  content: "\F85B";
+}
+.mdi-chess-king:before {
+  content: "\F856";
+}
+.mdi-chess-knight:before {
+  content: "\F857";
+}
+.mdi-chess-pawn:before {
+  content: "\F858";
+}
+.mdi-chess-queen:before {
+  content: "\F859";
+}
+.mdi-chess-rook:before {
+  content: "\F85A";
+}
 .mdi-chevron-double-down:before {
   content: "\F13C";
 }
@@ -11344,6 +11447,9 @@ button.close {
 .mdi-circle:before {
   content: "\F764";
 }
+.mdi-circle-edit-outline:before {
+  content: "\F8D4";
+}
 .mdi-circle-outline:before {
   content: "\F765";
 }
@@ -11371,6 +11477,9 @@ button.close {
 .mdi-clipboard-check:before {
   content: "\F14C";
 }
+.mdi-clipboard-check-outline:before {
+  content: "\F8A7";
+}
 .mdi-clipboard-flow:before {
   content: "\F6C7";
 }
@@ -11379,6 +11488,12 @@ button.close {
 }
 .mdi-clipboard-plus:before {
   content: "\F750";
+}
+.mdi-clipboard-pulse:before {
+  content: "\F85C";
+}
+.mdi-clipboard-pulse-outline:before {
+  content: "\F85D";
 }
 .mdi-clipboard-text:before {
   content: "\F14E";
@@ -11530,6 +11645,9 @@ button.close {
 .mdi-coffee-to-go:before {
   content: "\F177";
 }
+.mdi-cogs:before {
+  content: "\F8D5";
+}
 .mdi-coin:before {
   content: "\F178";
 }
@@ -11563,6 +11681,9 @@ button.close {
 .mdi-comment-check-outline:before {
   content: "\F180";
 }
+.mdi-comment-multiple:before {
+  content: "\F85E";
+}
 .mdi-comment-multiple-outline:before {
   content: "\F181";
 }
@@ -11593,6 +11714,12 @@ button.close {
 .mdi-comment-text:before {
   content: "\F188";
 }
+.mdi-comment-text-multiple:before {
+  content: "\F85F";
+}
+.mdi-comment-text-multiple-outline:before {
+  content: "\F860";
+}
 .mdi-comment-text-outline:before {
   content: "\F189";
 }
@@ -11610,6 +11737,9 @@ button.close {
 }
 .mdi-console-line:before {
   content: "\F7B6";
+}
+.mdi-console-network:before {
+  content: "\F8A8";
 }
 .mdi-contact-mail:before {
   content: "\F18E";
@@ -11665,6 +11795,9 @@ button.close {
 .mdi-cow:before {
   content: "\F19A";
 }
+.mdi-crane:before {
+  content: "\F861";
+}
 .mdi-creation:before {
   content: "\F1C9";
 }
@@ -11682,6 +11815,9 @@ button.close {
 }
 .mdi-credit-card-scan:before {
   content: "\F19D";
+}
+.mdi-credit-card-settings:before {
+  content: "\F8D6";
 }
 .mdi-crop:before {
   content: "\F19E";
@@ -11731,6 +11867,12 @@ button.close {
 .mdi-cup-water:before {
   content: "\F1AB";
 }
+.mdi-curling:before {
+  content: "\F862";
+}
+.mdi-currency-bdt:before {
+  content: "\F863";
+}
 .mdi-currency-btc:before {
   content: "\F1AC";
 }
@@ -11757,6 +11899,9 @@ button.close {
 }
 .mdi-currency-krw:before {
   content: "\F7BC";
+}
+.mdi-currency-kzt:before {
+  content: "\F864";
 }
 .mdi-currency-ngn:before {
   content: "\F1B0";
@@ -11802,6 +11947,18 @@ button.close {
 }
 .mdi-database-plus:before {
   content: "\F1BA";
+}
+.mdi-database-search:before {
+  content: "\F865";
+}
+.mdi-death-star:before {
+  content: "\F8D7";
+}
+.mdi-death-star-variant:before {
+  content: "\F8D8";
+}
+.mdi-debian:before {
+  content: "\F8D9";
 }
 .mdi-debug-step-into:before {
   content: "\F1BB";
@@ -11896,6 +12053,9 @@ button.close {
 .mdi-dice-d10:before {
   content: "\F76E";
 }
+.mdi-dice-d12:before {
+  content: "\F866";
+}
 .mdi-dice-d20:before {
   content: "\F5EA";
 }
@@ -11956,6 +12116,9 @@ button.close {
 .mdi-do-not-disturb-off:before {
   content: "\F698";
 }
+.mdi-docker:before {
+  content: "\F867";
+}
 .mdi-dolby:before {
   content: "\F6B2";
 }
@@ -11973,6 +12136,9 @@ button.close {
 }
 .mdi-door-open:before {
   content: "\F81B";
+}
+.mdi-doorbell-video:before {
+  content: "\F868";
 }
 .mdi-dots-horizontal:before {
   content: "\F1D8";
@@ -12139,6 +12305,9 @@ button.close {
 .mdi-escalator:before {
   content: "\F1FF";
 }
+.mdi-ethereum:before {
+  content: "\F869";
+}
 .mdi-ethernet:before {
   content: "\F200";
 }
@@ -12180,6 +12349,18 @@ button.close {
 }
 .mdi-eye-outline:before {
   content: "\F6CF";
+}
+.mdi-eye-plus:before {
+  content: "\F86A";
+}
+.mdi-eye-plus-outline:before {
+  content: "\F86B";
+}
+.mdi-eye-settings:before {
+  content: "\F86C";
+}
+.mdi-eye-settings-outline:before {
+  content: "\F86D";
 }
 .mdi-eyedropper:before {
   content: "\F20A";
@@ -12223,6 +12404,9 @@ button.close {
 .mdi-feather:before {
   content: "\F6D2";
 }
+.mdi-fedora:before {
+  content: "\F8DA";
+}
 .mdi-ferry:before {
   content: "\F213";
 }
@@ -12240,6 +12424,9 @@ button.close {
 }
 .mdi-file-cloud:before {
   content: "\F217";
+}
+.mdi-file-compare:before {
+  content: "\F8A9";
 }
 .mdi-file-delimited:before {
   content: "\F218";
@@ -12304,6 +12491,9 @@ button.close {
 .mdi-file-presentation-box:before {
   content: "\F229";
 }
+.mdi-file-question:before {
+  content: "\F86E";
+}
 .mdi-file-restore:before {
   content: "\F670";
 }
@@ -12312,6 +12502,9 @@ button.close {
 }
 .mdi-file-tree:before {
   content: "\F645";
+}
+.mdi-file-undo:before {
+  content: "\F8DB";
 }
 .mdi-file-video:before {
   content: "\F22B";
@@ -12360,6 +12553,9 @@ button.close {
 }
 .mdi-fire:before {
   content: "\F238";
+}
+.mdi-fire-truck:before {
+  content: "\F8AA";
 }
 .mdi-firefox:before {
   content: "\F239";
@@ -12430,6 +12626,9 @@ button.close {
 .mdi-flip-to-front:before {
   content: "\F248";
 }
+.mdi-floor-lamp:before {
+  content: "\F8DC";
+}
 .mdi-floor-plan:before {
   content: "\F820";
 }
@@ -12448,11 +12647,20 @@ button.close {
 .mdi-folder-download:before {
   content: "\F24D";
 }
+.mdi-folder-edit:before {
+  content: "\F8DD";
+}
 .mdi-folder-google-drive:before {
   content: "\F24E";
 }
 .mdi-folder-image:before {
   content: "\F24F";
+}
+.mdi-folder-key:before {
+  content: "\F8AB";
+}
+.mdi-folder-key-network:before {
+  content: "\F8AC";
 }
 .mdi-folder-lock:before {
   content: "\F250";
@@ -12471,6 +12679,9 @@ button.close {
 }
 .mdi-folder-multiple-outline:before {
   content: "\F255";
+}
+.mdi-folder-network:before {
+  content: "\F86F";
 }
 .mdi-folder-open:before {
   content: "\F76F";
@@ -12558,6 +12769,9 @@ button.close {
 }
 .mdi-format-color-text:before {
   content: "\F69D";
+}
+.mdi-format-columns:before {
+  content: "\F8DE";
 }
 .mdi-format-float-center:before {
   content: "\F267";
@@ -12730,6 +12944,9 @@ button.close {
 .mdi-foursquare:before {
   content: "\F28E";
 }
+.mdi-freebsd:before {
+  content: "\F8DF";
+}
 .mdi-fridge:before {
   content: "\F28F";
 }
@@ -12754,6 +12971,9 @@ button.close {
 .mdi-function:before {
   content: "\F295";
 }
+.mdi-function-variant:before {
+  content: "\F870";
+}
 .mdi-gamepad:before {
   content: "\F296";
 }
@@ -12762,6 +12982,9 @@ button.close {
 }
 .mdi-garage:before {
   content: "\F6D8";
+}
+.mdi-garage-alert:before {
+  content: "\F871";
 }
 .mdi-garage-open:before {
   content: "\F6D9";
@@ -12775,8 +12998,38 @@ button.close {
 .mdi-gate:before {
   content: "\F299";
 }
+.mdi-gate-and:before {
+  content: "\F8E0";
+}
+.mdi-gate-nand:before {
+  content: "\F8E1";
+}
+.mdi-gate-nor:before {
+  content: "\F8E2";
+}
+.mdi-gate-not:before {
+  content: "\F8E3";
+}
+.mdi-gate-or:before {
+  content: "\F8E4";
+}
+.mdi-gate-xnor:before {
+  content: "\F8E5";
+}
+.mdi-gate-xor:before {
+  content: "\F8E6";
+}
 .mdi-gauge:before {
   content: "\F29A";
+}
+.mdi-gauge-empty:before {
+  content: "\F872";
+}
+.mdi-gauge-full:before {
+  content: "\F873";
+}
+.mdi-gauge-low:before {
+  content: "\F874";
 }
 .mdi-gavel:before {
   content: "\F29B";
@@ -12792,6 +13045,9 @@ button.close {
 }
 .mdi-gender-transgender:before {
   content: "\F29F";
+}
+.mdi-gentoo:before {
+  content: "\F8E7";
 }
 .mdi-gesture:before {
   content: "\F7CA";
@@ -12838,6 +13094,9 @@ button.close {
 .mdi-github-face:before {
   content: "\F6DA";
 }
+.mdi-glass-cocktail:before {
+  content: "\F356";
+}
 .mdi-glass-flute:before {
   content: "\F2A5";
 }
@@ -12850,11 +13109,17 @@ button.close {
 .mdi-glass-tulip:before {
   content: "\F2A8";
 }
+.mdi-glass-wine:before {
+  content: "\F875";
+}
 .mdi-glassdoor:before {
   content: "\F2A9";
 }
 .mdi-glasses:before {
   content: "\F2AA";
+}
+.mdi-globe-model:before {
+  content: "\F8E8";
 }
 .mdi-gmail:before {
   content: "\F2AB";
@@ -12870,6 +13135,9 @@ button.close {
 }
 .mdi-google:before {
   content: "\F2AD";
+}
+.mdi-google-allo:before {
+  content: "\F801";
 }
 .mdi-google-analytics:before {
   content: "\F7CB";
@@ -12910,6 +13178,9 @@ button.close {
 .mdi-google-glass:before {
   content: "\F2B8";
 }
+.mdi-google-hangouts:before {
+  content: "\F2C9";
+}
 .mdi-google-home:before {
   content: "\F823";
 }
@@ -12946,8 +13217,14 @@ button.close {
 .mdi-google-wallet:before {
   content: "\F2C0";
 }
+.mdi-gpu:before {
+  content: "\F8AD";
+}
 .mdi-gradient:before {
   content: "\F69F";
+}
+.mdi-graphql:before {
+  content: "\F876";
 }
 .mdi-grease-pencil:before {
   content: "\F648";
@@ -12985,14 +13262,14 @@ button.close {
 .mdi-hamburger:before {
   content: "\F684";
 }
+.mdi-hammer:before {
+  content: "\F8E9";
+}
 .mdi-hand-pointing-right:before {
   content: "\F2C7";
 }
 .mdi-hanger:before {
   content: "\F2C8";
-}
-.mdi-hangouts:before {
-  content: "\F2C9";
 }
 .mdi-harddisk:before {
   content: "\F2CA";
@@ -13075,11 +13352,20 @@ button.close {
 .mdi-high-definition:before {
   content: "\F7CE";
 }
+.mdi-high-definition-box:before {
+  content: "\F877";
+}
 .mdi-highway:before {
   content: "\F5F7";
 }
 .mdi-history:before {
   content: "\F2DA";
+}
+.mdi-hockey-puck:before {
+  content: "\F878";
+}
+.mdi-hockey-sticks:before {
+  content: "\F879";
 }
 .mdi-hololens:before {
   content: "\F2DB";
@@ -13090,6 +13376,9 @@ button.close {
 .mdi-home-account:before {
   content: "\F825";
 }
+.mdi-home-alert:before {
+  content: "\F87A";
+}
 .mdi-home-assistant:before {
   content: "\F7CF";
 }
@@ -13099,8 +13388,17 @@ button.close {
 .mdi-home-circle:before {
   content: "\F7D1";
 }
+.mdi-home-currency-usd:before {
+  content: "\F8AE";
+}
 .mdi-home-heart:before {
   content: "\F826";
+}
+.mdi-home-lock:before {
+  content: "\F8EA";
+}
+.mdi-home-lock-open:before {
+  content: "\F8EB";
 }
 .mdi-home-map-marker:before {
   content: "\F5F8";
@@ -13234,6 +13532,9 @@ button.close {
 .mdi-image-off:before {
   content: "\F82A";
 }
+.mdi-image-plus:before {
+  content: "\F87B";
+}
 .mdi-import:before {
   content: "\F2FA";
 }
@@ -13245,6 +13546,9 @@ button.close {
 }
 .mdi-inbox-arrow-up:before {
   content: "\F3D1";
+}
+.mdi-inbox-multiple:before {
+  content: "\F8AF";
 }
 .mdi-incognito:before {
   content: "\F5F9";
@@ -13281,6 +13585,9 @@ button.close {
 }
 .mdi-jira:before {
   content: "\F303";
+}
+.mdi-jquery:before {
+  content: "\F87C";
 }
 .mdi-jsfiddle:before {
   content: "\F304";
@@ -13393,6 +13700,9 @@ button.close {
 .mdi-language-javascript:before {
   content: "\F31E";
 }
+.mdi-language-lua:before {
+  content: "\F8B0";
+}
 .mdi-language-php:before {
   content: "\F31F";
 }
@@ -13483,6 +13793,9 @@ button.close {
 .mdi-library-plus:before {
   content: "\F334";
 }
+.mdi-lifebuoy:before {
+  content: "\F87D";
+}
 .mdi-lightbulb:before {
   content: "\F335";
 }
@@ -13516,11 +13829,17 @@ button.close {
 .mdi-linux:before {
   content: "\F33D";
 }
+.mdi-linux-mint:before {
+  content: "\F8EC";
+}
 .mdi-loading:before {
   content: "\F771";
 }
 .mdi-lock:before {
   content: "\F33E";
+}
+.mdi-lock-alert:before {
+  content: "\F8ED";
 }
 .mdi-lock-open:before {
   content: "\F33F";
@@ -13537,8 +13856,14 @@ button.close {
 .mdi-lock-plus:before {
   content: "\F5FB";
 }
+.mdi-lock-question:before {
+  content: "\F8EE";
+}
 .mdi-lock-reset:before {
   content: "\F772";
+}
+.mdi-lock-smart:before {
+  content: "\F8B1";
 }
 .mdi-locker:before {
   content: "\F7D6";
@@ -13606,6 +13931,9 @@ button.close {
 .mdi-map-marker-circle:before {
   content: "\F34F";
 }
+.mdi-map-marker-distance:before {
+  content: "\F8EF";
+}
 .mdi-map-marker-minus:before {
   content: "\F650";
 }
@@ -13635,9 +13963,6 @@ button.close {
 }
 .mdi-marker-check:before {
   content: "\F355";
-}
-.mdi-martini:before {
-  content: "\F356";
 }
 .mdi-material-ui:before {
   content: "\F357";
@@ -13744,11 +14069,17 @@ button.close {
 .mdi-microphone:before {
   content: "\F36C";
 }
+.mdi-microphone-minus:before {
+  content: "\F8B2";
+}
 .mdi-microphone-off:before {
   content: "\F36D";
 }
 .mdi-microphone-outline:before {
   content: "\F36E";
+}
+.mdi-microphone-plus:before {
+  content: "\F8B3";
 }
 .mdi-microphone-settings:before {
   content: "\F36F";
@@ -13764,6 +14095,12 @@ button.close {
 }
 .mdi-microsoft:before {
   content: "\F372";
+}
+.mdi-midi:before {
+  content: "\F8F0";
+}
+.mdi-midi-port:before {
+  content: "\F8F1";
 }
 .mdi-minecraft:before {
   content: "\F373";
@@ -13788,6 +14125,9 @@ button.close {
 }
 .mdi-mixcloud:before {
   content: "\F62A";
+}
+.mdi-mixed-reality:before {
+  content: "\F87E";
 }
 .mdi-mixer:before {
   content: "\F7DC";
@@ -13882,6 +14222,12 @@ button.close {
 .mdi-music-off:before {
   content: "\F75A";
 }
+.mdi-nas:before {
+  content: "\F8F2";
+}
+.mdi-nativescript:before {
+  content: "\F87F";
+}
 .mdi-nature:before {
   content: "\F38E";
 }
@@ -13897,17 +14243,44 @@ button.close {
 .mdi-needle:before {
   content: "\F391";
 }
-.mdi-nest-protect:before {
-  content: "\F392";
-}
-.mdi-nest-thermostat:before {
-  content: "\F393";
-}
 .mdi-netflix:before {
   content: "\F745";
 }
 .mdi-network:before {
   content: "\F6F2";
+}
+.mdi-network-strength-1:before {
+  content: "\F8F3";
+}
+.mdi-network-strength-1-alert:before {
+  content: "\F8F4";
+}
+.mdi-network-strength-2:before {
+  content: "\F8F5";
+}
+.mdi-network-strength-2-alert:before {
+  content: "\F8F6";
+}
+.mdi-network-strength-3:before {
+  content: "\F8F7";
+}
+.mdi-network-strength-3-alert:before {
+  content: "\F8F8";
+}
+.mdi-network-strength-4:before {
+  content: "\F8F9";
+}
+.mdi-network-strength-4-alert:before {
+  content: "\F8FA";
+}
+.mdi-network-strength-off:before {
+  content: "\F8FB";
+}
+.mdi-network-strength-off-outline:before {
+  content: "\F8FC";
+}
+.mdi-network-strength-outline:before {
+  content: "\F8FD";
 }
 .mdi-new-box:before {
   content: "\F394";
@@ -14113,6 +14486,9 @@ button.close {
 .mdi-onenote:before {
   content: "\F746";
 }
+.mdi-onepassword:before {
+  content: "\F880";
+}
 .mdi-opacity:before {
   content: "\F5CC";
 }
@@ -14182,6 +14558,9 @@ button.close {
 .mdi-palette-advanced:before {
   content: "\F3D9";
 }
+.mdi-palette-swatch:before {
+  content: "\F8B4";
+}
 .mdi-panda:before {
   content: "\F3DA";
 }
@@ -14215,6 +14594,9 @@ button.close {
 .mdi-passport:before {
   content: "\F7E2";
 }
+.mdi-patreon:before {
+  content: "\F881";
+}
 .mdi-pause:before {
   content: "\F3E4";
 }
@@ -14235,6 +14617,12 @@ button.close {
 }
 .mdi-paw-off:before {
   content: "\F657";
+}
+.mdi-paypal:before {
+  content: "\F882";
+}
+.mdi-peace:before {
+  content: "\F883";
 }
 .mdi-pen:before {
   content: "\F3EA";
@@ -14268,6 +14656,9 @@ button.close {
 }
 .mdi-percent:before {
   content: "\F3F0";
+}
+.mdi-periodic-table:before {
+  content: "\F8B5";
 }
 .mdi-periodic-table-co2:before {
   content: "\F7E3";
@@ -14323,6 +14714,12 @@ button.close {
 .mdi-phone-return:before {
   content: "\F82E";
 }
+.mdi-phone-rotate-landscape:before {
+  content: "\F884";
+}
+.mdi-phone-rotate-portrait:before {
+  content: "\F885";
+}
 .mdi-phone-settings:before {
   content: "\F3FD";
 }
@@ -14338,6 +14735,15 @@ button.close {
 .mdi-piano:before {
   content: "\F67C";
 }
+.mdi-pickaxe:before {
+  content: "\F8B6";
+}
+.mdi-pier:before {
+  content: "\F886";
+}
+.mdi-pier-crane:before {
+  content: "\F887";
+}
 .mdi-pig:before {
   content: "\F401";
 }
@@ -14352,6 +14758,12 @@ button.close {
 }
 .mdi-pin-off:before {
   content: "\F404";
+}
+.mdi-pin-off-outline:before {
+  content: "\F92F";
+}
+.mdi-pin-outline:before {
+  content: "\F930";
 }
 .mdi-pine-tree:before {
   content: "\F405";
@@ -14371,8 +14783,14 @@ button.close {
 .mdi-pipe-disconnected:before {
   content: "\F7E5";
 }
+.mdi-pipe-leak:before {
+  content: "\F888";
+}
 .mdi-pistol:before {
   content: "\F702";
+}
+.mdi-piston:before {
+  content: "\F889";
 }
 .mdi-pizza:before {
   content: "\F409";
@@ -14392,14 +14810,23 @@ button.close {
 .mdi-play-circle-outline:before {
   content: "\F40D";
 }
+.mdi-play-network:before {
+  content: "\F88A";
+}
 .mdi-play-pause:before {
   content: "\F40E";
 }
 .mdi-play-protected-content:before {
   content: "\F40F";
 }
+.mdi-play-speed:before {
+  content: "\F8FE";
+}
 .mdi-playlist-check:before {
   content: "\F5C7";
+}
+.mdi-playlist-edit:before {
+  content: "\F8FF";
 }
 .mdi-playlist-minus:before {
   content: "\F410";
@@ -14488,6 +14915,15 @@ button.close {
 .mdi-power:before {
   content: "\F425";
 }
+.mdi-power-cycle:before {
+  content: "\F900";
+}
+.mdi-power-off:before {
+  content: "\F901";
+}
+.mdi-power-on:before {
+  content: "\F902";
+}
 .mdi-power-plug:before {
   content: "\F6A4";
 }
@@ -14497,8 +14933,14 @@ button.close {
 .mdi-power-settings:before {
   content: "\F426";
 }
+.mdi-power-sleep:before {
+  content: "\F903";
+}
 .mdi-power-socket:before {
   content: "\F427";
+}
+.mdi-power-socket-au:before {
+  content: "\F904";
 }
 .mdi-power-socket-eu:before {
   content: "\F7E6";
@@ -14508,6 +14950,9 @@ button.close {
 }
 .mdi-power-socket-us:before {
   content: "\F7E8";
+}
+.mdi-power-standby:before {
+  content: "\F905";
 }
 .mdi-prescription:before {
   content: "\F705";
@@ -14560,6 +15005,9 @@ button.close {
 .mdi-qrcode:before {
   content: "\F432";
 }
+.mdi-qrcode-edit:before {
+  content: "\F8B7";
+}
 .mdi-qrcode-scan:before {
   content: "\F433";
 }
@@ -14571,6 +15019,9 @@ button.close {
 }
 .mdi-quicktime:before {
   content: "\F436";
+}
+.mdi-rabbit:before {
+  content: "\F906";
 }
 .mdi-radar:before {
   content: "\F437";
@@ -14656,8 +15107,14 @@ button.close {
 .mdi-reload:before {
   content: "\F453";
 }
+.mdi-reminder:before {
+  content: "\F88B";
+}
 .mdi-remote:before {
   content: "\F454";
+}
+.mdi-remote-desktop:before {
+  content: "\F8B8";
 }
 .mdi-rename-box:before {
   content: "\F455";
@@ -14731,11 +15188,17 @@ button.close {
 .mdi-robot:before {
   content: "\F6A8";
 }
+.mdi-robot-vacuum:before {
+  content: "\F70C";
+}
+.mdi-robot-vacuum-variant:before {
+  content: "\F907";
+}
 .mdi-rocket:before {
   content: "\F463";
 }
-.mdi-roomba:before {
-  content: "\F70C";
+.mdi-room-service:before {
+  content: "\F88C";
 }
 .mdi-rotate-3d:before {
   content: "\F464";
@@ -14782,14 +15245,23 @@ button.close {
 .mdi-sale:before {
   content: "\F46F";
 }
+.mdi-salesforce:before {
+  content: "\F88D";
+}
 .mdi-sass:before {
   content: "\F7EB";
 }
 .mdi-satellite:before {
   content: "\F470";
 }
+.mdi-satellite-uplink:before {
+  content: "\F908";
+}
 .mdi-satellite-variant:before {
   content: "\F471";
+}
+.mdi-sausage:before {
+  content: "\F8B9";
 }
 .mdi-saxophone:before {
   content: "\F609";
@@ -14805,6 +15277,9 @@ button.close {
 }
 .mdi-scanner:before {
   content: "\F6AA";
+}
+.mdi-scanner-off:before {
+  content: "\F909";
 }
 .mdi-school:before {
   content: "\F474";
@@ -14856,6 +15331,9 @@ button.close {
 }
 .mdi-security:before {
   content: "\F483";
+}
+.mdi-security-account:before {
+  content: "\F88E";
 }
 .mdi-security-home:before {
   content: "\F689";
@@ -14944,6 +15422,9 @@ button.close {
 .mdi-settings-box:before {
   content: "\F494";
 }
+.mdi-settings-outline:before {
+  content: "\F8BA";
+}
 .mdi-shape:before {
   content: "\F830";
 }
@@ -14967,6 +15448,9 @@ button.close {
 }
 .mdi-share:before {
   content: "\F496";
+}
+.mdi-share-outline:before {
+  content: "\F931";
 }
 .mdi-share-variant:before {
   content: "\F497";
@@ -15033,6 +15517,18 @@ button.close {
 }
 .mdi-signal-4g:before {
   content: "\F713";
+}
+.mdi-signal-cellular-1:before {
+  content: "\F8BB";
+}
+.mdi-signal-cellular-2:before {
+  content: "\F8BC";
+}
+.mdi-signal-cellular-3:before {
+  content: "\F8BD";
+}
+.mdi-signal-cellular-outline:before {
+  content: "\F8BE";
 }
 .mdi-signal-hspa:before {
   content: "\F714";
@@ -15106,11 +15602,17 @@ button.close {
 .mdi-slack:before {
   content: "\F4B1";
 }
+.mdi-slackware:before {
+  content: "\F90A";
+}
 .mdi-sleep:before {
   content: "\F4B2";
 }
 .mdi-sleep-off:before {
   content: "\F4B3";
+}
+.mdi-smoke-detector:before {
+  content: "\F392";
 }
 .mdi-smoking:before {
   content: "\F4B4";
@@ -15226,6 +15728,9 @@ button.close {
 .mdi-square:before {
   content: "\F763";
 }
+.mdi-square-edit-outline:before {
+  content: "\F90B";
+}
 .mdi-square-inc:before {
   content: "\F4CA";
 }
@@ -15238,11 +15743,14 @@ button.close {
 .mdi-square-root:before {
   content: "\F783";
 }
+.mdi-ssh:before {
+  content: "\F8BF";
+}
+.mdi-stack-exchange:before {
+  content: "\F60B";
+}
 .mdi-stack-overflow:before {
   content: "\F4CC";
-}
-.mdi-stackexchange:before {
-  content: "\F60B";
 }
 .mdi-stadium:before {
   content: "\F71F";
@@ -15271,8 +15779,14 @@ button.close {
 .mdi-steam:before {
   content: "\F4D3";
 }
+.mdi-steam-box:before {
+  content: "\F90C";
+}
 .mdi-steering:before {
   content: "\F4D4";
+}
+.mdi-steering-off:before {
+  content: "\F90D";
 }
 .mdi-step-backward:before {
   content: "\F4D5";
@@ -15355,8 +15869,14 @@ button.close {
 .mdi-swap-horizontal:before {
   content: "\F4E1";
 }
+.mdi-swap-horizontal-variant:before {
+  content: "\F8C0";
+}
 .mdi-swap-vertical:before {
   content: "\F4E2";
+}
+.mdi-swap-vertical-variant:before {
+  content: "\F8C1";
 }
 .mdi-swim:before {
   content: "\F4E3";
@@ -15430,6 +15950,9 @@ button.close {
 .mdi-table-row-remove:before {
   content: "\F4F5";
 }
+.mdi-table-search:before {
+  content: "\F90E";
+}
 .mdi-table-settings:before {
   content: "\F837";
 }
@@ -15454,6 +15977,9 @@ button.close {
 .mdi-tag-heart:before {
   content: "\F68A";
 }
+.mdi-tag-minus:before {
+  content: "\F90F";
+}
 .mdi-tag-multiple:before {
   content: "\F4FB";
 }
@@ -15474,6 +16000,9 @@ button.close {
 }
 .mdi-taxi:before {
   content: "\F4FF";
+}
+.mdi-teach:before {
+  content: "\F88F";
 }
 .mdi-teamviewer:before {
   content: "\F500";
@@ -15520,6 +16049,12 @@ button.close {
 .mdi-test-tube:before {
   content: "\F668";
 }
+.mdi-test-tube-empty:before {
+  content: "\F910";
+}
+.mdi-test-tube-off:before {
+  content: "\F911";
+}
 .mdi-text-shadow:before {
   content: "\F669";
 }
@@ -15550,6 +16085,12 @@ button.close {
 .mdi-thermometer-lines:before {
   content: "\F510";
 }
+.mdi-thermostat:before {
+  content: "\F393";
+}
+.mdi-thermostat-box:before {
+  content: "\F890";
+}
 .mdi-thought-bubble:before {
   content: "\F7F5";
 }
@@ -15579,6 +16120,9 @@ button.close {
 }
 .mdi-ticket-confirmation:before {
   content: "\F518";
+}
+.mdi-ticket-outline:before {
+  content: "\F912";
 }
 .mdi-ticket-percent:before {
   content: "\F723";
@@ -15641,6 +16185,9 @@ button.close {
   content: "\F528";
 }
 .mdi-tooth:before {
+  content: "\F8C2";
+}
+.mdi-tooth-outline:before {
   content: "\F529";
 }
 .mdi-tor:before {
@@ -15655,14 +16202,26 @@ button.close {
 .mdi-towing:before {
   content: "\F83B";
 }
+.mdi-track-light:before {
+  content: "\F913";
+}
 .mdi-trackpad:before {
   content: "\F7F7";
+}
+.mdi-trackpad-lock:before {
+  content: "\F932";
+}
+.mdi-tractor:before {
+  content: "\F891";
 }
 .mdi-traffic-light:before {
   content: "\F52B";
 }
 .mdi-train:before {
   content: "\F52C";
+}
+.mdi-train-variant:before {
+  content: "\F8C3";
 }
 .mdi-tram:before {
   content: "\F52D";
@@ -15678,6 +16237,12 @@ button.close {
 }
 .mdi-transit-transfer:before {
   content: "\F6AD";
+}
+.mdi-transition:before {
+  content: "\F914";
+}
+.mdi-transition-masked:before {
+  content: "\F915";
 }
 .mdi-translate:before {
   content: "\F5CA";
@@ -15739,8 +16304,14 @@ button.close {
 .mdi-tshirt-v:before {
   content: "\F540";
 }
+.mdi-tumble-dryer:before {
+  content: "\F916";
+}
 .mdi-tumblr:before {
   content: "\F541";
+}
+.mdi-tumblr-box:before {
+  content: "\F917";
 }
 .mdi-tumblr-reblog:before {
   content: "\F542";
@@ -15862,6 +16433,9 @@ button.close {
 .mdi-vector-difference-ba:before {
   content: "\F55C";
 }
+.mdi-vector-ellipse:before {
+  content: "\F892";
+}
 .mdi-vector-intersection:before {
   content: "\F55D";
 }
@@ -15913,6 +16487,12 @@ button.close {
 .mdi-video-4k-box:before {
   content: "\F83D";
 }
+.mdi-video-account:before {
+  content: "\F918";
+}
+.mdi-video-image:before {
+  content: "\F919";
+}
 .mdi-video-input-antenna:before {
   content: "\F83E";
 }
@@ -15927,6 +16507,9 @@ button.close {
 }
 .mdi-video-off:before {
   content: "\F568";
+}
+.mdi-video-stabilization:before {
+  content: "\F91A";
 }
 .mdi-video-switch:before {
   content: "\F569";
@@ -15985,6 +16568,9 @@ button.close {
 .mdi-violin:before {
   content: "\F60F";
 }
+.mdi-virtual-reality:before {
+  content: "\F893";
+}
 .mdi-visualstudio:before {
   content: "\F610";
 }
@@ -16039,6 +16625,15 @@ button.close {
 .mdi-wall:before {
   content: "\F7FD";
 }
+.mdi-wall-sconce:before {
+  content: "\F91B";
+}
+.mdi-wall-sconce-flat:before {
+  content: "\F91C";
+}
+.mdi-wall-sconce-variant:before {
+  content: "\F91D";
+}
 .mdi-wallet:before {
   content: "\F584";
 }
@@ -16063,8 +16658,17 @@ button.close {
 .mdi-watch-export:before {
   content: "\F58A";
 }
+.mdi-watch-export-variant:before {
+  content: "\F894";
+}
 .mdi-watch-import:before {
   content: "\F58B";
+}
+.mdi-watch-import-variant:before {
+  content: "\F895";
+}
+.mdi-watch-variant:before {
+  content: "\F896";
 }
 .mdi-watch-vibrate:before {
   content: "\F6B0";
@@ -16095,6 +16699,9 @@ button.close {
 }
 .mdi-weather-hail:before {
   content: "\F592";
+}
+.mdi-weather-hurricane:before {
+  content: "\F897";
 }
 .mdi-weather-lightning:before {
   content: "\F593";
@@ -16185,6 +16792,57 @@ button.close {
 }
 .mdi-wifi-off:before {
   content: "\F5AA";
+}
+.mdi-wifi-strength-1:before {
+  content: "\F91E";
+}
+.mdi-wifi-strength-1-alert:before {
+  content: "\F91F";
+}
+.mdi-wifi-strength-1-lock:before {
+  content: "\F920";
+}
+.mdi-wifi-strength-2:before {
+  content: "\F921";
+}
+.mdi-wifi-strength-2-alert:before {
+  content: "\F922";
+}
+.mdi-wifi-strength-2-lock:before {
+  content: "\F923";
+}
+.mdi-wifi-strength-3:before {
+  content: "\F924";
+}
+.mdi-wifi-strength-3-alert:before {
+  content: "\F925";
+}
+.mdi-wifi-strength-3-lock:before {
+  content: "\F926";
+}
+.mdi-wifi-strength-4:before {
+  content: "\F927";
+}
+.mdi-wifi-strength-4-alert:before {
+  content: "\F928";
+}
+.mdi-wifi-strength-4-lock:before {
+  content: "\F929";
+}
+.mdi-wifi-strength-alert-outline:before {
+  content: "\F92A";
+}
+.mdi-wifi-strength-lock-outline:before {
+  content: "\F92B";
+}
+.mdi-wifi-strength-off:before {
+  content: "\F92C";
+}
+.mdi-wifi-strength-off-outline:before {
+  content: "\F92D";
+}
+.mdi-wifi-strength-outline:before {
+  content: "\F92E";
 }
 .mdi-wii:before {
   content: "\F5AB";
@@ -16297,14 +16955,14 @@ button.close {
 .mdi-yin-yang:before {
   content: "\F67F";
 }
+.mdi-youtube:before {
+  content: "\F5C3";
+}
 .mdi-youtube-creator-studio:before {
   content: "\F846";
 }
 .mdi-youtube-gaming:before {
   content: "\F847";
-}
-.mdi-youtube-play:before {
-  content: "\F5C3";
 }
 .mdi-youtube-tv:before {
   content: "\F448";

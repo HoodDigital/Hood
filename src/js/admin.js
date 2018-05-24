@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).on('ready', function () {
 
     if ($(this).width() < 769) {
         $('body').addClass('body-small')
@@ -18,7 +18,7 @@ $(document).ready(function () {
         $('#right-sidebar').toggleClass('sidebar-open');
     });
 
-    $(".alert.auto-dismiss").fadeTo(2000, 500).slideUp(500, function () {
+    $(".alert.auto-dismiss").fadeTo(5000, 500).slideUp(500, function () {
         $(".alert.auto-dismiss").slideUp(500);
     });
 
@@ -131,7 +131,7 @@ $(document).ready(function () {
         .popover();
 });
 
-$(document).ready(function () {
+$(document).on('ready', function () {
     if (localStorageSupport) {
 
         var collapse = localStorage.getItem("collapse_menu");
@@ -242,7 +242,7 @@ function Resize() {
         });
     }
 }
-$(window).resize(Resize);
+$(window).on('resize', Resize);
 Resize();
 
 if (!$.hood)
@@ -253,53 +253,18 @@ $.hood.Admin = {
         $.hood.Helpers.InitIboxes(document);
         // Load any tinymce editors.
         tinymce.init({
-            selector: '.tinymce-full-admin',
-            height: 500,
-            menubar: false,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor media',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code'
-            ],
-            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage | code',
-            link_class_list: $.hood.LinkClasses,
-            image_class_list: $.hood.ImageClasses,
-            setup: $.hood.Uploader.Load.Insert,
-            image_dimensions: false,
-            content_css: [
-            ]
-        });
-
-        tinymce.init({
             selector: '.tinymce-full',
-            height: 500,
+            height: 150,
+            menubar: false,
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
                 'insertdatetime media contextmenu paste code'
             ],
-            menubar: false,
-            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | undo redo | link image media hoodimage',
+            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image media hoodimage | code',
             link_class_list: $.hood.LinkClasses,
             image_class_list: $.hood.ImageClasses,
             setup: $.hood.Uploader.Load.Insert,
-            image_dimensions: false,
-            content_css: [
-            ]
-        });
-
-        tinymce.init({
-            selector: '.tinymce-simple-admin',
-            height: 500,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor media',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code'
-            ],
-            menubar: false,
-            toolbar: 'bold italic | bullist numlist | undo redo | link | code',
-            link_class_list: $.hood.LinkClasses,
-            image_class_list: $.hood.ImageClasses,
             image_dimensions: false,
             content_css: [
             ]
@@ -321,10 +286,27 @@ $.hood.Admin = {
             content_css: [
             ]
         });
+        tinymce.init({
+            selector: '.tinymce-full-content',
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor media',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media contextmenu paste code'
+            ],
+            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image media hoodimage | code',
+            link_class_list: $.hood.LinkClasses,
+            image_class_list: $.hood.ImageClasses,
+            setup: $.hood.Uploader.Load.Insert,
+            image_dimensions: false,
+            content_css: [
+            ]
+        });
 
         tinymce.init({
-            selector: '.tinymce-basic',
-            height: 150,
+            selector: '.tinymce-simple-content',
+            height: 500,
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
@@ -343,7 +325,7 @@ $.hood.Admin = {
 
     },
 };
-$(window).load(function () {
+$(window).on('load', function () {
     $.hood.Admin.Init();
 });
 

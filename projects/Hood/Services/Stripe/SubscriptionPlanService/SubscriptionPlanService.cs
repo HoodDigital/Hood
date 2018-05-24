@@ -22,8 +22,12 @@ namespace Hood.Services
                 Currency = currency,                 // "usd" only supported right now
                 Interval = interval,                 // "month" or "year"
                 IntervalCount = intervalCount,       // optional
-                Name = name,
-                TrialPeriodDays = trialPeriodDays   // amount of time that will lapse before the customer is billed
+                Nickname = name,
+                TrialPeriodDays = trialPeriodDays,   // amount of time that will lapse before the customer is billed
+                Product = new StripePlanProductCreateOptions()
+                {
+                    Name = name
+                }
             };
             myPlan.Metadata.Add("Colour", colour);
             myPlan.Metadata.Add("Description", description);

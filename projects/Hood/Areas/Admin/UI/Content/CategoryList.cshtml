@@ -1,0 +1,24 @@
+@model ContentModel
+@inject ContentCategoryCache _categories
+@{
+    Layout = null;
+}
+@if (_categories.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th colspan="2">
+                    Categories
+                </th>
+            </tr>
+        </thead>
+        @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Slug)
+    </table>
+}
+else
+{
+    <h4>Categories</h4>
+    <p>No categories added yet. To add a category, simply add category on the right or a @Model.ContentType.TypeName to a new category name in the editor.</p>
+
+}

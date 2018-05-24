@@ -1,0 +1,98 @@
+@model AccountSettings
+@{
+    ViewData["Title"] = "Account Settings";
+    Layout = "_SettingsLayout";
+}
+@section buttons {
+    <a asp-action="ResetAccount" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
+@section description {
+    <p class="no-margin">
+        Enable or disable apsects of the site's registration and account system.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#registration">Registration</a></li>
+        <li><a data-toggle="tab" href="#welcome-email">Welcome E-mail</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="registration" class="tab-pane active">
+            <div class="panel-body form-horizontal">
+                <strong>Registration Settings</strong>
+                <p>
+                    Enable or disable apsects of the site's registration and account system.
+                </p>
+                <hr />
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableRegistration" class="styled">
+                        <label asp-for="EnableRegistration"></label>
+                    </div>
+                    <small>Note: Disabling registration will prevent users signing up to your site, you will have to add users manually.</small>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="RegistrationType"></label>
+                    <div class="col-sm-8">
+                        <select asp-for="RegistrationType" class="form-control">
+                            <option value="default">Default registration</option>
+                            <option value="code">Email code based registration</option>
+                        </select>
+                        <small>Note: Email Code based registration will force the user to validate their email address before completing registration.</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="CodeExpiry"></label>
+                    <div class="col-sm-8">
+                        <input asp-for="CodeExpiry" type="text" class="form-control" />
+                        <small>Note: Set (in hours) the time for your registration codes to expire, user's will need to resend their code if they wait too long.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="welcome-email" class="tab-pane">
+            <div class="panel-body form-horizontal">
+                <strong>Welcome Email Settings</strong>
+                <p>
+                    This is the content in the user welcome email, the email sent back to the user when they create an account. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}, {USEREMAIL}, {FULLNAME}, {FIRSTNAME}, {LASTNAME}.
+                </p>
+                <hr />
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableWelcome" class="styled">
+                        <label asp-for="EnableWelcome"></label>
+                    </div>
+                    <small>Note: This will send a formatted welcome email to new account holders.</small>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="NotifyNewAccount" class="styled">
+                        <label asp-for="NotifyNewAccount"></label>
+                    </div>
+                    <small>Note: This will copy in the NewAccountNotifications role on the above email.</small>
+                </div>
+                <hr />
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="WelcomeTitle"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="WelcomeTitle" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="WelcomeSubject"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="WelcomeSubject" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="WelcomeMessage"></label>
+                    <div class="col-sm-9">
+                        <textarea asp-for="WelcomeMessage" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

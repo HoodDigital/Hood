@@ -1,5 +1,6 @@
 ﻿using Hood.BaseTypes;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace System.Collections.Generic
@@ -29,7 +30,7 @@ namespace System.Collections.Generic
         /// <param name="pageSize">Page size</param>
         public PagedList(IQueryable<T> source, int pageIndex, int pageSize)
         {
-            this.Reload(source, pageIndex, pageSize);
+            this.ReloadAsync(source, pageIndex, pageSize);
         }
 
         public List<T> List
@@ -72,6 +73,32 @@ namespace System.Collections.Generic
             this.PageIndex = pageIndex;
             _list = new List<T>();
             _list.AddRange(source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList());
+            return this;
+        }
+
+        public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source, int pageIndex, int pageSize)
+        {
+            var total = source.Count();
+            this.TotalCount = total;
+            this.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+            if (pageIndex > TotalPages)
+                pageIndex = TotalPages;
+            this.PageSize = pageSize;
+            this.PageIndex = pageIndex;
+            _list = new List<T>();
+            _list.AddRange(await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync());
+            return this;
+        }
+
+        public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source)
+        {
+            var total = source.Count();
+            this.TotalCount = total;
+            this.TotalPages = (int)Math.Ceiling((double)total / PageSize);
+            if (PageIndex > TotalPages)
+                PageIndex = TotalPages;
+            _list = new List<T>();
+            _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
             return this;
         }
 

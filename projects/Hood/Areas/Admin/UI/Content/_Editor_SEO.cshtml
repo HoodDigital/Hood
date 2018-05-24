@@ -1,0 +1,51 @@
+@model EditContentModel
+<h5>Meta Settings</h5>
+<div class="ibox-content">
+    <fieldset class="form-horizontal">
+        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.Meta")).OrderBy(cm => cm.Name))
+        {
+            <div class="form-group">
+                <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                    @cm.Name.Replace("SEO.Meta.", "").ToSentenceCase():
+                </label>
+                <div class="col-sm-8">
+                    @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
+                </div>
+            </div>
+        }
+    </fieldset>
+</div>
+<hr />
+<h5>Twitter Card Settings</h5>
+<div class="ibox-content">
+    <fieldset class="form-horizontal">
+        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.Twitter")).OrderBy(cm => cm.Name))
+        {
+            <div class="form-group">
+                <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                    @cm.Name.Replace("SEO.Twitter.", "").ToSentenceCase():
+                </label>
+                <div class="col-sm-8">
+                    @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
+                </div>
+            </div>
+        }
+    </fieldset>
+</div>
+<hr />
+<h5>Facebook OG Settings</h5>
+<div class="ibox-content">
+    <fieldset class="form-horizontal">
+        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.Facebook")).OrderBy(cm => cm.Name))
+        {
+            <div class="form-group">
+                <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                    @cm.Name.Replace("SEO.Facebook.", "").ToSentenceCase():
+                </label>
+                <div class="col-sm-8">
+                    @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
+                </div>
+            </div>
+        }
+    </fieldset>
+</div>

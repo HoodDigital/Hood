@@ -219,8 +219,8 @@ namespace Hood.Services
         }
         public async Task<PropertySearchModel> GetPagedProperties(PropertySearchModel model, bool published = true)
         {
-            var propertiesQuery = await GetProperties(model, published).ToListAsync();
-            model.List = propertiesQuery;
+            var propertiesQuery = GetProperties(model, published);
+            await model.ReloadAsync(propertiesQuery);
             return model;
         }
         public Task<List<MapMarker>> GetLocations(PropertySearchModel filters)

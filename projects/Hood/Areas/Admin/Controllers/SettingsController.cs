@@ -8,6 +8,7 @@ using System;
 using Hood.Caching;
 using Geocoding.Google;
 using Hood.Enums;
+using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -445,9 +446,6 @@ namespace Hood.Areas.Admin.Controllers
             return Json(new { success = true });
         }
 
-
-
-
         [Route("admin/settings/mail/")]
         [Authorize(Roles = "Admin,Editor,Manager")]
         public IActionResult Mail(EditorMessage? status)
@@ -483,6 +481,45 @@ namespace Hood.Areas.Admin.Controllers
             var model = new MailSettings();
             _settings.Set("Hood.Settings.Mail", model);
             return RedirectToAction("Mail");
+        }
+
+        [Route("admin/settings/forum/")]
+        [Authorize(Roles = "Admin,Editor,Manager")]
+        public async Task<IActionResult> Forum(EditorMessage? status)
+        {
+            ForumSettings model = _settings.GetForumSettings(true);
+            if (model == null)
+                model = new ForumSettings();
+            model.AddEditorMessage(status);
+            model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+            return View(model);
+        }
+        [HttpPost]
+        [Route("admin/settings/forum/")]
+        [Authorize(Roles = "Admin,Editor,Manager")]
+        public async Task<IActionResult> Forum(ForumSettings model)
+        {
+            try
+            {
+                _settings.Set("Hood.Settings.Forum", model);
+                model.SaveMessage = "Settings saved!";
+                model.MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                model.SaveMessage = "An error occurred while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
+            }
+            model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+            return View(model);
+        }
+        [Route("admin/settings/forum/reset/")]
+        [Authorize(Roles = "Admin,Manager")]
+        public IActionResult ResetForum()
+        {
+            var model = new ForumSettings();
+            _settings.Set("Hood.Settings.Forum", model);
+            return RedirectToAction("Forum");
         }
 
 

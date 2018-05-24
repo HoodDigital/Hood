@@ -1,6 +1,5 @@
 if (!$.hood)
     $.hood = {}
-
 $.body = $('body');
 // Console hack
 var console = window.console || {};
@@ -8,54 +7,6 @@ console.log = console.log || function () { };
 console.warn = console.warn || function () { };
 console.error = console.error || function () { };
 console.info = console.info || function () { };
-/*! jRespond.js v 0.10 | Author: Jeremy Fields [jeremy.fields@viget.com], 2013 | License: MIT */
-!function (a, b, c) { "object" == typeof module && module && "object" == typeof module.exports ? module.exports = c : (a[b] = c, "function" == typeof define && define.amd && define(b, [], function () { return c })) }(this, "jRespond", function (a, b, c) { "use strict"; return function (a) { var b = [], d = [], e = a, f = "", g = "", i = 0, j = 100, k = 500, l = k, m = function () { var a = 0; return a = "number" != typeof window.innerWidth ? 0 !== document.documentElement.clientWidth ? document.documentElement.clientWidth : document.body.clientWidth : window.innerWidth }, n = function (a) { if (a.length === c) o(a); else for (var b = 0; b < a.length; b++) o(a[b]) }, o = function (a) { var e = a.breakpoint, h = a.enter || c; b.push(a), d.push(!1), r(e) && (h !== c && h.call(null, { entering: f, exiting: g }), d[b.length - 1] = !0) }, p = function () { for (var a = [], e = [], h = 0; h < b.length; h++) { var i = b[h].breakpoint, j = b[h].enter || c, k = b[h].exit || c; "*" === i ? (j !== c && a.push(j), k !== c && e.push(k)) : r(i) ? (j === c || d[h] || a.push(j), d[h] = !0) : (k !== c && d[h] && e.push(k), d[h] = !1) } for (var l = { entering: f, exiting: g }, m = 0; m < e.length; m++) e[m].call(null, l); for (var n = 0; n < a.length; n++) a[n].call(null, l) }, q = function (a) { for (var b = !1, c = 0; c < e.length; c++) if (a >= e[c].enter && a <= e[c].exit) { b = !0; break } b && f !== e[c].label ? (g = f, f = e[c].label, p()) : b || "" === f || (f = "", p()) }, r = function (a) { if ("object" == typeof a) { if (a.join().indexOf(f) >= 0) return !0 } else { if ("*" === a) return !0; if ("string" == typeof a && f === a) return !0 } }, s = function () { var a = m(); a !== i ? (l = j, q(a)) : l = k, i = a, setTimeout(s, l) }; return s(), { addFunc: function (a) { n(a) }, getBreakpoint: function () { return f } } } }(this, this.document));
-var jRes = jRespond([
-    {
-        label: 'smallest',
-        enter: 0,
-        exit: 479
-    }, {
-        label: 'handheld',
-        enter: 480,
-        exit: 767
-    }, {
-        label: 'tablet',
-        enter: 768,
-        exit: 991
-    }, {
-        label: 'laptop',
-        enter: 992,
-        exit: 1199
-    }, {
-        label: 'desktop',
-        enter: 1200,
-        exit: 10000
-    }
-]);
-jRes.addFunc([
-    {
-        breakpoint: 'desktop',
-        enter: function () { $.body.addClass('device-lg'); },
-        exit: function () { $.body.removeClass('device-lg'); }
-    }, {
-        breakpoint: 'laptop',
-        enter: function () { $.body.addClass('device-md'); },
-        exit: function () { $.body.removeClass('device-md'); }
-    }, {
-        breakpoint: 'tablet',
-        enter: function () { $.body.addClass('device-sm'); },
-        exit: function () { $.body.removeClass('device-sm'); }
-    }, {
-        breakpoint: 'handheld',
-        enter: function () { $.body.addClass('device-xs'); },
-        exit: function () { $.body.removeClass('device-xs'); }
-    }, {
-        breakpoint: 'smallest',
-        enter: function () { $.body.addClass('device-xxs'); },
-        exit: function () { $.body.removeClass('device-xxs'); }
-    }
-]);
 $.fn.doesExist = function () {
     return $(this).length > 0;
 };
@@ -210,6 +161,9 @@ $.getUrlVars = function () {
     }
     return vars;
 }
+$.decodeUrl = function (str) {
+    return decodeURIComponent(str).replace('+', ' ');
+}
 $.numberWithCommas = function (x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -294,11 +248,6 @@ if (!$.mobile.Android) {
     CustomEvent.prototype = window.Event.prototype;
     window.CustomEvent = CustomEvent;
 })();
-
-$.decodeUrl = function (str) {
-    return decodeURIComponent(str).replace('+', ' ');
-}
-
 $.hood.LinkClasses = [
     { title: 'None', value: '' },
     { title: 'Button link', value: 'btn btn-default' },
@@ -313,7 +262,6 @@ $.hood.LinkClasses = [
     { title: 'Large Button popup link', value: 'btn btn-default btn-lg colorbox-iframe' },
     { title: 'Theme coloured button popup link', value: 'btn btn-primary btn-lg colorbox-iframe' }
 ];
-
 $.hood.ImageClasses = [
     { title: 'None', value: '' },
     { title: 'Full Width', value: 'user-image full' },
@@ -326,202 +274,3 @@ $.hood.ImageClasses = [
     { title: 'Pulled Left', value: 'user-image pull-left' },
     { title: 'Pulled Right', value: 'user-image pull-right' },
 ];
-
-
-
-/*
- * Javascript Humane Dates
- * Copyright (c) 2008 Dean Landolt (deanlandolt.com)
- * Re-write by Zach Leatherman (zachleat.com)
- *
- * Adopted from the John Resig's pretty.js
- * at http://ejohn.org/blog/javascript-pretty-date
- * and henrah's proposed modification
- * at http://ejohn.org/blog/javascript-pretty-date/#comment-297458
- *
- * Licensed under the MIT license.
- */
-
-function humaneDate(date, compareTo) {
-
-    if (!date) {
-        return;
-    }
-
-    var lang = {
-        ago: 'Ago',
-        from: '',
-        now: 'Just Now',
-        minute: 'Minute',
-        minutes: 'Minutes',
-        hour: 'Hour',
-        hours: 'Hours',
-        day: 'Day',
-        days: 'Days',
-        week: 'Week',
-        weeks: 'Weeks',
-        month: 'Month',
-        months: 'Months',
-        year: 'Year',
-        years: 'Years'
-    },
-        formats = [
-            [60, lang.now],
-            [3600, lang.minute, lang.minutes, 60], // 60 minutes, 1 minute
-            [86400, lang.hour, lang.hours, 3600], // 24 hours, 1 hour
-            [604800, lang.day, lang.days, 86400], // 7 days, 1 day
-            [2628000, lang.week, lang.weeks, 604800], // ~1 month, 1 week
-            [31536000, lang.month, lang.months, 2628000], // 1 year, ~1 month
-            [Infinity, lang.year, lang.years, 31536000] // Infinity, 1 year
-        ],
-        isString = typeof date === 'string',
-        date = isString ?
-            new Date(('' + date).replace(/-/g, "/").replace(/[TZ]/g, " ")) :
-            date,
-        compareTo = compareTo || new Date,
-        seconds = (compareTo - date +
-            (compareTo.getTimezoneOffset() -
-                // if we received a GMT time from a string, doesn't include time zone bias
-                // if we got a date object, the time zone is built in, we need to remove it.
-                (isString ? 0 : date.getTimezoneOffset())
-            ) * 60000
-        ) / 1000,
-        token;
-
-    if (seconds < 0) {
-        seconds = Math.abs(seconds);
-        token = lang.from ? ' ' + lang.from : '';
-    } else {
-        token = lang.ago ? ' ' + lang.ago : '';
-    }
-
-    /*
-     * 0 seconds && < 60 seconds        Now
-     * 60 seconds                       1 Minute
-     * > 60 seconds && < 60 minutes     X Minutes
-     * 60 minutes                       1 Hour
-     * > 60 minutes && < 24 hours       X Hours
-     * 24 hours                         1 Day
-     * > 24 hours && < 7 days           X Days
-     * 7 days                           1 Week
-     * > 7 days && < ~ 1 Month          X Weeks
-     * ~ 1 Month                        1 Month
-     * > ~ 1 Month && < 1 Year          X Months
-     * 1 Year                           1 Year
-     * > 1 Year                         X Years
-     *
-     * Single units are +10%. 1 Year shows first at 1 Year + 10%
-     */
-
-    function normalize(val, single) {
-        var margin = 0.1;
-        if (val >= single && val <= single * (1 + margin)) {
-            return single;
-        }
-        return val;
-    }
-
-    for (var i = 0, format = formats[0]; formats[i]; format = formats[++i]) {
-        if (seconds < format[0]) {
-            if (i === 0) {
-                // Now
-                return format[1];
-            }
-
-            var val = Math.ceil(normalize(seconds, format[3]) / (format[3]));
-            return val +
-                ' ' +
-                (val !== 1 ? format[2] : format[1]) +
-                (i > 0 ? token : '');
-        }
-    }
-};
-
-if (typeof jQuery !== 'undefined') {
-    jQuery.fn.humaneDates = function (options) {
-        var settings = jQuery.extend({
-            'lowercase': false
-        }, options);
-
-        return this.each(function () {
-            var $t = jQuery(this),
-                date = $t.attr('datetime') || $t.attr('title');
-
-            date = humaneDate(date);
-
-            if (date && settings['lowercase']) {
-                date = date.toLowerCase();
-            }
-
-            if (date && $t.html() !== date) {
-                // don't modify the dom if we don't have to
-                $t.html(date);
-            }
-        });
-    };
-}
-
-(function (window, document, undefined) {
-
-    /*
-     * Grab all iframes on the page or return
-     */
-    var iframes = document.getElementsByTagName('iframe');
-
-    /*
-     * Loop through the iframes array
-     */
-    for (var i = 0; i < iframes.length; i++) {
-
-        var iframe = iframes[i],
-
-            /*
-               * RegExp, extend this if you need more players
-               */
-            players = /www.youtube.com|player.vimeo.com|www.londonlive.co.uk|www.slideshare.net|www.ustream.tv/;
-
-        /*
-         * If the RegExp pattern exists within the current iframe
-         */
-        if (iframe.src.search(players) > 0) {
-
-            /*
-             * Calculate the video ratio based on the iframe's w/h dimensions
-             */
-            var videoRatio = (iframe.height / iframe.width) * 100;
-
-            /*
-             * Replace the iframe's dimensions and position
-             * the iframe absolute, this is the trick to emulate
-             * the video ratio
-             */
-            iframe.style.position = 'absolute';
-            iframe.style.top = '0';
-            iframe.style.left = '0';
-            iframe.width = '100%';
-            iframe.height = '100%';
-
-            /*
-             * Wrap the iframe in a new <div> which uses a
-             * dynamically fetched padding-top property based
-             * on the video's w/h dimensions
-             */
-            var wrap = document.createElement('div');
-            wrap.className = 'fluid-vids';
-            wrap.style.width = '100%';
-            wrap.style.position = 'relative';
-            wrap.style.paddingTop = videoRatio + '%';
-
-            /*
-             * Add the iframe inside our newly created <div>
-             */
-            var iframeParent = iframe.parentNode;
-            iframeParent.insertBefore(wrap, iframe);
-            wrap.appendChild(iframe);
-
-        }
-
-    }
-
-})(window, document);
-

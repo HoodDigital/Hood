@@ -53,15 +53,15 @@ $.hood.Inline = {
             } else {
                 $.hood.Alerts.Error(data.Errors);
             }
+            if (data.Url) {
+                setTimeout(function () {
+                    window.location = data.Url;
+                }, 500);
+            }
         })
         .done($.proxy(function () {
             if ($(this).attr("data-complete")) {
                 eval($(this).data('complete'));
-            }
-            if (!data.Url.IsNullOrUndefined()) {
-                setTimeout(function () {
-                    window.location = data.Url;
-                }, 500);
             }
         }, e.currentTarget))
         .fail(function (data) {

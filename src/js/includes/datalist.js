@@ -73,7 +73,7 @@ $.fn.hoodDataList = function (options) {
         element.data('hoodDataList', hoodDataList);
     });
 };
-$(document).ready(function () {
+$(document).on('ready', function () {
     $('.hood-data').each(function () {
         $(this).hoodDataList({
             url: $(this).data('url'),

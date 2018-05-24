@@ -1,0 +1,47 @@
+@model Topic
+@{
+    var _account = Context.GetAccountInfo();
+}
+<div class="row">
+    <div class="col-md-6">
+        <h5><a asp-action="ShowTopic" asp-route-id="@Model.Id" asp-route-title="@Model.Title.ToSeoUrl()">@Model.Title</a></h5>
+        <p>
+            <span class="m-r-sm"><i class="fa fa-user"></i> @(Model.Author.DisplayName.IsSet() ? Model.Author.DisplayName : "Anonymous")</span>
+            <span><i class="fa fa-clock-o"></i> @Model.CreatedOn.ToLongDateString() at @Model.CreatedOn.ToShortTimeString()</span>
+        </p>
+    </div>
+    <div class="col-md-4">
+        <p>
+            <strong>Posts</strong>
+            @Model.NumPosts
+        </p>
+        <p>
+            @if (Model.LastPostId.HasValue)
+            {
+                <span>
+                    Latest Post by <strong>@Model.LastUserDisplayName</strong><br />
+                    at <strong>@Model.LastPosted.Value.ToDisplay()</strong>
+                </span>
+            }
+            else
+            {
+                <span>No posts yet.</span>
+            }
+        </p>
+    </div>
+    <div class="col-md-2 text-right">
+        @if (User.Identity.IsAuthenticated &&
+           (Model.AuthorId == _account.User.Id ||
+             User.IsInRole("Administrator") ||
+             User.IsInRole("Moderator")))
+        {
+            <p>
+                <a class="btn btn-sm btn-warning" asp-action="EditTopic" asp-route-id="@Model.Id">Edit</a>
+            </p>
+            <p>
+                <a class="btn btn-sm btn-danger" asp-action="DeleteTopic" asp-route-id="@Model.Id">Delete</a>
+            </p>
+        }
+    </div>
+</div>
+<hr />

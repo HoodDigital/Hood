@@ -258,6 +258,25 @@ namespace Hood.Areas.Admin.Controllers
                         _cache.Remove(cacheKey);
                         return new MediaResponse(true, media);
 
+                    case "Forum":
+
+                        // create the new media item for content =>
+                        int forumId = int.Parse(attach.Id);
+                        Forum forum = await _db.Forums.Where(p => p.Id == forumId).FirstOrDefaultAsync();
+
+                        switch (attach.Field)
+                        {
+                            case "FeaturedImage":
+                                forum.FeaturedImage = new ContentMedia(media);
+                                break;
+                            case "ShareImage":
+                                forum.ShareImage = new ContentMedia(media);
+                                break;
+                        }
+
+                        await _db.SaveChangesAsync();
+                        return new MediaResponse(true, media);
+
                     case "ApplicationUser":
 
                         // create the new media item for content =>

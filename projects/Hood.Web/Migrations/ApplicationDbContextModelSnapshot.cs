@@ -74,13 +74,13 @@ namespace Hood.Web.Migrations
 
                     b.Property<bool>("Active");
 
+                    b.Property<bool>("Anonymous");
+
                     b.Property<string>("AvatarJson");
 
                     b.Property<string>("BillingAddressJson");
 
                     b.Property<string>("Bio");
-
-                    b.Property<string>("ClientCode");
 
                     b.Property<string>("CompanyName");
 
@@ -98,11 +98,11 @@ namespace Hood.Web.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<bool>("EmailOptin");
-
                     b.Property<string>("Facebook");
 
                     b.Property<string>("FirstName");
+
+                    b.Property<string>("ForumSignature");
 
                     b.Property<string>("GooglePlus");
 
@@ -156,8 +156,6 @@ namespace Hood.Web.Migrations
                         .HasMaxLength(256);
 
                     b.Property<string>("UserVars");
-
-                    b.Property<string>("VATNumber");
 
                     b.Property<string>("WebsiteUrl");
 
@@ -354,6 +352,116 @@ namespace Hood.Web.Migrations
                     b.ToTable("HoodContentTagJoins");
                 });
 
+            modelBuilder.Entity("Hood.Models.Forum", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AuthorDisplayName");
+
+                    b.Property<string>("AuthorId");
+
+                    b.Property<string>("AuthorName");
+
+                    b.Property<string>("Body");
+
+                    b.Property<string>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedOn");
+
+                    b.Property<string>("Description")
+                        .IsRequired();
+
+                    b.Property<bool>("Featured");
+
+                    b.Property<string>("FeaturedImageJson");
+
+                    b.Property<string>("LastEditedBy");
+
+                    b.Property<DateTime>("LastEditedOn");
+
+                    b.Property<long?>("LastPostId");
+
+                    b.Property<DateTime?>("LastPosted");
+
+                    b.Property<int?>("LastTopicId");
+
+                    b.Property<string>("LastUserDisplayName");
+
+                    b.Property<string>("LastUserId");
+
+                    b.Property<string>("LastUserName");
+
+                    b.Property<int>("ModeratedPostCount");
+
+                    b.Property<string>("Notes");
+
+                    b.Property<int>("NumPosts");
+
+                    b.Property<int>("NumTopics");
+
+                    b.Property<bool>("Public");
+
+                    b.Property<bool>("Published");
+
+                    b.Property<bool>("RequirePostModeration");
+
+                    b.Property<bool>("RequireTopicModeration");
+
+                    b.Property<int>("ShareCount");
+
+                    b.Property<string>("ShareImageJson");
+
+                    b.Property<string>("Slug");
+
+                    b.Property<string>("SystemNotes");
+
+                    b.Property<string>("Title")
+                        .IsRequired();
+
+                    b.Property<string>("UserVars");
+
+                    b.Property<int>("Views");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("HoodForums");
+                });
+
+            modelBuilder.Entity("Hood.Models.ForumCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("ForumCategoryId");
+
+                    b.Property<string>("DisplayName");
+
+                    b.Property<int?>("ParentCategoryId");
+
+                    b.Property<string>("Slug");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentCategoryId");
+
+                    b.ToTable("HoodForumCategories");
+                });
+
+            modelBuilder.Entity("Hood.Models.ForumCategoryJoin", b =>
+                {
+                    b.Property<int>("ForumId");
+
+                    b.Property<int>("CategoryId");
+
+                    b.HasKey("ForumId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("HoodForumCategoryJoins");
+                });
+
             modelBuilder.Entity("Hood.Models.MediaObject", b =>
                 {
                     b.Property<int>("Id")
@@ -400,6 +508,64 @@ namespace Hood.Web.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HoodOptions");
+                });
+
+            modelBuilder.Entity("Hood.Models.Post", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Approved");
+
+                    b.Property<DateTime?>("ApprovedTime");
+
+                    b.Property<string>("AuthorDisplayName");
+
+                    b.Property<string>("AuthorId");
+
+                    b.Property<string>("AuthorIp");
+
+                    b.Property<string>("AuthorName");
+
+                    b.Property<string>("Body");
+
+                    b.Property<string>("DeleteReason");
+
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("DeletedById");
+
+                    b.Property<DateTime?>("DeletedTime");
+
+                    b.Property<string>("EditReason");
+
+                    b.Property<bool>("Edited");
+
+                    b.Property<string>("EditedById");
+
+                    b.Property<DateTime?>("EditedTime");
+
+                    b.Property<DateTime>("PostedTime");
+
+                    b.Property<long?>("ReplyId");
+
+                    b.Property<string>("Signature");
+
+                    b.Property<int>("TopicId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("DeletedById");
+
+                    b.HasIndex("EditedById");
+
+                    b.HasIndex("ReplyId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("HoodForumPosts");
                 });
 
             modelBuilder.Entity("Hood.Models.PropertyFloorplan", b =>
@@ -706,6 +872,84 @@ namespace Hood.Web.Migrations
                     b.ToTable("HoodSubscriptionFeatures");
                 });
 
+            modelBuilder.Entity("Hood.Models.Topic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("AllowReplies");
+
+                    b.Property<bool>("Approved");
+
+                    b.Property<DateTime?>("ApprovedTime");
+
+                    b.Property<string>("AuthorDisplayName");
+
+                    b.Property<string>("AuthorId");
+
+                    b.Property<string>("AuthorName");
+
+                    b.Property<string>("CreatedBy");
+
+                    b.Property<DateTime>("CreatedOn");
+
+                    b.Property<string>("Description")
+                        .IsRequired();
+
+                    b.Property<bool>("Featured");
+
+                    b.Property<string>("FeaturedImageJson");
+
+                    b.Property<int>("ForumId");
+
+                    b.Property<string>("LastEditedBy");
+
+                    b.Property<DateTime>("LastEditedOn");
+
+                    b.Property<long?>("LastPostId");
+
+                    b.Property<DateTime?>("LastPosted");
+
+                    b.Property<int?>("LastTopicId");
+
+                    b.Property<string>("LastUserDisplayName");
+
+                    b.Property<string>("LastUserId");
+
+                    b.Property<string>("LastUserName");
+
+                    b.Property<int>("ModeratedPostCount");
+
+                    b.Property<string>("Notes");
+
+                    b.Property<int>("NumPosts");
+
+                    b.Property<bool>("Public");
+
+                    b.Property<bool>("Published");
+
+                    b.Property<int>("ShareCount");
+
+                    b.Property<string>("ShareImageJson");
+
+                    b.Property<string>("SystemNotes");
+
+                    b.Property<string>("Title")
+                        .IsRequired();
+
+                    b.Property<string>("UserVars");
+
+                    b.Property<int>("Views");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("ForumId");
+
+                    b.ToTable("HoodForumTopics");
+                });
+
             modelBuilder.Entity("Hood.Models.UserAccessCode", b =>
                 {
                     b.Property<int>("Id")
@@ -958,6 +1202,57 @@ namespace Hood.Web.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Hood.Models.Forum", b =>
+                {
+                    b.HasOne("Hood.Models.ApplicationUser", "Author")
+                        .WithMany("Forums")
+                        .HasForeignKey("AuthorId");
+                });
+
+            modelBuilder.Entity("Hood.Models.ForumCategory", b =>
+                {
+                    b.HasOne("Hood.Models.ForumCategory", "ParentCategory")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentCategoryId");
+                });
+
+            modelBuilder.Entity("Hood.Models.ForumCategoryJoin", b =>
+                {
+                    b.HasOne("Hood.Models.ForumCategory", "Category")
+                        .WithMany("Forum")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Hood.Models.Forum", "Forum")
+                        .WithMany("Categories")
+                        .HasForeignKey("ForumId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Hood.Models.Post", b =>
+                {
+                    b.HasOne("Hood.Models.ApplicationUser", "Author")
+                        .WithMany("Posts")
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("Hood.Models.ApplicationUser", "DeletedBy")
+                        .WithMany("DeletedPosts")
+                        .HasForeignKey("DeletedById");
+
+                    b.HasOne("Hood.Models.ApplicationUser", "EditedBy")
+                        .WithMany("EditedPosts")
+                        .HasForeignKey("EditedById");
+
+                    b.HasOne("Hood.Models.Post", "Reply")
+                        .WithMany()
+                        .HasForeignKey("ReplyId");
+
+                    b.HasOne("Hood.Models.Topic", "Topic")
+                        .WithMany("Posts")
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("Hood.Models.PropertyFloorplan", b =>
                 {
                     b.HasOne("Hood.Models.PropertyListing", "Property")
@@ -994,6 +1289,18 @@ namespace Hood.Web.Migrations
                     b.HasOne("Hood.Models.Subscription", "Subscription")
                         .WithMany("Features")
                         .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Hood.Models.Topic", b =>
+                {
+                    b.HasOne("Hood.Models.ApplicationUser", "Author")
+                        .WithMany("Topics")
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("Hood.Models.Forum", "Forum")
+                        .WithMany("Topics")
+                        .HasForeignKey("ForumId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

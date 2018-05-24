@@ -51,6 +51,7 @@ namespace Hood.Core
             services.AddSingleton<SubscriptionsEventListener>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
+            services.AddSingleton<ForumCategoryCache>();
             services.AddSingleton<IHoodCache, HoodCache>();
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IRightmovePropertyImporter, RightmovePropertyImporter>();

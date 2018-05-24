@@ -13,6 +13,8 @@ using Hood.Services;
 using Hood.ViewModels;
 using Hood.Core;
 using Microsoft.AspNetCore.Http;
+using Hood.Enums;
+using Hood.BaseTypes;
 
 namespace Hood.Controllers
 {
@@ -26,6 +28,7 @@ namespace Hood.Controllers
         private readonly UrlEncoder _urlEncoder;
         private readonly IAccountRepository _auth;
         private readonly IMediaManager<MediaObject> _media;
+        private readonly IBillingService _billing;
 
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -37,6 +40,7 @@ namespace Hood.Controllers
           UrlEncoder urlEncoder,
           IAccountRepository auth,
           ILoggerFactory loggerFactory,
+          IBillingService billing,
           IMediaManager<MediaObject> media)
         {
             _userManager = userManager;
@@ -46,6 +50,7 @@ namespace Hood.Controllers
             _urlEncoder = urlEncoder;
             _auth = auth;
             _media = media;
+            _billing = billing;
         }
 
         [TempData]
@@ -71,7 +76,7 @@ namespace Hood.Controllers
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = StatusMessage,
                 Avatar = user.Avatar,
-                Profile = profile, 
+                Profile = profile,
                 Roles = await _userManager.GetRolesAsync(user)
             };
 
@@ -519,6 +524,51 @@ namespace Hood.Controllers
             _logger.LogInformation("User with ID {UserId} has generated new 2FA recovery codes.", user.Id);
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Delete(EditorMessage? message)
+        {
+            var model = new Hood.BaseTypes.SaveableModel();
+            model.AddEditorMessage(message);
+            return View(nameof(Delete), model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmDelete(string id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(Delete), new { message = EditorMessage.NotFound });
+            }
+
+            // Delete functionality.
+            try
+            {
+                if (User.IsInRole("Admin") || User.IsInRole("SuperUser"))
+                {
+                    return RedirectToAction(nameof(Delete), new { message = EditorMessage.CannotDeleteAdmin });
+                }
+
+                await _signInManager.SignOutAsync();
+                _logger.LogInformation(4, "User logged out.");
+
+                await _auth.DeleteUserAsync(user);
+
+                return RedirectToAction(nameof(Deleted));
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction(nameof(Delete), new { message = EditorMessage.Error });
+            }
+        }
+
+        [AllowAnonymous]
+        public IActionResult Deleted()
+        {
+            return View(nameof(Deleted));
         }
 
         #region Helpers

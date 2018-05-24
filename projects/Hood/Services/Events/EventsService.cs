@@ -6,6 +6,26 @@ namespace Hood.Services
 {
     public class EventsService
     {
+        private event EventHandler<EventArgs> _ForumChanged;
+        public event EventHandler<EventArgs> ForumChanged
+        {
+            add
+            {
+                if (_ForumChanged == null || !_ForumChanged.GetInvocationList().Contains(value))
+                {
+                    _ForumChanged += value;
+                }
+            }
+            remove
+            {
+                _ForumChanged -= value;
+            }
+        }
+        public void triggerForumChanged(object sender)
+        {
+            _ForumChanged?.Invoke(sender, new EventArgs());
+        }
+
         private event EventHandler<EventArgs> _ContentChanged;
         public event EventHandler<EventArgs> ContentChanged
         {

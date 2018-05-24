@@ -129,6 +129,61 @@ namespace Hood.Services
                 return new OperationResult(ex);
             }
         }
+        public async Task DeleteUserAsync(ApplicationUser user)
+        {
+            string container = typeof(ApplicationUser).Name;
+            var logins = await _userManager.GetLoginsAsync(user);
+            foreach (var li in logins)
+            {
+                await _userManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                await _userManager.RemoveFromRoleAsync(user, role);
+            }
+            var claims = await _userManager.GetClaimsAsync(user);
+            foreach (var claim in claims)
+            {
+                await _userManager.RemoveClaimAsync(user, claim);
+            }
+
+            var userSubs = GetUserById(user.Id);
+            if (userSubs.Subscriptions != null)
+            {
+                if (userSubs.Subscriptions.Count > 0)
+                {
+                    foreach (var sub in userSubs.Subscriptions)
+                    {
+                        try
+                        {
+                            var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.CustomerId, sub.StripeId, false);
+                        }
+                        catch (Stripe.StripeException ex)
+                        {
+                            switch (ex.StripeError.ErrorType)
+                            {
+                                case "card_error":
+                                case "api_connection_error":
+                                case "api_error":
+                                case "authentication_error":
+                                case "invalid_request_error":
+                                case "rate_limit_error":
+                                case "validation_error":
+                                    throw new Exception("An error occurred while cancelling active subscriptions.");
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    userSubs.Subscriptions.Clear();
+                    UpdateUser(userSubs);
+                }
+            }
+            _db.SaveChanges();
+            return;
+        }
+
         public void ResetBillingInfo()
         {
             var user = GetCurrentUser();
@@ -235,7 +290,7 @@ namespace Hood.Services
                     Currency = subscription.Currency,                 // "usd" only supported right now
                     Interval = subscription.Interval,                 // "month" or "year"
                     IntervalCount = subscription.IntervalCount,       // optional
-                    Name = subscription.Name,
+                    Nickname = subscription.Name,
                     TrialPeriodDays = subscription.TrialPeriodDays   // amount of time that will lapse before the customer is billed
                 };
                 StripePlan response = await _billing.Stripe.PlanService.CreateAsync(myPlan);
@@ -367,7 +422,7 @@ namespace Hood.Services
             {
                 var myPlan = new StripePlanUpdateOptions()
                 {
-                    Name = subscription.Name
+                    Nickname = subscription.Name
                 };
                 StripePlan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
                 _db.Update(subscription);

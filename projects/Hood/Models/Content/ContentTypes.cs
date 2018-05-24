@@ -24,7 +24,6 @@ namespace Hood.Models
         public string ExcerptName { get; set; }
         public bool ShowPreview { get; set; }
         public bool ShowEditor { get; set; }
-        public string EditorType { get; set; }
         public bool ShowDesigner { get; set; }
         public bool MultiLineExcerpt { get; set; }
         public bool RichTextExcerpt { get; set; }

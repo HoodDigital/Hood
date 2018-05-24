@@ -92,7 +92,7 @@ $.fn.hoodFileUpload = function (options) {
         element.data('hoodFileUpload', hoodFileUpload);
     });
 };
-$(document).ready(function () {
+$(document).on('ready', function () {
     $('.hood-fileupload').each(function () {
         $(this).hoodFileUpload({
             attachUrl: $(this).data('attach') ? $(this).data('attach') : '/admin/media/upload',

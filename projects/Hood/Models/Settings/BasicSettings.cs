@@ -22,6 +22,7 @@ namespace Hood.Models
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
 
+
         // Site Address
         [Display(Name = "Site Title")]
         public string SiteTitle { get; set; }
@@ -47,6 +48,8 @@ namespace Hood.Models
         public string LockoutModeTokens { get; set; }
         [Display(Name = "Lockout Mode Holding Page")]
         public int? LockoutModeHoldingPage { get; set; }
+        [Display(Name = "Text Editor Type")]
+        public string EditorType { get; set; }
 
         // Notes
         public string Notes { get; set; }
@@ -57,6 +60,7 @@ namespace Hood.Models
         {
             // Set Defaults
             SiteTitle = "My Hood Site";
+            EditorType = "Full";
         }
 
         public string OwnerFullName

@@ -1,9 +1,11 @@
 ﻿if (!$.hood)
     $.hood = {};
+
 $.hood.Site = {
     // This init function will be called back by app.js, when it has been successfully loaded. 
     // If preloaders are present, they will hide any delay while loading the app.js files.
     Init: function () {
+
         // Overwrite any variables for $.hood.App
         $.window = $(window),
         $.wrapper = $('#wrapper'),
@@ -54,6 +56,6 @@ $.hood.Site = {
 }
 
 // Initialise $.hood.App
-$(document).ready($.hood.Site.Ready);
-$(window).load($.hood.Site.Load);
-$(window).resize($.hood.Site.Resize);
+$($.hood.Site.Ready);
+$(window).on('load', $.hood.Site.Load);
+$(window).on('resize', $.hood.Site.Resize);

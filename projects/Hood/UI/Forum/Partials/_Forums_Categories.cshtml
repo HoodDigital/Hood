@@ -1,0 +1,9 @@
+@inject ForumCategoryCache _categories
+<div class="sidebar-widget m-b-lg">
+    <h4>Categories</h4>
+    <hr />
+    @_categories.ForumCategoryTree(_categories.TopLevel());
+    <ul>
+        <li><a asp-action="Index">Show All</a></li>
+    </ul>
+</div>

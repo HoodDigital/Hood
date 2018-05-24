@@ -1,0 +1,26 @@
+@model PagedList<Forum>
+@if (Model != null && Model.List.Count > 0)
+{
+    <div class="sidebar-widget">
+        <h4>Recently Added</h4>
+        <hr />
+        @foreach (Forum forum in Model.List)
+        {
+            <div class="media">
+                <div class="media-left media-top">
+                    <a href="@forum.Url">
+                        <fixedImage src="@forum.FeaturedImage.ThumbUrl" class="media-object img-xxs @string.Format("forum-image-{0}", forum.Id)" />
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h5 class="media-heading"><a class="title-link" href="@forum.Url">@forum.Title</a></h5>
+                    <small>
+                        <i class="m-r-xs fa fa-user"></i>@forum.Author.FullName
+                        <i class="m-r-xs m-l-sm fa fa-clock-o"></i>@forum.CreatedOn.ToLongDateString()
+                    </small>
+                </div>
+            </div>
+            <hr />
+        }
+    </div>
+}
