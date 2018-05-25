@@ -31,7 +31,7 @@ namespace Hood.Extensions
             if (modelExplorer == null) throw new InvalidOperationException($"Failed to get model explorer for {ExpressionHelper.GetExpressionText(expression)}");
             return new HtmlString(WebUtility.HtmlEncode(modelExplorer.Metadata.Description));
         }
-        public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = true, string cssClass = "")
+        public static IHtmlContent BootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = false, string cssClass = "")
         {
             if (!message.IsSet())
                 return null;
@@ -50,7 +50,7 @@ namespace Hood.Extensions
             }
 
         }
-        public static IHtmlContent ContainedBootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = true, string cssClass = "")
+        public static IHtmlContent ContainedBootstrapAlert(this IHtmlHelper html, string message, AlertType type, bool autoDismiss = false, string cssClass = "")
         {
             if (!message.IsSet())
                 return null;
