@@ -8,13 +8,13 @@ namespace Hood.Models
     public class MailSettings : SaveableModel
     {
         [NonSerialized]
-        public const string PlainTemplate = "Areas/Admin/Views/Mail/Plain.cshtml";
+        public const string PlainTemplate = "Areas/Admin/UI/Mail/Plain.cshtml";
         [NonSerialized]
-        public const string SuccessTemplate = "Areas/Admin/Views/Mail/Success.cshtml";
+        public const string SuccessTemplate = "Areas/Admin/UI/Mail/Success.cshtml";
         [NonSerialized]
-        public const string WarningTemplate = "Areas/Admin/Views/Mail/Warning.cshtml";
+        public const string WarningTemplate = "Areas/Admin/UI/Mail/Warning.cshtml";
         [NonSerialized]
-        public const string DangerTemplate = "Areas/Admin/Views/Mail/Danger.cshtml";
+        public const string DangerTemplate = "Areas/Admin/UI/Mail/Danger.cshtml";
 
         [Display(Name = "SendGrid Api Key")]
         public string SendGridKey { get; set; }
