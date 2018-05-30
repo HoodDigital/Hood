@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
@@ -23,6 +24,7 @@ namespace Hood.Areas.Admin.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISettingsRepository _settings;
+        private readonly ILogService _logger;
         private readonly IHostingEnvironment _env;
         private readonly IBillingService _billing;
         private readonly IAccountRepository _auth;
@@ -35,12 +37,13 @@ namespace Hood.Areas.Admin.Controllers
             IAccountRepository auth,
             IHttpContextAccessor contextAccessor,
             ISettingsRepository settings,
-            ISettingsRepository site,
+            ILogService logger,
             IBillingService billing,
             IHostingEnvironment env)
         {
             _userManager = userManager;
-            _settings = site;
+            _settings = settings;
+            _logger = logger;
             _auth = auth;
             _billing = billing;
             _env = env;
@@ -81,6 +84,15 @@ namespace Hood.Areas.Admin.Controllers
             {
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
+                await _logger.AddLogAsync(
+                   string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
+                   ex,
+                   LogType.Error,
+                   LogSource.Subscriptions,
+                   _userManager.GetUserId(User),
+                   model.Id.ToString(),
+                   Url.AbsoluteAction("Index", "Subscriptions")
+               );
             }
             return View(model);
         }
@@ -95,11 +107,12 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/add")]
         public async Task<Response> Add(CreateSubscriptionModel model)
         {
+            Subscription subscription = new Subscription();
             try
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 BillingSettings billingSettings = _settings.GetBillingSettings();
-                Subscription subscription = new Subscription
+                subscription = new Subscription
                 {
                     CreatedBy = user.Id,
                     StripeId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString(),
@@ -118,17 +131,29 @@ namespace Hood.Areas.Admin.Controllers
                     TrialPeriodDays = model.TrialPeriodDays,
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
-                OperationResult result = await _auth.AddSubscriptionPlan(subscription);
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.ErrorString);
-                }
-
+                subscription = await _auth.AddSubscriptionPlan(subscription);
+                await _logger.AddLogAsync(
+                    string.Format("Subscription ({0}) added with name: {1}", subscription.StripeId, subscription.Name),
+                    JsonConvert.SerializeObject(subscription),
+                    LogType.Success,
+                    LogSource.Subscriptions,
+                    _userManager.GetUserId(User),
+                    subscription.Id.ToString(),
+                    Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
+                );
                 return new Response(true);
-
             }
             catch (Exception ex)
             {
+                await _logger.AddLogAsync(
+                    string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name),
+                    ex,
+                    LogType.Error,
+                    LogSource.Subscriptions,
+                    _userManager.GetUserId(User),
+                    subscription.Id.ToString(),
+                    Url.AbsoluteAction("Index", "Subscriptions")
+                );
                 return new Response(ex.Message);
             }
         }
@@ -139,18 +164,30 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                OperationResult result = await _auth.DeleteSubscriptionPlan(id);
-                if (result.Succeeded)
-                {
-                    return new Response(true);
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                var subscription = await _auth.GetSubscriptionPlanById(id);
+                await _auth.DeleteSubscriptionPlan(id);
+                await _logger.AddLogAsync(
+                string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
+                    JsonConvert.SerializeObject(subscription),
+                    LogType.Success,
+                    LogSource.Subscriptions,
+                    _userManager.GetUserId(User),
+                    subscription.Id.ToString(),
+                    Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
+                );
+                return new Response(true);
             }
             catch (Exception ex)
             {
+                await _logger.AddLogAsync(
+                    string.Format("Error deleting subscription with id: {0}", id),
+                    ex,
+                    LogType.Error,
+                    LogSource.Subscriptions,
+                    _userManager.GetUserId(User),
+                    id.ToString(),
+                    Url.AbsoluteAction("Index", "Subscriptions")
+                );
                 return new Response(ex.Message);
             }
         }

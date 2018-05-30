@@ -278,52 +278,41 @@ namespace Hood.Services
         }
 
         // Subscriptions
-        public async Task<OperationResult> AddSubscriptionPlan(Subscription subscription)
+        public async Task<Subscription> AddSubscriptionPlan(Subscription subscription)
         {
-            try
+            // try adding to stripe
+            var myPlan = new StripePlanCreateOptions()
             {
-                // try adding to stripe
-                var myPlan = new StripePlanCreateOptions()
+                Id = subscription.StripeId,
+                Amount = subscription.Amount,                     // all amounts on Stripe are in cents, pence, etc
+                Currency = subscription.Currency,                 // "usd" only supported right now
+                Interval = subscription.Interval,                 // "month" or "year"
+                IntervalCount = subscription.IntervalCount,       // optional
+                TrialPeriodDays = subscription.TrialPeriodDays,   // amount of time that will lapse before the customer is billed
+                Product = new StripePlanProductCreateOptions()
                 {
-                    Id = subscription.StripeId,
-                    Amount = subscription.Amount,                     // all amounts on Stripe are in cents, pence, etc
-                    Currency = subscription.Currency,                 // "usd" only supported right now
-                    Interval = subscription.Interval,                 // "month" or "year"
-                    IntervalCount = subscription.IntervalCount,       // optional
-                    Nickname = subscription.Name,
-                    TrialPeriodDays = subscription.TrialPeriodDays   // amount of time that will lapse before the customer is billed
-                };
-                StripePlan response = await _billing.Stripe.PlanService.CreateAsync(myPlan);
-                subscription.StripeId = response.Id;
-                _db.Subscriptions.Add(subscription);
-                var result = new OperationResult(_db.SaveChanges() == 1);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message);
-            }
-        }
-        public async Task<OperationResult> DeleteSubscriptionPlan(int id)
-        {
-            try
-            {
-                Subscription subscription = _db.Subscriptions.Where(p => p.Id == id).FirstOrDefault();
-                try
-                {
-                    await _billing.Stripe.PlanService.DeleteAsync(subscription.StripeId);
+                    Name = subscription.Name
                 }
-                catch (StripeException)
-                { }
-                _db.SaveChanges();
-                _db.Entry(subscription).State = EntityState.Deleted;
-                await _db.SaveChangesAsync();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
+            };
+            StripePlan response = await _billing.Stripe.PlanService.CreateAsync(myPlan);
+            subscription.StripeId = response.Id;
+            _db.Subscriptions.Add(subscription);
+            await _db.SaveChangesAsync();
+            return subscription;
+        }
+        public async Task DeleteSubscriptionPlan(int id)
+        {
+            Subscription subscription = _db.Subscriptions.Where(p => p.Id == id).FirstOrDefault();
+            try
             {
-                return new OperationResult(ex.Message);
+                await _billing.Stripe.PlanService.DeleteAsync(subscription.StripeId);
             }
+            catch (StripeException)
+            { }
+            _db.SaveChanges();
+            _db.Entry(subscription).State = EntityState.Deleted;
+            await _db.SaveChangesAsync();
+            return;
         }
         public async Task<Subscription> GetSubscriptionPlanById(int id)
         {
@@ -416,23 +405,16 @@ namespace Hood.Services
             model.List = subs;
             return model;
         }
-        public async Task<OperationResult> UpdateSubscription(Subscription subscription)
+        public async Task UpdateSubscription(Subscription subscription)
         {
-            try
+            var myPlan = new StripePlanUpdateOptions()
             {
-                var myPlan = new StripePlanUpdateOptions()
-                {
-                    Nickname = subscription.Name
-                };
-                StripePlan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
-                _db.Update(subscription);
-                await _db.SaveChangesAsync();
-                return new OperationResult(true);
-            }
-            catch (DbUpdateException ex)
-            {
-                return new OperationResult(ex);
-            }
+                Nickname = subscription.Name
+            };
+            StripePlan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
+            _db.Update(subscription);
+            await _db.SaveChangesAsync();
+            return;
         }
 
         // Stripe customer object

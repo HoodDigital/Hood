@@ -1,0 +1,28 @@
+@model LogListModel
+@{
+    ViewBag.Title = "View Logs";
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+@section scripts {
+    <script src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&libraries=places", _settings.GetIntegrationSettings().GoogleMapsApiKey)"></script>
+}
+@section buttons {
+    <a class="btn btn-sm btn-success" asp-action="Index" asp-controller="Widgets"><i class="fa fa-gavel m-r-sm"></i>Widgets</a>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
+<div class="panel-body">
+    <h4>Logs for All Widgets</h4>
+    <div class="form-group">
+        <div class="checkbox">
+            <input id="log-list-live" class="styled" type="checkbox">
+            <label for="log-list-live">
+                Live reload <small><strong>- The list of logs will refresh every 5 seconds.</strong></small>
+            </label>
+        </div>
+    </div>
+    <div id="log-list" class="url-change" data-url="/admin/logs/show">
+    </div>
+</div>

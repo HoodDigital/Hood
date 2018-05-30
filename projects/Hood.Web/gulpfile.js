@@ -221,6 +221,7 @@ gulp.task("js:package:admin", function () {
         hood.js + "includes/subscriptions.js",
         hood.js + "includes/content.js",
         hood.js + "includes/forums.js",
+        hood.js + "includes/logs.js",
         hood.js + "includes/google.js",
         hood.js + "admin.js"
     ], { base: '.' })

@@ -78,6 +78,7 @@ namespace Hood.Core
             services.AddScoped<IStripeWebHookService, StripeWebHookService>();
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<ILogService, LogService>();
 
             //populate Autofac container builder with the set of registered service descriptors
             builder.Populate(services);

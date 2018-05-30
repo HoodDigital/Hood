@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Hood.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace Hood.Models
 {
@@ -41,6 +45,9 @@ namespace Hood.Models
         // Property
         public DbSet<PropertyListing> Properties { get; set; }
 
+        // Logs
+        public DbSet<Log> Logs { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -52,5 +59,6 @@ namespace Hood.Models
             base.OnModelCreating(builder);
             builder.CreateHoodModels();
         }
+
     }
 }

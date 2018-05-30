@@ -1,0 +1,54 @@
+@model Log
+<div class="data-item">
+    <div class="row row-center">
+         <div class="col-xs-1">
+            <div>
+                @switch (Model.Type)
+                {
+                    case LogType.Success:
+                        <span class="label label-success">Success</span>
+                        break;
+                    case LogType.Error:
+                        <span class="label label-danger">Error</span>
+                        break;
+                    case LogType.Warning:
+                        <span class="label label-warning">Warning</span>
+                        break;
+                    case LogType.Info:
+                        <span class="label label-info">Info</span>
+                        break;
+                }
+            </div>
+        </div>
+       <div class="col-xs-3">
+            <div>@Model.Time.ToDisplay()</div>
+        </div>
+        <div class="col-md-7">
+            <div><strong>@Model.Title</strong></div>
+        </div>
+        <a data-toggle="collapse" href="@string.Format("#log-{0}", Model.Id)" class="full-box-link"></a>
+    </div>
+    <div class="collapse" id="@string.Format("log-{0}", Model.Id)">
+        <div class="p-sm">
+            <div class="row">
+                <div class="col-xs-12 col-sm-8">
+                    <h4>Details:</h4>
+                    <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
+                </div>
+                <div class="col-xs-12 col-sm-4">
+                    <dl>
+                        @if (Model.User != null)
+                        {
+                            <dt>User</dt>
+                            <dd>
+                                <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                                    @Model.User.FullName
+                                </a>
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -60,4 +60,8 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Admin\UI\Logs\" />
+  </ItemGroup>
+
 </Project>

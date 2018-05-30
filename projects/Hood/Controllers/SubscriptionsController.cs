@@ -208,10 +208,7 @@ namespace Hood.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             return model;
         }
-        private string FormatLog(string v)
-        {
-            return DateTime.Now.ToShortDateString() + " - " + DateTime.Now.ToShortTimeString() + ": " + v + Environment.NewLine;
-        }
+
         private string GetReturnUrl(BillingMessage? message, int? planId, string returnUrl, string errors = null)
         {
             if (!returnUrl.IsSet())

@@ -396,6 +396,10 @@ namespace Hood.Extensions
             return x.Link(x);
         }
 
+        public static string AddHtmlBreaks(this string str)
+        {
+            return str.Replace("  ", "&nbsp;&nbsp;").Replace(Environment.NewLine, "<br/>");
+        }
 
     }
 }

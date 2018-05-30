@@ -191,7 +191,7 @@ namespace Hood.Models
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent AdminContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentSlug, int startingLevel = 0)
+        public IHtmlContent AdminContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentType, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
 
@@ -208,7 +208,7 @@ namespace Hood.Models
                     {
                         htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
                     }
-                    htmlOutput += string.Format("<a href=\"/admin/content/{0}/manage?category={1}\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("<a href=\"/admin/content/{0}/manage?category={1}\" class=\"content-category\">", contentType, category.Slug);
                     htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";
                     htmlOutput += " <small>[" + category.Slug + "]</small>";
@@ -217,7 +217,7 @@ namespace Hood.Models
                     htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-content-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
                     htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-content-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
                     htmlOutput += "</td>";
-                    htmlOutput += AdminContentCategoryTree(category.Children, contentSlug, startingLevel + 1);
+                    htmlOutput += AdminContentCategoryTree(category.Children, contentType, startingLevel + 1);
                     htmlOutput += "</tr>";
                 }
             }

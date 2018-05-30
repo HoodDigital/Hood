@@ -28,15 +28,15 @@ namespace Hood.Services
         OperationResult SetDeliveryAddress(string userId, int id);
 
         // Subscription Plans
-        Task<OperationResult> AddSubscriptionPlan(Subscription subscription);
+        Task<Subscription> AddSubscriptionPlan(Subscription subscription);
         Task<List<Subscription>> GetSubscriptionPlansAsync();
         Task<List<Subscription>> GetSubscriptionPlanLevels(string category = null);
         Task<List<Subscription>> GetSubscriptionPlanAddons();
         Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model);
         Task<Subscription> GetSubscriptionPlanById(int id);
         Task<Subscription> GetSubscriptionPlanByStripeId(string stripeId);
-        Task<OperationResult> DeleteSubscriptionPlan(int id);
-        Task<OperationResult> UpdateSubscription(Subscription model);
+        Task DeleteSubscriptionPlan(int id);
+        Task UpdateSubscription(Subscription model);
 
         // User Subscriptions
         Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model);
