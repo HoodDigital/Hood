@@ -149,7 +149,7 @@ namespace Hood.Areas.Admin.Controllers
                 }
                 var currentTemplate = content.GetMeta("Settings.Template").GetStringValue();
                 // check if new template has been selected
-                if (oldTemplate.IsSet() && currentTemplate.IsSet() && oldTemplate != currentTemplate)
+                if (oldTemplate.IsSet() && currentTemplate.IsSet())
                 {
                     // delete all template metas that do not exist in the new template, and add any that are missing
                     List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, type.TemplateFolder);
