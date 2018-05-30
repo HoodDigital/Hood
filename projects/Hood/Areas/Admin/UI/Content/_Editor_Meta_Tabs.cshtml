@@ -1,9 +1,9 @@
 @model EditContentModel
+@if (Model.ContentType.Templates)
+{<li class=""><a data-toggle="tab" href="#template-settings" aria-expanded="false"> Template</a></li>}
 @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.ContentType.BaseName + ".")).Count() > 0 || 
     Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
 {<li class=""><a data-toggle="tab" href="#type-settings" aria-expanded="false"> @Model.ContentType.BaseName Settings</a></li>}
-@if (Model.ContentType.Templates)
-{<li class=""><a data-toggle="tab" href="#template-settings" aria-expanded="false"> Template</a></li>}
 @if (Model.ContentType.Gallery)
 {<li class=""><a data-toggle="tab" href="#gallery" aria-expanded="false"> Gallery</a></li>}
 @if (Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
