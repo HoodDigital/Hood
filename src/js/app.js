@@ -270,16 +270,19 @@ $.hood.App = {
             $('.contact-form .form-submit').show();
             $('body').on('submit', '.contact-form', function (e) {
                 e.preventDefault();
-                if ($('.g-recaptcha')) {
+                $(this).addClass('loading');
+                if ($('.g-recaptcha').length > 0) {
                     grecaptcha.reset();
                     grecaptcha.execute();
                 } else {
-                    $.hood.App.ContactForms.Submit($(this).attr('id'));
+                    $.hood.App.ContactForms.Submit(this);
                 }
                 return false;
             });
-            $('body').on('click', '.form-submit-basic', function () {
-                $.hood.App.ContactForms.Submit($(this).data('tag'));
+            $('body').on('submit', '.contact-form-basic', function (e) {
+                e.preventDefault();
+                $(this).addClass('loading');
+                $.hood.App.ContactForms.Submit(this);
             });
         },
         Submit: function (tag) {
@@ -300,6 +303,7 @@ $.hood.App = {
 
                     $.hood.Alerts.Error("There was an error sending the message", "Error", null, true);
                 }
+                $form.removeClass('loading');
             });
             return false;
         }

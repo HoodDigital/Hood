@@ -47,6 +47,7 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
+        [Route("hood/contact/send/")]
         [Route("hood/process-contact-form/")]
         public async Task<Response> ProcessContactForm(ContactFormModel model)
         {

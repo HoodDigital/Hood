@@ -8,7 +8,13 @@
         action = Model.FormAction;
     }
 }
-<form asp-controller="Home" asp-action="ProcessContactForm" method="post" role="form" class="@(Model.FormClass.IsSet() ? Model.FormClass : "contact-form")" id="@(Model.FormAction.IsSet() ? Model.FormAction : "contact-form")" data-redirect="@_contactSettings.ThankYouUrl" data-alert-message="@_contactSettings.ThankYouMessage">
+<form method="post" 
+      role="form" 
+      id="@(Model.FormId.IsSet() ? Model.FormId : _integrationSettings.EnableGoogleRecaptcha ? "contact-form" : "contact-form-basic")"
+      class="@(_integrationSettings.EnableGoogleRecaptcha ? "contact-form" : "contact-form-basic") @(Model.FormClass.IsSet() ? Model.FormClass : "")" 
+      action="@(Model.FormAction.IsSet() ? Model.FormAction : Url.Action("ProcessContactForm", "Hood"))" 
+      data-redirect="@_contactSettings.ThankYouUrl" 
+      data-alert-message="@_contactSettings.ThankYouMessage">
     <div class="thank-you">
         <h2>@_contactSettings.ThankYouTitle</h2>
         <p>@_contactSettings.ThankYouMessage</p>
