@@ -145,8 +145,6 @@ gulp.task("js:package:app", function () {
         l.end();
     });
     return gulp.src([
-        libFolder + 'jquery-validation/dist/jquery.validate.min.js',
-        libFolder + 'jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js',
         hood.js + "includes/production.js",
         lib + 'loaders.css/loaders.css.js',
         lib + 'FitVids/jquery.fitvids.js',
