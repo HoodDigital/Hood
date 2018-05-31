@@ -2,59 +2,53 @@
 @{
     var _account = Context.GetAccountInfo();
 }
-<div class="forum-post" id="@string.Format("post-{0}", Model.Id)">
+<div class="post" id="@string.Format("post-{0}", Model.Id)">
     <div class="row">
         <div class="col-md-10">
             <div class="post-content">
                 @if (Model.ReplyId.HasValue)
                 {
-                    <span>
+                    <p class="reply">
                         This is a reply to
-                        <a class="btn btn-sm btn-info" asp-action="ShowTopic" asp-route-id="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-highlight="@Model.ReplyId">Reply</a>
-                    </span>
+                        <a asp-action="ShowTopic" asp-route-id="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-highlight="@Model.ReplyId">Original Post</a>.
+                    </p>
                 }
                 @Html.Raw(Model.HtmlBody)
             </div>
         </div>
         <div class="col-md-2 text-right">
-            <p>
-                <a class="btn btn-sm btn-info" asp-action="ReportPost" asp-route-id="@Model.Id">Report abuse</a>
-            </p>
-            <p>
-                <a class="btn btn-sm btn-info" asp-action="ShowTopic" asp-route-id="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-reply="@Model.Id">Reply</a>
-            </p>
-            @if (User.Identity.IsAuthenticated &&
-          (Model.AuthorId == _account.User.Id ||
-            User.IsInRole("Administrator") ||
-            User.IsInRole("Moderator")))
-            {
-                <p>
-                    <a class="btn btn-sm btn-warning" asp-action="EditPost" asp-route-id="@Model.Id">Edit</a>
-                </p>
-                <p>
-                    <a class="btn btn-sm btn-danger" asp-action="DeletePost" asp-route-id="@Model.Id">Delete</a>
-                </p>
-            }
+            <a class="btn btn btn-success m-b-xs" asp-action="ShowTopic" asp-route-id="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-reply="@Model.Id">Reply</a><br />
+            <a class="btn btn-xs btn-info" asp-action="ReportPost" asp-route-id="@Model.Id">Report</a>
         </div>
     </div>
     <hr />
-    <div class="post-content m-b-md">
+    <div class="post-content">
         @Html.Raw(Model.Signature)
     </div>
     @*<div class="dropup pull-right">
-        <button type="button" id="dropdownMenu2" class="dropdown-toggle btn btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fa fa-smile-o"></i>
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-            <a class="reaction plus" data-reaction="plus"></a>
-            <a class="reaction minus" data-reaction="minus"></a>
-            <a class="reaction confused" data-reaction="confused"></a>
-            <a class="reaction smiley" data-reaction="smiley"></a>
-            <a class="reaction joy" data-reaction="joy"></a>
-        </div>
-    </div>*@
-    <p class="no-margin">
-        <span class="m-r-sm"><i class="fa fa-user"></i> @Model.Topic.Author.FullName</span>
-        <span><i class="fa fa-clock-o"></i> @Model.PostedTime.ToLongDateString() at @Model.PostedTime.ToShortTimeString()</span>
+            <button type="button" id="dropdownMenu2" class="dropdown-toggle btn btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-smile-o"></i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                <a class="reaction plus" data-reaction="plus"></a>
+                <a class="reaction minus" data-reaction="minus"></a>
+                <a class="reaction confused" data-reaction="confused"></a>
+                <a class="reaction smiley" data-reaction="smiley"></a>
+                <a class="reaction joy" data-reaction="joy"></a>
+            </div>
+        </div>*@
+    <p class="pull-right">
+        @if (User.Identity.IsAuthenticated &&
+  (Model.AuthorId == _account.User.Id ||
+    User.IsInRole("Administrator") ||
+    User.IsInRole("Moderator")))
+        {
+            <a class="btn btn-xs btn-warning m-r-xs" asp-action="EditPost" asp-route-id="@Model.Id">Edit</a>
+            <a class="btn btn-xs btn-danger m-r-xs" asp-action="DeletePost" asp-route-id="@Model.Id">Delete</a>
+        }
+    </p>
+    <p class="stats">
+        <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.FullName</span>
+        <span><i class="fa fa-clock-o m-r-xs"></i> @Model.Topic.CreatedOn.ToHumaneDate()</span>
     </p>
 </div>

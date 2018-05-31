@@ -7,6 +7,7 @@
     ViewData["SubTitle"] = Model.Topic.Forum.Description;
     ViewData["EditUrl"] = Url.Action("Edit", "Forum", new { area = "Admin", id = Model.Topic.Forum.Id });
     ViewData["Forum"] = Model.Topic.Forum;
+    ViewData["Topic"] = Model.Topic;
     Layout = "_ForumLayout";
 
     string url = Context.GetSiteUrl(true, true);
@@ -47,22 +48,25 @@
 }
 @if (Model.SaveMessage.IsSet())
 {
-    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+    @Html.ContainedBootstrapAlert(Model.SaveMessage, Model.MessageType, true, "no-margin");
 }
 <div class="row">
     <div class="col-sm-9">
-        <div class="forum-post">
+        <div class="post">
             <div class="post-content">
                 <h4>@Model.Topic.Title</h4>
                 @Html.Raw(Model.Topic.Description)
             </div>
             <hr />
-            <div class="post-content m-b-md">
-                @Html.Raw(Model.Topic.Author.ForumSignature)
-            </div>
-            <p class="no-margin">
-                <span class="m-r-sm"><i class="fa fa-user"></i> @Model.Topic.Author.FullName</span>
-                <span><i class="fa fa-clock-o"></i> @Model.Topic.CreatedOn.ToLongDateString() at @Model.Topic.CreatedOn.ToShortTimeString()</span>
+            @if (Model.Topic.Author.ForumSignature.IsSet())
+            {
+                <div class="post-content m-b-md">
+                    @Html.Raw(Model.Topic.Author.ForumSignature)
+                </div>
+            }
+            <p class="stats">
+                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.FullName</span>
+                <span><i class="fa fa-clock-o m-r-xs"></i> @Model.Topic.CreatedOn.ToHumaneDate()</span>
             </p>
         </div>
         @if (Model.List.Count == 0)
@@ -71,12 +75,16 @@
         }
         else
         {
-            await Html.RenderPartialAsync("_Pagination");
             @foreach (var post in Model.List)
             {
                 await Html.RenderPartialAsync("_Template_Post", post);
             }
-            await Html.RenderPartialAsync("_Pagination");
+            @if (Model.TotalPages > 1)
+            {
+                <div class="text-center">
+                    @{ await Html.RenderPartialAsync("_Pagination");}
+                </div>
+            }
         }
         <hr />
         @{ await Html.RenderPartialAsync("_Forms_Post"); }

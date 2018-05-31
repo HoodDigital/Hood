@@ -5,6 +5,9 @@
 @section styles {
     @RenderSection("styles", required: false)
 }
+@section includes {
+    @RenderSection("includes", required: false)
+}
 @section scripts {
     @RenderSection("scripts", required: false)
 }
@@ -20,6 +23,6 @@
         </p>
     </div>
 </div>
-<section class="container">
+<section class="container forum">
     @RenderBody()
 </section>

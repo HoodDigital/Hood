@@ -2,22 +2,26 @@
 @{
     ViewData["Title"] = "Our Forums";
     ViewData["SubTitle"] = "Browse and engage with our interactive forums.";
-    ViewData["Forum"] = null;
     Layout = "_ForumLayout";
 }
 <div class="row">
     <div class="col-sm-9">
         @if (Model.List.Count == 0)
         {
-            await Html.RenderPartialAsync("_Forums_NoResults");
+        await Html.RenderPartialAsync("_Forums_NoResults");
         }
         else
         {
-            @foreach (var forum in Model.List)
-            {
-                await Html.RenderPartialAsync("_Template_Forum", forum);
-            }
-            await Html.RenderPartialAsync("_Pagination");
+        @foreach (var forum in Model.List)
+        {
+        await Html.RenderPartialAsync("_Template_Forum", forum);
+        }
+        @if (Model.TotalPages > 1)
+        {
+        <div class="text-center">
+            @{ await Html.RenderPartialAsync("_Pagination");}
+        </div>
+        }
         }
     </div>
     <div class="col-sm-3">
