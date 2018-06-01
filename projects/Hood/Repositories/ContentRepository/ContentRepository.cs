@@ -121,9 +121,9 @@ namespace Hood.Services
                 {
                     var sortVal = sort.Replace("Meta:", "").Replace(":Desc", "");
                     if (sort.EndsWith("Desc"))
-                        orderedContent = content.OrderByDescending(n => n.Metadata.Where(m => m.Name == sortVal).FirstOrDefault().BaseValue);
+                        orderedContent = content.OrderByDescending(n => n.Metadata.SingleOrDefault(m => m.Name == sortVal).BaseValue);
                     else
-                        orderedContent = content.OrderBy(n => n.Metadata.Where(m => m.Name == sortVal).FirstOrDefault().BaseValue);
+                        orderedContent = content.OrderBy(n => n.Metadata.SingleOrDefault(m => m.Name == sortVal).BaseValue);
                 }
                 else
                 {
