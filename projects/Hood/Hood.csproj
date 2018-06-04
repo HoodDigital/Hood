@@ -60,4 +60,8 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Areas\Admin\UI\Forum\_Editor_Settings.cshtml" />
+  </ItemGroup>
+
 </Project>

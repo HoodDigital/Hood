@@ -55,9 +55,11 @@
                     <div class="tabs-container m-b-lg">
                         <ul class="nav nav-tabs">
                             <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> Basics</a></li>
+                            <li><a data-toggle="tab" href="#settings" aria-expanded="true"> Settings</a></li>
                         </ul>
                         <div class="tab-content">
                             @{await Html.RenderPartialAsync("_Editor_Info"); }
+                            @{await Html.RenderPartialAsync("_Editor_Settings"); }
                         </div>
                     </div>
                 </div>

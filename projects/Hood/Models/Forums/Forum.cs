@@ -43,6 +43,8 @@ namespace Hood.Models
         public List<Topic> Topics { get; set; }
 
         public List<ForumCategoryJoin> Categories { get; set; }
+
+
         [NotMapped]
         public IEnumerable<ForumCategory> AllowedCategories { get; set; }
 

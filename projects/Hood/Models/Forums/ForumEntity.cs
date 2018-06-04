@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Hood.Models
 {
-    public class ForumEntity : BaseEntity
+    public class ForumEntity : ForumAccessEntity
     {
         // Author 
         public string AuthorId { get; set; }
@@ -45,7 +45,6 @@ namespace Hood.Models
 
         // Settings
         public bool Published { get; set; }
-        public bool Public { get; set; }
         public bool Featured { get; set; }
 
         // Images
@@ -65,4 +64,6 @@ namespace Hood.Models
             set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
     }
+
+
 }

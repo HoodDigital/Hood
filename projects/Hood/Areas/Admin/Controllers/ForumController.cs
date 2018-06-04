@@ -120,6 +120,10 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Authors = await GetAuthorsAsync();
             model.AddEditorMessage(message);
+
+            model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+            model.Roles = _auth.GetAllRoles();
+
             return View(model);
         }
 
@@ -161,9 +165,6 @@ namespace Hood.Areas.Admin.Controllers
 
                 model.SaveMessage = "Forum saved.";
                 model.MessageType = AlertType.Success;
-
-                return View(model);
-
             }
             catch (Exception ex)
             {
@@ -173,9 +174,12 @@ namespace Hood.Areas.Admin.Controllers
 
                 model.SaveMessage = "There was a problem saving: " + ex.Message;
                 model.MessageType = AlertType.Danger;
-
-                return View(model);
             }
+
+            model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+            model.Roles = _auth.GetAllRoles();
+
+            return View(model);
         }
 
         [Route("admin/forums/create/")]
@@ -208,7 +212,6 @@ namespace Hood.Areas.Admin.Controllers
                 model.LastEditedBy = user.UserName;
                 model.LastEditedOn = DateTime.Now;
 
-                model.Public = true;
                 model.ShareCount = 0;
                 model.Views = 0;
 

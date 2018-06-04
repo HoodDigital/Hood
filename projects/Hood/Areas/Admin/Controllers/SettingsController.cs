@@ -9,6 +9,7 @@ using Hood.Caching;
 using Geocoding.Google;
 using Hood.Enums;
 using System.Threading.Tasks;
+using Hood.Extensions;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -492,6 +493,7 @@ namespace Hood.Areas.Admin.Controllers
                 model = new ForumSettings();
             model.AddEditorMessage(status);
             model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+            model.Roles = _auth.GetAllRoles();
             return View(model);
         }
         [HttpPost]
@@ -511,6 +513,7 @@ namespace Hood.Areas.Admin.Controllers
                 model.MessageType = Enums.AlertType.Danger;
             }
             model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+            model.Roles = _auth.GetAllRoles();
             return View(model);
         }
         [Route("admin/settings/forum/reset/")]

@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace Hood.Models
 {
     // Add profile data for application users by adding properties to the ApplicationUser class
     [Serializable]
-    public class ForumSettings : SaveableModel
+    public class ForumSettings : ForumAccessEntity
     {
         public ForumSettings()
         {
@@ -16,23 +17,6 @@ namespace Hood.Models
 
         [Display(Name = "Enable Forums")]
         public bool Enabled { get; set; }
-
-        [Display(Name = "Viewing Requires Login")]
-        public bool ViewingRequiresLogin { get; set; }
-        [Display(Name = "Viewing Requires Subscription")]
-        public bool ViewingRequiresSubscription { get; set; }
-        [Display(Name = "Viewing Susbcriptions")]
-        public string ViewingSusbcriptions { get; set; }
-
-        [Display(Name = "Posting Requires Login")]
-        public bool PostingRequiresLogin { get; set; }
-        [Display(Name = "Posting Requires Subscription")]
-        public bool PostingRequiresSubscription { get; set; }
-        [Display(Name = "Posting Susbcriptions")]
-        public string PostingSusbcriptions { get; set; }
-
-        [JsonIgnore]
-        public List<Subscription> Subscriptions { get; set; }
     }
 
 }

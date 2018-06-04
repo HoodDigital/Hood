@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-namespace Hood.Areas.Controllers
+namespace Hood.Controllers
 {
     public class ForumController : Controller
     {
@@ -130,9 +130,6 @@ namespace Hood.Areas.Controllers
             if (!model.Forum.Published)
                 return View("Offline", model);
 
-            if (!model.Forum.Public && !User.Identity.IsAuthenticated)
-                return View("NotAuthorized", model);
-
             IQueryable<Topic> topics = _db.Topics
                 .Include(t => t.Author)
                 .Include(t => t.Forum)
@@ -170,9 +167,6 @@ namespace Hood.Areas.Controllers
 
                 if (!model.Forum.Published)
                     return View("Offline", model);
-
-                if (!model.Forum.Public && !User.Identity.IsAuthenticated)
-                    return View("NotAuthorized", model);
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (model.Topic == null)
@@ -236,9 +230,6 @@ namespace Hood.Areas.Controllers
 
             if (!model.Topic.Forum.Published)
                 return View("Offline", model);
-
-            if (!model.Topic.Forum.Public && !User.Identity.IsAuthenticated)
-                return View("NotAuthorized", model);
 
             IQueryable<Post> posts = _db.Posts
                 .Include(p => p.Author)
@@ -307,9 +298,6 @@ namespace Hood.Areas.Controllers
 
                 if (!model.Topic.Forum.Published)
                     return View("Offline", model);
-
-                if (!model.Topic.Forum.Public && !User.Identity.IsAuthenticated)
-                    return View("NotAuthorized", model);
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (model.Post == null)

@@ -10,70 +10,10 @@
                 <label class="col-sm-3 control-label">Description</label>
                 <div class="col-sm-8"><textarea asp-for="Description" type="text" class="form-control"></textarea></div>
             </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Accessible publicly:</label>
-                <div class="col-sm-8">
-                    <div class="checkbox">
-                        <input class="styled" asp-for="Public" type="checkbox" />
-                        <label for="Public">
-                            Public
-                            <small>
-                                <strong><i class="fa fa-info m-l-sm m-r-xs"></i>Will be accessible by users without a registered account.</strong>
-                            </small>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Show in featured list:</label>
-                <div class="col-sm-8">
-                    <div class="checkbox">
-                        <input class="styled" asp-for="Featured" type="checkbox" />
-                        <label for="Featured">Featured</label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Topic Moderation:</label>
-                <div class="col-sm-8">
-                    <div class="checkbox">
-                        <input class="styled" asp-for="RequireTopicModeration" type="checkbox" />
-                        <label for="RequireTopicModeration">
-                            Required
-                            <small>
-                                <strong><i class="fa fa-info m-l-sm m-r-xs"></i>If set, all topics will require approval by a moderator.</strong>
-                            </small>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Post &amp; Reply Moderation:</label>
-                <div class="col-sm-8">
-                    <div class="checkbox">
-                        <input class="styled" asp-for="RequirePostModeration" type="checkbox" />
-                        <label for="RequirePostModeration">
-                            Required
-                            <small>
-                                <strong><i class="fa fa-info m-l-sm m-r-xs"></i>If set, all posts &amp; replies will require approval by a moderator.</strong>
-                            </small>
-                        </label>
-                    </div>
-                </div>
-            </div>
             <h5 class="m-t-lg">Content</h5>
-            @if (User.IsInRole("Admin"))
-            {
-                <textarea asp-for="Body" class="tinymce-full-admin">
-                    @Model.Body
-                </textarea>
-            }
-            else
-            {
-                <textarea asp-for="Body" class="tinymce-full">
-                    @Model.Body
-                </textarea>
-            }
+            <textarea asp-for="Body" class="tinymce-full">
+                @Model.Body
+            </textarea>
         </fieldset>
     </div>
 </div>
