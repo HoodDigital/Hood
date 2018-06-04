@@ -1,5 +1,7 @@
+# Project Ignores
+/Admin/Views
+/Views
 /wwwroot/lib
 /wwwroot/css
 /wwwroot/js/**/*.min.js
 /wwwroot/js/**/*.packaged.js
-

@@ -1,0 +1,46 @@
+﻿// inside header .wrap
+.top-bar {
+    height: 70px;
+    .transition(all .5s ease-in-out);
+    overflow: hidden;
+
+    .brand {
+        a.logo {
+            padding: 15px 0;
+            display: inline-block;
+
+            img {
+                height: 40px;
+            }
+        }
+    }
+
+    .contact {
+        display: none;
+
+        @media (min-width:768px) {
+            display: block;
+        }
+
+        float: right;
+        text-align: right;
+
+        span {
+            color: @dark-color;
+            font-weight: bold;
+            padding: 25px 0;
+            vertical-align: middle;
+            display: inline-block;
+
+            &.phone {
+                padding: 0;
+                margin-left: 15px;
+                font-size: 25px;
+            }
+
+            i {
+                color: @theme-color;
+            }
+        }
+    }
+}

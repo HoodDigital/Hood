@@ -1,0 +1,106 @@
+@inject IContentRepository _content
+@{
+    Layout = "_Layout";
+    Content currentContent = ViewData["Content"] as Content;
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section includes {
+    @RenderSection("includes", required: false)
+}
+@section scripts {
+    @RenderSection("scripts", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+@if (ViewData.IsSet("Template.00.Hero-Section.Title") || ViewData.IsSet("Template.01.Hero-Section.Body"))
+{
+    <section class="hero">
+        <fixedImage src="@ViewData["Template.00.Hero-Section.ImageUrl"]" class="background-image hood-image"></fixedImage>
+        <div class="intro">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-7 col-md-offset-1">
+                        <h1>
+                            @Html.Raw(ViewData["Template.00.Hero-Section.Title"])
+                        </h1>
+                        <div class="m-b-lg">
+                            @Html.Raw(ViewData["Template.01.Hero-Section.Body"])
+                        </div>
+                        <p>
+                            <a class="btn btn-white btn-lg" href="@Html.Raw(ViewData["Template.01.Hero-Section-Button.Url"])">@Html.Raw(ViewData["Template.01.Hero-Section-Button.Text"])</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.05.Above-Top-Section.Body"))
+{
+    <section class="padded">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    @Html.Raw(ViewData["Template.05.Above-Top-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.11.Top-Section.Body"))
+{
+    <section id="next" class="padded">
+        <div class="container">
+            <div class="row row-center">
+                <div class="col-xs-12 col-sm-6">
+                    <img src="@ViewData["Template.10.Top-Section.ImageUrl"]" class="img-full" />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    @Html.Raw(ViewData["Template.11.Top-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.12.Below-Top-Section.Body"))
+{
+    <section class="padded">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    @Html.Raw(ViewData["Template.12.Below-Top-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.21.Second-Section.Body"))
+{
+    <section class="padded">
+        <div class="container">
+            <div class="row row-center">
+                <div class="col-xs-12 col-sm-6">
+                    <img src="@ViewData["Template.20.Second-Section.ImageUrl"]" class="img-full" />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    @Html.Raw(ViewData["Template.21.Second-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.22.Below-Second-Section.Body"))
+{
+    <section class="padded">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    @Html.Raw(ViewData["Template.22.Below-Second-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}

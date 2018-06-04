@@ -1,0 +1,88 @@
+﻿// inside header .wrap
+nav.main {
+    display: none;
+    background-color: @theme-color;
+
+    @media (min-width:768px) {
+        display: block;
+    }
+
+    ul.nav {
+        > li {
+            > a {
+                font-weight: bold;
+                position: relative;
+                font-size: 13px;
+                padding: 5px 10px;
+                margin: 8px 0;
+                border-radius: 4px;
+                color: white;
+
+                i {
+                    color: @theme-light;
+                    width: auto;
+                    text-align: center;
+                    margin-right: 8px;
+                }
+
+                &:hover,
+                &:focus {
+                    text-decoration: none;
+                    background-color: fade(@theme-dark, 15%);
+                }
+            }
+
+            &.social {
+                a {
+                    i {
+                        margin-right: 0;
+                    }
+                }
+            }
+
+            &.dropdown.open {
+                position: initial;
+
+                a {
+                    &:hover,
+                    &:focus {
+                        text-decoration: none;
+                        background-color: fade(@theme-dark, 15%);
+                    }
+                }
+
+                .dropdown-menu {
+                    background-color: @theme-dark;
+                    border: 0;
+                    color: white;
+                    padding: 25px 0;
+
+                    &.full {
+                        width: 100vw;
+                        position: absolute;
+                        margin-top: -1px;
+                        left: 50%;
+                        right: 50%;
+                        margin-left: -50vw;
+                        margin-right: -50vw;
+
+                        @import "mega-menu";
+                    }
+
+                    a {
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        &.login {
+            float: right;
+        }
+
+        &.main {
+            .transition(all .5s ease-in-out);
+            transition-delay: .5s;
+        }
+    }
+}

@@ -1,0 +1,44 @@
+﻿﻿body {
+    header.header {
+        position: relative;
+        width: 100%;
+        z-index: 99;
+
+        &:before, &:after {
+            content: " ";
+            display: table;
+        }
+
+        &:after {
+            clear: both;
+        }
+
+        .wrap {
+            box-shadow: 0 0 20px 0px fade(black, 13%);
+            background-color: white;
+
+            @import "header/top-bar";
+            @import "header/mobile";
+            @import "header/main-menu";
+            @import "header/contact-slim";
+        }
+
+        &.sticky-header {
+            @import "header/sticky-header";
+        }
+    }
+
+    @media (max-width:@screen-sm) {
+        &.mobile-menu-open {
+            overflow: hidden;
+
+            header.header {
+                .wrap {
+                    nav.mobile {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}

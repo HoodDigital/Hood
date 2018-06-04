@@ -23,6 +23,42 @@
     <EmbeddedResource Include="Areas\Views\**\*.cshtml" />
     <EmbeddedResource Include="Views\**\*.cshtml" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Content Remove="Views\Shared\Error.cshtml" />
+    <Content Remove="Views\Shared\ErrorCode.cshtml" />
+    <Content Remove="Views\Shared\NotImplemented.cshtml" />
+    <Content Remove="Views\Shared\_AdminEditor.cshtml" />
+    <Content Remove="Views\Shared\_BaseMetas.cshtml" />
+    <Content Remove="Views\Shared\_BillingMessage.cshtml" />
+    <Content Remove="Views\Shared\_ContactForm.cshtml" />
+    <Content Remove="Views\Shared\_ContentCard.cshtml" />
+    <Content Remove="Views\Shared\_DeferredStyles.cshtml" />
+    <Content Remove="Views\Shared\_DeferredStylesLoader.cshtml" />
+    <Content Remove="Views\Shared\_Email_Header.cshtml" />
+    <Content Remove="Views\Shared\_Email_Layout.cshtml" />
+    <Content Remove="Views\Shared\_Email_PreHeader.cshtml" />
+    <Content Remove="Views\Shared\_Footer.cshtml" />
+    <Content Remove="Views\Shared\_Header_Menu_Account.cshtml" />
+    <Content Remove="Views\Shared\_Header_Menu_Main.cshtml" />
+    <Content Remove="Views\Shared\_Header_Menu_Mobile.cshtml" />
+    <Content Remove="Views\Shared\_LoginScripts.cshtml" />
+    <Content Remove="Views\Shared\_LoginSocials.cshtml" />
+    <Content Remove="Views\Shared\_LoginStyles.cshtml" />
+    <Content Remove="Views\Shared\_MailchimpForm.cshtml" />
+    <Content Remove="Views\Shared\_Metas.cshtml" />
+    <Content Remove="Views\Shared\_NoScript.cshtml" />
+    <Content Remove="Views\Shared\_Pagination.cshtml" />
+    <Content Remove="Views\Shared\_PreLoader.cshtml" />
+    <Content Remove="Views\Shared\_PropertyCard.cshtml" />
+    <Content Remove="Views\Shared\_PropertySearch.cshtml" />
+    <Content Remove="Views\Shared\_Scripts.cshtml" />
+    <Content Remove="Views\Shared\_Styles.cshtml" />
+    <Content Remove="Views\Shared\_Subscriptions_ChargeButton.cshtml" />
+    <Content Remove="Views\Shared\_Subscriptions_CurrentInfo.cshtml" />
+    <Content Remove="Views\Shared\_Subscriptions_Table.cshtml" />
+    <Content Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />

@@ -37,14 +37,14 @@ gulp.task('update-views', function () {
         './Views/**/*.cshtml',
         './Views/**/*.json'
     ], { base: './Views/' })
-    .pipe(gulp.dest('./../Hood/Views/'));
+    .pipe(gulp.dest('./../Hood/UI/'));
 });
 gulp.task('update-admin-views', function () {
     return gulp.src([
         './Areas/Admin/Views/**/*.cshtml',
         './Areas/Admin/Views/**/*.json'
     ], { base: './Areas/Admin/Views/' })
-    .pipe(gulp.dest('./../Hood/Areas/Admin/Views/'));
+    .pipe(gulp.dest('./../Hood/Areas/Admin/UI/'));
 });
 
 // Cleans all dist/src/images output folders, as well as the lib/hood/dev dist and lib/hood/src/css folders.
@@ -290,5 +290,13 @@ gulp.task('site:js:package', ['site:js'], function () {
     .pipe(gulp.dest(jsFolder));
 });
 // TODO: Add themes less/js processing.
+
+gulp.task('watch:js', function () {
+    gulp.watch(jsFolder + '**/*.js', ['site:js']);
+});
+gulp.task('watch:less', function () {
+    gulp.watch(lessFolder + '**/*.less', ['site:less']);
+});
+gulp.task("watch", ["watch:js", "watch:less"]);
 
 gulp.task("publish", ['site:less', 'site:js', 'site:js:package']);

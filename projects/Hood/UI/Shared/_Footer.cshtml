@@ -1,22 +1,54 @@
-@inject IContentRepository _content
-@{
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
-    IntegrationSettings _plugins = _settings.GetIntegrationSettings();
-    SeoSettings _seoSettings = _settings.GetSeo();
-}
-<hr />
-<footer class="footer pb-60">
-    <div class="container">
-        <p class="address no-margin">
-            @if (_basicSettings.Address != null)
-            {
-                <span><i class="fa fa-map-pin m-sm"></i>@_basicSettings.Address.ToFormat(AddressFormat.SingleLine)</span>
-            }
-            <span><i class="fa fa-phone m-sm"></i>@_basicSettings.Phone</span>
-        </p>
-        <p class="copyright">
-            <span><i class="fa fa-copyright m-sm"></i>@DateTime.Now.Year.ToString() @_basicSettings.CompanyName - All Rights Reserved.</span>
-            <span><i class="fa fa-paint-brush m-sm"></i><a href="http://hooddigital.com/">Website designed and built by Hood's Digital Architects</a></span>
-        </p>
+<footer>
+    <nav>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7 links">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h4><a href="/">Home</a></h4>
+                            <ul>
+                                <li><a asp-action="Index" asp-controller="Forum">Forums</a></li>
+                                <li><a asp-action="Index" asp-controller="Subscriptions">Member's Area</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4><a href="/">Content</a></h4>
+                            <ul>
+                                @{
+                                    var _propertySettings = _settings.GetPropertySettings();
+                                    var sideTypes = _settings.GetContentSettings().GetAllowedTypes();
+                                    if (_propertySettings.Enabled)
+                                    {
+                                        sideTypes.Add(new ContentType() { Type = "property", Title = _propertySettings.Title, TypeNamePlural = _propertySettings.Plural, Slug = _propertySettings.Slug, IsPublic = true });
+                                    }
+                                    sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
+                                }
+                                @foreach (ContentType ct in sideTypes)
+                                {
+                                    if (ct.IsPublic)
+                                    {
+                                        <li><a href="@string.Format("/{0}/", ct.Slug)">@ct.Title</a></li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 text-right">
+                    <p class="logo m-b-md">
+                        <a>
+                            <img src="~/lib/hood/images/hood-cms-white.png" />
+                        </a>
+                    </p>
+                    <p>Designed and built by <a href="https://hooddigital.com/">Hood Digital</a></p>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="copyright">
+        <div class="container">
+            <p><i class="fa fa-copyright m-r-sm"></i>@DateTime.Now.Year.ToString() Hood Digital Limited &#8226; <a href="/terms">Terms</a> &#8226; <a href="/privacy">Privacy</a></p>
+            <p><i class="fa fa-paint-brush m-r-sm"></i><a href="https://hooddigital.com/">App designed and built by Hood Digital</a></p>
+        </div>
     </div>
 </footer>
