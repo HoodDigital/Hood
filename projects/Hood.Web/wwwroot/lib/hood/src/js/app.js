@@ -40,7 +40,7 @@ $.hood.App = {
             StickyHeader: true,
             InitialPosition: false,
             Functions: true,
-            Offset: 64,
+            Offset: 117,
             ToTargetSelector: ".scroll-to-target",
             ToTopSelector: '.scroll-top'
         },
@@ -385,6 +385,11 @@ $.hood.App = {
                 $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
             }
 
+            // toggle editors
+            $('.forum').on('click', '.edit-post', function (e) {
+                $(this).parents('.post').find('.post-view').slideToggle();
+                $(this).parents('.post').find('.edit-view').slideToggle();
+            });
         }
     },
     ResizeVideos: function () {

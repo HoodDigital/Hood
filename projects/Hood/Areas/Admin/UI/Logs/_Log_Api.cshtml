@@ -1,0 +1,51 @@
+@model Log
+<div class="row">
+    <div class="col-xs-12 col-sm-8">
+        <h4>Details:</h4>
+        <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
+    </div>
+    <div class="col-xs-12 col-sm-4">
+        <dl>
+            @if (Model.User != null)
+            {
+                <dt>User</dt>
+                <dd>
+                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                        @Model.User.FullName
+                    </a>
+                </dd>
+            }
+            @if (Model.SourceUrl.IsSet())
+            {
+                <dt>Endpoint Url</dt>
+                <dd>
+                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                        @Model.SourceUrl
+                    </a>
+                </dd>
+            }
+            @if (Model.EntityId.IsSet())
+            {
+                switch (Model.EntityType)
+                {
+                    case nameof(ApiKey):
+                        <dt>Api Key</dt>
+                        <dd>
+                            <a asp-action="ShowKey" asp-controller="Api" asp-route-id="@Model.EntityId">
+                                Show key
+                            </a>
+                        </dd>
+                        break;
+                    case nameof(ApiEvent):
+                        <dt>Api Event</dt>
+                        <dd>
+                            <a asp-action="ShowEvent" asp-controller="Api" asp-route-id="@Model.EntityId">
+                                Show event
+                            </a>
+                        </dd>
+                        break;
+                }
+            }
+        </dl>
+    </div>
+</div>

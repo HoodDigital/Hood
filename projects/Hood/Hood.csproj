@@ -64,6 +64,8 @@
     <None Remove="Areas\Admin\UI\Api\Create.cshtml" />
     <None Remove="Areas\Admin\UI\Api\Index.cshtml" />
     <None Remove="Areas\Admin\UI\Forum\_Editor_Settings.cshtml" />
+    <None Remove="Areas\Admin\UI\Logs\_Log_Api.cshtml" />
+    <None Remove="Areas\Admin\UI\Logs\_Log_Subscription.cshtml" />
     <None Remove="UI\Shared\Api.cshtml" />
   </ItemGroup>
 

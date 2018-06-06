@@ -14,7 +14,7 @@ namespace Hood.Models
         public string Search { get; set; }
         [FromRoute(Name = "slug")]
         public string Slug { get; set; }
-        [FromRoute(Name = "id")]
+        [FromRoute(Name = "topicId")]
         public int? TopicId { get; set; }
         [FromRoute(Name = "title")]
         public string Title { get; set; }

@@ -97,8 +97,7 @@ namespace Hood.Filters
                     throw new Exception("You must enable subscriptions before you can set required subscriptions for forums.");
                 }
 
-                BillingSettings billingSettings = _settings.GetBillingSettings();
-                IActionResult subscriptionResult = billingSettings.GetNewSubscriptionUrl(context.HttpContext);
+                IActionResult unauthorizedResult = new RedirectToActionResult("Unauthorized", "Forum", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
 
                 // Check if forums in general can be viewed without subscription, of not check for a tier sub
                 if (!_account.HasTieredSubscription && _access == ForumAccess.View && _forumSettings.ViewingRequiresSubscription)
@@ -106,7 +105,7 @@ namespace Hood.Filters
                     if (CheckForOverrideRoles(_forumSettings.ViewingRoles, context))
                         return;
 
-                    context.Result = subscriptionResult;
+                    context.Result = unauthorizedResult;
                     return;
                 }
 
@@ -116,12 +115,11 @@ namespace Hood.Filters
                     if (CheckForOverrideRoles(_forumSettings.PostingRoles, context))
                         return;
 
-                    context.Result = subscriptionResult;
+                    context.Result = unauthorizedResult;
                     return;
                 }
 
                 // Specific subscription/role required stuff
-                IActionResult changeSubscriptionResult = billingSettings.GetChangeSubscriptionUrl(context.HttpContext);
 
                 // Check if forums in general can be viewed without a SPECIFIC subscription, if one is required, make sure the user is in that subscription
                 if (_access == ForumAccess.View && _forumSettings.ViewingRequiresSpecificSubscription)
@@ -131,7 +129,7 @@ namespace Hood.Filters
                         // if the user is in an override role (code access for example, or role granted by admin)
                         if (CheckForOverrideRoles(_forumSettings.ViewingRoles, context))
                             return;
-                        context.Result = subscriptionResult;
+                        context.Result = unauthorizedResult;
                         return;
                     }
                 }
@@ -144,7 +142,7 @@ namespace Hood.Filters
                         // if the user is in an override role (code access for example, or role granted by admin)
                         if (CheckForOverrideRoles(_forumSettings.PostingRoles, context))
                             return;
-                        context.Result = subscriptionResult;
+                        context.Result = unauthorizedResult;
                         return;
                     }
                 }
@@ -192,7 +190,7 @@ namespace Hood.Filters
                     if (CheckForOverrideRoles(forum.ViewingRoles, context))
                         return;
 
-                    context.Result = subscriptionResult;
+                    context.Result = unauthorizedResult;
                     return;
                 }
 
@@ -204,7 +202,7 @@ namespace Hood.Filters
                     if (CheckForOverrideRoles(forum.PostingRoles, context))
                         return;
 
-                    context.Result = subscriptionResult;
+                    context.Result = unauthorizedResult;
                     return;
                 }
 
@@ -218,7 +216,7 @@ namespace Hood.Filters
                             return;
                         if (CheckForOverrideRoles(forum.ViewingRoles, context))
                             return;
-                        context.Result = subscriptionResult;
+                        context.Result = unauthorizedResult;
                         return;
                     }
                 }
@@ -233,7 +231,60 @@ namespace Hood.Filters
                             return;
                         if (CheckForOverrideRoles(forum.PostingRoles, context))
                             return;
-                        context.Result = subscriptionResult;
+                        context.Result = unauthorizedResult;
+                        return;
+                    }
+                }
+
+                if (_access == ForumAccess.Moderate)
+                {
+                    bool moderator = false;
+                    // moderator checks, if admin or mod, let through.
+                    if (_userManager.IsInRoleAsync(_account.User, "Administrator").Result ||
+                        _userManager.IsInRoleAsync(_account.User, "Moderator").Result)
+                        moderator = true;
+
+                    // if is forum owner
+                    if (forum.AuthorId == _account.User.Id)
+                        moderator = true;
+
+                    // if this is a post (postId is a route variable)
+                    // Specific forum based subscription/role required stuff
+                    if (context.RouteData.Values.ContainsKey("postId"))
+                    {
+                        long postId = 0;
+                        if (long.TryParse(context.RouteData.Values["postId"].ToString(), out postId))
+                        {
+                            Post post = _db.Posts.SingleOrDefault(f => f.Id == postId);
+                            if (post != null)
+                            {
+                                // if user is author, allow through.
+                                if (post.AuthorId == _account.User.Id)
+                                    moderator = true;
+                            }
+                        }
+                    }
+
+                    // if this is a topic (topicId is a route variable)
+                    // check for user access (Author)
+                    if (context.RouteData.Values.ContainsKey("topicId"))
+                    {
+                        int topicId = 0;
+                        if (int.TryParse(context.RouteData.Values["topicId"].ToString(), out topicId))
+                        {
+                            Topic topic = _db.Topics.SingleOrDefault(f => f.Id == topicId);
+                            if (topic != null)
+                            {
+                                // if user is author, allow through.
+                                if (topic.AuthorId == _account.User.Id)
+                                    moderator = true;
+                            }
+                        }
+                    }
+
+                    if (!moderator)
+                    {
+                        context.Result = unauthorizedResult;
                         return;
                     }
                 }

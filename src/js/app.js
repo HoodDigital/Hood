@@ -385,6 +385,8 @@ $.hood.App = {
                 $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
             }
 
+            // toggle editors
+            
         }
     },
     ResizeVideos: function () {

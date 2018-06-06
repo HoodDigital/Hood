@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hood.ViewModels;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers
@@ -58,7 +59,7 @@ namespace Hood.Controllers
         #region "Forum Views"
 
         [Route("forums/")]
-        [ForumAuthorize(AccessRequired: ForumAccess.View)]
+        [ForumAuthorize(ForumAccess.View)]
         public async Task<IActionResult> Index(ForumModel model, ForumMessage? message)
         {
             IQueryable<Forum> forums = _db.Forums
@@ -115,7 +116,7 @@ namespace Hood.Controllers
         }
 
         [Route("forum/{slug}")]
-        [ForumAuthorize(AccessRequired: ForumAccess.View)]
+        [ForumAuthorize(ForumAccess.View)]
         public async Task<IActionResult> Topics(TopicModel model, ForumMessage? message)
         {
             if (model.Forum == null)
@@ -151,7 +152,7 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [ForumAuthorize(AccessRequired: ForumAccess.Post)]
+        [ForumAuthorize(ForumAccess.Post)]
         [Route("forum/{slug}")]
         public async Task<IActionResult> AddTopic(TopicModel model)
         {
@@ -214,8 +215,8 @@ namespace Hood.Controllers
             return await Topics(model, ForumMessage.Created);
         }
 
-        [Route("forum/{slug}/{id}/{title}/")]
-        [ForumAuthorize(AccessRequired: ForumAccess.View)]
+        [Route("forum/{slug}/{topicId}/{title}/")]
+        [ForumAuthorize(ForumAccess.View)]
         public async Task<IActionResult> ShowTopic(PostModel model, ForumMessage? message)
         {
             if (model.Topic == null)
@@ -274,20 +275,12 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        [Authorize]
-        [Route("forum/{slug}/{id}/{title}/")]
-        [ForumAuthorize(AccessRequired: ForumAccess.Post)]
+        [Route("forum/{slug}/{topicId}/{title}/")]
+        [ForumAuthorize(ForumAccess.Post)]
         public async Task<IActionResult> AddPost(PostModel model, ForumMessage? message)
         {
             try
             {
-                if (message.HasValue && message == ForumMessage.Created)
-                {
-                    model.MessageType = AlertType.Warning;
-                    model.SaveMessage = "Looks like you pressed refresh, but this will cause your post to be submitted again, if you wish to edit your post, simply click the edit button.";
-                    return await ShowTopic(model, null);
-                }
-
                 model.Topic = await _db.Topics
                          .Include(f => f.Author)
                          .Include(f => f.Forum)
@@ -304,12 +297,14 @@ namespace Hood.Controllers
                 {
                     model.MessageType = AlertType.Danger;
                     model.SaveMessage = "No topic was submitted.";
+                    return await ShowTopic(model, null);
                 }
 
                 if (!model.Post.Body.IsSet())
                 {
                     model.MessageType = AlertType.Danger;
                     model.SaveMessage = "You have to enter a message.";
+                    return await ShowTopic(model, null);
                 }
 
                 var user = await _userManager.GetUserAsync(User);
@@ -349,7 +344,7 @@ namespace Hood.Controllers
                 // Highlight the post we just created, so it is shown on load.#
                 return RedirectToAction(nameof(ForumController.ShowTopic), new
                 {
-                    id = model.Topic.Id,
+                    topicId = model.Topic.Id,
                     slug = model.Topic.Forum.Slug,
                     title = model.Topic.Title.ToSeoUrl(),
                     message = ForumMessage.Created,
@@ -366,15 +361,133 @@ namespace Hood.Controllers
 
         #endregion
 
-        #region "Actions"
-        [Authorize]
-        [Route("forum/delete-post/{id}/")]
-        public async Task<IActionResult> DeletePost(long id)
+        #region "Editing" 
+
+        [HttpPost]
+        [Route("forum/{slug}/edit-post/{postId}/")]
+        [ForumAuthorize(ForumAccess.Moderate)]
+        public async Task<IActionResult> EditPost(long postId, string body)
         {
             var post = await _db.Posts
                  .Include(f => f.Author)
                  .Include(f => f.Topic).ThenInclude(t => t.Forum)
-                 .SingleOrDefaultAsync(f => f.Id == id);
+                 .SingleOrDefaultAsync(f => f.Id == postId);
+
+            try
+            {
+
+                // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
+                if (post == null)
+                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoPostFound });
+
+                post.Body = body;
+
+                post.Edited = true;
+                post.EditedById = _userManager.GetUserId(User);
+                post.EditedTime = DateTime.Now;
+                post.EditReason = "Modified by user.";
+
+                post.Topic.LastEditedBy = _userManager.GetUserId(User);
+                post.Topic.LastEditedOn = DateTime.Now;
+
+                post.Topic.Forum.LastEditedBy = _userManager.GetUserId(User);
+                post.Topic.Forum.LastEditedOn = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+
+                return RedirectToAction(nameof(ForumController.ShowTopic),
+                    new
+                    {
+                        topicId = post.Topic.Id,
+                        slug = post.Topic.Forum.Slug,
+                        title = post.Topic.Title.ToSeoUrl(),
+                        highlight = post.Id,
+                        message = ForumMessage.Saved
+                    });
+
+            }
+            catch (Exception ex)
+            {
+                if (post != null)
+                    return RedirectToAction(nameof(ForumController.ShowTopic),
+                        new
+                        {
+                            topicId = post.Topic.Id,
+                            slug = post.Topic.Forum.Slug,
+                            title = post.Topic.Title.ToSeoUrl(),
+                            highlight = post.Id,
+                            message = ForumMessage.Error
+                        });
+                else
+                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+            }
+        }
+
+        [HttpPost]
+        [Route("forum/{slug}/edit-topic/{topicId}/")]
+        [ForumAuthorize(ForumAccess.Moderate)]
+        public async Task<IActionResult> EditTopic(long topicId, string title, string description)
+        {
+            var topic = await _db.Topics
+                .Include(t => t.Forum)
+                .SingleOrDefaultAsync(f => f.Id == topicId);
+
+            try
+            {
+
+                // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
+                if (topic == null)
+                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoTopicFound });
+
+                topic.Title = title;
+                topic.Description = description;
+
+                topic.LastEditedBy = _userManager.GetUserId(User);
+                topic.LastEditedOn = DateTime.Now;
+
+                topic.Forum.LastEditedBy = _userManager.GetUserId(User);
+                topic.Forum.LastEditedOn = DateTime.Now;
+
+                await _db.SaveChangesAsync();
+
+                return RedirectToAction(nameof(ForumController.ShowTopic),
+                    new
+                    {
+                        topicId = topic.Id,
+                        slug = topic.Forum.Slug,
+                        title = topic.Title.ToSeoUrl(),
+                        message = ForumMessage.Saved
+                    });
+
+            }
+            catch (Exception ex)
+            {
+                if (topic != null)
+                    return RedirectToAction(nameof(ForumController.ShowTopic),
+                        new
+                        {
+                            topicId = topic.Id,
+                            slug = topic.Forum.Slug,
+                            title = topic.Title.ToSeoUrl(),
+                            message = ForumMessage.Saved
+                        });
+                else
+                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+            }
+        }
+
+        #endregion
+
+        #region "Actions"
+
+        [Route("forum/{slug}/delete-post/{postId}/")]
+        [ForumAuthorize(ForumAccess.Moderate)]
+        public async Task<IActionResult> DeletePost(long postId)
+        {
+            var post = await _db.Posts
+                 .Include(f => f.Author)
+                 .Include(f => f.Topic).ThenInclude(t => t.Forum)
+                 .SingleOrDefaultAsync(f => f.Id == postId);
 
             try
             {
@@ -399,7 +512,7 @@ namespace Hood.Controllers
                 return RedirectToAction(nameof(ForumController.ShowTopic),
                     new
                     {
-                        id = post.Topic.Id,
+                        topicId = post.Topic.Id,
                         slug = post.Topic.Forum.Slug,
                         title = post.Topic.Title.ToSeoUrl(),
                         message = ForumMessage.PostDeleted
@@ -412,7 +525,7 @@ namespace Hood.Controllers
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
-                            id = post.Topic.Id,
+                            topicId = post.Topic.Id,
                             slug = post.Topic.Forum.Slug,
                             title = post.Topic.Title.ToSeoUrl(),
                             message = ForumMessage.Error
@@ -422,13 +535,13 @@ namespace Hood.Controllers
             }
         }
 
-        [Authorize]
-        [Route("forum/delete-topic/{id}/")]
-        public async Task<IActionResult> DeleteTopic(long id)
+        [Route("forum/{slug}/delete-topic/{topicId}/")]
+        [ForumAuthorize(ForumAccess.Moderate)]
+        public async Task<IActionResult> DeleteTopic(long topicId)
         {
             var topic = await _db.Topics
                 .Include(t => t.Forum)
-                .SingleOrDefaultAsync(f => f.Id == id);
+                .SingleOrDefaultAsync(f => f.Id == topicId);
 
             try
             {
@@ -471,15 +584,15 @@ namespace Hood.Controllers
         }
 
         [Authorize]
-        [Route("forum/report-post/{id}/")]
-        public async Task<IActionResult> ReportPost(long id)
+        [Route("forum/{slug}/report-post/{postId}/")]
+        public async Task<IActionResult> ReportPost(long postId)
         {
             try
             {
                 Post post = await _db.Posts
                          .Include(f => f.Author)
                          .Include(f => f.Topic).ThenInclude(t => t.Forum)
-                         .SingleOrDefaultAsync(f => f.Id == id);
+                         .SingleOrDefaultAsync(f => f.Id == postId);
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (post == null)
@@ -521,7 +634,7 @@ namespace Hood.Controllers
 
                 return RedirectToAction(nameof(ForumController.ShowTopic), new
                 {
-                    id = post.Topic.Id,
+                    topicId = post.Topic.Id,
                     slug = post.Topic.Forum.Slug,
                     title = post.Topic.Title.ToSeoUrl(),
                     message = ForumMessage.PostReported
@@ -535,6 +648,13 @@ namespace Hood.Controllers
         }
 
         #endregion
+
+        [Route("forums/unauthorized")]
+        public IActionResult Unauthorized(string returnUrl)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
 
     }
 }

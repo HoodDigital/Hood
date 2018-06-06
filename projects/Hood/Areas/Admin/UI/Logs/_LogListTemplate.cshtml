@@ -35,25 +35,15 @@
     </div>
     <div class="collapse" id="@string.Format("log-{0}", Model.Id)">
         <div class="p-sm">
-            <div class="row">
-                <div class="col-xs-12 col-sm-8">
-                    <h4>Details:</h4>
-                    <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
-                </div>
-                <div class="col-xs-12 col-sm-4">
-                    <dl>
-                        @if (Model.User != null)
-                        {
-                            <dt>User</dt>
-                            <dd>
-                                <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
-                                    @Model.User.FullName
-                                </a>
-                            </dd>
-                        }
-                    </dl>
-                </div>
-            </div>
+            @switch (Model.Source)
+            {
+                case LogSource.Api:
+                    await Html.RenderPartialAsync("_Log_Api");
+                    break;
+                case LogSource.Subscriptions:
+                    await Html.RenderPartialAsync("_Log_Api");
+                    break;
+            }
         </div>
     </div>
 </div>

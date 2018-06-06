@@ -19535,7 +19535,6 @@ h6 {
   position: relative;
 }
 .data-item .full-box-link {
-  position: relative;
   z-index: 1;
 }
 .data-item a:not(.full-box-link) {

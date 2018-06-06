@@ -69,6 +69,16 @@ namespace Hood.Areas.Api.Controllers
             // add the user to the role
             var user = await _userManager.GetUserAsync(User);
 
+            if (role == "Admin" || role== "SuperUser")
+                return View("Api", new ApiViewModel()
+                {
+                    SaveMessage = "You cannot be added to the '" + role.ToSentenceCase() + "' role, this cannot be done via the API.",
+                    MessageType = AlertType.Warning,
+                    Title = "Could not add you to the '" + role.ToSentenceCase() + "' role.",
+                    Details = "You cannot be added to the '" + role.ToSentenceCase() + "' role , this cannot be done via the API.",
+                });
+
+
             if (await _roleManager.RoleExistsAsync(role))
             {
                 if (!await _userManager.IsInRoleAsync(user, role))
@@ -79,10 +89,10 @@ namespace Hood.Areas.Api.Controllers
                 {
                     return View("Api", new ApiViewModel()
                     {
-                        SaveMessage = "You have not been added to the " + role.ToSentenceCase() + ", you are already in that role.",
+                        SaveMessage = "You have not been added to the '" + role.ToSentenceCase() + "' role, you are already in that role.",
                         MessageType = AlertType.Warning,
-                        Title = "Could not add you to " + role.ToSentenceCase(),
-                        Details = "You have not been added to the " + role.ToSentenceCase() + ", you are already in that role.",
+                        Title = "Could not add you to '" + role.ToSentenceCase() + "' role.",
+                        Details = "You have not been added to the '" + role.ToSentenceCase() + "' role, you are already in that role.",
                     });
                 }
             }
@@ -90,10 +100,10 @@ namespace Hood.Areas.Api.Controllers
             {
                 return View("Api", new ApiViewModel()
                 {
-                    SaveMessage = "You have not been added to the " + role.ToSentenceCase() + ", the role does not exist.",
+                    SaveMessage = "You have not been added to the '" + role.ToSentenceCase() + "' role, the role does not exist.",
                     MessageType = AlertType.Danger,
-                    Title = "Could not add you to " + role.ToSentenceCase(),
-                    Details = "You have not been added to the " + role.ToSentenceCase() + ", the role does not exist.",
+                    Title = "Could not add you to '" + role.ToSentenceCase() + "' role.",
+                    Details = "You have not been added to the " + role.ToSentenceCase() + " role, the role does not exist.",
                 });
             }
 
@@ -103,10 +113,10 @@ namespace Hood.Areas.Api.Controllers
 
             ApiViewModel model = new ApiViewModel()
             {
-                SaveMessage = "You have been added to the " + role.ToSentenceCase() + ", you will be able to access the new features right away.",
+                SaveMessage = "You have been added to the '" + role.ToSentenceCase() + "' role, you will be able to access the new features right away.",
                 MessageType = AlertType.Success,
-                Title = "Added to " + role.ToSentenceCase(),
-                Details = "You have been added to the " + role.ToSentenceCase() + ", you will be able to access the new features right away.",
+                Title = "Added to '" + role.ToSentenceCase() + "' role.",
+                Details = "You have been added to the " + role.ToSentenceCase() + "' role, you will be able to access the new features right away.",
             };
 
             return View("Api", model);

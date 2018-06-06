@@ -1,0 +1,36 @@
+@model Log
+<div class="row">
+    <div class="col-xs-12 col-sm-8">
+        <h4>Subscription Object:</h4>
+        <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
+    </div>
+    <div class="col-xs-12 col-sm-4">
+        <dl>
+            @if (Model.User != null)
+            {
+                <dt>User</dt>
+                <dd>
+                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                        @Model.User.FullName
+                    </a>
+                </dd>
+            }
+            @if (Model.SourceUrl.IsSet())
+            {
+                <dt>Endpoint Url</dt>
+                <dd>
+                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                        @Model.SourceUrl
+                    </a>
+                </dd>
+            }
+            @if (Model.EntityId.IsSet())
+            {
+                switch (Model.EntityType)
+                {
+
+                }
+            }
+        </dl>
+    </div>
+</div>

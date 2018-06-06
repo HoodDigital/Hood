@@ -157,13 +157,13 @@
                                         <div class="checkbox">
                                             @if (subs == null || !subs.Contains(sub.StripeId))
                                             {
-                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingRoles" id="PostingRoles-@sub.StripeId.ToSeoUrl()" />
+                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingSubscriptions" id="PostingSubscriptions-@sub.StripeId.ToSeoUrl()" />
                                             }
                                             else
                                             {
-                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingRoles" id="PostingRoles-@sub.StripeId.ToSeoUrl()" checked />
+                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingSubscriptions" id="PostingSubscriptions-@sub.StripeId.ToSeoUrl()" checked />
                                             }
-                                            <label for="PostingRoles-@sub.StripeId.ToSeoUrl()">
+                                            <label for="PostingSubscriptions-@sub.StripeId.ToSeoUrl()">
                                                 @sub.Name
                                             </label>
                                         </div>
@@ -193,13 +193,13 @@
                                         <div class="checkbox">
                                             @if (roles == null || !roles.Contains(role.Name))
                                             {
-                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="ViewingRoles" id="ViewingRoles-@role.Name.ToSeoUrl()" />
+                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="PostingRoles" id="PostingRoles-@role.Name.ToSeoUrl()" />
                                             }
                                             else
                                             {
-                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="ViewingRoles" id="ViewingRoles-@role.Name.ToSeoUrl()" checked />
+                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="PostingRoles" id="PostingRoles-@role.Name.ToSeoUrl()" checked />
                                             }
-                                            <label for="ViewingRoles-@role.Name.ToSeoUrl()">
+                                            <label for="PostingRoles-@role.Name.ToSeoUrl()">
                                                 @role.Name
                                             </label>
                                         </div>

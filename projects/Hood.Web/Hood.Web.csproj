@@ -26,27 +26,6 @@
   
   <ItemGroup>
     <Content Remove="Views\Api\Index.cshtml" />
-    <Content Remove="Views\Forum\Index.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forms_Post.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forms_Topic.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forums_Categories.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forums_NoResults.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forums_Recent.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forums_Search.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Forums_Sidebar.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Posts_NoResults.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Posts_Recent.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Posts_Search.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Posts_Sidebar.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Template_Forum.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Template_Post.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Template_Topic.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Topics_NoResults.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Topics_Recent.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Topics_Search.cshtml" />
-    <Content Remove="Views\Forum\Partials\_Topics_Sidebar.cshtml" />
-    <Content Remove="Views\Forum\ShowTopic.cshtml" />
-    <Content Remove="Views\Forum\Topics.cshtml" />
     <Content Remove="Views\Shared\Error.cshtml" />
     <Content Remove="Views\Shared\ErrorCode.cshtml" />
     <Content Remove="Views\Shared\NotImplemented.cshtml" />
@@ -80,6 +59,10 @@
     <Content Remove="Views\Shared\_Subscriptions_CurrentInfo.cshtml" />
     <Content Remove="Views\Shared\_Subscriptions_Table.cshtml" />
     <Content Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Remove="Views\Forum\Unauthorized.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

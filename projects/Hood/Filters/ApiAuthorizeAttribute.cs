@@ -80,7 +80,7 @@ namespace Hood.Filters
 
                 if (!key.IsSet())
                 {
-                    LogError("The API creadentials were not supplied.", context.HttpContext.Request.Path);
+                    LogError("The API creadentials were not supplied.", context.HttpContext.GetSiteUrl(true, true));
                     context.Result = new UnauthorizedResult();
                     return;
                 }
@@ -91,39 +91,26 @@ namespace Hood.Filters
                 ApiKey apiKey = _db.ApiKeys.SingleOrDefault(f => f.Key == credentials.Key && f.Id == credentials.Id);
                 if (apiKey == null)
                 {
-                    LogError("Could not load API key object from provided credentials.", context.HttpContext.Request.Path);
+                    LogError("Could not load API key object from provided credentials.", context.HttpContext.GetSiteUrl(true, true));
                     context.Result = new UnauthorizedResult();
                     return;
                 }
 
                 if (!apiKey.Active)
                 {
-                    LogError("The API key is not active.", context.HttpContext.Request.Path, apiKey.UserId, apiKey.Id);
+                    LogError("The API key is not active.", context.HttpContext.GetSiteUrl(true, true), apiKey.UserId, apiKey.Id);
                     context.Result = new UnauthorizedResult();
                     return;
                 }
 
                 if (apiKey.AccessLevel < _access)
                 {
-                    LogError("The API key is does not have the required access level.", context.HttpContext.Request.Path, apiKey.UserId, apiKey.Id);
+                    LogError("The API key is does not have the required access level.", context.HttpContext.GetSiteUrl(true, true), apiKey.UserId, apiKey.Id);
                     context.Result = new UnauthorizedResult();
                     return;
                 }
 
                 // We did it! Now log the access, and the event.
-
-                var log = new Log()
-                {
-                    Type = LogType.Info,
-                    Source = LogSource.Api,
-                    Detail = "Api was accessed using API Key: " + apiKey.Name,
-                    Time = DateTime.Now,
-                    Title = "Api was accessed using API Key: " + apiKey.Name,
-                    UserId = apiKey.UserId,
-                    EntityId = apiKey.Id,
-                    SourceUrl = context.HttpContext.Request.Path
-                };
-                _db.Logs.Add(log);
 
                 var apiEvent = new ApiEvent()
                 {
@@ -136,6 +123,21 @@ namespace Hood.Filters
                     Url = context.HttpContext.Request.Path
                 };
                 _db.ApiEvents.Add(apiEvent);
+                _db.SaveChanges();
+
+                var log = new Log()
+                {
+                    Type = LogType.Info,
+                    Source = LogSource.Api,
+                    Detail = "Api was accessed using API Key: " + apiKey.Name,
+                    Time = DateTime.Now,
+                    Title = "Api was accessed using API Key: " + apiKey.Name,
+                    UserId = apiKey.UserId,
+                    EntityId = apiEvent.Id.ToString(),
+                    EntityType = nameof(ApiEvent),
+                    SourceUrl = context.HttpContext.GetSiteUrl(true, true)
+                };
+                _db.Logs.Add(log);
                 _db.SaveChanges();
 
             }
@@ -151,6 +153,7 @@ namespace Hood.Filters
                     Title = "Api attempted access failed using API Key: " + reason,
                     UserId = userId,
                     EntityId = keyId,
+                    EntityType = keyId.IsSet() ? nameof(ApiKey) : null,
                     SourceUrl = url
                 };
                 _db.Logs.Add(log);
