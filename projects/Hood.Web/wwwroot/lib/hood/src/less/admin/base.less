@@ -43,6 +43,17 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 7px;
     background-color: #f6f6f6;
     border-radius: 4px;
+    position: relative;
+
+    .full-box-link {
+        position: relative;
+        z-index: 1;
+    }
+
+    a:not(.full-box-link) {
+        position: relative;
+        z-index: 2;
+    }
 
     .inline-drop {
         margin-top: 15px;

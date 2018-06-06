@@ -1,5 +1,7 @@
 ﻿using Hood.Enums;
 using Hood.Extensions;
+using Hood.Filters;
+using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -11,6 +13,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

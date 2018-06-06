@@ -1,6 +1,7 @@
 ﻿using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;

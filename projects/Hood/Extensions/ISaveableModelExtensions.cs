@@ -70,6 +70,14 @@ namespace Hood.Extensions
                         model.MessageType = AlertType.Success;
                         model.SaveMessage = "Published successfully.";
                         break;
+                    case EditorMessage.Activated:
+                        model.MessageType = AlertType.Success;
+                        model.SaveMessage = "Activated successfully.";
+                        break;
+                    case EditorMessage.Deactivated:
+                        model.MessageType = AlertType.Success;
+                        model.SaveMessage = "Deactivated successfully.";
+                        break;
                     case EditorMessage.HomepageSet:
                         model.MessageType = AlertType.Success;
                         model.SaveMessage = "Homepage updated.";
@@ -77,6 +85,14 @@ namespace Hood.Extensions
                     case EditorMessage.Error:
                         model.MessageType = AlertType.Danger;
                         model.SaveMessage = "An error occurred. If this continues to occur please contact support.";
+                        break;
+                    case EditorMessage.KeyCreated:
+                        model.MessageType = AlertType.Success;
+                        model.SaveMessage = "You have a new API access key, this can now be used to communicate with the site, and access protected links.";
+                        break;
+                    case EditorMessage.KeyRolled:
+                        model.MessageType = AlertType.Success;
+                        model.SaveMessage = "You have reset the API access key, this can now be used to communicate with the site, and access protected links.";
                         break;
                 }
             }

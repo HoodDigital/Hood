@@ -16,6 +16,10 @@ using Microsoft.AspNetCore.Http;
 using Hood.Enums;
 using Hood.BaseTypes;
 using Hood.Extensions;
+using Hood.Infrastructure;
+using Hood.Filters;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Controllers
 {
@@ -30,6 +34,7 @@ namespace Hood.Controllers
         private readonly IAccountRepository _auth;
         private readonly IMediaManager<MediaObject> _media;
         private readonly IBillingService _billing;
+        private readonly HoodDbContext _db;
 
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
@@ -42,6 +47,7 @@ namespace Hood.Controllers
           IAccountRepository auth,
           ILoggerFactory loggerFactory,
           IBillingService billing,
+          HoodDbContext db,
           IMediaManager<MediaObject> media)
         {
             _userManager = userManager;
@@ -52,6 +58,7 @@ namespace Hood.Controllers
             _auth = auth;
             _media = media;
             _billing = billing;
+            _db = db;
         }
 
         [TempData]

@@ -3,6 +3,7 @@
 @{
     BasicSettings _basicSettings = _settings.GetBasicSettings();
     AccountInfo _account = Context.GetAccountInfo();
+    bool subscriptions = _settings.SubscriptionsEnabled().Succeeded;
 }
 <div class="row">
     <div class="col-sm-4">
@@ -24,6 +25,27 @@
                     <i class="fa fa-cogs m-r-xs"></i>Manage Account
                 </a>
             </li>
+            <li>
+                <a asp-action="Index" asp-controller="Billing">
+                    <i class="fa fa-money m-r-xs"></i>Manage Billing
+                </a>
+            </li>
+            @if (User.IsInRole("Admin") || User.IsInRole("Api"))
+            {
+                <li>
+                    <a asp-action="Index" asp-controller="Api">
+                        <i class="fa fa-key m-r-xs"></i>Api Keys
+                    </a>
+                </li>
+            }
+            @if (subscriptions)
+            {
+                <li>
+                    <a asp-action="Index" asp-controller="Subscriptions">
+                        <i class="fa fa-credit-card m-r-xs"></i>Manage Subscription
+                    </a>
+                </li>
+            }
             <li>
                 <a asp-action="ChangePassword" asp-controller="Manage">
                     <i class="fa fa-lock m-r-xs"></i>Change Password

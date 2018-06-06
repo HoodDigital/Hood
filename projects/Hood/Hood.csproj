@@ -61,7 +61,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Admin\UI\Api\Create.cshtml" />
+    <None Remove="Areas\Admin\UI\Api\Index.cshtml" />
     <None Remove="Areas\Admin\UI\Forum\_Editor_Settings.cshtml" />
+    <None Remove="UI\Shared\Api.cshtml" />
   </ItemGroup>
 
 </Project>

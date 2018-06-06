@@ -17840,6 +17840,9 @@ input[type="radio"] .styled:checked ~ label::after {
 .autocomplete-suggestion.selected {
   background: #f0f0f0;
 }
+.tiny-mce-body {
+  padding: 15px;
+}
 .no-wrap {
   white-space: nowrap;
   width: 100%;
@@ -19529,6 +19532,15 @@ h6 {
   margin-bottom: 7px;
   background-color: #f6f6f6;
   border-radius: 4px;
+  position: relative;
+}
+.data-item .full-box-link {
+  position: relative;
+  z-index: 1;
+}
+.data-item a:not(.full-box-link) {
+  position: relative;
+  z-index: 2;
 }
 .data-item .inline-drop {
   margin-top: 15px;
@@ -19987,14 +19999,13 @@ body nav.sidebar ul.side-menu li a {
   font-size: 18px;
   cursor: pointer;
   padding: 10px 22px 0;
-  height: 50px;
 }
 @media (min-width: 768px) {
   body nav.sidebar ul.side-menu li a {
     font-weight: 600;
     font-size: 13px;
     cursor: pointer;
-    padding: 14px 20px 14px 25px;
+    padding: 11px 20px 11px 25px;
   }
 }
 body nav.sidebar ul.side-menu li a i {

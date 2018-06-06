@@ -10857,6 +10857,9 @@ header#header .container {
 .autocomplete-suggestion.selected {
   background: #f0f0f0;
 }
+.tiny-mce-body {
+  padding: 15px;
+}
 .no-wrap {
   white-space: nowrap;
   width: 100%;

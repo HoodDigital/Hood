@@ -17,6 +17,10 @@
         NotFound,
         ErrorDuplicating,
         Duplicated,
-        CannotDeleteAdmin
+        CannotDeleteAdmin,
+        Deactivated,
+        Activated,
+        KeyRolled,
+        KeyCreated
     }
 }

@@ -130,6 +130,7 @@ namespace Hood.Models
         }
 
         public List<UserAccessCode> AccessCodes { get; set; }
+        public List<ApiKey> ApiKeys { get; set; }
         public List<Content> Content { get; set; }
         public List<Forum> Forums { get; set; }
         public List<Topic> Topics { get; set; }

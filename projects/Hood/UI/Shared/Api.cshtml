@@ -1,0 +1,8 @@
+@model ApiViewModel
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
+<h2>@Model.Title</h2>
+<p class="lead">@Model.Details</p>
+

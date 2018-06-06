@@ -24,6 +24,10 @@ namespace Hood.Models
         public DbSet<Address> Addresses { get; set; }
         public DbSet<MediaObject> Media { get; set; }
 
+        // Api
+        public DbSet<ApiKey> ApiKeys { get; set; }
+        public DbSet<ApiEvent> ApiEvents { get; set; }
+
         // Content
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }

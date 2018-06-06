@@ -267,6 +267,7 @@ $.hood.Admin = {
             setup: $.hood.Uploader.Load.Insert,
             image_dimensions: false,
             content_css: [
+                '/css/site.min.css'
             ]
         });
 
@@ -284,6 +285,7 @@ $.hood.Admin = {
             image_class_list: $.hood.ImageClasses,
             image_dimensions: false,
             content_css: [
+                '/css/site.min.css'
             ]
         });
         tinymce.init({
@@ -301,6 +303,7 @@ $.hood.Admin = {
             setup: $.hood.Uploader.Load.Insert,
             image_dimensions: false,
             content_css: [
+                '/css/site.min.css'
             ]
         });
 
@@ -318,6 +321,7 @@ $.hood.Admin = {
             image_class_list: $.hood.ImageClasses,
             image_dimensions: false,
             content_css: [
+                '/css/site.min.css'
             ]
         });
 

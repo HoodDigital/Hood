@@ -19,6 +19,9 @@ namespace Hood.Models
         {
             // Identity
             builder.Entity<Option>().ToTable("HoodOptions");
+            builder.Entity<Log>().ToTable("HoodLogs");
+            builder.Entity<ApiKey>().ToTable("HoodApiKeys");
+            builder.Entity<ApiEvent>().ToTable("HoodApiEvents");
             builder.Entity<MediaObject>().ToTable("HoodMedia");
             builder.Entity<Address>().ToTable("HoodAddresses");
             builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");

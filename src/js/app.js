@@ -569,8 +569,8 @@ $.hood.App = {
             menubar: false,
             toolbar: 'styleselect | bold italic | bullist numlist outdent indent | undo redo | link image media emoticons',
             image_dimensions: false,
-            content_css: [
-            ]
+            body_class: 'tiny-mce-body',
+            content_css: '/css/site.css'
         });
     }
 };

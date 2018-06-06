@@ -135,6 +135,11 @@ namespace Hood.Extensions
                          defaults: new { controller = "Billing" }
                     );
                     routes.MapRoute(
+                         name: "Api",
+                         template: "account/api/{action=Index}/{id?}",
+                         defaults: new { controller = "Api" }
+                    );
+                    routes.MapRoute(
                          name: "Subscriptions",
                          template: "account/subscriptions/{action=Index}/{id?}",
                          defaults: new { controller = "Subscriptions" }

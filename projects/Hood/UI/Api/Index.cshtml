@@ -1,0 +1,39 @@
+@model ApiKey
+@{
+    ViewBag.Title = "Your Api Key";
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
+<h2>Your API Key</h2>
+<p>You have been granted API access to the site, the following can be used to access the HoodCMS API.</p>
+<div class="row">
+    <div class="col-xs-5">Api User</div>
+    <div class="col-xs-5"><strong>@Model.Id</strong></div>
+</div>
+<div class="row">
+    <div class="col-xs-5">Api Key</div>
+    <div class="col-xs-5"><strong>@Model.Key</strong></div>
+</div>
+<div class="row m-b-lg">
+    <div class="col-xs-5">Api Encoded Token</div>
+    <div class="col-xs-5"><strong>@Model.ToEncodedApiKeyPair()</strong></div>
+</div>
+<div class="m-b-lg">
+    <h3>Using your API Key</h3>
+    <p>You can use your API key to access any of the secured endpoints on the site, this will log you as the user of the endpoint. You can also use the encoded token to share links to various endpoints that can be used to grant priveleges to your users etc. For example, you can create a link to add your users to specified roles. As shown below with the "Forum" role, so if a user follows the link below, they will be added to the "Forum" role, which can be used to grant access to forums or sections of the site.</p>
+    <h4>
+        Example Endpoint
+    </h4>
+    <p>This link can be used to invite users to the Forum Access role, simply send your users to this URL:</p>
+    @{
+        var url = Url.AbsoluteAction("InviteRoleAsync", "Users", new { area = "Api", key = Model.ToEncodedApiKeyPair(), role = "Forum" });
+    }
+    <div class="input-group">
+        <input type="text" class="form-control" value="@url" placeholder="Add to forum role...">
+        <span class="input-group-btn">
+            <a class="btn btn-default" href="@url">Go!</a>
+        </span>
+    </div>
+</div>

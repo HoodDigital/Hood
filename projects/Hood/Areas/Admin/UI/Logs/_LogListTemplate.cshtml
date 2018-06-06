@@ -1,7 +1,7 @@
 @model Log
 <div class="data-item">
     <div class="row row-center">
-         <div class="col-xs-1">
+        <div class="col-xs-1">
             <div>
                 @switch (Model.Type)
                 {
@@ -20,10 +20,15 @@
                 }
             </div>
         </div>
-       <div class="col-xs-3">
+        <div class="col-xs-1">
+            <div>
+                <span class="label label-default">@Model.Source</span>
+            </div>
+        </div>
+        <div class="col-xs-3">
             <div>@Model.Time.ToDisplay()</div>
         </div>
-        <div class="col-md-7">
+        <div class="col-md-6">
             <div><strong>@Model.Title</strong></div>
         </div>
         <a data-toggle="collapse" href="@string.Format("#log-{0}", Model.Id)" class="full-box-link"></a>
