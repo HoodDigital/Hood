@@ -40,7 +40,7 @@ $.hood.App = {
             StickyHeader: true,
             InitialPosition: false,
             Functions: true,
-            Offset: 64,
+            Offset: 117,
             ToTargetSelector: ".scroll-to-target",
             ToTopSelector: '.scroll-top'
         },
@@ -386,7 +386,10 @@ $.hood.App = {
             }
 
             // toggle editors
-            
+            $('.forum').on('click', '.edit-post', function (e) {
+                $(this).parents('.post').find('.post-view').slideToggle();
+                $(this).parents('.post').find('.edit-view').slideToggle();
+            });
         }
     },
     ResizeVideos: function () {
@@ -394,7 +397,7 @@ $.hood.App = {
             console.log('resizeVideos: FitVids not Defined.');
             return true;
         }
-        $("#content,#footer,#slider:not(.revslider-wrap),.landing-offer-media,.portfolio-ajax-modal,.mega-menu-column").fitVids({
+        $("body").fitVids({
             customSelector: "iframe[src^='http://www.dailymotion.com/embed'], iframe[src*='maps.google.com'], iframe[src*='google.com/maps']",
             ignore: '.no-fv'
         });
