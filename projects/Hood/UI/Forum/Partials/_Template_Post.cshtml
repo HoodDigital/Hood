@@ -1,54 +1,73 @@
 @model Post
 @{
     var _account = Context.GetAccountInfo();
+    bool moderator = User.Identity.IsAuthenticated &&
+        (Model.AuthorId == _account.User.Id ||
+        User.IsInRole("Administrator") ||
+        User.IsInRole("Moderator"));
 }
 <div class="post" id="@string.Format("post-{0}", Model.Id)">
     <div class="row">
         <div class="col-md-10">
-            <div class="post-content">
-                @if (Model.ReplyId.HasValue)
-                {
-                    <p class="reply">
-                        This is a reply to
-                        <a asp-action="ShowTopic" asp-route-id="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-highlight="@Model.ReplyId">Original Post</a>.
-                    </p>
-                }
-                @Html.Raw(Model.HtmlBody)
+            <div class="post-view">
+                <div class="post-content">
+                    @if (Model.ReplyId.HasValue)
+                    {
+                        <p class="reply">
+                            This is a reply to
+                            <a asp-action="ShowTopic" asp-route-topicId="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-highlight="@Model.ReplyId">Original Post</a>.
+                        </p>
+                    }
+                    @Html.Raw(Model.Body)
+                    @if (Model.Edited && Model.EditedTime.HasValue)
+                    {
+                        <p class="stats">
+                            <span><i class="fa fa-pencil m-r-xs"></i> This was last edited @Model.EditedTime.Value.ToHumaneDate() by @Model.EditedBy.FullName</span>
+                        </p>
+                    }
+                </div>
             </div>
+            @if (moderator)
+            {
+                <div class="edit-view">
+                    <form method="post" class="edit-post-form" asp-action="EditPost" asp-route-postId="@Model.Id">
+                        <fieldset>
+                            <input name="postId" type="hidden" value="@Model.Id" />
+                            <div class="form-group">
+                                <label class="control-label">Edit post</label>
+                                <div class="">
+                                    <textarea name="body" for="post-body-@Model.Id" type="text" class="form-control tinymce-public" data-apikey="im5cz6mwvyzb4wnmt2m9uylj2oqrlolmxmow161fioddtgy0">@Model.Body</textarea>
+                                    <span for="post-body-@Model.Id"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary"><span>Update post</span></button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            }
         </div>
         <div class="col-md-2 text-right">
-            <a class="btn btn btn-success m-b-xs" asp-action="ShowTopic" asp-route-id="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-reply="@Model.Id">Reply</a><br />
-            <a class="btn btn-xs btn-info" asp-action="ReportPost" asp-route-id="@Model.Id">Report</a>
+            <a class="btn btn btn-success m-b-xs" asp-action="ShowTopic" asp-route-topicId="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-reply="@Model.Id">Reply</a><br />
+            <a class="btn btn-xs btn-info warning-alert" asp-action="ReportPost" asp-route-postId="@Model.Id"  data-warning="This will alert administrators to look into this post for abuse, are you sure you want to send the report?">Report</a>
         </div>
     </div>
     <hr />
     <div class="post-content">
         @Html.Raw(Model.Signature)
     </div>
-    @*<div class="dropup pull-right">
-            <button type="button" id="dropdownMenu2" class="dropdown-toggle btn btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-smile-o"></i>
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                <a class="reaction plus" data-reaction="plus"></a>
-                <a class="reaction minus" data-reaction="minus"></a>
-                <a class="reaction confused" data-reaction="confused"></a>
-                <a class="reaction smiley" data-reaction="smiley"></a>
-                <a class="reaction joy" data-reaction="joy"></a>
-            </div>
-        </div>*@
     <p class="pull-right">
-        @if (User.Identity.IsAuthenticated &&
-  (Model.AuthorId == _account.User.Id ||
-    User.IsInRole("Administrator") ||
-    User.IsInRole("Moderator")))
+        @if (moderator)
         {
-            <a class="btn btn-xs btn-warning m-r-xs" asp-action="EditPost" asp-route-id="@Model.Id">Edit</a>
-            <a class="btn btn-xs btn-danger m-r-xs" asp-action="DeletePost" asp-route-id="@Model.Id">Delete</a>
+            <a class="btn btn-xs btn-warning edit-post m-r-xs">Edit</a>
+            <a class="btn btn-xs btn-danger warning-alert m-r-xs" asp-action="DeletePost" asp-route-postId="@Model.Id" data-warning="This will delete the post, and cannot be undone, are you sure?">Delete</a>
         }
     </p>
     <p class="stats">
-        <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.FullName</span>
-        <span><i class="fa fa-clock-o m-r-xs"></i> @Model.Topic.CreatedOn.ToHumaneDate()</span>
+        <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Author.FullName</span>
+        <span><i class="fa fa-clock-o m-r-xs"></i> @Model.PostedTime.ToHumaneDate()</span>
     </p>
 </div>

@@ -15,6 +15,15 @@
     {
         url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
+
+    var _account = Context.GetAccountInfo();
+
+    bool moderator = User.Identity.IsAuthenticated &&
+               (
+                   Model.Topic.AuthorId == _account.User.Id ||
+                   User.IsInRole("Admin") ||
+                   User.IsInRole("Moderator")
+               );
 }
 @section includes {
     <script src="~/lib/tinymce/tinymce.min.js"></script>
@@ -53,10 +62,41 @@
 <div class="row">
     <div class="col-sm-9">
         <div class="post">
-            <div class="post-content">
-                <h4>@Model.Topic.Title</h4>
-                @Html.Raw(Model.Topic.Description)
+            <div class="post-view">
+                <div class="post-content">
+                    <h4>@Model.Topic.Title</h4>
+                    @Html.Raw(Model.Topic.Description)
+                </div>
             </div>
+            @if (moderator)
+            {
+                <div class="edit-view">
+                    <form method="post" class="edit-topic-form" asp-action="EditTopic" asp-route-topicId="@Model.Topic.Id">
+                        <fieldset>
+                            <input name="topicId" type="hidden" value="@Model.Topic.Id" />
+                            <div class="form-group">
+                                <label class="control-label">Edit title</label>
+                                <div class="">
+                                    <input name="title" for="topic-title-@Model.Topic.Id" type="text" value="@Model.Topic.Title" class="form-control" />
+                                    <span for="topic-title-@Model.Topic.Id"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Edit description</label>
+                                <div class="">
+                                    <textarea name="description" for="topic-description-@Model.Topic.Id" type="text" class="form-control">@Model.Topic.Description</textarea>
+                                    <span for="topic-description-@Model.Topic.Id"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary"><span>Update topic</span></button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            }
             <hr />
             @if (Model.Topic.Author.ForumSignature.IsSet())
             {
@@ -68,6 +108,14 @@
                 <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.FullName</span>
                 <span><i class="fa fa-clock-o m-r-xs"></i> @Model.Topic.CreatedOn.ToHumaneDate()</span>
             </p>
+            @if (moderator)
+            {
+                <hr class="m-t-sm m-b-sm" />
+                <p class="no-margin">
+                    <a class="btn btn-xs btn-warning edit-post m-r-sm">Edit</a>
+                    <a class="btn btn-xs btn-danger" asp-action="DeleteTopic" asp-route-slug="@Model.Topic.Forum.Slug" asp-route-topicId="@Model.Topic.Id">Delete</a>
+                </p>
+            }
         </div>
         @if (Model.List.Count == 0)
         {
