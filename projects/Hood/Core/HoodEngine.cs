@@ -23,6 +23,7 @@ using Hood.IO;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Hood.Core
 {

@@ -61,15 +61,15 @@ namespace Hood.Areas.Api.Controllers
             _billing = billing;
         }
 
-        [Route("api/roles/invite/")]
         [Authorize]
-        [ApiAuthorize]
+        [ApiAuthorize(AccessLevel.Public)]
+        [Route("api/roles/invite/")]
         public async Task<IActionResult> InviteRoleAsync(string role)
         {
             // add the user to the role
             var user = await _userManager.GetUserAsync(User);
 
-            if (role == "Admin" || role== "SuperUser")
+            if (Roles.System.Contains(role))
                 return View("Api", new ApiViewModel()
                 {
                     SaveMessage = "You cannot be added to the '" + role.ToSentenceCase() + "' role, this cannot be done via the API.",
@@ -77,7 +77,6 @@ namespace Hood.Areas.Api.Controllers
                     Title = "Could not add you to the '" + role.ToSentenceCase() + "' role.",
                     Details = "You cannot be added to the '" + role.ToSentenceCase() + "' role , this cannot be done via the API.",
                 });
-
 
             if (await _roleManager.RoleExistsAsync(role))
             {
@@ -121,5 +120,22 @@ namespace Hood.Areas.Api.Controllers
 
             return View("Api", model);
         }
+
+        [HttpGet]
+        [ApiAuthorize(AccessLevel.Public)]
+        [Route("api/test/get/")]
+        public IActionResult TestGetEndpoint(string variable)
+        {
+            return Json(new { success = true, result = new { input = variable } });
+        }
+
+        [HttpPost]
+        [ApiAuthorize]
+        [Route("api/test/post/")]
+        public IActionResult TestPostEndpoint(string variable)
+        {
+            return Json(new { success = true, result = new { input = variable } });
+        }
+
     }
 }

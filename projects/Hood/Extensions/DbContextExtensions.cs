@@ -1,4 +1,5 @@
-﻿using Hood.Models.Payments;
+﻿using Hood.Infrastructure;
+using Hood.Models.Payments;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -208,6 +209,14 @@ namespace Hood.Models
                 {
                     context.Options.Add(new Option { Id = "Hood.Settings.Seo", Value = JsonConvert.SerializeObject(new SeoSettings()) });
                 }
+
+                if (!context.Options.Any(o => o.Id == "Hood.Api.SystemPrivateKey"))
+                {
+                    var generator = new KeyGenerator(true, true, true, false);
+                    var key = generator.Generate(24);
+                    context.Options.Add(new Option { Id = "Hood.Api.SystemPrivateKey", Value = JsonConvert.SerializeObject(key) });
+                }
+
                 context.SaveChanges();
             }
         }

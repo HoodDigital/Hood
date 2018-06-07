@@ -1,8 +1,15 @@
-﻿using Hood.Entities;
+﻿using Hood.Core;
+using Hood.Entities;
 using Hood.Enums;
+using Hood.Extensions;
+using Hood.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace Hood.Models
@@ -22,15 +29,70 @@ namespace Hood.Models
 
         public List<ApiEvent> Events { get; set; }
 
-        public string ToEncodedApiKeyPair()
+        public string Token
         {
-            string json = JsonConvert.SerializeObject(new ApiKeyPair()
+            get
             {
-                Key = Key,
-                Id = Id
-            });
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key));
+
+                var _contextAccessor = EngineContext.Current.Resolve<IHttpContextAccessor>();
+                var claims = new Claim[] {
+                    new Claim(ClaimTypes.NameIdentifier, Id),
+                    new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddDays(7)).ToUnixTimeSeconds()}")
+                };
+
+                var token = new JwtSecurityToken(new JwtHeader(new SigningCredentials(key, SecurityAlgorithms.HmacSha256)), new JwtPayload(claims));
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
         }
+
+        public string PublicToken
+        {
+            get
+            {
+                var privateKey = Key;
+                var _settings = EngineContext.Current.Resolve<ISettingsRepository>();
+                privateKey += _settings.Get<string>("Hood.Api.SystemPrivateKey");
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
+
+                var _contextAccessor = EngineContext.Current.Resolve<IHttpContextAccessor>();
+                var claims = new Claim[] {
+                    new Claim(ClaimTypes.NameIdentifier, Id),
+                    new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddDays(7)).ToUnixTimeSeconds()}")
+                };
+
+                var token = new JwtSecurityToken(new JwtHeader(new SigningCredentials(key, SecurityAlgorithms.HmacSha256)), new JwtPayload(claims));
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
+            }
+        }
+
+        public bool ValidateToken(string token, AccessLevel access)
+        {
+            var privateKey = Key;
+
+            if (access == AccessLevel.Public)
+            {
+                var _settings = EngineContext.Current.Resolve<ISettingsRepository>();
+                privateKey += _settings.Get<string>("Hood.Api.SystemPrivateKey");
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
+
+            SecurityToken validatedToken;
+            var credentials = new JwtSecurityTokenHandler().ValidateToken(token, new TokenValidationParameters()
+            {
+                IssuerSigningKey = key,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = access == AccessLevel.Public,
+                ValidateAudience = false,
+                ValidateIssuer = false
+            }, out validatedToken);
+
+            return credentials.Identity.IsAuthenticated;
+        }
+
     }
 
     public class ApiKeyPair
@@ -50,7 +112,7 @@ namespace Hood.Models
                 Id = decoded.Id;
                 Key = decoded.Key;
             }
-            catch 
+            catch
             {
                 Id = null;
                 Key = null;

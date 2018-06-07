@@ -11,7 +11,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Hood.Filters
 {
@@ -67,78 +69,79 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                // Specific forum based subscription/role required stuff
-                string key = null;
-                if (context.HttpContext.Request.Query.ContainsKey("key"))
+                try
                 {
-                    key = context.HttpContext.Request.Query["key"].ToString();
-                }
-                else if (context.HttpContext.Request.Form.ContainsKey("key"))
-                {
-                    key = context.HttpContext.Request.Form["key"].ToString();
-                }
+                    // Specific forum based subscription/role required stuff
+                    string key = null;
+                    if (context.HttpContext.Request.Query.ContainsKey("key") && context.HttpContext.Request.Method == "GET" && _access == AccessLevel.Public)
+                    {
+                        key = context.HttpContext.Request.Query["key"].ToString();
+                    }
+                    else if (context.HttpContext.Request.Headers.ContainsKey("Authorization") && context.HttpContext.Request.Method == "POST" && _access >= AccessLevel.Restricted)
+                    {
+                        key = context.HttpContext.Request.Headers["Authorization"].ToString().Split(' ')[1];
+                    }
 
-                if (!key.IsSet())
+                    if (!key.IsSet())
+                        throw new Exception("No API credentials were not supplied, please supply a valid authorization token.");
+
+                    // get the Id value from the claims in the token (ClaimTypes.NameIdentifier)
+                    var id = new JwtSecurityTokenHandler().ReadJwtToken(key).Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                    // load the api key object from the db.
+                    ApiKey apiKey = _db.ApiKeys.SingleOrDefault(f => f.Id == id);
+
+                    if (apiKey == null)
+                        throw new Exception("Could not load API key object from provided credentials.");
+
+                    // Validate the JWT Signature using HS256 and the private key from the ApiKey object.
+                    if (!apiKey.ValidateToken(key, _access))
+                        throw new Exception("Signature validation failed.");
+
+                    // Check the ApiKey is still active.
+                    if (!apiKey.Active)
+                        throw new Exception("The API key is not active.");
+
+                    // Check the ApiKey is has the right access level.
+                    if (apiKey.AccessLevel < _access)
+                        throw new Exception("The API key is does not have the required access level.");
+
+                    // We did it! Now log the access, and the event.
+                    var apiEvent = new ApiEvent()
+                    {
+                        Action = context.RouteData.Values["action"].ToString(),
+                        ApiKeyId = apiKey.Id,
+                        IpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString(),
+                        RequiredAccessLevel = _access,
+                        RouteData = context.RouteData.Values,
+                        Time = DateTime.Now,
+                        Url = context.HttpContext.Request.Path
+                    };
+                    _db.ApiEvents.Add(apiEvent);
+                    _db.SaveChanges();
+
+                    var log = new Log()
+                    {
+                        Type = LogType.Info,
+                        Source = LogSource.Api,
+                        Detail = "Api was accessed using API Key: " + apiKey.Name,
+                        Time = DateTime.Now,
+                        Title = "Api was accessed using API Key: " + apiKey.Name,
+                        UserId = apiKey.UserId,
+                        EntityId = apiEvent.Id.ToString(),
+                        EntityType = nameof(ApiEvent),
+                        SourceUrl = context.HttpContext.GetSiteUrl(true, true)
+                    };
+                    _db.Logs.Add(log);
+                    _db.SaveChanges();
+
+                }
+                catch (Exception ex)
                 {
-                    LogError("The API creadentials were not supplied.", context.HttpContext.GetSiteUrl(true, true));
+                    LogError("API Access Error: " + ex.Message, context.HttpContext.GetSiteUrl(true, true));
                     context.Result = new UnauthorizedResult();
                     return;
                 }
-
-                // Get the key/id from the encoded string
-                var credentials = new ApiKeyPair(key);
-
-                ApiKey apiKey = _db.ApiKeys.SingleOrDefault(f => f.Key == credentials.Key && f.Id == credentials.Id);
-                if (apiKey == null)
-                {
-                    LogError("Could not load API key object from provided credentials.", context.HttpContext.GetSiteUrl(true, true));
-                    context.Result = new UnauthorizedResult();
-                    return;
-                }
-
-                if (!apiKey.Active)
-                {
-                    LogError("The API key is not active.", context.HttpContext.GetSiteUrl(true, true), apiKey.UserId, apiKey.Id);
-                    context.Result = new UnauthorizedResult();
-                    return;
-                }
-
-                if (apiKey.AccessLevel < _access)
-                {
-                    LogError("The API key is does not have the required access level.", context.HttpContext.GetSiteUrl(true, true), apiKey.UserId, apiKey.Id);
-                    context.Result = new UnauthorizedResult();
-                    return;
-                }
-
-                // We did it! Now log the access, and the event.
-
-                var apiEvent = new ApiEvent()
-                {
-                    Action = context.RouteData.Values["action"].ToString(),
-                    ApiKeyId = apiKey.Id,
-                    IpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString(),
-                    RequiredAccessLevel = _access,
-                    RouteData = context.RouteData.Values,
-                    Time = DateTime.Now,
-                    Url = context.HttpContext.Request.Path
-                };
-                _db.ApiEvents.Add(apiEvent);
-                _db.SaveChanges();
-
-                var log = new Log()
-                {
-                    Type = LogType.Info,
-                    Source = LogSource.Api,
-                    Detail = "Api was accessed using API Key: " + apiKey.Name,
-                    Time = DateTime.Now,
-                    Title = "Api was accessed using API Key: " + apiKey.Name,
-                    UserId = apiKey.UserId,
-                    EntityId = apiEvent.Id.ToString(),
-                    EntityType = nameof(ApiEvent),
-                    SourceUrl = context.HttpContext.GetSiteUrl(true, true)
-                };
-                _db.Logs.Add(log);
-                _db.SaveChanges();
 
             }
 
@@ -148,9 +151,9 @@ namespace Hood.Filters
                 {
                     Type = LogType.Error,
                     Source = LogSource.Api,
-                    Detail = "Api attempted access failed with response: " + reason,
+                    Detail = reason,
                     Time = DateTime.Now,
-                    Title = "Api attempted access failed using API Key: " + reason,
+                    Title = reason,
                     UserId = userId,
                     EntityId = keyId,
                     EntityType = keyId.IsSet() ? nameof(ApiKey) : null,

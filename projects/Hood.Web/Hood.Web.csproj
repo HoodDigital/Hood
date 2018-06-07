@@ -25,7 +25,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Content Remove="Views\Api\Index.cshtml" />
     <Content Remove="Views\Shared\Error.cshtml" />
     <Content Remove="Views\Shared\ErrorCode.cshtml" />
     <Content Remove="Views\Shared\NotImplemented.cshtml" />
