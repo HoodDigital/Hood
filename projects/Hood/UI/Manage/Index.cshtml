@@ -3,11 +3,6 @@
     ViewData["Title"] = "Update your profile";
     ViewData.AddActivePage(ManageNavPages.Index);
 }
-@section avatar {
-    <div class="text-center m-b-lg">
-        <fixedImage src="@Model.Avatar?.SmallUrl" class="img img-sm @string.Format("avatar-{0}", Model.UserId)"></fixedImage>
-    </div>
-}
 <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="active"><a href="#basics" aria-controls="password" role="tab" data-toggle="tab">Basic Details</a></li>
     <li role="presentation"><a href="#roles" aria-controls="socials" role="tab" data-toggle="tab">Roles</a></li>

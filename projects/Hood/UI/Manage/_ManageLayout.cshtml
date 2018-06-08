@@ -5,11 +5,15 @@
     ViewData["SubTitle"] = ViewData["Title"];
     ViewData["PageTitle"] = (ViewData["Title"] as string) + (_basicSettings.SiteTitle.IsSet() ? " - " + _basicSettings.SiteTitle : "");
     ViewData["Title"] = "Manage your account";
+
+    var _account = Context.GetAccountInfo();
 }
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            @RenderSection("avatar", required: false)
+            <div class="text-center m-b-lg">
+                <fixedImage src="@_account.User.Avatar?.SmallUrl" class="img img-sm @string.Format("avatar-{0}", _account.User.Id)"></fixedImage>
+            </div>
             @await Html.PartialAsync("_ManageNav")
         </div>
         <div class="col-md-9">
