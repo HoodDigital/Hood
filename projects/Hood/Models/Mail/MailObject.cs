@@ -36,13 +36,13 @@ namespace Hood.Services
         {
             get
             {
-                return _body.ToString();
+                return _textBody.ToString();
             }
             set
             {
-                _body.Close();
-                _body = new StringWriter();
-                _body.Write(value);
+                _textBody.Close();
+                _textBody = new StringWriter();
+                _textBody.Write(value);
             }
         }
 
