@@ -1,3 +1,4 @@
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -24,33 +25,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class ApiController : Controller
+    public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly HoodDbContext _db;
-        private readonly ForumCategoryCache _categories;
-        private readonly ISettingsRepository _settings;
-        private readonly IHostingEnvironment _env;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IAccountRepository _auth;
-
-        public ApiController(
-            IAccountRepository auth,
-            HoodDbContext db,
-            ForumCategoryCache categories,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository settings,
-            IBillingService billing,
-            IMediaManager<MediaObject> media,
-            IHostingEnvironment env)
+        public ApiController()
+            : base()
         {
-            _auth = auth;
-            _media = media;
-            _userManager = userManager;
-            _db = db;
-            _settings = settings;
-            _env = env;
-            _categories = categories;
         }
 
         [Route("admin/api/keys/manage/")]

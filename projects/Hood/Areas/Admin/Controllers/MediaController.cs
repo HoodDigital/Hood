@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -18,22 +19,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class MediaController : Controller
+    public class MediaController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly HoodDbContext _db;
-        private readonly IHoodCache _cache;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly ISettingsRepository _settings;
-
-        public MediaController(
-            UserManager<ApplicationUser> userManager, HoodDbContext db, IHoodCache cache, IMediaManager<MediaObject> media, ISettingsRepository settings)
+        public MediaController()
+            : base()
         {
-            _userManager = userManager;
-            _cache = cache;
-            _db = db;
-            _media = media;
-            _settings = settings;
         }
 
         [Route("admin/media/")]

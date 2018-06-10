@@ -6,6 +6,7 @@ using Hood.Interfaces;
 using Hood.Extensions;
 using Hood.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
@@ -51,6 +52,7 @@ namespace Hood.Models
                Description = "If entered, a trial will be active before charging for the set number of days.")]
         public int? TrialPeriodDays { get; set; }
 
+        [JsonIgnore]
         public List<UserSubscription> Users { get; set; }
 
         [NotMapped]

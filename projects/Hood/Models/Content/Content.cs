@@ -181,6 +181,7 @@ namespace Hood.Models
         public IEnumerable<ContentCategory> AllowedCategories { get; set; }
         // Author 
         public string AuthorId { get; set; }
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Author { get; set; }
 
         public List<ContentCategoryJoin> Categories { get; set; }
@@ -190,6 +191,7 @@ namespace Hood.Models
 
         public string FeaturedImageJson { get; set; }
         [NotMapped]
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject FeaturedImage
         {
             get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : ContentMedia.Blank; }
@@ -198,6 +200,7 @@ namespace Hood.Models
 
         public string ShareImageJson { get; set; }
         [NotMapped]
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject ShareImage
         {
             get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(ShareImageJson) : ContentMedia.Blank; }

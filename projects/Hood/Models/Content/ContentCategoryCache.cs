@@ -20,7 +20,7 @@ namespace Hood.Models
 
         public ContentCategoryCache(IConfiguration config,
                                     ISettingsRepository settings,
-                                    EventsService events)
+                                    IEventsService events)
         {
             _config = config;
             _settings = settings;

@@ -27,7 +27,7 @@ namespace Hood.Services
         private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
         private readonly ContentSettings _contentSettings;
-        private readonly EventsService _events;
+        private readonly IEventsService _events;
         private readonly IHostingEnvironment _env;
 
         public ContentRepository(HoodDbContext db,
@@ -35,7 +35,7 @@ namespace Hood.Services
                                  IConfiguration config,
                                  ISettingsRepository site,
                                  IHostingEnvironment env,
-                                 EventsService events)
+                                 IEventsService events)
         {
             _db = db;
             _config = config;

@@ -3,18 +3,19 @@ using Microsoft.AspNetCore.Mvc;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
 using Hood.Services;
+using Hood.Controllers;
+using Microsoft.AspNetCore.Identity;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class ThemesController : Controller
+    public class ThemesController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly ISettingsRepository _options;
-        public ThemesController(ISettingsRepository options)
+        public ThemesController()
+            : base()
         {
-            _options = options;
         }
 
         [HttpPost()]
@@ -24,7 +25,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // set the site theme
-                bool res = _options.Set("Hood.Settings.Theme", name);
+                bool res = _settings.Set("Hood.Settings.Theme", name);
                 if (res)
                 {
                     return new Response(true);

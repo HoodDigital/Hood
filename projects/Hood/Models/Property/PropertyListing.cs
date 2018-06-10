@@ -60,6 +60,7 @@ namespace Hood.Models
         // Featured Images
         public string FeaturedImageJson { get; set; }
         [NotMapped]
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject FeaturedImage
         {
             get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank; }
@@ -69,6 +70,7 @@ namespace Hood.Models
         // Media
         public string InfoDownloadJson { get; set; }
         [NotMapped]
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject InfoDownload
         {
             get { return InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : MediaObject.Blank; }
@@ -164,6 +166,7 @@ namespace Hood.Models
 
         // Agent 
         public string AgentId { get; set; }
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Agent { get; set; }
 
         [NotMapped]

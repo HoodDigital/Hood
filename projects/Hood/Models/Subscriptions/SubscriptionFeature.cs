@@ -1,4 +1,5 @@
 ﻿using Hood.Interfaces;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
@@ -10,7 +11,9 @@ namespace Hood.Models
         public string Name { get; set; }
         public string Type { get; set; }
 
+        [JsonIgnore]
         public int SubscriptionId { get; set; }
+        [JsonIgnore]
         public Subscription Subscription { get; set; }
 
     }

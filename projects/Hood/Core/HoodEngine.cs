@@ -48,7 +48,7 @@ namespace Hood.Core
 
             services.AddSingleton(configuration);
 
-            services.AddSingleton<EventsService>();
+            services.AddSingleton<IEventsService, EventsService>();
             services.AddSingleton<SubscriptionsEventListener>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
@@ -63,6 +63,7 @@ namespace Hood.Core
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<ISettingsRepository, SettingsRepository>();
             services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
+            services.AddSingleton<ILogService, LogService>();
             services.AddTransient<IStripeService, StripeService>();
             services.AddTransient<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddTransient<ISubscriptionService, SubscriptionService>();
@@ -79,7 +80,6 @@ namespace Hood.Core
             services.AddScoped<IStripeWebHookService, StripeWebHookService>();
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
-            services.AddScoped<ILogService, LogService>();
 
             //populate Autofac container builder with the set of registered service descriptors
             builder.Populate(services);

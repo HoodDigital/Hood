@@ -1,3 +1,4 @@
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -24,33 +25,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class ForumController : Controller
+    public class ForumController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly HoodDbContext _db;
-        private readonly ForumCategoryCache _categories;
-        private readonly ISettingsRepository _settings;
-        private readonly IHostingEnvironment _env;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IAccountRepository _auth;
-
-        public ForumController(
-            IAccountRepository auth,
-            HoodDbContext db,
-            ForumCategoryCache categories,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository settings,
-            IBillingService billing,
-            IMediaManager<MediaObject> media,
-            IHostingEnvironment env)
+        public ForumController()
+            : base()
         {
-            _auth = auth;
-            _media = media;
-            _userManager = userManager;
-            _db = db;
-            _settings = settings;
-            _env = env;
-            _categories = categories;
         }
 
         [Route("admin/forums/manage/")]
@@ -334,7 +313,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> EditCategory(int id)
         {
             var model = await _db.ForumCategories.FirstOrDefaultAsync(c => c.Id == id);
-            model.Categories = _categories.TopLevel();
+            model.Categories = _forumCategoryCache.TopLevel();
             return View(model);
         }
 
@@ -348,7 +327,7 @@ namespace Hood.Areas.Admin.Controllers
                     if (model.ParentCategoryId == model.Id)
                         throw new Exception("You cannot set the parent to be the same category!");
 
-                    var thisAndChildren = _categories.GetThisAndChildren(model.Id);
+                    var thisAndChildren = _forumCategoryCache.GetThisAndChildren(model.Id);
                     if (thisAndChildren.Select(c => c.Id).ToList().Contains(model.ParentCategoryId.Value))
                         throw new Exception("You cannot set the parent to be a child of this category!");
                 }
@@ -527,7 +506,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/forums/categories/suggestions/{type}/")]
         public IActionResult CategorySuggestions(string type)
         {
-            var suggestions = _categories.GetSuggestions().Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
+            var suggestions = _forumCategoryCache.GetSuggestions().Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
             return Json(suggestions.ToArray());
         }
 

@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col-xs-12 col-sm-8">
         <h4>Details:</h4>
-        <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
+        <div>@Html.Raw(Model.Detail?.ToFormattedJson().AddHtmlBreaks())</div>
     </div>
     <div class="col-xs-12 col-sm-4">
         <dl>
@@ -19,7 +19,7 @@
             {
                 <dt>Endpoint Url</dt>
                 <dd>
-                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                    <a href="@Model.SourceUrl">
                         @Model.SourceUrl
                     </a>
                 </dd>

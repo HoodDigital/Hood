@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Controllers;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
@@ -20,33 +21,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Manager")]
-    public class SubscriptionsController : Controller
+    public class SubscriptionsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ISettingsRepository _settings;
-        private readonly ILogService _logger;
-        private readonly IHostingEnvironment _env;
-        private readonly IBillingService _billing;
-        private readonly IAccountRepository _auth;
-
-        public SubscriptionsController(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            HoodDbContext db,
-            IHoodCache cache,
-            IAccountRepository auth,
-            IHttpContextAccessor contextAccessor,
-            ISettingsRepository settings,
-            ILogService logger,
-            IBillingService billing,
-            IHostingEnvironment env)
+        public SubscriptionsController()
+            : base()
         {
-            _userManager = userManager;
-            _settings = settings;
-            _logger = logger;
-            _auth = auth;
-            _billing = billing;
-            _env = env;
         }
 
         [Route("admin/subscriptions/")]
@@ -84,13 +63,14 @@ namespace Hood.Areas.Admin.Controllers
             {
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
-                await _logger.AddLogAsync(
+                await _logService.AddLogAsync(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
                    ex,
                    LogType.Error,
                    LogSource.Subscriptions,
                    _userManager.GetUserId(User),
                    model.Id.ToString(),
+                   nameof(Subscription),
                    Url.AbsoluteAction("Index", "Subscriptions")
                );
             }
@@ -132,26 +112,28 @@ namespace Hood.Areas.Admin.Controllers
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
                 subscription = await _auth.AddSubscriptionPlan(subscription);
-                await _logger.AddLogAsync(
+                await _logService.AddLogAsync(
                     string.Format("Subscription ({0}) added with name: {1}", subscription.StripeId, subscription.Name),
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
                     LogSource.Subscriptions,
                     _userManager.GetUserId(User),
                     subscription.Id.ToString(),
+                    nameof(Subscription),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
                 return new Response(true);
             }
             catch (Exception ex)
             {
-                await _logger.AddLogAsync(
+                await _logService.AddLogAsync(
                     string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name),
                     ex,
                     LogType.Error,
                     LogSource.Subscriptions,
                     _userManager.GetUserId(User),
                     subscription.Id.ToString(),
+                    nameof(Subscription),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
                 return new Response(ex.Message);
@@ -166,26 +148,28 @@ namespace Hood.Areas.Admin.Controllers
             {
                 var subscription = await _auth.GetSubscriptionPlanById(id);
                 await _auth.DeleteSubscriptionPlan(id);
-                await _logger.AddLogAsync(
+                await _logService.AddLogAsync(
                 string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
                     LogSource.Subscriptions,
                     _userManager.GetUserId(User),
                     subscription.Id.ToString(),
+                    nameof(Subscription),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
                 return new Response(true);
             }
             catch (Exception ex)
             {
-                await _logger.AddLogAsync(
+                await _logService.AddLogAsync(
                     string.Format("Error deleting subscription with id: {0}", id),
                     ex,
                     LogType.Error,
                     LogSource.Subscriptions,
                     _userManager.GetUserId(User),
                     id.ToString(),
+                    nameof(Subscription),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
                 return new Response(ex.Message);

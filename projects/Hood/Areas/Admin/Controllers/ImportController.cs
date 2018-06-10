@@ -1,7 +1,10 @@
-﻿using Hood.Extensions;
+﻿using Hood.Controllers;
+using Hood.Extensions;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
@@ -10,26 +13,24 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class ImportController : Controller
+    public class ImportController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly IRightmovePropertyImporter _rightmove;
-        private readonly IPropertyExporter _propertyExporter;
-        private readonly IContentExporter _contentExporter;
-        private readonly ISettingsRepository _settings;
         private readonly IFTPService _ftp;
-        private readonly IHostingEnvironment _env;
 
-        public ImportController(IFTPService ftp, 
-            ISettingsRepository settings,
-            IRightmovePropertyImporter rightmove,
-            IHostingEnvironment env
+        private readonly IRightmovePropertyImporter _rightmove;
+
+        //private readonly IContentExporter _contentExporter;
+        //private readonly IPropertyExporter _propertyExporter;
+
+        public ImportController(
+            IFTPService ftp, 
+            IRightmovePropertyImporter rightmove
             //IContentExporter contentExporter, 
             //IPropertyExporter propertyExporter
             )
+            : base()
         {
-            _settings = settings;
             _ftp = ftp;
-            _env = env;
             _rightmove = rightmove;
             //_contentExporter = contentExporter;
             //_propertyExporter = propertyExporter;

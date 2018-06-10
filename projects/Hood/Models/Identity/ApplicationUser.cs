@@ -200,4 +200,28 @@ namespace Hood.Models
             return null;
         }
     }
+
+    public partial class UserInfo
+    {
+        public UserInfo(ApplicationUser applicationUser)
+        {
+            Username = applicationUser.UserName;
+            Email = applicationUser.Email;
+            DisplayName = applicationUser.DisplayName;
+            Avatar = applicationUser.Avatar;
+            Id = applicationUser.Id;
+        }
+
+        public string Id { get; set; }
+
+        public string Username { get; set; }
+
+        public string Email { get; set; }
+
+        [Display(Name = "Display name")]
+        public string DisplayName { get; set; }
+
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
+        public IMediaObject Avatar { get; set; }
+    }
 }

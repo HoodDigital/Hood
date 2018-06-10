@@ -25,6 +25,7 @@ namespace Hood.Models
         public AccessLevel AccessLevel { get; set; }
 
         public string UserId { get; set; }
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
 
         public List<ApiEvent> Events { get; set; }

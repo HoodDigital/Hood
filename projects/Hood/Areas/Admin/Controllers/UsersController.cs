@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Controllers;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Infrastructure;
@@ -27,38 +28,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Manager")]
-    public class UsersController : Controller
+    public class UsersController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IAccountRepository _auth;
-        private readonly IContentRepository _content;
-        private readonly HoodDbContext _db;
-        private readonly IEmailSender _email;
-        private readonly ISettingsRepository _settings;
-        private readonly IBillingService _billing;
-
-        public UsersController(
-            HoodDbContext db,
-            IAccountRepository auth,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            RoleManager<IdentityRole> roleManager,
-            IEmailSender email,
-            ISettingsRepository site,
-            IBillingService billing,
-            IContentRepository content)
+        public UsersController()
+            : base()
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _signInManager = signInManager;
-            _auth = auth;
-            _db = db;
-            _email = email;
-            _settings = site;
-            _content = content;
-            _billing = billing;
         }
 
         [Route("admin/users/")]

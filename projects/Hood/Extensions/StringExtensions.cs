@@ -82,6 +82,11 @@ namespace Hood.Extensions
 
         #endregion
 
+        public static string ToHtmlLineBreaks(this string str)
+        {
+            return str.Replace(Environment.NewLine, "<br />");
+        }
+
         public static bool IsNullOrEmpty(this string str)
         {
             return string.IsNullOrEmpty(str);

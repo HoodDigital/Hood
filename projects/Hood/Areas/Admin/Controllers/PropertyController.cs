@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Controllers;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
@@ -20,34 +21,14 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class PropertyController : Controller
+    public class PropertyController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IPropertyRepository _property;
-        private readonly ISettingsRepository _settings;
-        private readonly PropertySettings _propertySettings;
-        private readonly IHostingEnvironment _env;
-        private readonly IBillingService _billing;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IAddressService _address;
+        protected readonly PropertySettings _propertySettings;
 
-        public PropertyController(
-            IPropertyRepository property,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository settings,
-            IMediaManager<MediaObject> media,
-            IBillingService billing,
-            IHostingEnvironment env,
-            IAddressService address)
+        public PropertyController()
+            : base()
         {
-            _userManager = userManager;
-            _property = property;
-            _settings = settings;
-            _billing = billing;
-            _env = env;
-            _media = media;
             _propertySettings = _settings.GetPropertySettings();
-            _address = address;
         }
 
         [Route("admin/property/manage/")]

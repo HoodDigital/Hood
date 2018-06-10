@@ -10,48 +10,22 @@ using Geocoding.Google;
 using Hood.Enums;
 using System.Threading.Tasks;
 using Hood.Extensions;
+using Hood.Controllers;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Manager")]
-    public class SettingsController : Controller
+    public class SettingsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        public readonly IConfiguration _config;
-        public readonly IHostingEnvironment _env;
-        private readonly IContentRepository _content;
-        private readonly ISettingsRepository _settings;
-        private readonly IAccountRepository _auth;
-        private readonly IAddressService _address;
-        private readonly IHoodCache _cache;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly HoodDbContext _db;
-        private readonly IEmailSender _email;
-        private readonly IMediaRefreshService _mediaRefresh;
+        protected IMediaRefreshService _mediaRefresh;
 
-        public SettingsController(IAccountRepository auth,
-                              IConfiguration conf,
-                              IHostingEnvironment env,
-                              ISettingsRepository site,
-                              IContentRepository content,
-                              IAddressService address,
-                              IHoodCache cache,
-                              IMediaManager<MediaObject> media,
-                              HoodDbContext db,
-                              IEmailSender email,
-                              IMediaRefreshService mediaRefresh)
+        public SettingsController(
+            IMediaRefreshService mediaRefresh
+            )
+            : base()
         {
-            _auth = auth;
-            _config = conf;
-            _env = env;
-            _content = content;
-            _address = address;
-            _settings = site;
-            _cache = cache;
-            _media = media;
-            _db = db;
-            _email = email;
-            _mediaRefresh = mediaRefresh;
         }
 
         [Route("admin/settings/basics/")]

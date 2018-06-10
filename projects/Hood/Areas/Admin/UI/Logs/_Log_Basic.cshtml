@@ -1,7 +1,7 @@
 @model Log
 <div class="row">
     <div class="col-xs-12 col-sm-8">
-        <h4>Subscription Object:</h4>
+        <h4>Details:</h4>
         <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
     </div>
     <div class="col-xs-12 col-sm-4">
@@ -19,17 +19,24 @@
             {
                 <dt>Endpoint Url</dt>
                 <dd>
-                    <a href="@Model.SourceUrl">
+                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
                         @Model.SourceUrl
                     </a>
                 </dd>
             }
+            @if (Model.EntityType.IsSet())
+            {
+                <dt>Entity Type</dt>
+                <dd>
+                    @Model.EntityType
+                </dd>
+            }
             @if (Model.EntityId.IsSet())
             {
-                switch (Model.EntityType)
-                {
-
-                }
+                <dt>Entity Id</dt>
+                <dd>
+                    @Model.EntityId
+                </dd>
             }
         </dl>
     </div>

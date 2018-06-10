@@ -8,34 +8,21 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using SendGrid.Helpers.Mail;
 using Hood.Enums;
+using Hood.Controllers;
+using Hood.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles="SuperUser,Admin")]
-    public class MailController : Controller
+    public class MailController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly IConfiguration _config;
-        private readonly IHostingEnvironment _env;
-        private readonly IContentRepository _content;
-        private readonly ISettingsRepository _settings;
-        private readonly IAccountRepository _auth;
-        private readonly IEmailSender _email;
-
-        public MailController(IAccountRepository auth,
-                              IConfiguration conf,
-                              IHostingEnvironment env,
-                              ISettingsRepository site,
-                              IContentRepository content,
-                              IEmailSender email)
+        public MailController()
+            : base()
         {
-            _auth = auth;
-            _config = conf;
-            _env = env;
-            _content = content;
-            _settings = site;
-            _email = email;
         }
+
         [Route("admin/mail/preview/plain/")]
         public IActionResult Plain()
         {

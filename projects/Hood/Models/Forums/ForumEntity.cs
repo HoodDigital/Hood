@@ -13,6 +13,7 @@ namespace Hood.Models
     {
         // Author 
         public string AuthorId { get; set; }
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Author { get; set; }
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
@@ -50,6 +51,7 @@ namespace Hood.Models
         // Images
         public string FeaturedImageJson { get; set; }
         [NotMapped]
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject FeaturedImage
         {
             get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ForumMedia>(FeaturedImageJson) : ForumMedia.Blank; }
@@ -58,6 +60,7 @@ namespace Hood.Models
 
         public string ShareImageJson { get; set; }
         [NotMapped]
+        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject ShareImage
         {
             get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ForumMedia>(ShareImageJson) : ForumMedia.Blank; }

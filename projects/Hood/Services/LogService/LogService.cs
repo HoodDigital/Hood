@@ -8,21 +8,28 @@ using System.Threading.Tasks;
 using Hood.Models;
 using System;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Hood.Services
 {
     public class LogService : ILogService
     {
-        private readonly HoodDbContext _db;
-        private readonly ISettingsRepository _settings;
+        protected readonly HoodDbContext _db;
+        protected readonly ISettingsRepository _settings;
+        protected readonly IConfiguration _config;
 
-        public LogService(ISettingsRepository site, HoodDbContext db)
+        public LogService(ISettingsRepository site, IConfiguration config)
         {
             _settings = site;
-            _db = db;
+            _config = config;
+
+            var options = new DbContextOptionsBuilder<HoodDbContext>();
+            options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+            _db = new HoodDbContext(options.Options);
         }
 
-        public async Task AddLogAsync(string message, string detail, LogType type, LogSource source, string UserId, string entityId, string url)
+        public async Task AddLogAsync(string message, string detail, LogType type, LogSource source, string UserId, string entityId, string entityType, string url)
         {
             var log = new Log()
             {
@@ -33,13 +40,14 @@ namespace Hood.Services
                 Title = message,
                 UserId = UserId,
                 EntityId = entityId,
+                EntityType = entityType,
                 SourceUrl = url
             };
             _db.Logs.Add(log);
             await _db.SaveChangesAsync();
         }
 
-        public async Task AddLogAsync(string message, Exception ex, LogType type, LogSource source, string UserId, string entityId, string url)
+        public async Task AddLogAsync(string message, Exception ex, LogType type, LogSource source, string UserId, string entityId, string entityType, string url)
         {
             var detail = string.Concat("Stack Trace:", Environment.NewLine, ex.StackTrace);
             if (ex.InnerException != null)
@@ -48,7 +56,7 @@ namespace Hood.Services
                     "Stack Trace:", Environment.NewLine, ex.StackTrace,
                     "Exception JSON:", Environment.NewLine, Environment.NewLine,
                     JsonConvert.SerializeObject(ex));
-            await AddLogAsync(message, detail, LogType.Error, source, UserId, entityId, url);
+            await AddLogAsync(message, detail, LogType.Error, source, UserId, entityId, entityType, url);
         }
 
     }

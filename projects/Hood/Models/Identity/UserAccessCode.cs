@@ -1,4 +1,5 @@
 ﻿using Hood.Entities;
+using Newtonsoft.Json;
 using System;
 
 namespace Hood.Models
@@ -11,6 +12,8 @@ namespace Hood.Models
         public bool Used { get; set; }
         public DateTime DateUsed { get; set; }
         public string UserId { get; set; }
+
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
     }
 }

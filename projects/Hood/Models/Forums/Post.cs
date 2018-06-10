@@ -2,6 +2,7 @@
 using Hood.Extensions;
 using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,6 +23,7 @@ namespace Hood.Models
 
         // Author
         public string AuthorId { get; set; }
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Author { get; set; }
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
@@ -43,12 +45,16 @@ namespace Hood.Models
         public string EditReason { get; set; }
         public DateTime? EditedTime { get; set; }
         public string EditedById { get; set; }
+
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser EditedBy { get; set; }
 
         public bool Deleted { get; set; }
         public string DeleteReason { get; set; }
         public DateTime? DeletedTime { get; set; }
         public string DeletedById { get; set; }
+
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser DeletedBy { get; set; }
 
         public MailObject WriteToMessage(MailObject message)

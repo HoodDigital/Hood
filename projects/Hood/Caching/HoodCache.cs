@@ -14,7 +14,7 @@ namespace Hood.Caching
         private IList<string> _entries { get; set; }
 
         public HoodCache(IMemoryCache cache,
-                         EventsService events)
+                         IEventsService events)
         {
             _cache = cache;
             _entries = new List<string>();

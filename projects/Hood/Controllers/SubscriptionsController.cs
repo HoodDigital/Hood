@@ -9,29 +9,22 @@ using System.IO;
 using Hood.Filters;
 using Hood.Enums;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
     //[Area("Hood")]
-    public class SubscriptionsController : Controller
+    public class SubscriptionsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly IAccountRepository _auth;
-        private readonly IBillingService _billing;
-        private readonly IStripeWebHookService _webHooks;
-        private readonly EventsService _events;
 
+        private readonly IStripeWebHookService _webHooks;
         public SubscriptionsController(
-            IAccountRepository auth,
-            IBillingService billing,
-            IStripeWebHookService webHooks,
-            EventsService events)
+            IStripeWebHookService webHooks
+            )
         {
-            _auth = auth;
-            _billing = billing;
             _webHooks = webHooks;
-            _events = events;
         }
 
         [HttpGet]
@@ -80,7 +73,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _auth.CreateUserSubscription(model.PlanId, model.StripeToken, model.CardId);
-                _events.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(sub));
+                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"New subscription created by user {User.Identity.Name}", sub));
                 returnUrl = GetReturnUrl(BillingMessage.SubscriptionCreated, sub.SubscriptionId, returnUrl);
                 return Redirect(returnUrl);
             }
@@ -116,7 +109,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _auth.UpgradeUserSubscription(id, plan);
-                _events.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(sub));
+                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription upgraded by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionUpdated, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -133,7 +126,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _auth.CancelUserSubscription(id);
-                _events.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(sub));
+                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription cancelled by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionCancelled, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -150,7 +143,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _auth.RemoveUserSubscription(id);
-                _events.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(sub));
+                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription removed by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionEnded, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -167,7 +160,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _auth.ReactivateUserSubscription(id);
-                _events.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(sub));
+                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription re-activated by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionReactivated, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -180,6 +173,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [Route("stripe/webhooks/")]
         public StatusCodeResult WebHooks()
         {
             var json = new StreamReader(Request.Body).ReadToEnd();

@@ -1,5 +1,6 @@
 ﻿using Hood.Services;
 using Hood.Extensions;
+using Newtonsoft.Json;
 
 namespace Hood.Models
 {
@@ -11,6 +12,7 @@ namespace Hood.Models
             ConfirmationLink = confirmationLink;
         }
 
+        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
         public string ConfirmationLink { get; set; }
 

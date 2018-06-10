@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Hood.Services
 {
-    public class EventsService
+    public class EventsService : IEventsService
     {
         private event EventHandler<EventArgs> _ForumChanged;
         public event EventHandler<EventArgs> ForumChanged

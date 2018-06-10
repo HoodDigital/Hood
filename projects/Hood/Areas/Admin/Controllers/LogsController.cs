@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Controllers;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -15,37 +16,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class LogsController : Controller
+    public class LogsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly HoodDbContext _db;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IPropertyRepository _property;
-        private readonly ISettingsRepository _settings;
-        private readonly PropertySettings _propertySettings;
-        private readonly IHostingEnvironment _env;
-        private readonly IBillingService _billing;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IAddressService _address;
-
-        public LogsController(
-            IPropertyRepository property,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository settings,
-            IMediaManager<MediaObject> media,
-            IBillingService billing,
-            IHostingEnvironment env,
-            HoodDbContext db,
-            IAddressService address)
+        public LogsController()
+            : base()
         {
-            _userManager = userManager;
-            _property = property;
-            _settings = settings;
-            _billing = billing;
-            _env = env;
-            _media = media;
-            _propertySettings = _settings.GetPropertySettings();
-            _address = address;
-            _db = db;
         }
 
         public async Task<IActionResult> Index(LogListModel model)

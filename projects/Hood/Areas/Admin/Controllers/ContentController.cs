@@ -1,3 +1,4 @@
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -23,33 +24,11 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class ContentController : Controller
+    public class ContentController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ContentCategoryCache _categories;
-        private readonly IContentRepository _content;
-        private readonly ISettingsRepository _settings;
-        private readonly IHostingEnvironment _env;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IAccountRepository _auth;
-
-        public ContentController(
-            IAccountRepository auth,
-            IContentRepository content,
-            ContentCategoryCache categories,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository settings,
-            IBillingService billing,
-            IMediaManager<MediaObject> media,
-            IHostingEnvironment env)
+        public ContentController()
+            : base()
         {
-            _auth = auth;
-            _media = media;
-            _userManager = userManager;
-            _content = content;
-            _settings = settings;
-            _categories = categories;
-            _env = env;
         }
 
         [Route("admin/content/{type}/manage/")]
@@ -265,7 +244,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 // User must have an organisation.
                 await _content.AddCategoryToContent(contentId, categoryId);
-                _categories.ResetCache();
+                _contentCategoryCache.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
             }
@@ -281,7 +260,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 _content.RemoveCategoryFromContent(contentId, categoryId);
-                _categories.ResetCache();
+                _contentCategoryCache.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
             }
@@ -307,7 +286,7 @@ namespace Hood.Areas.Admin.Controllers
 
                 // check if it exists in the db, if not add it. 
                 var categoryResult = await _content.AddCategory(category);
-                _categories.ResetCache();
+                _contentCategoryCache.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
             }
@@ -321,7 +300,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> EditCategory(int id, string type)
         {
             var model = await _content.GetCategoryById(id);
-            model.Categories = _categories.TopLevel(type);
+            model.Categories = _contentCategoryCache.TopLevel(type);
             return View(model);
         }
 
@@ -335,7 +314,7 @@ namespace Hood.Areas.Admin.Controllers
                     if (model.ParentCategoryId == model.Id)
                         throw new Exception("You cannot set the parent to be the same category!");
 
-                    var thisAndChildren = _categories.GetThisAndChildren(model.Id);
+                    var thisAndChildren = _contentCategoryCache.GetThisAndChildren(model.Id);
                     if (thisAndChildren.Select(c => c.Id).ToList().Contains(model.ParentCategoryId.Value))
                         throw new Exception("You cannot set the parent to be a child of this category!");
                 }
@@ -777,7 +756,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/suggestions/{type}/")]
         public IActionResult CategorySuggestions(string type)
         {
-            var suggestions = _categories.GetSuggestions(type).Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
+            var suggestions = _contentCategoryCache.GetSuggestions(type).Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
             return Json(suggestions.ToArray());
         }
 
