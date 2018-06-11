@@ -57,7 +57,6 @@ namespace Hood.Services
                 var args = new StripeWebHookTriggerArgs(stripeEvent);
 
                 _mailObject.AddParagraph("Stripe Event detected: <strong>" + args.StripeEvent.GetEventName() + "</strong>");
-                _mailObject.AddParagraph("Processed JSON: <strong>" + args.Json.ToFormattedJson() + "</strong>");
 
                 if (stripeEvent.GetEventName() == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
@@ -306,8 +305,7 @@ namespace Hood.Services
             {
                 // Get the subscription.
                 StripeSubscription subscription = _billing.Subscriptions.FindById(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId).Result;
-                _mailObject.AddParagraph("StripeSubscription Object:");
-                _mailObject.AddParagraph(JsonConvert.SerializeObject(subscription).ToFormattedJson() + Environment.NewLine);
+                _mailObject.AddParagraph($"StripeSubscription Object loaded from Stripe: {successfulInvoice.SubscriptionId}");
 
                 UserSubscription userSub = _auth.FindUserSubscriptionByStripeId(subscription.Id);
                 // if ths sub is set up in the db ALL IS WELL. Continuer
@@ -317,8 +315,7 @@ namespace Hood.Services
                     _mailObject.AddParagraph("The subscription is NOT in the db we must roll back the charge and subscription on stripe.");
 
                     StripeRefund refund = _billing.Stripe.RefundService.CreateAsync(successfulInvoice.ChargeId).Result;
-                    _mailObject.AddParagraph("StripeRefund Object Created:");
-                    _mailObject.AddParagraph(JsonConvert.SerializeObject(refund).ToFormattedJson() + Environment.NewLine);
+                    _mailObject.AddParagraph("StripeRefund Object Created.");
 
                     _billing.Subscriptions.CancelSubscriptionAsync(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId, false).GetAwaiter().GetResult();
                     _mailObject.AddParagraph("Subscription Cancelled.");
@@ -340,10 +337,8 @@ namespace Hood.Services
                 }
                 else
                 {
-                    _mailObject.AddParagraph("Local User Subscription Object:");
-                    _mailObject.AddParagraph(JsonConvert.SerializeObject(userSub).ToFormattedJson() + Environment.NewLine);
-
-                    _mailObject.AddParagraph("Send an email to the customer letting them know they have been charged...");
+                    _mailObject.AddParagraph($"Local User Subscription Object located with Id: {userSub.Id}");
+                    _mailObject.AddParagraph("Sending an email to the customer letting them know they have been charged...");
                     var successfulInvoiceUser = _auth.GetUserByStripeId(successfulInvoice.CustomerId).Result;
 
                     MailObject message = new MailObject()
@@ -355,6 +350,9 @@ namespace Hood.Services
                     message.AddH1("Thank you!");
                     message.AddParagraph("Your payment has been received. You will recieve a payment reciept from our payment providers, Stripe.");
                     _email.SendEmailAsync(message, MailSettings.DangerTemplate).GetAwaiter().GetResult();
+
+                    _mailObject.AddParagraph($"Email sent to customer: {successfulInvoiceUser.Email}");
+
                 }
             }
         }
@@ -437,9 +435,8 @@ namespace Hood.Services
             UserSubscription endTrialUserSub = _auth.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {
-                _mailObject.AddParagraph("Local User Subscription Object:");
-                _mailObject.AddParagraph(JsonConvert.SerializeObject(endTrialUserSub).ToFormattedJson() + Environment.NewLine);
-                _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
+                _mailObject.AddParagraph($"Local User Subscription object found: {endTrialUserSub.Id}");
+                _mailObject.AddParagraph("Sending an email to the customer letting them know what has happened...");
 
                 MailObject message = new MailObject()
                 {

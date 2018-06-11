@@ -28,7 +28,7 @@ namespace Hood.Services
             if (!_env.IsProduction())
             {
                 var logService = EngineContext.Current.Resolve<ILogService>();
-                logService.AddLogAsync($"User Subscription Changed EVEnt: {e.Action}", JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, Models.LogSource.Subscriptions, null, e.Subscription?.Id.ToString(), nameof(UserSubscription), null);
+                logService.AddLogAsync($"User Subscription Changed Event: {e.Action}", JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, Models.LogSource.Subscriptions, null, e.Subscription?.Id.ToString(), nameof(UserSubscription), null);
             }
         }
 
