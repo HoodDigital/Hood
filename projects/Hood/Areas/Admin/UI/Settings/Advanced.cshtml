@@ -1,7 +1,6 @@
 @inject IThemesService _theme
 @inject IConfiguration _config
 @inject IContentRepository _data
-
 @inject IHoodCache _cache
 @{
     var theme = _theme.CurrentTheme;
@@ -44,22 +43,50 @@
                     </div>
                     <div class="panel-body">
                         <ul class="list-group settings-list clear-list m-t">
-                            <li class="list-group-item">
-                                @if (_config["ConnectionStrings:DefaultConnection"].IsSet())
+                            @if (_config.IsDatabaseConfigured())
+                            {
+                                @if (_config.IsDatabaseConfigured())
                                 {
-                                    <span class="pull-right">
-                                        @_config["ConnectionStrings:DefaultConnection"]
-                                    </span>
-                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Connection String</span>
+                                    <li class="list-group-item">
+                                        <span class="pull-right">
+                                            @_config.GetConnectionSettings().DataSource
+                                        </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span>
+                                        <span>DataSource</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <span class="pull-right">
+                                            @_config.GetConnectionSettings().UserID
+                                        </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span>
+                                        <span>UserID</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <span class="pull-right">
+                                            Hidden for security. See your appSettings file, or Environment Variables.
+                                        </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span>
+                                        <span>Password</span>
+                                    </li>
                                 }
                                 else
                                 {
-                                    <span class="pull-right">
-                                        -
-                                    </span>
-                                    <span class="label label-danger"><i class="fa fa-close"></i></span> <span>Connection String</span>
+                                    <li class="list-group-item">
+                                        <span class="pull-right">
+                                            -
+                                        </span>
+                                        <span class="label label-danger"><i class="fa fa-close"></i></span> <span>Database not configured!</span>
+                                    </li>
                                 }
-                            </li>
+                            }
+                            else
+                            {
+                                <span class="pull-right">
+                                    -
+                                </span>
+                                <span class="label label-danger"><i class="fa fa-close"></i></span>
+                                <span>Connection String</span>
+                            }
                             <li class="list-group-item">
                                 @if (_config["ASPNETCORE_ENVIRONMENT"].IsSet())
                                 {

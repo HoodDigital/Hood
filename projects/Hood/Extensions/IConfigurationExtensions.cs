@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Data.SqlClient;
 
 namespace Hood.Extensions
 {
@@ -25,6 +26,8 @@ namespace Hood.Extensions
             return config.CheckConfiguration("Google", "Authentication:Google:AppId", "Authentication:Google:Secret");
         }
 
+
+
         private static bool CheckConfiguration(this IConfiguration config, string flag, params string[] keys)
         {
             foreach (string key in keys)
@@ -50,6 +53,13 @@ namespace Hood.Extensions
             if (!string.IsNullOrEmpty(config["UseHttps"]) && config["UseHttps"] == "true")
                 return true;
             return false;
+        }
+
+        public static SqlConnectionStringBuilder GetConnectionSettings(this IConfiguration config)
+        {
+            SqlConnectionStringBuilder builder =
+                new SqlConnectionStringBuilder(config["ConnectionStrings:DefaultConnection"]);
+            return builder;
         }
 
     }
