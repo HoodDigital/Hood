@@ -51,7 +51,6 @@ namespace Hood.Core
             services.AddSingleton<IEventsService>(new EventsService());
 
             // Register singletons.
-            services.AddSingleton<IEventsService, EventsService>();
             services.AddSingleton<SubscriptionsEventListener>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
