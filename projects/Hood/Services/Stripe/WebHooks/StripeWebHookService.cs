@@ -72,7 +72,7 @@ namespace Hood.Services
 
                 if (!_env.IsProduction())
                 {
-                    _logService.AddLogAsync("Stripe webhook processed.", _mailObject.Text.ToHtmlLineBreaks(), Models.LogType.Success, Models.LogSource.Subscriptions, null, null, nameof(UserSubscription), null);
+                    _logService.AddLogAsync("Stripe webhook processed.", JsonConvert.SerializeObject(new { Event = stripeEvent }), Models.LogType.Success, Models.LogSource.Subscriptions, null, null, nameof(StripeWebHookService), null);
                 }
 
                 // Fire the event to allow any other packages to process the webhook.
