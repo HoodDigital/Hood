@@ -46,8 +46,11 @@ namespace Hood.Core
             //register engine
             builder.RegisterInstance(this).As<IEngine>().SingleInstance();
 
+            // Register single instance singletons
             services.AddSingleton(configuration);
+            services.AddSingleton<IEventsService>(new EventsService());
 
+            // Register singletons.
             services.AddSingleton<IEventsService, EventsService>();
             services.AddSingleton<SubscriptionsEventListener>();
             services.AddSingleton<ContentCategoryCache>();
@@ -64,6 +67,8 @@ namespace Hood.Core
             services.AddSingleton<ISettingsRepository, SettingsRepository>();
             services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
             services.AddSingleton<ILogService, LogService>();
+
+            // Register transients.
             services.AddTransient<IStripeService, StripeService>();
             services.AddTransient<ISubscriptionPlanService, SubscriptionPlanService>();
             services.AddTransient<ISubscriptionService, SubscriptionService>();
@@ -73,6 +78,8 @@ namespace Hood.Core
             services.AddTransient<IBillingService, BillingService>();
             services.AddTransient<FormSenderService>();
             services.AddTransient<WelcomeEmailSender>();
+
+            // Register scoped.
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
