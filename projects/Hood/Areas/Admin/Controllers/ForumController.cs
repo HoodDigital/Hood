@@ -294,12 +294,9 @@ namespace Hood.Areas.Admin.Controllers
                     model.Slug = model.DisplayName.ToSeoUrl() + "-" + counter;
                     counter++;
                 }
-                var exists = _db.ForumCategories.SingleOrDefault(t => t.DisplayName == model.DisplayName && t.ParentCategoryId == model.ParentCategoryId);
-                if (exists == null)
-                {
-                    _db.ForumCategories.Add(model);
+
+                _db.ForumCategories.Add(model);
                     await _db.SaveChangesAsync();
-                }
 
                 return Json(new { Success = true });
             }

@@ -516,13 +516,10 @@ namespace Hood.Services
                 category.Slug = category.DisplayName.ToSeoUrl() + "-" + counter;
                 counter++;
             }
-            var exists = _db.ContentCategories.SingleOrDefault(t => t.DisplayName == category.DisplayName && t.ContentType == category.ContentType && t.ParentCategoryId == category.ParentCategoryId);
-            if (exists == null)
-            {
-                _db.ContentCategories.Add(category);
-                await _db.SaveChangesAsync();
-                _events.triggerContentChanged(this);
-            }
+
+            _db.ContentCategories.Add(category);
+            await _db.SaveChangesAsync();
+            _events.triggerContentChanged(this);
             return new OperationResult<ContentCategory>(category);
         }
         public async Task<OperationResult> DeleteCategory(int categoryId)
