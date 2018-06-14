@@ -705,7 +705,12 @@ namespace Hood.Services
         {
             StringWriter sw = new StringWriter();
             ApplicationUser user = GetUserByStripeId(created.CustomerId).Result;
+            if (user == null)
+                throw new Exception($"Could not locate user from Stripe id: {created.CustomerId}");
+
             UserSubscription userSub = GetUserSubscriptionByStripeId(user, created.Id);
+            if (userSub == null)
+                throw new Exception($"Could not locate user's subscription from Stripe id: {created.Id}");
 
             // Check the timestamp of the event, with the last update of the object
             // If this was updated last before the event, therefore the event is valid and should be applied.
@@ -724,8 +729,16 @@ namespace Hood.Services
         {
             StringWriter sw = new StringWriter();
             ApplicationUser user = GetUserByStripeId(updated.CustomerId).Result;
+            if (user == null)
+                throw new Exception($"Could not locate user from Stripe id: {updated.CustomerId}");
+
             UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
+            if (userSub == null)
+                throw new Exception($"Could not locate user's subscription from Stripe id: {updated.Id}");
+
             Subscription plan = GetSubscriptionPlanByStripeId(updated.StripePlan.Id).Result;
+            if (plan == null)
+                throw new Exception($"Could not locate subscription plan object from Stripe id: {updated.StripePlan.Id}");
 
             if (userSub.SubscriptionId != plan.Id)
             {
@@ -739,6 +752,7 @@ namespace Hood.Services
             {
                 return sw.ToString();
             }
+
             userSub = UpdateUserSubscriptionFromStripe(userSub, updated);
             _db.SaveChanges();
 
@@ -748,7 +762,12 @@ namespace Hood.Services
         {
             StringWriter sw = new StringWriter();
             ApplicationUser user = GetUserByStripeId(deleted.CustomerId).Result;
+            if (user == null)
+                throw new Exception($"Could not locate user from Stripe id: {deleted.CustomerId}");
+
             UserSubscription userSub = GetUserSubscriptionByStripeId(user, deleted.Id);
+            if (userSub == null)
+                throw new Exception($"Could not locate user's subscription from Stripe id: {deleted.Id}");
 
             // Check the timestamp of the event, with the last update of the object
             // If this was updated last before the event, therefore the event is valid and should be applied.

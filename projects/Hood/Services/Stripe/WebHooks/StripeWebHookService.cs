@@ -80,7 +80,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                _logService.AddLogAsync("An error occurred processing a stripe webhook.", _mailObject.Html, Models.LogType.Error, Models.LogSource.Subscriptions, null, null, nameof(UserSubscription), null);
+                _logService.AddLogAsync("An error occurred processing a stripe webhook.", JsonConvert.SerializeObject(new { Message = ex.Message, Event = stripeEvent, Exception = ex }), Models.LogType.Error, Models.LogSource.Subscriptions, null, null, nameof(StripeWebHookService), null);
 
                 _mailObject.PreHeader = "An error occurred processing a stripe webhook.";
                 _mailObject.Subject = _mailObject.PreHeader;
