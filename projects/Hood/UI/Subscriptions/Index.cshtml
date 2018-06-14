@@ -18,9 +18,9 @@
         }
         else
         {
-            if (Model.User.HasActiveSubscription())
+            if (Model.User.HasActiveSubscription(Model.Category))
             {
-                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription());
+                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(Model.Category));
             }
             else
             {
