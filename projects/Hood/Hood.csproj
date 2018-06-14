@@ -13,7 +13,7 @@
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <Version>2.0.6</Version>
+    <Version>2.0.8</Version>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/HoodDigital/Hood/blob/master/LICENSE</PackageLicenseUrl>
@@ -24,6 +24,7 @@
     <PackageTags>ASP.NET MVC EntityFramework CMS</PackageTags>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
+    <AssemblyVersion>2.0.8.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -58,16 +59,6 @@
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <None Remove="node_modules\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Areas\Admin\UI\Api\Create.cshtml" />
-    <None Remove="Areas\Admin\UI\Api\Index.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_Editor_Settings.cshtml" />
-    <None Remove="Areas\Admin\UI\Logs\_Log_Api.cshtml" />
-    <None Remove="Areas\Admin\UI\Logs\_Log_Basic.cshtml" />
-    <None Remove="Areas\Admin\UI\Logs\_Log_Subscription.cshtml" />
-    <None Remove="UI\Shared\Api.cshtml" />
   </ItemGroup>
 
 </Project>
