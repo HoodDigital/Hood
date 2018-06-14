@@ -296,7 +296,8 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
                 _db.ForumCategories.Add(model);
-                    await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync();
+                _forumCategoryCache.ResetCache();
 
                 return Json(new { Success = true });
             }
