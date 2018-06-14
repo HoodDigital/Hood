@@ -1,4 +1,5 @@
-﻿using Hood.Events;
+﻿using Hood.Core;
+using Hood.Events;
 using System;
 using System.Linq;
 
@@ -23,7 +24,18 @@ namespace Hood.Services
         }
         public void triggerForumChanged(object sender)
         {
-            _ForumChanged?.Invoke(sender, new EventArgs());
+            try
+            {
+                foreach (var d in _ForumChanged.GetInvocationList())
+                {
+                    d.DynamicInvoke(sender);
+                }
+            }
+            catch (Exception ex)
+            {
+                var logService = EngineContext.Current.Resolve<ILogService>();
+                logService.AddLogAsync("An error while triggering a Forum Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+            }
         }
 
         private event EventHandler<EventArgs> _ContentChanged;
@@ -63,7 +75,18 @@ namespace Hood.Services
         }
         public void triggerPropertiesChanged(object sender)
         {
-            _PropertiesChanged?.Invoke(sender, new EventArgs());
+            try
+            {
+                foreach (var d in _PropertiesChanged.GetInvocationList())
+                {
+                    d.DynamicInvoke(sender);
+                }
+            }
+            catch (Exception ex)
+            {
+                var logService = EngineContext.Current.Resolve<ILogService>();
+                logService.AddLogAsync("An error while triggering a Properties Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+            }
         }
 
         private event EventHandler<EventArgs> _OptionsChanged;
@@ -83,7 +106,18 @@ namespace Hood.Services
         }
         public void triggerOptionsChanged(object sender)
         {
-            _OptionsChanged?.Invoke(sender, new EventArgs());
+            try
+            {
+                foreach (var d in _OptionsChanged.GetInvocationList())
+                {
+                    d.DynamicInvoke(sender);
+                }
+            }
+            catch (Exception ex)
+            {
+                var logService = EngineContext.Current.Resolve<ILogService>();
+                logService.AddLogAsync("An error while triggering a Options Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+            }
         }
 
         private event EventHandler<UserSubscriptionChangeEventArgs> _UserSubcriptionChanged;
@@ -103,7 +137,18 @@ namespace Hood.Services
         }
         public void triggerUserSubcriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
         {
-            _UserSubcriptionChanged?.Invoke(sender, e);
+            try
+            {
+                foreach (var d in _UserSubcriptionChanged.GetInvocationList())
+                {
+                    d.DynamicInvoke(sender, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                var logService = EngineContext.Current.Resolve<ILogService>();
+                logService.AddLogAsync("An error while triggering a User Subcription Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+            }
         }
 
         private event EventHandler<StripeWebHookTriggerArgs> _StripeWebhook;
@@ -123,7 +168,18 @@ namespace Hood.Services
         }
         public void triggerStripeWebhook(object sender, StripeWebHookTriggerArgs e)
         {
-            _StripeWebhook?.Invoke(sender, e);
+            try
+            {
+                foreach (var d in _StripeWebhook.GetInvocationList())
+                {
+                    d.DynamicInvoke(sender, e);
+                }
+            }
+            catch (Exception ex)
+            {
+                var logService = EngineContext.Current.Resolve<ILogService>();
+                logService.AddLogAsync("An error while triggering a Stripe Webhook event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+            }
         }
     }
 }
