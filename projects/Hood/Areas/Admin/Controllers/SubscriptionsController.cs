@@ -92,10 +92,15 @@ namespace Hood.Areas.Admin.Controllers
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 BillingSettings billingSettings = _settings.GetBillingSettings();
+
+                var newId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString();
+                if (_settings.GetBillingSettings().EnableStripeTestMode)
+                    newId += "-test";
+
                 subscription = new Subscription
                 {
                     CreatedBy = user.Id,
-                    StripeId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString(),
+                    StripeId = ,
                     Created = DateTime.Now,
                     LastEditedBy = user.UserName,
                     LastEditedOn = DateTime.Now,

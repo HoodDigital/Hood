@@ -1,13 +1,4 @@
 @model SubscriptionModel
-@{
-    var plans = ViewData["plans"] as List<Subscription>;
-    var profile = plans.Where(p => p.StripeId.Contains("profile-monthly")).FirstOrDefault();
-    var profileAnnual = plans.Where(p => p.StripeId.Contains("profile-annual")).FirstOrDefault();
-    var plus = plans.Where(p => p.StripeId.Contains("plus-monthly")).FirstOrDefault();
-    var plusAnnual = plans.Where(p => p.StripeId.Contains("plus-annual")).FirstOrDefault();
-    var ultimate = plans.Where(p => p.StripeId.Contains("ultimate-monthly")).FirstOrDefault();
-    var ultimateAnnual = plans.Where(p => p.StripeId.Contains("ultimate-annual")).FirstOrDefault();
-}
 <div class="row">
     <div class="selected-package">
         <p>You have selected:</p>
@@ -26,7 +17,4 @@
             </p>
         </div>
     </div>
-    <span id="siteseal">
-        <script async type="text/javascript" src="https://seal.godaddy.com/getSeal?sealID=cKFSdQOEb4Tcr3Jmgbi76k5KcnsTeQESE7j6msHcgbSA1uJKQ74PJHuqHZyx"></script>
-    </span>
 </div>

@@ -8,14 +8,22 @@
     {
         plans = plans.Where(p => p.Category == Model.Category).ToList();
     }
+    if (_settings.GetBillingSettings().EnableStripeTestMode)
+    {
+        plans = plans.Where(p => p.StripeId.EndsWith("-test")).ToList();
+    }
+    else
+    {
+        plans = plans.Where(p => !p.StripeId.EndsWith("-test")).ToList();
+    }
 }
 <div class="row">
     @foreach (Subscription plan in plans)
     {
-        <div class="col-xs-12 col-sm-6 col-md-3">
+        <div class="col-xs-12 col-sm-6 col-sm-offset-3">
             <div class="thumbnail price">
                 <div class="panel-heading  text-center bg-info">
-                    <h3>Profile</h3>
+                    <h3>@plan.Name</h3>
                     <p>@plan.FullPrice</p>
                     @if (plan.TrialPeriodDays > 0)
                     {
@@ -26,19 +34,19 @@
                         <p>No trial period.</p>
                     }
                 </div>
-                <div class="p-lg">
+                <div class="p-lg text-center">
                     @plan.Description
                 </div>
                 <div class="panel-footer text-center">
                     @{ await Html.RenderPartialAsync("_Subscriptions_ChargeButton",
-                           new ChargeButtonModel()
-                           {
-                               SubscriptionModel = Model,
-                               Subscription = plan,
-                               CssClass = "annual",
-                               Text = "Select this."
-                           }
-                       );
+                            new ChargeButtonModel()
+                            {
+                                SubscriptionModel = Model,
+                                Subscription = plan,
+                                CssClass = "annual",
+                                Text = "Select this."
+                            }
+                        );
                     }
                 </div>
             </div>

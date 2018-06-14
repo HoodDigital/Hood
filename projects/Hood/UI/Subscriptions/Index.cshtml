@@ -1,38 +1,64 @@
 @model SubscriptionModel
 @{
     ViewBag.Title = "Member's Area";
-    Layout = "_Layout";
+    ViewBag.SubTitle = "Manage your Red Umbrella account, and access the forums and other private areas of the site.";
+    Layout = "_BasicLayout";
+    var planCategories = Model.Plans.Where(p => p.Category.IsSet()).Select(p => p.Category).Distinct();
 }
-<div class="jumbotron">
-    <div class="container">
-        <h1>Private Subscription Area</h1>
-        <p>This is the home area for any subscribed user. Only accessible with a valid tiered subscription.</p>
-    </div>
-</div>
 <div class="container">
     @if (Model.SaveMessage.IsSet())
     {
         @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
     }
-    @foreach (string category in Model.Plans.Select(p => p.Category).Distinct())
+    @if (planCategories.Count() == 0)
     {
-        <h1>@category Packages</h1>
-        if (Model.User.HasActiveSubscription(category))
+        @if (Model.Plans.Count == 0)
         {
-            await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(category));
+            @Html.BootstrapAlert("There are no subscription plans added to the site yet.", AlertType.Warning);
         }
         else
         {
-            <div class="current-subscription well">
-                <h4>You are not currently on a paid package, you have the free package.</h4>
-                <p>
-                    You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
-                </p>
-                <p>
-                    <a class="btn btn-sm btn-primary" asp-action="Change" asp-route-category="@category">Get a package!</a>
-                    <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
-                </p>
-            </div>
+            if (Model.User.HasActiveSubscription())
+            {
+                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription());
+            }
+            else
+            {
+                <div class="current-subscription well">
+                    <h4>You are not currently on a paid package, you have the free package.</h4>
+                    <p>
+                        You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
+                    </p>
+                    <p>
+                        <a class="btn btn-sm btn-primary" asp-action="Change">Get a package!</a>
+                        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
+                    </p>
+                </div>
+            }
+        }
+    }
+    else
+    {
+        foreach (string category in planCategories)
+        {
+            <h1>@category.ToTitleCase() Packages</h1>
+            if (Model.User.HasActiveSubscription(category))
+            {
+                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(category));
+            }
+            else
+            {
+                <div class="current-subscription well">
+                    <h4>You are not currently on a paid package, you have the free package.</h4>
+                    <p>
+                        You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
+                    </p>
+                    <p>
+                        <a class="btn btn-sm btn-primary" asp-action="Change" asp-route-category="@category">Get a package!</a>
+                        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
+                    </p>
+                </div>
+            }
         }
     }
 </div>

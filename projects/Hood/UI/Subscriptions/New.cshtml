@@ -3,8 +3,8 @@
 @{
     BillingSettings settings = _settings.GetBillingSettings();
     ViewBag.Title = "Choose your package";
-    var plans = await _subs.GetSubscriptionPlanLevels();
-    ViewData["plans"] = plans;
+    ViewBag.SubTitle = "To take advantage of one of our paid packages, you will need to add a payment method. You can try our paid packages for free, as our monthly packages come with 30 days free, and of course you can cancel at any time!";
+    Layout = "_BasicLayout";
 }
 <section class="page-section">
     <div class="container">
@@ -12,8 +12,6 @@
         {
             @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
         }
-        <h3 class="large">Finish your account setup</h3>
-        <p class="m-b-lg">To take advantage of one of our paid packages, you will need to add a payment method. You can try our paid packages for free, as our monthly packages come with 30 days free, and of course you can cancel at any time!</p>
         @if (Model.Plans?.Count <= 0)
         {
             <div class="alert alert-warning text-center">
@@ -23,46 +21,48 @@
         else
         {
             <div class="" id="accordion" role="tablist" aria-multiselectable="true">
-                <div class="">
-                    <div class="" role="tab" id="headingOne">
-                        <h4 class="">
+                <div class="panel panel-default panel-accordion">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
                             Choose your package
                         </h4>
                     </div>
-                    <div id="price-panel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                        @if (Model.Category.IsSet())
+                    <div id="price-panel" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        @if (Model.Plans.Count > 0)
                         {
-                            await Html.RenderPartialAsync("_Subscriptions_Table");
-                        }
-                        else
-                        {
-                            @foreach (string category in Model.Plans.Select(p => p.Category).Distinct())
+                            if (Model.Category.IsSet())
                             {
-                                <h1>@category Packages</h1>
-                                var ptModel = Model;
-                                ptModel.Category = category;
-                                await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
+                                await Html.RenderPartialAsync("_Subscriptions_Table");
+                            }
+                            else
+                            {
+                                @foreach (string category in Model.Plans.Select(p => p.Category).Distinct())
+                                {
+                                    var ptModel = Model;
+                                    ptModel.Category = category;
+                                    await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
+                                }
                             }
                         }
                     </div>
                 </div>
-                <div class="">
-                    <div class="" role="tab" id="headingTwo">
-                        <h4 class="">
+                <div class="panel panel-default panel-accordion">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title">
                             Enter your billing details
                         </h4>
                     </div>
-                    <div id="billing-panel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                    <div id="billing-panel" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                         @{ await Html.RenderPartialAsync("_PaymentForm"); }
                     </div>
                 </div>
-                <div class="">
-                    <div class="" role="tab" id="headingThree">
-                        <h4 class="">
+                <div class="panel panel-default panel-accordion">
+                    <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
                             Confirm &amp; Pay
                         </h4>
                     </div>
-                    <div id="confirm-panel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                    <div id="confirm-panel" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                         @{ await Html.RenderPartialAsync("_Confirmation"); }
                     </div>
                 </div>

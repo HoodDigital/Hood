@@ -1,8 +1,9 @@
 @model SubscriptionModel
 @{
     ViewBag.Title = "Manage your subscription";
-    ViewData["SubTitle"] = "Pay for more features and expand your profiles!";
+    ViewBag.SubTitle = "Pay for more features and expand your profiles!";
     AccountInfo _account = Context.GetAccountInfo();
+    var planCategories = Model.Plans.Where(p => p.Category.IsSet()).Select(p => p.Category).Distinct();
 }
 <section class="page-section">
     @if (Model.SaveMessage.IsSet())
@@ -23,27 +24,60 @@
             </div>
         </div>
     }
-    @foreach (string category in Model.Plans.Select(p => p.Category).Distinct())
+
+    @if (planCategories.Count() == 0)
     {
-        <h1>@category Packages</h1>
-        if (Model.User.HasActiveSubscription(category))
+        if (Model.Plans.Count == 0)
         {
-            await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(category));
+            @Html.BootstrapAlert("There are no subscription plans added to the site yet.", AlertType.Warning);
         }
         else
         {
-            <div class="current-subscription well">
-                <h4>You are not currently on a paid package, you have the free package.</h4>
-                <p>
-                    You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
-                </p>
-                <p>
-                    <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
-                </p>
-            </div>
+            if (Model.User.HasActiveSubscription())
+            {
+                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription());
+            }
+            else
+            {
+                <div class="current-subscription well">
+                    <h4>You are not currently on a paid package, you have the free package.</h4>
+                    <p>
+                        You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
+                    </p>
+                    <p>
+                        <a class="btn btn-sm btn-primary" asp-action="Change">Get a package!</a>
+                        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
+                    </p>
+                </div>
+            }
+            await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
         }
-        var ptModel = Model;
-        ptModel.Category = category;
-        await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
+    }
+    else
+    {
+        foreach (string category in planCategories)
+        {
+            <h1>@category.ToTitleCase() Packages</h1>
+            if (Model.User.HasActiveSubscription(category))
+            {
+                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(category));
+            }
+            else
+            {
+                <div class="current-subscription well">
+                    <h4>You are not currently on a paid package, you have the free package.</h4>
+                    <p>
+                        You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
+                    </p>
+                    <p>
+                        <a class="btn btn-sm btn-primary" asp-action="Change" asp-route-category="@category">Get a package!</a>
+                        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
+                    </p>
+                </div>
+            }
+            var ptModel = Model;
+            ptModel.Category = category;
+            await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
+        }
     }
 </section>

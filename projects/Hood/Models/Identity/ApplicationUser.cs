@@ -151,7 +151,7 @@ namespace Hood.Models
             profile.CopyProperties(this);
         }
 
-        public bool HasActiveSubscription(string category)
+        public bool HasActiveSubscription(string category = null)
         {
             var subs = Subscriptions;
             if (category.IsSet())
@@ -161,7 +161,7 @@ namespace Hood.Models
                     return true;
             return false;
         }
-        public UserSubscription GetActiveSubscription(string category)
+        public UserSubscription GetActiveSubscription(string category = null)
         {
             var subs = Subscriptions;
             if (category.IsSet())
