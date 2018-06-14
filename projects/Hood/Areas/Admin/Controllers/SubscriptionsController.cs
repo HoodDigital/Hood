@@ -100,7 +100,7 @@ namespace Hood.Areas.Admin.Controllers
                 subscription = new Subscription
                 {
                     CreatedBy = user.Id,
-                    StripeId = ,
+                    StripeId = newId,
                     Created = DateTime.Now,
                     LastEditedBy = user.UserName,
                     LastEditedOn = DateTime.Now,
