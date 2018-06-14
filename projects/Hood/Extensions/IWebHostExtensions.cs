@@ -10,7 +10,7 @@ using System;
 
 namespace Hood.Extensions
 {
-    public static class IServiceProviderExtensions
+    public static class IWebHostExtensions
     {
         public static void SeedHoodData<TDbContext>(this IWebHost host)
             where TDbContext : HoodDbContext
@@ -34,8 +34,8 @@ namespace Hood.Extensions
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<HoodDbContext>>();
-                    logger.LogError(ex, "An error occurred seeding the DB.");
+                    var logService = services.GetService<ILogService>();
+                    logService.AddLogAsync("An error occurred during the seed function.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IWebHostExtensions), null);
                 }
             }
             host.Run();

@@ -49,7 +49,12 @@ namespace Hood.Services
 
         public async Task AddLogAsync(string message, Exception ex, LogType type, LogSource source, string UserId, string entityId, string entityType, string url)
         {
-            var detail = string.Concat("Stack Trace:", Environment.NewLine, ex.StackTrace);
+            var detail = string.Concat(
+                "Exception  Message: ", ex.Message, Environment.NewLine,
+                "Stack Trace:", Environment.NewLine, ex.StackTrace,
+                "Exception JSON:", Environment.NewLine, Environment.NewLine,
+                JsonConvert.SerializeObject(ex)
+            );
             if (ex.InnerException != null)
                 detail = string.Concat(
                     "Inner Exception: ", ex.InnerException.Message, Environment.NewLine,

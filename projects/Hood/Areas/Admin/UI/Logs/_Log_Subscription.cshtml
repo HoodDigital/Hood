@@ -17,7 +17,7 @@
             }
             @if (Model.SourceUrl.IsSet())
             {
-                <dt>Endpoint Url</dt>
+                <dt>Source Url</dt>
                 <dd>
                     <a href="@Model.SourceUrl">
                         @Model.SourceUrl
@@ -28,7 +28,30 @@
             {
                 switch (Model.EntityType)
                 {
-
+                    case nameof(ApplicationUser):
+                        <dt>User</dt>
+                        <dd>
+                            <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.EntityId">
+                                Go to user
+                            </a>
+                        </dd>
+                        break;
+                    case nameof(UserSubscription):
+                        <dt>Subscription</dt>
+                        <dd>
+                            <a target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.EntityId)">
+                                Go to subscription (Stripe)
+                            </a>
+                        </dd>
+                        break;
+                    case nameof(Subscription):
+                        <dt>Plan</dt>
+                        <dd>
+                            <a asp-action="Edit" asp-controller="Subscriptions" asp-route-id="@Model.EntityId">
+                                Go to subscription plan
+                            </a>
+                        </dd>
+                        break;
                 }
             }
         </dl>

@@ -17,7 +17,7 @@
             }
             @if (Model.SourceUrl.IsSet())
             {
-                <dt>Endpoint Url</dt>
+                <dt>Source Url</dt>
                 <dd>
                     <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
                         @Model.SourceUrl
@@ -26,14 +26,14 @@
             }
             @if (Model.EntityType.IsSet())
             {
-                <dt>Entity Type</dt>
+                <dt>Source Object</dt>
                 <dd>
                     @Model.EntityType
                 </dd>
             }
             @if (Model.EntityId.IsSet())
             {
-                <dt>Entity Id</dt>
+                <dt>Source Object Id</dt>
                 <dd>
                     @Model.EntityId
                 </dd>

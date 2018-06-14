@@ -25,6 +25,7 @@ namespace Hood.Models
         Media,
         Themes,
         Importers,
-        Exporters
+        Exporters,
+        System
     }
 }
