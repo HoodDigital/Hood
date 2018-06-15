@@ -28,7 +28,7 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [SubscriptionRequired(Roles: "SuperUser", Categories: "Hosting")]
+        [SubscriptionRequired(Roles: "SuperUser")]
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
             AccountInfo account = HttpContext.GetAccountInfo();
