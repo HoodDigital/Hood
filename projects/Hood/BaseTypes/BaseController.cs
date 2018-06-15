@@ -57,6 +57,7 @@ namespace Hood.Controllers
             _cache = EngineContext.Current.Resolve<IHoodCache>();
             _address = EngineContext.Current.Resolve<IAddressService>();
             _eventService = EngineContext.Current.Resolve<IEventsService>();
+            _media = EngineContext.Current.Resolve<IMediaManager<MediaObject>>();
         }
     }
 }
