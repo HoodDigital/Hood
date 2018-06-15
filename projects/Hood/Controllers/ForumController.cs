@@ -199,6 +199,9 @@ namespace Hood.Controllers
                 else
                     model.Topic.Approved = true;
 
+                var roles = await _userManager.GetRolesAsync(user);
+                model.Topic.AuthorRoles = string.Join(",", roles);
+
                 _db.Topics.Add(model.Topic);
                 await _db.SaveChangesAsync();
 
@@ -319,6 +322,9 @@ namespace Hood.Controllers
                     model.Post.Approved = false;
                 else
                     model.Post.Approved = true;
+
+                var roles = await _userManager.GetRolesAsync(user);
+                model.Post.AuthorRoles = string.Join(",", roles);
 
                 _db.Posts.Add(model.Post);
                 await _db.SaveChangesAsync();

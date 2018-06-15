@@ -17,6 +17,7 @@ namespace Hood.Models
         public ApplicationUser Author { get; set; }
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
+        public string AuthorRoles { get; set; }
 
         [NotMapped]
         public List<ApplicationUser> Authors { get; set; }
@@ -36,7 +37,6 @@ namespace Hood.Models
         public string LastUserDisplayName { get; set; }
 
         // Logs and notes
-        public string UserVars { get; set; }
         public string Notes { get; set; }
         public string SystemNotes { get; set; }
 

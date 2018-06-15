@@ -28,6 +28,7 @@ namespace Hood.Models
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
         public string AuthorIp { get; set; }
+        public string AuthorRoles { get; set; }
 
         // Dates
         public DateTime PostedTime { get; set; }
