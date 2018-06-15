@@ -189,7 +189,7 @@ namespace Hood.Controllers
                 }
                 var user = await _userManager.GetUserAsync(User);
                 model.Topic.AuthorId = user.Id;
-                model.Topic.AuthorDisplayName = user.DisplayName;
+                model.Topic.AuthorDisplayName = user.FullName;
                 model.Topic.AuthorName = user.UserName;
                 model.Topic.ForumId = model.Forum.Id;
                 model.Topic.CreatedOn = DateTime.Now;

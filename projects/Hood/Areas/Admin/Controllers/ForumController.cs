@@ -119,7 +119,7 @@ namespace Hood.Areas.Admin.Controllers
                 if (author != null)
                 {
                     model.AuthorId = author.Id;
-                    model.AuthorDisplayName = author.DisplayName;
+                    model.AuthorDisplayName = author.FullName;
                     model.AuthorName = author.FullName;
                 }
 
@@ -183,7 +183,7 @@ namespace Hood.Areas.Admin.Controllers
                     model.Slug = generator.UrlSlug();
 
                 model.AuthorId = user.Id;
-                model.AuthorDisplayName = user.DisplayName;
+                model.AuthorDisplayName = user.FullName;
                 model.AuthorName = user.FullName;
 
                 var roles = await _userManager.GetRolesAsync(user);
