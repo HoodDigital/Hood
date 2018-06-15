@@ -186,6 +186,9 @@ namespace Hood.Areas.Admin.Controllers
                 model.AuthorDisplayName = user.DisplayName;
                 model.AuthorName = user.FullName;
 
+                var roles = await _userManager.GetRolesAsync(user);
+                model.AuthorRoles = string.Join(",", roles);
+
                 model.CreatedBy = user.UserName;
                 model.CreatedOn = DateTime.Now;
                 model.LastEditedBy = user.UserName;
