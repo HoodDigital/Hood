@@ -37,6 +37,7 @@ namespace Hood.Models
         public string LastUserDisplayName { get; set; }
 
         // Logs and notes
+        public string UserVars { get; set; }
         public string Notes { get; set; }
         public string SystemNotes { get; set; }
 
