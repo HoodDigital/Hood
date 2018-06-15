@@ -161,8 +161,9 @@ $.hood.Subscriptions = {
                 submitUrl: '/admin/subscriptions/add',
                 submitFunction: function (data) {
                     if (data.Success) {
-                        $('#manage-subscription-list').data('hoodDataList').Refresh();
                         swal("Created!", "The subscription has now been created!", "success");
+                        if (data.Url)
+                            window.location = data.Url;
                     } else {
                         swal("Error", "There was a problem creating the subscription:\n\n" + data.Errors, "error");
                     }

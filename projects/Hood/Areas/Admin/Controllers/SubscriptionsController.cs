@@ -1,5 +1,6 @@
 ﻿using Hood.Caching;
 using Hood.Controllers;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
@@ -43,9 +44,10 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/subscriptions/edit/{id}/")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
             var model = await _auth.GetSubscriptionPlanById(id);
+            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -127,7 +129,10 @@ namespace Hood.Areas.Admin.Controllers
                     nameof(Subscription),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
-                return new Response(true);
+
+                var response = new Response(true, "Published successfully.");
+                response.Url = Url.Action("Edit", new { id = subscription.Id, message = EditorMessage.Created });
+                return response;
             }
             catch (Exception ex)
             {
