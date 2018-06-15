@@ -232,6 +232,7 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
+                _forumCategoryCache.ResetCache();
 
                 return Json(new { Success = true });
             }
@@ -261,6 +262,7 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
+                _forumCategoryCache.ResetCache();
 
                 return Json(new { Success = true });
             }
@@ -348,6 +350,7 @@ namespace Hood.Areas.Admin.Controllers
                 var category = await _db.ForumCategories.FirstOrDefaultAsync(c => c.Id == id);
                 _db.Entry(category).State = EntityState.Deleted;
                 await _db.SaveChangesAsync();
+                _forumCategoryCache.ResetCache();
                 return new Response(true);
             }
             catch (Exception ex)
