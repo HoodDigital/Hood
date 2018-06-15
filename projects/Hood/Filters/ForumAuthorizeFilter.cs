@@ -69,8 +69,12 @@ namespace Hood.Filters
             {
                 ForumSettings _forumSettings = _settings.GetForumSettings();
 
+                // if user is admin or moderator - let them through, regardless.
+                if (context.HttpContext.User.IsInRole("Admin") || context.HttpContext.User.IsInRole("Moderator"))
+                    return;
+
                 // Login required stuff
-                IActionResult loginResult = new RedirectToActionResult("Login", "Account", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
+                    IActionResult loginResult = new RedirectToActionResult("Login", "Account", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
 
                 if (!context.HttpContext.User.Identity.IsAuthenticated && _access == ForumAccess.View && _forumSettings.ViewingRequiresLogin)
                 {
@@ -239,10 +243,6 @@ namespace Hood.Filters
                 if (_access == ForumAccess.Moderate)
                 {
                     bool moderator = false;
-                    // moderator checks, if admin or mod, let through.
-                    if (_userManager.IsInRoleAsync(_account.User, "Administrator").Result ||
-                        _userManager.IsInRoleAsync(_account.User, "Moderator").Result)
-                        moderator = true;
 
                     // if is forum owner
                     if (forum.AuthorId == _account.User.Id)
