@@ -26,6 +26,7 @@ namespace Hood.Areas.Admin.Controllers
             )
             : base()
         {
+            _mediaRefresh = mediaRefresh;
         }
 
         [Route("admin/settings/basics/")]
