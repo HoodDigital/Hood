@@ -180,7 +180,8 @@ namespace Hood.Services
                     UpdateUser(userSubs);
                 }
             }
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
+            await _userManager.DeleteAsync(user);
             return;
         }
 
