@@ -12,6 +12,7 @@ namespace Hood.Extensions
         {
             if (message.HasValue)
             {
+                model.MessageId = (int)message.Value;
                 switch (message.Value)
                 {
                     case EditorMessage.Succeeded:
@@ -101,6 +102,7 @@ namespace Hood.Extensions
         {
             if (message.HasValue)
             {
+                model.MessageId = (int)message.Value;
                 switch (message.Value)
                 {
                     case ForumMessage.PostReported:

@@ -145,6 +145,8 @@ namespace Hood.Models
         public AlertType MessageType { get; set; }
         [NotMapped]
         public string SaveMessage { get; set; }
+        [NotMapped]
+        public int? MessageId { get; set; }
 
         public void SetProfile(IUserProfile profile)
         {
