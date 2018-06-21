@@ -207,7 +207,7 @@ namespace Hood.Controllers
         {
             if (!returnUrl.IsSet())
             {
-                returnUrl = Url.Action("Change", "Subscriptions");
+                returnUrl = Url.Action("Index", "Subscriptions");
             }
             var newParams = new Dictionary<string, string>();
             if (message.HasValue)
