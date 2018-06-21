@@ -1096,7 +1096,7 @@ namespace Hood.Services
             }
             else
             {
-                var path = "~/Views/" + folder + "/" + templateName + ".cshtml";
+                var path = "~/UI/" + folder + "/" + templateName + ".cshtml";
                 if (EmbeddedFiles.GetFiles(path).Length > 0)
                     template = EmbeddedFiles.ReadAllText(path);
                 else

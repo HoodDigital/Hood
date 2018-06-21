@@ -56,6 +56,13 @@
                                     </li>
                                     <li class="list-group-item">
                                         <span class="pull-right">
+                                            @_config.GetConnectionSettings().InitialCatalog
+                                        </span>
+                                        <span class="label label-success"><i class="fa fa-check"></i></span>
+                                        <span>Database</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <span class="pull-right">
                                             @_config.GetConnectionSettings().UserID
                                         </span>
                                         <span class="label label-success"><i class="fa fa-check"></i></span>
