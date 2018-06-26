@@ -144,6 +144,8 @@ namespace Hood.Models
 
                 if (type.BaseName == "Page")
                 {
+                    if (IsHomepage)
+                        return "/";
                     return string.Format("/{0}", Slug);
                 }
                 switch (type.UrlFormatting)

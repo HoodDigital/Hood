@@ -25,6 +25,14 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Remove="wwwroot\images\.gitkeep" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="wwwroot\images\.gitkeep" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
   

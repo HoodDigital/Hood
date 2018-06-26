@@ -2,13 +2,35 @@
 @{
     BasicSettings _basicSettings = _settings.GetBasicSettings();
     AccountInfo _account = Context.GetAccountInfo();
+    var path = Context.Request.Path.ToString().ToLower();
 }
 <nav class="main">
     <div class="container">
         <ul class="nav navbar-nav main">
-            <li><a href="/">Home</a></li>
-            <li><a asp-action="Index" asp-controller="Forum">Forums</a></li>
-            <li><a asp-action="Index" asp-controller="Subscriptions">Member's Area</a></li>
+            @{
+                var pages = await _content.GetPagedContent(new ContentModel()
+                {
+                    Category = "main-menu",
+                    Type = "page",
+                    PageSize = 999,
+                    Order = "Meta:Custom.DisplayOrder"
+                });
+            }
+            @if (pages.TotalCount > 0)
+            {
+                @foreach (var pg in pages.List)
+                {
+                    <li class="@(path == pg.Url ? "highlight" : "")">
+                        <a href="@pg.Url">
+                            @pg.Title
+                        </a>
+                    </li>
+                }
+            }
+            @if (_settings.GetForumSettings().Enabled)
+            {
+                <li><a asp-action="Index" asp-controller="Forum">Forums</a></li>
+            }
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <span class="caret"></span></a>
                 <div class="dropdown-menu full">
