@@ -3,6 +3,7 @@
 @{
     Layout = "_SettingsLayout";
     ViewData["Title"] = "Site Basic Settings";
+    var _mediaSettings = _settings.GetMediaSettings();
     var pages = _content.GetPages();
 }
 @section buttons {
@@ -32,6 +33,38 @@
                     <label class="control-label" asp-for="SiteTitle"></label>
                     <div>
                         <input asp-for="SiteTitle" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="SiteLogo"></label>
+                    <div class="row image-cell">
+                        <div class="col-xs-1">
+                            <img src="@(Model.SiteLogo.IsSet() ? Model.SiteLogo : _mediaSettings.NoImage.IsSet() ? _mediaSettings.NoImage : "/lib/hood/images/no-image.jpg")" class="img img-xxs img-circle SiteLogo" />
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="input-group">
+                                <input asp-for="SiteLogo" type="url" class="form-control SiteLogo" placeholder="Enter a url..." />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default hood-image-set" data-target=".SiteLogo" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" asp-for="SiteLogoLight"></label>
+                    <div class="row image-cell">
+                        <div class="col-xs-1">
+                            <img src="@(Model.SiteLogoLight.IsSet() ? Model.SiteLogoLight : _mediaSettings.NoImage.IsSet() ? _mediaSettings.NoImage : "/lib/hood/images/no-image.jpg")" class="img img-xxs img-circle SiteLogoLight" />
+                        </div>
+                        <div class="col-xs-11">
+                            <div class="input-group">
+                                <input asp-for="SiteLogoLight" type="url" class="form-control SiteLogoLight" placeholder="Enter a url..." />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default hood-image-set" data-target=".SiteLogoLight" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -188,17 +221,6 @@
                 </p>
                 <hr />
                 <div class="form-group">
-                    <label class="control-label" asp-for="EditorType"></label>
-                    <div>
-                        <select asp-for="EditorType" class="form-control">
-                            <option value="full">Full</option>
-                            <option value="simple">Simple</option>
-                        </select>
-                        <small>Note: This determines the editors throughout the admin areas, on all content editors. Choose either full featured or simple, which will show bold, italic, and some basic formatting settings.</small>
-                    </div>
-                </div>
-                <hr />
-                <div class="form-group">
                     <label class="control-label" asp-for="Homepage"></label>
                     <div>
                         <select asp-for="Homepage" class="form-control">
@@ -208,6 +230,18 @@
                                 <option value="@content.PageId">@content.Title</option>
                             }
                         </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableThemes" class="styled">
+                        <label asp-for="EnableThemes"></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableApiKeys" class="styled">
+                        <label asp-for="EnableApiKeys"></label>
                     </div>
                 </div>
                 <hr />
@@ -241,7 +275,7 @@
                     <div>
                         <textarea asp-for="LockoutModeTokens" class="form-control" rows="6"></textarea>
                     </div>
-                    <p>Enter codes for access, <strong>one code per line</strong>, you can share these codes to grant access to the site. Without one only the homepage, and login page will be available. Administrators can log in to bypass the Lockout Mode.</p>
+                    <p>Enter codes for access, <strong>one code per line</strong>, you can share these codes to grant access to the site. Without one only the Default Holding Page, and login page will be available. Administrators can log in to bypass the Lockout Mode.</p>
                 </div>
             </div>
         </div>

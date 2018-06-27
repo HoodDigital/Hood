@@ -60,41 +60,6 @@
                 <h5>Theme currently selected: @_settings["Hood.Settings.Theme"]</h5>
                 <p>There is no active theme currently, this could be due to no theme being selected, or an issue with the installation of the currently selected theme.</p>
             }
-            <hr />
-            @if (_settings != null)
-            {
-                <div class="editor-box">
-                    <h5>Holding Page</h5>
-                    <p>You can activate a holding page, which will show instead of the site, this is useful prelaunch.</p>
-                    <p class="text-warning">This feature is currently disabled. Please contact Hood for more information.</p>
-                    @*<p>
-                            @if (config["Settings.HoldingPage"] == "true")
-                            {
-                                <a class="pull-right btn-danger btn-block btn btn-sm update-site-setting" data-name="Settings.HoldingPage" data-value="false">De-activate Holding Page</a>
-                            }
-                            else
-                            {
-                                <a class="pull-right btn-primary btn-block btn btn-sm update-site-setting" data-name="Settings.HoldingPage" data-value="true">Activate Holding Page</a>
-                            }
-                        </p>*@
-                </div>
-                <hr />
-                <div class="editor-box">
-                    <h5>Under Construction Page</h5>
-                    <p>You can activate an Under Construction page, which will show instead of the site, this is useful during maintenance periods.</p>
-                    <p class="text-warning">This feature is currently disabled. Please contact Hood for more information.</p>
-                    @*<p>
-                            @if (config["Settings.MaintenancePage"] == "true")
-                            {
-                                <a class="pull-right btn-danger btn-block btn btn-sm update-site-setting" data-name="Settings.MaintenancePage" data-value="false">De-activate Maintenance Page</a>
-                            }
-                            else
-                            {
-                                <a class="pull-right btn-primary btn-block btn btn-sm update-site-setting" data-name="Settings.MaintenancePage" data-value="true">Activate Maintenance Page</a>
-                            }
-                        </p>*@
-                </div>
-            }
         </div>
     </div>
 </div>

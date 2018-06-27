@@ -22,6 +22,10 @@ namespace Hood.Models
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
 
+        [Display(Name = "Enable Api Keys")]
+        public bool EnableApiKeys { get; set; }
+        [Display(Name = "Enable Themes")]
+        public bool EnableThemes { get; set; }
 
         // Site Address
         [Display(Name = "Site Title")]
@@ -31,6 +35,10 @@ namespace Hood.Models
 
         [Display(Name = "Company Name")]
         public string CompanyName { get; set; }
+        [Display(Name = "Site Logo")]
+        public string SiteLogo { get; set; }
+        [Display(Name = "Site Logo (Light)")]
+        public string SiteLogoLight { get; set; }
         [Display(Name = "Site/Company Phone Number")]
         public string Phone { get; set; }
         [Display(Name = "Site/Company Email")]

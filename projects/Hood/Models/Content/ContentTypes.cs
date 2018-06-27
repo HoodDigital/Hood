@@ -91,7 +91,6 @@ namespace Hood.Models
             get
             {
                 return new List<ContentType>() {
-
                     new ContentType() {
                         BaseName = "Slider",
                         Slug = "slider",
@@ -123,38 +122,6 @@ namespace Hood.Models
                             new CustomField() { Name = "Content.Slider.CallToAction.Style", Default = "", System = true, Type="System.String" },
                             new CustomField() { Name = "Content.Slider.CallToAction.Text", Default = "", System = true, Type="System.String" },
                             new CustomField() { Name = "Content.Slider.DisplayOrder", Default = "0", System = true, Type="System.Int32" }
-                        })
-                    },
-                    new ContentType() {
-                        BaseName = "Event",
-                        Slug = "event",
-                        Type = "event",
-                        Search = "events",
-                        Title = "Events",
-                        Icon = "fa-calendar",
-                        TypeName = "Event",
-                        Enabled = false,
-                        IsPublic = true,
-                        HasPage = false,
-                        TypeNamePlural = "Events",
-                        TitleName = "Title",
-                        ExcerptName = "Description",
-                        MultiLineExcerpt = true,
-                        ShowDesigner = false,
-                        ShowEditor = true,
-                        ShowCategories = true,
-                        ShowBanner = true,
-                        ShowImage = true,
-                        UrlFormatting = "news-title",
-                        ShowMeta = true,
-                        Gallery = false,
-                        Templates = false,
-                        TemplateFolder = "Templates",
-                        CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.Event.Start", Default = "", System = true, Type="System.DateTime" },
-                            new CustomField() { Name = "Content.Event.End", Default = "", System = true, Type="System.DateTime" }
                         })
                     },
                     new ContentType() {
@@ -378,64 +345,17 @@ namespace Hood.Models
                             new CustomField() { Name = "Content.Portfolio.DeliveryDate", Default = "", System = true, Type="System.DateTime" },
                             new CustomField() { Name = "Content.Portfolio.Headline", Default = "", System = true, Type="System.String" }
                         })
-                    },
-                    new ContentType() {
-                        BaseName = "Product",
-                        Slug = "products",
-                        Type = "product",
-                        Search = "products",
-                        Title = "Products",
-                        Icon = "fa-shopping-bag",
-                        TypeName = "Product",
-                        Enabled = false,
-                        IsPublic = true,
-                        HasPage = true,
-                        TypeNamePlural = "Products",
-                        TitleName = "Title",
-                        ExcerptName = "Short Description",
-                        MultiLineExcerpt = true,
-                        ShowDesigner = false,
-                        ShowEditor = true,
-                        ShowCategories = true,
-                        ShowBanner = true,
-                        ShowImage = true,
-                        ShowMeta = true,
-                        Gallery = true,
-                        Templates = false,
-                        UrlFormatting = "news-title",
-                        TemplateFolder = "Templates",
-                        CustomFields = BaseFields(
-                        new List<CustomField>()
-                        {
-                            new CustomField() { Name = "Content.Product.Supplier", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Product.SKU", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Product.Price", Default = "0", System = true, Type="System.Decimal" },
-                            new CustomField() { Name = "Content.Product.Tax", Default = "20", System = true, Type="System.Decimal" },
-                            new CustomField() { Name = "Content.Product.ListPrice", Default = "0", System = true, Type="System.Decimal" },
-                            new CustomField() { Name = "Content.Product.Discount", Default = "0", System = true, Type="System.Decimal" },
-                            new CustomField() { Name = "Content.Product.RecommendedPrice", Default = "0", System = true, Type="System.Decimal" },
-                            new CustomField() { Name = "Content.Product.MinCart", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.MaxCart", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.Width", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.Height", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.Depth", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.Weight", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.SellByDate", Default = "false", System = true, Type="System.Boolean" },
-                            new CustomField() { Name = "Content.Product.SellStartDate", Default = "", System = true, Type="System.DateTime" },
-                            new CustomField() { Name = "Content.Product.SellEndDate", Default = "", System = true, Type="System.DateTime" },
-                            new CustomField() { Name = "Content.Product.Available", Default = "true", System = true, Type="System.Boolean" },
-                            new CustomField() { Name = "Content.Product.StockLevel", Default = "0", System = true, Type="System.Int32" },
-                            new CustomField() { Name = "Content.Product.TrackStock", Default = "false", System = true, Type="System.Boolean" }
-                        })
                     }
                 };
             }
         }
 
-        private static List<CustomField> BaseFields(List<CustomField> fields)
+        public static List<CustomField> BaseFields(List<CustomField> fields)
         {
             fields.AddRange(new List<CustomField>()
             {
+                new CustomField() {Name="DisplayOrder", Default="0", System=true, Type="System.Int32" },
+
                 new CustomField() {Name="Settings.Template", Default = "_Blank", System = true, Type = "System.String" },
 
                 new CustomField() {Name="Settings.SubType", Default = "", System = true, Type = "System.String" },

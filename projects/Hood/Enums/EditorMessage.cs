@@ -21,6 +21,7 @@
         Deactivated,
         Activated,
         KeyRolled,
-        KeyCreated
+        KeyCreated,
+        Exists
     }
 }

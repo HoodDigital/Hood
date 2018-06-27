@@ -138,21 +138,27 @@
             </li>
             @if (User.IsInRole("Admin"))
             {
-                <li>
-                    <a asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
-                        <i class="fa fa-paint-brush"></i><span class="nav-label">Theme</span>
-                    </a>
-                </li>
+                @if (_basicSettings.EnableThemes)
+                {
+                    <li>
+                        <a asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
+                            <i class="fa fa-paint-brush"></i><span class="nav-label">Theme</span>
+                        </a>
+                    </li>
+                }
                 <li>
                     <a asp-action="Index" asp-controller="Users">
                         <i class="fa fa-group"></i><span class="nav-label">Users</span>
                     </a>
                 </li>
-                <li>
-                    <a asp-action="Index" asp-controller="Api">
-                        <i class="fa fa-key"></i><span class="nav-label">Api Keys</span>
-                    </a>
-                </li>
+                @if (_basicSettings.EnableApiKeys)
+                {
+                    <li>
+                        <a asp-action="Index" asp-controller="Api">
+                            <i class="fa fa-key"></i><span class="nav-label">Api Keys</span>
+                        </a>
+                    </li>
+                }
                 <li>
                     <a asp-action="Index" asp-controller="Logs">
                         <i class="fa fa-list"></i><span class="nav-label">Logs</span>

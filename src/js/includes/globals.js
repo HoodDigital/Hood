@@ -95,7 +95,7 @@ $.fn.warningAlert = function (val) {
         $.getScript('/lib/sweetalert/dist/sweetalert.min.js', $.proxy(function () {
             swal({
                 title: "Whoa!",
-                text: targets.data('warning'),
+                text: $(e.currentTarget).data('warning'),
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",

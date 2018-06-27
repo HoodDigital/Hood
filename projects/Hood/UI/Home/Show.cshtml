@@ -26,9 +26,6 @@
     Layout = "_Blank";
     @switch (Model.ContentType.BaseName)
     {
-        case "Event":
-            Layout = "_EventLayout";
-            break;
         case "FAQ":
             Layout = "_FaqLayout";
             break;
@@ -112,9 +109,6 @@ else
         case "Job":
             await Html.RenderPartialAsync("_JobView");
             break;
-        case "News":
-            await Html.RenderPartialAsync("_NewsView");
-            break;
         case "Portfolio":
             await Html.RenderPartialAsync("_PortfolioView");
             break;
@@ -128,8 +122,11 @@ else
             await Html.RenderPartialAsync("_TestimonialView");
             break;
         case "Page":
-        default:
             await Html.RenderPartialAsync("_EditableContent");
+            break;
+        case "News":
+        default:
+            await Html.RenderPartialAsync("_NewsView");
             break;
     }
 }

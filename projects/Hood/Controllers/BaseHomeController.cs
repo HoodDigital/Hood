@@ -41,7 +41,7 @@ namespace Hood.Controllers
                 if (basicSettings.LockoutModeHoldingPage.HasValue)
                     return await Show(basicSettings.LockoutModeHoldingPage.Value);
                 else
-                    return View("~/Views/Home/Holding.cshtml");
+                    return View(nameof(Holding));
             }
             else
             {
@@ -50,6 +50,11 @@ namespace Hood.Controllers
                 else
                     return View();
             }
+        }
+
+        public virtual IActionResult Holding()
+        {
+            return View();
         }
 
         #region "Content"

@@ -5,6 +5,7 @@
 }
 @section buttons {
     <a asp-action="ResetContent" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    <a asp-action="AddContentType" class="btn btn-info warning-alert" data-warning="This will add a blank content type to the site (cannot if you already have one with the type name 'blank'. Are you sure?"><i class="fa fa-plus-circle"></i> Add New Blank Type</a>
 }
 @section description {
     Use this page to manage what content types are available on your site.
@@ -70,16 +71,10 @@
                                         {
                                             <select asp-for="Types[i].BaseName" class="form-control">
                                                 <option value="Blank">Blank</option>
-                                                <option value="Client">Client</option>
-                                                <option value="Event">Event</option>
-                                                <option value="Faq">FAQ</option>
-                                                <option value="Job">Job</option>
-                                                <option value="News">News</option>
-                                                <option value="Portfolio">Portfolio</option>
-                                                <option value="Product">Product</option>
-                                                <option value="Slider">Slider</option>
-                                                <option value="Team">Team</option>
-                                                <option value="Testimonial">Testimonial</option>
+                                                @foreach (var t in ContentTypes.All)
+                                                {
+                                                    <option value="@t.BaseName">@t.BaseName</option>
+                                                }
                                             </select>
                                         }
                                     </div>
@@ -168,6 +163,17 @@
                                         <p><small>Only recommended for items that are rendered a lot, not recommended on large content sets such as news.</small></p>
                                     </div>
                                 </div>
+                                <hr />
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">Delete Type?</label>
+                                    <div class="col-sm-9">
+                                        <a asp-action="DeleteContentType" asp-route-type="@Model.Types[i].Type" class="btn btn-danger warning-alert" data-warning="This will delete this content type, you will no longer be able to access or manage this type, however anything saved to the database will remain. You should clear all the content before deleting this if you wish to. Are you sure you wish to continue!?">
+                                            <i class="fa fa-trash-o"></i> Delete this Content Type
+                                        </a>
+                                        <br />
+                                        <small>This will delete this content type, you will no longer be able to access or manage this type, however anything saved to the database will remain. You should clear all the content before deleting this if you wish to.</small>
+                                    </div>
+                                </div>
                             </fieldset>
                         </div>
                     </div>
@@ -177,7 +183,7 @@
                             <p>
                                 Here you can set what types of content you want to show up on the website. You can activate them as full sections or simply as types to be shown in custom areas.
                             </p>
-                        <hr />
+                            <hr />
                             <fieldset class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Title Field Name:</label>

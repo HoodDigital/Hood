@@ -39,6 +39,10 @@ namespace Hood.Extensions
                         model.MessageType = AlertType.Danger;
                         model.SaveMessage = "There was a problem duplicating the content.";
                         break;
+                    case EditorMessage.Exists:
+                        model.MessageType = AlertType.Danger;
+                        model.SaveMessage = "Something already exists with that handle/slug/name.";
+                        break;
                     case EditorMessage.Created:
                         model.MessageType = AlertType.Success;
                         model.SaveMessage = "Created successfully.";
