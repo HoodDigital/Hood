@@ -46,6 +46,11 @@ namespace Hood.Extensions
                 return ret;
             switch (format)
             {
+                case AddressFormat.Short:
+                    ret = from.Address1;
+                    ret += from.City.IsSet() ? ", " + from.City : "";
+                    ret += from.Postcode.IsSet() ? ", " + from.Postcode : "";
+                    break;
                 case AddressFormat.SingleLine:
                     ret = "";
                     ret += from.Number.IsSet() ? from.Number + (from.Address1.IsSet() ? ", " : "") : "";
@@ -77,6 +82,11 @@ namespace Hood.Extensions
                 return html.Raw(ret);
             switch (format)
             {
+                case AddressFormat.Short:
+                    ret = address.Address1;
+                    ret += address.City.IsSet() ? ", " + address.City : "";
+                    ret += address.Postcode.IsSet() ? ", " + address.Postcode : "";
+                    break;
                 case AddressFormat.SingleLine:
                     ret = address.Address1;
                     ret += address.Address2.IsSet() ? ", " + address.Address2 : "";

@@ -2,6 +2,7 @@
 {
     public enum AddressFormat
     {
+        Short,
         SingleLine,
         MultiLine
     }
