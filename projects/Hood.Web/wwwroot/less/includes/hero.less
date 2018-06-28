@@ -3,8 +3,7 @@
         background-color: rgba(0,0,0,.3);
         padding: 50px 0 50px;
         position: relative;
-        height: 500px;
-        margin-bottom: 25px;
+        height: 400px;
 
         .background-image {
             display: block;
@@ -15,12 +14,16 @@
             right: 0;
             background-size: cover;
             background-position: center;
+            -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+            filter: grayscale(100%);
         }
 
         .intro {
+            position: absolute;
             color: white;
             width: 100%;
             top: 50%;
+            .transform(translateY(-50%));
 
             h1 {
                 font-size: 41px;
@@ -44,35 +47,6 @@
                 &:last-child {
                     color: @theme-light;
                     margin-bottom: 0;
-                }
-            }
-        }
-
-        &.home {
-            height: auto;
-            background-color: #f1f3f2;
-
-            .intro-image {
-                height: 400px;
-                float: right;
-            }
-
-            .intro {
-                color: black;
-
-                h1 {
-                    color: black;
-
-                    span {
-                        color: @theme-dark;
-                    }
-                }
-
-                p {
-
-                    &:last-child {
-                        color: @theme-dark;
-                    }
                 }
             }
         }
