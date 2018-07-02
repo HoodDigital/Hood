@@ -24,7 +24,6 @@
     <PackageTags>ASP.NET MVC EntityFramework CMS</PackageTags>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
-    <AssemblyVersion>2.0.9.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
