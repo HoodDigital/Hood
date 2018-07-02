@@ -1,6 +1,7 @@
 # Project Ignores
 /Admin/Views
 /Views
+/Migrations
 /wwwroot/lib
 /wwwroot/css
 /wwwroot/js/**/*.min.js
