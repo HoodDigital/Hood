@@ -26,6 +26,8 @@ namespace Hood.Models
         public bool EnableApiKeys { get; set; }
         [Display(Name = "Enable Themes")]
         public bool EnableThemes { get; set; }
+        [Display(Name = "Enable Preload")]
+        public bool EnablePreload { get; set; }
 
         // Site Address
         [Display(Name = "Site Title")]

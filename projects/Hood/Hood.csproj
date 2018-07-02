@@ -61,4 +61,8 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="UI\Shared\_DeferredStyles.cshtml" />
+  </ItemGroup>
+
 </Project>

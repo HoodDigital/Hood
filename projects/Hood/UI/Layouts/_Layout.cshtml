@@ -1,5 +1,5 @@
-@{ 
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+@{
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
     SeoSettings _seoSettings = _settings.GetSeo();
 
     var pageTitle = ViewData["PageTitle"] as string;
@@ -18,7 +18,14 @@
         await Html.RenderPartialAsync("_Metas");
     }
     @RenderSection("metas", required: false)
-    @{ await Html.RenderPartialAsync("_Styles"); }
+    @if (_settings.GetBasicSettings().EnablePreload)
+    {
+        await Html.RenderPartialAsync("_DeferredStyles");
+    }
+    else
+    {
+        await Html.RenderPartialAsync("_Styles");
+    }
     @RenderSection("styles", required: false)
 </head>
 <body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
@@ -34,7 +41,10 @@
     @{ await Html.RenderPartialAsync("_Footer"); }
     @RenderSection("afterfooter", required: false)
     @{ await Html.RenderPartialAsync("_AdminEditor"); }
-    @{ await Html.RenderPartialAsync("_DeferredStylesLoader"); }
+    @if (_settings.GetBasicSettings().EnablePreload)
+    {
+        await Html.RenderPartialAsync("_DeferredStylesLoader");
+    }
     @RenderSection("includes", required: false)
     @{ await Html.RenderPartialAsync("_Scripts"); }
     @RenderSection("scripts", required: false)
