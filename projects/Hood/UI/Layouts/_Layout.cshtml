@@ -31,7 +31,10 @@
 <body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
     @RenderSection("afterbody", required: false)
     @{ await Html.RenderPartialAsync("_NoScript"); }
-    @{ await Html.RenderPartialAsync("_PreLoader"); }
+    @if (_settings.GetBasicSettings().EnablePreload)
+    {
+        await Html.RenderPartialAsync("_PreLoader");
+    }
     @RenderSection("beforecontent", required: false)
     <div class="wrapper" id="wrapper">
         @await Component.InvokeAsync(typeof(Hood.ViewComponents.Header))
