@@ -22,7 +22,7 @@
     </div>
 }
 @{
-    var customFields = Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom."));
+    var customFields = Model.Content.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.ContentType.BaseName + ".")) || c.Name.StartsWith("Custom."));
 }
 @if (customFields.Count() > 0 && typeFields.Count() > 0)
 {

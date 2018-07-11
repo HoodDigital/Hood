@@ -17,7 +17,7 @@ $.fn.restrictToSlug = function (restrictPattern) {
     // and everything else will be 'cleaned'
     // For example 'ABCdEfGhI5' become 'ABCEGI5'
     var pattern = restrictPattern ||
-        /[^0-9a-zA-Z-//]*/g; // default pattern
+        /[^0-9a-zA-Z]*/g; // default pattern
 
     var restrictHandler = function () {
         var val = $(this).val();
@@ -61,6 +61,33 @@ $.fn.restrictToPageSlug = function (restrictPattern) {
     targets.on('change', restrictHandler);
 };
 $('.restrict-to-page-slug').restrictToPageSlug();
+$.fn.restrictToMetaSlug = function (restrictPattern) {
+    var targets = $(this);
+
+    // The characters inside this pattern are accepted
+    // and everything else will be 'cleaned'
+    var pattern = restrictPattern ||
+        /[^0-9a-zA-Z.]*/g; // default pattern
+
+    var restrictHandler = function () {
+        var val = $(this).val();
+        var newVal = val.replace(pattern, '');
+        if ((newVal.match(new RegExp(".", "g")) || []).length > 1) {
+            var pos = newVal.lastIndexOf('.');
+            newVal = newVal.substring(0, pos) + newVal.substring(pos + 1);
+            $.hood.Alerts.Warning("You can only have up to 1 '.' characters in a meta slug.");
+        }
+        // This condition is to prevent selection and keyboard navigation issues
+        if (val !== newVal) {
+            $(this).val(newVal);
+        }
+    };
+
+    targets.on('keyup', restrictHandler);
+    targets.on('paste', restrictHandler);
+    targets.on('change', restrictHandler);
+};
+$('.restrict-to-meta-slug').restrictToMetaSlug();
 $.fn.characterCounter = function (val) {
     var targets = $(this);
     var characterCounterHandler = function () {

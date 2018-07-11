@@ -120,8 +120,7 @@ namespace Hood.Models
                         {
                             new CustomField() { Name = "Content.Slider.CallToAction.Url", Default = "", System = true, Type="System.String" },
                             new CustomField() { Name = "Content.Slider.CallToAction.Style", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Slider.CallToAction.Text", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Slider.DisplayOrder", Default = "0", System = true, Type="System.Int32" }
+                            new CustomField() { Name = "Content.Slider.CallToAction.Text", Default = "", System = true, Type="System.String" }
                         })
                     },
                     new ContentType() {
@@ -180,7 +179,7 @@ namespace Hood.Models
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
-                        CustomFields = new List<CustomField>()
+                        CustomFields = BaseFields(new List<CustomField>())
                     },
                     new ContentType() {
                         BaseName = "FAQ",
@@ -206,10 +205,11 @@ namespace Hood.Models
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
-                        CustomFields = new List<CustomField>()
+                        CustomFields = BaseFields(
+                        new List<CustomField>()
                         {
                             new CustomField() { Name = "Content.FAQ.Department", Default = "", System = true, Type="System.String" }
-                        }
+                        })
                     },
                     new ContentType() {
                         BaseName = "Page",
@@ -275,8 +275,7 @@ namespace Hood.Models
                             new CustomField() { Name = "Content.Team.Twitter", Default = "", System = true, Type="System.String" },
                             new CustomField() { Name = "Content.Team.LinkedIn", Default = "", System = true, Type="System.String" },
                             new CustomField() { Name = "Content.Team.Facebook", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.GooglePlus", Default = "", System = true, Type="System.String" },
-                            new CustomField() { Name = "Content.Team.DisplayOrder", Default = "", System = true, Type="System.String" }
+                            new CustomField() { Name = "Content.Team.GooglePlus", Default = "", System = true, Type="System.String" }
                         })
                     },
                     new ContentType() {

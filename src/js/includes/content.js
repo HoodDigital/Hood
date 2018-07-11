@@ -43,7 +43,7 @@ $.hood.Content = {
             }
             // Add the new item.
             newField = {
-                Name: "Custom." + $('#custom-field-name-' + $(this).data('id')).val(),
+                Name: $('#custom-field-name-' + $(this).data('id')).data('prefix') + $('#custom-field-name-' + $(this).data('id')).val(),
                 Default: $('#custom-field-default-' + $(this).data('id')).val(),
                 Type: $('#custom-field-type-' + $(this).data('id')).val(),
                 System: false

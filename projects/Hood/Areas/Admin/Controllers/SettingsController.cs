@@ -212,23 +212,23 @@ namespace Hood.Areas.Admin.Controllers
             if (model == null)
                 model = new ContentSettings();
             var types = model.Types.ToList();
-            if (types.Any(t => t.Type == "blank"))
+            if (types.Any(t => t.Type == "new-content"))
             {
                 return RedirectToAction("Content", new { message = EditorMessage.Exists });
             }
             types.Add(new ContentType()
             {
-                BaseName = "Blank",
-                Slug = "blank",
-                Type = "blank",
-                Search = "blanks",
-                Title = "Blank Types",
+                BaseName = "Default",
+                Slug = "new-content",
+                Type = "new-content",
+                Search = "new-content",
+                Title = "New Content Type",
                 Icon = "fa-object-group",
                 TypeName = "Slider",
                 Enabled = true,
                 IsPublic = false,
                 HasPage = false,
-                TypeNamePlural = "Blank Types",
+                TypeNamePlural = "New Content Types",
                 TitleName = "Title",
                 ExcerptName = "Excerpt",
                 MultiLineExcerpt = true,

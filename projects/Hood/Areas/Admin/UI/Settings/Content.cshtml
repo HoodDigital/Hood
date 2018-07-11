@@ -70,7 +70,7 @@
                                         else
                                         {
                                             <select asp-for="Types[i].BaseName" class="form-control">
-                                                <option value="Blank">Blank</option>
+                                                <option value="Default">Basic Content (Default)</option>
                                                 @foreach (var t in ContentTypes.All)
                                                 {
                                                     <option value="@t.BaseName">@t.BaseName</option>
@@ -349,7 +349,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Name:</label>
                                     <div class="col-sm-9">
-                                        <input id="custom-field-name-@i" type="text" class="form-control restrict-to-slug" />
+                                        <input id="custom-field-name-@i" type="text" class="form-control restrict-to-meta-slug" data-prefix="@string.Format("Content.{0}.", Model.Types[i].Type.ToTitleCase())" />
                                     </div>
                                 </div>
                                 <div class="form-group">
