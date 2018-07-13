@@ -311,10 +311,11 @@ namespace Hood.Areas.Admin.Controllers
                             Subject = "You account has been created."
                         };
                         message.AddH1("Account Created!");
-                        message.AddParagraph("Your account has been set up on the " + _settings.GetSiteTitle() + " website.");
+                        message.AddParagraph("Your new account has been set up on the " + _settings.GetSiteTitle() + " website.");
                         message.AddParagraph("Name: <strong>" + user.FullName + "</strong>");
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
+                        message.AddCallToAction("Log in here", ControllerContext.HttpContext.GetSiteUrl() + "/account/login", "#32bc4e", "center");
                         await _email.SendEmailAsync(message);
                     }
                     catch (Exception)
