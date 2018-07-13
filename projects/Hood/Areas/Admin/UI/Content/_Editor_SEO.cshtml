@@ -6,7 +6,7 @@
         {
             <div class="form-group">
                 <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                    @cm.Name.Replace("SEO.Meta.", "").ToSentenceCase():
+                    @cm.Name.Replace("SEO.Meta.", "").CamelCaseToString():
                 </label>
                 <div class="col-sm-8">
                     @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
@@ -23,7 +23,7 @@
         {
             <div class="form-group">
                 <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                    @cm.Name.Replace("SEO.Twitter.", "").ToSentenceCase():
+                    @cm.Name.Replace("SEO.Twitter.", "").CamelCaseToString():
                 </label>
                 <div class="col-sm-8">
                     @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }

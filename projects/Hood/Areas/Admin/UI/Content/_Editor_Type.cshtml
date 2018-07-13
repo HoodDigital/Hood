@@ -4,14 +4,14 @@
 }
 @if (typeFields.Count() > 0)
 {
-    <h5>@Model.ContentType.BaseName Settings</h5>
+    <h5>@Model.ContentType.TypeName Settings</h5>
     <div class="ibox-content">
         <fieldset class="form-horizontal">
             @foreach (ContentMeta cm in typeFields.OrderBy(cm => cm.Name))
             {
                 <div class="form-group">
                     <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                        @cm.Name.Replace("Content." + Model.ContentType.BaseName + ".", "").ToSentenceCase().ToTitleCase():
+                        @cm.Name.Replace("Content." + Model.ContentType.BaseName + ".", "").CamelCaseToString().ToTitleCase():
                     </label>
                     <div class="col-sm-8">
                         @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }

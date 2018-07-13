@@ -6,7 +6,7 @@
 }
 <div class="form-group">
     <label for="@string.Format("Meta:{0}", Model.Name)" class="col-sm-3 control-label">
-        @name.ToSentenceCase().ToTitleCase()<br /><em class="text-muted">@type.ToSentenceCase()</em>
+        @name.CamelCaseToString().CamelCaseToString()<br /><em class="text-muted">@type.CamelCaseToString()</em>
     </label>
     <div class="col-sm-8">
         @switch (type)
