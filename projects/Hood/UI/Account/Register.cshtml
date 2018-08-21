@@ -2,7 +2,6 @@
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Authentication
 @model RegisterViewModel
-
 @inject IContentRepository _content
 @{
     BasicSettings _basicSettings = _settings.GetBasicSettings();
@@ -34,6 +33,7 @@
 </div>
 
 <form asp-controller="Account" asp-action="Register" method="post" class="" role="form">
+    @Html.RenderHoneypotField()
     <div asp-validation-summary="All" class="validation-summary"></div>
     <div class="form-group">
         <label asp-for="Email" class="control-label"></label>

@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
-    public class LoginViewModel
+    public class LoginViewModel : HoneyPotFormModel
     {
         [Required]
         public string Username { get; set; }

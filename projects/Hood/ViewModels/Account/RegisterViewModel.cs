@@ -2,7 +2,7 @@
 
 namespace Hood.ViewModels
 {
-    public class RegisterViewModel
+    public class RegisterViewModel : HoneyPotFormModel
     {
         [Required]
         [EmailAddress]

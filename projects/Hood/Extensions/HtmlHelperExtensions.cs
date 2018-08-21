@@ -1,5 +1,6 @@
 ﻿using Hood.Enums;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
@@ -13,6 +14,13 @@ namespace Hood.Extensions
 {
     public static class HtmlHelperExtensions
     {
+        public static IHtmlContent RenderHoneypotField<TModel>(this IHtmlHelper<TModel> html)
+            where TModel : HoneyPotFormModel
+        {
+            var output = $@"<div class='zip_code_text'><label for='zip_code'>Your Zip code:</label><input name='zip_code' id='zip_code' type='text' tabindex='-1' autocomplete='off' /></div>";
+            return new HtmlString(output);
+        }
+
         public static IHtmlContent DescriptionFor<TModel, TValue>(this IHtmlHelper<TModel> html, Expression<Func<TModel, TValue>> expression)
         {
             if (html == null) throw new ArgumentNullException(nameof(html));

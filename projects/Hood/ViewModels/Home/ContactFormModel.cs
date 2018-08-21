@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Hood.Services;
+using Hood.ViewModels;
 
 namespace Hood.Models
 {
-    public class ContactFormModel : IContactFormModel
+    public class ContactFormModel : HoneyPotFormModel, IContactFormModel
     {
         public string FormId { get; set; }
         public string FormClass { get; set; }

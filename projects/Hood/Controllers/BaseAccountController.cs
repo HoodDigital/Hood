@@ -73,8 +73,10 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+
+            if (ModelState.IsValid && ModelState.IsNotSpam(model))
             {
+
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -256,8 +258,9 @@ namespace Hood.Controllers
                 ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process");
             }
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && ModelState.IsNotSpam(model))
             {
+
                 var user = new ApplicationUser { UserName = model.Username.IsSet() ? model.Username : model.Email, Email = model.Email };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
