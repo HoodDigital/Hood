@@ -15,6 +15,7 @@
       action="@(Model.FormAction.IsSet() ? Model.FormAction : Url.Action("ProcessContactForm", "Hood"))" 
       data-redirect="@_contactSettings.ThankYouUrl" 
       data-alert-message="@_contactSettings.ThankYouMessage">
+    @Html.RenderHoneypotField()
     <div class="thank-you">
         <h2>@_contactSettings.ThankYouTitle</h2>
         <p>@_contactSettings.ThankYouMessage</p>

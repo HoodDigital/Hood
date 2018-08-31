@@ -54,8 +54,13 @@ namespace Hood.Controllers
         {
             try
             {
-                await _settings.ProcessCaptchaOrThrowAsync(Request);
-                return await _forms.ProcessAndSend(model);
+                if (ModelState.IsNotSpam(model))
+                {
+                    await _settings.ProcessCaptchaOrThrowAsync(Request);
+                    return await _forms.ProcessAndSend(model);
+                }
+                else
+                    throw new Exception("You have been flagged as a spam bot. If this is not true, please contact us via email.");
             }
             catch (Exception ex)
             {
