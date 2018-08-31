@@ -54,7 +54,7 @@ namespace Hood.Controllers
         {
             try
             {
-                if (ModelState.IsNotSpam(model))
+                if (!ModelState.IsNotSpam(model))
                 {
                     await _settings.ProcessCaptchaOrThrowAsync(Request);
                     return await _forms.ProcessAndSend(model);
