@@ -41,14 +41,14 @@ namespace Hood.Services
                     if (!string.IsNullOrEmpty(siteEmail))
                     {
 
-                        message.PreHeader = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
-                        message.Subject = _settings.ReplacePlaceholders(contactSettings.AdminNoficationSubject);
+                        message.PreHeader = _settings.ReplacePlaceholders(model.Subject);
+                        message.Subject = _settings.ReplacePlaceholders(model.Subject);
                         message.AddH1(_settings.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
                         message.AddDiv(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
                         message = model.WriteToMessage(message);
 
 
-                        if (_environment.IsDevelopment() || _environment.IsStaging())
+                        if (_environment.IsDevelopment())
                         {
                             await _email.NotifyRoleAsync(message, "SuperUser");
                         }
@@ -63,8 +63,8 @@ namespace Hood.Services
                     message = new MailObject()
                     {
                         To = new SendGrid.Helpers.Mail.EmailAddress(model.Email, model.Name),
-                        PreHeader = _settings.ReplacePlaceholders(contactSettings.Subject),
-                        Subject = _settings.ReplacePlaceholders(contactSettings.Subject)
+                        PreHeader = _settings.ReplacePlaceholders(model.Subject),
+                        Subject = _settings.ReplacePlaceholders(model.Subject)
                     };
                     message.AddH1(_settings.ReplacePlaceholders(contactSettings.Title));
                     message.AddDiv(_settings.ReplacePlaceholders(contactSettings.Message));

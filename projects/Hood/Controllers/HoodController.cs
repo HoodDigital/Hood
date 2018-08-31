@@ -56,6 +56,7 @@ namespace Hood.Controllers
             {
                 if (!ModelState.IsNotSpam(model))
                 {
+                    model.Subject = "Contact form enquiry: " + model.Subject;
                     await _settings.ProcessCaptchaOrThrowAsync(Request);
                     return await _forms.ProcessAndSend(model);
                 }
