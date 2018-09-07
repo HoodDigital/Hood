@@ -1,6 +1,7 @@
 ﻿using Hood.BaseTypes;
 using Hood.Extensions;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -42,8 +43,9 @@ namespace Hood.Models
         public int PremiumIncrement { get; set; }
         public bool ShowFees { get; set; }
         public bool ShowFeesDecimals { get; set; }
-        public FTPImporterSettings FTPImporterSettings { get; set; }
         public int DefaultPageSize { get; set; }
+
+        public PropertyImporterSettings FTPImporterSettings { get; set; }
 
         public PropertySettings()
         {
@@ -123,13 +125,54 @@ namespace Hood.Models
         }
     }
 
-    public class FTPImporterSettings
+    public class PropertyImporterSettings
     {
+        /// <summary>
+        /// This is the type of importer to use, can be BLM File or Web API.
+        /// </summary>
+        public PropertyImporterMethod Method { get; set; }
+
+        /// <summary>
+        /// Whether or not to use the FTP Service to download the BLM & Image files when using BLM Importer.
+        /// </summary>
+        [Display(Name = "Download from Remote FTP Server")]
         public bool UseFTP { get; set; }
+
+        /// <summary>
+        /// The FTP Server address that is used for the FTP Import
+        /// </summary>
+        [Display(Name = "Remote FTP Server Address")]
         public string Server { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
+
+        /// <summary>
+        /// The BLM Filename to be used with the BLM File importer
+        /// </summary>
+        [Display(Name = "BLM Filename (On FTP or Local)")]
         public string Filename { get; set; }
+
+        /// <summary>
+        /// This is the local folder where files are loaded from if FTP is not used.
+        /// </summary>
+        [Display(Name = "Local folder to load files from (When not using FTP)")]
+        public string LocalFolder { get; set; }
+
+        /// <summary>
+        /// Username for accessing FTP Services or Web APIs
+        /// </summary>
+        [Display(Name = "API/FTP Username")]
+        public string Username { get; set; }
+
+        /// <summary>
+        /// Password for accessing FTP Services or Web APIs
+        /// </summary>
+        [Display(Name = "API/FTP Password")]
+        public string Password { get; set; }
+    }
+
+    public enum PropertyImporterMethod
+    {
+        BlmFile, 
+        AltoWebApi,
     }
 
     public static class PropertyDetails

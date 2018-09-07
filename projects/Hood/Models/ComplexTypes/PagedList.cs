@@ -30,7 +30,7 @@ namespace System.Collections.Generic
         /// <param name="pageSize">Page size</param>
         public PagedList(IQueryable<T> source, int pageIndex, int pageSize)
         {
-            this.ReloadAsync(source, pageIndex, pageSize);
+            this.Reload(source, pageIndex, pageSize);
         }
 
         public List<T> List

@@ -47,7 +47,13 @@ namespace Hood.Services
             StripeSubscription currentSubscription = await _stripe.SubscriptionService.GetAsync(subscriptionId);
             var updateOptions = new StripeSubscriptionUpdateOptions()
             {
-                PlanId = subscription.Id
+                Items = new List<StripeSubscriptionItemUpdateOption>()
+                {
+                    new StripeSubscriptionItemUpdateOption()
+                    {
+                        Id = subscriptionId
+                    }
+                }
             };
             if (currentSubscription.Status == "trialing" && subscription.TrialPeriodDays > 0)
             {

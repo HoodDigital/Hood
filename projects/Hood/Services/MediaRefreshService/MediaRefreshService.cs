@@ -34,8 +34,9 @@ namespace Hood.Services
             Cancelled = false;
             Succeeded = false;
             StatusMessage = "Not running...";
+            _env = env;
             _settings = settings;
-            _media = new MediaManager<MediaObject>(config, settings);
+            _media = new MediaManager<MediaObject>(config, settings, env);
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(MediaRefreshService) + "\\";
         }
 
@@ -47,6 +48,9 @@ namespace Hood.Services
         private int Total { get; set; }
         private int Processed { get; set; }
         private string StatusMessage { get; set; }
+
+        private IHostingEnvironment _env;
+
         private bool Cancelled { get; set; }
         private HoodDbContext _db { get; set; }
         private bool _killFlag;
@@ -73,7 +77,7 @@ namespace Hood.Services
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new HoodDbContext(options.Options);
 
-                _media = new MediaManager<MediaObject>(_config, _settings);
+                _media = new MediaManager<MediaObject>(_config, _settings, _env);
 
                 Lock.ReleaseWriterLock();
 

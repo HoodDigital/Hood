@@ -16,15 +16,14 @@ namespace Hood.Areas.Admin.Controllers
     public class ImportController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         private readonly IFTPService _ftp;
-
-        private readonly IRightmovePropertyImporter _rightmove;
+        private readonly IPropertyImporter _rightmove;
 
         //private readonly IContentExporter _contentExporter;
         //private readonly IPropertyExporter _propertyExporter;
 
         public ImportController(
             IFTPService ftp, 
-            IRightmovePropertyImporter rightmove
+            IPropertyImporter rightmove
             //IContentExporter contentExporter, 
             //IPropertyExporter propertyExporter
             )
@@ -60,7 +59,7 @@ namespace Hood.Areas.Admin.Controllers
             logWriter.WriteLine("Rightmove Importer Report: ");
             logWriter.Write(status.ToFormattedJson());
 
-            _env.WriteLogToFile<IRightmovePropertyImporter>(logWriter.ToString());
+            _env.WriteLogToFile<IPropertyImporter>(logWriter.ToString());
 
             return StatusCode(401);
         }

@@ -1,7 +1,9 @@
 ﻿using Hood.Enums;
 using Hood.Extensions;
+using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
@@ -27,13 +29,15 @@ namespace Hood.Services
         private string _hoodApiKey;
         private readonly IConfiguration _config;
         private readonly ISettingsRepository _settings;
+        private readonly IHostingEnvironment _env;
         private string _hoodApiScheme;
         private string _hoodApiHost;
 
-        public MediaManager(IConfiguration config, ISettingsRepository site)
+        public MediaManager(IConfiguration config, ISettingsRepository site, IHostingEnvironment env)
         {
             _config = config;
             _settings = site;
+            _env = env;
             Initialise();
         }
 
@@ -216,7 +220,7 @@ namespace Hood.Services
             switch (type)
             {
                 case GenericFileType.Image:
-                    media = ProcessImage(media);
+                    media = await ProcessImageAsync(media);
                     break;
             }
 
@@ -246,7 +250,7 @@ namespace Hood.Services
             switch (type)
             {
                 case GenericFileType.Image:
-                    media = ProcessImage(media);
+                    media = await ProcessImageAsync(media);
                     break;
             }
 
@@ -312,40 +316,69 @@ namespace Hood.Services
             return blockBlob.Uri + sasBlobToken;
         }
 
-        private TMediaObject ProcessImage(TMediaObject media)
+        private async Task<TMediaObject> ProcessImageAsync(TMediaObject media)
         {
             ThumbSet thumbs = new ThumbSet();
-            if (!_hoodApiUrl.IsSet() || !_hoodApiKey.IsSet())
+
+            string fileName = Path.GetFileNameWithoutExtension(media.Url);
+            string fileExt = Path.GetExtension(media.Url);
+            string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
+            string tempGuid = Guid.NewGuid().ToString();
+            string tempFileName = tempDir + tempGuid + fileExt;
+
+            if (!Directory.Exists(tempDir))
+                Directory.CreateDirectory(tempDir);
+
+            // download the file.
+            using (var client = new WebClient())
             {
-                media.SmallUrl = media.Url;
-                media.MediumUrl = media.Url;
-                media.LargeUrl = media.Url;
-                media.ThumbUrl = media.Url;
-                return media;
+                client.DownloadFile(media.Url, tempFileName);
             }
-            string thumbUrl = _hoodApiUrl + "?key={0}&url={1}&directory={2}&container={3}";
-            thumbUrl = string.Format(thumbUrl, WebUtility.UrlEncode(_key), media.Url, media.Directory, _container);
-            var json = "";
-            using (WebClient client = new WebClient())
+
+            // create three thumbnailed versions, and add to the array of files to upload.
+            string XsFilename = string.Format("{0}/{1}_xs{2}", media.Directory.ToLower(), fileName, fileExt);
+            string SmFilename = string.Format("{0}/{1}_sm{2}", media.Directory.ToLower(), fileName, fileExt);
+            string MdFilename = string.Format("{0}/{1}_md{2}", media.Directory.ToLower(), fileName, fileExt);
+            string LgFilename = string.Format("{0}/{1}_lg{2}", media.Directory.ToLower(), fileName, fileExt);
+            string tempXs = tempDir + tempGuid + "_xs" + fileExt;
+            string tempSm = tempDir + tempGuid + "_sm" + fileExt;
+            string tempMd = tempDir + tempGuid + "_md" + fileExt;
+            string tempLg = tempDir + tempGuid + "_lg" + fileExt;
+
+            System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
+            switch (fileExt.ToLowerInvariant())
             {
-                var requestParams = new System.Collections.Specialized.NameValueCollection
-                {
-                    { "apiKey", _hoodApiKey },
-                    { "azureKey", _key },
-                    { "azureHost", _hoodApiHost },
-                    { "azureScheme", _hoodApiScheme },
-                    { "url", media.Url },
-                    { "container", _container },
-                    { "blobReference", media.BlobReference }
-                };
-                byte[] responsebytes = client.UploadValues(_hoodApiUrl, "POST", requestParams);
-                json = Encoding.UTF8.GetString(responsebytes);
+                case ".gif":
+                    format = System.Drawing.Imaging.ImageFormat.Gif;
+                    break;
+                case ".bmp":
+                    format = System.Drawing.Imaging.ImageFormat.Bmp;
+                    break;
+                case ".png":
+                    format = System.Drawing.Imaging.ImageFormat.Png;
+                    break;
             }
-            thumbs = JsonConvert.DeserializeObject<ThumbSet>(json);
-            media.SmallUrl = thumbs.Small;
-            media.MediumUrl = thumbs.Medium;
-            media.LargeUrl = thumbs.Large;
-            media.ThumbUrl = thumbs.Thumb;
+
+            ImageProcessor.ResizeImage(tempFileName, tempXs, 250, 250, format);
+            ImageProcessor.ResizeImage(tempFileName, tempSm, 640, 640, format);
+            ImageProcessor.ResizeImage(tempFileName, tempMd, 1280, 1280, format);
+            ImageProcessor.ResizeImage(tempFileName, tempLg, 1920, 1920, format);
+
+            // foreach, file in the list of thumbnails
+            // upload to the thumbLocation
+            using (var fs = File.OpenRead(tempXs)) { media.ThumbUrl = (await Upload(fs, XsFilename)).Uri.AbsoluteUri; }
+            using (var fs = File.OpenRead(tempSm)) { media.SmallUrl = (await Upload(fs, SmFilename)).Uri.AbsoluteUri; }
+            using (var fs = File.OpenRead(tempMd)) { media.MediumUrl = (await Upload(fs, MdFilename)).Uri.AbsoluteUri; }
+            using (var fs = File.OpenRead(tempLg)) { media.LargeUrl = (await Upload(fs, LgFilename)).Uri.AbsoluteUri; }
+
+            // add the url to the array of urls to send back
+            // remove the temporary image
+            try { File.Delete(tempFileName); } catch (Exception) { }
+            try { File.Delete(tempXs); } catch (Exception) { }
+            try { File.Delete(tempSm); } catch (Exception) { }
+            try { File.Delete(tempMd); } catch (Exception) { }
+            try { File.Delete(tempLg); } catch (Exception) { }
+
             return media;
         }
 

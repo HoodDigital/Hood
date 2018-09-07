@@ -1,18 +1,8 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 
 namespace Hood.Services
 {
-    public interface IRightmovePropertyImporter
-    {
-        bool IsComplete();
-        bool IsRunning();
-        bool RunUpdate(HttpContext context);
-        void Kill();
-        PropertyDataImporterReport Report();
-    }
-
-    public class PropertyDataImporterReport
+    public class PropertyImporterReport
     {
         public int Total { get;set; }
         public int Updated { get;set; }

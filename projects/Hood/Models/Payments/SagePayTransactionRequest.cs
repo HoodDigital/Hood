@@ -6,10 +6,6 @@ namespace Hood.Models.Payments
     public partial class SagePayTransactionRequest : SagePayTransactionBase
     {
         [NotMapped]
-        [JsonIgnore]
-        public SagePayMerchantSessionKey MerchantSession { get; set; }
-
-        [NotMapped]
         public SagePayPaymentMethodRequest PaymentMethod { get; set; }
 
         /// <summary>

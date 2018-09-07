@@ -19,7 +19,7 @@ using Hood.Core;
 
 namespace Hood.Services
 {
-    public class RightmovePropertyImporter : IRightmovePropertyImporter
+    public class BlmFileImporter : IPropertyImporter
     {
         private IFTPService _ftp;
         private IConfiguration _config;
@@ -28,7 +28,7 @@ namespace Hood.Services
         private ISettingsRepository _settings;
         private IHttpContextAccessor _context;
 
-        public RightmovePropertyImporter(
+        public BlmFileImporter(
             IFTPService ftp,
             IHostingEnvironment env,
             IHttpContextAccessor context,
@@ -57,7 +57,7 @@ namespace Hood.Services
             Errors = new List<string>();
             Warnings = new List<string>();
             StatusMessage = "Not running...";
-            TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(RightmovePropertyImporter) + "\\";
+            TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(BlmFileImporter) + "\\";
             _settings = site;
             _propertySettings = site.GetPropertySettings();
             _media = media;
@@ -167,7 +167,10 @@ namespace Hood.Services
                 CleanTempFolder();
 
                 // open a socket to the FTP site, and pull the property file out
-                GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
+                if (_propertySettings.FTPImporterSettings.UseFTP)
+                    GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
+                else
+                    GetFileFromLocal(_propertySettings.FTPImporterSettings.Filename);
 
                 if (HasFileError())
                     throw new Exception("There was a problem downloading the properties file. Please try again.");
@@ -356,7 +359,11 @@ namespace Hood.Services
                 if (data[key].IsSet())
                 {
                     // We have a document, download it with the FTPService
-                    GetFileFromFtp(data[key]);
+                    if (_propertySettings.FTPImporterSettings.UseFTP)
+                        GetFileFromFtp(data[key]);
+                    else
+                        GetFileFromLocal(data[key]);
+
                     if (!HasFileError())
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
@@ -399,7 +406,11 @@ namespace Hood.Services
                 if (data[key].IsSet())
                 {
                     // We have a floor plan reference, download it with the FTPService
-                    GetFileFromFtp(data[key]);
+                    if (_propertySettings.FTPImporterSettings.UseFTP)
+                        GetFileFromFtp(data[key]);
+                    else
+                        GetFileFromLocal(data[key]);
+
                     if (!HasFileError())
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
@@ -445,7 +456,11 @@ namespace Hood.Services
                 if (data[key].IsSet() && !key.Contains("60"))
                 {
                     // We have an image, download it with the FTPService
-                    GetFileFromFtp(data[key]);
+                    if (_propertySettings.FTPImporterSettings.UseFTP)
+                        GetFileFromFtp(data[key]);
+                    else
+                        GetFileFromLocal(data[key]);
+
                     if (!HasFileError())
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
@@ -496,7 +511,11 @@ namespace Hood.Services
                 else if (data[key].IsSet() && (key.Contains("60") || key.Contains("61")))
                 {
                     // We have an EPC, download it with the FTPService.
-                    GetFileFromFtp(data[key]);
+                    if (_propertySettings.FTPImporterSettings.UseFTP)
+                        GetFileFromFtp(data[key]);
+                    else
+                        GetFileFromLocal(data[key]);
+
                     if (!HasFileError())
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
@@ -577,6 +596,34 @@ namespace Hood.Services
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// This will download the property file from the FTP service. The thread will wait until the file is downloaded before continuing.
+        /// </summary>
+        private void GetFileFromLocal(string filename)
+        {
+            Lock.AcquireWriterLock(Timeout.Infinite);
+            StatusMessage = "Copying the local file (" + filename + "), please wait...";
+            FileError = false;
+            Lock.ReleaseWriterLock();
+
+            try
+            {
+
+                File.Copy(Path.Combine(_propertySettings.FTPImporterSettings.LocalFolder, filename), Path.Combine(TempFolder, filename), true);
+                Lock.AcquireWriterLock(Timeout.Infinite);
+                StatusMessage = "Copied the file (" + filename + ") successfully...";
+                Lock.ReleaseWriterLock();
+            }
+            catch
+            {
+                Lock.AcquireWriterLock(Timeout.Infinite);
+                StatusMessage = "There was an error downloading the file (" + filename + ")...";
+                Errors.Add(FormatLog(StatusMessage));
+                FileError = true;
+                Lock.ReleaseWriterLock();
+            }
         }
 
         /// <summary>
@@ -938,11 +985,11 @@ namespace Hood.Services
             // stop the ftp service
             _ftp.Kill();
         }
-        public PropertyDataImporterReport Report()
+        public PropertyImporterReport Report()
         {
-            PropertyDataImporterReport report = new PropertyDataImporterReport();
+            PropertyImporterReport report = new PropertyImporterReport();
             Lock.AcquireWriterLock(Timeout.Infinite);
-            report = new PropertyDataImporterReport
+            report = new PropertyImporterReport
             {
                 Added = Added,
                 Complete = Succeeded ? 100 : Tasks > 0 ? ((double)CompletedTasks / (double)Tasks) * (double)100 : 0,
