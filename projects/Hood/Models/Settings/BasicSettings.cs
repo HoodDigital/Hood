@@ -66,11 +66,12 @@ namespace Hood.Models
 
         public SiteAddress Address { get; set; }
 
-        public BasicSettings()
+         public BasicSettings()
         {
-            // Set Defaults
-            SiteTitle = "My Hood Site";
+            SiteTitle = "New Website";
             EditorType = "Full";
+            SiteLogo = "/lib/hood/images/hood-cms-dark.svg";
+            SiteLogoLight = "/lib/hood/images/hood-cms-light.svg";
         }
 
         public string OwnerFullName

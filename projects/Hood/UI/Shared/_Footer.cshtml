@@ -1,3 +1,7 @@
+@{
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    AccountInfo _account = Context.GetAccountInfo();
+}
 <footer>
     <nav>
         <div class="container">
@@ -36,8 +40,8 @@
                 </div>
                 <div class="col-md-5 text-right">
                     <p class="logo m-b-md">
-                        <a>
-                            <img src="~/lib/hood/images/hood-cms-white.svg" />
+                        <a href="/" title="@_basicSettings.SiteTitle">
+                            <img src="@_basicSettings.SiteLogoLight" />
                         </a>
                     </p>
                     <p>Designed and built by <a href="https://hooddigital.com/">Hood Digital</a></p>
@@ -47,7 +51,7 @@
     </nav>
     <div class="copyright">
         <div class="container">
-            <p><i class="fa fa-copyright m-r-sm"></i>@DateTime.Now.Year.ToString() Hood Digital Limited &#8226; <a href="/terms">Terms</a> &#8226; <a href="/privacy">Privacy</a></p>
+            <p><i class="fa fa-copyright m-r-sm"></i>@DateTime.Now.Year.ToString() @_basicSettings.CompanyName &#8226; <a href="/terms">Terms</a> &#8226; <a href="/privacy">Privacy</a></p>
             <p><i class="fa fa-paint-brush m-r-sm"></i><a href="https://hooddigital.com/">App designed and built by Hood Digital</a></p>
         </div>
     </div>
