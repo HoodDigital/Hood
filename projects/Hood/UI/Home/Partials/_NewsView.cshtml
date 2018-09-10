@@ -6,6 +6,7 @@
     <div class="col-sm-8">
         <div class="blog-post mb-30">
             <h2>@Model.Content.Title</h2>
+            <hr />
             @if (Model.Content.Author != null)
             {
                 <p>
@@ -13,10 +14,14 @@
                     <span><i class="fa fa-clock-o"></i> @Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span>
                 </p>
             }
+            <hr />
             <p>@Model.Content.Excerpt</p>
             <p class="text-muted"><em>@Model.Content.TagString</em></p>
             @{ await Html.RenderPartialAsync("_FeaturedMedia", Model.Content); }
-            <p><a href="#post-content" class="scroll-to-target">Read on...</a></p>
+            <hr />
+            <p>
+                <a href="#post-content" class="scroll-to-target btn btn-block">Read on...</a>
+            </p>
             <hr />
             <div id="share"></div>
             <div id="post-content">

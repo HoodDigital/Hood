@@ -1,3 +1,4 @@
+/// <binding BeforeBuild='publish' ProjectOpened='publish' />
 // Useful gulp functions for the development of HoodCMS.
 // Note this is a demo project and should not be used for production HoodCMS projects.
 // In production, you should install the nuget and bower packages to your HoodCMS project.
@@ -27,7 +28,7 @@ gulp.task('clean', function (cb) {
         jsFolder + '*.min.js',
         jsFolder + '*.packaged.js',
         cssFolder
-    ], { read: false })
+    ], { read: false, allowEmpty: true })
     .pipe(rimraf({ force: true }));
 });
 
@@ -76,14 +77,8 @@ gulp.task('js:package', function () {
     .pipe(gulp.dest(jsFolder));
 });
 
-gulp.task('watch:js', function () {
-    gulp.watch(jsFolder + '**/*.js', gulp.series('js'));
+gulp.task('watch', function () {
+    gulp.watch(lessFolder + '**/*.less', gulp.series('publish'));
 });
-
-gulp.task('watch:less', function () {
-    gulp.watch(lessFolder + '**/*.less', gulp.series('less'));
-});
-
-gulp.task("watch", gulp.series('watch:js', 'watch:less'));
 
 gulp.task("publish", gulp.series('clean', 'less:src', 'less', 'js', 'js:package'));

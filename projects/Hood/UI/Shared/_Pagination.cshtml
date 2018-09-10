@@ -1,30 +1,32 @@
 @model IPageableModel
-@{ 
+@{
     string baseUrl = Context.Request.Path;
 }
-<ul class="pagination">
-    @if (Model.PageIndex > 1)
-    {
-        <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(1))" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>
-        <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(Model.PageIndex - 1))" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-left"></i></span></a></li>
-    }
-    @for (int i = Model.PageIndex - 2; i <= Model.PageIndex + 2; i++)
-    {
-        if (i > 0 && i <= Model.TotalPages)
+<div class="pager">
+    <ul class="pagination">
+        @if (Model.PageIndex > 1)
         {
-            if (i == Model.PageIndex)
+            <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(1))" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-double-left"></i></span></a></li>
+            <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(Model.PageIndex - 1))" aria-label="Previous"><span aria-hidden="true"><i class="fa fa-angle-left"></i></span></a></li>
+        }
+        @for (int i = Model.PageIndex - 2; i <= Model.PageIndex + 2; i++)
+        {
+            if (i > 0 && i <= Model.TotalPages)
             {
-                <li class="active"><a href="@string.Concat(baseUrl, Model.GetPageUrl(i))">@i</a></li>
-            }
-            else
-            {
-                <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(i))">@i</a></li>
+                if (i == Model.PageIndex)
+                {
+                    <li class="active"><a href="@string.Concat(baseUrl, Model.GetPageUrl(i))">@i</a></li>
+                }
+                else
+                {
+                    <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(i))">@i</a></li>
+                }
             }
         }
-    }
-    @if (Model.PageIndex < Model.TotalPages)
-    {
-        <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(Model.PageIndex + 1))" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-right"></i></span></a></li>
-        <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(Model.TotalPages))" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>
-    }
-</ul>
+        @if (Model.PageIndex < Model.TotalPages)
+        {
+            <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(Model.PageIndex + 1))" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-right"></i></span></a></li>
+            <li><a href="@string.Concat(baseUrl, Model.GetPageUrl(Model.TotalPages))" aria-label="Next"><span aria-hidden="true"><i class="fa fa-angle-double-right"></i></span></a></li>
+        }
+    </ul>
+</div>

@@ -1,4 +1,4 @@
-﻿body {
+﻿﻿body {
     font-family: 'Source Sans Pro';
     min-width: 380px;
 
@@ -9,7 +9,7 @@
     .jumbotron {
         background-color: @dark-color;
         color: white;
-        margin-bottom: 25px;
+        margin-bottom: 0px;
         padding: 25px 0;
 
         h1, h2, h3 {
@@ -17,24 +17,8 @@
         }
     }
 
-    .row-center-mobile {
-        display: -webkit-box;
-        display: -moz-box;
-        display: -ms-flexbox;
-        display: -webkit-flex;
-        display: flex;
-        align-items: center;
-    }
-
-    @media (min-width:@screen-sm) {
-        .row-center {
-            display: -webkit-box;
-            display: -moz-box;
-            display: -ms-flexbox;
-            display: -webkit-flex;
-            display: flex;
-            align-items: center;
-        }
+    section.container {
+        padding: 25px 0;
     }
 
     section {
