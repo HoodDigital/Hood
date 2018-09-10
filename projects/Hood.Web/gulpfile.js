@@ -40,7 +40,7 @@ gulp.task('less:src', function () {
         .pipe(gulp.dest(cssFolder));
 });
 
-gulp.task('less', gulp.series('less:src'), function () {
+gulp.task('less', function () {
     return gulp
         .src(lessFolder + '*.less')
         .pipe(sourcemaps.init({ largeFile: true }))
@@ -65,7 +65,7 @@ gulp.task('js', function () {
         .pipe(gulp.dest(jsFolder));
 });
 
-gulp.task('js:package', gulp.series('js'), function () {
+gulp.task('js:package', function () {
     return gulp.src([
         libFolder + 'hood/dist/js/includes/google.min.js',
         jsFolder + 'site.min.js',
@@ -86,4 +86,4 @@ gulp.task('watch:less', function () {
 
 gulp.task("watch", gulp.series('watch:js', 'watch:less'));
 
-gulp.task("publish", gulp.series('less', 'js', 'js:package'));
+gulp.task("publish", gulp.series('clean', 'less:src', 'less', 'js', 'js:package'));

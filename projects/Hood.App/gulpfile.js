@@ -200,4 +200,4 @@ gulp.task("js:package:admin", function () {
 
 // The build function, copies all less, processes less, copies and processes js, files and images
 gulp.task("package", gulp.series('js:package:admin', 'js:package:app', 'js:package:login'));
-gulp.task("build", gulp.series('clean', gulp.parallel('less:src', 'less', 'js', 'images'), 'package'));
+gulp.task("build", gulp.series('clean', 'less:copy', gulp.parallel('less:src', 'less', 'js', 'images'), 'package'));
