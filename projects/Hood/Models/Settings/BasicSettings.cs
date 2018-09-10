@@ -71,7 +71,7 @@ namespace Hood.Models
             SiteTitle = "New Website";
             EditorType = "Full";
             SiteLogo = "/lib/hood/images/hood-cms-dark.svg";
-            SiteLogoLight = "/lib/hood/images/hood-cms-light.svg";
+            SiteLogoLight = "/lib/hood/images/hood-cms-white.svg";
         }
 
         public string OwnerFullName
