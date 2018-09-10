@@ -1,20 +1,10 @@
 {
   "name": "hood",
-  "version": "2.1.0",
   "homepage": "https://github.com/HoodDigital/Hood",
   "authors": [
     "George Whysall"
   ],
   "description": "An ASP.NET Core 2 Content Management System.",
-  "main": [
-    "./dist/css/admin.min.css",
-    "./dist/css/app.min.css",
-    "./dist/css/designer.min.css",
-    "./dist/css/login.min.css",
-    "./dist/js/admin.min.js",
-    "./dist/js/app.min.js",
-    "./dist/js/login.min.js"
-  ],
   "ignore": [
     ".bowerrc",
     ".gitignore",
@@ -59,6 +49,6 @@
     "waypoints": "4.0.1"
   },
   "resolutions": {
-    "jquery": ">=1.7.1 <4.0.0"
+    "jquery": "3.3.1"
   }
 }

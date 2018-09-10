@@ -242,6 +242,8 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
+/bower_components
+
 # Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
  -/projects/Hood.Web/Areas/
  -/projects/Hood.Web/Areas/*

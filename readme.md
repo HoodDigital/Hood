@@ -23,7 +23,7 @@ PM> Install-Package Hood
 ```
 ### Less/JavaScript
 
-[![Bower](https://img.shields.io/bower/v/hood.svg?label=Bower&colorB=f07c3d)](https://bower.io/search/?q=hood)
+[![Bower](https://img.shields.io/myget/hood/vpre/hood.svg?label=Bower&colorB=f07c3d)](https://bower.io/search/?q=hood)
 
 To install Hood JS & LESS, run the following command in the command line (bower required):
 ```
