@@ -1,0 +1,5 @@
+# Project Ignores
+/lib
+/css
+/js/**/*.min.js
+/js/**/*.packaged.js

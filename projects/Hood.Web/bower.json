@@ -1,21 +1,6 @@
 {
   "name": "Hood.Web",
-  "version": "2.0.14",
-  "ignore": [
-    ".bowerrc",
-    ".gitignore",
-    ".gitattributes",
-    ".jshintrc",
-    "bower.json",
-    "global.json",
-    "Hood.sln",
-    ".git",
-    ".vs",
-    "Demo",
-    "Hood",
-    "packages",
-    "Tests"
-  ],
+  "version": "2.1.0",
   "dependencies": {
     "bootstrap": "~3",
     "bootstrap-colorpicker": "2.5.2",

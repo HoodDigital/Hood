@@ -1,4 +1,7 @@
 # Project Ignores
+/Properties/PublishProfiles
+/Temporary
+/Temporary/*
 /Admin/Views
 /Views
 /Migrations
