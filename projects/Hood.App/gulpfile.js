@@ -16,7 +16,6 @@ var gulp = require("gulp"),
     sourcemaps = require('gulp-sourcemaps'),
     lib = './lib/',
     hood = {
-        lib: './',
         js: './js/',
         less: './less/',
         images: './images/'
@@ -32,7 +31,7 @@ var gulp = require("gulp"),
         src: './../../src/'
     };
 
-// Cleans all dist/src/images output folders, as well as the lib/hood/dev dist and lib/hood/src/css folders.
+// Cleans all dist/src/images output folders, as well as the Hood.Web lib/hood folders.
 gulp.task('clean', function (cb) {
     return gulp.src([
         output.dist,
@@ -41,20 +40,21 @@ gulp.task('clean', function (cb) {
         demo.dist,
         demo.images,
         demo.src
-    ], { read: false })
+    ], { read: false, allowEmpty: true })
     .pipe(rimraf({ force: true }));
 });
 
+// Copies all less files to the src directory and the Hood.Web src directory.
 gulp.task('less:copy', function () {
-    return gulp.src(hood.less + "**/*.less", { base: hood.less })
+    return gulp.src(hood.less + "**/*.less")
     .pipe(gulp.dest(demo.src + "/less/"))
     .pipe(gulp.dest(output.src + "/less/"));
 });
 
-// Processes less and saves the outputted css MINIFIED to the dist directories.
-gulp.task('less:src', gulp.series('less:copy'), function () {
+// Processes less and saves the outputted css UNMINIFIED to the src directories and the Hood.Web src directory.
+gulp.task('less:src', function () {
     return gulp
-        .src(hood.less + '*.less', { base: hood.less })
+        .src(hood.less + '*.less')
         .pipe(sourcemaps.init({ largeFile: true }))
         .pipe(less({ relativeUrls: true }))
         .pipe(sourcemaps.write("/"))
@@ -62,12 +62,17 @@ gulp.task('less:src', gulp.series('less:copy'), function () {
         .pipe(gulp.dest(demo.src + "/css/"));
 });
 
-// Processes less and saves the outputted css UNMINIFIED to the src directories.
-gulp.task('less', gulp.series('less:src'), function () {
+// Processes less and saves the outputted css MINIFIED to the dist directories and the Hood.Web dist directory.
+gulp.task('less', function () {
+    lss = less({ relativeUrls: true });
+    lss.on('error', function (e) {
+        console.log(e);
+        lss.end();
+    });
     return gulp
-        .src(hood.less + '*.less', { base: hood.less })
+        .src(hood.less + '*.less')
         .pipe(sourcemaps.init({ largeFile: true }))
-        .pipe(less({ relativeUrls: true }))
+        .pipe(lss)
         .pipe(stripCss({ preserve: false }))
         .pipe(cssmin())
         .pipe(rename({ suffix: ".min" }))
@@ -76,8 +81,8 @@ gulp.task('less', gulp.series('less:src'), function () {
         .pipe(gulp.dest(demo.dist + "/css/"));
 });
 
-
-// Processes the JS and saves outputted js UNMINIFIED to the src directories, then minifies the output to the dist directories.
+// Processes the JS and saves outputted js UNMINIFIED to the src directories and the Hood.Web src directory, 
+// then minifies the output to the dist directories and the Hood.Web dist directory.
 gulp.task('js', function () {
     l = uglify({});
     l.on('error', function (e) {
@@ -93,8 +98,7 @@ gulp.task('js', function () {
     .pipe(gulp.dest(demo.dist + "/js/"));
 });
 
-// Copies any image files from the images directories to the distribution images directory.
-// Any minification should occur here.
+// Copies any image files from the images directories to the distribution images directory and the Hood.Web images directory.
 gulp.task('images', function () {
     return gulp.src([
         hood.images + "**/*.png",
@@ -196,4 +200,4 @@ gulp.task("js:package:admin", function () {
 
 // The build function, copies all less, processes less, copies and processes js, files and images
 gulp.task("package", gulp.series('js:package:admin', 'js:package:app', 'js:package:login'));
-gulp.task("build", gulp.series('less', 'js', 'images', 'package'));
+gulp.task("build", gulp.series('clean', gulp.parallel('less:src', 'less', 'js', 'images'), 'package'));
