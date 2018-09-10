@@ -25,13 +25,9 @@ namespace Hood.Services
         private CloudStorageAccount _storageAccount;
         private string _container;
         private string _key;
-        private string _hoodApiUrl;
-        private string _hoodApiKey;
         private readonly IConfiguration _config;
         private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
-        private string _hoodApiScheme;
-        private string _hoodApiHost;
 
         public MediaManager(IConfiguration config, ISettingsRepository site, IHostingEnvironment env)
         {
@@ -53,10 +49,6 @@ namespace Hood.Services
             var _mediaSettings = _settings.GetMediaSettings(true);
             _container = _mediaSettings.ContainerName.ToSeoUrl();
             _key = _mediaSettings.AzureKey;
-            _hoodApiKey = _mediaSettings.HoodApiKey;
-            _hoodApiUrl = _mediaSettings.HoodApiUrl;
-            _hoodApiHost = _mediaSettings.AzureHost;
-            _hoodApiScheme = _mediaSettings.AzureScheme;
             try
             {
                 _storageAccount = CloudStorageAccount.Parse(_key);
@@ -260,13 +252,7 @@ namespace Hood.Services
         private string GetSavedUrl(Uri absoluteUri)
         {
             var host = absoluteUri.Host;
-            if (!string.IsNullOrEmpty(_hoodApiHost))
-                host = _hoodApiHost;
-
             var scheme = Uri.UriSchemeHttps;
-            if (_hoodApiScheme != "https")
-                scheme = Uri.UriSchemeHttp;
-
             var uriBuilder = new UriBuilder(absoluteUri)
             {
                 Host = host,
