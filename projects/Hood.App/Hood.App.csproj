@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <UserSecretsId>Hood.Web</UserSecretsId>
+    <UserSecretsId>Hood.App</UserSecretsId>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
@@ -18,17 +18,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Areas\Views\**\*.cshtml" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="wwwroot\.gitignore" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
-  
-  <ProjectExtensions><VisualStudio><UserProperties package_1json__JSONSchema="http://json.schemastore.org/package.manifest" /></VisualStudio></ProjectExtensions>
   
 </Project>

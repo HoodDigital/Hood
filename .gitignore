@@ -242,33 +242,6 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 
-# Project Ignores
-bower_components/
-/projects/Hood.Web/Properties/PublishProfiles
-/projects/Hood.Web/Temporary
-/projects/Hood.Web/Temporary/*
-
-# Ignore all hood wwwroot gulp processed content.
-/projects/Hood.Web/wwwroot/hood/dist
-/projects/Hood.Web/wwwroot/hood/src
-/projects/Hood.Web/wwwroot/themes
-/projects/Hood.Web/wwwroot/hood/dist/*
-/projects/Hood.Web/wwwroot/hood/src/*
-/projects/Hood.Web/wwwroot/themes/*
-
-# Ignore the lib directory, for bower_components
-/projects/Hood.Web/wwwroot/lib/*
-
-# Include the hood dir in the lib folder, but still exclude the dist folder and the gulp created css.
-!/projects/Hood.Web/wwwroot/lib/hood
-!/projects/Hood.Web/wwwroot/lib/hood/*
-/projects/Hood.Web/wwwroot/lib/hood/dist/*
-/projects/Hood.Web/wwwroot/lib/hood/src/css/*
-
-/projects/Hood.Web/wwwroot/js/site.packaged.js
-/projects/Hood.Web/wwwroot/js/site.min.js
-/projects/Hood.Web/wwwroot/css
-
 # Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
  -/projects/Hood.Web/Areas/
  -/projects/Hood.Web/Areas/*

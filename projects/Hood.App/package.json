@@ -1,6 +1,6 @@
 {
-  "name": "hood.web",
-  "description": "Packages required for Hood CMS, Hood.Web demo project.",
+  "name": "hood.app",
+  "description": "Client side code in Javascript & Less/SCSS for Hood CMS.",
   "repository": {
     "type": "git",
     "url": "https://github.com/HoodDigital/Hood"
@@ -9,14 +9,14 @@
   "version": "2.1.0",
   "devDependencies": {
     "del": "2.2.2",
-    "fs": "0.0.1-security",
+    "fs": "0.0.2",
     "gulp": "^4.0.0",
     "gulp-bump": "2.2.0",
     "gulp-clean": "0.3.2",
     "gulp-concat": "2.6.1",
     "gulp-csslint": "1.0.0",
     "gulp-cssmin": "0.1.7",
-    "gulp-less": "^4.0.1",
+    "gulp-less": "4.0.1",
     "gulp-rename": "1.2.2",
     "gulp-rimraf": "0.2.1",
     "gulp-sourcemaps": "1.9.1",
