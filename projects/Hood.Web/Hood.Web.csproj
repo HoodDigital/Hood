@@ -29,6 +29,10 @@
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="import\" />
+  </ItemGroup>
+  
   <ProjectExtensions><VisualStudio><UserProperties package_1json__JSONSchema="http://json.schemastore.org/package.manifest" /></VisualStudio></ProjectExtensions>
   
 </Project>

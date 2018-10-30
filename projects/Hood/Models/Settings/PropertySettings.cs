@@ -167,6 +167,19 @@ namespace Hood.Models
         /// </summary>
         [Display(Name = "API/FTP Password")]
         public string Password { get; set; }
+
+        /// <summary>
+        /// Does the service require a file unzip before importing?
+        /// </summary>
+        [Display(Name = "Require Unzip")]
+        public bool RequireUnzip { get; set; }
+
+        /// <summary>
+        /// Name of the zip file which contains the import data
+        /// </summary>
+        [Display(Name = "Unzip File name")]
+        public string ZipFile { get; set; }
+
     }
 
     public enum PropertyImporterMethod

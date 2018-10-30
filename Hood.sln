@@ -19,7 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood", "projects\Hood\Hood.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.Web", "projects\Hood.Web\Hood.Web.csproj", "{DECCBEDA-5B0D-4117-B4B9-8B0E2E7D89F1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.App", "projects\Hood.App\Hood.App.csproj", "{4FE478B6-ABB9-44A8-B8B8-11AA4BC7A7BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.Client", "projects\Hood.App\Hood.Client.csproj", "{4FE478B6-ABB9-44A8-B8B8-11AA4BC7A7BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Framework", "Framework", "{A89DE859-75A0-418B-BE31-3228BD827619}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{4BDDD020-CFDD-4A9E-BEA0-D3D7D54B2AC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +88,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5DC9CDAC-E241-4FAE-A7C2-9794AFDC0AE1} = {A89DE859-75A0-418B-BE31-3228BD827619}
+		{DECCBEDA-5B0D-4117-B4B9-8B0E2E7D89F1} = {4BDDD020-CFDD-4A9E-BEA0-D3D7D54B2AC4}
+		{4FE478B6-ABB9-44A8-B8B8-11AA4BC7A7BD} = {A89DE859-75A0-418B-BE31-3228BD827619}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E5B47CFC-A139-40DC-9B6A-7CB4C3ED7C71}

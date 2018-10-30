@@ -303,8 +303,17 @@
                         <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.UseFTP">Use FTP Service:</label>
                         <div class="col-sm-8">
                             <select asp-for="FTPImporterSettings.UseFTP" class="form-control">
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
+                                <option value="true">Download BLM file from remote FTP</option>
+                                <option value="false">Load BLM file from local folder.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.RequireUnzip">Require Unzip:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="FTPImporterSettings.RequireUnzip" class="form-control">
+                                <option value="true">Require unzip before import.</option>
+                                <option value="false">No unzip required.</option>
                             </select>
                         </div>
                     </div>
@@ -336,6 +345,12 @@
                         <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.Filename"></label>
                         <div class="col-sm-8">
                             <input asp-for="FTPImporterSettings.Filename" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.ZipFile"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.ZipFile" class="form-control" />
                         </div>
                     </div>
                     <div class="form-group">

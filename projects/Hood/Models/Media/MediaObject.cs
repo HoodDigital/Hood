@@ -84,14 +84,21 @@ namespace Hood.Models
         {
             get
             {
-                var output = "";
-                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
-                if (siteSettings != null)
+                try
                 {
-                    var mediaSettings = siteSettings.GetMediaSettings();
-                    output = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                    var output = "";
+                    var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                    if (siteSettings != null)
+                    {
+                        var mediaSettings = siteSettings.GetMediaSettings();
+                        output = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                    }
+                    return output;
                 }
-                return output;
+                catch
+                {
+                    return "/lib/hood/images/no-image.jpg";
+                }
             }
         }
         public virtual string FormattedSize => (FileSize / 1024).ToString() + "Kb";
