@@ -709,8 +709,13 @@ namespace Hood.Services
             {
                 ProcessProperty(new PropertyListing(), propertyDetails, true);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Lock.AcquireWriterLock(Timeout.Infinite);
+                StatusMessage = "There was an error with tvalidating a property.";
+                _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                Warnings.Add(FormatLog(StatusMessage));
+                Lock.ReleaseWriterLock();
                 return false;
             }
             return true;
@@ -875,7 +880,8 @@ namespace Hood.Services
                 property.CreatedOn = DateTime.Now;
             }
 
-            if (!int.TryParse(data["BEDROOMS"], out int bedrooms))
+            int bedrooms = 0;
+            if (data.ContainsKey("BEDROOMS") && !int.TryParse(data["BEDROOMS"], out bedrooms))
                 bedrooms = 0;
             property.Bedrooms = bedrooms;
 
@@ -892,11 +898,17 @@ namespace Hood.Services
                 property.ListingType = "Sale";
 
                 decimal price = 0;
-                if (decimal.TryParse(data["PRICE"], out price))
+                if (data.ContainsKey("PRICE") && decimal.TryParse(data["PRICE"], out price))
                 {
                     property.AskingPrice = price;
 
                     string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
+                    property.AskingPriceDisplay = priceQual;
+                } 
+                else
+                {
+                    property.AskingPrice = price;
+                    string priceQual = PropertyDetails.PriceQualifiers[0];
                     property.AskingPriceDisplay = priceQual;
                 }
             }
@@ -906,19 +918,28 @@ namespace Hood.Services
                 property.ListingType = listingType;
 
                 decimal rent = 0;
-                if (decimal.TryParse(data["PRICE"], out rent))
+                if (data.ContainsKey("PRICE") && decimal.TryParse(data["PRICE"], out rent))
                 {
                     property.Rent = rent;
-
                     string rentFreq = PropertyDetails.RentFrequency[int.Parse(data["LET_RENT_FREQUENCY"])];
+                    property.RentDisplay = rentFreq;
+                }
+                else
+                {
+                    property.Rent = rent;
+                    string rentFreq = PropertyDetails.RentFrequency[0];
                     property.RentDisplay = rentFreq;
                 }
 
                 decimal fees = 0;
-                if (decimal.TryParse(data["LET_BOND"], out fees))
+                if (data.ContainsKey("LET_BOND") && decimal.TryParse(data["LET_BOND"], out fees))
                 {
                     property.Fees = fees;
                     property.FeesDisplay = "{0} deposit";
+                } else
+                {
+                    property.Fees = fees;
+                    property.FeesDisplay = "{0}";
                 }
             }
 
