@@ -1,4 +1,5 @@
 # Project Ignores
+package-lock.json
 /Properties/PublishProfiles
 /Temporary
 /Temporary/*

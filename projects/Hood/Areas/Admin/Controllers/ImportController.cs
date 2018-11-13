@@ -16,36 +16,36 @@ namespace Hood.Areas.Admin.Controllers
     public class ImportController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         private readonly IFTPService _ftp;
-        private readonly IPropertyImporter _rightmove;
+        private readonly IPropertyImporter _blm;
 
         //private readonly IContentExporter _contentExporter;
         //private readonly IPropertyExporter _propertyExporter;
 
         public ImportController(
             IFTPService ftp, 
-            IPropertyImporter rightmove
+            IPropertyImporter blm
             //IContentExporter contentExporter, 
             //IPropertyExporter propertyExporter
             )
             : base()
         {
             _ftp = ftp;
-            _rightmove = rightmove;
+            _blm = blm;
             //_contentExporter = contentExporter;
             //_propertyExporter = propertyExporter;
         }
 
-        #region "RightmovePropertyImporter"
+        #region "BlmPropertyImporter"
 
         [HttpPost]
-        [Route("admin/property/import/rightmove/trigger")]
+        [Route("admin/property/import/blm/trigger")]
         [AllowAnonymous]
-        public IActionResult RightmovePropertyImporterTrigger()
+        public IActionResult BlmPropertyImporterTrigger()
         {
             var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
-            if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_rightmove.IsRunning())
+            if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
             {
-                _rightmove.RunUpdate(HttpContext);
+                _blm.RunUpdate(HttpContext);
                 return StatusCode(200);
             }
 
@@ -53,10 +53,10 @@ namespace Hood.Areas.Admin.Controllers
             logWriter.WriteLine("Unauthorized attempt from " + HttpContext.Connection.RemoteIpAddress.ToString());
             logWriter.WriteLine("Auth Key: " + triggerAuth);
             logWriter.WriteLine("Auth Header: " + Request.Headers["Auth"]);
-            logWriter.WriteLine("Rightmove Importer Status: " + (_rightmove.IsRunning() ? "True" : "False"));
-            var report = _rightmove.Report();
+            logWriter.WriteLine("Blm Importer Status: " + (_blm.IsRunning() ? "True" : "False"));
+            var report = _blm.Report();
             var status = JsonConvert.SerializeObject(report);
-            logWriter.WriteLine("Rightmove Importer Report: ");
+            logWriter.WriteLine("Blm Importer Report: ");
             logWriter.Write(status.ToFormattedJson());
 
             _env.WriteLogToFile<IPropertyImporter>(logWriter.ToString());
@@ -64,35 +64,35 @@ namespace Hood.Areas.Admin.Controllers
             return StatusCode(401);
         }
 
-        [Route("admin/property/import/rightmove/")]
-        public IActionResult PropertyFTP()
+        [Route("admin/property/import/blm/")]
+        public IActionResult BlmImporter()
         {
             return View();
         }
 
         [HttpPost]
-        [Route("admin/property/import/rightmove/start/")]
-        public IActionResult PropertyFTPStart()
+        [Route("admin/property/import/blm/start/")]
+        public IActionResult BlmImporterStart()
         {
-            _rightmove.Kill();
-            _rightmove.RunUpdate(HttpContext);
+            _blm.Kill();
+            _blm.RunUpdate(HttpContext);
             return Json(new { success = true });
         }
 
         [HttpPost]
-        [Route("admin/property/import/rightmove/cancel/")]
-        public IActionResult PropertyFTPCancel()
+        [Route("admin/property/import/blm/cancel/")]
+        public IActionResult BlmImporterCancel()
         {
-            _rightmove.Kill();
+            _blm.Kill();
             return Json(new { success = true });
         }
 
-        [Route("admin/property/import/rightmove/status/")]
-        public IActionResult PropertyFTPStatus()
+        [Route("admin/property/import/blm/status/")]
+        public IActionResult BlmImporterStatus()
         {
             return Json(new
             {
-                Importer = _rightmove.Report(),
+                Importer = _blm.Report(),
                 Ftp = _ftp.Report()
             });
         }
