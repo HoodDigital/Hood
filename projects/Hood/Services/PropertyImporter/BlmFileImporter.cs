@@ -712,7 +712,7 @@ namespace Hood.Services
             catch (Exception ex)
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                StatusMessage = "There was an error with tvalidating a property.";
+                StatusMessage = "There was an error with validating a property.";
                 _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                 Warnings.Add(FormatLog(StatusMessage));
                 Lock.ReleaseWriterLock();
@@ -954,12 +954,12 @@ namespace Hood.Services
             property.Additional = "";
             property.Number = data["ADDRESS_1"];
             property.Address1 = data["ADDRESS_2"];
-            property.Address2 = data["ADDRESS_3"];
+            property.Address2 = data.ContainsKey("ADDRESS_3") ? data["ADDRESS_3"] : "";
             property.AgentId = User.Id;
             property.AllowComments = false;
-            property.AgentInfo = data["ADMINISTRATION_FEE"];
+            property.AgentInfo = data.ContainsKey("ADMINISTRATION_FEE") ? data["ADMINISTRATION_FEE"] : "";
             property.Areas = "";
-            property.City = data["TOWN"];
+            property.City = data.ContainsKey("TOWN") ? data["TOWN"] : "";
             property.Confidential = false;
             property.ContactName = "";
             property.Country = "United Kingdom";
@@ -973,7 +973,7 @@ namespace Hood.Services
             property.Size = "";
             property.SystemNotes = "";
             property.Tags = "";
-            property.Title = data["DISPLAY_ADDRESS"];
+            property.Title = data.ContainsKey("DISPLAY_ADDRESS") ? data["DISPLAY_ADDRESS"] : property.Address1;
             property.Views = 0;
 
             property.UserVars = "IMPORTED";
