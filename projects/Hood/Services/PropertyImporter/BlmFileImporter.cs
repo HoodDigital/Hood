@@ -132,7 +132,7 @@ namespace Hood.Services
                 User = userManager.FindByNameAsync("PropertyImporter").Result;
                 if (User == null)
                 {
-                    var identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter" }, Guid.NewGuid().ToString()).Result;
+                    var identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter" , Email = "importer@domain.con" }, Guid.NewGuid().ToString()).Result;
                     if (!identityResult.Succeeded)
                         throw new Exception("Could not load the PropertyImporter user account.");
                     User = userManager.FindByNameAsync("PropertyImporter").Result;
