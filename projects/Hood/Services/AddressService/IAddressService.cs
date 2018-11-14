@@ -1,10 +1,11 @@
 ﻿using Geocoding;
+using Geocoding.Google;
 using Hood.Interfaces;
 
 namespace Hood.Services
 {
     public interface IAddressService
     {
-        Location GeocodeAddress(IAddress address);    
+        GoogleAddress GeocodeAddress(IAddress address);    
     }
 }

@@ -49,8 +49,8 @@ namespace Hood.Areas.Admin.Controllers
                 var location = _address.GeocodeAddress(model.Address);
                 if (location != null)
                 {
-                    model.Address.Latitude = location.Latitude;
-                    model.Address.Longitude = location.Longitude;
+                    model.Address.Latitude = location.Coordinates.Latitude;
+                    model.Address.Longitude = location.Coordinates.Longitude;
                     _settings.Set("Hood.Settings.Basic", model);
                     model.SaveMessage = "Settings saved & address geocoded via Google API.";
                     model.MessageType = Enums.AlertType.Success;

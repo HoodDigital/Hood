@@ -132,7 +132,7 @@ namespace Hood.Services
                 User = userManager.FindByNameAsync("PropertyImporter").Result;
                 if (User == null)
                 {
-                    var identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter" , Email = "importer@domain.con" }, Guid.NewGuid().ToString()).Result;
+                    var identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter", Email = "importer@domain.con" }, Guid.NewGuid().ToString()).Result;
                     if (!identityResult.Succeeded)
                         throw new Exception("Could not load the PropertyImporter user account.");
                     User = userManager.FindByNameAsync("PropertyImporter").Result;
@@ -904,7 +904,7 @@ namespace Hood.Services
 
                     string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
                     property.AskingPriceDisplay = priceQual;
-                } 
+                }
                 else
                 {
                     property.AskingPrice = price;
@@ -936,7 +936,8 @@ namespace Hood.Services
                 {
                     property.Fees = fees;
                     property.FeesDisplay = "{0} deposit";
-                } else
+                }
+                else
                 {
                     property.Fees = fees;
                     property.FeesDisplay = "{0}";
@@ -985,7 +986,24 @@ namespace Hood.Services
                 try
                 {
                     var loc = _address.GeocodeAddress(property);
-                    property.SetLocation(loc);
+                    property.SetLocation(loc.Coordinates);
+
+                    // check for missing address elements
+                    try
+                    {
+                        if (!property.Address2.IsSet())
+                            property.Address2 = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.Route)).LongName;
+
+                        if (!property.County.IsSet())
+                            property.County = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.AdministrativeAreaLevel2)).LongName;
+
+                        if (!property.City.IsSet())
+                            property.City = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.PostalTown)).LongName;
+                    }
+                    catch (Exception)
+                    {
+
+                    }
                 }
                 catch (GoogleGeocodingException ex)
                 {

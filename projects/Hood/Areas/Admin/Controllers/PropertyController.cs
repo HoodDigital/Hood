@@ -85,7 +85,13 @@ namespace Hood.Areas.Admin.Controllers
                 post.LastEditedOn = DateTime.Now;
 
                 if (post.AutoGeocode)
-                    post.SetLocation(_address.GeocodeAddress(post));
+                {
+                    var address = _address.GeocodeAddress(post);
+                    if (address != null)
+                    {
+                        post.SetLocation(address.Coordinates);
+                    }
+                }
 
                 OperationResult result = _property.UpdateProperty(post);
 
@@ -255,7 +261,11 @@ namespace Hood.Areas.Admin.Controllers
                     property.ListingType = "Not Specified";
 
                 // Geocode
-                property.SetLocation(_address.GeocodeAddress(property));
+                var address = _address.GeocodeAddress(property);
+                if (address != null)
+                {
+                    property.SetLocation(address.Coordinates);
+                }
 
                 OperationResult result = _property.Add(property);
                 if (property.Metadata == null)

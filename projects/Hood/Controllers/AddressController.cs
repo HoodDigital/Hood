@@ -62,7 +62,11 @@ namespace Hood.Controllers
             try
             {
                 // Geocode
-                address.SetLocation(_address.GeocodeAddress(address));
+                var location = _address.GeocodeAddress(address);
+                if (location != null)
+                {
+                    address.SetLocation(location.Coordinates);
+                }
 
                 var user = _auth.GetCurrentUser(false);
                 address.UserId = user.Id;
@@ -95,7 +99,11 @@ namespace Hood.Controllers
             try
             {
                 // Geocode
-                address.SetLocation(_address.GeocodeAddress(address));
+                var location = _address.GeocodeAddress(address);
+                if (location != null)
+                {
+                    address.SetLocation(location.Coordinates);
+                }
 
                 OperationResult result = _auth.UpdateAddress(address);
                 return Json(new Response(true));

@@ -16,7 +16,7 @@ namespace Hood.Services
             _settings = site;
         }
 
-        public Location GeocodeAddress(IAddress address)
+        public GoogleAddress GeocodeAddress(IAddress address)
         {
             var key = _settings.GetIntegrationSettings().GoogleMapsApiKey;
             if (!key.IsSet() || !_settings.GetIntegrationSettings().EnableGoogleGeocoding)
@@ -24,10 +24,10 @@ namespace Hood.Services
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };
             IEnumerable<Address> addresses = geocoder.GeocodeAsync(
-                address.Number.IsSet() ? string.Format("{0} {1}", address.Number, address.Address1) : address.Address1, 
-                address.City, 
-                address.County, 
-                address.Postcode, 
+                address.Number.IsSet() ? string.Format("{0} {1}", address.Number, address.Address1) : address.Address1,
+                address.City,
+                address.County,
+                address.Postcode,
                 address.Country
             ).Result;
             if (addresses.Count() == 0)
@@ -37,7 +37,7 @@ namespace Hood.Services
                     return null;
             }
 
-            return addresses.First().Coordinates;           
+            return (GoogleAddress)addresses.First();
         }
 
     }
