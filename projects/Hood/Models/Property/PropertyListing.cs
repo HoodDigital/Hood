@@ -142,9 +142,9 @@ namespace Hood.Models
         /// </summary>
         public string AgentInfo { get; set; }
 
-       /// <summary>
-       /// Planning Classifcation A1/A2/A3 etc.
-       /// </summary>
+        /// <summary>
+        /// Planning Classifcation A1/A2/A3 etc.
+        /// </summary>
         public string Planning { get; set; }
 
         // Prices
@@ -318,6 +318,26 @@ namespace Hood.Models
         public bool PublishPending { get; set; }
         [NotMapped]
         public bool AutoGeocode { get; set; }
+        public string QuickInfo
+        {
+            get
+            {
+                switch (ListingType)
+                {
+                    case "Sale":
+                        return @"{Bedrooms} bedroom {PropertyType} for sale at {FormattedAskingPrice}";
+                    case "Commercial":
+                        return @"{Bedrooms} bedroom {PropertyType} for sale at {FormattedAskingPrice}";
+                    default:
+                        if (LeaseStatus == "Available")
+                            return @"{Bedrooms} bedroom {PropertyType} available now for {FormattedRent}";
+                        else if (LeaseStatus == "Let Agreed")
+                            return @"{Bedrooms} bedroom {PropertyType}. Let Agreed.";
+                        else
+                            return @"{Bedrooms} bedroom {PropertyType}. Unavailable.";
+                }
+            }
+        }
 
         public PropertyMeta GetMeta(string name)
         {

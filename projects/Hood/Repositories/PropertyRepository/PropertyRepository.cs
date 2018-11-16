@@ -226,7 +226,11 @@ namespace Hood.Services
         public Task<List<MapMarker>> GetLocations(PropertySearchModel filters)
         {
             var propertiesQuery = GetProperties(filters, true);
-            return propertiesQuery.AsNoTracking().Select(p => new MapMarker(p, p.Title, p.Id.ToString(), p.Url)).ToListAsync();
+            return propertiesQuery.AsNoTracking().Select(p =>
+                new MapMarker(p, p.Title, p.Id.ToString(), p.QuickInfo, p.Url, p.FeaturedImage.Url)
+            ).ToListAsync();
+
+
         }
         public OperationResult<PropertyListing> UpdateProperty(PropertyListing property)
         {

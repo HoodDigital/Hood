@@ -17,11 +17,13 @@ namespace Hood.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
-        public string MarkerContent { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
         public string AssociatedId { get; set; }
         public string MarkerUrl { get; set; }
+        public string ImageUrl { get; set; }
 
-        public MapMarker(IAddress address, string content, string id, string url)
+        public MapMarker(IAddress address, string title, string description, string id, string url, string imageUrl)
         {
             Address1 = address.Address1;
             Address2 = address.Address2;
@@ -31,9 +33,11 @@ namespace Hood.Models
             Country = address.Country;
             Latitude = address.Latitude;
             Longitude = address.Longitude;
-            MarkerContent = content;
+            Title = title;
             AssociatedId = id;
             MarkerUrl = url;
+            Description = description;
+            ImageUrl = imageUrl;
         }
     }
 }
