@@ -227,7 +227,7 @@ namespace Hood.Services
         {
             var propertiesQuery = GetProperties(filters, true);
             return propertiesQuery.AsNoTracking().Select(p =>
-                new MapMarker(p, p.Title, p.Id.ToString(), p.QuickInfo, p.Url, p.FeaturedImage.Url)
+                new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(),p.Url, p.FeaturedImage.Url)
             ).ToListAsync();
 
 
