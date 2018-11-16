@@ -325,16 +325,16 @@ namespace Hood.Models
                 switch (ListingType)
                 {
                     case "Sale":
-                        return @"{Bedrooms} bedroom {PropertyType} for sale at {FormattedAskingPrice}";
+                        return $"{Bedrooms} bedroom {PropertyType} for sale at {FormattedAskingPrice}";
                     case "Commercial":
-                        return @"{Bedrooms} bedroom {PropertyType} for sale at {FormattedAskingPrice}";
+                        return $"{PropertyType} for sale at {FormattedAskingPrice}";
                     default:
                         if (LeaseStatus == "Available")
-                            return @"{Bedrooms} bedroom {PropertyType} available now for {FormattedRent}";
+                            return $"{Bedrooms} bedroom {PropertyType} available now for {FormattedRent}";
                         else if (LeaseStatus == "Let Agreed")
-                            return @"{Bedrooms} bedroom {PropertyType}. Let Agreed.";
+                            return $"{Bedrooms} bedroom {PropertyType}. Let Agreed.";
                         else
-                            return @"{Bedrooms} bedroom {PropertyType}. Unavailable.";
+                            return $"{Bedrooms} bedroom {PropertyType}. Unavailable.";
                 }
             }
         }
