@@ -7054,21 +7054,8 @@ p.terms-paragraph {
 /*////////////////////////////////////////////////////////////////////////////////////////////////////*/
 /* OWL CAROUSEL STYLES */
 /*////////////////////////////////////////////////////////////////////////////////////////////////////*/
-.owl-nav .owl-next {
-  right: 0;
-  left: auto;
-  transform: translateY(-50%) rotate(90deg) !important;
-  -o-transform: translateY(-50%) rotate(90deg) !important;
-  -moz-transform: translateY(-50%) rotate(90deg) !important;
-  -webkit-transform: translateY(-50%) rotate(90deg) !important;
-}
-.owl-nav .owl-prev {
-  transform: translateY(-50%) rotate(-90deg) !important;
-  -o-transform: translateY(-50%) rotate(-90deg) !important;
-  -moz-transform: translateY(-50%) rotate(-90deg) !important;
-  -webkit-transform: translateY(-50%) rotate(-90deg) !important;
-}
-.owl-nav div {
+.owl-nav > div,
+.owl-nav > button {
   position: absolute;
   top: 50%;
   left: 0;
@@ -7092,7 +7079,24 @@ p.terms-paragraph {
   -moz-transform: translateY(-50%);
   -webkit-transform: translateY(-50%);
 }
-.owl-nav div:hover {
+.owl-nav > div.owl-next,
+.owl-nav > button.owl-next {
+  right: 0;
+  left: auto;
+  transform: translateY(-50%) rotate(90deg) !important;
+  -o-transform: translateY(-50%) rotate(90deg) !important;
+  -moz-transform: translateY(-50%) rotate(90deg) !important;
+  -webkit-transform: translateY(-50%) rotate(90deg) !important;
+}
+.owl-nav > div.owl-prev,
+.owl-nav > button.owl-prev {
+  transform: translateY(-50%) rotate(-90deg) !important;
+  -o-transform: translateY(-50%) rotate(-90deg) !important;
+  -moz-transform: translateY(-50%) rotate(-90deg) !important;
+  -webkit-transform: translateY(-50%) rotate(-90deg) !important;
+}
+.owl-nav > div:hover,
+.owl-nav > button:hover {
   filter: invert(0%);
   -ms-filter: invert(0%);
   -moz-filter: invert(0%);
