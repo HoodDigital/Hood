@@ -428,11 +428,11 @@ namespace Hood.Services
                 }
                 catch (Exception ex)
                 {
-                    Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the images...";
-                    await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
-                    Errors.Add(FormatLog(StatusMessage, property));
-                    Lock.ReleaseWriterLock();
+                    //Lock.AcquireWriterLock(Timeout.Infinite);
+                    //StatusMessage = "There was an error processing the images...";
+                    //await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                    //Errors.Add(FormatLog(StatusMessage, property));
+                    //Lock.ReleaseWriterLock();
                 }
 
                 try
@@ -441,11 +441,11 @@ namespace Hood.Services
                 }
                 catch (Exception ex)
                 {
-                    Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the floor plans..";
-                    await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
-                    Errors.Add(FormatLog(StatusMessage, property));
-                    Lock.ReleaseWriterLock();
+                    //Lock.AcquireWriterLock(Timeout.Infinite);
+                    //StatusMessage = "There was an error processing the floor plans..";
+                    //await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                    //Errors.Add(FormatLog(StatusMessage, property));
+                    //Lock.ReleaseWriterLock();
                 }
 
                 try
@@ -454,11 +454,11 @@ namespace Hood.Services
                 }
                 catch (Exception ex)
                 {
-                    Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the info document...";
-                    await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
-                    Errors.Add(FormatLog(StatusMessage, property));
-                    Lock.ReleaseWriterLock();
+                    //Lock.AcquireWriterLock(Timeout.Infinite);
+                    //StatusMessage = "There was an error processing the info document...";
+                    //await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                    //Errors.Add(FormatLog(StatusMessage, property));
+                    //Lock.ReleaseWriterLock();
                 }
 
             }
