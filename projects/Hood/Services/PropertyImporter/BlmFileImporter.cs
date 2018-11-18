@@ -568,7 +568,7 @@ namespace Hood.Services
             // Images
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")))
             {
-                if (data[key].IsSet() && !key.Contains("60"))
+                if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
                 {
                     // We have an image, download it with the FTPService
                     if (_propertySettings.FTPImporterSettings.UseFTP)
