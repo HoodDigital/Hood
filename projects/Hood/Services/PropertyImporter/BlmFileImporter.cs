@@ -623,7 +623,7 @@ namespace Hood.Services
                     }
                     MarkCompleteTask("Attached image successfully.");
                 }
-                else if (data[key].IsSet() && (key.Contains("60") || key.Contains("61")))
+                else if (data[key].IsSet() && key.Contains("60"))
                 {
                     // We have an EPC, download it with the FTPService.
                     if (_propertySettings.FTPImporterSettings.UseFTP)
