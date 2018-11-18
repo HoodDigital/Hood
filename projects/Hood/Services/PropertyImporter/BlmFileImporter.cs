@@ -432,7 +432,6 @@ namespace Hood.Services
                     StatusMessage = "There was an error processing the images...";
                     await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                     Errors.Add(FormatLog(StatusMessage, property));
-                    FileError = true;
                     Lock.ReleaseWriterLock();
                 }
 
@@ -446,7 +445,6 @@ namespace Hood.Services
                     StatusMessage = "There was an error processing the floor plans..";
                     await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                     Errors.Add(FormatLog(StatusMessage, property));
-                    FileError = true;
                     Lock.ReleaseWriterLock();
                 }
 
@@ -460,7 +458,6 @@ namespace Hood.Services
                     StatusMessage = "There was an error processing the info document...";
                     await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                     Errors.Add(FormatLog(StatusMessage, property));
-                    FileError = true;
                     Lock.ReleaseWriterLock();
                 }
 
