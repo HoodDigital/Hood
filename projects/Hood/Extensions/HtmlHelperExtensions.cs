@@ -1,4 +1,5 @@
 ﻿using Hood.Enums;
+using Hood.Infrastructure;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Html;
@@ -17,7 +18,9 @@ namespace Hood.Extensions
         public static IHtmlContent RenderHoneypotField<TModel>(this IHtmlHelper<TModel> html)
             where TModel : HoneyPotFormModel
         {
-            var output = $@"<div class='zip_code_text'><label for='zip_code'>Your Zip code:</label><input name='zip_code' id='zip_code' type='text' tabindex='-1' autocomplete='off' /></div>";
+            var keygen = new KeyGenerator(false, true, true, false);
+            var hp_key = keygen.Generate(4);
+            var output = $@"<div class='comments_or_notes hidden'><label for='comments_or_notes_{hp_key}'>Comments:</label><input name='comments_or_notes_{hp_key}' id='comments_or_notes_{hp_key}' type='text' tabindex='-1' autocomplete='off' /></div>";
             return new HtmlString(output);
         }
 

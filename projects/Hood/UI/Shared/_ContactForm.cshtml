@@ -10,8 +10,8 @@
 }
 <form method="post" 
       role="form" 
-      id="@(Model.FormId.IsSet() ? Model.FormId : _integrationSettings.EnableGoogleRecaptcha ? "contact-form" : "contact-form-basic")"
-      class="@(_integrationSettings.EnableGoogleRecaptcha ? "contact-form" : "contact-form-basic") @(Model.FormClass.IsSet() ? Model.FormClass : "")" 
+      id="contact-form"
+      class="contact-form @(_integrationSettings.EnableGoogleRecaptcha ? "google-recaptcha" : "simple") @(Model.FormClass.IsSet() ? Model.FormClass : "")" 
       action="@(Model.FormAction.IsSet() ? Model.FormAction : Url.Action("ProcessContactForm", "Hood"))" 
       data-redirect="@_contactSettings.ThankYouUrl" 
       data-alert-message="@_contactSettings.ThankYouMessage">

@@ -54,7 +54,7 @@ namespace Hood.Controllers
         {
             try
             {
-                if (!ModelState.IsNotSpam(model))
+                if (ModelState.IsNotSpam(model))
                 {
                     model.Subject = "Online Enquiry: " + model.Subject;
                     await _settings.ProcessCaptchaOrThrowAsync(Request);

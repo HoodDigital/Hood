@@ -154,7 +154,7 @@ $.hood.App = {
         },
         ItemComplete: function (name) {
             for (cnt = 0; cnt < $.hood.App.Loader.LoadList.length; cnt++) {
-                if ($.hood.App.Loader.LoadList[cnt].Name == name) {
+                if ($.hood.App.Loader.LoadList[cnt].Name === name) {
                     $.hood.App.Loader.LoadList[cnt].Complete = true;
                     console.log('Loaded: ' + name);
                 }
@@ -268,7 +268,7 @@ $.hood.App = {
         Init: function () {
             $('.contact-form .thank-you').hide();
             $('.contact-form .form-submit').show();
-            $('body').on('submit', '.contact-form', function (e) {
+            $('body').on('submit', '.contact-form.google-recaptcha', function (e) {
                 e.preventDefault();
                 $(this).addClass('loading');
                 if ($('.g-recaptcha').length > 0) {
@@ -279,7 +279,7 @@ $.hood.App = {
                 }
                 return false;
             });
-            $('body').on('submit', '.contact-form-basic', function (e) {
+            $('body').on('submit', '.contact-form.simple', function (e) {
                 e.preventDefault();
                 $(this).addClass('loading');
                 $.hood.App.ContactForms.Submit(this);
@@ -298,10 +298,10 @@ $.hood.App = {
                     $form.find('.form').hide();
                     $form.find('.thank-you').show();
                 } else {
-                    if (typeof ($form.attr('data-alert-error')) != 'undefined')
+                    if (typeof ($form.attr('data-alert-error')) !== 'undefined')
                         $.hood.Alerts.Success($form.attr('data-alert-error'), "Error", null, true);
 
-                    $.hood.Alerts.Error("There was an error sending the message", "Error", null, true);
+                    $.hood.Alerts.Error("There was an error sending the message: " + data.Errors, "Error", null, true);
                 }
                 $form.removeClass('loading');
             });
@@ -509,7 +509,7 @@ $.hood.App = {
                 clickable: "#avatar-upload" // Define the element that should be used as click trigger to select files.
             });
             avatarDropzone.on("addedfile", function () {
-                if (this.files[1] != null) {
+                if (this.files[1] !== null) {
                     this.removeFile(this.files[0]);
                 }
             });

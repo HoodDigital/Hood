@@ -3,7 +3,9 @@ if (!$.hood)
 $.hood.Google = {
     Maps: function () {
         $('.google-map').each(function () {
-            var myLatLng = { lat: $(this).data('lat'), lng: $(this).data('long') };
+            var myLatLng = new google.maps.LatLng($(this).data('lat'), $(this).data('long'));
+
+            console.log('Loading map at: ' + $(this).data('lat') + ', ' + $(this).data('long'));
 
             var map = new google.maps.Map(this, {
                 zoom: $(this).data('zoom') || 15,
@@ -17,8 +19,7 @@ $.hood.Google = {
                 title: $(this).data('marker')
             });
 
-            $(window).on('resize', function () {
-
+            $(window).resize(function () {
                 google.maps.event.trigger(map, 'resize');
             });
             google.maps.event.trigger(map, 'resize');
@@ -108,15 +109,26 @@ $.hood.Google = {
 
         var map = new google.maps.Map(document.getElementById('clustered-map'), {
             zoom: zoom,
+            maxZoom: 18,
             scrollwheel: scrollWheel,
             center: { lat: mapElement.data('lat'), lng: mapElement.data('long') }
         });
+
+        var oms = new OverlappingMarkerSpiderfier(map, {
+            markersWontMove: true,
+            markersWontHide: true,
+            basicFormatEvents: true,
+            circleFootSeparation: 80,
+            spiralFootSeparation: 80
+        });
+
+        var iconSize = new google.maps.Size(30, 41);
 
         // Create an array  of alphabetical characters used to label the markers.
         var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         var locations = mapElement.data('locations');
-        var clickFunction = mapElement.data('click')
+        var clickFunction = mapElement.data('click');
         // Add some markers to the map.
         // Note: The code uses the JavaScript Array.prototype.map() method to
         // create an array of markers based on a given "locations" array.
@@ -124,16 +136,52 @@ $.hood.Google = {
         var markers = locations.map(function (location, i) {
             var marker = new google.maps.Marker({
                 position: new google.maps.LatLng(location.Latitude, location.Longitude),
-                label: location.Title
+                optimized: !isIE  // makes SVG icons work in IE
             });
-            marker.addListener('click', function () {
-                eval(clickFunction + "(" + location.AssociatedId + ")");
+            marker.setIcon({
+                url: '/images/marker.png',
+                size: iconSize,
+                scaledSize: iconSize  // makes SVG icons work in IE
             });
+            google.maps.event.addListener(marker, 'spider_click', function (e) {  // 'spider_click', not plain 'click'
+                func = clickFunction + "(" + location.AssociatedId + ")";
+                eval(func);
+            });
+
+            var icon1 = '/images/marker.png';
+            var icon2 = '/images/marker-highlight.png';
+
+            var info = '<div class="google-popup">' +
+                '<img src="' + location.ImageUrl + '" class="map-image" />' +
+                '<p>' + location.Address1 + ', ' + location.Postcode + '</p>' +
+                '<p>' + location.Description + '</p>' +
+                '</div>';
+
+            var infowindow = new google.maps.InfoWindow({
+                content: info
+            });
+
+            google.maps.event.addListener(marker, 'mouseover', function () {
+                infowindow.open(map, this);
+                marker.setIcon(icon2);
+            });
+            google.maps.event.addListener(marker, 'mouseout', function () {
+                infowindow.close();
+                marker.setIcon(icon1);
+            });
+
+            oms.addMarker(marker);
+
             return marker;
         });
 
         // Add a marker clusterer to manage the markers.
-        var markerCluster = new MarkerClusterer(map, markers, { imagePath: '/lib/hood/images/maps/m' });
+        var markerCluster = new MarkerClusterer(map, markers, {
+            imagePath: '/lib/hood/images/maps/m',
+            maxZoom: 15
+        });
+
+
     }
 };
 function initGoogleMapsComplete() {
@@ -143,5 +191,5 @@ function initGoogleMapsComplete() {
     $.hood.Google.Maps();
     $.hood.Google.ClusteredMap();
     // try calling initMaps, this may have been added to pages.
-    try {initMap();} catch (ex) {}
-}
+    try { initMap(); } catch (ex) { $.noop(); }
+};
