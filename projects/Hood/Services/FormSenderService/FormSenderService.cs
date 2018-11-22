@@ -53,7 +53,7 @@ namespace Hood.Services
                     message.AddH1(_settings.ReplacePlaceholders(
                         adminNotificationTitle.IsSet() ? adminNotificationTitle : contactSettings.AdminNoficationTitle
                     ));
-                    message.AddDiv(_settings.ReplacePlaceholders(
+                    message.AddParagraph(_settings.ReplacePlaceholders(
                         adminNotificationMessage.IsSet() ? adminNotificationMessage : contactSettings.AdminNoficationMessage
                     ));
                     message = model.WriteToMessage(message);
@@ -84,8 +84,8 @@ namespace Hood.Services
                         message.AddH1(_settings.ReplacePlaceholders(
                                 notificationTitle.IsSet() ? notificationTitle : contactSettings.Title
                             ));
-                        message.AddDiv(_settings.ReplacePlaceholders(
-                                notificationTitle.IsSet() ? notificationTitle : contactSettings.Title
+                        message.AddParagraph(_settings.ReplacePlaceholders(
+                                notificationMessage.IsSet() ? notificationMessage : contactSettings.Message
                             ));
 
                         message = model.WriteToMessage(message);
