@@ -30,13 +30,14 @@ namespace Hood.Services
         }
 
         public async Task<Models.Response> ProcessAndSend(IContactFormModel model,
-                                                            string NotifyRole = "ContactFormNotifications",
-                                                            EmailAddress to = null, 
-                                                            EmailAddress from = null,
-                                                            string NotificationTitle = null, 
-                                                            string NotificationMessage = null,
-                                                            string AdminNotificationTitle = null, 
-                                                            string AdminNotificationMessage = null)
+                                                            bool notifySender = true,
+                                                            string notifyRole = "ContactFormNotifications",
+                                                            EmailAddress toEmail = null,
+                                                            EmailAddress notifyEmail = null,
+                                                            string notificationTitle = null,
+                                                            string notificationMessage = null,
+                                                            string adminNotificationTitle = null,
+                                                            string adminNotificationMessage = null)
         {
             try
             {
@@ -46,47 +47,51 @@ namespace Hood.Services
                 {
                     MailObject message = new MailObject();
 
-                    string siteEmail = to == null ? contactSettings.Email : to.Email;
-                    if (!string.IsNullOrEmpty(siteEmail))
+                    // Send to notification email and/or notification roles.
+
+                    message.PreHeader = _settings.ReplacePlaceholders(model.Subject);
+                    message.Subject = _settings.ReplacePlaceholders(model.Subject);
+                    message.AddH1(_settings.ReplacePlaceholders(
+                        adminNotificationTitle.IsSet() ? adminNotificationTitle : contactSettings.AdminNoficationTitle
+                    ));
+                    message.AddDiv(_settings.ReplacePlaceholders(
+                        adminNotificationMessage.IsSet() ? adminNotificationMessage : contactSettings.AdminNoficationMessage
+                    ));
+                    message = model.WriteToMessage(message);
+
+                    if (_environment.IsDevelopment())
                     {
+                        await _email.NotifyRoleAsync(message, "SuperUser");
+                    }
+                    else
+                    {
+                        message.To = notifyEmail == null ? new EmailAddress(contactSettings.Email) : notifyEmail;
+                        await _email.SendEmailAsync(message);
 
-                        message.PreHeader = _settings.ReplacePlaceholders(model.Subject);
-                        message.Subject = _settings.ReplacePlaceholders(model.Subject);
-                        message.AddH1(_settings.ReplacePlaceholders(
-                            AdminNotificationTitle.IsSet() ? AdminNotificationTitle : contactSettings.AdminNoficationTitle
-                        ));
-                        message.AddDiv(_settings.ReplacePlaceholders(
-                            AdminNotificationMessage.IsSet() ? AdminNotificationMessage : contactSettings.AdminNoficationMessage
-                        ));
-                        message = model.WriteToMessage(message);
-
-
-                        if (_environment.IsDevelopment())
-                        {
-                            await _email.NotifyRoleAsync(message, "SuperUser");
-                        }
-                        else
-                        {
-                            message.To = new EmailAddress(siteEmail);
-                            await _email.SendEmailAsync(message);
-                            await _email.NotifyRoleAsync(message, NotifyRole);
-                        }
+                        if (notifyRole.IsSet())
+                            await _email.NotifyRoleAsync(message, notifyRole);
                     }
 
-                    message = new MailObject()
+                    if (notifySender)
                     {
-                        To = model.To,
-                        PreHeader = _settings.ReplacePlaceholders(model.Subject),
-                        Subject = _settings.ReplacePlaceholders(model.Subject)
-                    };
-                    message.AddH1(_settings.ReplacePlaceholders(
-                            NotificationTitle.IsSet() ? NotificationTitle : contactSettings.Title
-                        ));
-                    message.AddDiv(_settings.ReplacePlaceholders(
-                            NotificationTitle.IsSet() ? NotificationTitle : contactSettings.Title
-                        ));
-                    message = model.WriteToMessage(message);
-                    await _email.SendEmailAsync(message);
+                        // Now recreate the message and send to the sender as a notification of their send success.
+
+                        message = new MailObject()
+                        {
+                            To = model.To,
+                            PreHeader = _settings.ReplacePlaceholders(model.Subject),
+                            Subject = _settings.ReplacePlaceholders(model.Subject)
+                        };
+                        message.AddH1(_settings.ReplacePlaceholders(
+                                notificationTitle.IsSet() ? notificationTitle : contactSettings.Title
+                            ));
+                        message.AddDiv(_settings.ReplacePlaceholders(
+                                notificationTitle.IsSet() ? notificationTitle : contactSettings.Title
+                            ));
+
+                        message = model.WriteToMessage(message);
+                        await _email.SendEmailAsync(message);
+                    }
 
                     return new Models.Response(true);
                 }
