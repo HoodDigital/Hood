@@ -32,7 +32,6 @@ namespace Hood.Services
         public async Task<Models.Response> ProcessAndSend(IContactFormModel model,
                                                             bool notifySender = true,
                                                             string notifyRole = "ContactFormNotifications",
-                                                            EmailAddress toEmail = null,
                                                             EmailAddress notifyEmail = null,
                                                             string notificationTitle = null,
                                                             string notificationMessage = null,
