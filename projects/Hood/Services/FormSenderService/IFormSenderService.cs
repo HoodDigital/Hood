@@ -8,9 +8,9 @@ namespace Hood.Services
         where TEmailModel : IEmailSendable
     {
         Task<Response> ProcessAndSend(TEmailModel model,
-                                        string NotifyRole = "ContactFormNotifications",
-                                        EmailAddress to = null,
-                                        EmailAddress from = null,
+                                        bool notifySender = true,
+                                        string notifyRole = "ContactFormNotifications",
+                                        EmailAddress notifyEmail = null,
                                         string NotificationTitle = null,
                                         string NotificationMessage = null,
                                         string AdminNotificationTitle = null,

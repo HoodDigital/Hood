@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System;
 using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
+using SendGrid.Helpers.Mail;
 
 namespace Hood.Services
 {
@@ -27,7 +28,15 @@ namespace Hood.Services
             _renderer = renderer;
         }
 
-        public async Task<Models.Response> ProcessAndSend(WelcomeEmailModel model)
+        public async Task<Models.Response> ProcessAndSend(WelcomeEmailModel model, 
+                                                            bool notifySender = true, 
+                                                            string notifyRole = "NewAccountNotifications", 
+                                                            EmailAddress notifyEmail = null, 
+                                                            string NotificationTitle = null, 
+                                                            string NotificationMessage = null, 
+                                                            string AdminNotificationTitle = null, 
+                                                            string AdminNotificationMessage = null)
+
         {
             try
             {
@@ -53,7 +62,7 @@ namespace Hood.Services
                         }
                         else
                         {
-                            await _email.NotifyRoleAsync(message, "NewAccountNotifications");
+                            await _email.NotifyRoleAsync(message, notifyRole);
                         }
 
                     }
@@ -83,7 +92,5 @@ namespace Hood.Services
                 return new Models.Response(ex);
             }
         }
-
-
     }
 }
