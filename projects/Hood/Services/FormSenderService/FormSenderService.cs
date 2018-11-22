@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using System;
 using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
+using SendGrid.Helpers.Mail;
+using Hood.Extensions;
 
 namespace Hood.Services
 {
@@ -27,7 +29,14 @@ namespace Hood.Services
             _renderer = renderer;
         }
 
-        public async Task<Models.Response> ProcessAndSend(IContactFormModel model)
+        public async Task<Models.Response> ProcessAndSend(IContactFormModel model,
+                                                            string NotifyRole = "ContactFormNotifications",
+                                                            EmailAddress to = null, 
+                                                            EmailAddress from = null,
+                                                            string NotificationTitle = null, 
+                                                            string NotificationMessage = null,
+                                                            string AdminNotificationTitle = null, 
+                                                            string AdminNotificationMessage = null)
         {
             try
             {
@@ -37,14 +46,18 @@ namespace Hood.Services
                 {
                     MailObject message = new MailObject();
 
-                    string siteEmail = contactSettings.Email;
+                    string siteEmail = to == null ? contactSettings.Email : to.Email;
                     if (!string.IsNullOrEmpty(siteEmail))
                     {
 
                         message.PreHeader = _settings.ReplacePlaceholders(model.Subject);
                         message.Subject = _settings.ReplacePlaceholders(model.Subject);
-                        message.AddH1(_settings.ReplacePlaceholders(contactSettings.AdminNoficationTitle));
-                        message.AddDiv(_settings.ReplacePlaceholders(contactSettings.AdminNoficationMessage));
+                        message.AddH1(_settings.ReplacePlaceholders(
+                            AdminNotificationTitle.IsSet() ? AdminNotificationTitle : contactSettings.AdminNoficationTitle
+                        ));
+                        message.AddDiv(_settings.ReplacePlaceholders(
+                            AdminNotificationMessage.IsSet() ? AdminNotificationMessage : contactSettings.AdminNoficationMessage
+                        ));
                         message = model.WriteToMessage(message);
 
 
@@ -54,20 +67,24 @@ namespace Hood.Services
                         }
                         else
                         {
-                            message.To = new SendGrid.Helpers.Mail.EmailAddress(siteEmail);
+                            message.To = new EmailAddress(siteEmail);
                             await _email.SendEmailAsync(message);
-                            await _email.NotifyRoleAsync(message, "ContactFormNotifications");
+                            await _email.NotifyRoleAsync(message, NotifyRole);
                         }
                     }
 
                     message = new MailObject()
                     {
-                        To = new SendGrid.Helpers.Mail.EmailAddress(model.Email, model.Name),
+                        To = model.To,
                         PreHeader = _settings.ReplacePlaceholders(model.Subject),
                         Subject = _settings.ReplacePlaceholders(model.Subject)
                     };
-                    message.AddH1(_settings.ReplacePlaceholders(contactSettings.Title));
-                    message.AddDiv(_settings.ReplacePlaceholders(contactSettings.Message));
+                    message.AddH1(_settings.ReplacePlaceholders(
+                            NotificationTitle.IsSet() ? NotificationTitle : contactSettings.Title
+                        ));
+                    message.AddDiv(_settings.ReplacePlaceholders(
+                            NotificationTitle.IsSet() ? NotificationTitle : contactSettings.Title
+                        ));
                     message = model.WriteToMessage(message);
                     await _email.SendEmailAsync(message);
 

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Hood.Services;
 using Hood.ViewModels;
+using SendGrid.Helpers.Mail;
 
 namespace Hood.Models
 {
@@ -27,7 +28,16 @@ namespace Hood.Models
         public string Enquiry { get; set; }
 
         public string Message { get; set; }
+
         public string Subject { get; set; }
+
+        public EmailAddress To
+        {
+            get
+            {
+                return new EmailAddress(Email, Name);
+            }
+        }
 
         public bool ShowValidationMessage { get; set; }
         public bool ShowValidationIndividualMessages { get; set; }
@@ -52,22 +62,5 @@ namespace Hood.Models
             message.AddParagraph("<strong>" + Enquiry + "</strong>");
             return message;
         }
-    }
-
-    public interface IContactFormModel : IEmailSendable
-    {
-        string Name { get; set; }
-        string Email { get; set; }
-        string Message { get; set; }
-        string Subject { get; set; }
-        string PhoneNumber { get; set; }
-        string Enquiry { get; set; }
-        bool ShowValidationMessage { get; set; }
-        bool ShowValidationIndividualMessages { get; set; }
-    }
-
-    public interface IEmailSendable
-    {
-        MailObject WriteToMessage(MailObject message);
     }
 }
