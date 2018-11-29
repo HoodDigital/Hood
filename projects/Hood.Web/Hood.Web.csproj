@@ -6,7 +6,7 @@
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
-    <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,21 +18,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Areas\Views\**\*.cshtml" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="wwwroot\.gitignore" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="import\" />
-  </ItemGroup>
-  
-  <ProjectExtensions><VisualStudio><UserProperties package_1json__JSONSchema="http://json.schemastore.org/package.manifest" /></VisualStudio></ProjectExtensions>
-  
+    
 </Project>
