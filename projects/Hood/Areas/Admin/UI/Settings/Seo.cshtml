@@ -4,7 +4,9 @@
     Layout = "_SettingsLayout";
 }
 @section buttons {
-    <a asp-action="ResetSEO" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetSEO" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
 }
 @section description {
 <p class="no-margin">
@@ -45,6 +47,15 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label" asp-for="GoogleAnalytics"></label>
                         <div class="col-sm-8"><textarea asp-for="GoogleAnalytics" type="text" class="form-control" rows="4"></textarea></div>
+                    </div>
+                    <h5>Custom HTML tags</h5>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="HeadTags"></label>
+                        <div class="col-sm-8"><textarea asp-for="HeadTags" type="text" class="form-control" rows="4"></textarea></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="BodyTags"></label>
+                        <div class="col-sm-8"><textarea asp-for="BodyTags" type="text" class="form-control" rows="4"></textarea></div>
                     </div>
                     <h5>SEO Page Fallbacks</h5>
                     <div class="form-group">

@@ -7,10 +7,6 @@ namespace Hood.Models
 {
     public class ContactFormModel : HoneyPotFormModel, IContactFormModel
     {
-        public string FormId { get; set; }
-        public string FormClass { get; set; }
-        public string FormAction { get; set; }
-
         [Required]
         [Display(Name = "Your name")]
         public string Name { get; set; }

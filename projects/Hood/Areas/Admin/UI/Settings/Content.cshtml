@@ -4,7 +4,9 @@
     ViewData["Title"] = "Content Settings";
 }
 @section buttons {
-    <a asp-action="ResetContent" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetContent" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
     <a asp-action="AddContentType" class="btn btn-info warning-alert" data-warning="This will add a blank content type to the site (cannot if you already have one with the type name 'blank'. Are you sure?"><i class="fa fa-plus-circle"></i> Add New Blank Type</a>
 }
 @section description {

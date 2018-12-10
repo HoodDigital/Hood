@@ -4,7 +4,9 @@
     Layout = "_SettingsLayout";
 }
 @section buttons {
-    <a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
 }
 @section description {
 <p class="no-margin">
@@ -43,7 +45,7 @@
                     </div>
                 </div>
                 <hr />
-                <h5>Google Recaptcha (Invisible)</h5>
+                <h5>Google Recaptcha</h5>
                 <div class="form-group">
                     <div class="checkbox">
                         <input asp-for="EnableGoogleRecaptcha" class="styled">
@@ -121,14 +123,6 @@
                             <option value="loader-inner ball-grid-beat">ball-grid-beat</option>
                             <option value="loader-inner semi-circle-spin">semi-circle-spin</option>
                         </select>
-                    </div>
-                </div>
-                <hr />
-                <h5>Hood CDN</h5>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <input asp-for="UseCDN" class="styled">
-                        <label asp-for="UseCDN"></label>
                     </div>
                 </div>
                 <hr />

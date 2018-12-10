@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor")]
+    [Authorize(Roles = "Admin,Manager")]
     public class ThemesController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public ThemesController()

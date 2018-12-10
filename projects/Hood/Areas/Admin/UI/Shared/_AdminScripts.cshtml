@@ -47,14 +47,7 @@
     <script src="~/lib/hood/src/js/admin.js"></script>
 </environment>
 <environment names="Production,PreProduction">
-    @if (_settings.GetIntegrationSettings().UseCDN)
-    {
-        <script src="@string.Format("//hood.azureedge.net/cdn/{0}/dist/js/admin.packaged.js", _settings.GetVersion())"></script>
-    }
-    else
-    {
-        <script src="~/lib/hood/dist/js/admin.packaged.js" asp-append-version="true"></script>
-    }
+    <script src="~/lib/hood/dist/js/admin.packaged.js" asp-append-version="true"></script>
 </environment>
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {

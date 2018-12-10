@@ -56,4 +56,8 @@
 {
     <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
 }
+@if (_plugins.GoogleRecaptchaSiteKey.IsSet() && _plugins.EnableGoogleRecaptcha)
+{                     
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+}
 

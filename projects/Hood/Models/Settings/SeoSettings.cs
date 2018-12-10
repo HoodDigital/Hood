@@ -37,6 +37,10 @@ namespace Hood.Models
         // basic
         [Display(Name = "Google Analytics Code")]
         public string GoogleAnalytics { get; set; }
+        [Display(Name = "Header Scripts (Rendered before closing </head> tag)")]
+        public string HeadTags { get; set; }
+        [Display(Name = "Body Scripts (Rendered before closing </body> tag)")]
+        public string BodyTags { get; set; }
         [Display(Name = "Facebook Application ID")]
         public string FacebookAppId { get; set; }
         [Display(Name = "Site Icon (favicon) Url")]

@@ -27,6 +27,7 @@
         await Html.RenderPartialAsync("_Styles");
     }
     @RenderSection("styles", required: false)
+    @Html.Raw(_seoSettings.HeadTags)
 </head>
 <body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
     @RenderSection("afterbody", required: false)
@@ -53,5 +54,6 @@
     @RenderSection("scripts", required: false)
     @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seoSettings.GoogleAnalytics)
+    @Html.Raw(_seoSettings.BodyTags)
 </body>
 </html>

@@ -2,18 +2,14 @@
 @{
     ContactSettings _contactSettings = _settings.GetContactSettings();
     IntegrationSettings _integrationSettings = _settings.GetIntegrationSettings();
-    string action = Url.Action("ProcessContactForm", "Home");
-    if (Model.FormAction.IsSet())
-    {
-        action = Model.FormAction;
-    }
 }
-<form method="post" 
-      role="form" 
+<form method="post"
+      role="form"
       id="contact-form"
-      class="contact-form @(_integrationSettings.EnableGoogleRecaptcha ? "google-recaptcha" : "simple") @(Model.FormClass.IsSet() ? Model.FormClass : "")" 
-      action="@(Model.FormAction.IsSet() ? Model.FormAction : Url.Action("ProcessContactForm", "Hood"))" 
-      data-redirect="@_contactSettings.ThankYouUrl" 
+      class="contact-form"
+      asp-action="ProcessContactForm"
+      asp-controller="Hood"
+      data-redirect="@_contactSettings.ThankYouUrl"
       data-alert-message="@_contactSettings.ThankYouMessage">
     @Html.RenderHoneypotField()
     <div class="thank-you">
@@ -53,12 +49,10 @@
             <div class="col-xs-12 text-center">
                 @if (_integrationSettings.EnableGoogleRecaptcha)
                 {
-                    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-                    <div class="g-recaptcha" id="g-recaptcha"
+                    <div class="g-recaptcha" id="contact-form-captcha"
                          data-target="#contact-form"
                          data-sitekey="@_integrationSettings.GoogleRecaptchaSiteKey"
-                         data-callback="googleRecaptchaCallback"
-                         data-size="invisible">
+                         data-size="normal">
                     </div>
                 }
                 else

@@ -268,21 +268,11 @@ $.hood.App = {
         Init: function () {
             $('.contact-form .thank-you').hide();
             $('.contact-form .form-submit').show();
-            $('body').on('submit', '.contact-form.google-recaptcha', function (e) {
-                e.preventDefault();
-                $(this).addClass('loading');
-                if ($('.g-recaptcha').length > 0) {
-                    grecaptcha.reset();
-                    grecaptcha.execute();
-                } else {
-                    $.hood.App.ContactForms.Submit(this);
-                }
-                return false;
-            });
-            $('body').on('submit', '.contact-form.simple', function (e) {
+            $('body').on('submit', '.contact-form', function (e) {
                 e.preventDefault();
                 $(this).addClass('loading');
                 $.hood.App.ContactForms.Submit(this);
+                return false;
             });
         },
         Submit: function (tag) {
@@ -581,6 +571,3 @@ $.hood.App = {
 };
 if ($.hood.Site && $.hood.Site.Init());
 $(window).on('resize', $.hood.App.Resize);
-var googleRecaptchaCallback = function (token) {
-    $.hood.App.ContactForms.Submit($('#g-recaptcha').data('target'));
-}

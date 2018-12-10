@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor,Manager")]
+    [Authorize(Roles = "Admin,Manager")]
     public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public ApiController()

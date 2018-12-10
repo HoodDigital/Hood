@@ -18,7 +18,6 @@ using System.Collections.Generic;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
     public class SettingsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         protected IMediaRefreshService _mediaRefresh;
@@ -32,6 +31,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/basics/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Basics()
         {
             BasicSettings model = _settings.GetBasicSettings(true);
@@ -41,6 +41,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/basics/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Basics(BasicSettings model)
         {
             try
@@ -86,7 +87,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/basics/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetBasics()
         {
             var model = new BasicSettings();
@@ -96,6 +99,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/integrations/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Integrations()
         {
             IntegrationSettings model = _settings.GetIntegrationSettings(true);
@@ -105,6 +109,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/integrations/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Integrations(IntegrationSettings model)
         {
             try
@@ -120,7 +125,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/integrations/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetIntegrations()
         {
             var model = new IntegrationSettings();
@@ -130,6 +137,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/contact/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Contact()
         {
             ContactSettings model = _settings.GetContactSettings(true);
@@ -139,6 +147,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/contact/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Contact(ContactSettings model)
         {
             try
@@ -154,7 +163,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/contact/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetContact()
         {
             var model = new ContactSettings();
@@ -164,6 +175,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/content/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Content(EditorMessage? message)
         {
             ContentSettings model = _settings.GetContentSettings(true);
@@ -174,6 +186,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/content/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Content(ContentSettings model)
         {
             try
@@ -196,7 +209,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/content/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetContent()
         {
             var model = new ContentSettings();
@@ -206,6 +221,8 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Content");
         }
         [Route("admin/settings/content/add-type/")]
+
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult AddContentType()
         {
             ContentSettings model = _settings.GetContentSettings(true);
@@ -257,6 +274,7 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Content", new { message = EditorMessage.Created });
         }
         [Route("admin/settings/content/delete-type/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult DeleteContentType(string type)
         {   
             ContentSettings model = _settings.GetContentSettings(true);
@@ -285,6 +303,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/property/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Property()
         {
             PropertySettings model = _settings.GetPropertySettings(true);
@@ -294,6 +313,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/property/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Property(PropertySettings model)
         {
             try
@@ -309,7 +329,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/property/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetProperty()
         {
             var model = new PropertySettings();
@@ -319,7 +341,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/billing/")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Billing()
         {
             BillingSettings model = _settings.GetBillingSettings(true);
@@ -329,7 +351,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/billing/")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Billing(BillingSettings model)
         {
             try
@@ -345,7 +367,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/billing/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetBilling()
         {
             var model = new BillingSettings();
@@ -354,7 +378,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/account/")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Account()
         {
             AccountSettings model = _settings.GetAccountSettings(true);
@@ -364,7 +388,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/account/")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Account(AccountSettings model)
         {
             try
@@ -380,7 +404,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/account/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetAccount()
         {
             var model = new AccountSettings();
@@ -390,7 +416,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/seo/")]
-        [Authorize(Roles = "Admin,Manager,SEO")]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public IActionResult Seo()
         {
             SeoSettings model = _settings.GetSeo(true);
@@ -400,7 +426,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/seo/")]
-        [Authorize(Roles = "Admin,Manager,SEO")]
+        [Authorize(Roles = "Admin,Manager,Editor")]
         public IActionResult Seo(SeoSettings model)
         {
             try
@@ -416,7 +442,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/seo/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetSeo()
         {
             var model = new SeoSettings();
@@ -426,7 +454,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/media/")]
-        [Authorize(Roles = "Admin,Editor,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Media()
         {
             MediaSettings model = _settings.GetMediaSettings(true);
@@ -439,7 +467,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/media/")]
-        [Authorize(Roles = "Admin,Editor,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Media(MediaSettings model)
         {
             try
@@ -458,7 +486,9 @@ namespace Hood.Areas.Admin.Controllers
 
             return View(model);
         }
+
         [Route("admin/settings/media/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetMedia()
         {
             var model = new MediaSettings();
@@ -466,13 +496,14 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Media");
         }
         [Route("admin/settings/media/refresh/")]
+
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult RefreshMedia()
         {
             _mediaRefresh.Kill();
             _mediaRefresh.RunUpdate(HttpContext);
             return RedirectToAction("Media");
         }
-
         [HttpPost]
         [Route("admin/settings/media/refresh/cancel/")]
         public IActionResult RefreshMediaKillAsync()
@@ -482,7 +513,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/mail/")]
-        [Authorize(Roles = "Admin,Editor,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Mail(EditorMessage? status)
         {
             MailSettings model = _settings.GetMailSettings(true);
@@ -493,7 +524,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/mail/")]
-        [Authorize(Roles = "Admin,Editor,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Mail(MailSettings model)
         {
             try
@@ -509,7 +540,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
+
         [Route("admin/settings/mail/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetMail()
         {
             var model = new MailSettings();
@@ -518,7 +551,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/forum/")]
-        [Authorize(Roles = "Admin,Editor,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Forum(EditorMessage? status)
         {
             ForumSettings model = _settings.GetForumSettings(true);
@@ -531,7 +564,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/forum/")]
-        [Authorize(Roles = "Admin,Editor,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Forum(ForumSettings model)
         {
             try
@@ -549,7 +582,9 @@ namespace Hood.Areas.Admin.Controllers
             model.Roles = _auth.GetAllRoles();
             return View(model);
         }
+
         [Route("admin/settings/forum/reset/")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetForum()
         {
             var model = new ForumSettings();
@@ -559,7 +594,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/advanced/")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Advanced()
         {
             return View();
@@ -567,12 +602,14 @@ namespace Hood.Areas.Admin.Controllers
 
         #region "Caching" 
         [Route("admin/settings/removecacheitem/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult RemoveCacheItem(string key)
         {
             _cache.Remove(key);
             return RedirectToAction("Advanced");
         }
         [Route("admin/settings/resetcache/")]
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult ResetCache()
         {
             _cache.ResetCache();

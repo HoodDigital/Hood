@@ -4,7 +4,9 @@
     Layout = "_SettingsLayout";
 }
 @section buttons {
-    <a asp-action="ResetBilling" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetBilling" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
 }
 @section description {
     <p class="no-margin">

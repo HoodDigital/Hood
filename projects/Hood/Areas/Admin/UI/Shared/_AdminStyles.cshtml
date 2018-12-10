@@ -1,15 +1,8 @@
-<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link href="//fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <environment names="Development,Staging,ErrorTesting">
     <link rel="stylesheet" href="~/lib/hood/src/css/admin.css" asp-append-version="true" />
 </environment>
 <environment names="Production,PreProduction">
-    @if (_settings.GetIntegrationSettings().UseCDN)
-    {
-        <link rel="stylesheet" href="@string.Format("https://hood.azureedge.net/cdn/{0}/dist/css/admin.min.css", _settings.GetVersion())" asp-append-version="true" />
-    }
-    else
-    {
-        <link rel="stylesheet" href="~/lib/hood/dist/css/admin.min.css" asp-append-version="true" />
-    }
+    <link rel="stylesheet" href="~/lib/hood/dist/css/admin.min.css" asp-append-version="true" />
 </environment>
