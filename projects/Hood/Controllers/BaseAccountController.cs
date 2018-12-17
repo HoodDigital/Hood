@@ -849,7 +849,7 @@ namespace Hood.Controllers
 
         #region Helpers
 
-        private void AddErrors(IdentityResult result)
+        protected void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
             {
@@ -857,12 +857,12 @@ namespace Hood.Controllers
             }
         }
 
-        private Task<ApplicationUser> GetCurrentUserAsync()
+        protected Task<ApplicationUser> GetCurrentUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
+        protected IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
             {
@@ -874,14 +874,14 @@ namespace Hood.Controllers
             }
         }
 
-        private IActionResult RedirectWithReturnUrl(string url, string returnUrl)
+        protected IActionResult RedirectWithReturnUrl(string url, string returnUrl)
         {
             if (returnUrl != null)
                 url += "&returnUrl=" + System.Net.WebUtility.UrlEncode(returnUrl);
             return RedirectToLocal(url);
         }
 
-        private bool CheckForAccessCodes(ApplicationUser user)
+        protected bool CheckForAccessCodes(ApplicationUser user)
         {
             if (user.AccessCodes == null)
                 return false;

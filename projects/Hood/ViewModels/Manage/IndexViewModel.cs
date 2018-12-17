@@ -7,8 +7,10 @@ using Hood.BaseTypes;
 
 namespace Hood.ViewModels
 {
-    public class IndexViewModel: SaveableModel
+    public class IndexViewModel : SaveableModel
     {
+        public string UserId { get; set; }
+
         public string Username { get; set; }
 
         public bool IsEmailConfirmed { get; set; }
@@ -26,8 +28,6 @@ namespace Hood.ViewModels
         public UserProfile Profile { get; set; }
 
         public IMediaObject Avatar { get; set; }
-
-        public string UserId { get; internal set; }
 
         public IList<string> Roles { get; set; }
     }
