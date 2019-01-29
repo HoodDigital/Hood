@@ -16,6 +16,10 @@ $.hood.Modals = {
             }
             $('body').append(data);
             $(modalId).modal();
+            // Workaround for sweetalert popups.
+            $(modalId).on('shown.bs.modal', function () {
+                $(document).off('focusin.modal');
+            });
         })
          .done(function () {
              if (!$.hood.Helpers.IsNullOrUndefined(completeFunction)) {
