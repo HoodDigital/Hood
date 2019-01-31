@@ -1,4 +1,5 @@
-﻿using Hood.Models;
+﻿using Hood.Extensions;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.Extensions.Caching.Memory;
 using System;
@@ -29,6 +30,8 @@ namespace Hood.Caching
                 _cache.Set(key, cacheItem);
             else
                 _cache.Set(key, cacheItem, options);
+            if (_entries == null)
+                _entries = new List<string>();
             if (!_entries.Contains(key))
                 _entries.Add(key);
             return key;
@@ -38,6 +41,8 @@ namespace Hood.Caching
         {
             get
             {
+                if (_entries == null)
+                    _entries = new List<string>();
                 return _entries;
             }
         }
@@ -45,6 +50,8 @@ namespace Hood.Caching
 
         public bool TryGetValue<T>(string key, out T cacheItem)
         {
+            if (_entries == null)
+                _entries = new List<string>();
             if (_cache.TryGetValue(key, out cacheItem)) // Get the value from cache.
             {
                 if (!_entries.Contains(key)) // Item is in cache, but not entry dictionary. Add it.
@@ -59,12 +66,19 @@ namespace Hood.Caching
 
         public void Remove(string key)
         {
-            _entries.Remove(key);
+            if (_entries == null)
+                _entries = new List<string>();
+            if (!key.IsSet())
+                return;
+            if (_entries.Contains(key)) // Item has fallen out of cache, remove from entries.
+                _entries.Remove(key);
             _cache.Remove(key);
         }
 
         public void RemoveWhere(Func<string, bool> predicate)
         {
+            if (_entries == null)
+                _entries = new List<string>();
             var toRemove = _entries.Where(predicate).ToList();
             foreach (string key in toRemove)
                 Remove(key);
@@ -72,6 +86,10 @@ namespace Hood.Caching
 
         public void RemoveByType(Type type)
         {
+            if (_entries == null)
+                _entries = new List<string>();
+            if (type == null)
+                return;
             var toRemove = _entries.Where(e => e.StartsWith(type.ToString())).ToList();
             foreach (string key in toRemove)
                 Remove(key);
@@ -79,6 +97,8 @@ namespace Hood.Caching
 
         public void ResetCache()
         {
+            if (_entries == null)
+                _entries = new List<string>();
             var toRemove = _entries.ToList();
             foreach (string key in toRemove)
                 Remove(key);
