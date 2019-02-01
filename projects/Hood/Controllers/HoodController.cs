@@ -54,14 +54,17 @@ namespace Hood.Controllers
         {
             try
             {
-                if (ModelState.IsNotSpam(model))
-                {
-                    model.Subject = "Online Enquiry: " + model.Subject;
-                    await _settings.ProcessCaptchaOrThrowAsync(Request);
-                    return await _forms.ProcessAndSend(model);
-                }
-                else
-                    throw new Exception("You have been flagged as a spam bot. If this is not true, please contact us via email.");
+                if (!ModelState.IsValid)
+                    return new Response("The submitted information is not valid.");
+
+                if (model.IsSpambot)
+                    return new Response("You have been flagged as a spam bot. If this is not true, please contact us via email.");
+
+                await _settings.ProcessCaptchaOrThrowAsync(Request);
+
+                model.Subject = "Online Enquiry: " + model.Subject;
+
+                return await _forms.ProcessAndSend(model);
             }
             catch (Exception ex)
             {

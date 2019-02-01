@@ -6,7 +6,7 @@
 <form method="post"
       role="form"
       id="contact-form"
-      class="contact-form"
+      class="contact-form @(_integrationSettings.EnableGoogleRecaptcha ? "g-recaptcha" : "")"
       asp-action="ProcessContactForm"
       asp-controller="Hood"
       data-redirect="@_contactSettings.ThankYouUrl"
@@ -49,16 +49,9 @@
             <div class="col-xs-12 text-center">
                 @if (_integrationSettings.EnableGoogleRecaptcha)
                 {
-                    <div class="g-recaptcha" id="contact-form-captcha"
-                         data-target="#contact-form"
-                         data-sitekey="@_integrationSettings.GoogleRecaptchaSiteKey"
-                         data-size="normal">
-                    </div>
+                    <div class="recaptcha" id="contact-recaptcha"></div>
                 }
-                else
-                {
-                }
-                <button class="btn btn-md btn-primary form-full" type="submit">Send Message</button>
+                <p class="m-t-md"><button class="btn btn-md btn-primary form-full" type="submit">Send Message</button></p>
             </div>
         </div>
     </div>
