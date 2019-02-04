@@ -4,7 +4,8 @@
     Layout = "_SettingsLayout";
 }
 @section buttons {
-    @if (User.IsInRole("Admin")) { 
+    @if (User.IsInRole("Admin"))
+    {
         <a asp-action="ResetBilling" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
     }
 }
@@ -16,6 +17,7 @@
 <div class="tabs-container">
     <ul class="nav nav-tabs">
         <li class="active"><a data-toggle="tab" href="#paypal">PayPal</a></li>
+        <li><a data-toggle="tab" href="#sagepay">SagePay</a></li>
         <li class=""><a data-toggle="tab" href="#stripe">Stripe</a></li>
         <li class=""><a data-toggle="tab" href="#subscriptions">Subscriptions</a></li>
     </ul>
@@ -62,6 +64,89 @@
                         <label asp-for="EnableCart"></label>
                     </div>
                     <small>Note: To enable paypal, you must also enable PayPal and supply a Paypal Client Id and a Client Secret in your application settings (appsettings.json or Env variables).</small>
+                </div>
+            </div>
+        </div>
+        <div id="sagepay" class="tab-pane">
+            <div class="panel-body">
+                <strong>SagePay Payment Settings</strong>
+                <p>
+                    Enable or disable the SagePay payment systems on the site.
+                </p>
+                <hr />
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input asp-for="EnableSagePay" class="styled">
+                        <label asp-for="EnableSagePay"></label>
+                    </div>
+                    <small>Note: To enable stripe, you must also supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).</small>
+                </div>
+                <hr />
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayMode"></label>
+                        <div class="col-sm-10">
+                            <select asp-for="SagePayMode" class="form-control">
+                                <option value="Sandbox">Sandbox Mode</option>
+                                <option value="Testing">Testing Mode</option>
+                                <option value="Live">Live Mode</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayEndpoint"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayEndpoint" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayKey"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayKey" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayPassword"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayPassword" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayVendorName"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayVendorName" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayTestingEndpoint"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayTestingEndpoint" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayTestingKey"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayTestingKey" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayTestingPassword"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayTestingPassword" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" asp-for="SagePayTestingVendorName"></label>
+                        <div class="col-sm-10">
+                            <input asp-for="SagePayTestingVendorName" class="form-control" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -122,14 +207,6 @@
                         </div>
                     </div>
                 </div>
-                <hr />
-                <div class="form-group">
-                    <div class="checkbox">
-                        <input asp-for="EnableCart" class="styled">
-                        <label asp-for="EnableCart"></label>
-                    </div>
-                    <small>Note: To enable paypal, you must also enable PayPal and supply a Paypal Client Id and a Client Secret in your application settings (appsettings.json or Env variables).</small>
-                </div>
             </div>
         </div>
         <div id="subscriptions" class="tab-pane">
@@ -170,7 +247,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

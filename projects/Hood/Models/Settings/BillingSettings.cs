@@ -20,6 +20,31 @@ namespace Hood.Models
         [Display(Name = "PayPal Secret")]
         public string PayPalSecret { get; set; }
 
+        // SagePay
+        [Display(Name = "Enable SagePay")]
+        public bool EnableSagePay { get; set; }
+        [Display(Name = "SagePayMode")]
+        public string SagePayMode { get; set; }
+
+        [Display(Name = "SagePay Endpoint")]
+        public string SagePayEndpoint { get; set; }
+        [Display(Name = "SagePay Key")]
+        public string SagePayKey { get; set; }
+        [Display(Name = "SagePay Password")]
+        public string SagePayPassword { get; set; }
+        [Display(Name = "SagePay Vendor Name")]
+        public string SagePayVendorName { get; set; }
+
+        // SagePay Testing
+        [Display(Name = "SagePay Testing Endpoint")]
+        public string SagePayTestingEndpoint { get; set; }
+        [Display(Name = "SagePay Testing Key")]
+        public string SagePayTestingKey { get; set; }
+        [Display(Name = "SagePay Testing Password")]
+        public string SagePayTestingPassword { get; set; }
+        [Display(Name = "SagePay Testing Vendor Name")]
+        public string SagePayTestingVendorName { get; set; }
+
         // Store
         [Display(Name = "Enable Shopping Cart / Checkout")]
         public bool EnableCart { get; set; }
