@@ -17,7 +17,7 @@ namespace Hood.Models.Payments
         private const string vendorNameSandbox = "sandbox";
         private const string integrationKeySandbox = "hJYxsw7HLbj40cB8udES8CDRFLhuJ8G54O6rDpUXvE6hYDrria";
         private const string integrationPasswordSandbox = "o2iHSrFybYMZpmWOQMuhsXP52V4fBtpuSDshrKDSWsBY1OiN6hwd9Kb12z4j5Us5u";
-    
+
         private static BillingSettings BillingSettings
         {
             get
@@ -30,7 +30,7 @@ namespace Hood.Models.Payments
 
         public static SagePayCredentials GetCredentials(string forceMode = null)
         {
-            if (forceMode == "Sandbox" || BillingSettings.SagePayMode == "Sandbox")
+            if (forceMode == "Sandbox")
                 return new SagePayCredentials()
                 {
                     Endpoint = sagePayEndpointSandbox,
@@ -39,7 +39,6 @@ namespace Hood.Models.Payments
                     Password = integrationPasswordSandbox
                 };
             else if (forceMode == "Testing" || BillingSettings.SagePayMode == "Testing")
-            {
                 return new SagePayCredentials()
                 {
                     Endpoint = BillingSettings.SagePayTestingEndpoint,
@@ -47,9 +46,15 @@ namespace Hood.Models.Payments
                     Key = BillingSettings.SagePayTestingKey,
                     Password = BillingSettings.SagePayTestingPassword
                 };
-            }
+            else if (BillingSettings.SagePayMode == "Sandbox")
+                return new SagePayCredentials()
+                {
+                    Endpoint = sagePayEndpointSandbox,
+                    VendorName = vendorNameSandbox,
+                    Key = integrationKeySandbox,
+                    Password = integrationPasswordSandbox
+                };
             else
-            {
                 return new SagePayCredentials()
                 {
                     Endpoint = BillingSettings.SagePayEndpoint,
@@ -57,7 +62,6 @@ namespace Hood.Models.Payments
                     Key = BillingSettings.SagePayKey,
                     Password = BillingSettings.SagePayPassword
                 };
-            }
         }
     }
 }
