@@ -1,4 +1,6 @@
-﻿using Hood.Middleware;
+﻿using Hood.Core;
+using Hood.Interfaces;
+using Hood.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,14 +17,6 @@ namespace Hood.Extensions
 
     public static class IApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseHttpsEnforcement(this IApplicationBuilder app)
-        {
-            if (app == null)
-                throw new ArgumentNullException(nameof(app));
-
-            return app.UseMiddleware<EnforceHttpsMiddleware>();
-        }
-
         /// <summary>
         /// Configure Hood, using the default setup, can be configured to add custom routes and priority routes if required.
         /// </summary>
@@ -33,7 +27,7 @@ namespace Hood.Extensions
         /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
         /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
         /// <returns></returns>
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IConfiguration config)
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
@@ -42,13 +36,27 @@ namespace Hood.Extensions
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
+            // Register all Hood Components
+            var typeFinder = EngineContext.Current.Resolve<ITypeFinder>();
+            var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
+
+            var instances = dependencies
+                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
+                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
+
+            foreach (var dependency in instances)
+                dependency.Configure(app, env, config);
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseHoodDefaults(this IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
+        {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
-            if (env.IsEnvironment("Development") || env.IsEnvironment("PreProduction") || env.IsEnvironment("Staging"))
+            if (env.IsEnvironment("Development") || env.IsEnvironment("Staging"))
             {
-                loggerFactory.AddDebug(LogLevel.Debug);
-                loggerFactory.AddConsole(LogLevel.Debug);
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
             }
@@ -60,7 +68,8 @@ namespace Hood.Extensions
 
             if (config.ForceHttps())
             {
-                app.UseHttpsEnforcement();
+                app.UseHttpsRedirection();
+                app.UseHsts();
             }
 
             app.UseStaticFiles(new StaticFileOptions()
@@ -72,6 +81,8 @@ namespace Hood.Extensions
                     }
             });
 
+            app.UseCookiePolicy();
+
             // Activate url helpers
             var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             UrlHelpers.Configure(httpContextAccessor);
@@ -80,15 +91,10 @@ namespace Hood.Extensions
             {
                 app.UseAuthentication();
 
-                int timeout = 60;
-                var builder = new CookieBuilder()
-                {
-                    Name = config["Session:CookieName"].IsSet() ? config["Session:CookieName"] : ".Hood.Session"
-                };
-                if (int.TryParse(config["Session:Timeout"], out timeout))
-                    builder.Expiration = TimeSpan.FromMinutes(timeout);
-                else
-                    builder.Expiration = TimeSpan.FromMinutes(60);
+                var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+
+                var builder = new CookieBuilder() { Name = $".{cookieName}.Session" };
+                builder.Expiration = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
 
                 app.UseSession(new SessionOptions()
                 {
@@ -97,10 +103,10 @@ namespace Hood.Extensions
                 });
             }
 
+            app.UseDefaultRoutesForHood(config);
 
             return app;
         }
-
         public static IApplicationBuilder UseDefaultRoutesForHood(this IApplicationBuilder app, IConfiguration config)
         {
             if (!config.IsDatabaseConfigured())
@@ -157,4 +163,5 @@ namespace Hood.Extensions
             return app;
         }
     }
+
 }

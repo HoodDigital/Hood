@@ -11,49 +11,68 @@
 <!DOCTYPE html>
 <html lang="en-gb" xml:lang="en">
 <head>
-    @{ await Html.RenderPartialAsync("_BaseMetas"); }
+
+    <partial name="_BaseMetas" />
     <title>@ViewData["Title"]</title>
+
     @if (!IsSectionDefined("metas"))
     {
-        await Html.RenderPartialAsync("_Metas");
+        <partial name="_Metas" />
     }
     @RenderSection("metas", required: false)
+
     @if (_settings.GetBasicSettings().EnablePreload)
     {
-        await Html.RenderPartialAsync("_DeferredStyles");
+        <partial name="_DeferredStyles" />
     }
     else
     {
-        await Html.RenderPartialAsync("_Styles");
+        <partial name="_Styles" />
     }
     @RenderSection("styles", required: false)
+
     @Html.Raw(_seoSettings.HeadTags)
+
 </head>
 <body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
+
     @RenderSection("afterbody", required: false)
-    @{ await Html.RenderPartialAsync("_NoScript"); }
+
+    <partial name="_NoScript" />
+
     @if (_settings.GetBasicSettings().EnablePreload)
     {
         await Html.RenderPartialAsync("_PreLoader");
     }
+
     @RenderSection("beforecontent", required: false)
+
     <div class="wrapper" id="wrapper">
         @await Component.InvokeAsync(typeof(Hood.ViewComponents.Header))
         @RenderBody()
     </div>
+
     @RenderSection("beforefooter", required: false)
-    @{ await Html.RenderPartialAsync("_Footer"); }
+    <partial name="_Footer" />
+    <partial name="_CookieConsentPartial" />
+
     @RenderSection("afterfooter", required: false)
-    @{ await Html.RenderPartialAsync("_AdminEditor"); }
+    <partial name="_AdminEditor" />
+
     @if (_settings.GetBasicSettings().EnablePreload)
     {
-        await Html.RenderPartialAsync("_DeferredStylesLoader");
+        <partial name="_DeferredStylesLoader" />
     }
+
     @RenderSection("includes", required: false)
-    @{ await Html.RenderPartialAsync("_Scripts"); }
+
+    <partial name="_Scripts" />
+
     @RenderSection("scripts", required: false)
+
     @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seoSettings.GoogleAnalytics)
     @Html.Raw(_seoSettings.BodyTags)
+
 </body>
 </html>

@@ -1,11 +1,12 @@
-﻿using Hood.Services;
+﻿using Hood.Models;
+using Hood.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hood.Models
+namespace Hood.Caching
 {
     public class ContentByTypeCache
     {

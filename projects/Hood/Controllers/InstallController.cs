@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
-
 namespace Hood.Controllers
 {
-    //[Area("Hood")]
     public class InstallController : Controller
     {
         private readonly IApplicationLifetime _applicationLifetime;

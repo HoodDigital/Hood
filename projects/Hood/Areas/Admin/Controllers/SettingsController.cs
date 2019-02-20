@@ -1,19 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authorization;
-using Hood.Services;
-using Hood.Models;
-using System;
-using Hood.Caching;
-using Geocoding.Google;
-using Hood.Enums;
-using System.Threading.Tasks;
-using Hood.Extensions;
+﻿using Geocoding.Google;
 using Hood.Controllers;
+using Hood.Enums;
+using Hood.Extensions;
+using Hood.Models;
+using Hood.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -558,8 +555,8 @@ namespace Hood.Areas.Admin.Controllers
             if (model == null)
                 model = new ForumSettings();
             model.AddEditorMessage(status);
-            model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
-            model.Roles = _auth.GetAllRoles();
+            model.Subscriptions = await _account.GetSubscriptionPlansAsync();
+            model.Roles = _account.GetAllRoles();
             return View(model);
         }
         [HttpPost]
@@ -578,8 +575,8 @@ namespace Hood.Areas.Admin.Controllers
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
             }
-            model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
-            model.Roles = _auth.GetAllRoles();
+            model.Subscriptions = await _account.GetSubscriptionPlansAsync();
+            model.Roles = _account.GetAllRoles();
             return View(model);
         }
 

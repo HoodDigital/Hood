@@ -506,9 +506,6 @@ $.hood.App = {
                 clickable: "#avatar-upload" // Define the element that should be used as click trigger to select files.
             });
             avatarDropzone.on("addedfile", function () {
-                if (this.files[1] !== null) {
-                    this.removeFile(this.files[0]);
-                }
             });
             // Update the total progress bar
             avatarDropzone.on("totaluploadprogress", function (progress) {
@@ -533,6 +530,7 @@ $.hood.App = {
                 } else {
                     $.hood.Alerts.Error("There was a problem adding the profile image: " + response.Error);
                 }
+                avatarDropzone.removeFile(file);
                 $($("#avatar-upload").data('preview')).removeClass('loading');
             });
         }

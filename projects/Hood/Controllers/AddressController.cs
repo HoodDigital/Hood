@@ -1,51 +1,22 @@
-﻿using Hood.Infrastructure;
+﻿using Hood.Extensions;
+using Hood.Infrastructure;
 using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
-using Hood.Extensions;
 
 namespace Hood.Controllers
 {
     [Authorize]
-    //[Area("Hood")]
-    public partial class AddressController : Controller
+    public class AddressController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
-        private readonly ISmsSender _smsSender;
-        private readonly ILogger _logger;
-        private readonly IContentRepository _content;
-        private readonly IAccountRepository _auth;
-        private readonly IAddressService _address;
-
-        public AddressController(
-            IContentRepository content,
-            IAccountRepository auth,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,
-            ISmsSender smsSender,
-            ILoggerFactory loggerFactory,
-            IAddressService address)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _emailSender = emailSender;
-            _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<AddressController>();
-            _content = content;
-            _auth = auth;
-            _address = address;
-        }
+        public AddressController()
+        { }
 
         public ActionResult Index()
         {
-            var user = _auth.GetCurrentUser(false);
+            var user = _account.GetCurrentUser(false);
             return View(user);
         }
 
@@ -68,17 +39,17 @@ namespace Hood.Controllers
                     address.SetLocation(location.Coordinates);
                 }
 
-                var user = _auth.GetCurrentUser(false);
+                var user = _account.GetCurrentUser(false);
                 address.UserId = user.Id;
                 user.Addresses.Add(address);
-                _auth.UpdateUser(user);
+                _account.UpdateUser(user);
 
                 if (user.BillingAddress == null)
                     user.BillingAddress = address.CloneTo<Address>();
                 if (user.DeliveryAddress == null)
                     user.DeliveryAddress = address.CloneTo<Address>();
 
-                _auth.UpdateUser(user);
+                _account.UpdateUser(user);
 
                 return Json(new Response(true));
             }
@@ -90,7 +61,7 @@ namespace Hood.Controllers
 
         public ActionResult Edit(int id)
         {
-            return View(_auth.GetAddressById(id));
+            return View(_account.GetAddressById(id));
         }
 
         [HttpPost]
@@ -105,7 +76,7 @@ namespace Hood.Controllers
                     address.SetLocation(location.Coordinates);
                 }
 
-                OperationResult result = _auth.UpdateAddress(address);
+                OperationResult result = _account.UpdateAddress(address);
                 return Json(new Response(true));
             }
             catch (Exception ex)
@@ -119,7 +90,7 @@ namespace Hood.Controllers
         {
             try
             {
-                OperationResult result = _auth.DeleteAddress(id);
+                OperationResult result = _account.DeleteAddress(id);
                 if (result.Succeeded)
                     return Json(new { success = true });
                 else
@@ -137,7 +108,7 @@ namespace Hood.Controllers
             try
             {
                 string userId = _userManager.GetUserId(User);
-                OperationResult result = _auth.SetBillingAddress(userId, id);
+                OperationResult result = _account.SetBillingAddress(userId, id);
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -152,7 +123,7 @@ namespace Hood.Controllers
             try
             {
                 string userId = _userManager.GetUserId(User);
-                OperationResult result = _auth.SetDeliveryAddress(userId, id);
+                OperationResult result = _account.SetDeliveryAddress(userId, id);
                 return Json(new { success = true });
             }
             catch (Exception ex)

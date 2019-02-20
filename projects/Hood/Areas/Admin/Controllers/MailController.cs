@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Hood.Controllers;
+using Hood.Enums;
 using Hood.Extensions;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
-using SendGrid.Helpers.Mail;
-using Hood.Enums;
-using Hood.Controllers;
-using Hood.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using SendGrid.Helpers.Mail;
+using System;
+using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -57,7 +55,7 @@ namespace Hood.Areas.Admin.Controllers
                 mail.To = new SendGrid.Helpers.Mail.EmailAddress(email);
                 mail.Subject = "Test email from HoodCMS";
                 mail.PreHeader = "This is a test email from HoodCMS.";
-                await _email.SendEmailAsync(mail, template);
+                await _emailSender.SendEmailAsync(mail, template);
                 return RedirectToAction("Mail", "Settings", new { status = EditorMessage.Sent });
             }
             catch (Exception ex)
@@ -73,21 +71,21 @@ namespace Hood.Areas.Admin.Controllers
             var mail = GetDemoMail();
 
             mail.Subject = "Testing basic email sends";
-            mail.To = _email.GetSiteFromEmail();
-            _email.SendEmailAsync(mail);
-            _email.NotifyRoleAsync(mail, "Admin");
+            mail.To = _emailSender.GetSiteFromEmail();
+            _emailSender.SendEmailAsync(mail);
+            _emailSender.NotifyRoleAsync(mail, "Admin");
             EmailAddress[] emails = { mail.To };
-            _email.SendEmailAsync(emails, "Basic Email send", "<h1>basic email test</h1>", "basic email test");
-            _email.NotifyRoleAsync("Admin", "Basic Email send", "<h1>basic email test</h1>", "basic email test");
+            _emailSender.SendEmailAsync(emails, "Basic Email send", "<h1>basic email test</h1>", "basic email test");
+            _emailSender.NotifyRoleAsync("Admin", "Basic Email send", "<h1>basic email test</h1>", "basic email test");
 
             mail.Subject = "Testing FROM parameter";
 
             var from = new EmailAddress() { Email = "george@hooddigital.com", Name = "HoodCMS Test From" };
 
-            _email.SendEmailAsync(mail, Models.MailSettings.DangerTemplate, from);
-            _email.NotifyRoleAsync(mail, "Admin", Models.MailSettings.DangerTemplate, from);
-            _email.SendEmailAsync(emails, "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
-            _email.NotifyRoleAsync("Admin", "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
+            _emailSender.SendEmailAsync(mail, Models.MailSettings.DangerTemplate, from);
+            _emailSender.NotifyRoleAsync(mail, "Admin", Models.MailSettings.DangerTemplate, from);
+            _emailSender.SendEmailAsync(emails, "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
+            _emailSender.NotifyRoleAsync("Admin", "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
 
             return View();
         }

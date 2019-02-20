@@ -1,13 +1,9 @@
-﻿using Hood.Caching;
-using Hood.Controllers;
+﻿using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Infrastructure;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -32,21 +28,21 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/")]
         public async Task<IActionResult> Index(SubscriptionSearchModel model)
         {
-            model = await _auth.GetPagedSubscriptionPlans(model);
+            model = await _account.GetPagedSubscriptionPlans(model);
             return View(model);
         }
 
         [Route("admin/subscribers/")]
         public async Task<IActionResult> Subscribers(SubscriberSearchModel model)
         {
-            model = await _auth.GetPagedSubscribers(model);
+            model = await _account.GetPagedSubscribers(model);
             return View(model);
         }
 
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
-            var model = await _auth.GetSubscriptionPlanById(id);
+            var model = await _account.GetSubscriptionPlanById(id);
             model.AddEditorMessage(message);
             return View(model);
         }
@@ -57,7 +53,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                await _auth.UpdateSubscription(model);
+                await _account.UpdateSubscription(model);
                 model.SaveMessage = "Subscription saved.";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -65,7 +61,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
-                await _logService.AddLogAsync(
+                await _logService.LogErrorAsync(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
                    ex,
                    LogType.Error,
@@ -118,12 +114,12 @@ namespace Hood.Areas.Admin.Controllers
                     TrialPeriodDays = model.TrialPeriodDays,
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
-                subscription = await _auth.AddSubscriptionPlan(subscription);
+                subscription = await _account.AddSubscriptionPlan(subscription);
                 await _logService.AddLogAsync(
                     string.Format("Subscription ({0}) added with name: {1}", subscription.StripeId, subscription.Name),
+                    LogSource.Subscriptions,
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
-                    LogSource.Subscriptions,
                     _userManager.GetUserId(User),
                     subscription.Id.ToString(),
                     nameof(Subscription),
@@ -136,7 +132,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.AddLogAsync(
+                await _logService.LogErrorAsync(
                     string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name),
                     ex,
                     LogType.Error,
@@ -156,13 +152,13 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var subscription = await _auth.GetSubscriptionPlanById(id);
-                await _auth.DeleteSubscriptionPlan(id);
+                var subscription = await _account.GetSubscriptionPlanById(id);
+                await _account.DeleteSubscriptionPlan(id);
                 await _logService.AddLogAsync(
                 string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
+                    LogSource.Subscriptions,
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
-                    LogSource.Subscriptions,
                     _userManager.GetUserId(User),
                     subscription.Id.ToString(),
                     nameof(Subscription),
@@ -172,7 +168,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.AddLogAsync(
+                await _logService.LogErrorAsync(
                     string.Format("Error deleting subscription with id: {0}", id),
                     ex,
                     LogType.Error,

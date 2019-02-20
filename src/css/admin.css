@@ -19740,6 +19740,11 @@ h6 {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.data-item .form-control,
+.data-item .form-control-static {
+  z-index: 9;
+  position: relative;
+}
 .action-button span {
   display: inline-block;
 }

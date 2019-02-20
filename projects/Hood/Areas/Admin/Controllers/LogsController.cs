@@ -1,9 +1,7 @@
 ﻿using Hood.Controllers;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

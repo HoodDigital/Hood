@@ -1,64 +1,33 @@
-﻿using System;
+﻿using Hood.Core;
+using Hood.Enums;
+using Hood.Extensions;
+using Hood.Models;
+using Hood.Services;
+using Hood.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Hood.Models;
-using Hood.Services;
-using Hood.ViewModels;
-using Hood.Core;
-using Microsoft.AspNetCore.Http;
-using Hood.Enums;
-using Hood.BaseTypes;
-using Hood.Extensions;
-using Hood.Infrastructure;
-using Hood.Filters;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Controllers
 {
     [Authorize]
-    public class ManageController : Controller
+    public class ManageController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
-        private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
-        private readonly IAccountRepository _auth;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IBillingService _billing;
-        private readonly HoodDbContext _db;
 
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-        public ManageController(
-          UserManager<ApplicationUser> userManager,
-          SignInManager<ApplicationUser> signInManager,
-          IEmailSender emailSender,
-          ILogger<ManageController> logger,
-          UrlEncoder urlEncoder,
-          IAccountRepository auth,
-          ILoggerFactory loggerFactory,
-          IBillingService billing,
-          HoodDbContext db,
-          IMediaManager<MediaObject> media)
+        public ManageController(UrlEncoder urlEncoder)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _emailSender = emailSender;
-            _logger = logger;
             _urlEncoder = urlEncoder;
-            _auth = auth;
-            _media = media;
-            _billing = billing;
-            _db = db;
         }
 
         [TempData]
@@ -129,7 +98,7 @@ namespace Hood.Controllers
                 }
 
                 user.SetProfile(model.Profile);
-                _auth.UpdateUser(user);
+                _account.UpdateUser(user);
                 model.SaveMessage = "Saved!";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -148,7 +117,7 @@ namespace Hood.Controllers
         public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
-            var user = _auth.GetUserById(userId);
+            var user = _account.GetUserById(userId);
             if (user == null)
                 return NotFound();
 
@@ -164,7 +133,7 @@ namespace Hood.Controllers
                     }
                     mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = string.Format("users/{0}/", userId) });
                     user.Avatar = mediaResult;
-                    _auth.UpdateUser(user);
+                    _account.UpdateUser(user);
                 }
                 return Json(new { Success = true, Image = mediaResult });
             }
@@ -241,7 +210,7 @@ namespace Hood.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            _logger.LogInformation("User changed their password successfully.");
+            await _logService.AddLogAsync($"User ({user.UserName}) changed their password successfully.", LogSource.Identity, "", LogType.Info, user.Id);
             StatusMessage = "Your password has been changed.";
 
             return RedirectToAction(nameof(ChangePassword));
@@ -427,8 +396,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
             }
-
-            _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
+            await _logService.AddLogAsync($"User ({user.UserName}) has disabled 2fa.", LogSource.Identity, "", LogType.Info, user.Id);
             return RedirectToAction(nameof(TwoFactorAuthentication));
         }
 
@@ -485,7 +453,7 @@ namespace Hood.Controllers
             }
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
-            _logger.LogInformation("User with ID {UserId} has enabled 2FA with an authenticator app.", user.Id);
+            await _logService.AddLogAsync($"User with ID {user.Id} has enabled 2FA with an authenticator app.", LogSource.Identity, "", LogType.Info, user.Id);
             return RedirectToAction(nameof(GenerateRecoveryCodes));
         }
 
@@ -507,7 +475,8 @@ namespace Hood.Controllers
 
             await _userManager.SetTwoFactorEnabledAsync(user, false);
             await _userManager.ResetAuthenticatorKeyAsync(user);
-            _logger.LogInformation("User with id '{UserId}' has reset their authentication app key.", user.Id);
+
+            await _logService.AddLogAsync($"User with ID {user.Id} has reset their authentication app key.", LogSource.Identity, "", LogType.Info, user.Id);
 
             return RedirectToAction(nameof(EnableAuthenticator));
         }
@@ -529,7 +498,7 @@ namespace Hood.Controllers
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
 
-            _logger.LogInformation("User with ID {UserId} has generated new 2FA recovery codes.", user.Id);
+            await _logService.AddLogAsync($"User with ID {user.Id} has generated new 2FA recovery codes.", LogSource.Identity, "", LogType.Info, user.Id);
 
             return View(model);
         }
@@ -561,9 +530,10 @@ namespace Hood.Controllers
                 }
 
                 await _signInManager.SignOutAsync();
-                _logger.LogInformation(4, "User logged out.");
 
-                await _auth.DeleteUserAsync(user);
+                await _logService.AddLogAsync($"User with ID {user.Id} has deleted their account.", LogSource.Identity, "", LogType.Warning);
+
+                await _account.DeleteUserAsync(user);
 
                 return RedirectToAction(nameof(Deleted));
             }

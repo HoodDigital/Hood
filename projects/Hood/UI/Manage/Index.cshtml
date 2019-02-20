@@ -163,11 +163,11 @@
                 </fieldset>
             </div>
             <div role="tabpanel" class="tab-pane" id="avatar">
-                <div class="media">
-                    <div class="media-left media-middle">
+                <div class="row row-center-xs m-t-md m-b-lg">
+                    <div class="col-xs-4">
                         <fixedImage src="@Model.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId)"></fixedImage>
                     </div>
-                    <div class="media-body">
+                    <div class="col-xs-8">
                         <h4 class="media-heading">Change your profile image</h4>
                         <p>You can set your own profile image, click the upload button below to begin.</p>
                         <p><a class="btn btn-default" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })" data-preview="@string.Format(".avatar-{0}", Model.UserId)">Upload</a></p>

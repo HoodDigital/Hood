@@ -156,7 +156,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Running = false;
-                _logService.AddLogAsync("An error occurred starting a property update.", ex, LogType.Error, LogSource.Properties);
+                _logService.LogErrorAsync("An error occurred starting a property update.", ex, LogType.Error, LogSource.Properties);
                 StatusMessage = ex.Message;
                 Lock.ReleaseWriterLock();
                 return false;
@@ -249,7 +249,7 @@ namespace Hood.Services
                         Processed++;
                         Added++;
                         Errors.Add(FormatLog("Error adding property: " + addPropertyException.Message, propertyRef));
-                        await _logService.AddLogAsync("An error occurred adding a property via BLM import.", addPropertyException, LogType.Error, LogSource.Properties);
+                        await _logService.LogErrorAsync("An error occurred adding a property via BLM import.", addPropertyException, LogType.Error, LogSource.Properties);
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Adding property failed: " + addPropertyException.Message);
                     }
@@ -284,7 +284,7 @@ namespace Hood.Services
                         Processed++;
                         Updated++;
                         Errors.Add(FormatLog("Error updating property: " + updatePropertyException.Message, propertyRef));
-                        await _logService.AddLogAsync("An error occurred updating a property via BLM import.", updatePropertyException, LogType.Error, LogSource.Properties);
+                        await _logService.LogErrorAsync("An error occurred updating a property via BLM import.", updatePropertyException, LogType.Error, LogSource.Properties);
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Updating property failed: " + updatePropertyException.Message);
                     }
@@ -323,7 +323,7 @@ namespace Hood.Services
                         Processed++;
                         Updated++;
                         Errors.Add(FormatLog("Error removing property: " + removePropertyException.Message, property));
-                        await _logService.AddLogAsync("An error occurred updating a removing via BLM import.", removePropertyException, LogType.Error, LogSource.Properties);
+                        await _logService.LogErrorAsync("An error occurred updating a removing via BLM import.", removePropertyException, LogType.Error, LogSource.Properties);
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Removing property failed: " + removePropertyException.Message);
                     }
@@ -340,7 +340,7 @@ namespace Hood.Services
                 StatusMessage = "Update completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
                 Lock.ReleaseWriterLock();
 
-                await _logService.AddLogAsync("Sucessfully imported properties via BLM.", "Process completed!", LogType.Success, LogSource.Properties);
+                await _logService.AddLogAsync("Sucessfully imported properties via BLM.", LogSource.Properties, "Process completed!", LogType.Success);
 
                 return;
             }
@@ -348,7 +348,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Running = false;
-                await _logService.AddLogAsync("An error occurred importing properties via BLM.", ex, LogType.Error, LogSource.Properties);
+                await _logService.LogErrorAsync("An error occurred importing properties via BLM.", ex, LogType.Error, LogSource.Properties);
                 StatusMessage = ex.Message;
                 Lock.ReleaseWriterLock();
                 return;
@@ -710,7 +710,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 StatusMessage = "There was an error with validating a property.";
-                _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                 Warnings.Add(FormatLog(StatusMessage));
                 Lock.ReleaseWriterLock();
                 return false;
@@ -741,7 +741,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 StatusMessage = "There was an error downloading the file (" + filename + ")...";
-                _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                 Errors.Add(FormatLog(StatusMessage));
                 FileError = true;
                 Lock.ReleaseWriterLock();
@@ -1009,21 +1009,21 @@ namespace Hood.Services
                         case GoogleStatus.RequestDenied:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
-                            _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                            _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
                         case GoogleStatus.OverQueryLimit:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
-                            _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                            _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
                         default:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
-                            _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                            _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
@@ -1033,7 +1033,7 @@ namespace Hood.Services
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
                     StatusMessage = "There was an error GeoLocating the property.";
-                    _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                    _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }

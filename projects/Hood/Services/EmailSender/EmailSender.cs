@@ -73,7 +73,7 @@ namespace Hood.Services
 
             var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
             var response = await client.SendEmailAsync(msg);
-            var body = response.DeserializeResponseBody(response.Body);
+            var body = await response.DeserializeResponseBodyAsync(response.Body);
             if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
                 return 1;
 
@@ -89,7 +89,7 @@ namespace Hood.Services
             {
                 var msg = MailHelper.CreateSingleEmail(from, email, subject, textContent, htmlContent);
                 var response = await client.SendEmailAsync(msg);
-                var body = response.DeserializeResponseBody(response.Body);
+                var body = await response.DeserializeResponseBodyAsync(response.Body);
                 if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
                     sent++;
             }

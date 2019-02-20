@@ -1,7 +1,7 @@
 ﻿using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -12,23 +12,16 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public abstract class BaseHomeController : Controller
+    public abstract class BaseHomeController : BaseHomeController<HoodDbContext>
     {
-        public IAccountRepository _auth { get; }
-        public ISettingsRepository _settings { get; }
-        public IContentRepository _content { get; }
-        public ContentCategoryCache _categories { get; }
+        public BaseHomeController() : base() { }
+    }
 
-        public BaseHomeController(IAccountRepository auth,
-                              IContentRepository content,
-                              ContentCategoryCache categories, 
-                              ISettingsRepository settings)
-        {
-            _auth = auth;
-            _settings = settings;
-            _content = content;
-            _categories = categories;
-        }
+    public abstract class BaseHomeController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+         where TContext : HoodDbContext
+    {
+
+        public BaseHomeController() : base() { }
 
         [ResponseCache(CacheProfileName = "Day")]
         public virtual async Task<IActionResult> Index()

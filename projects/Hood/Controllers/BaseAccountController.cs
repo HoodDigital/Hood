@@ -19,39 +19,18 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize]
-    public abstract class BaseAccountController : Controller
+    public abstract class BaseAccountController : BaseAccountController<HoodDbContext>
     {
-        protected readonly UserManager<ApplicationUser> _userManager;
-        protected readonly SignInManager<ApplicationUser> _signInManager;
-        protected readonly IEmailSender _emailSender;
-        protected readonly IAccountRepository _account;
-        protected readonly ISmsSender _smsSender;
-        protected readonly ILogger _logger;
-        protected readonly IContentRepository _data;
-        protected readonly IHoodCache _cache;
-        protected readonly ISettingsRepository _settings;
+        public BaseAccountController() : base() { }
+    }
 
-        public BaseAccountController(
-            IContentRepository data,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,
-            ISmsSender smsSender,
-            IHoodCache cache,
-            ILoggerFactory loggerFactory,
-            IAccountRepository account,
-            ISettingsRepository settings)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _emailSender = emailSender;
-            _smsSender = smsSender;
-            _account = account;
-            _logger = loggerFactory.CreateLogger<BaseAccountController>();
-            _data = data;
-            _cache = cache;
-            _settings = settings;
-        }
+    [Authorize]
+    public abstract class BaseAccountController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+         where TContext : HoodDbContext
+    {
+        public BaseAccountController()
+            : base()
+        { }
 
         [TempData]
         public string ErrorMessage { get; set; }
@@ -88,7 +67,7 @@ namespace Hood.Controllers
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
 
-                    _logger.LogInformation(1, "User " + model.Username + " logged in.");
+                    await _logService.AddLogAsync("User " + model.Username + " logged in.", LogSource.Identity);
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -97,7 +76,6 @@ namespace Hood.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out.");
                     return View("Lockout");
                 }
                 else
@@ -151,17 +129,16 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+                await _logService.AddLogAsync($"User with ID {user.Id} logged in with 2fa.", LogSource.Identity, "", LogType.Info, user.Id);
                 return RedirectToLocal(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
                 return RedirectToAction(nameof(Lockout));
             }
             else
             {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
+                await _logService.AddLogAsync($"Invalid authenticator code entered for user with ID {user.Id}.", LogSource.Identity, "", LogType.Info, user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return View();
             }
@@ -205,17 +182,16 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID {UserId} logged in with a recovery code.", user.Id);
+                await _logService.AddLogAsync($"User with ID {user.Id} logged in with a recovery code.", LogSource.Identity, "", LogType.Info, user.Id);
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
                 return RedirectToAction(nameof(Lockout));
             }
             else
             {
-                _logger.LogWarning("Invalid recovery code entered for user with ID {UserId}", user.Id);
+                await _logService.AddLogAsync($"Invalid recovery code entered for user with ID {user.Id}", LogSource.Identity, "", LogType.Info, user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return View();
             }
@@ -506,7 +482,7 @@ namespace Hood.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                _logger.LogInformation(3, "User created a new account with password.");
+                await _logService.AddLogAsync($"User ({user.UserName}) created a new account with password.", LogSource.Identity, "", LogType.Info, user.Id);
 
                 WelcomeEmailSender welcomeSender = EngineContext.Current.Resolve<WelcomeEmailSender>();
                 await welcomeSender.ProcessAndSend(new WelcomeEmailModel(user));
@@ -526,8 +502,9 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> LogOff()
         {
+            var user = User.Identity;
             await _signInManager.SignOutAsync();
-            _logger.LogInformation(4, "User logged out.");
+            await _logService.AddLogAsync($"User ({user.Name}) logged out.", LogSource.Identity, "", LogType.Info);
             return RedirectToAction("Index", "Home");
         }
 
@@ -576,7 +553,7 @@ namespace Hood.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
+                await _logService.AddLogAsync($"User ({info.Principal.FindFirstValue(ClaimTypes.Email)}) created an account using {info.LoginProvider} provider.", LogSource.Identity, "", LogType.Info);
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
@@ -614,7 +591,7 @@ namespace Hood.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        await _logService.AddLogAsync($"User ({user.UserName}) created an account using {info.LoginProvider} provider.", LogSource.Identity, "", LogType.Info, user.Id);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -623,7 +600,7 @@ namespace Hood.Controllers
 
             ViewData["ReturnUrl"] = returnUrl;
             return View(nameof(ExternalLogin), model);
-        }        
+        }
 
         #endregion
 
@@ -633,7 +610,7 @@ namespace Hood.Controllers
         {
             if (userId == null || code == null)
             {
-                return RedirectToAction(nameof(BaseHomeController.Index), "Home");
+                return RedirectToAction(nameof(BaseHomeController<TContext>.Index), "Home");
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -837,7 +814,6 @@ namespace Hood.Controllers
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning(7, "User account locked out.");
                 return View("Lockout");
             }
             else
