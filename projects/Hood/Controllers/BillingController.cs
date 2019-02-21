@@ -16,6 +16,7 @@ namespace Hood.Controllers
     public class BillingController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public BillingController()
+            : base()
         { }
 
         [HttpGet]

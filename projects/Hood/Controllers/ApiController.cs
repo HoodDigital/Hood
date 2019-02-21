@@ -18,6 +18,7 @@ namespace Hood.Controllers
         private readonly UrlEncoder _urlEncoder;
 
         public ApiController(UrlEncoder urlEncoder)
+            : base()
         {
             _urlEncoder = urlEncoder;
         }

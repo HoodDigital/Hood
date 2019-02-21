@@ -3,6 +3,7 @@ using Hood.Extensions;
 using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -58,7 +59,17 @@ namespace Hood.Models
         [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser DeletedBy { get; set; }
 
-        public MailObject WriteToMessage(MailObject message)
+        [NotMapped]
+        public EmailAddress To { get; } = null;
+
+        [NotMapped]
+        public bool NotifySender { get; set; } = false;
+        [NotMapped]
+        public EmailAddress NotifyEmail { get; set; } = null;
+        [NotMapped]
+        public string NotifyRole { get; set; } = null;
+
+        public MailObject WriteToMailObject(MailObject message)
         {
             message.AddDiv("<hr /><br />");
             message.AddParagraph("<strong>Post content:</strong>");
@@ -69,6 +80,13 @@ namespace Hood.Models
             message.AddParagraph("<strong>Posted by (Username): </strong>" + AuthorName);
             message.AddParagraph("<strong>Posted from (IP Address): </strong>" + AuthorIp);
             message.AddDiv("<hr /><br />");
+            return message;
+        }
+
+        public MailObject WriteNotificationToMailObject(MailObject message)
+        {
+            message = WriteToMailObject(message);
+            message.Subject += " [COPY]";
             return message;
         }
     }

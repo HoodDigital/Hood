@@ -22,16 +22,19 @@ namespace Hood.Controllers
     public class ManageController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         private readonly UrlEncoder _urlEncoder;
-
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
+        [TempData]
+        public string SaveMessage { get; set; }
+        [TempData]
+        public AlertType MessageType { get; set; }
+
         public ManageController(UrlEncoder urlEncoder)
+            : base()
         {
             _urlEncoder = urlEncoder;
         }
 
-        [TempData]
-        public string StatusMessage { get; set; }
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -51,11 +54,14 @@ namespace Hood.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = StatusMessage,
+                StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
                 Profile = profile,
                 Roles = await _userManager.GetRolesAsync(user)
             };
+
+            model.SaveMessage = SaveMessage;
+            model.MessageType = MessageType;
 
             return View(model);
         }
@@ -77,13 +83,15 @@ namespace Hood.Controllers
                     throw new Exception($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
 
+                model.Roles = await _userManager.GetRolesAsync(user);
+
                 var email = user.Email;
                 if (model.Email != email)
                 {
                     var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
                     if (!setEmailResult.Succeeded)
                     {
-                        throw new Exception($"Unexpected error setting email for user with ID '{user.Id}'.");
+                        throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
                     }
                 }
 
@@ -93,24 +101,44 @@ namespace Hood.Controllers
                     var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
                     if (!setPhoneResult.Succeeded)
                     {
-                        throw new Exception($"Unexpected error setting phone number for user with ID '{user.Id}'.");
+                        model.Email = phoneNumber;
+                        throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
                     }
                 }
 
                 user.SetProfile(model.Profile);
                 _account.UpdateUser(user);
-                model.SaveMessage = "Saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
-                return View(model);
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+                var profile = new UserProfile();
+                profile.SetProfile(user);
+                model = new IndexViewModel
+                {
+                    UserId = user.Id,
+                    Username = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    IsEmailConfirmed = user.EmailConfirmed,
+                    StatusMessage = SaveMessage,
+                    Avatar = user.Avatar,
+                    Profile = profile,
+                    Roles = await _userManager.GetRolesAsync(user)
+                };
+                SaveMessage = "Something went wrong: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
+                return RedirectToAction(nameof(Index));
             }
 
-            model.SaveMessage = "Your profile has been updated";
-            model.MessageType = Enums.AlertType.Success;
+            SaveMessage = "Your profile has been updated";
+            MessageType = Enums.AlertType.Success;
             return RedirectToAction(nameof(Index));
         }
 
@@ -159,12 +187,12 @@ namespace Hood.Controllers
             }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+            var verifyModel = new VerifyEmailModel(user, callbackUrl) { NotifySender = true };
 
-            WelcomeEmailSender welcomeSender = EngineContext.Current.Resolve<WelcomeEmailSender>();
-            await welcomeSender.ProcessAndSend(new WelcomeEmailModel(user, callbackUrl));
+            await _mailService.ProcessAndSend(verifyModel);
 
-            StatusMessage = "Verification email sent. Please check your email.";
+            SaveMessage = "Verification email sent. Please check your email.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -183,7 +211,7 @@ namespace Hood.Controllers
                 return RedirectToAction(nameof(SetPassword));
             }
 
-            var model = new ChangePasswordViewModel { StatusMessage = StatusMessage };
+            var model = new ChangePasswordViewModel { StatusMessage = SaveMessage };
             return View(model);
         }
 
@@ -211,7 +239,7 @@ namespace Hood.Controllers
 
             await _signInManager.SignInAsync(user, isPersistent: false);
             await _logService.AddLogAsync($"User ({user.UserName}) changed their password successfully.", LogSource.Identity, "", LogType.Info, user.Id);
-            StatusMessage = "Your password has been changed.";
+            SaveMessage = "Your password has been changed.";
 
             return RedirectToAction(nameof(ChangePassword));
         }
@@ -232,7 +260,7 @@ namespace Hood.Controllers
                 return RedirectToAction(nameof(ChangePassword));
             }
 
-            var model = new SetPasswordViewModel { StatusMessage = StatusMessage };
+            var model = new SetPasswordViewModel { StatusMessage = SaveMessage };
             return View(model);
         }
 
@@ -259,7 +287,7 @@ namespace Hood.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            StatusMessage = "Your password has been set.";
+            SaveMessage = "Your password has been set.";
 
             return RedirectToAction(nameof(SetPassword));
         }
@@ -278,7 +306,7 @@ namespace Hood.Controllers
                 .Where(auth => model.CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
                 .ToList();
             model.ShowRemoveButton = await _userManager.HasPasswordAsync(user) || model.CurrentLogins.Count > 1;
-            model.StatusMessage = StatusMessage;
+            model.StatusMessage = SaveMessage;
 
             return View(model);
         }
@@ -320,7 +348,7 @@ namespace Hood.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            StatusMessage = "The external login was added.";
+            SaveMessage = "The external login was added.";
             return RedirectToAction(nameof(ExternalLogins));
         }
 
@@ -341,7 +369,7 @@ namespace Hood.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            StatusMessage = "The external login was removed.";
+            SaveMessage = "The external login was removed.";
             return RedirectToAction(nameof(ExternalLogins));
         }
 
@@ -532,6 +560,13 @@ namespace Hood.Controllers
                 await _signInManager.SignOutAsync();
 
                 await _logService.AddLogAsync($"User with ID {user.Id} has deleted their account.", LogSource.Identity, "", LogType.Warning);
+
+                var userLogs = _db.Logs.Where(l => l.UserId == user.Id);
+                foreach (var log in userLogs)
+                {
+                    log.UserId = null;
+                }
+                _db.SaveChanges();
 
                 await _account.DeleteUserAsync(user);
 

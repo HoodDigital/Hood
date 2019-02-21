@@ -18,7 +18,8 @@ namespace Hood.Controllers
     public class ForumController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public ForumController()
-        {}
+            : base()
+        { }
 
         #region "Forum Views"
 
@@ -575,7 +576,7 @@ namespace Hood.Controllers
                 message.PreHeader = _settings.ReplacePlaceholders("Abuse report");
                 message.Subject = _settings.ReplacePlaceholders("Abuse report");
                 message.AddParagraph(_settings.ReplacePlaceholders("The following post has been reported for abuse."));
-                message = post.WriteToMessage(message);
+                message = post.WriteToMailObject(message);
                 message.AddParagraph("The report was sent by: ");
                 if (reporter == null)
                 {

@@ -52,6 +52,8 @@
             </div>
         </div>
     </div>
+    <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+    <input type="password" name="password_fake" id="password_fake" value="" style="display:none;" />
     <div class="form-group">
         <label asp-for="Username" class="control-label"></label>
         <div class="input-group">
@@ -64,7 +66,7 @@
         <label asp-for="Password" class="control-label"></label>
         <div class="input-group">
             <span class="input-group-addon"><i class="fa fa-hashtag"></i></span>
-            <input asp-for="Password" class="form-control" placeholder="Your email address" />
+            <input asp-for="Password" class="form-control" placeholder="Choose a password" autocomplete="new-password" />
         </div>
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
@@ -72,7 +74,7 @@
         <label asp-for="ConfirmPassword" class="control-label"></label>
         <div class="input-group">
             <span class="input-group-addon"><i class="fa fa-hashtag"></i></span>
-            <input asp-for="ConfirmPassword" class="form-control" placeholder="Your email address" />
+            <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
         </div>
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>

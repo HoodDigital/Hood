@@ -20,9 +20,8 @@ namespace Hood.Controllers
     {
 
         private readonly IStripeWebHookService _webHooks;
-        public SubscriptionsController(
-            IStripeWebHookService webHooks
-            )
+        public SubscriptionsController(IStripeWebHookService webHooks)
+            : base()
         {
             _webHooks = webHooks;
         }

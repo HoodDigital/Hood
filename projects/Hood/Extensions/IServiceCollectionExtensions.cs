@@ -109,8 +109,7 @@ namespace Hood.Extensions
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<IBillingService, BillingService>();
-            services.AddTransient<FormSenderService>();
-            services.AddTransient<WelcomeEmailSender>();
+            services.AddTransient<IMailService, MailService>();
 
             // Register scoped.
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();

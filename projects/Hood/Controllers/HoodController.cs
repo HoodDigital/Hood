@@ -16,12 +16,9 @@ namespace Hood.Controllers
 {
     public class HoodController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        public readonly FormSenderService _forms;
-
-        public HoodController(FormSenderService forms)
-        {
-            _forms = forms;
-        }
+        public HoodController()
+            : base()
+        { }
 
         [HttpPost]
         [Route("hood/contact/send/")]
@@ -38,9 +35,12 @@ namespace Hood.Controllers
 
                 await _settings.ProcessCaptchaOrThrowAsync(Request);
 
-                model.Subject = "Online Enquiry: " + model.Subject;
+                var contactSettings = _settings.GetContactSettings();
 
-                return await _forms.ProcessAndSend(model);
+                model.NotifySender = true;
+                model.NotifyRole = "ContactFormNotifications";
+
+                return await _mailService.ProcessAndSend(model);
             }
             catch (Exception ex)
             {

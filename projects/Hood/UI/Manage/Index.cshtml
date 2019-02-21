@@ -3,6 +3,10 @@
     ViewData["Title"] = "Update your profile";
     ViewData.AddActivePage(ManageNavPages.Index);
 }
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
 <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="active"><a href="#basics" aria-controls="password" role="tab" data-toggle="tab">Basic Details</a></li>
     <li role="presentation"><a href="#roles" aria-controls="socials" role="tab" data-toggle="tab">Roles</a></li>
@@ -10,7 +14,6 @@
     <li role="presentation"><a href="#avatar" aria-controls="avatar" role="tab" data-toggle="tab">Avatar</a></li>
     <li role="presentation"><a href="#bio" aria-controls="bio" role="tab" data-toggle="tab">Bio</a></li>
 </ul>
-@Html.Partial("_StatusMessage", Model.StatusMessage)
 <hr class="m-b-lg" />
 <form method="post">
 

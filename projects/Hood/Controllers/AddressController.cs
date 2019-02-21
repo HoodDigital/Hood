@@ -12,6 +12,7 @@ namespace Hood.Controllers
     public class AddressController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public AddressController()
+            : base()
         { }
 
         public ActionResult Index()

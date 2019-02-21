@@ -27,6 +27,7 @@ namespace Hood.Controllers
         protected readonly ForumCategoryCache _forumCategoryCache;
         protected readonly TContext _db;
         protected readonly IEmailSender _emailSender;
+        protected readonly IMailService _mailService;
         protected readonly ISmsSender _smsSender;
         protected readonly ISettingsRepository _settings;
         protected readonly IBillingService _billing;
@@ -50,6 +51,7 @@ namespace Hood.Controllers
             _account = EngineContext.Current.Resolve<IAccountRepository>();
             _db = EngineContext.Current.Resolve<TContext>();
             _emailSender = EngineContext.Current.Resolve<IEmailSender>();
+            _mailService = EngineContext.Current.Resolve<IMailService>();
             _smsSender = EngineContext.Current.Resolve<ISmsSender>();
             _settings = EngineContext.Current.Resolve<ISettingsRepository>();
             _billing = EngineContext.Current.Resolve<IBillingService>();

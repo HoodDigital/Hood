@@ -67,7 +67,7 @@ namespace Hood.Controllers
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
 
-                    await _logService.AddLogAsync("User " + model.Username + " logged in.", LogSource.Identity);
+                    await _logService.AddLogAsync("User (" + model.Username + ") logged in.", LogSource.Identity);
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -242,10 +242,17 @@ namespace Hood.Controllers
                 if (result.Succeeded)
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
 
-                    WelcomeEmailSender welcomeSender = EngineContext.Current.Resolve<WelcomeEmailSender>();
-                    await welcomeSender.ProcessAndSend(new WelcomeEmailModel(user, callbackUrl));
+                    if (_settings.GetAccountSettings().EnableWelcome)
+                    {
+                        var welcomeModel = new WelcomeEmailModel(user, callbackUrl)
+                        {
+                            NotifySender = true,
+                            NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
+                        };
+                        await _mailService.ProcessAndSend(welcomeModel);
+                    }
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -288,9 +295,10 @@ namespace Hood.Controllers
 
                 // check if the user is registered, if so forward to login, filling in the email address.
                 var user = _account.GetUserByEmail(model.Email);
+
                 if (user == null)
                 {
-                    // if no account exists, create one, then carry on.
+                    // Try to create the new account, then carry on.
                     user = new ApplicationUser { UserName = Guid.NewGuid().ToString(), Email = model.Email };
                     var result = await _userManager.CreateAsync(user, keyGen.Generate(24));
                     if (!result.Succeeded)
@@ -300,28 +308,11 @@ namespace Hood.Controllers
                     }
                 }
 
-                // the user exists, has a code, but isn't set up for access, forward to the complete page
-                if (user.EmailConfirmed)
+                if (user.Active)
                 {
-                    if (!user.Active)
-                    {
-                        return RedirectWithReturnUrl("/account/finish?uid=" + user.Id, returnUrl);
-                    }
-                    else
-                    {
-                        // They are good, let them log in.
-                        return RedirectWithReturnUrl("/account/login?uid=", returnUrl);
-                    }
+                    ModelState.AddModelError(null, $"Email '{model.Email}' is already taken.");
+                    return View(model);
                 }
-
-                // check if they have a current valid code, if so forward them to the code page.
-                user = _account.GetUserById(user.Id);
-                if (CheckForAccessCodes(user))
-                {
-                    return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
-                }
-
-                // If they don't have a valid code, let them add a new code to their account, send it and forward to the code page.
 
                 // Attach the code to the user, along with it's expiry date.
                 keyGen = new KeyGenerator(false, false, true, false);
@@ -349,7 +340,7 @@ namespace Hood.Controllers
                 message.AddParagraph($"You can use the following access code to complete your registration:");
                 message.AddH2(code.Substring(0, 3) + " - " + code.Substring(3, 3), "#5fba7d", "center");
                 message.AddParagraph($"Once you have entered your code you can create a username and password for the site. Click the button below to enter your code now.");
-                message.AddCallToAction("Validate your account", "/account/code?uid=" + user.Id);
+                var callbackUrl = Url.Action("Code", "Account", new { uid = user.Id }, protocol: HttpContext.Request.Scheme);
                 await _emailSender.SendEmailAsync(message, MailSettings.SuccessTemplate);
 
                 return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
@@ -473,6 +464,11 @@ namespace Hood.Controllers
                     return RedirectWithReturnUrl("/account/create", returnUrl);
                 }
 
+                // check if the username is already taken
+                var dupeUser = await _userManager.FindByNameAsync(model.Username);
+                if (dupeUser != null)
+                    throw new Exception($"The username '{model.Username}' is already taken.");
+
                 user.UserName = model.Username;
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
@@ -484,8 +480,15 @@ namespace Hood.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 await _logService.AddLogAsync($"User ({user.UserName}) created a new account with password.", LogSource.Identity, "", LogType.Info, user.Id);
 
-                WelcomeEmailSender welcomeSender = EngineContext.Current.Resolve<WelcomeEmailSender>();
-                await welcomeSender.ProcessAndSend(new WelcomeEmailModel(user));
+                if (_settings.GetAccountSettings().EnableWelcome)
+                {
+                    var welcomeModel = new WelcomeEmailModel(user)
+                    {
+                        NotifySender = true,
+                        NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
+                    };
+                    await _mailService.ProcessAndSend(welcomeModel);
+                }
 
                 return RedirectToLocal(returnUrl);
             }

@@ -11,6 +11,7 @@ namespace Hood.Controllers
     {
 
         public PropertyController()
+            : base()
         { }
 
         public async Task<IActionResult> Index(PropertySearchModel model)
