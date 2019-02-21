@@ -41,27 +41,27 @@ namespace Hood.Controllers
 
         public BaseController()
         {
-            _userManager = EngineContext.Current.Resolve<UserManager<ApplicationUser>>();
-            _signInManager = EngineContext.Current.Resolve<SignInManager<ApplicationUser>>();
-            _roleManager = EngineContext.Current.Resolve<RoleManager<IdentityRole>>();
-            _content = EngineContext.Current.Resolve<IContentRepository>();
-            _contentCategoryCache = EngineContext.Current.Resolve<ContentCategoryCache>();
-            _property = EngineContext.Current.Resolve<IPropertyRepository>();
-            _forumCategoryCache = EngineContext.Current.Resolve<ForumCategoryCache>();
-            _account = EngineContext.Current.Resolve<IAccountRepository>();
-            _db = EngineContext.Current.Resolve<TContext>();
-            _emailSender = EngineContext.Current.Resolve<IEmailSender>();
-            _mailService = EngineContext.Current.Resolve<IMailService>();
-            _smsSender = EngineContext.Current.Resolve<ISmsSender>();
-            _settings = EngineContext.Current.Resolve<ISettingsRepository>();
-            _billing = EngineContext.Current.Resolve<IBillingService>();
-            _logService = EngineContext.Current.Resolve<ILogService>();
-            _config = EngineContext.Current.Resolve<IConfiguration>();
-            _env = EngineContext.Current.Resolve<IHostingEnvironment>();
-            _cache = EngineContext.Current.Resolve<IHoodCache>();
-            _address = EngineContext.Current.Resolve<IAddressService>();
-            _eventService = EngineContext.Current.Resolve<IEventsService>();
-            _media = EngineContext.Current.Resolve<IMediaManager<MediaObject>>();
+            _userManager = Engine.Current.Resolve<UserManager<ApplicationUser>>();
+            _signInManager = Engine.Current.Resolve<SignInManager<ApplicationUser>>();
+            _roleManager = Engine.Current.Resolve<RoleManager<IdentityRole>>();
+            _content = Engine.Current.Resolve<IContentRepository>();
+            _contentCategoryCache = Engine.Current.Resolve<ContentCategoryCache>();
+            _property = Engine.Current.Resolve<IPropertyRepository>();
+            _forumCategoryCache = Engine.Current.Resolve<ForumCategoryCache>();
+            _account = Engine.Current.Resolve<IAccountRepository>();
+            _db = Engine.Current.Resolve<TContext>();
+            _emailSender = Engine.Current.Resolve<IEmailSender>();
+            _mailService = Engine.Current.Resolve<IMailService>();
+            _smsSender = Engine.Current.Resolve<ISmsSender>();
+            _settings = Engine.Current.Resolve<ISettingsRepository>();
+            _billing = Engine.Current.Resolve<IBillingService>();
+            _logService = Engine.Current.Resolve<ILogService>();
+            _config = Engine.Current.Resolve<IConfiguration>();
+            _env = Engine.Current.Resolve<IHostingEnvironment>();
+            _cache = Engine.Current.Resolve<IHoodCache>();
+            _address = Engine.Current.Resolve<IAddressService>();
+            _eventService = Engine.Current.Resolve<IEventsService>();
+            _media = Engine.Current.Resolve<IMediaManager<MediaObject>>();
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Hood.Services
             )
             : base()
         {
-            _auth = EngineContext.Current.Resolve<IAccountRepository>();
+            _auth = Engine.Current.Resolve<IAccountRepository>();
 
             _basicSettings = _settings.GetBasicSettings();
             _mailSettings = _settings.GetMailSettings();

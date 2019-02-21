@@ -34,7 +34,7 @@ namespace Hood.Models
 
         public MailObject WriteToMailObject(MailObject message)
         {
-            var _settings = EngineContext.Current.Resolve<ISettingsRepository>();
+            var _settings = Engine.Current.Resolve<ISettingsRepository>();
             var _accountSettings = _settings.GetAccountSettings();
             message.Subject = User.ReplacePlaceholders(message.Subject);
             message.PreHeader = User.ReplacePlaceholders(message.PreHeader);

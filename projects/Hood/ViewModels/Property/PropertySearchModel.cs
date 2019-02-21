@@ -10,7 +10,7 @@ namespace Hood.Models
     {
         public PropertySearchModel()
         {
-            var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+            var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
             var propertySettings = siteSettings.GetPropertySettings();
             PageSize = propertySettings.DefaultPageSize;
             if (PageSize <= 0)

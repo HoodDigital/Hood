@@ -84,7 +84,7 @@ namespace Hood.Models
             get
             {
                 var output = "";
-                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
                 if (siteSettings != null)
                 {
                     var mediaSettings = siteSettings.GetMediaSettings();

@@ -33,7 +33,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.LogErrorAsync("An error while triggering a Forum Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
             }
         }
@@ -84,7 +84,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.LogErrorAsync("An error while triggering a Properties Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
             }
         }
@@ -115,7 +115,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.LogErrorAsync("An error while triggering a Options Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
             }
         }
@@ -146,7 +146,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.LogErrorAsync("An error while triggering a User Subcription Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
             }
         }
@@ -177,7 +177,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.LogErrorAsync("An error while triggering a Stripe Webhook event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
             }
         }

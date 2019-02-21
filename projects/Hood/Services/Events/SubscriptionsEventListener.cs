@@ -25,20 +25,20 @@ namespace Hood.Services
 
         public void OnUserSubscriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
         {
-            var env = EngineContext.Current.Resolve<IHostingEnvironment>();
+            var env = Engine.Current.Resolve<IHostingEnvironment>();
             if (!env.IsProduction())
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.AddLogAsync($"User Subscription Changed Event: {e.Action}", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, null, e.Subscription?.Id.ToString(), nameof(UserSubscription), null);
             }
         }
 
         public void OnWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
         {
-            var env = EngineContext.Current.Resolve<IHostingEnvironment>();
+            var env = Engine.Current.Resolve<IHostingEnvironment>();
             if (!env.IsProduction())
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
+                var logService = Engine.Current.Resolve<ILogService>();
                 logService.AddLogAsync($"Webhook Triggered Event: {e.Action}", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, null, e.StripeEvent?.Id.ToString(), null, null);
             }
         }

@@ -38,7 +38,7 @@ namespace Hood.Extensions
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //create, initialize and configure the engine
-            var engine = EngineContext.Create();
+            var engine = Engine.Create();
             engine.Initialize(services);
             var serviceProvider = engine.ConfigureServices(services, configuration);
 

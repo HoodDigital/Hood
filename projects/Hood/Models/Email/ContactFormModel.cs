@@ -65,7 +65,7 @@ namespace Hood.Models
 
         public MailObject WriteToMailObject(MailObject message)
         {
-            var settings = EngineContext.Current.Resolve<ISettingsRepository>();
+            var settings = Engine.Current.Resolve<ISettingsRepository>();
             var contactSettings = settings.GetContactSettings();
 
             message.PreHeader = settings.ReplacePlaceholders(
@@ -92,7 +92,7 @@ namespace Hood.Models
 
         public MailObject WriteNotificationToMailObject(MailObject message)
         {
-            var settings = EngineContext.Current.Resolve<ISettingsRepository>();
+            var settings = Engine.Current.Resolve<ISettingsRepository>();
             var contactSettings = settings.GetContactSettings();
 
             message.PreHeader = settings.ReplacePlaceholders(

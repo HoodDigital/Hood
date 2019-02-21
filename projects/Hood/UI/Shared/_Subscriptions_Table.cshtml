@@ -8,14 +8,6 @@
     {
         plans = plans.Where(p => p.Category == Model.Category).ToList();
     }
-    if (_settings.GetBillingSettings().EnableStripeTestMode)
-    {
-        plans = plans.Where(p => p.StripeId.EndsWith("-test")).ToList();
-    }
-    else
-    {
-        plans = plans.Where(p => !p.StripeId.EndsWith("-test")).ToList();
-    }
 }
 <div class="row">
     @foreach (Subscription plan in plans)

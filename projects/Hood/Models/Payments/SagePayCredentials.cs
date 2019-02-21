@@ -22,7 +22,7 @@ namespace Hood.Models.Payments
         {
             get
             {
-                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
                 BillingSettings contentSettings = siteSettings.GetBillingSettings();
                 return contentSettings;
             }
