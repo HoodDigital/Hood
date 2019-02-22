@@ -102,12 +102,10 @@ namespace Hood.Extensions
                     Cookie = builder
                 });
             }
-
-            app.UseDefaultRoutesForHood(config);
-
+            
             return app;
         }
-        public static IApplicationBuilder UseDefaultRoutesForHood(this IApplicationBuilder app, IConfiguration config)
+        public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app, IConfiguration config)
         {
             if (!config.IsDatabaseConfigured())
             {

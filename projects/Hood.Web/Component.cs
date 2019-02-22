@@ -17,6 +17,7 @@ namespace Hood.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
         {
             app.UseHoodDefaults(env, config);
+            app.UseHoodDefaultRoutes(config);
         }
 
         public void ConfigureServices(IServiceCollection services, IConfiguration config)
