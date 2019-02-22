@@ -15,21 +15,7 @@ $.window = $(window),
     stickyHeaderClass = 'sticky-header',
     mobileMenuOpenClass = 'mobile-menu-open',
     sidePushPanelClass = 'side-push-panel',
-    sidePushPanelOpenClass = 'side-panel-open',
-
-    defaultLogo = $('#logo').find('.standard-logo'),
-    defaultLogoImg = defaultLogo.find('img').attr('src'),
-    defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
-    defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
-
-    defaultLogoWidth = defaultLogo.find('img').outerWidth(),
-
-    retinaLogo = $('#logo').find('.retina-logo'),
-    retinaLogoImg = retinaLogo.find('img').attr('src'),
-    retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
-    retinaMobileLogo = retinaLogo.attr('data-mobile-logo');
-
-var windowWidth = $.window.width()
+    sidePushPanelOpenClass = 'side-panel-open';
 
 if (!$.hood)
     $.hood = {};
@@ -51,7 +37,6 @@ $.hood.App = {
 
             ]
         },
-        ShowCookieMessage: !$('body').hasClass('disable-cookies'),
         Accordion: true,
         Alerts: true,
         Colorbox: true,
@@ -105,9 +90,6 @@ $.hood.App = {
 
         if ($.hood.App.Options.LoadSharers)
             $.hood.App.Sharers();
-
-        if ($.hood.App.Options.ShowCookieMessage)
-            $.hood.App.Cookies();
 
         if ($.hood.App.Options.RichTextEditors)
             $.hood.App.RichTextEditors();
@@ -174,7 +156,6 @@ $.hood.App = {
         Init: function () {
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
-            $.hood.App.Header.Logo();
         },
         StickyMenu: function () {
             var headerOffset = 0;
@@ -210,15 +191,6 @@ $.hood.App = {
                 $.body.toggleClass(mobileMenuOpenClass);
                 return false;
             });
-        },
-        Logo: function () {
-            if (($.header.hasClass('dark') || $.body.hasClass('dark')) && !$.headerWrap.hasClass('not-dark')) {
-                if (defaultDarkLogo) { defaultLogo.find('img').attr('src', defaultDarkLogo); }
-                if (retinaDarkLogo) { retinaLogo.find('img').attr('src', retinaDarkLogo); }
-            } else {
-                if (defaultLogoImg) { defaultLogo.find('img').attr('src', defaultLogoImg); }
-                if (retinaLogoImg) { retinaLogo.find('img').attr('src', retinaLogoImg); }
-            }
         }
     },
     Scroll: {
@@ -228,7 +200,6 @@ $.hood.App = {
 
                 $('body.open-header.close-header-on-scroll').removeClass("side-header-open");
                 $.hood.App.Header.StickyMenu();
-                $.hood.App.Header.Logo();
 
             });
         },
@@ -319,13 +290,6 @@ $.hood.App = {
             $(".accordion-title").not($(this)).removeClass('active');
         });
         $(".accordion-content").addClass("defualt-hidden");
-    },
-    Cookies: function () {
-        $.hood.App.Loader.AddItem('cookies');
-        window.cookieconsent_options = { "message": "This website uses cookies to ensure you get the best experience on our website.", "dismiss": "Got it!", "learnMore": "More info", "link": null, "theme": "dark-bottom" };
-        $.getScript('//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js', function () {
-            $.hood.App.Loader.ItemComplete('cookies');
-        });
     },
     Colorbox: function () {
         $.hood.App.Loader.AddItem('colorbox');
