@@ -1,4 +1,5 @@
 ﻿using Hood.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Web
@@ -18,6 +19,13 @@ namespace Hood.Web
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+        }
+
+        public override void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        {
+            base.Seed(userManager, roleManager);
+
+
         }
     }
 }
