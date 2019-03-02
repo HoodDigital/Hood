@@ -66,7 +66,8 @@ namespace Hood.Services
                 switch (_billingSettings.SubscriptionWebhookLogs)
                 {
                     case "email":
-                        _email.NotifyRoleAsync(_mailObject, "SuperUser", MailSettings.SuccessTemplate).GetAwaiter().GetResult();
+                        _mailObject.Template = MailSettings.SuccessTemplate;
+                        _email.NotifyRoleAsync(_mailObject, "SuperUser").GetAwaiter().GetResult();
                         break;
                 }
 
@@ -84,7 +85,9 @@ namespace Hood.Services
 
                 _mailObject.PreHeader = "An error occurred processing a stripe webhook.";
                 _mailObject.Subject = _mailObject.PreHeader;
-                _email.NotifyRoleAsync(_mailObject, "SuperUser", MailSettings.DangerTemplate).GetAwaiter().GetResult();
+                _mailObject.Template = MailSettings.DangerTemplate;
+
+                _email.NotifyRoleAsync(_mailObject, "SuperUser").GetAwaiter().GetResult();
 
                 // Throw the error back to the application, for creating the response object.
                 throw ex;
@@ -265,7 +268,8 @@ namespace Hood.Services
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
                     message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the service.");
-                    _email.SendEmailAsync(message, MailSettings.DangerTemplate).GetAwaiter().GetResult();
+                    message.Template = MailSettings.DangerTemplate;
+                    _email.SendEmailAsync(message).GetAwaiter().GetResult();
 
                 }
                 else
@@ -285,7 +289,8 @@ namespace Hood.Services
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
                     message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the service.");
-                    _email.SendEmailAsync(message, MailSettings.DangerTemplate).GetAwaiter().GetResult();
+                    message.Template = MailSettings.DangerTemplate;
+                    _email.SendEmailAsync(message).GetAwaiter().GetResult();
                 }
             }
 
@@ -332,7 +337,8 @@ namespace Hood.Services
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
                     message.AddParagraph("The charge was created, and completed however the subscription could not be created. Therefore we have refunded the charge to your card, and reset the subscription. Please subscribe again in order to reinstate your subscription.");
-                    _email.SendEmailAsync(message, MailSettings.DangerTemplate).GetAwaiter().GetResult();
+                    message.Template = MailSettings.DangerTemplate;
+                    _email.SendEmailAsync(message).GetAwaiter().GetResult();
 
                 }
                 else
@@ -349,7 +355,8 @@ namespace Hood.Services
                     };
                     message.AddH1("Thank you!");
                     message.AddParagraph("Your payment has been received. You will recieve a payment reciept from our payment providers, Stripe.");
-                    _email.SendEmailAsync(message, MailSettings.DangerTemplate).GetAwaiter().GetResult();
+                    message.Template = MailSettings.DangerTemplate;
+                    _email.SendEmailAsync(message).GetAwaiter().GetResult();
 
                     _mailObject.AddParagraph($"Email sent to customer: {successfulInvoiceUser.Email}");
 
@@ -469,7 +476,8 @@ namespace Hood.Services
                 message.AddH1("Oops!");
                 message.AddParagraph("Seems there was an error with your subscription.");
                 message.AddParagraph("The charge has failed, and we couldn't find a valid subscription on the service, therefore we have prevented any further charges to your card.");
-                _email.SendEmailAsync(message, MailSettings.DangerTemplate).GetAwaiter().GetResult();
+                message.Template = MailSettings.DangerTemplate;
+                _email.SendEmailAsync(message).GetAwaiter().GetResult();
 
                 _mailObject.AddParagraph("Sent email to customer: " + endTrialUser.Email);
             }

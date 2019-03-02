@@ -55,7 +55,8 @@ namespace Hood.Areas.Admin.Controllers
                 mail.To = new SendGrid.Helpers.Mail.EmailAddress(email);
                 mail.Subject = "Test email from HoodCMS";
                 mail.PreHeader = "This is a test email from HoodCMS.";
-                await _emailSender.SendEmailAsync(mail, template);
+                mail.Template = template;
+                await _emailSender.SendEmailAsync(mail);
                 return RedirectToAction("Mail", "Settings", new { status = EditorMessage.Sent });
             }
             catch (Exception ex)
@@ -81,9 +82,10 @@ namespace Hood.Areas.Admin.Controllers
             mail.Subject = "Testing FROM parameter";
 
             var from = new EmailAddress() { Email = "george@hooddigital.com", Name = "HoodCMS Test From" };
+            mail.Template = Models.MailSettings.DangerTemplate;
 
-            _emailSender.SendEmailAsync(mail, Models.MailSettings.DangerTemplate, from);
-            _emailSender.NotifyRoleAsync(mail, "Admin", Models.MailSettings.DangerTemplate, from);
+            _emailSender.SendEmailAsync(mail, from);
+            _emailSender.NotifyRoleAsync(mail, "Admin", from);
             _emailSender.SendEmailAsync(emails, "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
             _emailSender.NotifyRoleAsync("Admin", "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
 
