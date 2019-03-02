@@ -62,7 +62,7 @@ namespace Hood.Services
                 }
                 catch (Exception sendEx)
                 {
-                    throw new Exception("There was a problem sending the message: " + sendEx.Message);
+                    throw new Exception("There was a problem sending the message: " + sendEx.Message, sendEx);
                 }
 
             }

@@ -7,20 +7,20 @@ namespace Hood.Entities
     public abstract partial class BaseEntity : BaseEntity<int>
     { }
 
-    public abstract partial class BaseEntity<T> : SaveableModel
+    public abstract partial class BaseEntity<TKey> : SaveableModel, IBaseEntity<TKey>
     {
         /// <summary>
         /// Gets or sets the entity identifier
         /// </summary>
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public T Id { get; set; }
+        public TKey Id { get; set; }
 
         /// <summary>
         /// Is transient
         /// </summary>
         /// <param name="obj">Object</param>
         /// <returns>Result</returns>
-        private static bool IsTransient(BaseEntity<T> obj)
+        private static bool IsTransient(BaseEntity<TKey> obj)
         {
             return obj != null && Equals(obj.Id, default(int));
         }
@@ -41,7 +41,7 @@ namespace Hood.Entities
         /// <returns>Result</returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj as BaseEntity<T>);
+            return Equals(obj as BaseEntity<TKey>);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Hood.Entities
         /// </summary>
         /// <param name="other">other entity</param>
         /// <returns>Result</returns>
-        public virtual bool Equals(BaseEntity<T> other)
+        public virtual bool Equals(BaseEntity<TKey> other)
         {
             if (other == null)
                 return false;
@@ -87,7 +87,7 @@ namespace Hood.Entities
         /// <param name="x">x</param>
         /// <param name="y">y</param>
         /// <returns>Result</returns>
-        public static bool operator ==(BaseEntity<T> x, BaseEntity<T> y)
+        public static bool operator ==(BaseEntity<TKey> x, BaseEntity<TKey> y)
         {
             return Equals(x, y);
         }
@@ -98,7 +98,7 @@ namespace Hood.Entities
         /// <param name="x">x</param>
         /// <param name="y">y</param>
         /// <returns>Result</returns>
-        public static bool operator !=(BaseEntity<T> x, BaseEntity<T> y)
+        public static bool operator !=(BaseEntity<TKey> x, BaseEntity<TKey> y)
         {
             return !(x == y);
         }

@@ -109,7 +109,6 @@ namespace Hood.Extensions
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<IBillingService, BillingService>();
-            services.AddTransient<IMailService, MailService>();
 
             // Register scoped.
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
@@ -117,6 +116,7 @@ namespace Hood.Extensions
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<IContentRepository, ContentRepository>();
             services.AddScoped<IStripeWebHookService, StripeWebHookService>();
+            services.AddScoped<IMailService, MailService>();
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
 

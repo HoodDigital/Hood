@@ -32,6 +32,7 @@ namespace Hood.Models
         public EmailAddress NotifyEmail { get; set; }
         public string NotifyRole { get; set; }
 
+        public string Template { get; set; } = Hood.Models.MailSettings.SuccessTemplate;
 
         public MailObject WriteToMailObject(MailObject message)
         {

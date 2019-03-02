@@ -1,4 +1,5 @@
 ﻿using SendGrid.Helpers.Mail;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Hood.Services
@@ -9,6 +10,7 @@ namespace Hood.Services
         public string Subject { get; set; }
         public string PreHeader { get; set; }
         public string ToName { get; set; }
+        public string Template { get; set; } = Models.MailSettings.PlainTemplate;
 
         public MailObject()
         {
@@ -45,14 +47,26 @@ namespace Hood.Services
                 _textBody.Write(value);
             }
         }
-
+        public void AddHorizontalRule()
+        {
+            _textBody.WriteLine();
+            _textBody.WriteLine("--------------------");
+            _textBody.WriteLine();
+            _body.WriteLine(string.Format(@"<hr />"));
+        }
+        public void AddLineBreak()
+        {
+            _textBody.WriteLine();
+            _textBody.WriteLine();
+            _body.WriteLine(string.Format(@"<br />"));
+        }
         public void AddH1(string content, string colour = "#222222", string align = "left")
         {
             _textBody.WriteLine();
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h1 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; margin-bottom: 30px; font-size: 35px; text-transform: capitalize; text-align: {2};'>{0}</h1>", content, colour, align));
+            _body.WriteLine(string.Format(@"<h1 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4em; margin-top: 2em; margin-bottom: 1em;  font-size: 35px; text-transform: capitalize; text-align: {2};'>{0}</h1>", content, colour, align));
         }
         public void AddH2(string content, string colour = "#222222", string align = "left")
         {
@@ -60,7 +74,7 @@ namespace Hood.Services
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h2 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; margin-bottom: 30px; font-size: 30px; text-transform: capitalize; text-align: {2};'>{0}</h2>", content, colour, align));
+            _body.WriteLine(string.Format(@"<h2 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4em; margin-top: 2em; margin-bottom: 1em;  font-size: 30px; text-transform: capitalize; text-align: {2};'>{0}</h2>", content, colour, align));
         }
         public void AddH3(string content, string colour = "#222222", string align = "left")
         {
@@ -68,7 +82,7 @@ namespace Hood.Services
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h3 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; margin-bottom: 30px; font-size: 25px; text-transform: capitalize; text-align: {2};'>{0}</h3>", content, colour, align));
+            _body.WriteLine(string.Format(@"<h3 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4em; margin-top: 2em; margin-bottom: 1em; font-size: 25px; text-transform: capitalize; text-align: {2};'>{0}</h3>", content, colour, align));
         }
         public void AddH4(string content, string colour = "#222222", string align = "left")
         {
@@ -76,19 +90,49 @@ namespace Hood.Services
             _textBody.WriteLine(content);
             _textBody.WriteLine();
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<h4 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4; margin: 0; margin-bottom: 30px; font-size: 20px; text-transform: capitalize; text-align: {2};'>{0}</h4>", content, colour, align));
+            _body.WriteLine(string.Format(@"<h4 class='align-{2}' style='color: {1}; font-family: sans-serif; font-weight: 300; line-height: 1.4em; margin-top: 2em; margin-bottom: 1em; font-size: 20px; text-transform: capitalize; text-align: {2};'>{0}</h4>", content, colour, align));
         }
         public void AddParagraph(string content, string colour = "#222222", string align = "left")
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<p class='align-{2}' style='color: {1}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: {2};'>{0}</p>", content, colour, align));
+            _body.WriteLine(string.Format(@"<p class='align-{2}' style='color: {1}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin-top: 0; margin-bottom: 1em;  text-align: {2};'>{0}</p>", content, colour, align));
         }
         public void AddDiv(string content, string colour = "#222222", string align = "left")
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<div class='align-{2}' style='color: {1}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px; text-align: {2};'>{0}</p>", content, colour, align));
+            _body.WriteLine(string.Format(@"<div class='align-{2}' style='color: {1}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin-top: 2em; margin-bottom: 1em;  text-align: {2};'>{0}</p>", content, colour, align));
+        }
+        public void AddUnorderedList(List<string> items, string colour = "#222222")
+        {
+            foreach (string item in items)
+            {
+                _textBody.WriteLine($"- {item}");
+            }
+            _textBody.WriteLine();
+
+            _body.WriteLine(string.Format(@"<ul style='color: {0}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin-top: 2em; margin-bottom: 1em;'>", colour));
+            foreach (string item in items)
+            {
+                _body.WriteLine(string.Format(@"<li>{0}</li>", item, colour));
+            }
+            _body.WriteLine("</ul>");
+        }
+        public void AddOrderedList(List<string> items, string colour = "#222222")
+        {
+            foreach (string item in items)
+            {
+                _textBody.WriteLine($"- {item}");
+            }
+            _textBody.WriteLine();
+
+            _body.WriteLine(string.Format(@"<ol style='color: {0}; font-family: sans-serif; font-size: 14px; font-weight: normal; margin-top: 2em; margin-bottom: 1em;'>", colour));
+            foreach (string item in items)
+            {
+                _body.WriteLine(string.Format(@"<li>{0}</li>", item, colour));
+            }
+            _body.WriteLine("</ol>");
         }
         public void AddImage(string url, string altText)
         {

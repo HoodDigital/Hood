@@ -29,7 +29,6 @@ namespace Hood.Models
 
         public string Subject { get; set; }
 
-
         public EmailAddress To
         {
             get

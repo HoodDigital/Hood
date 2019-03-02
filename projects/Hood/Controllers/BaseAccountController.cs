@@ -341,7 +341,8 @@ namespace Hood.Controllers
                 message.AddH2(code.Substring(0, 3) + " - " + code.Substring(3, 3), "#5fba7d", "center");
                 message.AddParagraph($"Once you have entered your code you can create a username and password for the site. Click the button below to enter your code now.");
                 var callbackUrl = Url.Action("Code", "Account", new { uid = user.Id }, protocol: HttpContext.Request.Scheme);
-                await _emailSender.SendEmailAsync(message, MailSettings.SuccessTemplate);
+                message.Template = MailSettings.SuccessTemplate;
+                await _emailSender.SendEmailAsync(message);
 
                 return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
             }
@@ -663,7 +664,8 @@ namespace Hood.Controllers
                 message.AddH1(_settings.ReplacePlaceholders("Reset your password."));
                 message.AddParagraph($"Please reset your password by clicking here:");
                 message.AddCallToAction("Reset your password", callbackUrl);
-                await _emailSender.SendEmailAsync(message, MailSettings.WarningTemplate);
+                message.Template = MailSettings.WarningTemplate;
+                await _emailSender.SendEmailAsync(message);
                 return View("ForgotPasswordConfirmation");
             }
 
