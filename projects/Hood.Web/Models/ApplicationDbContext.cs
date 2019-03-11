@@ -24,8 +24,6 @@ namespace Hood.Web
         public override void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             base.Seed(userManager, roleManager);
-
-
         }
     }
 }

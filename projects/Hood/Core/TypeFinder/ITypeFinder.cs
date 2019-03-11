@@ -7,44 +7,17 @@ namespace Hood.Core
     public interface ITypeFinder
     {
         /// <summary>
-        /// Find classes of type
+        /// Find all classes of type from all loaded assemblies.
         /// </summary>
-        /// <typeparam name="T">Type</typeparam>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
+        /// <param name="onlyConcreteClasses">Search for only concrete classes, set as false to include abstracts or interfaces.</param>
+        /// <typeparam name="T">The type to check for.</typeparam>
+        /// <returns>List of Types that implement the supplied type.</returns>
         IEnumerable<Type> FindClassesOfType<T>(bool onlyConcreteClasses = true);
 
         /// <summary>
-        /// Find classes of type
+        /// Gets the assemblies currently loaded into the AppDomain.
         /// </summary>
-        /// <param name="assignTypeFrom">Assign type from</param>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
-        /// <returns></returns>
-        IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true);
-
-        /// <summary>
-        /// Find classes of type
-        /// </summary>
-        /// <typeparam name="T">Type</typeparam>
-        /// <param name="assemblies">Assemblies</param>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
-        IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true);
-
-        /// <summary>
-        /// Find classes of type
-        /// </summary>
-        /// <param name="assignTypeFrom">Assign type from</param>
-        /// <param name="assemblies">Assemblies</param>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
-        IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true);
-
-        /// <summary>
-        /// Gets the assemblies related to the current implementation.
-        /// </summary>
-        /// <returns>A list of assemblies</returns>
+        /// <returns>A complete list of loaded assemblies.</returns>
         IList<Assembly> GetAssemblies();
     }
 }

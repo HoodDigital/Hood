@@ -36,7 +36,7 @@ namespace Hood.Extensions
                 }
                 catch (Exception ex)
                 {
-                    var logService = services.GetService<ILogService>();
+                    var logService = scope.ServiceProvider.GetService<ILogService>();
                     logService.LogErrorAsync("An error occurred during the seed function.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IWebHostExtensions), null);
                 }
             }

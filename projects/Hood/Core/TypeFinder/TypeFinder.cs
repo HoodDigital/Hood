@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hood.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -11,154 +12,18 @@ namespace Hood.Core
         public TypeFinder()
         { }
 
-        #region Utilities
-
-        /// <summary>
-        /// Iterates all assemblies in the AppDomain and if it's name matches the configured patterns add it to our list.
-        /// </summary>
-        /// <param name="addedAssemblyNames"></param>
-        /// <param name="assemblies"></param>
-        private void AddAssembliesInAppDomain(List<string> addedAssemblyNames, List<Assembly> assemblies)
-        {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (!Matches(assembly.FullName))
-                    continue;
-
-                if (addedAssemblyNames.Contains(assembly.FullName))
-                    continue;
-
-                assemblies.Add(assembly);
-                addedAssemblyNames.Add(assembly.FullName);
-            }
-        }
-
-        /// <summary>
-        /// Adds specifically configured assemblies.
-        /// </summary>
-        /// <param name="addedAssemblyNames"></param>
-        /// <param name="assemblies"></param>
-        protected virtual void AddConfiguredAssemblies(List<string> addedAssemblyNames, List<Assembly> assemblies)
-        {
-            foreach (var assemblyName in AssemblyNames)
-            {
-                var assembly = Assembly.Load(assemblyName);
-                if (addedAssemblyNames.Contains(assembly.FullName))
-                    continue;
-
-                assemblies.Add(assembly);
-                addedAssemblyNames.Add(assembly.FullName);
-            }
-        }
-
-        /// <summary>
-        /// Check if a dll is one of the shipped dlls that we know don't need to be investigated.
-        /// </summary>
-        /// <param name="assemblyFullName">
-        /// The name of the assembly to check.
-        /// </param>
-        /// <returns>
-        /// True if the assembly should be loaded into Nop.
-        /// </returns>
-        public virtual bool Matches(string assemblyFullName)
-        {
-            return !Matches(assemblyFullName, SkipLoadingPattern)
-                   && Matches(assemblyFullName, RestrictToLoadingPattern);
-        }
-
-        /// <summary>
-        /// Check if a dll is one of the shipped dlls that we know don't need to be investigated.
-        /// </summary>
-        /// <param name="assemblyFullName">
-        /// The assembly name to match.
-        /// </param>
-        /// <param name="pattern">
-        /// The regular expression pattern to match against the assembly name.
-        /// </param>
-        /// <returns>
-        /// True if the pattern matches the assembly name.
-        /// </returns>
-        protected virtual bool Matches(string assemblyFullName, string pattern)
-        {
-            return Regex.IsMatch(assemblyFullName, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        }
-
-        /// <summary>
-        /// Does type implement generic?
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="openGeneric"></param>
-        /// <returns></returns>
-        protected virtual bool DoesTypeImplementOpenGeneric(Type type, Type openGeneric)
-        {
-            try
-            {
-                var genericTypeDefinition = openGeneric.GetGenericTypeDefinition();
-                foreach (var implementedInterface in type.FindInterfaces((objType, objCriteria) => true, null))
-                {
-                    if (!implementedInterface.IsGenericType)
-                        continue;
-
-                    var isMatch = genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition());
-                    return isMatch;
-                }
-
-                return false;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        #endregion
-
         #region Methods
 
         /// <summary>
-        /// Find classes of type
+        /// Find all classes of type from all loaded assemblies.
         /// </summary>
-        /// <typeparam name="T">Type</typeparam>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
+        /// <param name="onlyConcreteClasses">Search for only concrete classes, set as false to include abstracts or interfaces.</param>
+        /// <typeparam name="T">The type to check for.</typeparam>
+        /// <returns>List of Types that implement the supplied type.</returns>
         public IEnumerable<Type> FindClassesOfType<T>(bool onlyConcreteClasses = true)
         {
-            return FindClassesOfType(typeof(T), onlyConcreteClasses);
-        }
-
-        /// <summary>
-        /// Find classes of type
-        /// </summary>
-        /// <param name="assignTypeFrom">Assign type from</param>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
-        /// <returns></returns>
-        public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, bool onlyConcreteClasses = true)
-        {
-            return FindClassesOfType(assignTypeFrom, GetAssemblies(), onlyConcreteClasses);
-        }
-
-        /// <summary>
-        /// Find classes of type
-        /// </summary>
-        /// <typeparam name="T">Type</typeparam>
-        /// <param name="assemblies">Assemblies</param>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
-        public IEnumerable<Type> FindClassesOfType<T>(IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true)
-        {
-            return FindClassesOfType(typeof(T), assemblies, onlyConcreteClasses);
-        }
-
-        /// <summary>
-        /// Find classes of type
-        /// </summary>
-        /// <param name="assignTypeFrom">Assign type from</param>
-        /// <param name="assemblies">Assemblies</param>
-        /// <param name="onlyConcreteClasses">A value indicating whether to find only concrete classes</param>
-        /// <returns>Result</returns>
-        public IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true)
-        {
+            var assemblies = GetAssemblies();
+            var assignTypeFrom = typeof(T);
             var result = new List<Type>();
             try
             {
@@ -178,7 +43,7 @@ namespace Hood.Core
 
                     foreach (var t in types)
                     {
-                        if (!assignTypeFrom.IsAssignableFrom(t) && (!assignTypeFrom.IsGenericTypeDefinition || !DoesTypeImplementOpenGeneric(t, assignTypeFrom)))
+                        if (!assignTypeFrom.IsAssignableFrom(t) && (!assignTypeFrom.IsGenericTypeDefinition || !t.Implements(assignTypeFrom)))
                             continue;
 
                         if (t.IsInterface)
@@ -214,19 +79,24 @@ namespace Hood.Core
         }
 
         /// <summary>
-        /// Gets the assemblies related to the current implementation.
+        /// Gets the assemblies currently loaded into the AppDomain.
         /// </summary>
-        /// <returns>A list of assemblies</returns>
+        /// <returns>A complete list of loaded assemblies.</returns>
         public virtual IList<Assembly> GetAssemblies()
         {
-            var addedAssemblyNames = new List<string>();
+            var added = new List<string>();
             var assemblies = new List<Assembly>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (Regex.IsMatch(assembly.FullName, IngoreAssemblies, RegexOptions.IgnoreCase | RegexOptions.Compiled))
+                    continue;
 
-            AddAssembliesInAppDomain(addedAssemblyNames, assemblies);
-            AddConfiguredAssemblies(addedAssemblyNames, assemblies);
+                if (added.Contains(assembly.FullName))
+                    continue;
 
-            // LoadPluginAssemblies(AppContext.BaseDirectory);
-
+                assemblies.Add(assembly);
+                added.Add(assembly.FullName);
+            }
             return assemblies;
         }
 
@@ -234,15 +104,8 @@ namespace Hood.Core
 
         #region Properties
 
-        /// <summary>Gets or sets assemblies loaded a startup in addition to those loaded in the AppDomain.</summary>
-        public IList<string> AssemblyNames { get; set; } = new List<string>();
-
         /// <summary>Gets the pattern for dlls that we know don't need to be investigated.</summary>
-        public string SkipLoadingPattern { get; set; } = "^System|^mscorlib|^Microsoft|^AjaxControlToolkit|^Antlr3|^Autofac|^AutoMapper|^Castle|^ComponentArt|^CppCodeProvider|^DotNetOpenAuth|^EntityFramework|^EPPlus|^FluentValidation|^ImageResizer|^itextsharp|^log4net|^MaxMind|^MbUnit|^MiniProfiler|^Mono.Math|^MvcContrib|^Newtonsoft|^NHibernate|^nunit|^Org.Mentalis|^PerlRegex|^QuickGraph|^Recaptcha|^Remotion|^RestSharp|^Rhino|^Telerik|^Iesi|^TestDriven|^TestFu|^UserAgentStringLibrary|^VJSharpCodeProvider|^WebActivator|^WebDev|^WebGrease";
-
-        /// <summary>Gets or sets the pattern for dll that will be investigated. For ease of use this defaults to match all but to increase performance you might want to configure a pattern that includes assemblies and your own.</summary>
-        /// <remarks>If you change this so that Nop assemblies aren't investigated (e.g. by not including something like "^Nop|..." you may break core functionality.</remarks>
-        public string RestrictToLoadingPattern { get; set; } = ".*";
+        public string IngoreAssemblies { get; set; } = "^System|^mscorlib|^Microsoft|^AjaxControlToolkit|^Antlr3|^Autofac|^AutoMapper|^Castle|^ComponentArt|^CppCodeProvider|^DotNetOpenAuth|^EntityFramework|^EPPlus|^FluentValidation|^ImageResizer|^itextsharp|^log4net|^MaxMind|^MbUnit|^MiniProfiler|^Mono.Math|^MvcContrib|^Newtonsoft|^NHibernate|^nunit|^Org.Mentalis|^PerlRegex|^QuickGraph|^Recaptcha|^Remotion|^RestSharp|^Rhino|^Telerik|^Iesi|^TestDriven|^TestFu|^UserAgentStringLibrary|^VJSharpCodeProvider|^WebActivator|^WebDev|^WebGrease";
 
         #endregion
     }
