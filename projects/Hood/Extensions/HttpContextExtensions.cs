@@ -73,6 +73,12 @@ namespace Hood.Extensions
             return false;
         }
 
+        public static bool IsLocalhost(this HttpContext context)
+        {
+            string url = context.Request.Headers["HOST"];
+            return url.Contains("localhost");
+        }
+
         public static string GetSiteUrl(this HttpContext context, bool includePath = false, bool includeQuery = false)
         {
             // Return variable declaration

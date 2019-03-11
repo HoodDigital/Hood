@@ -16,7 +16,7 @@ namespace Hood.Models
     /// In order to use the Hood functionality on the site, you must call the 'void Configure(DbContextOptionsBuilder optionsBuilder)' function in the OnConfiguring() method, and then call the 'void CreateModels(ModelBuilder builder)' function in the OnModelCreating() method.
     /// </summary>
     /// <param name="optionsBuilder"></param>
-    public class HoodDbContext : IdentityDbContext<ApplicationUser>
+    public class HoodDbContext : IdentityDbContext<ApplicationUser>, IHoodDbContext
     {
 
         public HoodDbContext(DbContextOptions options)
@@ -178,5 +178,9 @@ namespace Hood.Models
             }
         }
 
+        public DbSet<TEntity> Set<TEntity, TKey>() where TEntity : BaseEntity<TKey>
+        {
+            return base.Set<TEntity>();
+        }
     }
 }

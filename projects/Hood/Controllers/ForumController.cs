@@ -594,14 +594,15 @@ namespace Hood.Controllers
                 message.AddParagraph("Click below to view the post on the forum:");
                 var url = Url.AbsoluteAction("ShowTopic", "Forum", new { slug = post.Topic.Forum.Slug, title = post.Topic.Title.ToSeoUrl(), id = post.TopicId });
                 message.AddCallToAction("View reported post", string.Format("{0}?highlight={1}", url, post.Id), "#f39c12", "center");
+                message.Template = MailSettings.WarningTemplate;
 
                 if (_env.IsDevelopment() || _env.IsStaging())
                 {
-                    await _emailSender.NotifyRoleAsync(message, "SuperUser", MailSettings.WarningTemplate);
+                    await _emailSender.NotifyRoleAsync(message, "SuperUser");
                 }
                 else
                 {
-                    await _emailSender.NotifyRoleAsync(message, "Moderator", MailSettings.WarningTemplate);
+                    await _emailSender.NotifyRoleAsync(message, "Moderator");
                 }
 
                 return RedirectToAction(nameof(ForumController.ShowTopic), new

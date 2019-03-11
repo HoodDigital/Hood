@@ -214,7 +214,8 @@ namespace Hood.Services
                     mail.AddCallToAction("Download Zip", downloadUrl, align: "left");
                     mail.AddParagraph("And that's about it!", align: "left");
                     mail.To = new SendGrid.Helpers.Mail.EmailAddress(settings.Email);
-                    await _email.SendEmailAsync(mail, MailSettings.SuccessTemplate);
+                    mail.Template = MailSettings.SuccessTemplate;
+                    await _email.SendEmailAsync(mail);
                 }
 
                 // Mark completed.
