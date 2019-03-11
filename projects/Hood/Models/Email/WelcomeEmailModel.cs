@@ -3,6 +3,7 @@ using Hood.Extensions;
 using Newtonsoft.Json;
 using Hood.Core;
 using SendGrid.Helpers.Mail;
+using System.Collections.Generic;
 
 namespace Hood.Models
 {
@@ -28,8 +29,8 @@ namespace Hood.Models
 
         public string NotificationTitle { get; set; }
         public string NotificationMessage { get; set; }
-        public bool NotifySender { get; set; }
-        public EmailAddress NotifyEmail { get; set; }
+        public bool SendToRecipient { get; set; }
+        public List<EmailAddress> NotifyEmails { get; set; }
         public string NotifyRole { get; set; }
 
         public MailObject WriteToMailObject(MailObject message)

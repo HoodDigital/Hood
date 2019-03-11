@@ -37,7 +37,7 @@ namespace Hood.Controllers
 
                 var contactSettings = _settings.GetContactSettings();
 
-                model.NotifySender = true;
+                model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";
 
                 return await _mailService.ProcessAndSend(model);

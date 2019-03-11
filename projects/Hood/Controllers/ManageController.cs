@@ -188,7 +188,7 @@ namespace Hood.Controllers
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-            var verifyModel = new VerifyEmailModel(user, callbackUrl) { NotifySender = true };
+            var verifyModel = new VerifyEmailModel(user, callbackUrl) { SendToRecipient = true };
 
             await _mailService.ProcessAndSend(verifyModel);
 

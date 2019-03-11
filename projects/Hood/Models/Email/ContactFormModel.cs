@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Services;
@@ -48,8 +49,8 @@ namespace Hood.Models
         public string NotificationSubject { get; set; }
         public string NotificationMessage { get; set; }
 
-        public bool NotifySender { get; set; }
-        public EmailAddress NotifyEmail { get; set; }
+        public bool SendToRecipient { get; set; }
+        public List<EmailAddress> NotifyEmails { get; set; }
         public string NotifyRole { get; set; }
 
         public ContactFormModel()

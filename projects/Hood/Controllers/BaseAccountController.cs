@@ -248,7 +248,7 @@ namespace Hood.Controllers
                     {
                         var welcomeModel = new WelcomeEmailModel(user, callbackUrl)
                         {
-                            NotifySender = true,
+                            SendToRecipient = true,
                             NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
                         };
                         await _mailService.ProcessAndSend(welcomeModel);
@@ -485,7 +485,7 @@ namespace Hood.Controllers
                 {
                     var welcomeModel = new WelcomeEmailModel(user)
                     {
-                        NotifySender = true,
+                        SendToRecipient = true,
                         NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
                     };
                     await _mailService.ProcessAndSend(welcomeModel);

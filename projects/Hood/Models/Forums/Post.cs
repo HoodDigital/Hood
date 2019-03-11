@@ -63,9 +63,9 @@ namespace Hood.Models
         public EmailAddress To { get; } = null;
 
         [NotMapped]
-        public bool NotifySender { get; set; } = false;
+        public bool SendToRecipient { get; set; } = false;
         [NotMapped]
-        public EmailAddress NotifyEmail { get; set; } = null;
+        public List<EmailAddress> NotifyEmails { get; set; } = null;
         [NotMapped]
         public string NotifyRole { get; set; } = null;
 
