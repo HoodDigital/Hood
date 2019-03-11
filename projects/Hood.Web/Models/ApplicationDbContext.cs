@@ -6,8 +6,7 @@ namespace Hood.Web
 {
     public class ApplicationDbContext : HoodDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<HoodDbContext> options) : base(options)
         {
         }
 

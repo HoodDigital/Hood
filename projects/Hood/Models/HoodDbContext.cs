@@ -18,7 +18,7 @@ namespace Hood.Models
     /// <param name="optionsBuilder"></param>
     public class HoodDbContext : IdentityDbContext<ApplicationUser>, IHoodDbContext
     {
-        public HoodDbContext(DbContextOptions options)
+        public HoodDbContext(DbContextOptions<HoodDbContext> options)
             : base(options)
         {
         }
