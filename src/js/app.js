@@ -238,29 +238,32 @@ $.hood.App = {
         Submit: function (tag) {
             $form = $(tag);
             if ($form.valid()) {
-                if ($form.hasClass('g-recaptcha') && grecaptcha.getResponse() === "") {
-                    $.hood.Alerts.Error('Please tell us you are not a robot!', 'Confirm Humanity!', null, true);
-                    return false;
-                } else {
-                    $.post($form.attr('action'), $form.serialize(), function (data) {
-                        if (data.Success) {
-                            if ($form.attr('data-redirect'))
-                                window.location = $form.attr('data-redirect');
-
-                            if ($form.attr('data-alert-message'))
-                                $.hood.Alerts.Success($form.attr('data-alert-message'), "Success", null, true);
-
-                            $form.find('.form').hide();
-                            $form.find('.thank-you').show();
-                        } else {
-                            if (typeof ($form.attr('data-alert-error')) !== 'undefined')
-                                $.hood.Alerts.Success($form.attr('data-alert-error'), "Error", null, true);
-
-                            $.hood.Alerts.Error("There was an error sending the message: " + data.Errors, "Error", null, true);
-                        }
+                if ($form.hasClass('g-recaptcha')) {
+                    var recaptchaId = $form.find('.recaptcha').data('recaptchaid');
+                    if (grecaptcha.getResponse(recaptchaId) === "") {
+                        $.hood.Alerts.Error('Please tell us you are not a robot!', 'Confirm Humanity!', null, true);
                         $form.removeClass('loading');
-                    });
+                        return false;
+                    }
                 }
+                $.post($form.attr('action'), $form.serialize(), function (data) {
+                    if (data.Success) {
+                        if ($form.attr('data-redirect'))
+                            window.location = $form.attr('data-redirect');
+
+                        if ($form.attr('data-alert-message'))
+                            $.hood.Alerts.Success($form.attr('data-alert-message'), "Success", null, true);
+
+                        $form.find('.form').hide();
+                        $form.find('.thank-you').show();
+                    } else {
+                        if (typeof ($form.attr('data-alert-error')) !== 'undefined')
+                            $.hood.Alerts.Success($form.attr('data-alert-error'), "Error", null, true);
+
+                        $.hood.Alerts.Error("There was an error sending the message: " + data.Errors, "Error", null, true);
+                    }
+                    $form.removeClass('loading');
+                });
             }
             return false;
         }
