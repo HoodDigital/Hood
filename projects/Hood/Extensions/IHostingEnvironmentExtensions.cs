@@ -3,7 +3,7 @@ using System;
 
 namespace Hood.Extensions
 {
-    public static class IHosttingEnvironmentExtensions
+    public static class IHostingEnvironmentExtensions
     {
         public static void WriteLogToFile<T>(this IHostingEnvironment env, string log) where T : class
         {

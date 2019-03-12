@@ -1,35 +1,12 @@
-// Global variables for the $.hood.App
-// Overwrite these in your site.js to use different classes/elements etc.
-
 $.window = $(window),
-    $.wrapper = $('#wrapper'),
     $.header = $('#header'),
-    $.headerWrap = $('#header-wrap'),
-    $.content = $('#content'),
-    $.footer = $('#footer'),
     $.mobileMenu = $('#mobile-menu'),
     $.mobileMenuTrigger = $('.mobile-menu-trigger'),
-    $.background = $('#site-background-image'),
-    $.sideMenus = $('.side-push-panel'),
     $.sideMenuTrigger = $(".side-panel-trigger"),
     stickyHeaderClass = 'sticky-header',
     mobileMenuOpenClass = 'mobile-menu-open',
     sidePushPanelClass = 'side-push-panel',
-    sidePushPanelOpenClass = 'side-panel-open',
-
-    defaultLogo = $('#logo').find('.standard-logo'),
-    defaultLogoImg = defaultLogo.find('img').attr('src'),
-    defaultDarkLogo = defaultLogo.attr('data-dark-logo'),
-    defaultMobileLogo = defaultLogo.attr('data-mobile-logo'),
-
-    defaultLogoWidth = defaultLogo.find('img').outerWidth(),
-
-    retinaLogo = $('#logo').find('.retina-logo'),
-    retinaLogoImg = retinaLogo.find('img').attr('src'),
-    retinaDarkLogo = retinaLogo.attr('data-dark-logo'),
-    retinaMobileLogo = retinaLogo.attr('data-mobile-logo');
-
-var windowWidth = $.window.width()
+    sidePushPanelOpenClass = 'side-panel-open';
 
 if (!$.hood)
     $.hood = {};
@@ -51,7 +28,6 @@ $.hood.App = {
 
             ]
         },
-        ShowCookieMessage: !$('body').hasClass('disable-cookies'),
         Accordion: true,
         Alerts: true,
         Colorbox: true,
@@ -60,10 +36,8 @@ $.hood.App = {
         FitVids: true,
         Forums: true,
         Header: true,
-        LoadSharers: $('#share').length,
         PaymentPages: true,
         RichTextEditors: $('.tinymce-public').length,
-        SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"],
         Uploaders: true
     },
     Init: function (options) {
@@ -105,9 +79,6 @@ $.hood.App = {
 
         if ($.hood.App.Options.LoadSharers)
             $.hood.App.Sharers();
-
-        if ($.hood.App.Options.ShowCookieMessage)
-            $.hood.App.Cookies();
 
         if ($.hood.App.Options.RichTextEditors)
             $.hood.App.RichTextEditors();
@@ -174,7 +145,6 @@ $.hood.App = {
         Init: function () {
             $.hood.App.Header.SidePanel();
             $.hood.App.Header.MobileMenu();
-            $.hood.App.Header.Logo();
         },
         StickyMenu: function () {
             var headerOffset = 0;
@@ -210,15 +180,6 @@ $.hood.App = {
                 $.body.toggleClass(mobileMenuOpenClass);
                 return false;
             });
-        },
-        Logo: function () {
-            if (($.header.hasClass('dark') || $.body.hasClass('dark')) && !$.headerWrap.hasClass('not-dark')) {
-                if (defaultDarkLogo) { defaultLogo.find('img').attr('src', defaultDarkLogo); }
-                if (retinaDarkLogo) { retinaLogo.find('img').attr('src', retinaDarkLogo); }
-            } else {
-                if (defaultLogoImg) { defaultLogo.find('img').attr('src', defaultLogoImg); }
-                if (retinaLogoImg) { retinaLogo.find('img').attr('src', retinaLogoImg); }
-            }
         }
     },
     Scroll: {
@@ -228,7 +189,6 @@ $.hood.App = {
 
                 $('body.open-header.close-header-on-scroll').removeClass("side-header-open");
                 $.hood.App.Header.StickyMenu();
-                $.hood.App.Header.Logo();
 
             });
         },
@@ -323,13 +283,6 @@ $.hood.App = {
         });
         $(".accordion-content").addClass("defualt-hidden");
     },
-    Cookies: function () {
-        $.hood.App.Loader.AddItem('cookies');
-        window.cookieconsent_options = { "message": "This website uses cookies to ensure you get the best experience on our website.", "dismiss": "Got it!", "learnMore": "More info", "link": null, "theme": "dark-bottom" };
-        $.getScript('//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js', function () {
-            $.hood.App.Loader.ItemComplete('cookies');
-        });
-    },
     Colorbox: function () {
         $.hood.App.Loader.AddItem('colorbox');
         $.getScript('/lib/jquery-colorbox/jquery.colorbox-min.js', $.proxy(function () {
@@ -401,18 +354,6 @@ $.hood.App = {
             customSelector: "iframe[src^='http://www.dailymotion.com/embed'], iframe[src*='maps.google.com'], iframe[src*='google.com/maps']",
             ignore: '.no-fv'
         });
-    },
-    Sharers: function () {
-        $.getScript('https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.min.js', $.proxy(function () {
-            $.loadCss('sharer-css', 'https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.css');
-            $.loadCss('sharer-theme-css', 'https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-flat.css');
-            $("#share").jsSocials({
-                shares: this.Options.SharerOptions,
-                showLabel: true,
-                showCount: true,
-                shareIn: "popup"
-            });
-        }, this));
     },
     Uploaders: {
         Init: function () {
@@ -509,9 +450,6 @@ $.hood.App = {
                 clickable: "#avatar-upload" // Define the element that should be used as click trigger to select files.
             });
             avatarDropzone.on("addedfile", function () {
-                if (this.files[1] !== null) {
-                    this.removeFile(this.files[0]);
-                }
             });
             // Update the total progress bar
             avatarDropzone.on("totaluploadprogress", function (progress) {
@@ -536,6 +474,7 @@ $.hood.App = {
                 } else {
                     $.hood.Alerts.Error("There was a problem adding the profile image: " + response.Error);
                 }
+                avatarDropzone.removeFile(file);
                 $($("#avatar-upload").data('preview')).removeClass('loading');
             });
         }

@@ -14,38 +14,11 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public class HoodController : Controller
+    public class HoodController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        public readonly IConfiguration _configuration;
-        public readonly ISettingsRepository _settings;
-        public readonly IHostingEnvironment _environment;
-        public readonly IEmailSender _email;
-        public readonly IContentRepository _content;
-        public readonly IAccountRepository _auth;
-        public readonly IConfiguration _config;
-        public readonly IHostingEnvironment _env;
-        public readonly ContentCategoryCache _categories;
-        public readonly UserManager<ApplicationUser> _userManager;
-        public readonly FormSenderService _forms;
-
-        public HoodController(IAccountRepository auth,
-                              ContentCategoryCache categories,
-                              UserManager<ApplicationUser> userManager,
-                              IConfiguration conf,
-                              IHostingEnvironment env,
-                              ISettingsRepository site,
-                              IContentRepository content,
-                              FormSenderService forms)
-        {
-            _auth = auth;
-            _config = conf;
-            _env = env;
-            _content = content;
-            _settings = site;
-            _categories = categories;
-            _userManager = userManager;
-            _forms = forms;
-        }
+        public HoodController()
+            : base()
+        { }
 
         [HttpPost]
         [Route("hood/contact/send/")]
@@ -62,9 +35,12 @@ namespace Hood.Controllers
 
                 await _settings.ProcessCaptchaOrThrowAsync(Request);
 
-                model.Subject = "Online Enquiry: " + model.Subject;
+                var contactSettings = _settings.GetContactSettings();
 
-                return await _forms.ProcessAndSend(model);
+                model.SendToRecipient = true;
+                model.NotifyRole = "ContactFormNotifications";
+
+                return await _mailService.ProcessAndSend(model);
             }
             catch (Exception ex)
             {

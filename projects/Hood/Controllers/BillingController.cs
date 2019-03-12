@@ -1,13 +1,10 @@
-﻿using Hood.Caching;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Stripe;
 using System;
 using System.Threading.Tasks;
@@ -16,43 +13,11 @@ namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
-    //[Area("Hood")]
-    public class BillingController : Controller
+    public class BillingController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
-        private readonly ISmsSender _smsSender;
-        private readonly ILogger _logger;
-        private readonly IContentRepository _data;
-        private readonly ISettingsRepository _settings;
-        private readonly IBillingService _billing;
-        private readonly IAccountRepository _auth;
-        private readonly IHoodCache _cache;
-
-        public BillingController(
-            IContentRepository data,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,
-            ISmsSender smsSender,
-            ILoggerFactory loggerFactory,
-            IBillingService billing,
-            IAccountRepository auth,
-            IHoodCache cache,
-            ISettingsRepository site)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _emailSender = emailSender;
-            _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<BillingController>();
-            _data = data;
-            _settings = site;
-            _auth = auth;
-            _billing = billing;
-            _cache = cache;
-        }
+        public BillingController()
+            : base()
+        { }
 
         [HttpGet]
         public async Task<IActionResult> Index(BillingMessage? message = null)
@@ -64,7 +29,7 @@ namespace Hood.Controllers
             };
             try
             {
-                model.Customer = await _auth.LoadCustomerObject(model.User?.StripeId, true);
+                model.Customer = await _account.LoadCustomerObject(model.User?.StripeId, true);
                 if (model.Customer != null)
                 {
                     model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);

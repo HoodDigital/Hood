@@ -12,7 +12,7 @@ namespace Hood.Extensions
 {
     public static class IWebHostExtensions
     {
-        public static void SeedHoodData<TDbContext>(this IWebHost host)
+        public static void InstallDatabase<TDbContext>(this IWebHost host)
             where TDbContext : HoodDbContext
         {
             using (var scope = host.Services.CreateScope())
@@ -20,22 +20,24 @@ namespace Hood.Extensions
                 var services = scope.ServiceProvider;
                 try
                 {
-                    var config = services.GetService<IConfiguration>();
-                    scope.ServiceProvider.GetService<TDbContext>().Database.Migrate();
+                    // Get the database from the services provider
+                    var db = scope.ServiceProvider.GetService<TDbContext>();
+
+                    // Migrate the database
+                    db.Database.Migrate();
+
+                    // Seed the database
                     var userManager = services.GetService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetService<RoleManager<IdentityRole>>();
-                    var options = new DbContextOptionsBuilder<HoodDbContext>();
-                    options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]);
-                    var db = new HoodDbContext(options.Options);
-                    db.EnsureSetup(userManager, roleManager);
+                    db.Seed(userManager, roleManager);
 
-                    // Initialise events
+                    // Configure any event listeners. TODO: Make this a TypeFinder iteration.
                     services.GetService<SubscriptionsEventListener>().Configure();
                 }
                 catch (Exception ex)
                 {
-                    var logService = services.GetService<ILogService>();
-                    logService.AddLogAsync("An error occurred during the seed function.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IWebHostExtensions), null);
+                    var logService = scope.ServiceProvider.GetService<ILogService>();
+                    logService.LogErrorAsync("An error occurred during the seed function.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IWebHostExtensions), null);
                 }
             }
         }

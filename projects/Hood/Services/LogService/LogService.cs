@@ -29,7 +29,7 @@ namespace Hood.Services
             _db = new HoodDbContext(options.Options);
         }
 
-        public async Task AddLogAsync(string message, string detail, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null)
+        public async Task AddLogAsync(string message, LogSource source, string detail = "", LogType type = LogType.Info, string UserId = null, string entityId = null, string entityType = null, string url = null)
         {
             var log = new Log()
             {
@@ -47,7 +47,7 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
         }
 
-        public async Task AddLogAsync(string message, Exception ex, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null)
+        public async Task LogErrorAsync(string message, Exception ex, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null)
         {
             var detail = string.Concat(
                 "Exception  Message: ", ex.Message, Environment.NewLine,
@@ -61,7 +61,7 @@ namespace Hood.Services
                     "Stack Trace:", Environment.NewLine, ex.StackTrace,
                     "Exception JSON:", Environment.NewLine, Environment.NewLine,
                     JsonConvert.SerializeObject(ex));
-            await AddLogAsync(message, detail, LogType.Error, source, UserId, entityId, entityType, url);
+            await AddLogAsync(message, source, detail, LogType.Error, UserId, entityId, entityType, url);
         }
 
     }

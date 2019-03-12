@@ -135,7 +135,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
                 ContentSettings _contentSettings = siteSettings.GetContentSettings();
                 ContentType type = _contentSettings.GetContentType(ContentType);
 
@@ -163,7 +163,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = EngineContext.Current.Resolve<ISettingsRepository>();
+                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
                 BasicSettings basicSettings = siteSettings.GetBasicSettings();
                 return Id == basicSettings.Homepage;
             }

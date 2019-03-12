@@ -19,39 +19,18 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize]
-    public abstract class BaseAccountController : Controller
+    public abstract class BaseAccountController : BaseAccountController<HoodDbContext>
     {
-        protected readonly UserManager<ApplicationUser> _userManager;
-        protected readonly SignInManager<ApplicationUser> _signInManager;
-        protected readonly IEmailSender _emailSender;
-        protected readonly IAccountRepository _account;
-        protected readonly ISmsSender _smsSender;
-        protected readonly ILogger _logger;
-        protected readonly IContentRepository _data;
-        protected readonly IHoodCache _cache;
-        protected readonly ISettingsRepository _settings;
+        public BaseAccountController() : base() { }
+    }
 
-        public BaseAccountController(
-            IContentRepository data,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            IEmailSender emailSender,
-            ISmsSender smsSender,
-            IHoodCache cache,
-            ILoggerFactory loggerFactory,
-            IAccountRepository account,
-            ISettingsRepository settings)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _emailSender = emailSender;
-            _smsSender = smsSender;
-            _account = account;
-            _logger = loggerFactory.CreateLogger<BaseAccountController>();
-            _data = data;
-            _cache = cache;
-            _settings = settings;
-        }
+    [Authorize]
+    public abstract class BaseAccountController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+         where TContext : HoodDbContext
+    {
+        public BaseAccountController()
+            : base()
+        { }
 
         [TempData]
         public string ErrorMessage { get; set; }
@@ -88,7 +67,7 @@ namespace Hood.Controllers
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
 
-                    _logger.LogInformation(1, "User " + model.Username + " logged in.");
+                    await _logService.AddLogAsync("User (" + model.Username + ") logged in.", LogSource.Identity);
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -97,7 +76,6 @@ namespace Hood.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out.");
                     return View("Lockout");
                 }
                 else
@@ -151,17 +129,16 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+                await _logService.AddLogAsync($"User with ID {user.Id} logged in with 2fa.", LogSource.Identity, "", LogType.Info, user.Id);
                 return RedirectToLocal(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
                 return RedirectToAction(nameof(Lockout));
             }
             else
             {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID {UserId}.", user.Id);
+                await _logService.AddLogAsync($"Invalid authenticator code entered for user with ID {user.Id}.", LogSource.Identity, "", LogType.Info, user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return View();
             }
@@ -205,17 +182,16 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID {UserId} logged in with a recovery code.", user.Id);
+                await _logService.AddLogAsync($"User with ID {user.Id} logged in with a recovery code.", LogSource.Identity, "", LogType.Info, user.Id);
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning("User with ID {UserId} account locked out.", user.Id);
                 return RedirectToAction(nameof(Lockout));
             }
             else
             {
-                _logger.LogWarning("Invalid recovery code entered for user with ID {UserId}", user.Id);
+                await _logService.AddLogAsync($"Invalid recovery code entered for user with ID {user.Id}", LogSource.Identity, "", LogType.Info, user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return View();
             }
@@ -266,10 +242,17 @@ namespace Hood.Controllers
                 if (result.Succeeded)
                 {
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
 
-                    WelcomeEmailSender welcomeSender = EngineContext.Current.Resolve<WelcomeEmailSender>();
-                    await welcomeSender.ProcessAndSend(new WelcomeEmailModel(user, callbackUrl));
+                    if (_settings.GetAccountSettings().EnableWelcome)
+                    {
+                        var welcomeModel = new WelcomeEmailModel(user, callbackUrl)
+                        {
+                            SendToRecipient = true,
+                            NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
+                        };
+                        await _mailService.ProcessAndSend(welcomeModel);
+                    }
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -312,9 +295,10 @@ namespace Hood.Controllers
 
                 // check if the user is registered, if so forward to login, filling in the email address.
                 var user = _account.GetUserByEmail(model.Email);
+
                 if (user == null)
                 {
-                    // if no account exists, create one, then carry on.
+                    // Try to create the new account, then carry on.
                     user = new ApplicationUser { UserName = Guid.NewGuid().ToString(), Email = model.Email };
                     var result = await _userManager.CreateAsync(user, keyGen.Generate(24));
                     if (!result.Succeeded)
@@ -324,28 +308,11 @@ namespace Hood.Controllers
                     }
                 }
 
-                // the user exists, has a code, but isn't set up for access, forward to the complete page
-                if (user.EmailConfirmed)
+                if (user.Active)
                 {
-                    if (!user.Active)
-                    {
-                        return RedirectWithReturnUrl("/account/finish?uid=" + user.Id, returnUrl);
-                    }
-                    else
-                    {
-                        // They are good, let them log in.
-                        return RedirectWithReturnUrl("/account/login?uid=", returnUrl);
-                    }
+                    ModelState.AddModelError(null, $"Email '{model.Email}' is already taken.");
+                    return View(model);
                 }
-
-                // check if they have a current valid code, if so forward them to the code page.
-                user = _account.GetUserById(user.Id);
-                if (CheckForAccessCodes(user))
-                {
-                    return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
-                }
-
-                // If they don't have a valid code, let them add a new code to their account, send it and forward to the code page.
 
                 // Attach the code to the user, along with it's expiry date.
                 keyGen = new KeyGenerator(false, false, true, false);
@@ -373,8 +340,9 @@ namespace Hood.Controllers
                 message.AddParagraph($"You can use the following access code to complete your registration:");
                 message.AddH2(code.Substring(0, 3) + " - " + code.Substring(3, 3), "#5fba7d", "center");
                 message.AddParagraph($"Once you have entered your code you can create a username and password for the site. Click the button below to enter your code now.");
-                message.AddCallToAction("Validate your account", "/account/code?uid=" + user.Id);
-                await _emailSender.SendEmailAsync(message, MailSettings.SuccessTemplate);
+                var callbackUrl = Url.Action("Code", "Account", new { uid = user.Id }, protocol: HttpContext.Request.Scheme);
+                message.Template = MailSettings.SuccessTemplate;
+                await _emailSender.SendEmailAsync(message);
 
                 return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
             }
@@ -497,6 +465,11 @@ namespace Hood.Controllers
                     return RedirectWithReturnUrl("/account/create", returnUrl);
                 }
 
+                // check if the username is already taken
+                var dupeUser = await _userManager.FindByNameAsync(model.Username);
+                if (dupeUser != null)
+                    throw new Exception($"The username '{model.Username}' is already taken.");
+
                 user.UserName = model.Username;
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
@@ -506,10 +479,17 @@ namespace Hood.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                _logger.LogInformation(3, "User created a new account with password.");
+                await _logService.AddLogAsync($"User ({user.UserName}) created a new account with password.", LogSource.Identity, "", LogType.Info, user.Id);
 
-                WelcomeEmailSender welcomeSender = EngineContext.Current.Resolve<WelcomeEmailSender>();
-                await welcomeSender.ProcessAndSend(new WelcomeEmailModel(user));
+                if (_settings.GetAccountSettings().EnableWelcome)
+                {
+                    var welcomeModel = new WelcomeEmailModel(user)
+                    {
+                        SendToRecipient = true,
+                        NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
+                    };
+                    await _mailService.ProcessAndSend(welcomeModel);
+                }
 
                 return RedirectToLocal(returnUrl);
             }
@@ -526,8 +506,9 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> LogOff()
         {
+            var user = User.Identity;
             await _signInManager.SignOutAsync();
-            _logger.LogInformation(4, "User logged out.");
+            await _logService.AddLogAsync($"User ({user.Name}) logged out.", LogSource.Identity, "", LogType.Info);
             return RedirectToAction("Index", "Home");
         }
 
@@ -576,7 +557,7 @@ namespace Hood.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("User logged in with {Name} provider.", info.LoginProvider);
+                await _logService.AddLogAsync($"User ({info.Principal.FindFirstValue(ClaimTypes.Email)}) created an account using {info.LoginProvider} provider.", LogSource.Identity, "", LogType.Info);
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
@@ -614,7 +595,7 @@ namespace Hood.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                        await _logService.AddLogAsync($"User ({user.UserName}) created an account using {info.LoginProvider} provider.", LogSource.Identity, "", LogType.Info, user.Id);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -623,7 +604,7 @@ namespace Hood.Controllers
 
             ViewData["ReturnUrl"] = returnUrl;
             return View(nameof(ExternalLogin), model);
-        }        
+        }
 
         #endregion
 
@@ -633,7 +614,7 @@ namespace Hood.Controllers
         {
             if (userId == null || code == null)
             {
-                return RedirectToAction(nameof(BaseHomeController.Index), "Home");
+                return RedirectToAction(nameof(BaseHomeController<TContext>.Index), "Home");
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -683,7 +664,8 @@ namespace Hood.Controllers
                 message.AddH1(_settings.ReplacePlaceholders("Reset your password."));
                 message.AddParagraph($"Please reset your password by clicking here:");
                 message.AddCallToAction("Reset your password", callbackUrl);
-                await _emailSender.SendEmailAsync(message, MailSettings.WarningTemplate);
+                message.Template = MailSettings.WarningTemplate;
+                await _emailSender.SendEmailAsync(message);
                 return View("ForgotPasswordConfirmation");
             }
 
@@ -837,7 +819,6 @@ namespace Hood.Controllers
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning(7, "User account locked out.");
                 return View("Lockout");
             }
             else

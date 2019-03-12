@@ -1,4 +1,5 @@
 ﻿using Hood.Enums;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hood.Models
+namespace Hood.Caching
 {
     public class ContentCategoryCache
     {

@@ -1,5 +1,5 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Property = {
     Init: function () {
         $('body').on('click', '.delete-property', this.Delete);
@@ -88,34 +88,34 @@ $.hood.Property = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/property/delete', { id: $this.data('id') }, function (data) {
-                    if (data.Success) {
-                        if (!$('#manage-property-list').doesExist())
-                            window.location = data.Url;
-                        $.hood.Property.Manage.Refresh();
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Deleted!",
-                            text: "The property has now been removed from the website.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem deleting the property: " + data.Errors,
-                            timer: 1300,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/property/delete', { id: $this.data('id') }, function (data) {
+                        if (data.Success) {
+                            if (!$('#manage-property-list').doesExist())
+                                window.location = data.Url;
+                            $.hood.Property.Manage.Refresh();
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Deleted!",
+                                text: "The property has now been removed from the website.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem deleting the property: " + data.Errors,
+                                timer: 1300,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Publish: function (e) {
         var $this = $(this);
@@ -131,34 +131,34 @@ $.hood.Property = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/property/publish', { id: $this.data('id') }, function (data) {
-                    if (data.Success) {
-                        if (!$('#manage-property-list').doesExist())
-                            window.location = data.Url;
-                        $.hood.Property.Manage.Refresh();
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Published!",
-                            text: "The property has now been published.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem publishing the property: " + data.Errors,
-                            timer: 1300,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/property/publish', { id: $this.data('id') }, function (data) {
+                        if (data.Success) {
+                            if (!$('#manage-property-list').doesExist())
+                                window.location = data.Url;
+                            $.hood.Property.Manage.Refresh();
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Published!",
+                                text: "The property has now been published.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem publishing the property: " + data.Errors,
+                                timer: 1300,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Archive: function (e) {
         var $this = $(this);
@@ -174,34 +174,34 @@ $.hood.Property = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/property/archive', { id: $this.data('id') }, function (data) {
-                    if (data.Success) {
-                        if (!$('#manage-property-list').doesExist())
-                            window.location = data.Url;
-                        $.hood.Property.Manage.Refresh();
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Archived!",
-                            text: "The property has now been archived.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem archiving the property: " + data.Errors,
-                            timer: 1300,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/property/archive', { id: $this.data('id') }, function (data) {
+                        if (data.Success) {
+                            if (!$('#manage-property-list').doesExist())
+                                window.location = data.Url;
+                            $.hood.Property.Manage.Refresh();
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Archived!",
+                                text: "The property has now been archived.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem archiving the property: " + data.Errors,
+                                timer: 1300,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Create: {
         Init: function (e) {
@@ -209,14 +209,9 @@ $.hood.Property = {
             $.hood.Blades.OpenWithLoader('button.create-property', '/admin/property/create/', $.hood.Property.Create.SetupCreateForm);
         },
         SetupCreateForm: function () {
-            $('#create-property-form').find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $('#create-property-form').find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
             $('#create-property-form').hoodValidator({
                 validationRules: {
@@ -363,16 +358,10 @@ $.hood.Property = {
         },
         LoadEditors: function (tag) {
             // Load the url thing if on page editor.
-            $(tag).find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: true,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $(tag).find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
-
         }
     },
     Upload: {
@@ -472,5 +461,5 @@ $.hood.Property = {
             });
         }
     }
-}
+};
 $.hood.Property.Init();

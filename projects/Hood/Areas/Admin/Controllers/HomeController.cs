@@ -1,11 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authorization;
-using Hood.Services;
+﻿using Hood.Controllers;
 using Hood.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Hood.Controllers;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -36,8 +33,8 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Stats()
         {
             var content = _content.GetStatistics();
-            var users = _auth.GetStatistics();
-            var subs = _auth.GetSubscriptionStatistics();
+            var users = _account.GetStatistics();
+            var subs = _account.GetSubscriptionStatistics();
             var properties = _property.GetStatistics();
 
             return Json(new { content, users, subs, properties });

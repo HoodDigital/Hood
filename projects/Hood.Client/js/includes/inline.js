@@ -27,23 +27,24 @@ $.hood.Inline = {
             try {
                 $.hood.Helpers.InitIboxes(tag);
             } catch (ex) { }
-        })
-        .fail(function (data) {
-            $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
-        })
-        .always(function (data) {
-            if ($(tag).attr("data-complete")) {
-                eval($(tag).data('complete'));
-            }
             if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-                complete();
+                complete(data);
             }
-            $.hood.Modals.Loading = false;
-            $(tag).removeClass('loading');
-        });
+            if ($(tag).attr("data-complete")) {
+                eval($(tag).data('complete') + "(data)");
+            }
+        })
+            .fail(function (data) {
+                $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
+            })
+            .always(function (data) {
+                $.hood.Modals.Loading = false;
+                $(tag).removeClass('loading');
+            });
     },
     Task: function (e) {
         e.preventDefault();
+        $tag = $(e.currentTarget);
         $tagcontents = $(e.currentTarget).html();
         $(e.currentTarget).addClass('loading');
         var urlLoad = $(e.currentTarget).attr('href');
@@ -58,19 +59,17 @@ $.hood.Inline = {
                     window.location = data.Url;
                 }, 500);
             }
-        })
-        .done($.proxy(function () {
-            if ($(this).attr("data-complete")) {
-                eval($(this).data('complete'));
+            if ($tag.attr("data-complete")) {
+                eval($tag.data('complete') + "(data)");
             }
-        }, e.currentTarget))
-        .fail(function (data) {
-            $.hood.Alerts.Error("There was an error processing the AJAX request:<br/><strong>" + urlLoad + "</strong>");
         })
-        .always(function (data) {
-            $.hood.Modals.Loading = false;
-            $(e.currentTarget).removeClass('loading');
-        });
+            .fail(function (data) {
+                $.hood.Alerts.Error("There was an error processing the AJAX request:<br/><strong>" + urlLoad + "</strong>");
+            })
+            .always(function (data) {
+                $.hood.Modals.Loading = false;
+                $(e.currentTarget).removeClass('loading');
+            });
     }
 };
 $.hood.Inline.Init();

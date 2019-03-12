@@ -1,20 +1,16 @@
 ﻿using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Filters;
-using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
 using MailChimp.Net;
 using MailChimp.Net.Core;
-using MailChimp.Net.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -91,10 +87,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             EditUserModel um = new EditUserModel()
             {
-                User = _auth.GetUserById(id)
+                User = _account.GetUserById(id)
             };
             um.Roles = await _userManager.GetRolesAsync(um.User);
-            um.AllRoles = _auth.GetAllRoles();
+            um.AllRoles = _account.GetAllRoles();
             return View(um);
         }
 
@@ -104,17 +100,17 @@ namespace Hood.Areas.Admin.Controllers
         {
             EditUserModel um = new EditUserModel()
             {
-                User = _auth.GetUserById(id)
+                User = _account.GetUserById(id)
             };
             try
             {
                 model.User.CopyProperties(um.User);
-                _auth.UpdateUser(um.User);
+                _account.UpdateUser(um.User);
 
                 // reload model
 
                 um.Roles = await _userManager.GetRolesAsync(um.User);
-                um.AllRoles = _auth.GetAllRoles();
+                um.AllRoles = _account.GetAllRoles();
                 um.SaveMessage = "Saved!";
                 um.MessageType = Enums.AlertType.Success;
                 return View(um);
@@ -132,10 +128,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             EditUserModel um = new EditUserModel()
             {
-                User = _auth.GetUserById(id)
+                User = _account.GetUserById(id)
             };
             um.Roles = await _userManager.GetRolesAsync(um.User);
-            um.AllRoles = _auth.GetAllRoles();
+            um.AllRoles = _account.GetAllRoles();
             return View(um);
         }
 
@@ -178,7 +174,7 @@ namespace Hood.Areas.Admin.Controllers
         [HttpGet]
         public List<Address> GetAddresses()
         {
-            var user = _auth.GetCurrentUser();
+            var user = _account.GetCurrentUser();
             return user.Addresses;
         }
 
@@ -196,7 +192,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = _auth.GetUserById(id);
+                var user = _account.GetUserById(id);
                 if (user != null)
                 {
                     if (user.Avatar == null)
@@ -316,7 +312,7 @@ namespace Hood.Areas.Admin.Controllers
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
                         message.AddCallToAction("Log in here", ControllerContext.HttpContext.GetSiteUrl() + "/account/login", "#32bc4e", "center");
-                        await _email.SendEmailAsync(message);
+                        await _emailSender.SendEmailAsync(message);
                     }
                     catch (Exception)
                     {
@@ -342,9 +338,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = _auth.GetUserById(id);
+                var user = _account.GetUserById(id);
                 user.Avatar = null;
-                _auth.UpdateUser(user);
+                _account.UpdateUser(user);
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
@@ -360,7 +356,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
-                await _auth.DeleteUserAsync(user);
+                await _account.DeleteUserAsync(user);
 
                 var response = new Response(true, "Deleted successfully.");
                 response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });

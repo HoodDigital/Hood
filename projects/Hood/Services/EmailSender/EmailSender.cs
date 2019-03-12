@@ -58,22 +58,22 @@ namespace Hood.Services
                 Subject = subject,
                 PreHeader = subject
             };
-            return await SendEmailAsync(message, Models.MailSettings.PlainTemplate, from);
+            return await SendEmailAsync(message, from);
         }
 
-        public async Task<int> SendEmailAsync(MailObject message, string template = Models.MailSettings.PlainTemplate, EmailAddress from = null)
+        public async Task<int> SendEmailAsync(MailObject message, EmailAddress from = null)
         {
             SendGridClient client = GetMailClient();
             if (from == null)
                 from = GetSiteFromEmail();
 
-            var html = await _renderer.Render(template, message);
+            var html = await _renderer.Render(message.Template, message);
             var textContent = new SendGrid.Helpers.Mail.Content("text/plain", message.ToString());
             var htmlContent = new SendGrid.Helpers.Mail.Content("text/html", html);
 
             var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
             var response = await client.SendEmailAsync(msg);
-            var body = response.DeserializeResponseBody(response.Body);
+            var body = await response.DeserializeResponseBodyAsync(response.Body);
             if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
                 return 1;
 
@@ -89,14 +89,14 @@ namespace Hood.Services
             {
                 var msg = MailHelper.CreateSingleEmail(from, email, subject, textContent, htmlContent);
                 var response = await client.SendEmailAsync(msg);
-                var body = response.DeserializeResponseBody(response.Body);
+                var body = await response.DeserializeResponseBodyAsync(response.Body);
                 if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
                     sent++;
             }
             return sent;
         }
 
-        public async Task<int> NotifyRoleAsync(MailObject message, string roleName, string template = "Areas/Admin/Views/Mail/Plain.cshtml", EmailAddress from = null)
+        public async Task<int> NotifyRoleAsync(MailObject message, string roleName, EmailAddress from = null)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
             int sent = 0;
@@ -104,7 +104,7 @@ namespace Hood.Services
             {
                 var messageToSend = message;
                 messageToSend.To = new EmailAddress(user.Email);
-                sent += await SendEmailAsync(messageToSend, template);
+                sent += await SendEmailAsync(messageToSend);
             }
             return sent;
         }

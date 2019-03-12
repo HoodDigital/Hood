@@ -8,7 +8,7 @@ namespace Hood.Services
 {
     public interface ILogService
     {
-        Task AddLogAsync(string message, string detail, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null);
-        Task AddLogAsync(string message, Exception ex, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null);
+        Task AddLogAsync(string message, LogSource source, string detail = "", LogType type = LogType.Info, string UserId = null, string entityId = null, string entityType = null, string url = null);
+        Task LogErrorAsync(string message, Exception ex, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null);
     }
 }

@@ -1,10 +1,7 @@
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Infrastructure;
-using Hood.Interfaces;
-using Hood.IO;
-using Hood.Models;
 using Hood.Filters;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -12,49 +9,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Hood.ViewModels;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers
 {
-    public class ForumController : Controller
+    public class ForumController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly HoodDbContext _db;
-        private readonly ForumCategoryCache _categories;
-        private readonly IEmailSender _email;
-        private readonly ISettingsRepository _settings;
-        private readonly IHostingEnvironment _environment;
-        private readonly IMediaManager<MediaObject> _media;
-        private readonly IAccountRepository _auth;
-
-        public ForumController(
-            IAccountRepository auth,
-            IEmailSender email,
-            HoodDbContext db,
-            ForumCategoryCache categories,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository settings,
-            IBillingService billing,
-            IMediaManager<MediaObject> media,
-            IHostingEnvironment env)
-        {
-            _auth = auth;
-            _media = media;
-            _userManager = userManager;
-            _db = db;
-            _settings = settings;
-            _environment = env;
-            _categories = categories;
-            _email = email;
-        }
+        public ForumController()
+            : base()
+        { }
 
         #region "Forum Views"
 
@@ -611,7 +576,7 @@ namespace Hood.Controllers
                 message.PreHeader = _settings.ReplacePlaceholders("Abuse report");
                 message.Subject = _settings.ReplacePlaceholders("Abuse report");
                 message.AddParagraph(_settings.ReplacePlaceholders("The following post has been reported for abuse."));
-                message = post.WriteToMessage(message);
+                message = post.WriteToMailObject(message);
                 message.AddParagraph("The report was sent by: ");
                 if (reporter == null)
                 {
@@ -629,14 +594,15 @@ namespace Hood.Controllers
                 message.AddParagraph("Click below to view the post on the forum:");
                 var url = Url.AbsoluteAction("ShowTopic", "Forum", new { slug = post.Topic.Forum.Slug, title = post.Topic.Title.ToSeoUrl(), id = post.TopicId });
                 message.AddCallToAction("View reported post", string.Format("{0}?highlight={1}", url, post.Id), "#f39c12", "center");
+                message.Template = MailSettings.WarningTemplate;
 
-                if (_environment.IsDevelopment() || _environment.IsStaging())
+                if (_env.IsDevelopment() || _env.IsStaging())
                 {
-                    await _email.NotifyRoleAsync(message, "SuperUser", MailSettings.WarningTemplate);
+                    await _emailSender.NotifyRoleAsync(message, "SuperUser");
                 }
                 else
                 {
-                    await _email.NotifyRoleAsync(message, "Moderator", MailSettings.WarningTemplate);
+                    await _emailSender.NotifyRoleAsync(message, "Moderator");
                 }
 
                 return RedirectToAction(nameof(ForumController.ShowTopic), new

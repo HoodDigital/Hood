@@ -1,19 +1,19 @@
 ﻿using Hood.Core;
 using Hood.Events;
+using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace Hood.Services
 {
-    public class SubscriptionsEventListener
+    public class SubscriptionsEventListener 
     {
         protected readonly IEventsService _eventService;
-        protected readonly IHostingEnvironment _env;
 
         public SubscriptionsEventListener(IEventsService events)
         {
-            _env = EngineContext.Current.Resolve<IHostingEnvironment>();
             _eventService = events;
         }
 
@@ -25,19 +25,21 @@ namespace Hood.Services
 
         public void OnUserSubscriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
         {
-            if (!_env.IsProduction())
+            var env = Engine.Current.Resolve<IHostingEnvironment>();
+            if (!env.IsProduction())
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
-                logService.AddLogAsync($"User Subscription Changed Event: {e.Action}", JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, Models.LogSource.Subscriptions, null, e.Subscription?.Id.ToString(), nameof(UserSubscription), null);
+                var logService = Engine.Current.Resolve<ILogService>();
+                logService.AddLogAsync($"User Subscription Changed Event: {e.Action}", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, null, e.Subscription?.Id.ToString(), nameof(UserSubscription), null);
             }
         }
 
         public void OnWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
         {
-            if (!_env.IsProduction())
+            var env = Engine.Current.Resolve<IHostingEnvironment>();
+            if (!env.IsProduction())
             {
-                var logService = EngineContext.Current.Resolve<ILogService>();
-                logService.AddLogAsync($"Webhook Triggered Event: {e.Action}", JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, Models.LogSource.Subscriptions, null, e.StripeEvent?.Id.ToString(), null, null);
+                var logService = Engine.Current.Resolve<ILogService>();
+                logService.AddLogAsync($"Webhook Triggered Event: {e.Action}", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, null, e.StripeEvent?.Id.ToString(), null, null);
             }
         }
 

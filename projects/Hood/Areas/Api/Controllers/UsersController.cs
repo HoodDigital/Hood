@@ -1,26 +1,13 @@
-﻿using Hood.BaseTypes;
-using Hood.Controllers;
+﻿using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
-using Hood.Infrastructure;
-using Hood.Interfaces;
 using Hood.Models;
-using Hood.Services;
-using Hood.ViewModels;
-using MailChimp.Net;
-using MailChimp.Net.Core;
-using MailChimp.Net.Interfaces;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860

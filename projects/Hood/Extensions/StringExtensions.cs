@@ -84,7 +84,7 @@ namespace Hood.Extensions
 
         public static string ToHtmlLineBreaks(this string str)
         {
-            return str.Replace(Environment.NewLine, "<br />");
+            return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br>").Replace("\r", "<br>").Replace("\n", "<br>");
         }
 
         public static bool IsNullOrEmpty(this string str)

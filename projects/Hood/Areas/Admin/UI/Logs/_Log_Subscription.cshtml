@@ -1,59 +1,33 @@
 @model Log
-<div class="row">
-    <div class="col-xs-12 col-sm-8">
-        <h4>Subscription Object:</h4>
-        <div>@Html.Raw(Model.Detail.ToFormattedJson().AddHtmlBreaks())</div>
-    </div>
-    <div class="col-xs-12 col-sm-4">
-        <dl>
-            @if (Model.User != null)
-            {
-                <dt>User</dt>
-                <dd>
-                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
-                        @Model.User.FullName
-                    </a>
-                </dd>
-            }
-            @if (Model.SourceUrl.IsSet())
-            {
-                <dt>Source Url</dt>
-                <dd>
-                    <a href="@Model.SourceUrl">
-                        @Model.SourceUrl
-                    </a>
-                </dd>
-            }
-            @if (Model.EntityId.IsSet())
-            {
-                switch (Model.EntityType)
-                {
-                    case nameof(ApplicationUser):
-                        <dt>User</dt>
-                        <dd>
-                            <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.EntityId">
-                                Go to user
-                            </a>
-                        </dd>
-                        break;
-                    case nameof(UserSubscription):
-                        <dt>Subscription</dt>
-                        <dd>
-                            <a target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.EntityId)">
-                                Go to subscription (Stripe)
-                            </a>
-                        </dd>
-                        break;
-                    case nameof(Subscription):
-                        <dt>Plan</dt>
-                        <dd>
-                            <a asp-action="Edit" asp-controller="Subscriptions" asp-route-id="@Model.EntityId">
-                                Go to subscription plan
-                            </a>
-                        </dd>
-                        break;
-                }
-            }
-        </dl>
-    </div>
-</div>
+@if (Model.EntityId.IsSet())
+{
+    switch (Model.EntityType)
+    {
+        case nameof(ApplicationUser):
+            break;
+        case nameof(UserSubscription):
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Subscription</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">
+                        <a target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.EntityId)">
+                            Go to subscription (Stripe)
+                        </a>
+                    </p>
+                </div>
+            </div>
+            break;
+        case nameof(Subscription):
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Plan</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">
+                        <a asp-action="Edit" asp-controller="Subscriptions" asp-route-id="@Model.EntityId">
+                            Go to subscription plan
+                        </a>
+                    </p>
+                </div>
+            </div>
+            break;
+    }
+}

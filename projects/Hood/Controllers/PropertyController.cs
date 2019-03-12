@@ -1,38 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Hood.Enums;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Hosting;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using Hood.Enums;
+using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Controllers
 {
-    //[Area("Hood")]
-    public class PropertyController : Controller
+    public class PropertyController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
 
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IPropertyRepository _property;
-        private readonly ISettingsRepository _settings;
-        private readonly IHostingEnvironment _env;
-        private readonly IBillingService _billing;
-
-        public PropertyController(
-            IPropertyRepository property,
-            UserManager<ApplicationUser> userManager,
-            ISettingsRepository site,
-            IBillingService billing,
-            IHostingEnvironment env)
-        {
-            _userManager = userManager;
-            _property = property;
-            _settings = site;
-            _billing = billing;
-            _env = env;
-        }
+        public PropertyController()
+            : base()
+        { }
 
         public async Task<IActionResult> Index(PropertySearchModel model)
         {

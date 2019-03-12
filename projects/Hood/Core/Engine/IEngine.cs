@@ -24,8 +24,7 @@ namespace Hood.Core
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration root of the application</param>
         /// <returns>Service provider</returns>
-        IServiceProvider ConfigureServices<TDbContext>(IServiceCollection services, IConfiguration configuration)
-            where TDbContext : DbContext;
+        IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration);
 
         /// <summary>
         /// Resolve dependency

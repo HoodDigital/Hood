@@ -3,11 +3,29 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Hood.Extensions
 {
     public static class HttpContextExtensions
     {
+        public static string GetSubdomain(this HttpContext httpContext)
+        {
+
+            string url = httpContext.Request.Headers["HOST"];
+            var urlSegments = url.Split('.').ToList();
+            switch (urlSegments.Count)
+            {
+                case 3:
+                    // found subdomain - strip the first off, and then return it.
+                    return urlSegments.First();
+                default:
+                    // FAIL - we should have exactly 3 substrings in order to return a sub-domain.
+                    // Return "www" to signify normal site load.
+                    return "www";
+            }
+        }
+
         public static void Set<T>(this HttpContext context, string key, T value)
         {
             context.Items[key] = JsonConvert.SerializeObject(value);
@@ -54,6 +72,12 @@ namespace Hood.Extensions
                 return true;
             }
             return false;
+        }
+
+        public static bool IsLocalhost(this HttpContext context)
+        {
+            string url = context.Request.Headers["HOST"];
+            return url.Contains("localhost");
         }
 
         public static string GetSiteUrl(this HttpContext context, bool includePath = false, bool includeQuery = false)

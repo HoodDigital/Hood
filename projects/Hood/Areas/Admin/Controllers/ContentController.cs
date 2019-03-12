@@ -5,9 +5,7 @@ using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -794,7 +792,7 @@ namespace Hood.Areas.Admin.Controllers
             if (result.Succeeded)
             {
                 // get subscriptions - if there are any.
-                model.Subscriptions = await _auth.GetSubscriptionPlansAsync();
+                model.Subscriptions = await _account.GetSubscriptionPlansAsync();
             }
             return model;
         }
