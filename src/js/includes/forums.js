@@ -1,5 +1,5 @@
 if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Forum = {
     Init: function () {
         $('body').on('click', '.delete-forum', this.Delete);
@@ -100,31 +100,31 @@ $.hood.Forum = {
                 showLoaderOnConfirm: true,
                 closeOnCancel: false
             },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/forums/categories/delete/' + $this.data('id'), null, function (data) {
-                        if (data.Success) {
-                            $.hood.Inline.Reload('.categorylist');
-                            swal({
-                                title: "Deleted!",
-                                text: "The field has now been removed from the website.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem deleting the field: " + data.Errors,
-                                timer: 5000,
-                                type: "error"
-                            });
-                        }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
+                function (isConfirm) {
+                    if (isConfirm) {
+                        // delete functionality
+                        $.post('/admin/forums/categories/delete/' + $this.data('id'), null, function (data) {
+                            if (data.Success) {
+                                $.hood.Inline.Reload('.categorylist');
+                                swal({
+                                    title: "Deleted!",
+                                    text: "The field has now been removed from the website.",
+                                    timer: 1300,
+                                    type: "success"
+                                });
+                            } else {
+                                swal({
+                                    title: "Error!",
+                                    text: "There was a problem deleting the field: " + data.Errors,
+                                    timer: 5000,
+                                    type: "error"
+                                });
+                            }
+                        });
+                    } else {
+                        swal("Cancelled", "It's all good in the hood!", "error");
+                    }
+                });
         }
     },
     Delete: function (e) {
@@ -141,34 +141,34 @@ $.hood.Forum = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/forums/delete/' + $this.data('id'), null, function (data) {
-                    if (data.Success) {
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Deleted!",
-                            text: "The forum has now been removed from the website.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                        setTimeout(function () {
-                            window.location = data.Url;
-                        }, 500);
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem deleting the forum: " + data.Errors,
-                            timer: 5000,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/forums/delete/' + $this.data('id'), null, function (data) {
+                        if (data.Success) {
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Deleted!",
+                                text: "The forum has now been removed from the website.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                            setTimeout(function () {
+                                window.location = data.Url;
+                            }, 500);
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem deleting the forum: " + data.Errors,
+                                timer: 5000,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Publish: function (e) {
         var $this = $(this);
@@ -184,33 +184,33 @@ $.hood.Forum = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/forums/publish/' + $this.data('id'), null, function (data) {
-                    if (data.Success) {
-                        swal({
-                            title: "Published!",
-                            text: "The item has now been published.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                        setTimeout(function () {
-                            window.location = data.Url;
-                        }, 500);
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem publishing the item: " + data.Errors,
-                            timer: 5000,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/forums/publish/' + $this.data('id'), null, function (data) {
+                        if (data.Success) {
+                            swal({
+                                title: "Published!",
+                                text: "The item has now been published.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                            setTimeout(function () {
+                                window.location = data.Url;
+                            }, 500);
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem publishing the item: " + data.Errors,
+                                timer: 5000,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Archive: function (e) {
         var $this = $(this);
@@ -226,32 +226,32 @@ $.hood.Forum = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                $.post('/admin/forums/archive/' + $this.data('id'), null, function (data) {
-                    if (data.Success) {
-                        swal({
-                            title: "Archived!",
-                            text: "The item has now been archived.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                        setTimeout(function () {
-                            window.location = data.Url;
-                        }, 500);
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem archiving the item: " + data.Errors,
-                            timer: 5000,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.post('/admin/forums/archive/' + $this.data('id'), null, function (data) {
+                        if (data.Success) {
+                            swal({
+                                title: "Archived!",
+                                text: "The item has now been archived.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                            setTimeout(function () {
+                                window.location = data.Url;
+                            }, 500);
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem archiving the item: " + data.Errors,
+                                timer: 5000,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Create: {
         Init: function (e) {
@@ -260,14 +260,9 @@ $.hood.Forum = {
             $.hood.Blades.OpenWithLoader('button.create-forum', '/admin/forums/create/', $.hood.Forum.Create.SetupCreateForm);
         },
         SetupCreateForm: function () {
-            $('#create-forum-form').find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $('#create-forum-form').find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
             $('#create-forum-form').hoodValidator({
                 validationRules: {
@@ -295,18 +290,13 @@ $.hood.Forum = {
     },
     Edit: {
         Init: function () {
-            $('#edit-forum-form').find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: true,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $('#edit-forum-form').find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
         }
     }
-}
+};
 $(window).on('load', function () {
     $.hood.Forum.Init();
 });

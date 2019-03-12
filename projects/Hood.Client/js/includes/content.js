@@ -355,14 +355,9 @@ $.hood.Content = {
             $.hood.Blades.OpenWithLoader('button.create-content', '/admin/content/' + $this.data('type') + '/create/', $.hood.Content.Create.SetupCreateForm);
         },
         SetupCreateForm: function () {
-            $('#create-content-form').find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $('#create-content-form').find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
             $('#create-content-form').hoodValidator({
                 validationRules: {
@@ -421,14 +416,9 @@ $.hood.Content = {
         },
         LoadEditors: function (tag) {
             // Load the url thing if on page editor.
-            $(tag).find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: true,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $(tag).find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
         }
     },

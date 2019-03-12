@@ -246,7 +246,7 @@ $(window).on('resize', Resize);
 Resize();
 
 if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Admin = {
     Init: function () {
         $.hood.Helpers.InitMetisMenu(document);
@@ -327,7 +327,7 @@ $.hood.Admin = {
 
         $('.colorpicker-component').colorpicker();
 
-    },
+    }
 };
 $(window).on('load', function () {
     $.hood.Admin.Init();

@@ -1,16 +1,7 @@
-﻿// Global variables for the $.hood.App
-// Overwrite these in your site.js to use different classes/elements etc.
-
-$.window = $(window),
-    $.wrapper = $('#wrapper'),
+﻿$.window = $(window),
     $.header = $('#header'),
-    $.headerWrap = $('#header-wrap'),
-    $.content = $('#content'),
-    $.footer = $('#footer'),
     $.mobileMenu = $('#mobile-menu'),
     $.mobileMenuTrigger = $('.mobile-menu-trigger'),
-    $.background = $('#site-background-image'),
-    $.sideMenus = $('.side-push-panel'),
     $.sideMenuTrigger = $(".side-panel-trigger"),
     stickyHeaderClass = 'sticky-header',
     mobileMenuOpenClass = 'mobile-menu-open',
@@ -45,10 +36,8 @@ $.hood.App = {
         FitVids: true,
         Forums: true,
         Header: true,
-        LoadSharers: $('#share').length,
         PaymentPages: true,
         RichTextEditors: $('.tinymce-public').length,
-        SharerOptions: ["email", "twitter", "facebook", "googleplus", "linkedin", "pinterest", "whatsapp"],
         Uploaders: true
     },
     Init: function (options) {
@@ -362,18 +351,6 @@ $.hood.App = {
             customSelector: "iframe[src^='http://www.dailymotion.com/embed'], iframe[src*='maps.google.com'], iframe[src*='google.com/maps']",
             ignore: '.no-fv'
         });
-    },
-    Sharers: function () {
-        $.getScript('https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.min.js', $.proxy(function () {
-            $.loadCss('sharer-css', 'https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials.css');
-            $.loadCss('sharer-theme-css', 'https://cdn.jsdelivr.net/jquery.jssocials/1.4.0/jssocials-theme-flat.css');
-            $("#share").jsSocials({
-                shares: this.Options.SharerOptions,
-                showLabel: true,
-                showCount: true,
-                shareIn: "popup"
-            });
-        }, this));
     },
     Uploaders: {
         Init: function () {

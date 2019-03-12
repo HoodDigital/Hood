@@ -1,5 +1,5 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Subscriptions = {
     Init: function () {
         $('body').on('click', '.delete-subscription', this.Delete);
@@ -89,34 +89,34 @@ $.hood.Subscriptions = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/subscriptions/delete', { id: $this.data('id') }, function (data) {
-                    if (data.Success) {
-                        if (!$('#manage-subscription-list').doesExist())
-                            window.location = '/admin/subscriptions/';
-                        $.hood.Subscriptions.Manage.Refresh();
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Deleted!",
-                            text: "The subscription has now been removed from the website.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem deleting the subscription: " + data.Errors,
-                            timer: 1300,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/subscriptions/delete', { id: $this.data('id') }, function (data) {
+                        if (data.Success) {
+                            if (!$('#manage-subscription-list').doesExist())
+                                window.location = '/admin/subscriptions/';
+                            $.hood.Subscriptions.Manage.Refresh();
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Deleted!",
+                                text: "The subscription has now been removed from the website.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem deleting the subscription: " + data.Errors,
+                                timer: 1300,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     Create: {
         Init: function (e) {
@@ -124,14 +124,9 @@ $.hood.Subscriptions = {
             $.hood.Blades.OpenWithLoader('button.create-subscription', '/admin/subscriptions/create/', $.hood.Subscriptions.Create.SetupCreateForm);
         },
         SetupCreateForm: function () {
-            $('#create-subscription-form').find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $('#create-subscription-form').find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
             $('#create-subscription-form').hoodValidator({
                 validationRules: {
@@ -187,7 +182,7 @@ $.hood.Subscriptions = {
                     Excerpt: {
                         required: true
                     }
-                },                
+                },
                 submitButtonTag: $('#save-blade'),
                 submitUrl: '/admin/subscriptions/save/' + $('#subscription-blade-form').data('id'),
                 submitFunction: function (data) {
@@ -202,17 +197,11 @@ $.hood.Subscriptions = {
         },
         LoadEditors: function (tag) {
             // Load the url thing if on page editor.
-            $(tag).find('.datepicker').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: true,
-                calendarWeeks: true,
-                autoclose: true,
-                orientation: "bottom",
-                format: "dd/mm/yyyy",
+            $(tag).find('.datepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'L'
             });
-
         }
-    },
-}
+    }
+};
 $.hood.Subscriptions.Init();
