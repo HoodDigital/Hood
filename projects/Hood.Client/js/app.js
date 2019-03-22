@@ -37,8 +37,7 @@ $.hood.App = {
         Forums: true,
         Header: true,
         PaymentPages: true,
-        RichTextEditors: $('.tinymce-public').length,
-        Uploaders: true
+        RichTextEditors: $('.tinymce-public').length
     },
     Init: function (options) {
 
@@ -70,9 +69,6 @@ $.hood.App = {
 
         if ($.hood.App.Options.ContactForms)
             $.hood.App.ContactForms.Init();
-
-        if ($.hood.App.Options.Uploaders)
-            $.hood.App.Uploaders.Init();
 
         if ($.hood.App.Options.Colorbox)
             $.hood.App.Colorbox();
@@ -354,130 +350,6 @@ $.hood.App = {
             customSelector: "iframe[src^='http://www.dailymotion.com/embed'], iframe[src*='maps.google.com'], iframe[src*='google.com/maps']",
             ignore: '.no-fv'
         });
-    },
-    Uploaders: {
-        Init: function () {
-            if ($('#media-upload').doesExist() || $('#avatar-upload').doesExist()) {
-                $.hood.App.Loader.AddItem('uploaders');
-                $.getScript('/lib/dropzone/dist/min/dropzone.min.js', $.proxy(function () {
-                    if ($('#media-upload').doesExist())
-                        $.hood.App.Uploaders.Gallery();
-                    if ($('#avatar-upload').doesExist())
-                        $.hood.App.Uploaders.Avatar();
-                    $.hood.App.Loader.ItemComplete('uploaders');
-                }, this));
-            }
-        },
-        Gallery: function () {
-            Dropzone.autoDiscover = false;
-
-            var previewNode = document.querySelector("#media-upload-template");
-            previewNode.id = "";
-            var previewTemplate = previewNode.parentNode.innerHTML;
-            previewNode.parentNode.removeChild(previewNode);
-
-            var galleryDropzone = new Dropzone("#media-upload", {
-                url: $("#media-upload").data('url'),
-                thumbnailWidth: 80,
-                thumbnailHeight: 80,
-                parallelUploads: 5,
-                previewTemplate: previewTemplate,
-                paramName: 'files',
-                autoProcessQueue: true, // Make sure the files aren't queued until manually added
-                previewsContainer: "#previews", // Define the container to display the previews
-                clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
-                dictDefaultMessage: '<span><i class="fa fa-cloud-upload fa-4x"></i><br />Drag and drop files here, or simply click me!</div>',
-                dictResponseError: 'Error while uploading file!'
-            });
-            $("#media-upload .cancel").hide();
-
-            galleryDropzone.on("addedfile", function (file) {
-                $(file.previewElement.querySelector(".complete")).hide();
-                $(file.previewElement.querySelector(".cancel")).show();
-                $("#media-upload .cancel").show();
-            });
-
-            // Update the total progress bar
-            galleryDropzone.on("totaluploadprogress", function (progress) {
-                document.querySelector("#total-progress .progress-bar").style.width = progress + "%";
-            });
-
-            galleryDropzone.on("sending", function (file) {
-                // Show the total progress bar when upload starts
-                document.querySelector("#total-progress").style.opacity = "1";
-                // And disable the start button
-            });
-
-            // Hide the total progress bar when nothing's uploading anymore
-            galleryDropzone.on("complete", function (file) {
-                $(file.previewElement.querySelector(".cancel")).hide();
-                $(file.previewElement.querySelector(".progress")).hide();
-                $(file.previewElement.querySelector(".complete")).show();
-                $.hood.Inline.Refresh('.gallery');
-            });
-
-            // Hide the total progress bar when nothing's uploading anymore
-            galleryDropzone.on("queuecomplete", function (progress) {
-                document.querySelector("#total-progress").style.opacity = "0";
-                $("#media-upload .cancel").hide();
-            });
-
-            galleryDropzone.on("success", function (file, response) {
-                $.hood.Inline.Refresh('.gallery');
-                if (response.Success) {
-                    $.hood.Alerts.Success("New images added!");
-                } else {
-                    $.hood.Alerts.Error("There was a problem adding the profile image: " + response.Error);
-                }
-            });
-
-            // Setup the buttons for all transfers
-            // The "add files" button doesn't need to be setup because the config
-            // `clickable` has already been specified.
-            document.querySelector(".actions .cancel").onclick = function () {
-                galleryDropzone.removeAllFiles(true);
-            };
-        },
-        Avatar: function () {
-            Dropzone.autoDiscover = false;
-            var avatarDropzone = new Dropzone("#avatar-upload", {
-                url: $("#avatar-upload").data('url'),
-                maxFiles: 1,
-                paramName: 'file',
-                parallelUploads: 1,
-                autoProcessQueue: true, // Make sure the files aren't queued until manually added
-                previewsContainer: false, // Define the container to display the previews
-                clickable: "#avatar-upload" // Define the element that should be used as click trigger to select files.
-            });
-            avatarDropzone.on("addedfile", function () {
-            });
-            // Update the total progress bar
-            avatarDropzone.on("totaluploadprogress", function (progress) {
-                document.querySelector("#avatar-total-progress .progress-bar").style.width = progress + "%";
-            });
-            avatarDropzone.on("sending", function (file) {
-                // Show the total progress bar when upload starts
-                document.querySelector("#avatar-total-progress").style.opacity = "1";
-                $($("#avatar-upload").data('preview')).addClass('loading');
-            });
-            avatarDropzone.on("queuecomplete", function (progress) {
-                document.querySelector("#avatar-total-progress").style.opacity = "0";
-            });
-            avatarDropzone.on("success", function (file, response) {
-                if (response.Success) {
-                    $("#AvatarJson").val(JSON.stringify(response.Image));
-                    $($("#avatar-upload").data('preview')).css({
-                        'background-image': 'url(' + response.Image.SmallUrl + ')'
-                    });
-                    $($("#avatar-upload").data('preview')).find('img').attr('src', response.Image.SmallUrl);
-                    $.hood.Alerts.Success("New profile image added!");
-                } else {
-                    $.hood.Alerts.Error("There was a problem adding the profile image: " + response.Error);
-                }
-                avatarDropzone.removeFile(file);
-                $($("#avatar-upload").data('preview')).removeClass('loading');
-            });
-        }
     },
     PaymentPages: {
         Init: function () {
