@@ -40,7 +40,7 @@ $.hood.Inline = {
             });
     },
     Task: function (e) {
-        $.hood.Handlers.Loader(true);
+        $.hood.Loader(true);
         e.preventDefault();
         $tag = $(e.currentTarget);
         $tagcontents = $(e.currentTarget).html();
@@ -65,7 +65,7 @@ $.hood.Inline = {
                 $.hood.Alerts.Error("There was an error processing the request:<br/><strong>" + urlLoad + "</strong>");
             })
             .always(function (data) {
-                $.hood.Handlers.Loader(false);
+                $.hood.Loader(false);
                 $.hood.Modals.Loading = false;
                 $(e.currentTarget).removeClass('loading');
             });
