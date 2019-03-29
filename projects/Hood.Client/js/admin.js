@@ -6,8 +6,6 @@
         $('body').removeClass('body-small')
     }
 
-
-    $.hood.Helpers.InitIboxes('body');
     $.hood.Helpers.InitMetisMenu('#side-menu');
 
     $('.close-canvas-menu').on('click', function () {
@@ -250,7 +248,7 @@ if (!$.hood)
 $.hood.Admin = {
     Init: function () {
         $.hood.Helpers.InitMetisMenu(document);
-        $.hood.Helpers.InitIboxes(document);
+
         // Load any tinymce editors.
         tinymce.init({
             selector: '.tinymce-full',
@@ -288,6 +286,7 @@ $.hood.Admin = {
                 '/css/site.min.css'
             ]
         });
+
         tinymce.init({
             selector: '.tinymce-full-content',
             height: 500,

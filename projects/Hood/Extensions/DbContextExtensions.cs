@@ -110,6 +110,7 @@ namespace Hood.Models
 
         public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction
         {
+            builder.Entity<T>().Property<string>("NotesJson").HasField("_NotesJson").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<string>("PaymentMethodJson").HasField("_PaymentMethodJson").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<string>("AmountJson").HasField("_AmountJson").UsePropertyAccessMode(PropertyAccessMode.Field);
             builder.Entity<T>().Property<string>("BillingAddressJson").HasField("_BillingAddressJson").UsePropertyAccessMode(PropertyAccessMode.Field);

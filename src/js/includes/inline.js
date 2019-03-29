@@ -3,7 +3,7 @@ if (!$.hood)
 
 $.hood.Inline = {
     Init: function () {
-        $('.hood-inline:not(.refresh)').each($.hood.Inline.Load)
+        $('.hood-inline:not(.refresh)').each($.hood.Inline.Load);
         $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
     },
     Refresh: function () {
@@ -15,20 +15,17 @@ $.hood.Inline = {
     Reload: function (tag, complete) {
         $(tag).addClass('loading');
         params = null;
-        if (($(tag).attr('data-params'))) {
+        if ($(tag).attr('data-params')) {
             params = eval($(tag).data('params'));
         }
         var urlLoad = $(tag).data('url');
         $.get(urlLoad, params, function (data) {
             $(tag).html(data);
-            try {
-                $.hood.Helpers.InitMetisMenu(tag);
-            } catch (ex) { }
-            try {
-                $.hood.Helpers.InitIboxes(tag);
-            } catch (ex) { }
             if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-                complete(data);
+                if ($.hood.helpers.IsFunction(complete))
+                    complete(data);
+                else
+                    eval(complete + "(data)");
             }
             if ($(tag).attr("data-complete")) {
                 eval($(tag).data('complete') + "(data)");

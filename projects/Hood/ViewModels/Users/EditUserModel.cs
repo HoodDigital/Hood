@@ -66,6 +66,8 @@ namespace Hood.Models
 
         public string Notes { get; set; }
 
+        public Dictionary<string, string> UserVariables { get; set; }
+
         public void SetProfile(IUserProfile profile)
         {
             profile.CopyProperties(this);

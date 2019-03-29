@@ -16,7 +16,13 @@ $.hood.Handlers = {
         // date/time meta editor
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
+        new CustomEvent('loader-show');
+        new CustomEvent('loader-hide');
+        $(document).on('loader-show', 'body', function () { console.log('Showing Loader...'); });
+        $(document).on('loader-hide', 'body', function () { console.log('Hiding Loader...'); });
+
         this.Uploaders.Init();
+        this.Loader.Init();
     },
     SubmitOnChange: function (e) {
         $(this).parents('form').submit();
@@ -87,6 +93,12 @@ $.hood.Handlers = {
             scrollTop: top
         }, Math.abs(top - scrollTop));
         return false;
+    },
+    Loader: function (show) {
+        if (show)
+            $('body').trigger('loader-show');
+        else 
+            $('body').trigger('loader-hide');
     },
     Uploaders: {
         Init: function () {

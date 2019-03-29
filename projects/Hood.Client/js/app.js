@@ -104,8 +104,6 @@ $.hood.App = {
             }
         },
         Complete: function () {
-            $('#loader').fadeOut(100);
-            $('#preloader').delay($.hood.App.Options.Loader.Delay).fadeOut(100);
             setTimeout(function () {
                 if ($.hood.App.Options.Forums)
                     $.hood.App.Forums.Init();

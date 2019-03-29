@@ -11,7 +11,7 @@ $.hood.Helpers = {
     GetQueryStringParamByName: function (name) {
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
-        results = regex.exec(location.search);
+            results = regex.exec(location.search);
         return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     },
     InsertQueryStringParam: function (key, value) {
@@ -38,6 +38,31 @@ $.hood.Helpers = {
             document.location.search = kvp.join('&');
         }
     },
+    InsertQueryStringParamToUrl: function (url, key, value) {
+        key = escape(key); value = escape(value);
+        var kvp = url.search.substr(1).split('&');
+        if (kvp == '') {
+            url.search = '?' + key + '=' + value;
+        }
+        else {
+
+            var i = kvp.length; var x; while (i--) {
+                x = kvp[i].split('=');
+
+                if (x[0] == key) {
+                    x[1] = value;
+                    kvp[i] = x.join('=');
+                    break;
+                }
+            }
+
+            if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
+
+            //this will reload the page, it's likely better to store this until finished
+            url.search = kvp.join('&');
+        }
+        return url;
+    },
     IsNullOrUndefined: function (a) {
         var rc = false;
         if (a === null || typeof (a) === "undefined" || a === "") {
@@ -62,6 +87,9 @@ $.hood.Helpers = {
         }
         el = null;
         return isSupported;
+    },
+    IsFunction: function (functionToCheck) {
+        return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
     },
     HtmlEncode: function (value) {
         //create a in-memory div, set it's inner text(which jQuery automatically encodes)
@@ -192,44 +220,6 @@ $.hood.Helpers = {
             height: '100%',
             railOpacity: 0.4,
             wheelStep: 10
-        });
-    },
-    UnwrapUploader: function (tag) {
-        tag.unwrap().unwrap().unwrap();
-        tag.siblings('span').remove();
-        tag.siblings('em').remove();
-    },
-    InitIboxes: function (tag) {
-        // Collapse ibox function
-        $(tag).find('.collapse-link').click(function () {
-            var ibox = $(this).closest('div.ibox');
-            var button = $(this).find('i');
-            var content = ibox.find('div.ibox-content');
-            content.slideToggle(200);
-            button.toggleClass('fa-chevron-up').toggleClass('fa-chevron-down');
-            ibox.toggleClass('').toggleClass('border-bottom');
-            setTimeout(function () {
-                ibox.resize();
-                ibox.find('[id^=map-]').resize();
-            }, 50);
-        });
-
-        // Close ibox function
-        $(tag).find('.close-link').click(function () {
-            var content = $(this).closest('div.ibox');
-            content.remove();
-        });
-
-        // Fullscreen ibox function
-        $(tag).find('.fullscreen-link').click(function () {
-            var ibox = $(this).closest('div.ibox');
-            var button = $(this).find('i');
-            $('body').toggleClass('fullscreen-ibox-mode');
-            button.toggleClass('fa-expand').toggleClass('fa-compress');
-            ibox.toggleClass('fullscreen');
-            setTimeout(function () {
-                $(window).trigger('resize');
-            }, 100);
         });
     },
     InitMetisMenu: function (tag) {

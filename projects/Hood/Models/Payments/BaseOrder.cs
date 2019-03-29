@@ -3,13 +3,25 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models.Payments
 {
+
     public partial class BaseOrder<TAddress> : BaseEntity<string>
         where TAddress : IAddress, new()
     {
+        public DateTime CreatedOn { get; set; }
+
+        [NotMapped]
+        public List<OrderNote> Notes
+        {
+            get { return _NotesJson.IsSet() ? JsonConvert.DeserializeObject<List<OrderNote>>(_NotesJson) : new List<OrderNote>(); }
+            set { _NotesJson = JsonConvert.SerializeObject(value); }
+        }
+        [NonSerialized]
+        private string _NotesJson;
 
         [NotMapped]
         public TAddress BillingAddress

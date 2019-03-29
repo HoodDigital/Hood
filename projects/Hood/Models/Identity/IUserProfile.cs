@@ -1,4 +1,6 @@
-﻿namespace Hood.Models
+﻿using System.Collections.Generic;
+
+namespace Hood.Models
 {
     public interface IUserProfile
     {
@@ -15,6 +17,8 @@
         string TwitterHandle { get; set; }
         string WebsiteUrl { get; set; }
         string Notes { get; set; }
+
+        Dictionary<string, string> UserVariables { get; set; }
 
         void SetProfile(IUserProfile profile);
     }
