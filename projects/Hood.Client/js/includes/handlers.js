@@ -17,7 +17,6 @@ $.hood.Handlers = {
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
         this.Uploaders.Init();
-        this.Loader.Init();
     },
     SubmitOnChange: function (e) {
         $(this).parents('form').submit();
