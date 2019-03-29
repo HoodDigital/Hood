@@ -1,5 +1,5 @@
 if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 
 $.hood.Inline = {
     Init: function () {
@@ -22,7 +22,7 @@ $.hood.Inline = {
         $.get(urlLoad, params, function (data) {
             $(tag).html(data);
             if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-                if ($.hood.helpers.IsFunction(complete))
+                if ($.hood.Helpers.IsFunction(complete))
                     complete(data);
                 else
                     eval(complete + "(data)");
@@ -40,6 +40,7 @@ $.hood.Inline = {
             });
     },
     Task: function (e) {
+        $.hood.Handlers.Loader(true);
         e.preventDefault();
         $tag = $(e.currentTarget);
         $tagcontents = $(e.currentTarget).html();
@@ -61,9 +62,10 @@ $.hood.Inline = {
             }
         })
             .fail(function (data) {
-                $.hood.Alerts.Error("There was an error processing the AJAX request:<br/><strong>" + urlLoad + "</strong>");
+                $.hood.Alerts.Error("There was an error processing the request:<br/><strong>" + urlLoad + "</strong>");
             })
             .always(function (data) {
+                $.hood.Handlers.Loader(false);
                 $.hood.Modals.Loading = false;
                 $(e.currentTarget).removeClass('loading');
             });

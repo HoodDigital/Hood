@@ -1,5 +1,6 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
+
 $.body = $('body');
 // Console hack
 var console = window.console || {};
@@ -301,3 +302,12 @@ $.hood.ImageClasses = [
     { title: 'Pulled Left', value: 'user-image pull-left' },
     { title: 'Pulled Right', value: 'user-image pull-right' },
 ];
+
+new CustomEvent('loader-show');
+new CustomEvent('loader-hide');
+$.hood.Loader = function (show) {
+    if (show)
+        $('body').trigger('loader-show');
+    else
+        $('body').trigger('loader-hide');
+};
