@@ -1,4 +1,7 @@
-﻿using SendGrid.Helpers.Mail;
+﻿using Hood.Core;
+using Hood.Extensions;
+using Hood.Models;
+using SendGrid.Helpers.Mail;
 using System.Collections.Generic;
 using System.IO;
 
@@ -11,6 +14,35 @@ namespace Hood.Services
         public string PreHeader { get; set; }
         public string ToName { get; set; }
         public string Template { get; set; } = Models.MailSettings.PlainTemplate;
+
+        public bool ShowSiteSocials { get; set; } = false;
+        public string EmailSmallPrint { get; set; } = "<a href='http://hooddigital.com/' style='color: #999999;text-decoration: none;'>Powered by HoodCMS by Hood Digital</a>.";
+        public string Logo { get; set; } = "";
+        public string Title { get; set; } = "";
+
+        public string HeaderContent
+        {
+            get
+            {
+                BasicSettings _basicSettings = Engine.Current.Resolve<ISettingsRepository>().GetBasicSettings();
+
+                if (!Title.IsSet())
+                    Title = _basicSettings.SiteTitle;
+
+                if (!Logo.IsSet())
+                    if (!_basicSettings.SiteLogo.IsSet())
+                        Logo = _basicSettings.SiteLogo;
+
+                if (Logo.IsSet())
+                    return $"<h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>" +
+                       $"    <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;max-width:75%;max-height:100px;'>" +
+                       $"</h1>";
+                else
+                    return $"<h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>" +
+                       $"    {Title}" +
+                       $"</h1>";
+            }
+        }
 
         public MailObject()
         {
@@ -46,6 +78,12 @@ namespace Hood.Services
                 _textBody = new StringWriter();
                 _textBody.Write(value);
             }
+        }
+        public void AddCustomHtml(string htmlContent, string textContent)
+        {
+            if (textContent.IsSet())
+                _textBody.WriteLine(textContent);
+            _body.WriteLine(htmlContent);
         }
         public void AddHorizontalRule()
         {
@@ -163,6 +201,5 @@ namespace Hood.Services
 </table>
 ", content, url, colour, align));
         }
-
     }
 }

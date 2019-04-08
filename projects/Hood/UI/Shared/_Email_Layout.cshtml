@@ -1,16 +1,11 @@
-﻿
+﻿@model MailObject
 @{
     MailSettings _mail = _settings.GetMailSettings();
-    BasicSettings _basicSettings = _settings.GetBasicSettings();
     SeoSettings _seoSettings = _settings.GetSeo();
-    ContactSettings _contactSettings = _settings.GetContactSettings();
 }
 <!doctype html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>@ViewData["Title"]</title>
     <style media="all" type="text/css">
         @@media only screen and (max-width: 620px) {
             .span-2,
@@ -150,7 +145,6 @@
     </xml>
     <![endif]-->
 </head>
-
 <body class="" style="font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: @_mail.BackgroundColour; margin: 0; padding: 0;">
     <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: @_mail.BackgroundColour;" width="100%" bgcolor="@_mail.BackgroundColour">
         <tr>
@@ -160,17 +154,7 @@
                     @RenderBody()
                     <div class="footer" style="clear: both; padding-top: 10px; text-align: center; width: 100%;">
                         <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
-                            <tr>
-                                <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
-                                    <span class="apple-link" style="color: #444444; font-size: 12px; text-align: center;">@_basicSettings.CompanyName</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
-                                    <span class="apple-link" style="color: #999999; font-size: 12px; text-align: center;">@_basicSettings.Address.ToFormat(AddressFormat.SingleLine)</span>
-                                </td>
-                            </tr>
-                            @if (_seoSettings.HasSocials())
+                            @if (Model.ShowSiteSocials && _seoSettings != null)
                             {
                                 <tr>
                                     <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
@@ -218,11 +202,14 @@
                                     </td>
                                 </tr>
                             }
-                            <tr>
-                                <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
-                                    <a href="http://hooddigital.com/" style="color: #999999; font-size: 10px; text-align: center; text-decoration: none;">Powered by HoodCMS by Hood Digital</a>.
-                                </td>
-                            </tr>
+                            @if (Model.EmailSmallPrint.IsSet())
+                            {
+                                <tr>
+                                    <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 10px; color: #999999; text-align: center;" valign="top" align="center">
+                                        @Html.Raw(Model.EmailSmallPrint)
+                                    </td>
+                                </tr>
+                            }
                         </table>
                     </div>
                 </div>
