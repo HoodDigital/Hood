@@ -108,7 +108,8 @@ namespace Hood.Models
                         LastLoginIP = "127.0.0.1",
                         LastLoginLocation = "Nottingham, UK",
                         Email = "admin@hooddigital.com",
-                        UserName = "admin@hooddigital.com"
+                        UserName = "admin@hooddigital.com",
+                        Active = true
                     };
                     IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
                     if (ir.Succeeded)

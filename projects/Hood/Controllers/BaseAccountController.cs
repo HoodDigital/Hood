@@ -254,6 +254,9 @@ namespace Hood.Controllers
                         await _mailService.ProcessAndSend(welcomeModel);
                     }
 
+                    user.Active = true;
+                    await _userManager.UpdateAsync(user);
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
                     return RedirectToLocal(returnUrl);
