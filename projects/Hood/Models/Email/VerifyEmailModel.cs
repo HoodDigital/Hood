@@ -15,6 +15,8 @@ namespace Hood.Models
             ConfirmLink = confirmationLink;
         }
 
+        public EmailAddress From { get; set; } = null;
+
         [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
         public string ConfirmLink { get; }

@@ -14,6 +14,8 @@ namespace Hood.Models
 {
     public class Post : BaseEntity<long>, IEmailSendable
     {
+        public EmailAddress From { get; set; } = null;
+
         // Parent
         public int TopicId { get; set; }
         public Topic Topic { get; set; }

@@ -6,6 +6,8 @@ namespace Hood.Models
 {
     public interface IEmailSendable
     {
+        EmailAddress From { get; set; }
+
         EmailAddress To { get; }
         bool SendToRecipient { get; set; }
 

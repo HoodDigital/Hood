@@ -10,6 +10,8 @@ namespace Hood.Models
 {
     public class ContactFormModel : HoneyPotFormModel, IEmailSendable
     {
+        public EmailAddress From { get; set; } = null;
+
         [Required]
         [Display(Name = "Your name")]
         public string Name { get; set; }
@@ -69,7 +71,7 @@ namespace Hood.Models
             var contactSettings = settings.GetContactSettings();
 
             message.PreHeader = settings.ReplacePlaceholders(
-                NotificationSubject.IsSet() ?  NotificationSubject : contactSettings.Title
+                NotificationSubject.IsSet() ? NotificationSubject : contactSettings.Title
             );
             message.Subject = settings.ReplacePlaceholders(
                 NotificationSubject.IsSet() ? NotificationSubject : contactSettings.Subject
