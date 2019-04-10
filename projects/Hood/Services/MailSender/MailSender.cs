@@ -43,7 +43,7 @@ namespace Hood.Services
                     if (model.SendToRecipient)
                     {
                         message.To = model.To;
-                        await _email.SendEmailAsync(message);
+                        await _email.SendEmailAsync(message, model.From);
                     }
 
                     message = new MailObject();
@@ -54,12 +54,12 @@ namespace Hood.Services
                         foreach (var recipient in model.NotifyEmails)
                         {
                             message.To = recipient;
-                            await _email.SendEmailAsync(message);
+                            await _email.SendEmailAsync(message, model.From);
                         }
                     }
 
                     if (model.NotifyRole.IsSet())
-                        await _email.NotifyRoleAsync(message, model.NotifyRole);
+                        await _email.NotifyRoleAsync(message, model.NotifyRole, model.From);
 
                     return new Response(true);
                 }
