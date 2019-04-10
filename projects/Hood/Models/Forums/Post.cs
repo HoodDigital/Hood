@@ -14,6 +14,7 @@ namespace Hood.Models
 {
     public class Post : BaseEntity<long>, IEmailSendable
     {
+        [NotMapped]
         public EmailAddress From { get; set; } = null;
 
         // Parent
