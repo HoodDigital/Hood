@@ -7,17 +7,17 @@ namespace Hood.Events
     public class StripeWebHookTriggerArgs : EventArgs
     {
         public string Action { get; set;}
-        public StripeEvent StripeEvent { get; set; }
+        public Stripe.Event Event { get; set; }
 
         public StripeWebHookTriggerArgs(string json)
         {
-            StripeEvent = StripeEventUtility.ParseEvent(json);
-            Action = StripeEvent.Type;
+            Event = Stripe.EventUtility.ParseEvent(json);
+            Action = Event.Type;
         }
-        public StripeWebHookTriggerArgs(StripeEvent stripeEvent)
+        public StripeWebHookTriggerArgs(Stripe.Event stripeEvent)
         {
-            StripeEvent = stripeEvent;
-            Action = StripeEvent.Type;
+            Event = stripeEvent;
+            Action = Event.Type;
         }
     }
 }

@@ -16,13 +16,13 @@ namespace Hood.Services
         /// </summary>
         /// <param name="customerId">The stripe subscription customer identifier.</param>
         /// <returns></returns>
-        Task<StripeCustomer> FindByIdAsync(string customerId);
+        Task<Stripe.Customer> FindByIdAsync(string customerId);
 
         /// <summary>
         /// Returns all the subscription customers for this account.
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<StripeCustomer>> GetAllAsync();
+        Task<IEnumerable<Stripe.Customer>> GetAllAsync();
 
         /// <summary>
         /// This creates a new customer on stripe, and if set, adds them to the provided plan id.
@@ -32,7 +32,7 @@ namespace Hood.Services
         /// <param name="token"></param>
         /// <param name="planId"></param>
         /// <returns></returns>
-        Task<StripeCustomer> CreateCustomer(ApplicationUser user, string token, string planId = null);
+        Task<Stripe.Customer> CreateCustomer(ApplicationUser user, string token, string planId = null);
 
         /// <summary>
         /// Deletes the customer asynchronous.

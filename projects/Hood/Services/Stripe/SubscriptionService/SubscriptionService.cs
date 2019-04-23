@@ -21,35 +21,52 @@ namespace Hood.Services
             _userManager = userManager;
         }
 
-        public async Task<StripeSubscription> CancelSubscriptionAsync(string customerId, string subscriptionId, bool cancelAtPeriodEnd = true)
+        public async Task<Stripe.Subscription> CancelSubscriptionAsync(string customerId, string subscriptionId, bool cancelAtPeriodEnd = true)
         {
-            return await _stripe.SubscriptionService.CancelAsync(subscriptionId, cancelAtPeriodEnd); // optional cancelAtPeriodEnd flag        
+            if (!cancelAtPeriodEnd)
+                return await _stripe.SubscriptionService.CancelAsync(subscriptionId, new SubscriptionCancelOptions() { });  
+
+            var options = new SubscriptionUpdateOptions
+            {
+                CancelAtPeriodEnd = false,
+            };
+            return await _stripe.SubscriptionService.UpdateAsync(subscriptionId, options);
+
         }
 
-        public async Task<StripeSubscription> FindById(string customerId, string subscriptionId)
+        public async Task<Stripe.Subscription> FindById(string customerId, string subscriptionId)
         {
             return await _stripe.SubscriptionService.GetAsync(subscriptionId);
         }
 
-        public async Task<StripeSubscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null, decimal taxPercent = 0)
+        public async Task<Stripe.Subscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null, decimal taxPercent = 0)
         {
-            var options = new StripeSubscriptionCreateOptions()
+            var options = new Stripe.SubscriptionCreateOptions()
             {
                 TrialEnd = trialEnd,
-                TaxPercent = taxPercent
+                TaxPercent = taxPercent,
+                CustomerId = customerId,
+                Items = new List<SubscriptionItemOption>()
+                {
+                    new SubscriptionItemOption()
+                    {
+                        PlanId = planId,
+                        Quantity = 1
+                    }
+                }
             };
-            StripeSubscription stripeSubscription = await _stripe.SubscriptionService.CreateAsync(customerId, planId, options);
+            Stripe.Subscription stripeSubscription = await _stripe.SubscriptionService.CreateAsync(options);
             return stripeSubscription;
         }
 
-        public async Task<StripeSubscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, StripePlan subscription)
+        public async Task<Stripe.Subscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, Stripe.Plan subscription)
         {
-            StripeSubscription currentSubscription = await _stripe.SubscriptionService.GetAsync(subscriptionId);
-            var updateOptions = new StripeSubscriptionUpdateOptions()
+            Stripe.Subscription currentSubscription = await _stripe.SubscriptionService.GetAsync(subscriptionId);
+            var updateOptions = new Stripe.SubscriptionUpdateOptions()
             {
-                Items = new List<StripeSubscriptionItemUpdateOption>()
+                Items = new List<Stripe.SubscriptionItemUpdateOption>()
                 {
-                    new StripeSubscriptionItemUpdateOption()
+                    new Stripe.SubscriptionItemUpdateOption()
                     {
                         Id = subscriptionId
                     }
@@ -72,31 +89,31 @@ namespace Hood.Services
             return currentSubscription;
         }
 
-        public async Task<StripeSubscription> UpdateSubscriptionTax(string customerId, string subscriptionId, decimal taxPercent)
+        public async Task<Stripe.Subscription> UpdateSubscriptionTax(string customerId, string subscriptionId, decimal taxPercent)
         {
-            var updateOptions = new StripeSubscriptionUpdateOptions()
+            var updateOptions = new Stripe.SubscriptionUpdateOptions()
             {
                 TaxPercent = taxPercent
             };
-            StripeSubscription stripeSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
+            Stripe.Subscription stripeSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
             return stripeSubscription;
         }
 
-        public async Task<StripeSubscription> UserActiveSubscriptionAsync(string customerId)
+        public async Task<Stripe.Subscription> UserActiveSubscriptionAsync(string customerId)
         {
-            IEnumerable<StripeSubscription> response = await UserActiveSubscriptionsAsync(customerId);
+            IEnumerable<Stripe.Subscription> response = await UserActiveSubscriptionsAsync(customerId);
             return response.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<StripeSubscription>> UserActiveSubscriptionsAsync(string customerId)
+        public async Task<IEnumerable<Stripe.Subscription>> UserActiveSubscriptionsAsync(string customerId)
         {
-            IEnumerable<StripeSubscription> response = await UserSubscriptionsAsync(customerId);
+            IEnumerable<Stripe.Subscription> response = await UserSubscriptionsAsync(customerId);
             return response.Where(s => s.Status == "active" || s.Status == "trialing");
         }
 
-        public async Task<IEnumerable<StripeSubscription>> UserSubscriptionsAsync(string customerId)
+        public async Task<IEnumerable<Stripe.Subscription>> UserSubscriptionsAsync(string customerId)
         {
-            IEnumerable<StripeSubscription> response = await _stripe.SubscriptionService.ListAsync(new StripeSubscriptionListOptions()
+            IEnumerable<Stripe.Subscription> response = await _stripe.SubscriptionService.ListAsync(new Stripe.SubscriptionListOptions()
             {
                 CustomerId = customerId
             });

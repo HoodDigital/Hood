@@ -5,37 +5,37 @@ namespace Hood.Services
 {
     public interface IStripeWebHookService
     {
-        void ChargeCaptured(StripeEvent stripeEvent);
-        void ChargeFailed(StripeEvent stripeEvent);
-        void ChargeRefunded(StripeEvent stripeEvent);
-        void ChargeSucceeded(StripeEvent stripeEvent);
-        void ChargeUpdated(StripeEvent stripeEvent);
-        void CustomerCardCreated(StripeEvent stripeEvent);
-        void CustomerCardDeleted(StripeEvent stripeEvent);
-        void CustomerCardUpdated(StripeEvent stripeEvent);
-        void CustomerCreated(StripeEvent stripeEvent);
-        void CustomerDeleted(StripeEvent stripeEvent);
-        void CustomerUpdated(StripeEvent stripeEvent);
-        void InvoiceCreated(StripeEvent stripeEvent);
-        void InvoiceItemCreated(StripeEvent stripeEvent);
-        void InvoiceItemDeleted(StripeEvent stripeEvent);
-        void InvoiceItemUpdated(StripeEvent stripeEvent);
-        void InvoicePaymentFailed(StripeEvent stripeEvent);
-        void InvoicePaymentSucceeded(StripeEvent stripeEvent);
-        void InvoiceUpdated(StripeEvent stripeEvent);
-        void PlanCreated(StripeEvent stripeEvent);
-        void PlanDeleted(StripeEvent stripeEvent);
-        void PlanUpdated(StripeEvent stripeEvent);
+        void ChargeCaptured(Stripe.Event stripeEvent);
+        void ChargeFailed(Stripe.Event stripeEvent);
+        void ChargeRefunded(Stripe.Event stripeEvent);
+        void ChargeSucceeded(Stripe.Event stripeEvent);
+        void ChargeUpdated(Stripe.Event stripeEvent);
+        void CustomerCardCreated(Stripe.Event stripeEvent);
+        void CustomerCardDeleted(Stripe.Event stripeEvent);
+        void CustomerCardUpdated(Stripe.Event stripeEvent);
+        void CustomerCreated(Stripe.Event stripeEvent);
+        void CustomerDeleted(Stripe.Event stripeEvent);
+        void CustomerUpdated(Stripe.Event stripeEvent);
+        void InvoiceCreated(Stripe.Event stripeEvent);
+        void InvoiceItemCreated(Stripe.Event stripeEvent);
+        void InvoiceItemDeleted(Stripe.Event stripeEvent);
+        void InvoiceItemUpdated(Stripe.Event stripeEvent);
+        void InvoicePaymentFailed(Stripe.Event stripeEvent);
+        void InvoicePaymentSucceeded(Stripe.Event stripeEvent);
+        void InvoiceUpdated(Stripe.Event stripeEvent);
+        void PlanCreated(Stripe.Event stripeEvent);
+        void PlanDeleted(Stripe.Event stripeEvent);
+        void PlanUpdated(Stripe.Event stripeEvent);
         void ProcessEvent(string json);
-        void SubscriptionCreated(StripeEvent stripeEvent);
-        void SubscriptionDeleted(StripeEvent stripeEvent);
-        void SubscriptionTrialWillEnd(StripeEvent stripeEvent);
-        void SubscriptionUpdated(StripeEvent stripeEvent);
-        void UnhandledWebHook(StripeEvent stripeEvent);
+        void SubscriptionCreated(Stripe.Event stripeEvent);
+        void SubscriptionDeleted(Stripe.Event stripeEvent);
+        void SubscriptionTrialWillEnd(Stripe.Event stripeEvent);
+        void SubscriptionUpdated(Stripe.Event stripeEvent);
+        void UnhandledWebHook(Stripe.Event stripeEvent);
     }
     public static class IStripeWebHookExtensions
     {
-        public static void ProcessEventByType(this IStripeWebHookService service, StripeEvent stripeEvent)
+        public static void ProcessEventByType(this IStripeWebHookService service, Stripe.Event stripeEvent)
         {
             switch (stripeEvent.GetEventName())
             {

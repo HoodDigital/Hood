@@ -18,27 +18,27 @@ namespace Hood.Services
             _userManager = userManager;
         }
 
-        public async Task<StripeInvoice> FindByIdAsync(string invoiceId)
+        public async Task<Stripe.Invoice> FindByIdAsync(string invoiceId)
         {
-            StripeInvoice response = await _stripe.InvoiceService.GetAsync(invoiceId);
+            Stripe.Invoice response = await _stripe.InvoiceService.GetAsync(invoiceId);
             return response;
         }
 
-        public async Task<IEnumerable<StripeInvoice>> GetAllAsync(string customerId, string startAfterId, int? pageSize = null)
+        public async Task<IEnumerable<Stripe.Invoice>> GetAllAsync(string customerId, string startAfterId, int? pageSize = null)
         {
-            StripeInvoiceListOptions options = new StripeInvoiceListOptions()
+            Stripe.InvoiceListOptions options = new Stripe.InvoiceListOptions()
             {
                 CustomerId = customerId,
                 StartingAfter = startAfterId,
                 Limit = pageSize
             };
-            IEnumerable<StripeInvoice> response = await _stripe.InvoiceService.ListAsync(options);
+            IEnumerable<Stripe.Invoice> response = await _stripe.InvoiceService.ListAsync(options);
             return response;
         }
 
-        public async Task<StripeInvoice> GetUpcoming(string customerId)
+        public async Task<Stripe.Invoice> GetUpcoming(string customerId)
         {
-            StripeInvoice response = await _stripe.InvoiceService.UpcomingAsync(customerId);
+            Stripe.Invoice response = await _stripe.InvoiceService.UpcomingAsync(new UpcomingInvoiceOptions() { CustomerId = customerId });
             return response;
         }
     }

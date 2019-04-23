@@ -14,13 +14,13 @@ namespace Hood.Services
         /// </summary>
         /// <param name="planId">The stripe subscription plan identifier.</param>
         /// <returns></returns>
-        Task<StripePlan> FindByIdAsync(string planId);
+        Task<Stripe.Plan> FindByIdAsync(string planId);
 
         /// <summary>
         /// Returns all the subscription plans for this account.
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<StripePlan>> GetAllAsync();
+        Task<IEnumerable<Stripe.Plan>> GetAllAsync();
 
         /// <summary>
         /// This creates a new plan on the site.
@@ -32,7 +32,7 @@ namespace Hood.Services
         /// <param name="intervalCount">Number of intervals to charge.</param>
         /// <param name="trialPeriodDays">Period before the user is charged.</param>
         /// <returns></returns>
-        Task<StripePlan> CreatePlan(string name, int amount, string colour, string description, string features, string currency = "gbp", string interval = "month", int intervalCount = 1, int trialPeriodDays = 30);
+        Task<Stripe.Plan> CreatePlan(string name, int amount, string colour, string description, string features, string currency = "gbp", string interval = "month", int intervalCount = 1, int trialPeriodDays = 30);
 
         /// <summary>
         /// Deletes the plan asynchronous.

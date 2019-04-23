@@ -14,20 +14,20 @@ namespace Hood.Services
         /// </summary>
         /// <param name="cardId">The stripe subscription card identifier.</param>
         /// <returns></returns>
-        Task<StripeCard> FindByIdAsync(string customerId, string cardId);
+        Task<Stripe.Card> FindByIdAsync(string customerId, string cardId);
 
         /// <summary>
         /// Returns all the subscription cards for this account.
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<StripeCard>> GetAllAsync(string customerId);
+        Task<IEnumerable<Stripe.Card>> GetAllAsync(string customerId);
 
         /// <summary>
         /// This creates a new card on stripe for the customer.
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task<StripeCard> CreateCard(string customerId, string token);
+        Task<Stripe.Card> CreateCard(string customerId, string token);
 
         /// <summary>
         /// Deletes the card asynchronous.

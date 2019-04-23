@@ -22,21 +22,21 @@ namespace Hood.Services
 
         // Addresses
         OperationResult DeleteAddress(int id);
-        Address GetAddressById(int id);
-        OperationResult UpdateAddress(Address address);
+        Models.Address GetAddressById(int id);
+        OperationResult UpdateAddress(Models.Address address);
         OperationResult SetBillingAddress(string userId, int id);
         OperationResult SetDeliveryAddress(string userId, int id);
 
         // Subscription Plans
-        Task<Subscription> AddSubscriptionPlan(Subscription subscription);
-        Task<List<Subscription>> GetSubscriptionPlansAsync();
-        Task<List<Subscription>> GetSubscriptionPlanLevels(string category = null);
-        Task<List<Subscription>> GetSubscriptionPlanAddons();
+        Task<Models.Subscription> AddSubscriptionPlan(Models.Subscription subscription);
+        Task<List<Models.Subscription>> GetSubscriptionPlansAsync();
+        Task<List<Models.Subscription>> GetSubscriptionPlanLevels(string category = null);
+        Task<List<Models.Subscription>> GetSubscriptionPlanAddons();
         Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model);
-        Task<Subscription> GetSubscriptionPlanById(int id);
-        Task<Subscription> GetSubscriptionPlanByStripeId(string stripeId);
+        Task<Models.Subscription> GetSubscriptionPlanById(int id);
+        Task<Models.Subscription> GetSubscriptionPlanByStripeId(string stripeId);
         Task DeleteSubscriptionPlan(int id);
-        Task UpdateSubscription(Subscription model);
+        Task UpdateSubscription(Models.Subscription model);
 
         // User Subscriptions
         Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model);
@@ -51,10 +51,10 @@ namespace Hood.Services
         // Customer Objects
         void ResetBillingInfo();
         Task<ApplicationUser> GetUserByStripeId(string stripeId);
-        Task<StripeCustomer> LoadCustomerObject(string stripeId, bool allowNullObject);
-        string ConfirmSubscriptionObject(StripeSubscription created, DateTime? eventTime);
-        string UpdateSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
-        string RemoveUserSubscriptionObject(StripeSubscription updated, DateTime? eventTime);
+        Task<Stripe.Customer> LoadCustomerObject(string stripeId, bool allowNullObject);
+        string ConfirmSubscriptionObject(Stripe.Subscription created, DateTime? eventTime);
+        string UpdateSubscriptionObject(Stripe.Subscription updated, DateTime? eventTime);
+        string RemoveUserSubscriptionObject(Stripe.Subscription updated, DateTime? eventTime);
         UserSubscription FindUserSubscriptionByStripeId(string id);
 
         // Stats

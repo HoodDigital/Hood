@@ -47,21 +47,21 @@ namespace Hood.Services
 
         public void ProcessEvent(string json)
         {
-            var stripeEvent = StripeEventUtility.ParseEvent(json);
+            var stripeEvent = Stripe.EventUtility.ParseEvent(json);
             ProcessEvent(stripeEvent);
         }
-        public void ProcessEvent(StripeEvent stripeEvent)
+        public void ProcessEvent(Stripe.Event stripeEvent)
         {
             try
             {
                 var args = new StripeWebHookTriggerArgs(stripeEvent);
 
-                _mailObject.AddParagraph("Stripe Event detected: <strong>" + args.StripeEvent.GetEventName() + "</strong>");
+                _mailObject.AddParagraph("Stripe Event detected: <strong>" + stripeEvent.GetEventName() + "</strong>");
 
                 if (stripeEvent.GetEventName() == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
 
-                this.ProcessEventByType(args.StripeEvent);
+                this.ProcessEventByType(stripeEvent);
 
                 switch (_billingSettings.SubscriptionWebhookLogs)
                 {
@@ -99,7 +99,7 @@ namespace Hood.Services
         /// Occurs whenever a card is removed from a customer.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerCardDeleted(StripeEvent stripeEvent)
+        public void CustomerCardDeleted(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -108,7 +108,7 @@ namespace Hood.Services
         /// TODO: Save card updated, might happen when the card is close to expire
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerCardUpdated(StripeEvent stripeEvent)
+        public void CustomerCardUpdated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -116,7 +116,7 @@ namespace Hood.Services
         /// Occurs whenever a new card is created for the customer.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerCardCreated(StripeEvent stripeEvent)
+        public void CustomerCardCreated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -124,7 +124,7 @@ namespace Hood.Services
         /// Occurs whenever any property of a customer changes.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerUpdated(StripeEvent stripeEvent)
+        public void CustomerUpdated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -132,7 +132,7 @@ namespace Hood.Services
         /// Occurs whenever a new customer is created.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerCreated(StripeEvent stripeEvent)
+        public void CustomerCreated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -140,7 +140,7 @@ namespace Hood.Services
         /// Occurs whenever a charge description or metadata is updated.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void ChargeUpdated(StripeEvent stripeEvent)
+        public void ChargeUpdated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -148,7 +148,7 @@ namespace Hood.Services
         /// Occurs whenever a previously uncaptured charge is captured.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void ChargeCaptured(StripeEvent stripeEvent)
+        public void ChargeCaptured(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -156,7 +156,7 @@ namespace Hood.Services
         /// Occurs whenever a charge is refunded, including partial refunds.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void ChargeRefunded(StripeEvent stripeEvent)
+        public void ChargeRefunded(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -164,7 +164,7 @@ namespace Hood.Services
         /// Occurs whenever a failed charge attempt occurs.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void ChargeFailed(StripeEvent stripeEvent)
+        public void ChargeFailed(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -172,7 +172,7 @@ namespace Hood.Services
         /// Occurs whenever a new charge is created and is successful.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void ChargeSucceeded(StripeEvent stripeEvent)
+        public void ChargeSucceeded(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -180,10 +180,10 @@ namespace Hood.Services
         /// Occurs whenever a customer is deleted.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerDeleted(StripeEvent stripeEvent)
+        public void CustomerDeleted(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Customer Deleted] processing...");
-            StripeCustomer deletedCustomer = Stripe.Mapper<StripeCustomer>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Customer deletedCustomer = Stripe.Mapper<Stripe.Customer>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddParagraph("Customer Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(deletedCustomer).ToFormattedJson() + Environment.NewLine);
             var dcUser = _auth.GetUserByStripeId(deletedCustomer.Id).Result;
@@ -205,7 +205,7 @@ namespace Hood.Services
         /// Occurs whenever an invoice changes (for example, the amount could change).
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoiceCreated(StripeEvent stripeEvent)
+        public void InvoiceCreated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -213,7 +213,7 @@ namespace Hood.Services
         /// Occurs whenever an invoice item is created.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoiceItemCreated(StripeEvent stripeEvent)
+        public void InvoiceItemCreated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -221,7 +221,7 @@ namespace Hood.Services
         /// Occurs whenever an invoice item is deleted.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoiceItemDeleted(StripeEvent stripeEvent)
+        public void InvoiceItemDeleted(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -229,7 +229,7 @@ namespace Hood.Services
         /// Occurs whenever an invoice item is updated.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoiceItemUpdated(StripeEvent stripeEvent)
+        public void InvoiceItemUpdated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -239,16 +239,16 @@ namespace Hood.Services
         /// A particular case of note is that if a customer with no active card reaches the end of its free trial, an invoice.payment_failed notification will occur.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoicePaymentFailed(StripeEvent stripeEvent)
+        public void InvoicePaymentFailed(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentFailed] processing...");
-            StripeInvoice failedInvoice = Stripe.Mapper<StripeInvoice>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Invoice failedInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddParagraph("StripeInvoice Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(failedInvoice).ToFormattedJson() + Environment.NewLine);
             if (failedInvoice.SubscriptionId.IsSet())
             {
                 // Get the subscription.
-                StripeSubscription failedInvoiceSubscription = _billing.Subscriptions.FindById(failedInvoice.CustomerId, failedInvoice.SubscriptionId).Result;
+                Stripe.Subscription failedInvoiceSubscription = _billing.Subscriptions.FindById(failedInvoice.CustomerId, failedInvoice.SubscriptionId).Result;
                 _mailObject.AddParagraph("StripeSubscription Object:");
                 _mailObject.AddParagraph(JsonConvert.SerializeObject(failedInvoiceSubscription).ToFormattedJson() + Environment.NewLine);
 
@@ -299,17 +299,17 @@ namespace Hood.Services
         /// Occurs whenever an invoice attempts to be paid, and the payment succeeds.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoicePaymentSucceeded(StripeEvent stripeEvent)
+        public void InvoicePaymentSucceeded(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentSucceeded] processing...");
-            StripeInvoice successfulInvoice = Stripe.Mapper<StripeInvoice>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Invoice successfulInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddH3("StripeInvoice Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(successfulInvoice).ToFormattedJson() + Environment.NewLine);
 
             if (successfulInvoice.SubscriptionId.IsSet())
             {
                 // Get the subscription.
-                StripeSubscription subscription = _billing.Subscriptions.FindById(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId).Result;
+                Stripe.Subscription subscription = _billing.Subscriptions.FindById(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId).Result;
                 _mailObject.AddParagraph($"StripeSubscription Object loaded from Stripe: {successfulInvoice.SubscriptionId}");
 
                 UserSubscription userSub = _auth.FindUserSubscriptionByStripeId(subscription.Id);
@@ -319,7 +319,7 @@ namespace Hood.Services
 
                     _mailObject.AddParagraph("The subscription is NOT in the db we must roll back the charge and subscription on stripe.");
 
-                    StripeRefund refund = _billing.Stripe.RefundService.CreateAsync(successfulInvoice.ChargeId).Result;
+                    Stripe.Refund refund = _billing.Stripe.RefundService.CreateAsync(new RefundCreateOptions { ChargeId = successfulInvoice.ChargeId }).Result;
                     _mailObject.AddParagraph("StripeRefund Object Created.");
 
                     _billing.Subscriptions.CancelSubscriptionAsync(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId, false).GetAwaiter().GetResult();
@@ -367,7 +367,7 @@ namespace Hood.Services
         /// Occurs whenever an invoice is updated.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoiceUpdated(StripeEvent stripeEvent)
+        public void InvoiceUpdated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -375,7 +375,7 @@ namespace Hood.Services
         /// Occurs whenever a plan is deleted.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void PlanDeleted(StripeEvent stripeEvent)
+        public void PlanDeleted(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -383,7 +383,7 @@ namespace Hood.Services
         /// Occurs whenever a plan is updated.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void PlanUpdated(StripeEvent stripeEvent)
+        public void PlanUpdated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -391,7 +391,7 @@ namespace Hood.Services
         /// Occurs whenever a plan is created.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void PlanCreated(StripeEvent stripeEvent)
+        public void PlanCreated(Stripe.Event stripeEvent)
         {
             UnhandledWebHook(stripeEvent);
         }
@@ -399,10 +399,10 @@ namespace Hood.Services
         /// Occurs whenever a customer with no subscription is signed up for a plan.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionCreated(StripeEvent stripeEvent)
+        public void SubscriptionCreated(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Created] processing...");
-            StripeSubscription created = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription created = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             var log = _auth.ConfirmSubscriptionObject(created, stripeEvent.Created);
             _mailObject.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
             _mailObject.AddParagraph("[Subscription Created] complete!");
@@ -411,10 +411,10 @@ namespace Hood.Services
         /// Occurs whenever a subscription changes. Examples would include switching from one plan to another, or switching status from trial to active.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionUpdated(StripeEvent stripeEvent)
+        public void SubscriptionUpdated(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Updated] processing...");
-            StripeSubscription updated = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription updated = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             var log = _auth.UpdateSubscriptionObject(updated, stripeEvent.Created);
             _mailObject.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
             _mailObject.AddParagraph("[Subscription Updated] complete!");
@@ -423,10 +423,10 @@ namespace Hood.Services
         /// Occurs whenever a customer ends their subscription.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionDeleted(StripeEvent stripeEvent)
+        public void SubscriptionDeleted(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Deleted] processing...");
-            StripeSubscription deleted = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription deleted = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddH2("Log:");
             var log = _auth.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Deleted] complete!");
@@ -435,10 +435,10 @@ namespace Hood.Services
         /// Occurs three days before the trial period of a subscription is scheduled to end.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionTrialWillEnd(StripeEvent stripeEvent)
+        public void SubscriptionTrialWillEnd(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription TrialWillEnd] processing...");
-            StripeSubscription endTrialSubscription = Stripe.Mapper<StripeSubscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription endTrialSubscription = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             UserSubscription endTrialUserSub = _auth.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {
@@ -487,11 +487,11 @@ namespace Hood.Services
         /// Called whenever an unknown webhook arrives from stripe.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void UnhandledWebHook(StripeEvent stripeEvent)
+        public void UnhandledWebHook(Stripe.Event stripeEvent)
         {
             if (!_env.IsProduction())
             {
-                _logService.AddLogAsync("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName(), Models.LogSource.Subscriptions, JsonConvert.SerializeObject(stripeEvent), Models.LogType.Info, null, null, nameof(StripeEvent), null);
+                _logService.AddLogAsync("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName(), Models.LogSource.Subscriptions, JsonConvert.SerializeObject(stripeEvent), Models.LogType.Info, null, null, nameof(Stripe.Event), null);
             }
 
             _mailObject.AddParagraph("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName());

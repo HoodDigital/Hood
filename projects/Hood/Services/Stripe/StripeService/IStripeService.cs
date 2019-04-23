@@ -7,14 +7,14 @@ namespace Hood.Services
     /// </summary>
     public interface IStripeService
     {
-        StripePlanService PlanService { get; }
-        StripeSubscriptionService SubscriptionService { get; }
-        StripeCustomerService CustomerService { get; }
-        StripeCardService CardService { get; }
-        StripeChargeService ChargeService { get; }
-        StripeInvoiceService InvoiceService { get; }
-        StripeInvoiceItemService InvoiceItemService { get; }
-        StripeTokenService TokenService { get; }
-        StripeRefundService RefundService { get; }
+        Stripe.PlanService PlanService { get; }
+        Stripe.SubscriptionService SubscriptionService { get; }
+        Stripe.CustomerService CustomerService { get; }
+        Stripe.CardService CardService { get; }
+        Stripe.ChargeService ChargeService { get; }
+        Stripe.InvoiceService InvoiceService { get; }
+        Stripe.InvoiceItemService InvoiceItemService { get; }
+        Stripe.TokenService TokenService { get; }
+        Stripe.RefundService RefundService { get; }
     }
 }

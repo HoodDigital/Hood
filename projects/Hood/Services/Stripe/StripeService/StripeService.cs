@@ -15,75 +15,75 @@ namespace Hood.Services
                 StripeApiKey = settings.StripeLiveKey;
         }
 
-        public StripePlanService PlanService
+        public Stripe.PlanService PlanService
         {
             get
             {
-                return new StripePlanService(StripeApiKey);
+                return new Stripe.PlanService(StripeApiKey);
             }
         }
 
-        public StripeSubscriptionService SubscriptionService
+        public Stripe.SubscriptionService SubscriptionService
         {
             get
             {
-                return new StripeSubscriptionService(StripeApiKey);
+                return new Stripe.SubscriptionService(StripeApiKey);
             }
         }
 
-        public StripeCustomerService CustomerService
+        public Stripe.CustomerService CustomerService
         {
             get
             {
-                return new StripeCustomerService(StripeApiKey);
+                return new Stripe.CustomerService(StripeApiKey);
             }
         }
 
-        public StripeCardService CardService
+        public Stripe.CardService CardService
         {
             get
             {
-                return new StripeCardService(StripeApiKey);
+                return new Stripe.CardService(StripeApiKey);
             }
         }
 
-        public StripeChargeService ChargeService
+        public Stripe.ChargeService ChargeService
         {
             get
             {
-                return new StripeChargeService(StripeApiKey);
+                return new Stripe.ChargeService(StripeApiKey);
             }
         }
 
-        public StripeInvoiceService InvoiceService
+        public Stripe.InvoiceService InvoiceService
         {
             get
             {
-                return new StripeInvoiceService(StripeApiKey);
+                return new Stripe.InvoiceService(StripeApiKey);
             }
         }
 
-        public StripeInvoiceItemService InvoiceItemService
+        public Stripe.InvoiceItemService InvoiceItemService
         {
             get
             {
-                return new StripeInvoiceItemService(StripeApiKey);
+                return new Stripe.InvoiceItemService(StripeApiKey);
             }
         }
 
-        public StripeTokenService TokenService
+        public Stripe.TokenService TokenService
         {
             get
             {
-                return new StripeTokenService(StripeApiKey);
+                return new Stripe.TokenService(StripeApiKey);
             }
         }
 
-        public StripeRefundService RefundService
+        public Stripe.RefundService RefundService
         {
             get
             {
-                return new StripeRefundService(StripeApiKey);
+                return new Stripe.RefundService(StripeApiKey);
             }
         }
     }

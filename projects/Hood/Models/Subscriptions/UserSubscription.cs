@@ -16,7 +16,7 @@ namespace Hood.Models
         public DateTime? CurrentPeriodStart { get; set; }
         public string CustomerId { get; set; }
         public DateTime? EndedAt { get; set; }
-        public int Quantity { get; set; }
+        public long Quantity { get; set; }
         public DateTime? Start { get; set; }
         public string Status { get; set; }
         public decimal? TaxPercent { get; set; }

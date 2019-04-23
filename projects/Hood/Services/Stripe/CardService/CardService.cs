@@ -18,13 +18,13 @@ namespace Hood.Services
             _userManager = userManager;
         }
 
-        public async Task<StripeCard> CreateCard(string customerId, string token)
+        public async Task<Stripe.Card> CreateCard(string customerId, string token)
         {
-            var card = new StripeCardCreateOptions()
+            var card = new Stripe.CardCreateOptions()
             {
                 SourceToken = token
             };
-            StripeCard stripeCard = await _stripe.CardService.CreateAsync(customerId, card); // optional isRecipient
+            Stripe.Card stripeCard = await _stripe.CardService.CreateAsync(customerId, card); // optional isRecipient
 
             return stripeCard;
         }
@@ -34,15 +34,15 @@ namespace Hood.Services
             await _stripe.CardService.DeleteAsync(customerId, cardId);
         }
 
-        public async Task<StripeCard> FindByIdAsync(string customerId, string cardId)
+        public async Task<Stripe.Card> FindByIdAsync(string customerId, string cardId)
         {
-            StripeCard stripeCard = await _stripe.CardService.GetAsync(customerId, cardId);
+            Stripe.Card stripeCard = await _stripe.CardService.GetAsync(customerId, cardId);
             return stripeCard;
         }
 
-        public async Task<IEnumerable<StripeCard>> GetAllAsync(string customerId)
+        public async Task<IEnumerable<Stripe.Card>> GetAllAsync(string customerId)
         {
-            IEnumerable<StripeCard> response = await _stripe.CardService.ListAsync(customerId);
+            IEnumerable<Stripe.Card> response = await _stripe.CardService.ListAsync(customerId);
             return response;
         }
     }

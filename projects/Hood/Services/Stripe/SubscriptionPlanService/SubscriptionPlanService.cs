@@ -13,9 +13,9 @@ namespace Hood.Services
             _stripe = stripe;
         }
 
-        public async Task<StripePlan> CreatePlan(string name, int amount, string colour, string description, string features, string currency = "gbp", string interval = "month", int intervalCount = 1, int trialPeriodDays = 30)
+        public async Task<Stripe.Plan> CreatePlan(string name, int amount, string colour, string description, string features, string currency = "gbp", string interval = "month", int intervalCount = 1, int trialPeriodDays = 30)
         {
-            var myPlan = new StripePlanCreateOptions()
+            var myPlan = new Stripe.PlanCreateOptions()
             {
                 Id = Guid.NewGuid().ToString(),
                 Amount = amount,                     // all amounts on Stripe are in cents, pence, etc
@@ -24,7 +24,7 @@ namespace Hood.Services
                 IntervalCount = intervalCount,       // optional
                 Nickname = name,
                 TrialPeriodDays = trialPeriodDays,   // amount of time that will lapse before the customer is billed
-                Product = new StripePlanProductCreateOptions()
+                Product = new Stripe.PlanProductCreateOptions()
                 {
                     Name = name
                 }
@@ -32,19 +32,19 @@ namespace Hood.Services
             myPlan.Metadata.Add("Colour", colour);
             myPlan.Metadata.Add("Description", description);
             myPlan.Metadata.Add("Features", features);
-            StripePlan response = await _stripe.PlanService.CreateAsync(myPlan);
+            Stripe.Plan response = await _stripe.PlanService.CreateAsync(myPlan);
             return response;
         }
         public void DeletePlan(string planId)
         {
             _stripe.PlanService.DeleteAsync(planId);
         }
-        public async Task<StripePlan> FindByIdAsync(string planId)
+        public async Task<Stripe.Plan> FindByIdAsync(string planId)
         {
-            StripePlan response = await _stripe.PlanService.GetAsync(planId);
+            Stripe.Plan response = await _stripe.PlanService.GetAsync(planId);
             return response;
         }
-        public async Task<IEnumerable<StripePlan>> GetAllAsync()
+        public async Task<IEnumerable<Stripe.Plan>> GetAllAsync()
         {
             var stripeSubs = await _stripe.PlanService.ListAsync();
             return stripeSubs;

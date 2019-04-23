@@ -71,7 +71,7 @@ namespace Hood.Controllers
                     model.Customer = await _billing.Customers.FindByIdAsync(user.StripeId);
 
                 // if not, then the user must have supplied a token
-                StripeToken stripeToken = _billing.Stripe.TokenService.Get(model.StripeToken);
+                Stripe.Token stripeToken = _billing.Stripe.TokenService.Get(model.StripeToken);
                 if (stripeToken == null)
                     throw new Exception("The provided card token was not valid.");
 

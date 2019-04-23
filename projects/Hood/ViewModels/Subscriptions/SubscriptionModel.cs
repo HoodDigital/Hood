@@ -24,10 +24,10 @@ namespace Hood.Models
 
         public List<Subscription> Plans { get; set; }
         public List<Subscription> Addons { get; set; }
-        public StripeSubscription CurrentSubscription { get; set; }
-        public StripeCustomer Customer { get; set; }
+        public Stripe.Subscription CurrentSubscription { get; set; }
+        public Stripe.Customer Customer { get; set; }
         public ApplicationUser User { get; set; }
-        public IEnumerable<StripeCard> Cards { get; set; }
+        public IEnumerable<Stripe.Card> Cards { get; set; }
         public Subscription CurrentPlan { get; set; }
     }
 }

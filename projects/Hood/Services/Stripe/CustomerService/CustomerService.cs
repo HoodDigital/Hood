@@ -22,16 +22,16 @@ namespace Hood.Services
             _userManager = userManager;
         }
 
-        public async Task<StripeCustomer> CreateCustomer(ApplicationUser user, string token, string planId = null)
+        public async Task<Stripe.Customer> CreateCustomer(ApplicationUser user, string token, string planId = null)
         {
-            var customer = new StripeCustomerCreateOptions()
+            var customer = new Stripe.CustomerCreateOptions()
             {
                 Email = user.Email,
                 Description = string.Format("{0} {1} ({2})", user.FirstName, user.LastName, user.Email),
                 SourceToken = token,
                 PlanId = planId
             };
-            StripeCustomer stripeCustomer = await _stripe.CustomerService.CreateAsync(customer);
+            Stripe.Customer stripeCustomer = await _stripe.CustomerService.CreateAsync(customer);
             return stripeCustomer;
         }
 
@@ -41,29 +41,29 @@ namespace Hood.Services
             _stripe.CustomerService.Delete(customerId);
         }
 
-        public async Task<StripeCustomer> FindByIdAsync(string customerId)
+        public async Task<Stripe.Customer> FindByIdAsync(string customerId)
         {
-            StripeCustomer stripeCustomer = await _stripe.CustomerService.GetAsync(customerId);
+            Stripe.Customer stripeCustomer = await _stripe.CustomerService.GetAsync(customerId);
             return stripeCustomer;
         }
 
-        public async Task<IEnumerable<StripeCustomer>> GetAllAsync()
+        public async Task<IEnumerable<Stripe.Customer>> GetAllAsync()
         {
-            return await _stripe.CustomerService.ListAsync(new StripeCustomerListOptions()
+            return await _stripe.CustomerService.ListAsync(new Stripe.CustomerListOptions()
             {
                 
-            }, new StripeRequestOptions() {
+            }, new Stripe.RequestOptions() {
 
             });
         }
 
         public async Task SetDefaultCard(string customerId, string cardId)
         {
-            var customer = new StripeCustomerUpdateOptions()
+            var customer = new Stripe.CustomerUpdateOptions()
             {
                 DefaultSource = cardId
             };
-            StripeCustomer stripeCustomer = await _stripe.CustomerService.UpdateAsync(customerId, customer);
+            Stripe.Customer stripeCustomer = await _stripe.CustomerService.UpdateAsync(customerId, customer);
         }
 
     }

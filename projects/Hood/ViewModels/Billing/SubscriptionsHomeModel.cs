@@ -7,9 +7,9 @@ namespace Hood.Models
     public partial class BillingHomeModel
     {
         public BillingMessage? Message { get; set; }
-        public StripeCustomer Customer { get; set; }
+        public Stripe.Customer Customer { get; set; }
         public ApplicationUser User { get; set; }
-        public IEnumerable<StripeInvoice> Invoices { get; set; }
-        public StripeInvoice NextInvoice { get; set; }
+        public IEnumerable<Stripe.Invoice> Invoices { get; set; }
+        public Stripe.Invoice NextInvoice { get; set; }
     }
 }
