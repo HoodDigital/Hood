@@ -15,7 +15,7 @@ namespace Hood.Services
         public string ToName { get; set; }
         public string Template { get; set; } = Models.MailSettings.PlainTemplate;
 
-        public bool ShowSiteSocials { get; set; } = false;
+        public bool ShowSiteSocials { get; set; } = true;
         public string EmailSmallPrint { get; set; } = "<a href='http://hooddigital.com/' style='color: #999999;text-decoration: none;'>Powered by HoodCMS by Hood Digital</a>.";
         public string Logo { get; set; } = "";
         public string Title { get; set; } = "";
@@ -25,12 +25,16 @@ namespace Hood.Services
             get
             {
                 BasicSettings _basicSettings = Engine.Current.Resolve<ISettingsRepository>().GetBasicSettings();
+                Models.MailSettings _mailSettings = Engine.Current.Resolve<ISettingsRepository>().GetMailSettings();
 
                 if (!Title.IsSet())
                     Title = _basicSettings.SiteTitle;
 
                 if (!Logo.IsSet())
-                    if (!_basicSettings.SiteLogo.IsSet())
+                    if (_mailSettings.Logo.IsSet())
+                        Logo = _mailSettings.Logo;
+                    else
+                        if (_basicSettings.SiteLogo.IsSet())
                         Logo = _basicSettings.SiteLogo;
 
                 if (Logo.IsSet())
