@@ -124,9 +124,10 @@ namespace Hood.Services
             {
                 if (propertyFilters.MaxBedrooms.HasValue)
                 {
-                    properties = properties
-                        .Where(n => n.Bedrooms >= propertyFilters.Bedrooms.Value)
-                        .Where(n => n.Bedrooms <= propertyFilters.MaxBedrooms.Value);
+                    if (propertyFilters.Bedrooms != -1)
+                        properties = properties.Where(n => n.Bedrooms >= propertyFilters.Bedrooms.Value);
+                    if (propertyFilters.MaxBedrooms != -1)
+                        properties = properties.Where(n => n.Bedrooms <= propertyFilters.MaxBedrooms.Value);
                 }
                 else
                     properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);

@@ -36,7 +36,13 @@ namespace Hood.Models
         /// </summary>
         public string PlanningType { get; set; }
         public string Location { get; set; }
+        /// <summary>
+        /// Set this as -1 in order to use MaxBedrooms as a high filter.  
+        /// </summary>
         public int? Bedrooms { get; set; }
+        /// <summary>
+        /// Set this as -1 in order to use Bedrooms as a low filter.  
+        /// </summary>
         public int? MaxBedrooms { get; set; }
         public int? MaxRent { get; set; }
         public int? MinRent { get; set; }
