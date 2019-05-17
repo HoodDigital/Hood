@@ -37,6 +37,7 @@ namespace Hood.Models
         public string PlanningType { get; set; }
         public string Location { get; set; }
         public int? Bedrooms { get; set; }
+        public int? MaxBedrooms { get; set; }
         public int? MaxRent { get; set; }
         public int? MinRent { get; set; }
         public int? MaxPrice { get; set; }
