@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
@@ -49,7 +50,9 @@ namespace Hood.Extensions
             where TContext : HoodDbContext
         {
 
-            services.AddMvc();
+            services
+                .AddMvc()
+                .AddApplicationPart(typeof(Engine).Assembly);
 
             if (config.IsDatabaseConfigured())
             {
@@ -325,6 +328,7 @@ namespace Hood.Extensions
         {
             services.Configure<RazorViewEngineOptions>(options =>
             {
+                options.FileProviders.Add(new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib"));
                 options.FileProviders.Add(EmbeddedFiles.GetProvider());
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });

@@ -48,7 +48,7 @@
     @RenderSection("beforecontent", required: false)
 
     <div class="wrapper" id="wrapper">
-        @await Component.InvokeAsync(typeof(Hood.ViewComponents.Header))
+        @await Component.InvokeAsync(nameof(Hood.ViewComponents.Header))
         @RenderBody()
     </div>
 

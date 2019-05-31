@@ -24,10 +24,12 @@
     <PackageTags>ASP.NET MVC EntityFramework CMS</PackageTags>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.All" />
 
     <PackageReference Include="MailChimp.Net.V3" Version="4.0.0" />
     <PackageReference Include="linqtotwitter" Version="5.0.0" />
