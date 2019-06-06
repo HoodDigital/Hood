@@ -121,7 +121,17 @@ namespace Hood.Services
                 properties = properties.Where(n => n.LeaseStatus == propertyFilters.Status);
 
             if (propertyFilters.Bedrooms.HasValue)
-                properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);
+            {
+                if (propertyFilters.MaxBedrooms.HasValue)
+                {
+                    if (propertyFilters.Bedrooms != -1)
+                        properties = properties.Where(n => n.Bedrooms >= propertyFilters.Bedrooms.Value);
+                    if (propertyFilters.MaxBedrooms != -1)
+                        properties = properties.Where(n => n.Bedrooms <= propertyFilters.MaxBedrooms.Value);
+                }
+                else
+                    properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);
+            }
 
             if (propertyFilters.MinRent.HasValue)
                 properties = properties.Where(n => n.Rent >= propertyFilters.MinRent.Value);

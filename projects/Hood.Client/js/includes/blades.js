@@ -1,5 +1,5 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Blades = {
     Init: function () {
         $('body').on('click', '.blade', $.hood.Blades.Open);
@@ -27,7 +27,7 @@ $.hood.Blades = {
         $(button).addClass('loading').append('<i class="fa fa-refresh fa-spin m-l-sm"></i>');
         // get in the create user blade content
         this.OpenBlade(url, function () {
-            if (complete != null)
+            if (complete !== null)
                 complete();
             $(button).removeClass('loading').html($(button).data('temp'));
         });
@@ -35,25 +35,22 @@ $.hood.Blades = {
     OpenBlade: function (url, complete) {
         $('#right-sidebar').removeClass('animate-all sidebar-open');
         $('#right-sidebar').addClass('animate-all');
-        $('#right-sidebar').data('url', url);
-        $('#right-sidebar').data('complete', complete);
         // get in the create user blade content
-        $.get(
-            url,
-            null,
-            $.proxy(function (data) {
-                // load and slide the blade
-                $('#right-sidebar').empty();
-                $('#right-sidebar').html(data);
-                $('#right-sidebar').addClass('sidebar-open');
-                $.hood.Helpers.ResetSidebarScroll();
-            }, this)
-        )
-        .done(function () {
-            complete()
+        $.get(url, null, function (data) {
+            // load and slide the blade
+            $('#right-sidebar').empty();
+            $('#right-sidebar').html(data);
+            $('#right-sidebar').addClass('sidebar-open');
+            $.hood.Helpers.ResetSidebarScroll();  
+            if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+                if ($.hood.Helpers.IsFunction(complete))
+                    complete(data);
+                else
+                    eval(complete);
+            }
         })
         .fail(function (data) {
-            $.hood.Alerts.Error("There was an error loading the blade.<br/><br />" + data.status + " - " + data.statusText);
+            $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
         })
         .always(function (data) {
             $.hood.Blades.Loading = false;

@@ -9,13 +9,23 @@ using System;
 
 namespace Hood.Models
 {
-    public partial class MediaObject :  BaseEntity, IMediaObject
+    public sealed class MediaObject : MediaObjectBase
     {
-        public MediaObject()
-        {
-        }
+        public MediaObject() : base()
+        {}
 
-        public MediaObject(IMediaObject mediaResult)
+        public MediaObject(IMediaObject mediaResult) : base(mediaResult)
+        {}
+
+        public new static IMediaObject Blank => MediaObjectBase.Blank;
+    }
+
+    public abstract class MediaObjectBase : BaseEntity, IMediaObject
+    {
+        public MediaObjectBase()
+        {}
+
+        public MediaObjectBase(IMediaObject mediaResult)
         {
             mediaResult.CopyProperties(this);
         }
@@ -45,86 +55,62 @@ namespace Hood.Models
         }
         public virtual string DownloadUrl => Url.Replace("https://", "http://");
         public virtual string DownloadUrlHttps => Url.Replace("http://", "https://");
-        public virtual string Icon
-        {
-            get
-            {
-                GenericFileType type = GenericFileType.Unknown;
-                string output = "";
-                if (Enum.TryParse(GeneralFileType, out type))
-                {
-                    switch (type)
-                    {
-                        case GenericFileType.Image:
-                            output = SmallUrl;
-                            break;
-                        case GenericFileType.Excel:
-                            return "/lib/hood/images/icons/excel.png";
-                        case GenericFileType.PDF:
-                            return "/lib/hood/images/icons/pdf.png";
-                        case GenericFileType.PowerPoint:
-                            return "/lib/hood/images/icons/powerpoint.png";
-                        case GenericFileType.Word:
-                            return "/lib/hood/images/icons/word.png";
-                        case GenericFileType.Photoshop:
-                            return "/lib/hood/images/icons/photoshop.png";
-                        case GenericFileType.Unknown:
-                        default:
-                            return "/lib/hood/images/icons/file.png";
-                    }
-                }
-                if (!output.IsSet())
-                {
-                    output = NoImageUrl;
-                }
-                return output;
-            }
-        }
+        public virtual string Icon => this.ToIcon();
+        public virtual string FormattedSize => (FileSize / 1024).ToString() + "Kb";
+        public virtual GenericFileType GenericFileType => FileType.ToFileType();
+
         public static string NoImageUrl
         {
             get
             {
+                var noImage = "";
                 try
                 {
-                    var output = "";
                     var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
                     if (siteSettings != null)
                     {
                         var mediaSettings = siteSettings.GetMediaSettings();
-                        output = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
                     }
-                    return output;
                 }
                 catch
                 {
-                    return "/lib/hood/images/no-image.jpg";
+                    noImage = "/lib/hood/images/no-image.jpg";
                 }
+                return noImage;
             }
         }
-        public virtual string FormattedSize => (FileSize / 1024).ToString() + "Kb";
         public static IMediaObject Blank
         {
             get
             {
-                var noImg = NoImageUrl;
+                var noImage = "";
+                try
+                {
+                    var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
+                    if (siteSettings != null)
+                    {
+                        var mediaSettings = siteSettings.GetMediaSettings();
+                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                    }
+                }
+                catch
+                {
+                    noImage = "/lib/hood/images/no-image.jpg";
+                }
                 MediaObject ret = new MediaObject
                 {
                     FileSize = 0,
                     Filename = "no-image.jpg",
-                    SmallUrl = noImg,
-                    MediumUrl = noImg,
-                    LargeUrl = noImg,
-                    ThumbUrl = noImg,
-                    Url = noImg,
+                    SmallUrl = noImage,
+                    MediumUrl = noImage,
+                    LargeUrl = noImage,
+                    ThumbUrl = noImage,
+                    Url = noImage,
                     BlobReference = "N/A"
                 };
                 return ret;
             }
-        }
-
-        public string GetJson()
-        {
-            return JsonConvert.SerializeObject(this);
         }
     }
 }

@@ -23,6 +23,26 @@ namespace Hood.Extensions
         {
             switch (fileType)
             {
+                case "video/x-flv":
+                case "application/x-mpegURL":
+                case "video/MP2T":
+                case "video/3gpp":
+                case "video/quicktime":
+                case "video/x-msvideo":
+                case "video/x-ms-wmv":
+                case "video/webm":
+                case "application/ogg":
+                case "video/ogg":
+                case "video/mp4":
+                    return GenericFileType.Video;
+                case "audio/wav":
+                case "audio/ogg":
+                case "audio/mpeg":
+                case "audio/mp3":
+                case "audio/flac":
+                case "audio/x-flac":
+                case "audio/webm":
+                    return GenericFileType.Audio;
                 case "image/gif":
                 case "image/jpeg":
                 case "image/png":

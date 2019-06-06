@@ -31,13 +31,13 @@ $.hood.Inline = {
                 eval($(tag).data('complete') + "(data)");
             }
         })
-            .fail(function (data) {
-                $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
-            })
-            .always(function (data) {
-                $.hood.Modals.Loading = false;
-                $(tag).removeClass('loading');
-            });
+        .fail(function (data) {
+            $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
+        })
+        .always(function (data) {
+            $.hood.Modals.Loading = false;
+            $(tag).removeClass('loading');
+        });
     },
     Task: function (e) {
         $.hood.Loader(true);

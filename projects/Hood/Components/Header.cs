@@ -5,6 +5,7 @@ using Hood.Extensions;
 
 namespace Hood.ViewComponents
 {
+    [ViewComponent(Name = "Header")]
     public class Header : ViewComponent
     {
         private readonly IContentRepository _content;

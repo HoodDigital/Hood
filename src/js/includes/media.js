@@ -58,7 +58,7 @@ $.hood.Media = {
             });
 
             myDropzone.on("success", function (file, response) {
-                if (response.Success == false) {
+                if (response.Success === false) {
                     $.hood.Alerts.Error("Uploads failed: " + response.Message);
                 } else {
                     $.hood.Alerts.Success("Uploads completed successfully.");
@@ -151,37 +151,37 @@ $.hood.Media = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/media/delete', { id: $this.data('id') }, function (data) {
-                    if (data.Success) {
-                        $.hood.Media.Manage.Refresh();
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Deleted!",
-                            text: "The media file has now been removed from the website.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem deleting the media file: " + data.Errors,
-                            timer: 1300,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
-        });
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/media/delete', { id: $this.data('id') }, function (data) {
+                        if (data.Success) {
+                            $.hood.Media.Manage.Refresh();
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Deleted!",
+                                text: "The media file has now been removed from the website.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem deleting the media file: " + data.Errors,
+                                timer: 1300,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
     },
     DeleteDirectory: function (e) {
         var $this = $(this);
         message = "The directory and all files will be permanently removed.\n\nWarning: Ensure these files are not attached to any posts, pages or features of the site, or it will appear as a broken image or file.";
-        if ($('#media-directory').val() == "") {
+        if ($('#media-directory').val() === "") {
             message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
         }
         swal({
@@ -196,32 +196,55 @@ $.hood.Media = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-        function (isConfirm) {
-            if (isConfirm) {
-                // delete functionality
-                $.post('/admin/media/directory/delete', { directory: $('#media-directory').val() }, function (data) {
-                    if (data.Success) {
-                        $.hood.Media.Manage.Refresh();
-                        $.hood.Blades.Close();
-                        swal({
-                            title: "Deleted!",
-                            text: "The directory has now been removed from the website.",
-                            timer: 1300,
-                            type: "success"
-                        });
-                    } else {
-                        swal({
-                            title: "Error!",
-                            text: "There was a problem directory the . " + data.Errors,
-                            timer: 1300,
-                            type: "error"
-                        });
-                    }
-                });
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
-            }
+            function (isConfirm) {
+                if (isConfirm) {
+                    // delete functionality
+                    $.post('/admin/media/directory/delete', { directory: $('#media-directory').val() }, function (data) {
+                        if (data.Success) {
+                            $.hood.Media.Manage.Refresh();
+                            $.hood.Blades.Close();
+                            swal({
+                                title: "Deleted!",
+                                text: "The directory has now been removed from the website.",
+                                timer: 1300,
+                                type: "success"
+                            });
+                        } else {
+                            swal({
+                                title: "Error!",
+                                text: "There was a problem directory the . " + data.Errors,
+                                timer: 1300,
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal("Cancelled", "It's all good in the hood!", "error");
+                }
+            });
+    },
+    Players: {},
+    LoadMediaPlayer: function (tag, file, type) {
+        var videoOptions = {
+            techOrder: ["azureHtml5JS", "flashSS", "html5FairPlayHLS", "silverlightSS", "html5"],
+            nativeControlsForTouch: false,
+            controls: true,
+            autoplay: false,
+            seeking: true
+        };
+        $(tag).each(function () {
+            player = $.hood.Media.Players[$(this).data('id')];
+            if (player)
+                player.dispose();
+            $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
+            player = $.hood.Media.Players[$(this).data('id')];
+            player.src([
+                {
+                    src: file,
+                    type: type
+                }
+            ]);
         });
     }
-}
+};
 $.hood.Media.Init();

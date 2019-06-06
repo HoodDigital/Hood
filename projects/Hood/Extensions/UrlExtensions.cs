@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Hood.Core;
+using Hood.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Web;
@@ -12,6 +14,32 @@ namespace Hood.Extensions
         {
             HttpContextAccessor = httpContextAccessor;
         }
+
+        public static string ToUrlString(this Uri absoluteUri, string hostname = null)
+        {
+            if (!hostname.IsSet())
+            {
+                try
+                {
+                    var mediaSettings = Engine.Current.Resolve<ISettingsRepository>().GetMediaSettings();
+                    if (mediaSettings != null)
+                    {
+                        hostname = mediaSettings.AzureHost.IsSet() ? mediaSettings.AzureHost : null;
+                    }
+                } catch (Exception) { }
+            }
+
+            var host = hostname.IsSet() ? hostname : absoluteUri.Host;
+            var scheme = Uri.UriSchemeHttps;
+            var uriBuilder = new UriBuilder(absoluteUri)
+            {
+                Host = host,
+                Scheme = scheme,
+                Port = -1
+            };
+            return uriBuilder.Uri.AbsoluteUri;
+        }
+
 
         public static Uri AddParameter(this Uri url, string name, string value)
         {
