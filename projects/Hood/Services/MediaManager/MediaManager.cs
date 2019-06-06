@@ -199,7 +199,7 @@ namespace Hood.Services
             var uploadResult = await Upload(file.OpenReadStream(), media.BlobReference);
 
             // Attach to the entity
-            media.Url = GetSavedUrl(uploadResult.StorageUri.PrimaryUri);
+            media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
 
             // Process type, size etc.
             media.CreatedOn = DateTime.Now;
@@ -230,7 +230,7 @@ namespace Hood.Services
             var uploadResult = await Upload(file, media.BlobReference);
 
             // Attach to the entity
-            media.Url = GetSavedUrl(uploadResult.StorageUri.PrimaryUri);
+            media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
 
             // Process type, size etc.
             media.CreatedOn = DateTime.Now;
@@ -247,19 +247,6 @@ namespace Hood.Services
             }
 
             return media;
-        }
-
-        private string GetSavedUrl(Uri absoluteUri)
-        {
-            var host = absoluteUri.Host;
-            var scheme = Uri.UriSchemeHttps;
-            var uriBuilder = new UriBuilder(absoluteUri)
-            {
-                Host = host,
-                Scheme = scheme,
-                Port = -1
-            };
-            return uriBuilder.Uri.AbsoluteUri;
         }
 
         public async Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read)
@@ -352,10 +339,10 @@ namespace Hood.Services
 
             // foreach, file in the list of thumbnails
             // upload to the thumbLocation
-            using (var fs = File.OpenRead(tempXs)) { media.ThumbUrl = (await Upload(fs, XsFilename)).Uri.AbsoluteUri; }
-            using (var fs = File.OpenRead(tempSm)) { media.SmallUrl = (await Upload(fs, SmFilename)).Uri.AbsoluteUri; }
-            using (var fs = File.OpenRead(tempMd)) { media.MediumUrl = (await Upload(fs, MdFilename)).Uri.AbsoluteUri; }
-            using (var fs = File.OpenRead(tempLg)) { media.LargeUrl = (await Upload(fs, LgFilename)).Uri.AbsoluteUri; }
+            using (var fs = File.OpenRead(tempXs)) { media.ThumbUrl = (await Upload(fs, XsFilename)).Uri.ToUrlString(); }
+            using (var fs = File.OpenRead(tempSm)) { media.SmallUrl = (await Upload(fs, SmFilename)).Uri.ToUrlString(); }
+            using (var fs = File.OpenRead(tempMd)) { media.MediumUrl = (await Upload(fs, MdFilename)).Uri.ToUrlString(); }
+            using (var fs = File.OpenRead(tempLg)) { media.LargeUrl = (await Upload(fs, LgFilename)).Uri.ToUrlString(); }
 
             // add the url to the array of urls to send back
             // remove the temporary image

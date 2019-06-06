@@ -4,16 +4,15 @@
 }
 <div class="sidebar-container">
     <form id="edit-media-form" asp-antiforgery="true" autocomplete="off">
-        <div class="sidebar-title image" style="background-image:url(@Model.LargeUrl)">
+        <div class="sidebar-title image" style="background-image:url(@(Model.LargeUrl.IsSet() ? Model.LargeUrl : Model.Icon)">
             <button type="button" class="close close-blade"><span>&times;</span></button>
             <h3 class="font-bold no-margins text-white">
                 @Model.GeneralFileType File
             </h3>
             <p><i class="fa fa-file"></i> &nbsp;&nbsp;@Model.Filename</p>
-            @if (Model.GeneralFileType != "Directory")
+            @switch (Model.GenericFileType)
             {
-                if (Model.GeneralFileType == "Image")
-                {
+                case GenericFileType.Image:
                     <div class="btn-group">
                         <button data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true">Download <span class="caret"></span></button>
                         <ul class="dropdown-menu">
@@ -25,28 +24,31 @@
                             <li><a target="_blank" href="@Model.DownloadUrlHttps"><i class="fa fa-save"></i> Download Original</a></li>
                         </ul>
                     </div>
-                }
-                else
-                {
+                    break;
+                default:
                     <a target="_blank" href="@Model.DownloadUrlHttps" class="btn btn-xs btn-default"><i class="fa fa-save"></i> Download</a>
-                }
+                    break;
             }
             <action hood-id="@Model.Id" hood-type="media" hood-action="delete" class="btn btn-xs btn-danger"></action>
         </div>
         <div class="blade-field">
-            @if (Model.GeneralFileType == "Image")
+            @switch (Model.GenericFileType)
             {
-                <showField db-field="cuFirstName" field-type="text" field-name="Thumbnail Url" db-value="@Model.ThumbUrl" />
-                <showField db-field="cuFirstName" field-type="text" field-name="Small Url" db-value="@Model.SmallUrl" />
-                <showField db-field="cuFirstName" field-type="text" field-name="Medium Url" db-value="@Model.MediumUrl" />
-                <showField db-field="cuFirstName" field-type="text" field-name="Large Url" db-value="@Model.LargeUrl" />
-                <showField db-field="cuFirstName" field-type="text" field-name="Original Url" db-value="@Model.DownloadUrlHttps" />
+                case GenericFileType.Audio:
+                    <video id="mediaplayer-@Model.Id" class="mediaplayer audio azuremediaplayer amp-default-skin always-show-controls m-b-lg" tabindex="0" seeking></video>
+                    break;
+                case GenericFileType.Video:
+                    <video id="mediaplayer-@Model.Id" class="mediaplayer video azuremediaplayer amp-default-skin vjs-fluid amp-big-play-centered m-b-lg" tabindex="0" seeking></video>
+                    break;
+                case GenericFileType.Image:
+                    <showField db-field="cuFirstName" field-type="text" field-name="Thumbnail Url" db-value="@Model.ThumbUrl" />
+                    <showField db-field="cuFirstName" field-type="text" field-name="Small Url" db-value="@Model.SmallUrl" />
+                    <showField db-field="cuFirstName" field-type="text" field-name="Medium Url" db-value="@Model.MediumUrl" />
+                    <showField db-field="cuFirstName" field-type="text" field-name="Large Url" db-value="@Model.LargeUrl" />
+                    break;
             }
-            else
-            {
-                <showField db-field="cuFirstName" field-type="text" field-name="Url" db-value="@Model.DownloadUrl" />
-                <showField db-field="cuFirstName" field-type="text" field-name="Https Url" db-value="@Model.DownloadUrlHttps" />
-            }
+            <showField db-field="cuFirstName" field-type="text" field-name="Url" db-value="@Model.DownloadUrl" />
+            <showField db-field="cuFirstName" field-type="text" field-name="Https Url" db-value="@Model.DownloadUrlHttps" />
         </div>
         <div class="blade-field">
             <table class="table table-striped">

@@ -2,6 +2,9 @@
 @{
     ViewBag.Title = "Website Media";
 }
+@section scripts {
+    <script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js"></script>
+}
 <div class="panel-body">
     <strong>Website Media</strong>
     <p>
@@ -39,7 +42,7 @@
                     <small>${ FormattedSize }</small>
                 </p>
             </div>
-            <a class="full-box-link blade" href="/admin/media/blade/${ Id }">${ Filename }</a>
+            <a class="full-box-link blade" href="/admin/media/blade/${ Id }" data-complete="$.hood.Media.LoadMediaPlayer('.mediaplayer', '${ DownloadUrlHttps }', '${ FileType }')">${ Filename }</a>
         </div>
     </div>
 </div>

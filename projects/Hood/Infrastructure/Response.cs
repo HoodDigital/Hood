@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Hood.Interfaces;
+using Hood.Extensions;
 
 namespace Hood.Models
 {
@@ -20,7 +21,7 @@ namespace Hood.Models
             : base(success)
         {
             Media = media;
-            Json = media.GetJson();
+            Json = media.ToJson();
         }
         public MediaResponse(Exception ex)
                : base(ex)

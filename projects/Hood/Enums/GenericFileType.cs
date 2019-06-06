@@ -9,7 +9,9 @@
         Excel,
         Unknown,
         PowerPoint,
-        Directory
+        Directory,
+        Audio,
+        Video
     }
 
 }
