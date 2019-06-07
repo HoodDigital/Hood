@@ -224,7 +224,7 @@ $.hood.Media = {
             });
     },
     Players: {},
-    LoadMediaPlayer: function (tag, file, type) {
+    LoadMediaPlayers: function (tag) {
         var videoOptions = {
             techOrder: ["azureHtml5JS", "flashSS", "html5FairPlayHLS", "silverlightSS", "html5"],
             nativeControlsForTouch: false,
@@ -240,8 +240,8 @@ $.hood.Media = {
             player = $.hood.Media.Players[$(this).data('id')];
             player.src([
                 {
-                    src: file,
-                    type: type
+                    src: $(this).data('file'),
+                    type: $(this).data('type')
                 }
             ]);
         });
