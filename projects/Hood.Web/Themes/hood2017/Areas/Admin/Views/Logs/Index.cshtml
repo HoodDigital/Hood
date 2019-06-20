@@ -1,0 +1,22 @@
+@model LogListModel
+@{
+    ViewBag.Title = "View Logs";
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
+<div class="panel-body">
+    <h4>Event Logs</h4>
+    <div class="form-group">
+        <div class="checkbox">
+            <input id="log-list-live" class="styled" type="checkbox">
+            <label for="log-list-live">
+                Live reload <small><strong>- The list of logs will refresh every 5 seconds.</strong></small>
+            </label>
+        </div>
+    </div>
+    <div id="log-list" class="url-change" data-url="/admin/logs/show">
+    </div>
+</div>

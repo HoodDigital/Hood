@@ -1,0 +1,27 @@
+@model SaveableModel
+@{
+    Layout = "_AdminLayout";
+}
+@section buttons {
+    @RenderSection("buttons", required: false)
+    <a href="javascript:document.getElementById('settings-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
+}
+@Html.BootstrapAlert(Model.SaveMessage, Model.MessageType)
+@RenderSection("alerts", required: false)
+<div class="row">
+    <div class="col-md-4 col-md-push-8">
+        <div class="panel-body">
+            <h4 class="text-center">
+                @ViewData["Title"]
+            </h4>
+            <div>
+                @RenderSection("description", required: false)
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8 col-md-pull-4">
+        <form method="post" id="settings-form">
+            @RenderBody()
+        </form>
+    </div>
+</div>

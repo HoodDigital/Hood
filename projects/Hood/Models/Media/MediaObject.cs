@@ -82,12 +82,12 @@ namespace Hood.Models
                     if (siteSettings != null)
                     {
                         var mediaSettings = siteSettings.GetMediaSettings();
-                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
                     }
                 }
                 catch
                 {
-                    noImage = "/lib/hood/images/no-image.jpg";
+                    noImage = "/hood/images/no-image.jpg";
                 }
                 return noImage;
             }
@@ -103,12 +103,12 @@ namespace Hood.Models
                     if (siteSettings != null)
                     {
                         var mediaSettings = siteSettings.GetMediaSettings();
-                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/lib/hood/images/no-image.jpg";
+                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
                     }
                 }
                 catch
                 {
-                    noImage = "/lib/hood/images/no-image.jpg";
+                    noImage = "/hood/images/no-image.jpg";
                 }
                 MediaObject ret = new MediaObject
                 {

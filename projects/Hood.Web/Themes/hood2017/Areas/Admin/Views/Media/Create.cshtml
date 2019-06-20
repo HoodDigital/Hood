@@ -1,0 +1,40 @@
+@*
+    @*
+        For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+<div class="sidebar-container">
+    <form id="upload-media-form" asp-antiforgery="true" autocomplete="off">
+        <div class="sidebar-title">
+            <button type="button" class="close close-blade"><span>&times;</span></button>
+            <h3><i class="fa fa-file-image-o"></i> Add media items</h3>
+            <small><i class="fa fa-plus-circle"></i> Upload new file(s) to the website.</small>
+        </div>
+        <div class="setings-item">
+            <p>Choose directory to upload to:</p>
+            <input id="uploadDirectory" name="uploadDirectory" style="width: 100%" />
+            <p class="text-right">
+                <button class="create-directory btn btn-primary btn-xs margin-top-10" type="button"><i class="fa fa-plus"></i> Create new directory...</button>
+            </p>
+        </div>
+        <div class="setings-item">
+            <input name="uploadMedia" id="uploadMedia" type="file" />
+        </div>
+        <div class="setings-item">
+            <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
+        </div>
+        <div class="sidebar-content">
+            <h4>Adding files</h4>
+            <div class="small">
+                <p>
+                    Use this to add media files (images, documents, videos, audio files) to the website. Once uploaded you will be able to use the table to the left to edit and title your images.
+                <p>
+                <p>
+                    <strong>Note:</strong> Try to keep file sizes low, remember your poor mobile users and think of their data bundles!
+                </p>
+            </div>
+        </div>
+    </form>
+</div>

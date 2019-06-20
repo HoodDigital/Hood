@@ -55,7 +55,7 @@ namespace Hood.TagHelpers
                 if (mediaSettings.NoImage.IsSet())
                     url = mediaSettings.NoImage;
                 else
-                    url = "/lib/hood/images/no-image.jpg";
+                    url = "/hood/images/no-image.jpg";
 
             if (Fallback.IsSet())
                 url = Fallback;

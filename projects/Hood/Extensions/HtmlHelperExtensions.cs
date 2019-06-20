@@ -20,7 +20,7 @@ namespace Hood.Extensions
         {
             var keygen = new KeyGenerator(false, true, true, false);
             var hp_key = keygen.Generate(4);
-            var output = $@"<div class='comments_or_notes hidden'><label for='comments_or_notes_{hp_key}'>Comments:</label><input name='comments_or_notes_{hp_key}' id='comments_or_notes_{hp_key}' type='text' tabindex='-1' autocomplete='off' /></div>";
+            var output = $@"<div class='comments_or_notes hidden d-none'><label for='comments_or_notes_{hp_key}'>Comments:</label><input name='comments_or_notes_{hp_key}' id='comments_or_notes_{hp_key}' type='text' tabindex='-1' autocomplete='off' /></div>";
             return new HtmlString(output);
         }
 

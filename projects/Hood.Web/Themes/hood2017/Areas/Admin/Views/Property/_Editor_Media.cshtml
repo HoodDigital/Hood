@@ -1,0 +1,30 @@
+@model PropertyListing
+@inject IContentRepository _data
+
+@{
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+<div id="media" class="tab-pane">
+    <div class="panel-body">
+        <div class="hood-inline refresh gallery" data-url="@Url.Action("EditorGallery")">
+            @{ await Html.RenderPartialAsync("EditorGallery"); }
+        </div>    
+        <div id="gallery-actions" class="row m-t-md">
+            <div class="col-xs-12">
+                <span class="btn btn-success" id="property-gallery-add">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                </span>
+            </div>
+            <div class="col-xs-12">
+                <div class="fileupload-process m-t-sm">
+                    <div id="gallery-total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="opacity: 0;">
+                        <div class="progress-bar progress-bar-dark" style="width:0%;" data-dz-uploadprogress=""></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="property-gallery-upload" class="media-upload text-center hidden" data-id="@Model.Id">
+        </div>
+    </div>
+</div>

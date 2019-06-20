@@ -1,0 +1,29 @@
+@model EditContentModel
+<h5>@Model.Content.ContentType.ToTitleCase() Image Settings</h5>
+<div class="ibox-content">
+    <fieldset class="form-horizontal">
+        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).OrderBy(cm => cm.Name))
+        {
+            if (Model.ContentType.ShowImage && cm.Name.Contains("Featured"))
+            {
+                <div class="form-group">
+                    @if (cm.Name.Contains("Share"))
+                    {
+                        <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                            Share Image @cm.Name.Replace("Settings.Image.Share.", ""):
+                        </label>
+                    }
+                    else
+                    {
+                        <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
+                            Featured Image @cm.Name.Replace("Settings.Image.Featured.", ""):
+                        </label>
+                    }
+                    <div class="col-sm-8">
+                        @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+                    </div>
+                </div>
+            }
+        }
+    </fieldset>
+</div>

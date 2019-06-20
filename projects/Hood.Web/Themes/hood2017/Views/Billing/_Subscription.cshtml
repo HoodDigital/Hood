@@ -1,0 +1,113 @@
+@model UserSubscription
+<div class="panel panel-default no-margin accordion-section">
+    <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-us-{0}", Model.Id)">
+        <span class="pull-right">
+            @switch (Model.Status)
+            {
+                case "trialing":
+                    if (Model.CancelAtPeriodEnd)
+                    {
+                        <span class="label label-danger">@Model.Status [Cancelling]</span>
+                    }
+                    else
+                    {
+                        <span class="label label-warning">@Model.Status</span>
+                    }
+                    break;
+                case "active":
+                    if (Model.CancelAtPeriodEnd)
+                    {
+                        <span class="label label-danger">@Model.Status [Cancelling]</span>
+                    }
+                    else
+                    {
+                        <span class="label label-success">@Model.Status</span>
+                    }
+                    break;
+                case "past_due":
+                    if (Model.CancelAtPeriodEnd)
+                    {
+                        <span class="label label-danger">@Model.Status [Cancelling]</span>
+                    }
+                    else
+                    {
+                        <span class="label label-warning">@Model.Status</span>
+                    }
+                    break;
+                case "canceled":
+                    <span class="label label-warning">@Model.Status</span>
+                    break;
+            }            
+        </span>
+        Subscription - @Model.Subscription.Name
+    </div>
+    <div id="@string.Format("#collapse-us-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-us-{0}", Model.Id)">
+        <div class="panel-body">
+            <dl class="dl-horizontal">
+                @if (Model.CancelAtPeriodEnd)
+                {
+                    if (Model.Status == "canceled")
+                    {
+                        <dt class="text-danger">
+                            Ended on
+                        </dt>
+                        <dd class="text-danger">
+                            @Model.CanceledAt.Value.ToShortDateString() at @Model.CanceledAt.Value.ToShortTimeString()
+                        </dd>
+                    }
+                    else
+                    {
+                        <dt class="text-danger">
+                            Cancelling on
+                        </dt>
+                        <dd class="text-danger">
+                            @Model.CurrentPeriodEnd.Value.ToShortDateString() at @Model.CurrentPeriodEnd.Value.ToShortTimeString()
+                        </dd>
+                    }
+                }
+                <dt>
+                    Price
+                </dt>
+                <dd>
+                    @Model.Subscription.FullPrice
+                </dd>
+                @if (Model.TrialEnd.HasValue)
+                {
+                    <dt>
+                        Trial Period
+                    </dt>
+                    <dd>
+                        @if (Model.TrialEnd.HasValue)
+                        {
+                            @Model.TrialStart.Value.ToShortDateString()
+                        }
+                        <span>- @Model.TrialEnd.Value.ToShortDateString() at @Model.TrialEnd.Value.ToShortTimeString()</span>
+                    </dd>
+                }
+                @if (!Model.CancelAtPeriodEnd && Model.Status != "canceled")
+                {
+                    <dt>
+                        Next Charge Date
+                    </dt>
+                    <dd>
+                        @Model.CurrentPeriodEnd.Value.ToShortDateString() at @Model.CurrentPeriodEnd.Value.ToShortTimeString()
+                    </dd>
+                }
+            </dl>
+            <p class="text-right">
+                @if (Model.Status != "canceled")
+                {
+                    if (Model.CancelAtPeriodEnd)
+                    {
+                        <a class="btn btn-xs btn-success" asp-action="Reactivate" asp-controller="Subscriptions" asp-route-id="@Model.Id">Re-Activate</a>
+                        <a class="btn btn-xs btn-danger" asp-action="Remove" asp-controller="Subscriptions" asp-route-id="@Model.Id">Delete</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-xs btn-danger" asp-action="Cancel" asp-controller="Subscriptions" asp-route-id="@Model.Id">Cancel</a>
+                    }
+                }
+            </p>
+        </div>
+    </div>
+</div>

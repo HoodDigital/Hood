@@ -3,7 +3,7 @@ package-lock.json
 /Properties/PublishProfiles
 /Temporary
 /Temporary/*
-/Admin/Views
+/Areas/Admin/Views
 /Views
 /Migrations
 /wwwroot/lib

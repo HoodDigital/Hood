@@ -1,0 +1,78 @@
+@{
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    SeoSettings _seoSettings = _settings.GetSeo();
+
+    var pageTitle = ViewData["PageTitle"] as string;
+    if (pageTitle.IsSet())
+    {
+        ViewData["Title"] += " - " + pageTitle;
+    }
+}
+<!DOCTYPE html>
+<html lang="en-gb" xml:lang="en">
+<head>
+
+    <partial name="_BaseMetas" />
+    <title>@ViewData["Title"]</title>
+    <meta name="theme" content="default" />
+
+    @if (!IsSectionDefined("metas"))
+    {
+        <partial name="_Metas" />
+    }
+    @RenderSection("metas", required: false)
+
+    @if (_settings.GetBasicSettings().EnablePreload)
+    {
+        <partial name="_DeferredStyles" />
+    }
+    else
+    {
+        <partial name="_Styles" />
+    }
+    @RenderSection("styles", required: false)
+
+    @Html.Raw(_seoSettings.HeadTags)
+
+</head>
+<body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
+    @RenderSection("afterbody", required: false)
+
+    <partial name="_NoScript" />
+
+    @if (_settings.GetBasicSettings().EnablePreload)
+    {
+        await Html.RenderPartialAsync("_PreLoader");
+    }
+
+    @RenderSection("beforecontent", required: false)
+
+    <div class="wrapper" id="wrapper">
+        @await Component.InvokeAsync(nameof(Hood.ViewComponents.Header))
+        @RenderBody()
+    </div>
+
+    @RenderSection("beforefooter", required: false)
+    <partial name="_Footer" />
+    <partial name="_CookieConsentPartial" />
+
+    @RenderSection("afterfooter", required: false)
+    <partial name="_AdminEditor" />
+
+    @if (_settings.GetBasicSettings().EnablePreload)
+    {
+        <partial name="_DeferredStylesLoader" />
+    }
+
+    @RenderSection("includes", required: false)
+
+    <partial name="_Scripts" />
+
+    @RenderSection("scripts", required: false)
+
+    @Html.Raw(JavaScriptSnippet.FullScript)
+    @Html.Raw(_seoSettings.GoogleAnalytics)
+    @Html.Raw(_seoSettings.BodyTags)
+
+</body>
+</html>

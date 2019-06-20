@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@3.4.1",
+      "destination": "wwwroot/lib/jquery"
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap@4.3.1",
+      "destination": "wwwroot/lib/bootstrap"
+    },
+    {
+      "provider": "unpkg",
+      "library": "font-awesome-5-css@5.4.1",
+      "destination": "wwwroot/lib/fontawesome"
+    },
+    {
+      "library": "jquery.mask@1.14.15",
+      "destination": "wwwroot/lib/jquery-mask"
+    }
+  ]
+}

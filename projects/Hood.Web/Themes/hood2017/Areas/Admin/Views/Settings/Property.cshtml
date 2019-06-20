@@ -1,0 +1,377 @@
+@model PropertySettings
+@{
+    ViewData["Title"] = "Property Settings";
+    Layout = "_SettingsLayout";
+}
+@section buttons {
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetProperty" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+@section description {
+    <p class="no-margin">
+        Use this page to manage the properties that are available on your site, including the advanced property search features.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#property">Property Settings</a></li>
+        <li class=""><a data-toggle="tab" href="#editor">Editor Settings</a></li>
+        <li class=""><a data-toggle="tab" href="#price">Price Settings</a></li>
+        <li class=""><a data-toggle="tab" href="#importer">Auto Importer Settings</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="property" class="tab-pane active">
+            <div class="panel-body">
+                <strong>Property Tool Settings</strong>
+                <p>
+                    Here are the settings for the property search tool.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Enabled:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="Enabled" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show List Page:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowList" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show List Page:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowList" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Page Size:</label>
+                        <div class="col-sm-8">
+                            <input asp-for="DefaultPageSize" type="number" min="0" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Title:</label>
+                        <div class="col-sm-8">
+                            <input asp-for="Title" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Type Name:</label>
+                        <div class="col-sm-8">
+                            <input asp-for="Name" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Plural Name:</label>
+                        <div class="col-sm-8">
+                            <input asp-for="Plural" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Url Slug:</label>
+                        <div class="col-sm-8">
+                            <input asp-for="Slug" class="form-control restrict-to-slug" />
+                            <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="editor" class="tab-pane">
+            <div class="panel-body">
+                <strong>Editors Settings</strong>
+                <p>
+                    Here are the settings for the property search tool.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Price Displays:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="PriceDisplays" class="form-control">@Model.PriceDisplays</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Rent Displays:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="RentDisplays" class="form-control">@Model.RentDisplays</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Fees Display:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="FeesDisplay" class="form-control">@Model.FeesDisplay</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Property Type:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="PropertyType" class="form-control">@Model.PropertyType</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Planning Type:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="PlanningType" class="form-control">@Model.PlanningType</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Listing Types:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="ListingTypes" class="form-control">@Model.ListingTypes</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Lease Statuses:</label>
+                        <div class="col-sm-8">
+                            <textarea asp-for="LeaseStatuses" class="form-control">@Model.LeaseStatuses</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Bedrooms:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowBedrooms" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </div>
+        </div>
+        <div id="price" class="tab-pane">
+            <div class="panel-body">
+                <strong>Pricing Settings</strong>
+                <p>
+                    Here are the settings for the property search tool.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Rent:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowRent" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Rent Decimals:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowRentDecimals" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Rent Minimum:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="RentMinimum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Rent Maximum:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="RentMaximum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Rent Increment:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="RentIncrement" class="form-control" />
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Asking Price:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowAskingPrice" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Asking Price Decimals:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowAskingPriceDecimals" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Asking Price Minimum:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="AskingPriceMinimum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Asking Price Maximum:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="AskingPriceMaximum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Asking Price Increment:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="AskingPriceIncrement" class="form-control" />
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Premium:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowPremium" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Premium Decimals:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowPremiumDecimals" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Premium Minimum:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="PremiumMinimum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Premium Maximum:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="PremiumMaximum" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Premium Increment:</label>
+                        <div class="col-sm-8">
+                            <input type="number" asp-for="PremiumIncrement" class="form-control" />
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Fees:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowFees" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Show Fees Decimals:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="ShowFeesDecimals" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="importer" class="tab-pane">
+            <div class="panel-body">
+                <strong>Auto Importer Settings</strong>
+                <p>
+                    Here are the settings for the property search tool.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.UseFTP">Use FTP Service:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="FTPImporterSettings.UseFTP" class="form-control">
+                                <option value="true">Download BLM file from remote FTP</option>
+                                <option value="false">Load BLM file from local folder.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.ClearImagesBeforeImport">Clear images before import:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="FTPImporterSettings.ClearImagesBeforeImport" class="form-control">
+                                <option value="true">Clear all images from each property before importing new ones.</option>
+                                <option value="false">Update images on this site, adding new ones, or updating old ones.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.RequireUnzip">Require Unzip:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="FTPImporterSettings.RequireUnzip" class="form-control">
+                                <option value="true">Require unzip before import.</option>
+                                <option value="false">No unzip required.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.Server"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.Server" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.LocalFolder"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.LocalFolder" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.Username"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.Username" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.Password"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.Password" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.Filename"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.Filename" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.ZipFile"></label>
+                        <div class="col-sm-8">
+                            <input asp-for="FTPImporterSettings.ZipFile" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TriggerAuthKey">Feed Trigger Authorization Key</label>
+                        <div class="col-sm-8">
+                            <input asp-for="TriggerAuthKey" class="form-control" />
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>

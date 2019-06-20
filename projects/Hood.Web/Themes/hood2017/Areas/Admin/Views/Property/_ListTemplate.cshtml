@@ -1,0 +1,138 @@
+@model PropertyListing
+@{
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+}
+<div class="data-item">
+    <div class="row row-center">
+        <div class="col-md-5">
+            <div class="media">
+                <div class="media-left media-middle">
+                    <a href="/admin/content/edit/@Model.Id">
+                        <figure class="img-xs content-feature-@Model.Id hood-image" style="background-image:url(@Model.FeaturedImage.ThumbUrl">
+                            <img src="@Model.FeaturedImage.ThumbUrl" alt="@Model.Title">
+                        </figure>
+                    </a>
+                </div>
+                <div class="media-body">
+                    <a class="forum-item-title" href="/admin/property/edit/@Model.Id">
+                        @Model.Title
+                        @if (Model.Status == 1)
+                        {
+                            <small class="txt-color-magenta">@Model.StatusString</small>
+                        }
+                        else
+                        {
+                            if (Model.Status == 3)
+                            {
+                                <small class="txt-color-orangeDark">@Model.StatusString</small>
+                            }
+                            else
+                            {
+                                if (Model.PublishPending)
+                                {
+                                    <small class="txt-color-orange">@Model.StatusString</small>
+                                }
+                                else
+                                {
+                                    <small class="txt-color-greenLight">@Model.StatusString</small>
+                                }
+                            }
+                        }
+                    </a>
+                    <small><i class="fa fa-map-pin m-r-xs"></i>@Model.SingleLineAddress</small><br />
+                    <small><i class="fa fa-clock-o"></i> Created on @Model.CreatedOn.ToDisplay()</small><br />
+                </div>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <span class="small font-bold">Status</span>
+            <div class="tag-list">
+                @if (Model.Status == 1)
+                {
+                    <span class="label label-default">Draft</span>
+                }
+                else if (Model.Status == 2)
+                {
+                    <span class="label label-info">Published</span>
+                }
+                else if (Model.Status == 3)
+                {
+                    <span class="label label-danger">Archived</span>
+                }
+            </div>
+            <div class="tag-list">
+                @if (Model.LeaseStatus.IsSet() && Model.LeaseStatus.Contains("Available"))
+                {
+                    <span class="label label-success">@Model.LeaseStatus</span>
+                }
+                else if (Model.Status == 2)
+                {
+                    <span class="label label-danger">@Model.LeaseStatus</span>
+                }
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="row">
+                @if (_propertySettings.ShowRent)
+                {
+                    <div class="col-md-4">
+                        <span class="small font-bold">Rent</span>
+                        <div class="tag-list">
+                            <span class="tag-item">@Model.FormattedRent</span>
+                        </div>
+                    </div>
+                }
+                @if (_propertySettings.ShowAskingPrice)
+                {
+                    <div class="col-md-4">
+                        <span class="small font-bold">Asking Price</span>
+                        <div class="tag-list">
+                            <span class="tag-item">@Model.FormattedAskingPrice</span>
+                        </div>
+                    </div>
+                }
+                @if (_propertySettings.ShowPremium)
+                {
+                    <div class="col-md-4">
+                        <span class="small font-bold">Premium</span>
+                        <div class="tag-list">
+                            <span class="tag-item">@Model.FormattedPremium</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-md-3 action-buttons pull-right">
+            @if ((Model.Status == 1) || (Model.Status == 3))
+            {
+                <a class="btn-success btn btn-sm action-button publish-property" data-id="@Model.Id"><i class="fa fa-thumbs-up"></i><span>&nbsp;Publish</span></a>
+            }
+            else if (Model.Status == 2)
+            {
+                <a class="btn-warning btn btn-sm action-button archive-property" data-id="@Model.Id"><i class="fa fa-archive"></i><span>&nbsp;Archive</span></a>
+            }
+            <a class="btn-default btn btn-sm action-button" href="/admin/property/edit/@Model.Id"><i class="fa fa-edit"></i><span>&nbsp;Edit</span></a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-cog"></i></button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li>
+                        <a href="@Model.Url" target="_blank">
+                            <i class="fa fa-search m-r-sm"></i>
+                            <span>
+                                Preview
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="delete-property" data-id="@Model.Id">
+                            <i class="fa fa-trash-o m-r-sm"></i>
+                            <span>
+                                Delete
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

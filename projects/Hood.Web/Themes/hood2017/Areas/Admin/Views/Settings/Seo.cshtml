@@ -1,0 +1,313 @@
+@model SeoSettings
+@{
+    ViewData["Title"] = "SEO Settings";
+    Layout = "_SettingsLayout";
+}
+@section buttons {
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetSEO" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+@section description {
+<p class="no-margin">
+    SEO is a marketing discipline focused on growing visibility in organic (non-paid) search engine results. SEO encompasses both the technical and creative elements required to improve rankings, drive traffic, and increase awareness in search engines.
+</p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#basics">Basic</a></li>
+        <li><a data-toggle="tab" href="#standard">Standard Page Defaults</a></li>
+        <li><a data-toggle="tab" href="#socials">Social Media</a></li>
+        <li><a data-toggle="tab" href="#opengraph">OG Tags</a></li>
+        <li><a data-toggle="tab" href="#twitter">Twitter Card</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="basics" class="tab-pane active">
+            <div class="panel-body">
+                <strong>General Titles, Keywords and Metadata</strong>
+                <p>
+                    Meta tags are used to add hidden content to your site, that is picked up by search engines and other internet crawlers.
+                    You can set titles and descriptions that will show up on search engine results, and add keywords and images to increase your potential traffic.
+                    Setting the following will create fallbacks for your site to use if you do not set individual page titles and descriptions.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <h5>Settings &amp; Analytics</h5>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="SiteIconUrl"></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input asp-for="SiteIconUrl" type="url" class="form-control SiteIconUrl" placeholder="Enter a url..." />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default hood-image-set" data-target=".SiteIconUrl" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="GoogleAnalytics"></label>
+                        <div class="col-sm-8"><textarea asp-for="GoogleAnalytics" type="text" class="form-control" rows="4"></textarea></div>
+                    </div>
+                    <h5>Custom HTML tags</h5>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="HeadTags"></label>
+                        <div class="col-sm-8"><textarea asp-for="HeadTags" type="text" class="form-control" rows="4"></textarea></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="BodyTags"></label>
+                        <div class="col-sm-8"><textarea asp-for="BodyTags" type="text" class="form-control" rows="4"></textarea></div>
+                    </div>
+                    <h5>SEO Page Fallbacks</h5>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Title"></label>
+                        <div class="col-sm-8"><input asp-for="Title" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Description"></label>
+                        <div class="col-sm-8"><input asp-for="Description" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Keywords"></label>
+                        <div class="col-sm-8"><input asp-for="Keywords" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="CanonicalUrl"></label>
+                        <div class="col-sm-8"><input asp-for="CanonicalUrl" type="text" class="form-control" /></div>
+                    </div>
+                    <h5>Other General Metas</h5>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Publisher"></label>
+                        <div class="col-sm-8"><input asp-for="Publisher" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FacebookAppId"></label>
+                        <div class="col-sm-8"><input asp-for="FacebookAppId" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="standard" class="tab-pane">
+            <div class="panel-body">
+                <strong>Settings for default pages</strong>
+                <p>
+                    Setting the following will add meta titles and descriptions for the standard pages of the site.
+                </p>
+                <hr />
+                <h5>Home Page</h5>
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Home.Title"></label>
+                        <div class="col-sm-8"><input asp-for="Home.Title" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Home.Description"></label>
+                        <div class="col-sm-8"><input asp-for="Home.Description" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Home.Keywords"></label>
+                        <div class="col-sm-8"><input asp-for="Home.Keywords" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Home.CanonicalUrl"></label>
+                        <div class="col-sm-8"><input asp-for="Home.CanonicalUrl" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+                <hr />
+                <h5>Contact Page</h5>
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Contact.Title"></label>
+                        <div class="col-sm-8"><input asp-for="Contact.Title" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Contact.Description"></label>
+                        <div class="col-sm-8"><input asp-for="Contact.Description" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Contact.Keywords"></label>
+                        <div class="col-sm-8"><input asp-for="Contact.Keywords" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Contact.CanonicalUrl"></label>
+                        <div class="col-sm-8"><input asp-for="Contact.CanonicalUrl" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+                <hr />
+                <h5>Login Page</h5>
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Login.Title"></label>
+                        <div class="col-sm-8"><input asp-for="Login.Title" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Login.Description"></label>
+                        <div class="col-sm-8"><input asp-for="Login.Description" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Login.Keywords"></label>
+                        <div class="col-sm-8"><input asp-for="Login.Keywords" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Contact.CanonicalUrl"></label>
+                        <div class="col-sm-8"><input asp-for="Contact.CanonicalUrl" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+                <hr />
+                <h5>Sign Up Page</h5>
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="SignUp.Title"></label>
+                        <div class="col-sm-8"><input asp-for="SignUp.Title" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="SignUp.Description"></label>
+                        <div class="col-sm-8"><input asp-for="SignUp.Description" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="SignUp.Keywords"></label>
+                        <div class="col-sm-8"><input asp-for="SignUp.Keywords" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="SignUp.CanonicalUrl"></label>
+                        <div class="col-sm-8"><input asp-for="SignUp.CanonicalUrl" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="socials" class="tab-pane">
+            <div class="panel-body">
+                <strong>Social Media</strong>
+                <p>
+                    Here you can set what Social Media networks are linked and displayed on your site. Remember linking more of these will provide you with direct links to these services.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Twitter"></label>
+                        <div class="col-sm-8"><input asp-for="Twitter" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TwitterHandle"></label>
+                        <div class="col-sm-8"><input asp-for="TwitterHandle" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Facebook"></label>
+                        <div class="col-sm-8"><input asp-for="Facebook" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="GooglePlus"></label>
+                        <div class="col-sm-8"><input asp-for="GooglePlus" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="LinkedIn"></label>
+                        <div class="col-sm-8"><input asp-for="LinkedIn" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TripAdvisor"></label>
+                        <div class="col-sm-8"><input asp-for="TripAdvisor" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Instagram"></label>
+                        <div class="col-sm-8"><input asp-for="Instagram" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="Pinterest"></label>
+                        <div class="col-sm-8"><input asp-for="Pinterest" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="GitHub"></label>
+                        <div class="col-sm-8"><input asp-for="GitHub" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div id="opengraph" class="tab-pane">
+            <div class="panel-body">
+                <strong>Open Graph Settings</strong>
+                <p>
+                    The Open Graph protocol, allows you to add images and rich content to your pages, that will help them to show up in the facebook or other social feeds correctly. For Twitter - see Twitter Cards.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="OgTitle"></label>
+                        <div class="col-sm-8"><input asp-for="OgTitle" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="OgDescription"></label>
+                        <div class="col-sm-8"><input asp-for="OgDescription" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="OgAuthor"></label>
+                        <div class="col-sm-8"><input asp-for="OgAuthor" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="OgImageUrl"></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input asp-for="OgImageUrl" type="url" class="form-control OgImageUrl" placeholder="Enter a url..." />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default hood-image-set" data-target=".OgImageUrl" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="OgSecureImageUrl"></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input asp-for="OgSecureImageUrl" type="url" class="form-control OgSecureImageUrl" placeholder="Enter a url..." />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default hood-image-set" data-target=".OgSecureImageUrl" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="OgLocale"></label>
+                        <div class="col-sm-8"><input asp-for="OgLocale" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+                <input type="hidden" asp-for="OgUrl" class="form-control">
+            </div>
+        </div>
+        <div id="twitter" class="tab-pane">
+            <div class="panel-body">
+                <strong>Twitter Card Settings</strong>
+                <p>
+                    With Twitter Cards, you can attach rich photos, videos and media experience to Tweets that drive traffic to your website. Simply add a few lines of HTML to your webpage, and users who Tweet links to your content will have a “Card” added to the Tweet that’s visible to all of their followers.
+                </p>
+                <hr />
+                <fieldset class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TwitterCardTitle"></label>
+                        <div class="col-sm-8"><input asp-for="TwitterCardTitle" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TwitterCardDescription"></label>
+                        <div class="col-sm-8"><input asp-for="TwitterCardDescription" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TwitterCardCreator"></label>
+                        <div class="col-sm-8"><input asp-for="TwitterCardCreator" type="text" class="form-control" /></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TwitterCardImageUrl"></label>
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <input asp-for="TwitterCardImageUrl" type="url" class="form-control TwitterCardImageUrl" placeholder="Enter a url..." />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default hood-image-set" data-target=".TwitterCardImageUrl" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="TwitterCardSite"></label>
+                        <div class="col-sm-8"><input asp-for="TwitterCardSite" type="text" class="form-control" /></div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+@model ForumModel
+@{
+    ViewData["Title"] = "Unauthorized";
+    ViewData["SubTitle"] = "You are not authorized to access this area, please log in or upgrade your account.";
+    Layout = "_ForumLayout";
+}
+<h2>@ViewData["Title"]</h2>
+<p class="m-b-lg">@ViewData["SubTitle"]</p>

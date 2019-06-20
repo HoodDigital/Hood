@@ -1,0 +1,33 @@
+@{
+    var _basicSettings = _settings.GetBasicSettings();
+    var _integrations = _settings.GetIntegrationSettings();
+    var _seoSettings = _settings.GetSeo();
+    string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+    string title = _basicSettings.CompanyName.IsSet() ? "Home - " + _basicSettings.CompanyName : _basicSettings.SiteTitle.IsSet() ? "Home - " + _basicSettings.SiteTitle : "Home";
+    if (_seoSettings.Home != null)
+    {
+        description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
+        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Home - " + _basicSettings.CompanyName;
+    }
+    ViewData["Title"] = title;
+    ViewData["SubTitle"] = "To change this page, you can create a new page in your admin area, and then set the homepage under Settings > Basic Settings";
+}
+
+@section metas {
+    <meta name="description" content="@description" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+}
+@if (_integrations.EnableTwitter)
+{
+    <div class="bg-color-white">
+        <h3>Latest from our news & twitter</h3>
+        <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")"></div>
+    </div>
+}

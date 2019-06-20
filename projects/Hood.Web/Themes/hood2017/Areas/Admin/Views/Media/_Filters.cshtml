@@ -1,0 +1,41 @@
+@inject IContentRepository _content
+@{
+    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    Hood.Infrastructure.OperationResult subscriptions = _settings.SubscriptionsEnabled();
+    Layout = null;
+    PropertySettings _propertySettings = _settings.GetPropertySettings();
+    var sideTypes = _settings.GetContentSettings().GetAllowedTypes();
+    if (_propertySettings.Enabled)
+    {
+        sideTypes.Add(new ContentType() { Type = "property", TypeNamePlural = "Properties", TypeName = "Property" });
+    }
+    sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
+}
+<div class="row m-b-sm m-t-sm">
+    <div class="col-md-6">
+        <select class="form-control media-change" name="media-sort" id="media-sort" data-selected="DateDesc">
+            <option value="DateDesc">Newest First</option>
+            <option value="Date">Oldest First</option>
+            <option value="Title">By Title (A-Z)</option>
+            <option value="TitleDesc">By Title (Z-A)</option>
+            <option value="Filename">By Filename (A-Z)</option>
+            <option value="FilenameDesc">By Filename (Z-A)</option>
+            <option value="Size">By File Size (&#8593;-&#8595;)</option>
+            <option value="SizeDesc">By File Size (&#8595;-&#8593;)</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <select class="form-control media-change" name="media-type" id="media-type">
+            <option value="">All Types</option>
+            @{
+                string[] names = Enum.GetNames(typeof(GenericFileType));
+                GenericFileType[] values = (GenericFileType[])Enum.GetValues(typeof(GenericFileType));
+
+                for (int i = 0; i < names.Length; i++)
+                {
+                    <option value="@names[i]">@names[i]</option>
+                }
+            }
+        </select>
+    </div>
+</div>

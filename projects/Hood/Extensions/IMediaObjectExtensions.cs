@@ -40,22 +40,22 @@ namespace Hood.Extensions
                         output = mediaObject.SmallUrl;
                         break;
                     case GenericFileType.Excel:
-                        return "/lib/hood/images/icons/excel.png";
+                        return "/hood/images/icons/excel.png";
                     case GenericFileType.PDF:
-                        return "/lib/hood/images/icons/pdf.png";
+                        return "/hood/images/icons/pdf.png";
                     case GenericFileType.PowerPoint:
-                        return "/lib/hood/images/icons/powerpoint.png";
+                        return "/hood/images/icons/powerpoint.png";
                     case GenericFileType.Word:
-                        return "/lib/hood/images/icons/word.png";
+                        return "/hood/images/icons/word.png";
                     case GenericFileType.Photoshop:
-                        return "/lib/hood/images/icons/photoshop.png";
+                        return "/hood/images/icons/photoshop.png";
                     case GenericFileType.Audio:
-                        return "/lib/hood/images/icons/audio.png";
+                        return "/hood/images/icons/audio.png";
                     case GenericFileType.Video:
-                        return "/lib/hood/images/icons/video.png";
+                        return "/hood/images/icons/video.png";
                     case GenericFileType.Unknown:
                     default:
-                        return "/lib/hood/images/icons/file.png";
+                        return "/hood/images/icons/file.png";
                 }
             }
             if (!output.IsSet())

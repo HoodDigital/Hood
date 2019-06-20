@@ -1,87 +1,66 @@
+/// <binding AfterBuild='build' />
 // Useful gulp functions for the development of HoodCMS.
 // Note this is a demo project and should not be used for production HoodCMS projects.
 // In production, you should install the nuget and bower packages to your HoodCMS project.
 
 var gulp = require("gulp"),
-    path = require('path'),
-    fs = require('fs'),
     rimraf = require('gulp-rimraf'),
-    less = require('gulp-less'),
     concat = require('gulp-concat'),
-    cssmin = require('gulp-cssmin'),
     uglify = require('gulp-uglify'),
     rename = require('gulp-rename'),
-    stripCss = require('gulp-strip-css-comments'),
-    stripJs = require('gulp-strip-comments'),
-    sourcemaps = require('gulp-sourcemaps'),
     lib = './lib/',
     hood = {
-        js: './js/',
-        less: './less/',
-        images: './images/'
+        js: './hood/js/',
+        css: './hood/css/',
+        scss: './hood/scss/',
+        images: './hood/images/'
     },
     demo = {
-        dist: './../Hood.Web/wwwroot/lib/hood/dist/',
-        images: './../Hood.Web/wwwroot/lib/hood/images/',
-        src: './../Hood.Web/wwwroot/lib/hood/src/'
+        srcjs: './../Hood.Web/wwwroot/hood/js/',
+        distjs: './../Hood.Web/wwwroot/hood/js/',
+        css: './../Hood.Web/wwwroot/hood/css/',
+        scss: './../Hood.Web/wwwroot/hood/scss/',
+        images: './../Hood.Web/wwwroot/hood/images/'
     },
     output = {
-        dist: './../../dist/',
-        images: './../../images/',
-        src: './../../src/'
+        srcjs: './../../js/',
+        distjs: './../../js/',
+        css: './../../css/',
+        scss: './../../scss/',
+        images: './../../images/'
     };
 
 // Cleans all dist/src/images output folders, as well as the Hood.Web lib/hood folders.
 gulp.task('clean', function (cb) {
     return gulp.src([
-        output.dist,
         output.images,
-        output.src,
-        demo.dist,
+        output.css,
+        output.scss,
+        output.distjs,
+        output.srcjs,
+        output.images,
         demo.images,
-        demo.src
+        demo.css,
+        demo.scss,
+        demo.distjs,
+        demo.srcjs,
+        demo.images
     ], { read: false, allowEmpty: true })
     .pipe(rimraf({ force: true }));
 });
 
 // Copies all less files to the src directory and the Hood.Web src directory.
-gulp.task('less:copy', function () {
-    return gulp.src(hood.less + "**/*.less")
-    .pipe(gulp.dest(demo.src + "/less/"))
-    .pipe(gulp.dest(output.src + "/less/"));
+gulp.task('css:copy', function () {
+    return gulp.src(hood.css + "/**/*.css")
+    .pipe(gulp.dest(demo.css))
+    .pipe(gulp.dest(output.css));
+});
+gulp.task('scss:copy', function () {
+    return gulp.src(hood.scss + "**/*.scss")
+        .pipe(gulp.dest(demo.scss))
+        .pipe(gulp.dest(output.scss));
 });
 
-// Processes less and saves the outputted css UNMINIFIED to the src directories and the Hood.Web src directory.
-gulp.task('less:src', function () {
-    return gulp
-        .src(hood.less + '*.less')
-        .pipe(sourcemaps.init({ largeFile: true }))
-        .pipe(less({ relativeUrls: true }))
-        .pipe(sourcemaps.write("/"))
-        .pipe(gulp.dest(output.src + "/css/"))
-        .pipe(gulp.dest(demo.src + "/css/"));
-});
-
-// Processes less and saves the outputted css MINIFIED to the dist directories and the Hood.Web dist directory.
-gulp.task('less', function () {
-    lss = less({ relativeUrls: true });
-    lss.on('error', function (e) {
-        console.log(e);
-        lss.end();
-    });
-    return gulp
-        .src(hood.less + '*.less')
-        .pipe(sourcemaps.init({ largeFile: true }))
-        .pipe(lss)
-        .pipe(stripCss({ preserve: false }))
-        .pipe(cssmin())
-        .pipe(rename({ suffix: ".min" }))
-        .pipe(sourcemaps.write("/"))
-        .pipe(gulp.dest(output.dist + "/css/"))
-        .pipe(gulp.dest(demo.dist + "/css/"));
-});
-
-// Processes the JS and saves outputted js UNMINIFIED to the src directories and the Hood.Web src directory, 
 // then minifies the output to the dist directories and the Hood.Web dist directory.
 gulp.task('js', function () {
     l = uglify({});
@@ -90,12 +69,12 @@ gulp.task('js', function () {
         l.end();
     });
     return gulp.src(hood.js + "**/*.js", { base: hood.js })
-    .pipe(gulp.dest(output.src + "/js/"))
-    .pipe(gulp.dest(demo.src + "/js/"))
+    .pipe(gulp.dest(output.srcjs))
+    .pipe(gulp.dest(demo.srcjs))
     .pipe(l)
     .pipe(rename({ suffix: ".min" }))
-    .pipe(gulp.dest(output.dist + "/js/"))
-    .pipe(gulp.dest(demo.dist + "/js/"));
+        .pipe(gulp.dest(output.distjs))
+        .pipe(gulp.dest(demo.distjs));
 });
 
 // Copies any image files from the images directories to the distribution images directory and the Hood.Web images directory.
@@ -119,7 +98,6 @@ gulp.task("js:package:app", function () {
     });
     return gulp.src([
         hood.js + "includes/production.js",
-        lib + 'FitVids/jquery.fitvids.js',
         hood.js + "includes/globals.js",
         hood.js + "includes/stringhelpers.js",
         hood.js + "includes/alerts.js",
@@ -136,8 +114,8 @@ gulp.task("js:package:app", function () {
     ], { base: '.' })
     .pipe(concat('app.packaged.js'))
     .pipe(l)
-    .pipe(gulp.dest(output.dist + 'js/'))
-    .pipe(gulp.dest(demo.dist + 'js/'));
+    .pipe(gulp.dest(demo.distjs))
+    .pipe(gulp.dest(output.distjs));
 });
 
 // Package the login javascript
@@ -148,14 +126,14 @@ gulp.task("js:package:login", function () {
         l.end();
     });
     return gulp.src([
-        lib + 'jQuery-Mask-Plugin/dist/jquery.mask.js',
+        lib + 'jquery-mask/jquery.mask.js',
         hood.js + "includes/production.js",
         hood.js + 'login.js'
     ], { base: '.' })
     .pipe(concat('login.packaged.js'))
     .pipe(l)
-    .pipe(gulp.dest(output.dist + 'js/'))
-    .pipe(gulp.dest(demo.dist + 'js/'));
+    .pipe(gulp.dest(demo.distjs))
+    .pipe(gulp.dest(output.distjs));
 });
 
 // Package the admin Javascript
@@ -194,10 +172,16 @@ gulp.task("js:package:admin", function () {
     ], { base: '.' })
     .pipe(concat('admin.packaged.js'))
     .pipe(l)
-    .pipe(gulp.dest(output.dist + 'js/'))
-    .pipe(gulp.dest(demo.dist + 'js/'));
+    .pipe(gulp.dest(demo.distjs))
+    .pipe(gulp.dest(output.distjs));
 });
 
 // The build function, copies all less, processes less, copies and processes js, files and images
 gulp.task("package", gulp.series('js:package:admin', 'js:package:app', 'js:package:login'));
-gulp.task("build", gulp.series('clean', 'less:copy', gulp.parallel('less:src', 'less', 'js', 'images'), 'package'));
+gulp.task("build", gulp.series('clean', gulp.parallel('css:copy', 'scss:copy', 'js', 'images'), 'package'));
+gulp.task('watch', function () {
+    gulp.watch([
+        hood.css + '**/*.css',
+        hood.js + '**/*.js'
+    ], gulp.series('build'));
+});

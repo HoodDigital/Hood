@@ -1,0 +1,33 @@
+@model Log
+@if (Model.EntityId.IsSet())
+{
+    switch (Model.EntityType)
+    {
+        case nameof(ApplicationUser):
+            break;
+        case nameof(UserSubscription):
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Subscription</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">
+                        <a target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.EntityId)">
+                            Go to subscription (Stripe)
+                        </a>
+                    </p>
+                </div>
+            </div>
+            break;
+        case nameof(Subscription):
+            <div class="form-group">
+                <label class="col-sm-4 control-label">Plan</label>
+                <div class="col-sm-6">
+                    <p class="form-control-static">
+                        <a asp-action="Edit" asp-controller="Subscriptions" asp-route-id="@Model.EntityId">
+                            Go to subscription plan
+                        </a>
+                    </p>
+                </div>
+            </div>
+            break;
+    }
+}

@@ -1,0 +1,28 @@
+@model ContentModel
+@if (Model.List.Count == 0)
+{
+    await Html.RenderPartialAsync("_NoResults");
+}
+else
+{
+    <div class="panel-group" id="job-accordion" role="tablist" aria-multiselectable="true">
+        @foreach (Content content in Model.List)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="@string.Format("job-heading-{0}", content.Id)">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="@string.Format("#job-accordion-{0}", content.Id)" href="@string.Format("#job-accordion-{0}", content.Id)" aria-expanded="false" aria-controls="@string.Format("job-accordion-{0}", content.Id)">
+                            @content.Title
+                        </a>
+                    </h4>
+                </div>
+                <div id="@string.Format("job-accordion-{0}", content.Id)" class="panel-collapse collapse" role="tabpanel" aria-labelledby="@string.Format("job-heading-{0}", content.Id)">
+                    <div class="panel-body">
+                        @content.Excerpt
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    await Html.RenderPartialAsync("_Pagination");
+}

@@ -1,0 +1,43 @@
+@model PropertyListing
+<div id="descriptions" class="tab-pane">
+    <div class="panel-body">
+        <fieldset class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Full Description:</label>
+                <div class="col-sm-8">
+                    <textarea asp-for="Description" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">About the Lease:</label>
+                <div class="col-sm-8">
+                    <textarea asp-for="Lease" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Internal Areas:</label>
+                <div class="col-sm-8">
+                    <textarea asp-for="Areas" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">About the Location:</label>
+                <div class="col-sm-8">
+                    <textarea asp-for="Location" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Agent Info:</label>
+                <div class="col-sm-8">
+                    <textarea asp-for="AgentInfo" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Additional Info:</label>
+                <div class="col-sm-8">
+                    <textarea asp-for="Additional" class="form-control @_settings.WysiwygEditorClass"></textarea>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

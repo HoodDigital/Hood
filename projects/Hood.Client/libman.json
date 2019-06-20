@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@3.4.1",
+      "destination": "lib/jquery"
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap@4.3.1",
+      "destination": "lib/bootstrap"
+    },
+    {
+      "provider": "unpkg",
+      "library": "jquery-backstretch@2.1.17",
+      "destination": "lib/jquery-backstretch"
+    },
+    {
+      "provider": "unpkg",
+      "library": "font-awesome-5-css@5.4.1",
+      "destination": "lib/fontawesome"
+    },
+    {
+      "library": "jquery.mask@1.14.15",
+      "destination": "lib/jquery-mask"
+    }
+  ]
+}

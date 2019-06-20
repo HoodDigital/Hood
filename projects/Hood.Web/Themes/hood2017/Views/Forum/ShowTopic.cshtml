@@ -1,0 +1,143 @@
+@model PostModel
+@{
+    SeoSettings _seoSettings = _settings.GetSeo();
+    BasicSettings _basicSettings = _settings.GetBasicSettings();
+
+    ViewData["Title"] = Model.Topic.Forum.Title + " - " + Model.Topic.Title;
+    ViewData["SubTitle"] = Model.Topic.Forum.Description;
+    ViewData["EditUrl"] = Url.Action("Edit", "Forum", new { area = "Admin", id = Model.Topic.Forum.Id });
+    ViewData["Forum"] = Model.Topic.Forum;
+    ViewData["Topic"] = Model.Topic;
+    Layout = "_ForumLayout";
+
+    string url = Context.GetSiteUrl(true, true);
+    if (_seoSettings.CanonicalUrl.IsSet())
+    {
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+    }
+
+    var _account = Context.GetAccountInfo();
+
+    bool moderator = User.Identity.IsAuthenticated &&
+               (
+                   Model.Topic.AuthorId == _account.User.Id ||
+                   User.IsInRole("Admin") ||
+                   User.IsInRole("Moderator")
+               );
+}
+@section includes {
+    <script src="~/lib/tinymce/tinymce.min.js"></script>
+    <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
+}
+@section metas {
+    <meta name="description" content="@Model.Topic.Forum.Description" />
+    <meta property="og:author" content="@Model.Topic.Author.DisplayName" />
+    <meta property="og:title" content="@Model.Topic.Forum.Title" />
+    @if (Model.Topic.Forum.ShareImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@Model.Topic.Forum.ShareImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@Model.Topic.Forum.ShareImage.LargeUrl" />
+        <meta name="twitter:image" content="@Model.Topic.Forum.ShareImage.LargeUrl" />
+    }
+    else if (Model.Topic.Forum.FeaturedImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@Model.Topic.Forum.FeaturedImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@Model.Topic.Forum.FeaturedImage.LargeUrl" />
+        <meta name="twitter:image" content="@Model.Topic.Forum.FeaturedImage.LargeUrl" />
+    }
+    else
+    {
+        <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+        <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+        <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+    }
+    <meta property="og:description" content="@Model.Topic.Forum.Description" />
+    <meta name="twitter:title" content="@Model.Topic.Forum.Title" />
+    <meta name="twitter:description" content="@Model.Topic.Forum.Description" />
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.ContainedBootstrapAlert(Model.SaveMessage, Model.MessageType, true, "no-margin");
+}
+<div class="row">
+    <div class="col-sm-9">
+        <div class="post">
+            <div class="post-view">
+                <div class="post-content">
+                    <h4>@Model.Topic.Title</h4>
+                    @Html.Raw(Model.Topic.Description)
+                </div>
+            </div>
+            @if (moderator)
+            {
+                <div class="edit-view">
+                    <form method="post" class="edit-topic-form" asp-action="EditTopic" asp-route-topicId="@Model.Topic.Id">
+                        <fieldset>
+                            <input name="topicId" type="hidden" value="@Model.Topic.Id" />
+                            <div class="form-group">
+                                <label class="control-label">Edit title</label>
+                                <div class="">
+                                    <input name="title" for="topic-title-@Model.Topic.Id" type="text" value="@Model.Topic.Title" class="form-control" />
+                                    <span for="topic-title-@Model.Topic.Id"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Edit description</label>
+                                <div class="">
+                                    <textarea name="description" for="topic-description-@Model.Topic.Id" type="text" class="form-control">@Model.Topic.Description</textarea>
+                                    <span for="topic-description-@Model.Topic.Id"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary"><span>Update topic</span></button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            }
+            <hr />
+            @if (Model.Topic.Author.ForumSignature.IsSet())
+            {
+                <div class="post-content m-b-md">
+                    @Html.Raw(Model.Topic.Author.ForumSignature)
+                </div>
+            }
+            <p class="stats">
+                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.FullName</span>
+                <span><i class="fa fa-clock-o m-r-xs"></i> @Model.Topic.CreatedOn.ToHumaneDate()</span>
+            </p>
+            @if (moderator)
+            {
+                <hr class="m-t-sm m-b-sm" />
+                <p class="no-margin">
+                    <a class="btn btn-xs btn-warning edit-post m-r-sm">Edit</a>
+                    <a class="btn btn-xs btn-danger" asp-action="DeleteTopic" asp-route-slug="@Model.Topic.Forum.Slug" asp-route-topicId="@Model.Topic.Id">Delete</a>
+                </p>
+            }
+        </div>
+        @if (Model.List.Count == 0)
+        {
+            await Html.RenderPartialAsync("_Posts_NoResults");
+        }
+        else
+        {
+            @foreach (var post in Model.List)
+            {
+                await Html.RenderPartialAsync("_Template_Post", post);
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <div class="text-center">
+                    @{ await Html.RenderPartialAsync("_Pagination");}
+                </div>
+            }
+        }
+        <hr />
+        @{ await Html.RenderPartialAsync("_Forms_Post"); }
+    </div>
+    <div class="col-sm-3">
+        @{ await Html.RenderPartialAsync("_Posts_Sidebar"); }
+    </div>
+</div>

@@ -1,0 +1,12 @@
+﻿[
+  {
+    "outputFile": "hood/css/admin.css",
+    "inputFile": "hood/scss/admin.scss",
+    "sourceMap": true
+  },
+  {
+    "outputFile": "hood/css/login.css",
+    "inputFile": "hood/scss/login.scss",
+    "sourceMap": true
+  }
+]

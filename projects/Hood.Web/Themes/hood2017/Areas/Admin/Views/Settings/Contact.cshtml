@@ -1,0 +1,121 @@
+@model ContactSettings
+@{
+    Layout = "_SettingsLayout";
+    ViewData["Title"] = "Contact Form & Page Settings";
+}
+@section buttons {
+    @if (User.IsInRole("Admin")) { 
+        <a asp-action="ResetContact" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+@section description {
+    <p>
+        Set up the contact forms for your site. You will need to have an active SendGrid Api key attached to the site in order for the forms to function, set this in your mail settings, Admin > Settings > Mail Settings.
+    </p>
+    <p class="no-margin">
+        Here you can set up the contact pages and how the contact form works. Choose whether to forward to a thank you page or not, set up where your contact forms go and what appears on your contact page. Set up how your contact page behaves, where the contact form goes, what happens to the user after they submit it.
+    </p>
+}
+<div class="tabs-container">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#contact">Form Settings</a></li>
+        <li><a data-toggle="tab" href="#user">User Emails</a></li>
+        <li><a data-toggle="tab" href="#notifications">Notifications</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="contact" class="tab-pane in active">
+            <div class="panel-body form-horizontal">
+                <strong>Form Settings</strong>
+                <p>Set up how the form works, you can set where the user is sent after the form is submitted, or customise the message displayed when they do. Note the enquiries are not stored, so it is vital you set this up correctly. </p>
+                <hr />
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="Email"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="Email" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="ContactFormTitle"></label>
+                    <div class="col-sm-9">
+                        <textarea asp-for="ContactFormTitle" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="ContactFormMessage"></label>
+                    <div class="col-sm-9">
+                        <textarea asp-for="ContactFormMessage" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="ThankYouUrl"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="ThankYouUrl" class="form-control">
+                        <small>Use this to forward the user to a contact "Thank You" page after submitting an enquiry. To simply display the message below and not forward, leave this field blank.</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="ThankYouTitle"></label>
+                    <div class="col-sm-9">
+                        <textarea asp-for="ThankYouTitle" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="ThankYouMessage"></label>
+                    <div class="col-sm-9">
+                        <textarea asp-for="ThankYouMessage" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="user" class="tab-pane">
+            <div class="panel-body form-horizontal">
+                <strong>User Email Settings</strong>
+                <p>This is the content in the user email, the email sent back to the user when they submit an enquiry. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}.</p>
+                <hr />
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="Title"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="Title" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="Subject"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="Subject" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="Message"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="Message" class="form-control @_settings.WysiwygEditorClass">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="notifications" class="tab-pane">
+            <div class="panel-body form-horizontal">
+                <strong>Notification Settings</strong>
+                <p>Set up the mail sent to the notofication address when an enquiry is sent. You can add placeholders to any of these fields such as {SITETITLE}, {SITEOWNERNAME}, {SITEEMAIL}, {SITEPHONE}.</p>
+                <hr />
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="AdminNoficationTitle"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="AdminNoficationTitle" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="AdminNoficationSubject"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="AdminNoficationSubject" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" asp-for="AdminNoficationMessage"></label>
+                    <div class="col-sm-9">
+                        <input asp-for="AdminNoficationMessage" class="form-control @_settings.WysiwygEditorClass">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

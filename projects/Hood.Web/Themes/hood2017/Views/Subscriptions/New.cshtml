@@ -1,0 +1,144 @@
+@model SubscriptionModel
+@inject IAccountRepository _subs
+@{
+    BillingSettings settings = _settings.GetBillingSettings();
+    ViewBag.Title = "Choose your package";
+    ViewBag.SubTitle = "To take advantage of one of our paid packages, you will need to add a payment method. You can try our paid packages for free, as our monthly packages come with 30 days free, and of course you can cancel at any time!";
+    Layout = "_BasicLayout";
+}
+<section class="page-section">
+    <div class="container">
+        @if (Model.SaveMessage.IsSet())
+        {
+            @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+        }
+        @if (Model.Plans?.Count <= 0)
+        {
+            <div class="alert alert-warning text-center">
+                <p><i class="fa fa-info-circle fa-4x m-r-xs"></i><br />There are no subscription plans added to the site yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default panel-accordion">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            Choose your package
+                        </h4>
+                    </div>
+                    <div id="price-panel" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                        @if (Model.Plans.Count > 0)
+                        {
+                            if (Model.Category.IsSet())
+                            {
+                                await Html.RenderPartialAsync("_Subscriptions_Table");
+                            }
+                            else
+                            {
+                                @foreach (string category in Model.Plans.Select(p => p.Category).Distinct())
+                                {
+                                    var ptModel = Model;
+                                    ptModel.Category = category;
+                                    await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="panel panel-default panel-accordion">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title">
+                            Enter your billing details
+                        </h4>
+                    </div>
+                    <div id="billing-panel" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                        @{ await Html.RenderPartialAsync("_PaymentForm"); }
+                    </div>
+                </div>
+                <div class="panel panel-default panel-accordion">
+                    <div class="panel-heading" role="tab" id="headingThree">
+                        <h4 class="panel-title">
+                            Confirm &amp; Pay
+                        </h4>
+                    </div>
+                    <div id="confirm-panel" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                        @{ await Html.RenderPartialAsync("_Confirmation"); }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+@section scripts {
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script type="text/javascript">
+        Stripe.setPublishableKey('@(settings.EnableStripeTestMode ? settings.StripeTestPublicKey : settings.StripeLivePublicKey)');
+        $(function () {
+            var $form = $('#payment-form');
+            $form.submit(function (event) {
+                if ($("input:radio[name='CardId']:checked").val() == "") {
+
+                    // Disable the submit button to prevent repeated clicks:
+                    $form.find('.submit').prop('disabled', true);
+
+                    // Request a token from Stripe:
+                    Stripe.card.createToken($form, stripeResponseHandler);
+
+                    // Prevent the form from being submitted:
+                    return false;
+                }
+            });
+            $("input:radio[name='CardId']").change(function () {
+                if ($("input:radio[name='CardId']:checked").val() == "") {
+                    $('#new-card-form').show();
+                } else {
+                    $('#new-card-form').hide();
+                }
+            });
+            if ($("input:radio[name='CardId']:checked").val() == "") {
+                $('#new-card-form').show();
+            } else {
+                $('#new-card-form').hide();
+            }
+            $('#skip-to-confirm').hide();
+        });
+
+        function stripeResponseHandler(status, response) {
+            // Grab the form:
+            var $form = $('#payment-form');
+
+            if (response.error) { // Problem!
+
+                // Show the errors on the form:
+                $form.find('.payment-errors').addClass('active').text(response.error.message);
+                $form.find('.submit').prop('disabled', false); // Re-enable submission
+
+            } else { // Token was created!
+
+                // Get the token ID:
+                var token = response.id;
+
+                // Insert the token ID into the form so it gets submitted to the server:
+                $form.append($('<input type="hidden" name="StripeToken" id="StripeToken">').val(token));
+                $form.find('.payment-errors').addClass('success').text("Card details validated with stripe, ready to continue...");
+                $form.find('.submit').hide(); // Re-enable submission
+                $('#price-panel').collapse('hide');
+                $('#billing-panel').collapse('hide');
+                $('#confirm-panel').collapse('show');
+                $('#skip-to-confirm').show();
+
+                // Wire up the skip button.
+                $('#skip-to-confirm').click(function () {
+                    $('#billing-panel').collapse('hide');
+                    $('#confirm-panel').collapse('show');
+                })
+
+                // Wire up the confirm button.
+                $('#confirm-and-pay').click(function () {
+                    $form.get(0).submit();
+                })
+            }
+        };
+    </script>
+}
