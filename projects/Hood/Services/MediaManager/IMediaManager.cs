@@ -88,7 +88,7 @@ namespace Hood.Services
         /// </summary>
         /// <param name="media">The media item to remove all associated media from Azure.</param>
         /// <returns></returns>
-        Task DeleteStoredMedia(TMediaObject media);
+        Task DeleteStoredMedia(IMediaObject media);
 
         /// <summary>
         /// Refreshes image data for all files stored on the media item, reuploading to the current storage account, CDN and folder structure etc.

@@ -137,7 +137,12 @@ namespace Hood.Models
         /// </summary>
         [Display(Name = "Download from Remote FTP Server")]
         public bool UseFTP { get; set; }
-
+        /// <summary>
+        /// Whether or not to use the FTP Service to download the BLM & Image files when using BLM Importer.
+        /// </summary>
+        [Display(Name = "Clear Images Before Downloading new Images")]
+        public bool ClearImagesBeforeImport { get; set; }
+        
         /// <summary>
         /// The FTP Server address that is used for the FTP Import
         /// </summary>
