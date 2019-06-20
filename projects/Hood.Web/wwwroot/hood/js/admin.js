@@ -1,4 +1,4 @@
-$(document).on('ready', function () {
+﻿$(document).on('ready', function () {
 
     if ($(this).width() < 769) {
         $('body').addClass('body-small')

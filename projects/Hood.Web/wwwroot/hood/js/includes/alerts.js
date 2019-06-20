@@ -1,4 +1,4 @@
-if (!$.hood)
+﻿if (!$.hood)
     $.hood = {}
 $.hood.Alerts = {
     Error: function (msg, title, callback, sweetAlert) {

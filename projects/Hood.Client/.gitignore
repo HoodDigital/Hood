@@ -1,6 +1,0 @@
-# Project Ignores
-package-lock.json
-/lib
-/css
-/js/**/*.min.js
-/js/**/*.packaged.js

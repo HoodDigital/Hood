@@ -13,6 +13,11 @@
     },
     {
       "provider": "unpkg",
+      "library": "jquery-backstretch@2.1.17",
+      "destination": "wwwroot/lib/jquery-backstretch"
+    },
+    {
+      "provider": "unpkg",
       "library": "font-awesome-5-css@5.4.1",
       "destination": "wwwroot/lib/fontawesome"
     },

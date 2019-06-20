@@ -1,4 +1,4 @@
-$.window = $(window),
+﻿$.window = $(window),
     $.header = $('#header'),
     $.mobileMenu = $('#mobile-menu'),
     $.mobileMenuTrigger = $('.mobile-menu-trigger'),

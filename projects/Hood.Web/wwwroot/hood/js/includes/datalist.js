@@ -1,4 +1,4 @@
-if (!$.hood)
+﻿if (!$.hood)
     $.hood = {}
 $.hood.DataList = function (element, options) {
     this.Options = $.extend({

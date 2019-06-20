@@ -1,4 +1,4 @@
-if (!$.hood)
+﻿if (!$.hood)
     $.hood = {};
 $.hood.IO = {
     Reporter: {

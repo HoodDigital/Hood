@@ -1,4 +1,4 @@
-String.prototype.contains = function (it) { return this.indexOf(it) != -1; };
+﻿String.prototype.contains = function (it) { return this.indexOf(it) != -1; };
 String.prototype.pick = function (min, max) {
     var n, chars = '';
 
