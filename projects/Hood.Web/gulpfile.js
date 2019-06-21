@@ -8,7 +8,9 @@ var gulp = require('gulp'),
     rimraf = require('gulp-rimraf'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
+    cssnano = require('gulp-cssnano'),
     rename = require('gulp-rename'),
+    imagemin = require('gulp-imagemin'),
     sourcemaps = require('gulp-sourcemaps'),
     lib = './wwwroot/lib/',
     hood = {
@@ -18,6 +20,8 @@ var gulp = require('gulp'),
         images: './wwwroot/hood/images/'
     },
     output = {
+        src: './../../src/',
+        dist: './../../dist/',
         srcJs: './../../src/js/',
         distJs: './../../dist/js/',
         srcCss: './../../src/css/',
@@ -29,6 +33,8 @@ var gulp = require('gulp'),
 // Cleans all dist/src/images output folders, as well as the hood folders.
 gulp.task('clean', function (cb) {
     return gulp.src([
+        output.src,
+        output.dist,
         output.srcCss,
         output.distCss,
         output.scss,
@@ -43,26 +49,35 @@ gulp.task('clean', function (cb) {
 // Compiles, compresses and copies all scss files to the output directories.
 gulp.task('scss', function () {
     return gulp.src(hood.scss + '*.scss')
-        .pipe(sourcemaps.init({ largeFile: true }))
-        .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
-        .pipe(sourcemaps.write('/'))
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
+        .pipe(sourcemaps.write())
+        .pipe(gulp.dest(hood.css));
+});
+
+gulp.task('scss:copy', function () {
+    return gulp.src(hood.scss + "**/*.scss")
+        .pipe(gulp.dest(demo.scss))
+        .pipe(gulp.dest(output.scss));
+});
+
+gulp.task('cssnano', function () {
+    return gulp.src([hood.css + '**/*.css', '!' + hood.css + '**/*.min.css'])
         .pipe(gulp.dest(output.srcCss))
-        .pipe(gulp.dest(hood.css))
-        .pipe(sourcemaps.init({ largeFile: true }))
-        .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
-        .pipe(sourcemaps.write('/'))
+        .pipe(cssnano({
+            discardComments: {
+                removeAll: true
+            }
+        }))
+        .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(hood.css))
         .pipe(gulp.dest(output.distCss));
 });
 
 // Copies any image files from the images directories to the distribution images directory.
 gulp.task('images', function () {
-    return gulp.src([
-        hood.images + '**/*.png',
-        hood.images + '**/*.jpg',
-        hood.images + '**/*.gif',
-        hood.images + '**/*.svg'
-    ], { base: hood.images })
+    return gulp.src(hood.images + '**/*.+(png|jpg|gif|svg)')
+        .pipe(imagemin())
         .pipe(gulp.dest(output.images));
 });
 
@@ -166,7 +181,7 @@ gulp.task('js:package:admin', function () {
 });
 
 gulp.task('package', gulp.series('js:package:admin', 'js:package:app', 'js:package:login'));
-gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images'), 'package'));
+gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images'), gulp.parallel('scss:copy', 'cssnano', 'package')));
 
 // Site workload, for the local site to compile files for use.
 gulp.task('site:js', function () {
@@ -192,20 +207,15 @@ gulp.task('site:js:package', function () {
         '/wwwroot/js/includes/google.js',
         '/wwwroot/js/site.min.js'
     ])
-    .pipe(concat('site.packaged.js'))
-    .pipe(l)
-    .pipe(gulp.dest(jsFolder))
-    .pipe(stripJs())
-    .pipe(gulp.dest(jsFolder));
+        .pipe(concat('site.packaged.js'))
+        .pipe(l)
+        .pipe(gulp.dest(jsFolder))
+        .pipe(stripJs())
+        .pipe(gulp.dest(jsFolder));
 });
 
 gulp.task('publish', gulp.series('clean', 'build', 'site:js', 'site:js:package'));
 
 gulp.task('watch', function () {
-    gulp.watch([
-        '/wwwroot/js/',
-        '/wwwroot/scss/',
-        hood.scss,
-        hood.js
-    ], gulp.series('publish'));
+    gulp.watch(hood.scss, gulp.series('scss'));
 });

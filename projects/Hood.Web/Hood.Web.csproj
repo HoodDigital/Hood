@@ -342,6 +342,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="wwwroot\hood\css\" />
   </ItemGroup> 
     
 </Project>
