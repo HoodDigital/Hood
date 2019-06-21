@@ -100,6 +100,7 @@ namespace Hood.Extensions
             services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IHoodCache, HoodCache>();
+            services.AddSingleton<IPageBuilder, PageBuilder>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
             services.AddSingleton<ForumCategoryCache>();

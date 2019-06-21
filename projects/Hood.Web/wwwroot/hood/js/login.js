@@ -11,11 +11,7 @@ $.backstretch([
   "/hood/images/bg/6.jpg",
   "/hood/images/bg/7.jpg",
   "/hood/images/bg/8.jpg",
-  "/hood/images/bg/9.jpg",
-  "/hood/images/bg/10.jpg",
-  "/hood/images/bg/11.jpg",
-  "/hood/images/bg/12.jpg",
-  "/hood/images/bg/13.jpg"
+  "/hood/images/bg/9.jpg"
 ], {
     fade: 1000,
     duration: 3000

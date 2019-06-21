@@ -1,0 +1,12 @@
+﻿body {
+    .toasts {
+        position: relative;
+        min-height: 200px;
+
+        > div {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    }
+}

@@ -1,5 +1,19 @@
 @import "../../lib/bootstrap/scss/bootstrap.scss";
 @import "../../lib/fontawesome/scss/fontawesome.scss";
 
-@import "admin/variables.scss";
-@import "admin/base.scss"; 
+@import "core/floating-label";
+@import "core/validation-summary";
+@import "core/toasts";
+
+@import "admin/variables";
+@import "admin/base";
+@import "admin/breadcrumb";
+@import "admin/editor";
+@import "admin/footer";
+@import "admin/layout";
+@import "admin/media";
+@import "admin/page-heading";
+@import "admin/panels";
+@import "admin/right-sidebar";
+@import "admin/top-bar";
+@import "admin/widgets";

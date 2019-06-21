@@ -79,7 +79,7 @@ gulp.task('js', function () {
         console.log(e);
         l.end();
     });
-    return gulp.src([hood.js + '**/*.js', '!' + hood.js + '**/*.min.js'], { base: hood.js })
+    return gulp.src([hood.js + '**/*.js', '!' + hood.js + '**/*.min.js', '!' + hood.js + '**/*.packaged.js'], { base: hood.js })
         .pipe(gulp.dest(output.js))
         .pipe(l)
         .pipe(rename({ suffix: '.min' }))
