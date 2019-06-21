@@ -20,26 +20,18 @@ var gulp = require('gulp'),
         images: './wwwroot/hood/images/'
     },
     output = {
-        src: './../../src/',
-        dist: './../../dist/',
-        srcJs: './../../src/js/',
-        distJs: './../../dist/js/',
-        srcCss: './../../src/css/',
-        distCss: './../../dist/css/',
-        scss: './../../src/scss/',
+        js: './../../js/',
+        css: './../../css/',
+        scss: './../../scss/',
         images: './../../images/'
     };
 
 // Cleans all dist/src/images output folders, as well as the hood folders.
 gulp.task('clean', function (cb) {
     return gulp.src([
-        output.src,
-        output.dist,
-        output.srcCss,
-        output.distCss,
+        output.css,
         output.scss,
-        output.distJs,
-        output.srcJs,
+        output.js,
         output.images,
         hood.css
     ], { read: false, allowEmpty: true })
@@ -57,13 +49,12 @@ gulp.task('scss', function () {
 
 gulp.task('scss:copy', function () {
     return gulp.src(hood.scss + "**/*.scss")
-        .pipe(gulp.dest(demo.scss))
         .pipe(gulp.dest(output.scss));
 });
 
 gulp.task('cssnano', function () {
     return gulp.src([hood.css + '**/*.css', '!' + hood.css + '**/*.min.css'])
-        .pipe(gulp.dest(output.srcCss))
+        .pipe(gulp.dest(output.css))
         .pipe(cssnano({
             discardComments: {
                 removeAll: true
@@ -71,7 +62,7 @@ gulp.task('cssnano', function () {
         }))
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(hood.css))
-        .pipe(gulp.dest(output.distCss));
+        .pipe(gulp.dest(output.css));
 });
 
 // Copies any image files from the images directories to the distribution images directory.
@@ -89,11 +80,11 @@ gulp.task('js', function () {
         l.end();
     });
     return gulp.src([hood.js + '**/*.js', '!' + hood.js + '**/*.min.js'], { base: hood.js })
-        .pipe(gulp.dest(output.srcJs))
+        .pipe(gulp.dest(output.js))
         .pipe(l)
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest(hood.js))
-        .pipe(gulp.dest(output.distJs));
+        .pipe(gulp.dest(output.js));
 });
 
 // Bundle the app into the packaged form and copies the output to the output directories.
@@ -121,7 +112,8 @@ gulp.task('js:package:app', function () {
     ], { base: '.' })
         .pipe(concat('app.packaged.js'))
         .pipe(l)
-        .pipe(gulp.dest(output.distJs));
+        .pipe(gulp.dest(hood.js))
+        .pipe(gulp.dest(output.js));
 });
 
 // Package the login javascript and copy the output to the output directories.
@@ -138,7 +130,8 @@ gulp.task('js:package:login', function () {
     ], { base: '.' })
         .pipe(concat('login.packaged.js'))
         .pipe(l)
-        .pipe(gulp.dest(output.distJs));
+        .pipe(gulp.dest(hood.js))
+        .pipe(gulp.dest(output.js));
 });
 
 // Package the admin Javascript and copy the output to the output directories.
@@ -177,7 +170,8 @@ gulp.task('js:package:admin', function () {
     ], { base: '.' })
         .pipe(concat('admin.packaged.js'))
         .pipe(l)
-        .pipe(gulp.dest(output.distJs));
+        .pipe(gulp.dest(hood.js))
+        .pipe(gulp.dest(output.js));
 });
 
 gulp.task('package', gulp.series('js:package:admin', 'js:package:app', 'js:package:login'));
