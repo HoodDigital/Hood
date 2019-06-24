@@ -1,13 +1,9 @@
 ﻿.right-column {
-    padding: @panel-body-padding;
+    padding: $grid-gutter-width / 2;
     border: 0;
-    background-color: @gray-lighter;
-    margin-bottom: @grid-gutter-width;
-    border-radius: @border-radius-base;
-
-    .editor-box {
-        padding-bottom: @panel-body-padding;
-    }
+    background-color: $gray-200;
+    margin-bottom: $grid-gutter-width;
+    border-radius: $border-radius;
 }
 
 .twitter-typeahead {
@@ -34,7 +30,7 @@
 }
 
 .category-list {
-    padding: 5px @panel-body-padding;
+    padding: 5px $grid-gutter-width / 2;
     max-height: 170px;
     overflow-y: auto;
     margin: -15px;

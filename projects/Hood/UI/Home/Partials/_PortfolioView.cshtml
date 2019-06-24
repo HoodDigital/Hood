@@ -10,7 +10,7 @@
         <div class="blog-post mb-30">
             @if (Model.Content.Author != null)
             {
-                <div class="post-meta"><span>by <a href="@Url.Action("Author", "News", new { author = Model.Content.Author.UserName.ToLower() })">@Model.Content.Author.FullName</a>,</span> posted on <span>@Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span></div>
+                <div class="post-meta"><span>by <a href="@Url.Action("Author", "News", new { author = Model.Content.Author.UserName.ToLower() })">@Model.Content.Author.ToDisplayName()</a>,</span> posted on <span>@Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span></div>
             }
             <div class="post-header">
                 <h2>@Model.Content.Title</h2>

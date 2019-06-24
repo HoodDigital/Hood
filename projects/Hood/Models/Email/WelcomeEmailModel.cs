@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Hood.Core;
 using SendGrid.Helpers.Mail;
 using System.Collections.Generic;
+using Hood.Interfaces;
 
 namespace Hood.Models
 {
@@ -25,7 +26,7 @@ namespace Hood.Models
         {
             get
             {
-                return new EmailAddress(User.Email, User.FullName);
+                return new EmailAddress(User.Email, User.ToFullName());
             }
         }
 

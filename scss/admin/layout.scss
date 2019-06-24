@@ -117,7 +117,7 @@ body {
 
                 &.landing-link {
                     a {
-                        background: $brand-success;
+                        background: $success;
                         color: white;
 
                         i {
@@ -125,7 +125,7 @@ body {
                         }
 
                         &:hover {
-                            background: darken($brand-success, 10%);
+                            background: darken($success, 10%);
                         }
                     }
                 }
@@ -255,7 +255,7 @@ body {
             .panel-body {
                 padding: $grid-gutter-width * 2;
                 background-color: white;
-                border-radius: $border-radius-base;
+                border-radius: $border-radius;
                 margin-bottom: $grid-gutter-width;
 
                 > h4:first-child {

@@ -1,86 +1,47 @@
-@using System.Collections.Generic
-@using Microsoft.AspNetCore.Http
-@using Microsoft.AspNetCore.Http.Authentication
 @model FinishAccountSetupModel
 @inject SignInManager<ApplicationUser> SignInManager
-
-@inject IContentRepository _content
 @{
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
-    SeoSettings _seoSettings = _settings.GetSeo();
-    string description = "Finish account setup - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-    string title = "Finish account setup - " + _basicSettings.CompanyName;
-    if (_seoSettings.Login != null)
-    {
-        description = _seoSettings.SignUp.Description.IsSet() ? _seoSettings.SignUp.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Finish account setup - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-        title = _seoSettings.SignUp.Title.IsSet() ? _seoSettings.SignUp.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Finish account setup - " + _basicSettings.CompanyName;
-    }
-    ViewData["Title"] = title;
+    ViewData["Title"] = "Finish account setup";
     Layout = "_LoginLayout";
 }
-@section metas {
-    <meta name="description" content="@description" />
-    <meta property="og:author" content="@_seoSettings.OgAuthor" />
-    <meta property="og:title" content="@title" />
-    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
-    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
-    <meta property="og:description" content="@description" />
-    <meta name="twitter:title" content="@title" />
-    <meta name="twitter:description" content="@description" />
-    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
-}
-<div class="login-block-header">
-    <h2>@ViewData["Title"]</h2>
+<div class="header">
+    <h2>Finish account setup</h2>
     <p>Great, your email address has been validated, now let's create you a username and password to access the site.</p>
 </div>
 <form method="post">
     <div asp-validation-summary="All" class="validation-summary"></div>
     <input asp-for="UserId" type="hidden" />
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" placeholder="Your first name" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="FirstName" class="form-control" placeholder="First name" />
+            <label asp-for="FirstName"></label>
         </div>
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" placeholder="Your last name" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
+    </div>
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="LastName" class="form-control" placeholder="Last name" />
+            <label asp-for="LastName"></label>
         </div>
     </div>
     <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
     <input type="password" name="password_fake" id="password_fake" value="" style="display:none;" />
     <div class="form-group">
-        <label asp-for="Username" class="control-label"></label>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-user"></i></span>
-            <input asp-for="Username" class="form-control" placeholder="Choose a username" />
+        <div class="floating-label">
+            <input asp-for="Username" class="form-control" placeholder="User name" />
+            <label asp-for="Username"></label>
         </div>
-        <span asp-validation-for="Username" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Password" class="control-label"></label>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-hashtag"></i></span>
-            <input asp-for="Password" class="form-control" placeholder="Choose a password" autocomplete="new-password" />
+        <div class="floating-label">
+            <input asp-for="Password" class="form-control" placeholder="Password" />
+            <label asp-for="Password"></label>
         </div>
-        <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="ConfirmPassword" class="control-label"></label>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-hashtag"></i></span>
+        <div class="floating-label">
             <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
-        </div>
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
-    <div class="row">
-        <div class="col-xs-12 text-center">
-            <p><button type="submit" class="btn btn-block">Finish account setup</button></p>
+            <label asp-for="ConfirmPassword"></label>
         </div>
     </div>
+    <p><button type="submit" class="btn btn-block">Finish account setup</button></p>
 </form>

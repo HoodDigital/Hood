@@ -35,7 +35,7 @@ body {
         }
 
         .sidebar-title {
-            background-color: $brand-info;
+            background-color: $info;
             padding: 15px 0px 15px 25px;
 
             button.close {
@@ -55,7 +55,7 @@ body {
             }
 
             &.create, &.image {
-                background-color: $brand-success;
+                background-color: $success;
             }
 
             &.image {

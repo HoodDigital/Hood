@@ -68,7 +68,7 @@
 }
 @section metas {
     <meta name="description" content="@metaDesc" />
-    <meta property="og:author" content="@Model.Content.Author.FullName" />
+    <meta property="og:author" content="@Model.Content.Author.ToDisplayName()" />
     <meta property="og:title" content="@metaTitle" />
     @if (Model.Content.ShareImage.DownloadUrl.IsSet())
     {
@@ -128,40 +128,5 @@ else
         default:
             await Html.RenderPartialAsync("_NewsView");
             break;
-    }
-}
-@if (Model.EditMode && (User.IsInRole("Admin") || User.IsInRole("Editor")))
-{
-    await Html.RenderPartialAsync("_DesignerBar");
-    @section styles {
-        <environment names="Development,Staging,ErrorTesting">
-            <link rel="stylesheet" href="~/lib/dragula/dist/dragula.css" />
-            <link rel="stylesheet" href="~/lib/hood/src/css/designer.css" />
-        </environment>
-        <environment names="Production,PreProduction">
-            <link rel="stylesheet" href="~/lib/dragula/dist/dragula.min.css" />
-            <link rel="stylesheet" href="~/lib/hood/dist/css/designer.min.css" />
-        </environment>
-    }
-    @section scripts {
-        <script src="~/lib/dragula/dist/dragula.min.js"></script>
-        <script src="~/lib/dropzone/dist/min/dropzone.min.js"></script>
-        <script src="~/lib/tinymce/tinymce.min.js"></script>
-        <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
-        <script src="~/lib/kendo-ui-core/js/kendo.ui.core.min.js"></script>
-        <environment names="Development,Staging,ErrorTesting">
-            <script src="~/lib/hood/src/js/includes/datalist.js"></script>
-            <script src="~/lib/hood/src/js/includes/pager.js"></script>
-            <script src="~/lib/hood/src/js/includes/uploader.js"></script>
-            <script src="~/lib/hood/src/js/includes/media.js"></script>
-            <script src="~/lib/hood/src/js/includes/designer.js"></script>
-        </environment>
-        <environment names="Production,PreProduction">
-            <script src="~/lib/hood/dist/js/includes/datalist.min.js"></script>
-            <script src="~/lib/hood/dist/js/includes/pager.min.js"></script>
-            <script src="~/lib/hood/dist/js/includes/uploader.min.js"></script>
-            <script src="~/lib/hood/dist/js/includes/media.min.js"></script>
-            <script src="~/lib/hood/dist/js/includes/designer.min.js"></script>
-        </environment>
     }
 }

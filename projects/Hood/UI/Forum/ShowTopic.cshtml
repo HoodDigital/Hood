@@ -25,10 +25,8 @@
                    User.IsInRole("Moderator")
                );
 }
-@section includes {
-    <script src="~/lib/tinymce/tinymce.min.js"></script>
-    <script src="~/lib/tinymce/themes/inlite/theme.min.js"></script>
-}
+<script src="~/lib/tinymce/tinymce.min.js" asp-location="BeforeScripts"></script>
+<script src="~/lib/tinymce/themes/inlite/theme.min.js" asp-location="BeforeScripts"></script>
 @section metas {
     <meta name="description" content="@Model.Topic.Forum.Description" />
     <meta property="og:author" content="@Model.Topic.Author.DisplayName" />
@@ -105,7 +103,7 @@
                 </div>
             }
             <p class="stats">
-                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.FullName</span>
+                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Topic.Author.ToDisplayName()</span>
                 <span><i class="fa fa-clock-o m-r-xs"></i> @Model.Topic.CreatedOn.ToHumaneDate()</span>
             </p>
             @if (moderator)

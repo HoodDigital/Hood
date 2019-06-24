@@ -7,6 +7,7 @@ using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Hood.Models;
 using System.Linq;
+using Hood.Interfaces;
 
 namespace Hood.Services
 {
@@ -111,7 +112,7 @@ namespace Hood.Services
         public async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
-            var emails = users.Select(u => new EmailAddress(u.Email, u.FullName)).ToArray();
+            var emails = users.Select(u => new EmailAddress(u.Email, u.ToFullName())).ToArray();
             return await SendEmailAsync(emails, subject, htmlContent, textContent);
         }
     }

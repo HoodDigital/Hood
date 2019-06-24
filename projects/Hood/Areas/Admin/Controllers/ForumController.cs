@@ -113,8 +113,8 @@ namespace Hood.Areas.Admin.Controllers
                 if (author != null)
                 {
                     model.AuthorId = author.Id;
-                    model.AuthorDisplayName = author.FullName;
-                    model.AuthorName = author.FullName;
+                    model.AuthorDisplayName = author.ToDisplayName();
+                    model.AuthorName = author.ToFullName();
                 }
 
                 if (model.Slug.IsSet())
@@ -177,8 +177,8 @@ namespace Hood.Areas.Admin.Controllers
                     model.Slug = generator.UrlSlug();
 
                 model.AuthorId = user.Id;
-                model.AuthorDisplayName = user.FullName;
-                model.AuthorName = user.FullName;
+                model.AuthorDisplayName = user.ToDisplayName();
+                model.AuthorName = user.ToFullName();
 
                 var roles = await _userManager.GetRolesAsync(user);
                 model.AuthorRoles = string.Join(",", roles);

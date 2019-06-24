@@ -21,6 +21,9 @@
     }
     @RenderSection("metas", required: false)
 
+    @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)
+
     @if (_settings.GetBasicSettings().EnablePreload)
     {
         <partial name="_DeferredStyles" />
@@ -30,6 +33,9 @@
         <partial name="_Styles" />
     }
     @RenderSection("styles", required: false)
+
+    @Html.RenderScripts(Url, ResourceLocation.AfterCss)
+    @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
     @Html.Raw(_seoSettings.HeadTags)
 
@@ -67,8 +73,6 @@
     @RenderSection("includes", required: false)
 
     <partial name="_Scripts" />
-
-    @RenderSection("scripts", required: false)
 
     @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seoSettings.GoogleAnalytics)

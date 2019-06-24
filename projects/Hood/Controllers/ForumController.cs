@@ -1,6 +1,7 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -155,8 +156,8 @@ namespace Hood.Controllers
                 }
                 var user = await _userManager.GetUserAsync(User);
                 model.Topic.AuthorId = user.Id;
-                model.Topic.AuthorDisplayName = user.FullName;
-                model.Topic.AuthorName = user.UserName;
+                model.Topic.AuthorDisplayName = user.ToDisplayName();
+                model.Topic.AuthorName = user.ToFullName();
                 model.Topic.ForumId = model.Forum.Id;
                 model.Topic.CreatedOn = DateTime.Now;
 
@@ -299,13 +300,13 @@ namespace Hood.Controllers
                 model.Topic.Forum.LastPostId = model.Post.Id;
                 model.Topic.Forum.LastUserId = user.Id;
                 model.Topic.Forum.LastUserName = user.UserName;
-                model.Topic.Forum.LastUserDisplayName = user.FullName;
+                model.Topic.Forum.LastUserDisplayName = user.ToDisplayName();
 
                 model.Topic.LastPosted = DateTime.Now;
                 model.Topic.LastPostId = model.Post.Id;
                 model.Topic.LastUserId = user.Id;
                 model.Topic.LastUserName = user.UserName;
-                model.Topic.LastUserDisplayName = user.FullName;
+                model.Topic.LastUserDisplayName = user.ToDisplayName();
 
                 model.Topic.Forum.NumTopics = await _db.Topics.CountAsync(f => f.ForumId == model.Topic.ForumId);
                 model.Topic.Forum.NumPosts = await _db.Posts.CountAsync(f => f.Topic.ForumId == model.Topic.ForumId);

@@ -6,14 +6,7 @@
 @section buttons {
     <a class="btn btn-sm btn-primary" asp-action="Manage" asp-controller="Property" asp-area="Admin"><i class="fa fa-list-ol m-r-sm"></i>Back to List</a>
 }
-@section scripts {
-    <environment names="Development,Staging,ErrorTesting">
-        <script src="~/lib/hood/src/js/includes/import.property.js"></script>
-    </environment>
-    <environment names="Production,PreProduction">
-        <script src="~/lib/hood/dist/js/includes/import.property.min.js"></script>
-    </environment>
-}
+<script src="~/hood/js/includes/import.property.js" asp-location="AfterScripts"></script>
 <div class="panel-body">
     <h4 class="font-bold">
         <span>Update from FTP Service</span>

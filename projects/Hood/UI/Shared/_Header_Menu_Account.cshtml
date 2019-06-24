@@ -62,7 +62,7 @@
     <div class="col-sm-3 text-right">
         <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs sidebar-avatar @string.Format("avatar-{0}", Model.User.Id)" />
         <p class="m-t-xs">
-            Logged in as <strong class="font-bold">@Model.User.FullName</strong><br />
+            Logged in as <strong class="font-bold">@Model.User.ToDisplayName()</strong><br />
             <a href="javascript:document.getElementById('logoutForm').submit()">
                 Log out
             </a>

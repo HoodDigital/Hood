@@ -10,7 +10,7 @@
         <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-sm img-rounded center-block m-sm m-t-lg @Model.User.Id" id="user-edit-avatar" />
         <div class="m-b-md text-center">
             <h3 class="font-bold no-margins text-white">
-                <span>@Model.User.FullName</span>
+                <span>@Model.User.ToFullName()</span>
             </h3>
             <small><span>@Model.User.JobTitle</span> at <span>@Model.User.CompanyName</span></small>
         </div>

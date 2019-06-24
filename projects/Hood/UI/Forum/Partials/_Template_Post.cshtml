@@ -22,7 +22,7 @@
                     @if (Model.Edited && Model.EditedTime.HasValue)
                     {
                         <p class="stats">
-                            <span><i class="fa fa-pencil m-r-xs"></i> This was last edited @Model.EditedTime.Value.ToHumaneDate() by @Model.EditedBy.FullName</span>
+                            <span><i class="fa fa-pencil m-r-xs"></i> This was last edited @Model.EditedTime.Value.ToHumaneDate() by @Model.EditedBy.ToDisplayName()</span>
                         </p>
                     }
                 </div>
@@ -67,7 +67,7 @@
         }
     </p>
     <p class="stats">
-        <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Author.FullName</span>
+        <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Author.ToDisplayName()</span>
         <span><i class="fa fa-clock-o m-r-xs"></i> @Model.PostedTime.ToHumaneDate()</span>
     </p>
 </div>

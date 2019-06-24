@@ -1,8 +1,10 @@
 @{
     ViewData["Title"] = "Access denied";
+    Layout = "_LoginLayout";
 }
-
-<header>
-    <h2 class="text-danger">ViewData["Title"]</h2>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="header">
+    <h2 class="text-danger">Access Denied</h2>
+    <div class="alert alert-danger">
+        You do not have permission to access this.
+    </div>
+</div>

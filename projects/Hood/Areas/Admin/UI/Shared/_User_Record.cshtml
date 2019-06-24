@@ -6,7 +6,7 @@
                 <fixedImage src="@Model.Avatar?.SmallUrl" class="img-xs pull-left m-r-sm" />
             </div>
             <div class="media-body">
-                <a class="forum-item-title" href="/admin/users/edit/@Model.Id">@Model.UserName <small>@Model.FullName</small></a>
+                <a class="forum-item-title" href="/admin/users/edit/@Model.Id">@Model.UserName <small>@Model.ToFullName()</small></a>
                 <small>Last logged in from <strong>@Model.LastLoginLocation</strong> <i class="fa fa-clock-o"></i> @Model.LastLogOn.ToDisplay()</small>
             </div>
         </div>

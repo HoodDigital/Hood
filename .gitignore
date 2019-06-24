@@ -245,7 +245,11 @@ ModelManifest.xml
 /bower_components
 
 # Ignore the local dev's Views, the view directory in the demo project is for dev purposes only. 
- -/projects/Hood.Web/Areas/
- -/projects/Hood.Web/Areas/*
- -/projects/Hood.Web/Views
- -/projects/Hood.Web/Views/*
+/projects/Hood.Web/Areas/
+/projects/Hood.Web/Areas/*
+/projects/Hood.Web/Views
+/projects/Hood.Web/Views/*
+/projects/Hood.Web/UI
+/projects/Hood.Web/UI/*
+/projects/Hood.Web/Areas/Admin/UI
+/projects/Hood.Web/Areas/Admin/UI/*

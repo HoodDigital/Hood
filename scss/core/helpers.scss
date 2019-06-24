@@ -1,0 +1,27 @@
+.tiny-mce-body {
+    padding: 15px;
+}
+
+.no-wrap {
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.word-wrap, .pre-line, .user-text {
+    white-space: pre-line;
+}
+
+a.full-box-link {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-indent: -10000px;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1;
+}

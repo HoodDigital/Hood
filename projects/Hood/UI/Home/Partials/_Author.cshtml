@@ -4,11 +4,11 @@
 }
 <div class="media">
     <div class="media-left">
-        <fixedImage src="@Model.Content.Author.Avatar.SmallUrl" class="img-xs m-r-sm content-feature-@Model.Content.Id" alt="@Model.Content.Author.FullName" />
+        <fixedImage src="@Model.Content.Author.Avatar.SmallUrl" class="img-xs m-r-sm content-feature-@Model.Content.Id" alt="@Model.Content.Author.ToDisplayName()" />
     </div>
     <div class="media-body media-middle">
         <h6>
-            @Model.Content.Author.FullName
+            @Model.Content.Author.ToDisplayName()
             @if (!string.IsNullOrEmpty(Model.Content.Author.JobTitle))
             {
                 <small>

@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public partial class ApplicationUser : IdentityUser, ISaveableModel, IUserProfile
+    public partial class ApplicationUser : IdentityUser, ISaveableModel, IUserProfile, IName
     {
         [Display(Name = "First name")]
         public string FirstName { get; set; }
@@ -46,7 +46,7 @@ namespace Hood.Models
 
         public string ReplacePlaceholders(string msg)
         {
-            return msg.Replace("{USERNAME}", UserName).Replace("{USEREMAIL}", Email).Replace("{FULLNAME}", FullName).Replace("{FIRSTNAME}", FirstName).Replace("{LASTNAME}", LastName);
+            return msg.Replace("{USERNAME}", UserName).Replace("{USEREMAIL}", Email).Replace("{FULLNAME}", this.ToFullName()).Replace("{FIRSTNAME}", FirstName).Replace("{LASTNAME}", LastName);
         }
 
         [Display(Name = "Job Title")]
@@ -95,23 +95,7 @@ namespace Hood.Models
         public string DeliveryAddressJson { get; set; }
 
         [NotMapped]
-        public string FullName
-        {
-            get
-            {
-                if (Anonymous)
-                    return "Anonymous";
-                if (DisplayName.IsSet())
-                    return DisplayName;
-                if (FirstName.IsSet() && LastName.IsSet())
-                    return FirstName + " " + LastName;
-                else if (FirstName.IsSet() && !LastName.IsSet())
-                    return FirstName;
-                else if (!FirstName.IsSet() && LastName.IsSet())
-                    return LastName;
-                else return UserName;
-            }
-        }
+        public string FullName { get => this.ToFullName(); set { } }
 
         public List<Address> Addresses { get; set; }
 

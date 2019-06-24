@@ -14,7 +14,7 @@
                         @{ await Html.RenderPartialAsync("_FeaturedMedia", content); }
                         <h3><a href="@content.Url">@content.Title</a></h3>
                         <p>
-                            <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">@content.Author.FullName</a></span>
+                            <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">@content.Author.ToDisplayName()</a></span>
                             <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
                         </p>
                         <p>@content.Excerpt</p>

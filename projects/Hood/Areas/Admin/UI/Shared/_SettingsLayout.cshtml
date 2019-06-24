@@ -4,7 +4,9 @@
 }
 @section buttons {
     @RenderSection("buttons", required: false)
-    <a href="javascript:document.getElementById('settings-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
+    <a href="javascript:document.getElementById('settings-form').submit()" class="btn btn-success">
+        <i class="fa fa-save"></i> Save
+    </a>
 }
 @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType)
 @RenderSection("alerts", required: false)

@@ -1,6 +1,8 @@
 @import "../../lib/bootstrap/scss/bootstrap.scss";
 @import "../../lib/fontawesome/scss/fontawesome.scss";
 
+@import "core/mixins";
+@import "core/helpers";
 @import "core/floating-label";
 @import "core/validation-summary";
 @import "core/toasts";

@@ -70,54 +70,84 @@
             position: relative;
         }
 
-
-        &.custom {
-            background-color: #1ea69a;
-            border-color: #1ea69a;
+        &.primary {
+            background-color: $primary;
+            border-color: $primary;
         }
 
-        &.primary {
-            background-color: $brand-primary;
-            border-color: $brand-primary;
+        &.secondary {
+            background-color: $secondary;
+            border-color: $secondary;
         }
 
         &.success {
-            background-color: $brand-success;
-            border-color: $brand-success;
+            background-color: $success;
+            border-color: $success;
         }
 
         &.warning {
-            background-color: $brand-warning;
-            border-color: $brand-warning;
+            background-color: $warning;
+            border-color: $warning;
         }
 
         &.info {
-            background-color: $brand-info;
-            border-color: $brand-info;
+            background-color: $info;
+            border-color: $info;
         }
 
         &.danger {
-            background-color: $brand-danger;
-            border-color: $brand-danger;
+            background-color: $danger;
+            border-color: $danger;
         }
 
         &.inverse {
-            background-color: $hood-dark;
-            border-color: $hood-dark;
+            background-color: $blue;
+            border-color: $blue;
         }
 
         &.purple {
-            background-color: #8892d6;
-            border-color: #8892d6;
+            background-color: $purple;
+            border-color: $purple;
         }
 
         &.pink {
-            background-color: #F06292;
-            border-color: #F06292;
+            background-color: $pink;
+            border-color: $pink;
+        }
+
+        &.red {
+            background-color: $red;
+            border-color: $red;
+        }
+
+        &.orange {
+            background-color: $orange;
+            border-color: $orange;
+        }
+
+        &.yellow {
+            background-color: $yellow;
+            border-color: $yellow;
+        }
+
+        &.green {
+            background-color: $green;
+            border-color: $green;
+        }
+
+        &.cyan {
+            background-color: $cyan;
+            border-color: $cyan;
+        }
+
+        &.grey {
+            background-color: $gray-600;
+            border-color: $gray-600;
         }
 
         &.default {
-            background-color: #ffffff;
+            background-color: white;
+            border-color: white;
         }
 
         &.default .icon {

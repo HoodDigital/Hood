@@ -29,7 +29,7 @@
 }
 @section metas {
     <meta name="description" content="@Model.Property.ShortDescription" />
-    <meta property="og:author" content="@Model.Property.Agent.FullName" />
+    <meta property="og:author" content="@Model.Property.Agent.ToDisplayName()" />
     <meta property="og:title" content="@Model.Property.Title - @_basicSettings.SiteTitle" />
     @if (Model.Property.FeaturedImage.DownloadUrl.IsSet())
     {

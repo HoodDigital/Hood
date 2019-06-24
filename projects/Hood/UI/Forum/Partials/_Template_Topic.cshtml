@@ -9,7 +9,7 @@
             <h5>@Model.Title</h5>
             <p class="stats">
                 <span class="m-r-sm"><i class="fa fa-paper-plane m-r-xs"></i> <strong>@Model.NumPosts</strong> posts.</span>
-                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Author.FullName</span>
+                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Author.ToDisplayName()</span>
                 <span><i class="fa fa-clock-o m-r-xs"></i> @Model.CreatedOn.ToHumaneDate()</span>
             </p>
         </div>

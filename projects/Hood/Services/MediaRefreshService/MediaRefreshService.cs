@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Hood.Core;
+using Hood.Interfaces;
 
 namespace Hood.Services
 {
@@ -193,7 +194,7 @@ namespace Hood.Services
                     if (user.Avatar != null)
                     {
                         user.Avatar = _db.Media.Find(user.Avatar.Id);
-                        StatusMessage = string.Format("Refreshing user avatar: {0} {1}", user.Id, user.FullName);
+                        StatusMessage = string.Format("Refreshing user avatar: {0} {1}", user.Id, user.ToFullName());
                     }
                 }
                 await _db.SaveChangesAsync();

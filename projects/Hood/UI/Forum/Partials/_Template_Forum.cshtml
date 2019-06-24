@@ -25,7 +25,7 @@
             <p class="stats">
                 <span class="m-r-sm"><i class="fa fa-comments m-r-xs"></i> <strong>@Model.NumTopics</strong> discussions.</span>
                 <span class="m-r-sm"><i class="fa fa-paper-plane m-r-xs"></i> <strong>@Model.NumPosts</strong> posts.</span>
-                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> Created by <strong>@Model.Author.FullName</strong></span>
+                <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> Created by <strong>@Model.Author.ToDisplayName()</strong></span>
             </p>
         </div>
         <div class="col-md-4">
