@@ -22,8 +22,4 @@
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
   
-  <ItemGroup>
-    <Folder Include="wwwroot\hood\scss\mixins\" />
-  </ItemGroup>
-      
 </Project>

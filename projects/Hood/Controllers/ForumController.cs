@@ -283,7 +283,7 @@ namespace Hood.Controllers
                 model.Post.Signature = user.ForumSignature;
                 model.Post.PostedTime = DateTime.Now;
                 model.Post.AuthorIp = HttpContext.Connection.RemoteIpAddress.ToString();
-                model.Post.AuthorDisplayName = user.FullName;
+                model.Post.AuthorDisplayName = user.ToFullName();
 
                 if (model.Topic.Forum.RequireTopicModeration)
                     model.Post.Approved = false;
