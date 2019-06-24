@@ -6,6 +6,5 @@ namespace Hood.Interfaces
     {
         AlertType MessageType { get; set; }
         string SaveMessage { get; set; }
-        int? MessageId { get; set; }
     }
 }

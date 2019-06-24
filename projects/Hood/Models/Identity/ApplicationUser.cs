@@ -95,7 +95,7 @@ namespace Hood.Models
         public string DeliveryAddressJson { get; set; }
 
         [NotMapped]
-        public string FullName { get => this.ToFullName(); set { } }
+        public string FullName { get; set; }
 
         public List<Address> Addresses { get; set; }
 
@@ -112,25 +112,34 @@ namespace Hood.Models
             get { return BillingAddressJson.IsSet() ? JsonConvert.DeserializeObject<Address>(BillingAddressJson) : null; }
             set { BillingAddressJson = JsonConvert.SerializeObject(value); }
         }
-
+        [JsonIgnore]
         public List<UserAccessCode> AccessCodes { get; set; }
+        [JsonIgnore]
         public List<ApiKey> ApiKeys { get; set; }
+        [JsonIgnore]
         public List<Content> Content { get; set; }
+        [JsonIgnore]
         public List<Forum> Forums { get; set; }
+        [JsonIgnore]
         public List<Topic> Topics { get; set; }
+        [JsonIgnore]
         public List<PropertyListing> Properties { get; set; }
+        [JsonIgnore]
         public List<UserSubscription> Subscriptions { get; set; }
 
+        [JsonIgnore]
         public List<Post> Posts { get; set; }
+        [JsonIgnore]
         public List<Post> EditedPosts { get; set; }
+        [JsonIgnore]
         public List<Post> DeletedPosts { get; set; }
 
         [NotMapped]
+        [JsonIgnore]
         public AlertType MessageType { get; set; }
         [NotMapped]
+        [JsonIgnore]
         public string SaveMessage { get; set; }
-        [NotMapped]
-        public int? MessageId { get; set; }
 
         public void SetProfile(IUserProfile profile)
         {
@@ -185,29 +194,5 @@ namespace Hood.Models
             }
             return null;
         }
-    }
-
-    public partial class UserInfo
-    {
-        public UserInfo(ApplicationUser applicationUser)
-        {
-            Username = applicationUser.UserName;
-            Email = applicationUser.Email;
-            DisplayName = applicationUser.DisplayName;
-            Avatar = applicationUser.Avatar;
-            Id = applicationUser.Id;
-        }
-
-        public string Id { get; set; }
-
-        public string Username { get; set; }
-
-        public string Email { get; set; }
-
-        [Display(Name = "Display name")]
-        public string DisplayName { get; set; }
-
-        [JsonConverter(typeof(MediaObjectJsonConverter))]
-        public IMediaObject Avatar { get; set; }
     }
 }

@@ -8,7 +8,6 @@ namespace Hood.Models
     {
         public IList<string> Roles { get; set; }
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
         public List<UserSubscription> ActiveSubscriptions { get; set; }
 

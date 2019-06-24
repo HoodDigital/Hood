@@ -18,7 +18,6 @@ namespace Hood.Models
 
         public EmailAddress From { get; set; } = null;
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
         public string LoginLink { get; }
 

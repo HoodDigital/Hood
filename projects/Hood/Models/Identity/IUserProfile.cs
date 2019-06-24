@@ -2,6 +2,9 @@
 
 namespace Hood.Models
 {
+    /// <summary>
+    /// REMOVE THIS COMPLETELY - ADD EDITORS FOR CUSTOM VARS THAT CAN BE ADDED TO FRONTPAGES.
+    /// </summary>
     public interface IUserProfile
     {
         string Bio { get; set; }

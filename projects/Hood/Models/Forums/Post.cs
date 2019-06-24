@@ -27,7 +27,6 @@ namespace Hood.Models
 
         // Author
         public string AuthorId { get; set; }
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Author { get; set; }
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
@@ -51,7 +50,6 @@ namespace Hood.Models
         public DateTime? EditedTime { get; set; }
         public string EditedById { get; set; }
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser EditedBy { get; set; }
 
         public bool Deleted { get; set; }
@@ -59,7 +57,6 @@ namespace Hood.Models
         public DateTime? DeletedTime { get; set; }
         public string DeletedById { get; set; }
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser DeletedBy { get; set; }
 
         [NotMapped]

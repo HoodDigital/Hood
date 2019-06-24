@@ -588,7 +588,7 @@ namespace Hood.Controllers
                 {
                     message.AddParagraph(string.Format("Username - <strong>{0}</strong>", reporter.UserName));
                     message.AddParagraph(string.Format("Email - <strong>{0}</strong>", reporter.Email));
-                    message.AddParagraph(string.Format("Display Name - <strong>{0}</strong>", reporter.DisplayName));
+                    message.AddParagraph(string.Format("Display Name - <strong>{0}</strong>", reporter.ToDisplayName()));
                     message.AddParagraph(string.Format("IP Address - <strong>{0}</strong>", HttpContext.Connection.RemoteIpAddress.ToString()));
                 }
                 message.AddDiv("<hr /><br />");

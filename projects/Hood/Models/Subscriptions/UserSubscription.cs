@@ -28,7 +28,6 @@ namespace Hood.Models
 
         public string UserId { get; set; }
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
 
         public int SubscriptionId { get; set; }
