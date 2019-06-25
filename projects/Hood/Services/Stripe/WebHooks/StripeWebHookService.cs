@@ -73,15 +73,15 @@ namespace Hood.Services
 
                 if (!_env.IsProduction())
                 {
-                    _logService.AddLogAsync("Stripe webhook processed.", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { Event = stripeEvent }), Models.LogType.Success, null, null, nameof(StripeWebHookService), null);
+                    _logService.AddLogAsync<StripeWebHookService>("Stripe webhook processed.", JsonConvert.SerializeObject(new { Event = stripeEvent }), Models.LogType.Success);
                 }
 
                 // Fire the event to allow any other packages to process the webhook.
-                _eventService.triggerStripeWebhook(this, args);
+                _eventService.TriggerStripeWebhook(this, args);
             }
             catch (Exception ex)
             {
-                _logService.AddLogAsync("An error occurred processing a stripe webhook.", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { Message = ex.Message, Event = stripeEvent, Exception = ex }), Models.LogType.Error, null, null, nameof(StripeWebHookService), null);
+                _logService.AddLogAsync<StripeWebHookService>("An error occurred processing a stripe webhook.", new { Message = ex.Message, Event = stripeEvent, Exception = ex }, Models.LogType.Error);
 
                 _mailObject.PreHeader = "An error occurred processing a stripe webhook.";
                 _mailObject.Subject = _mailObject.PreHeader;
@@ -489,11 +489,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         public void UnhandledWebHook(Stripe.Event stripeEvent)
         {
-            if (!_env.IsProduction())
-            {
-                _logService.AddLogAsync("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName(), Models.LogSource.Subscriptions, JsonConvert.SerializeObject(stripeEvent), Models.LogType.Info, null, null, nameof(Stripe.Event), null);
-            }
-
+            _logService.AddLogAsync<StripeWebHookService>("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName(), stripeEvent, LogType.Warning);
             _mailObject.AddParagraph("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName());
         }
     }

@@ -31,9 +31,14 @@ namespace Hood.Areas.Admin.Controllers
             var logs = _db.Logs
                 .Include(l => l.User).Where(l => l.Time > DateTime.MinValue);
 
-            if (model.EntityId.IsSet())
+            if (model.Source.IsSet())
             {
-                //logs = logs.Where(l => l.QuestionWidgetId == model.QuestionWidgetId);
+                logs = logs.Where(l => l.Source == model.Source);
+            }
+
+            if (model.LogType.HasValue)
+            {
+                logs = logs.Where(l => l.Type == model.LogType);
             }
 
             if (model.UserId.IsSet())

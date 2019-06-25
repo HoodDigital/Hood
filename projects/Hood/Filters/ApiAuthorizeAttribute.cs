@@ -35,7 +35,7 @@ namespace Hood.Filters
         private class ApiAuthorizeAttributeImpl : IActionFilter
         {
             private readonly HoodDbContext _db;
-            private readonly ILogger _logger;
+            private readonly ILogService _logService;
             private readonly IBillingService _billing;
             private readonly ISettingsRepository _settings;
 
@@ -48,7 +48,7 @@ namespace Hood.Filters
             public ApiAuthorizeAttributeImpl(
                 HoodDbContext db,
                 IAccountRepository auth,
-                ILoggerFactory loggerFactory,
+                ILogService logService,
                 IBillingService billing,
                 IHttpContextAccessor contextAccessor,
                 IHoodCache cache,
@@ -59,7 +59,7 @@ namespace Hood.Filters
             {
                 _db = db;
                 _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
-                _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
+                _logService = logService;
                 _billing = billing;
                 _settings = settings;
                 _userManager = userManager;
@@ -120,47 +120,15 @@ namespace Hood.Filters
                     _db.ApiEvents.Add(apiEvent);
                     _db.SaveChanges();
 
-                    var log = new Log()
-                    {
-                        Type = LogType.Info,
-                        Source = LogSource.Api,
-                        Detail = "Api was accessed using API Key: " + apiKey.Name,
-                        Time = DateTime.Now,
-                        Title = "Api was accessed using API Key: " + apiKey.Name,
-                        UserId = apiKey.UserId,
-                        EntityId = apiEvent.Id.ToString(),
-                        EntityType = nameof(ApiEvent),
-                        SourceUrl = context.HttpContext.GetSiteUrl(true, true)
-                    };
-                    _db.Logs.Add(log);
-                    _db.SaveChanges();
-
+                    _logService.AddLogAsync<ApiAuthorizeAttribute>("Api was accessed using API Key: " + apiKey.Name, userId: apiKey.UserId, url: context.HttpContext.GetSiteUrl(true, true));
                 }
                 catch (Exception ex)
                 {
-                    LogError("API Access Error: " + ex.Message, context.HttpContext.GetSiteUrl(true, true));
+                    _logService.AddExceptionAsync<ApiAuthorizeAttribute>("Error accessing API using an API Key.", ex, url: context.HttpContext.GetSiteUrl(true, true));
                     context.Result = new UnauthorizedResult();
                     return;
                 }
 
-            }
-
-            private void LogError(string reason, string url, string userId = null, string keyId = null)
-            {
-                var log = new Log()
-                {
-                    Type = LogType.Error,
-                    Source = LogSource.Api,
-                    Detail = reason,
-                    Time = DateTime.Now,
-                    Title = reason,
-                    UserId = userId,
-                    EntityId = keyId,
-                    EntityType = keyId.IsSet() ? nameof(ApiKey) : null,
-                    SourceUrl = url
-                };
-                _db.Logs.Add(log);
-                _db.SaveChanges();
             }
 
             public void OnActionExecuted(ActionExecutedContext context)

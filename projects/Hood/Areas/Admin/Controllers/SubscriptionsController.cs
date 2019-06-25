@@ -61,14 +61,11 @@ namespace Hood.Areas.Admin.Controllers
             {
                 model.SaveMessage = "An error occurred while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
-                await _logService.LogErrorAsync(
+                await _logService.AddExceptionAsync<SubscriptionsController>(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
                    ex,
                    LogType.Error,
-                   LogSource.Subscriptions,
                    _userManager.GetUserId(User),
-                   model.Id.ToString(),
-                   nameof(Subscription),
                    Url.AbsoluteAction("Index", "Subscriptions")
                );
             }
@@ -115,14 +112,11 @@ namespace Hood.Areas.Admin.Controllers
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
                 subscription = await _account.AddSubscriptionPlan(subscription);
-                await _logService.AddLogAsync(
+                await _logService.AddLogAsync<SubscriptionsController>(
                     string.Format("Subscription ({0}) added with name: {1}", subscription.StripeId, subscription.Name),
-                    LogSource.Subscriptions,
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
                     _userManager.GetUserId(User),
-                    subscription.Id.ToString(),
-                    nameof(Subscription),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
 
@@ -132,14 +126,11 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.LogErrorAsync(
+                await _logService.AddExceptionAsync<SubscriptionsController>(
                     string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name),
                     ex,
                     LogType.Error,
-                    LogSource.Subscriptions,
                     _userManager.GetUserId(User),
-                    subscription.Id.ToString(),
-                    nameof(Subscription),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
                 return new Response(ex.Message);
@@ -154,28 +145,22 @@ namespace Hood.Areas.Admin.Controllers
             {
                 var subscription = await _account.GetSubscriptionPlanById(id);
                 await _account.DeleteSubscriptionPlan(id);
-                await _logService.AddLogAsync(
-                string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
-                    LogSource.Subscriptions,
+                await _logService.AddLogAsync<SubscriptionsController>(
+                    string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
                     _userManager.GetUserId(User),
-                    subscription.Id.ToString(),
-                    nameof(Subscription),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
                 return new Response(true);
             }
             catch (Exception ex)
             {
-                await _logService.LogErrorAsync(
+                await _logService.AddExceptionAsync<SubscriptionsController>(
                     string.Format("Error deleting subscription with id: {0}", id),
                     ex,
                     LogType.Error,
-                    LogSource.Subscriptions,
                     _userManager.GetUserId(User),
-                    id.ToString(),
-                    nameof(Subscription),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
                 return new Response(ex.Message);

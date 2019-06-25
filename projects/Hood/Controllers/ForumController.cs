@@ -382,6 +382,8 @@ namespace Hood.Controllers
             catch (Exception ex)
             {
                 if (post != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Post)}.", post, ex);
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
@@ -391,8 +393,12 @@ namespace Hood.Controllers
                             highlight = post.Id,
                             message = ForumMessage.Error
                         });
+                }
                 else
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Post)}.", ex);
                     return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                }
             }
         }
 
@@ -436,6 +442,8 @@ namespace Hood.Controllers
             catch (Exception ex)
             {
                 if (topic != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Topic)}.", topic, ex);
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
@@ -444,8 +452,12 @@ namespace Hood.Controllers
                             title = topic.Title.ToSeoUrl(),
                             message = ForumMessage.Saved
                         });
+                }
                 else
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Topic)}.", ex);
                     return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                }
             }
         }
 
@@ -495,6 +507,8 @@ namespace Hood.Controllers
             catch (Exception ex)
             {
                 if (post != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Post)}.", post, ex);
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
@@ -503,8 +517,12 @@ namespace Hood.Controllers
                             title = post.Topic.Title.ToSeoUrl(),
                             message = ForumMessage.Error
                         });
+                }
                 else
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Post)}.", ex);
                     return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                }
             }
         }
 
@@ -545,14 +563,20 @@ namespace Hood.Controllers
             catch (Exception ex)
             {
                 if (topic != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Topic)}.", topic, ex);
                     return RedirectToAction(nameof(ForumController.Topics),
                         new
                         {
                             slug = topic.Forum.Slug,
                             message = ForumMessage.Error
                         });
+                }
                 else
+                {
+                    await _logService.AddExceptionAsync<ForumController>($"Error occurred while editing a {nameof(Topic)}.",  ex);
                     return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                }
             }
         }
 
@@ -617,6 +641,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
+                await _logService.AddExceptionAsync<ForumController>($"Error occurred while reporting a {nameof(Post)} with Id: {postId}", ex);
                 return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
             }
         }

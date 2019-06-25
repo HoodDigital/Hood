@@ -120,18 +120,6 @@ namespace Hood.Controllers
                 }
                 var profile = new UserProfile();
                 profile.SetProfile(user);
-                model = new IndexViewModel
-                {
-                    UserId = user.Id,
-                    Username = user.UserName,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    IsEmailConfirmed = user.EmailConfirmed,
-                    StatusMessage = SaveMessage,
-                    Avatar = user.Avatar,
-                    Profile = profile,
-                    Roles = await _userManager.GetRolesAsync(user)
-                };
                 SaveMessage = "Something went wrong: " + ex.Message;
                 MessageType = Enums.AlertType.Danger;
                 return RedirectToAction(nameof(Index));
@@ -238,7 +226,7 @@ namespace Hood.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            await _logService.AddLogAsync($"User ({user.UserName}) changed their password successfully.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.", userId: user.Id);
             SaveMessage = "Your password has been changed.";
 
             return RedirectToAction(nameof(ChangePassword));
@@ -424,7 +412,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
             }
-            await _logService.AddLogAsync($"User ({user.UserName}) has disabled 2fa.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) has disabled 2fa.", userId: user.Id);
             return RedirectToAction(nameof(TwoFactorAuthentication));
         }
 
@@ -481,7 +469,7 @@ namespace Hood.Controllers
             }
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
-            await _logService.AddLogAsync($"User with ID {user.Id} has enabled 2FA with an authenticator app.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has enabled 2FA with an authenticator app.", userId: user.Id);
             return RedirectToAction(nameof(GenerateRecoveryCodes));
         }
 
@@ -504,7 +492,7 @@ namespace Hood.Controllers
             await _userManager.SetTwoFactorEnabledAsync(user, false);
             await _userManager.ResetAuthenticatorKeyAsync(user);
 
-            await _logService.AddLogAsync($"User with ID {user.Id} has reset their authentication app key.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has reset their authentication app key.", userId: user.Id);
 
             return RedirectToAction(nameof(EnableAuthenticator));
         }
@@ -526,7 +514,7 @@ namespace Hood.Controllers
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
 
-            await _logService.AddLogAsync($"User with ID {user.Id} has generated new 2FA recovery codes.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has generated new 2FA recovery codes.", userId: user.Id);
 
             return View(model);
         }
@@ -541,7 +529,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmDelete(string id)
+        public async Task<IActionResult> ConfirmDelete()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -559,7 +547,7 @@ namespace Hood.Controllers
 
                 await _signInManager.SignOutAsync();
 
-                await _logService.AddLogAsync($"User with ID {user.Id} has deleted their account.", LogSource.Identity, "", LogType.Warning);
+                await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.", userId: user.Id);
 
                 var userLogs = _db.Logs.Where(l => l.UserId == user.Id);
                 foreach (var log in userLogs)
@@ -574,6 +562,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
+                await _logService.AddExceptionAsync<ManageController>($"Error when user with Id {user.Id} tried to deleted their account.", ex, userId: user.Id);
                 return RedirectToAction(nameof(Delete), new { message = EditorMessage.Error });
             }
         }

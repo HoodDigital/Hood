@@ -352,6 +352,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                await _logService.AddExceptionAsync<ForumController>($"Error deleting {nameof(ForumCategory)} with Id: {id}", ex);
                 return new Response("Have you made sure this has no sub-categories attached to it, you cannot delete a category until you remove all the sub-categories from it");
             }
         }

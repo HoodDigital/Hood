@@ -345,11 +345,12 @@ namespace Hood.Areas.Admin.Controllers
                 }
                 else
                 {
-                    return new Response("There was a problem updating the database.");
+                    throw new Exception("There was a problem updating the database.");
                 }
             }
             catch (Exception ex)
             {
+                await _logService.AddExceptionAsync<ContentController>($"Error deleting {nameof(ContentCategory)}  with Id: {id}", ex);
                 return new Response("Have you made sure this has no sub-categories attached to it, you cannot delete a category until you remove all the sub-categories from it");
             }
         }
@@ -536,7 +537,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/{id}/duplicate")]
-        public IActionResult Duplicate(int id)
+        public async Task<IActionResult> Duplicate(int id)
         {
             try
             {
@@ -546,6 +547,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                await _logService.AddExceptionAsync<ContentController>($"Error duplicating {nameof(Content)} with Id: {id}", ex);
                 return RedirectToAction("Edit", new { message = EditorMessage.ErrorDuplicating, id });
             }
         }

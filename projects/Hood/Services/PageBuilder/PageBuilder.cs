@@ -25,9 +25,10 @@ namespace Hood.Services
         private readonly Dictionary<ResourceLocation, List<FileReferenceMetadata>> _scripts;
         private readonly Dictionary<ResourceLocation, List<string>> _inlineScripts;
 
-        public PageBuilder(IHostingEnvironment hostingEnvironment)
+        public PageBuilder(IHostingEnvironment hostingEnvironment, IHoodCache cache)
         {
             _hostingEnvironment = hostingEnvironment;
+            _cache = cache;
             _scripts = new Dictionary<ResourceLocation, List<FileReferenceMetadata>>();
             _inlineScripts = new Dictionary<ResourceLocation, List<string>>();
             _css = new Dictionary<ResourceLocation, List<FileReferenceMetadata>>();

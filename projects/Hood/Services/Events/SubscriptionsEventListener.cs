@@ -29,7 +29,7 @@ namespace Hood.Services
             if (!env.IsProduction())
             {
                 var logService = Engine.Current.Resolve<ILogService>();
-                logService.AddLogAsync($"User Subscription Changed Event: {e.Action}", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, null, e.Subscription?.Id.ToString(), nameof(UserSubscription), null);
+                logService.AddLogAsync<SubscriptionsEventListener>($"User Subscription Changed Event: {e.Action}", new { EventData = e, Sender = sender.GetType().ToString() });
             }
         }
 
@@ -39,7 +39,7 @@ namespace Hood.Services
             if (!env.IsProduction())
             {
                 var logService = Engine.Current.Resolve<ILogService>();
-                logService.AddLogAsync($"Webhook Triggered Event: {e.Action}", Models.LogSource.Subscriptions, JsonConvert.SerializeObject(new { EventData = e, Sender = sender.GetType().ToString() }), Models.LogType.Info, null, e.Event?.Id.ToString(), null, null);
+                logService.AddLogAsync<SubscriptionsEventListener>($"Webhook Triggered Event: {e.Action}", new { EventData = e, Sender = sender.GetType().ToString() });
             }
         }
 

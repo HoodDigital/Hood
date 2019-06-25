@@ -29,7 +29,7 @@ namespace Hood.Services
         /// <returns>
         /// The subscription
         /// </returns>
-        Task<Stripe.Subscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null, decimal taxPercent = 0);
+        Task<Stripe.Subscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null);
 
         /// <summary>
         /// Gets the User's subscriptions asynchronous.
@@ -67,14 +67,5 @@ namespace Hood.Services
         /// <param name="subscription">The subscription.</param>
         /// <returns></returns>
         Task<Stripe.Subscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, Stripe.Plan subscription);
-
-        /// <summary>
-        /// Updates the subscription tax.
-        /// </summary>
-        /// <param name="subscriptionId">The subscription identifier.</param>
-        /// <param name="taxPercent">The tax percent.</param>
-        /// <returns></returns>
-        Task<Stripe.Subscription> UpdateSubscriptionTax(string customerId, string subscriptionId, decimal taxPercent);
-
     }
 }

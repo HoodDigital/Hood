@@ -223,7 +223,7 @@ namespace Hood.Services
                 _db.SaveChanges();
                 content = GetContentByID(content.Id);
                 RefreshMetas(content);
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -237,7 +237,7 @@ namespace Hood.Services
             {
                 _db.Update(content);
                 _db.SaveChanges();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (DbUpdateException ex)
@@ -253,7 +253,7 @@ namespace Hood.Services
                 _db.SaveChanges();
                 _db.Entry(content).State = EntityState.Deleted;
                 _db.SaveChanges();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -268,7 +268,7 @@ namespace Hood.Services
                 Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
                 content.Status = (int)status;
                 _db.SaveChanges();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
                 return new OperationResult<Content>(content);
             }
             catch (Exception ex)
@@ -285,7 +285,7 @@ namespace Hood.Services
                     _db.Entry(p).State = EntityState.Deleted;
                 });
                 await _db.SaveChangesAsync();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -303,7 +303,7 @@ namespace Hood.Services
                 _db.Media.Add(new MediaObject(media));
                 _db.Content.Update(content);
                 await _db.SaveChangesAsync();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
                 return new OperationResult<Content>(content);
             }
             catch (Exception ex)
@@ -445,7 +445,7 @@ namespace Hood.Services
                 tag = new ContentTag() { Value = value };
                 _db.ContentTags.Add(tag);
                 await _db.SaveChangesAsync();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
             }
             return new OperationResult<ContentTag>(tag);
 
@@ -460,7 +460,7 @@ namespace Hood.Services
             {
                 _db.ContentTags.Remove(tag);
                 await _db.SaveChangesAsync();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
             }
             return new OperationResult(true);
 
@@ -500,7 +500,7 @@ namespace Hood.Services
                 };
                 _db.ContentCategories.Add(category);
                 await _db.SaveChangesAsync();
-                _events.triggerContentChanged(this);
+                _events.TriggerContentChanged(this);
             }
             return new OperationResult<ContentCategory>(category);
 
@@ -519,7 +519,7 @@ namespace Hood.Services
 
             _db.ContentCategories.Add(category);
             await _db.SaveChangesAsync();
-            _events.triggerContentChanged(this);
+            _events.TriggerContentChanged(this);
             return new OperationResult<ContentCategory>(category);
         }
         public async Task<OperationResult> DeleteCategory(int categoryId)
@@ -527,14 +527,14 @@ namespace Hood.Services
             var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
             _db.Entry(category).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
-            _events.triggerContentChanged(this);
+            _events.TriggerContentChanged(this);
             return new OperationResult(true);
         }
         public async Task<OperationResult> UpdateCategory(ContentCategory category)
         {
             _db.Update(category);
             await _db.SaveChangesAsync();
-            _events.triggerContentChanged(this);
+            _events.TriggerContentChanged(this);
             return new OperationResult(true);
         }
         public async Task<OperationResult> AddCategoryToContent(int contentId, int categoryId)
@@ -788,7 +788,7 @@ namespace Hood.Services
                 }
             }
             _db.SaveChanges();
-            _events.triggerContentChanged(this);
+            _events.TriggerContentChanged(this);
         }
         public void RefreshAllMetas()
         {

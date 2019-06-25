@@ -72,7 +72,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.CreateUserSubscription(model.PlanId, model.StripeToken, model.CardId);
-                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"New subscription created by user {User.Identity.Name}", sub));
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"New subscription created by user {User.Identity.Name}", sub));
                 returnUrl = GetReturnUrl(BillingMessage.SubscriptionCreated, sub.SubscriptionId, returnUrl);
                 return Redirect(returnUrl);
             }
@@ -108,7 +108,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.UpgradeUserSubscription(id, plan);
-                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription upgraded by user {User.Identity.Name}", sub));
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription upgraded by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionUpdated, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -125,7 +125,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.CancelUserSubscription(id);
-                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription cancelled by user {User.Identity.Name}", sub));
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription cancelled by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionCancelled, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -142,7 +142,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.RemoveUserSubscription(id);
-                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription removed by user {User.Identity.Name}", sub));
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription removed by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionEnded, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }
@@ -159,7 +159,7 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.ReactivateUserSubscription(id);
-                _eventService.triggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription re-activated by user {User.Identity.Name}", sub));
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription re-activated by user {User.Identity.Name}", sub));
                 var returnUrl = GetReturnUrl(BillingMessage.SubscriptionReactivated, sub.SubscriptionId, null);
                 return Redirect(returnUrl);
             }

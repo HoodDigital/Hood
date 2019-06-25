@@ -61,6 +61,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                await _logService.AddExceptionAsync<MailController>($"Error sending test email to {email}", ex);
                 return RedirectToAction("Mail", "Settings", new { status = EditorMessage.ErrorSending });
             }
         }

@@ -29,7 +29,7 @@ namespace Hood.Services
             _db = new HoodDbContext(options.Options);
         }
 
-        public async Task AddLogAsync(string message, LogSource source, string detail = "", LogType type = LogType.Info, string UserId = null, string entityId = null, string entityType = null, string url = null)
+        private async Task AddLogAsync(string message, string detail = "", LogType type = LogType.Info, string userId = null, string url = null, string source = "")
         {
             var log = new Log()
             {
@@ -38,30 +38,86 @@ namespace Hood.Services
                 Detail = detail,
                 Time = DateTime.Now,
                 Title = message,
-                UserId = UserId,
-                EntityId = entityId,
-                EntityType = entityType,
+                UserId = userId,
                 SourceUrl = url
             };
             _db.Logs.Add(log);
             await _db.SaveChangesAsync();
         }
 
-        public async Task LogErrorAsync(string message, Exception ex, LogType type, LogSource source, string UserId = null, string entityId = null, string entityType = null, string url = null)
+        public async Task AddLogAsync<TSource>(string message, object logObject = null, LogType type = LogType.Info, string userId = null, string url = null)
         {
-            var detail = string.Concat(
-                "Exception  Message: ", ex.Message, Environment.NewLine,
+            try
+            {
+                if (logObject != null)
+                {
+                    if (logObject is string)
+                    {
+                        await AddLogAsync(message, logObject as string, type, userId, url, logObject.GetType().ToString());
+                    }
+                    var detail = string.Concat(
+                        $"{typeof(TSource).ToString()}:", Environment.NewLine,
+                        JsonConvert.SerializeObject(logObject)
+                    );
+                    await AddLogAsync(message, detail, type, userId, url);
+                }
+                else
+                    await AddLogAsync(message, "No detail provided for this log", type, userId, url);
+            }
+            catch (Exception ex)
+            {
+                await AddLogAsync(message, $"Could not serialize {logObject.GetType().ToString()} data: {ex.Message}", type, userId, url);
+            }
+        }
+
+        public async Task AddExceptionAsync<TSource>(string message, Exception ex, LogType type = LogType.Error, string userId = null, string url = null)
+        {
+            try
+            {
+                var detail = string.Concat(
+                "Exception Message: ", ex.Message, Environment.NewLine,
                 "Stack Trace:", Environment.NewLine, ex.StackTrace,
                 "Exception JSON:", Environment.NewLine, Environment.NewLine,
                 JsonConvert.SerializeObject(ex)
             );
-            if (ex.InnerException != null)
-                detail = string.Concat(
-                    "Inner Exception: ", ex.InnerException.Message, Environment.NewLine,
+                if (ex.InnerException != null)
+                    detail = string.Concat(
+                        "Inner Exception: ", ex.InnerException.Message, Environment.NewLine,
+                        "Stack Trace:", Environment.NewLine, ex.StackTrace,
+                        "Exception JSON:", Environment.NewLine, Environment.NewLine,
+                        JsonConvert.SerializeObject(ex));
+                await AddLogAsync<TSource>(message, detail, LogType.Error, userId, url);
+            }
+            catch (Exception serializationExecption)
+            {
+                await AddLogAsync<TSource>(message, $"Could not serialize exception data: {serializationExecption.Message}", type, userId, url);
+            }
+        }
+
+        public async Task AddExceptionAsync<TSource>(string message, object logObject, Exception ex, LogType type = LogType.Error, string userId = null, string url = null)
+        {
+            try
+            {
+                var detail = string.Concat(
+                    $"{typeof(TSource).ToString()}:", Environment.NewLine,
+                    JsonConvert.SerializeObject(logObject),
+                    "Exception Message: ", ex.Message, Environment.NewLine,
                     "Stack Trace:", Environment.NewLine, ex.StackTrace,
                     "Exception JSON:", Environment.NewLine, Environment.NewLine,
-                    JsonConvert.SerializeObject(ex));
-            await AddLogAsync(message, source, detail, LogType.Error, UserId, entityId, entityType, url);
+                    JsonConvert.SerializeObject(ex), Environment.NewLine, Environment.NewLine
+                );
+                if (ex.InnerException != null)
+                    detail += string.Concat(
+                        "Inner Exception: ", ex.InnerException.Message, Environment.NewLine,
+                        "Stack Trace:", Environment.NewLine, ex.StackTrace,
+                        "Exception JSON:", Environment.NewLine, Environment.NewLine,
+                        JsonConvert.SerializeObject(ex));
+                await AddLogAsync<TSource>(message, detail, LogType.Error, userId, url);
+            }
+            catch (Exception serializationExecption)
+            {
+                await AddLogAsync<TSource>(message, $"Could not serialize exception or {logObject.GetType().ToString()} data: {serializationExecption.Message}", type, userId, url);
+            }
         }
 
     }

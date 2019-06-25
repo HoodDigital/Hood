@@ -10,22 +10,9 @@ namespace Hood.Models
         Success,
         Info,
         Warning,
-        Error
-    }
-
-    public enum LogSource
-    {
-        Identity,
-        Security,
-        Subscriptions,
-        Api,
-        Content, 
-        Properties,
-        Forums,
-        Media,
-        Themes,
-        Importers,
-        Exporters,
-        System
+        Error,
+        Message,
+        Transaction,
+        Error404
     }
 }
