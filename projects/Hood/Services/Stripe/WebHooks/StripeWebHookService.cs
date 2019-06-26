@@ -29,18 +29,18 @@ namespace Hood.Services
         {
             _auth = Engine.Current.Resolve<IAccountRepository>();
 
-            _basicSettings = _settings.GetBasicSettings();
-            _mailSettings = _settings.GetMailSettings();
-            _billingSettings = _settings.GetBillingSettings();
+            _basicSettings = Engine.Settings.Basic;
+            _mailSettings = Engine.Settings.Mail;
+            _billingSettings = Engine.Settings.Billing;
             _context = contextAccessor.HttpContext;
-            var info = _settings.GetBasicSettings();
+            var info = Engine.Settings.Basic;
             _mailObject = new MailObject()
             {
                 PreHeader = "A new stripe webhook has been fired."
             };
             _mailObject.Subject = _mailObject.PreHeader;
             _mailObject.AddH1("Stripe Webhook Recieved!");
-            _mailObject.AddParagraph("Webhook recieved on site: <strong>" + info.SiteTitle + "</strong>");
+            _mailObject.AddParagraph("Webhook recieved on site: <strong>" + info.FullTitle + "</strong>");
             _mailObject.AddParagraph("Url: <strong>" + _context.GetSiteUrl() + "</strong>");
             _mailObject.AddH2("Log:");
         }
@@ -262,7 +262,7 @@ namespace Hood.Services
                     MailObject message = new MailObject()
                     {
                         To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUserSub.User.Email),
-                        PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                        PreHeader = "Error with your subscription on " + Engine.Settings.Basic.FullTitle,
                         Subject = "Error with your subscription..."
                     };
                     message.AddH1("Oops!");
@@ -283,7 +283,7 @@ namespace Hood.Services
                     MailObject message = new MailObject()
                     {
                         To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUser.Email),
-                        PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                        PreHeader = "Error with your subscription on " + Engine.Settings.Basic.FullTitle,
                         Subject = "Error with your subscription..."
                     };
                     message.AddH1("Oops!");
@@ -331,7 +331,7 @@ namespace Hood.Services
                     MailObject message = new MailObject()
                     {
                         To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email),
-                        PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                        PreHeader = "Error with your subscription on " + Engine.Settings.Basic.FullTitle,
                         Subject = "Error with your subscription..."
                     };
                     message.AddH1("Oops!");
@@ -350,7 +350,7 @@ namespace Hood.Services
                     MailObject message = new MailObject()
                     {
                         To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email),
-                        PreHeader = "Thank you for your payment on " + _settings.GetSiteTitle(),
+                        PreHeader = "Thank you for your payment on " + Engine.Settings.Basic.FullTitle,
                         Subject = "Thank you for your payment..."
                     };
                     message.AddH1("Thank you!");
@@ -448,7 +448,7 @@ namespace Hood.Services
                 MailObject message = new MailObject()
                 {
                     To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUserSub.User.Email),
-                    PreHeader = "Your trial will soon expire on " + _settings.GetSiteTitle(),
+                    PreHeader = "Your trial will soon expire on " + Engine.Settings.Basic.FullTitle,
                     Subject = "Your trial will soon expire..."
                 };
                 message.AddH1("The end is near!");
@@ -470,7 +470,7 @@ namespace Hood.Services
                 MailObject message = new MailObject()
                 {
                     To = new SendGrid.Helpers.Mail.EmailAddress(endTrialUser.Email),
-                    PreHeader = "Error with your subscription on " + _settings.GetSiteTitle(),
+                    PreHeader = "Error with your subscription on " + Engine.Settings.Basic.FullTitle,
                     Subject = "Error with your subscription..."
                 };
                 message.AddH1("Oops!");

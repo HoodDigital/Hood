@@ -13,7 +13,6 @@ namespace Hood.Caching
     public class ForumCategoryCache
     {
         private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
 
         private Lazy<Dictionary<int, ForumCategory>> byKey;
         private Lazy<Dictionary<string, ForumCategory>> bySlug;
@@ -21,12 +20,11 @@ namespace Hood.Caching
 
         public int Count { get { return byKey.Value.Count; } }
 
-        public ForumCategoryCache(IConfiguration config,
-                                    ISettingsRepository settings,
-                                    IEventsService events)
+        public ForumCategoryCache(
+            IConfiguration config,
+            IEventsService events)
         {
             _config = config;
-            _settings = settings;
             EventHandler<EventArgs> resetForumCache = (sender, eventArgs) =>
             {
                 ResetCache();

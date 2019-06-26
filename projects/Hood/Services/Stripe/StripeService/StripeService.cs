@@ -1,14 +1,15 @@
 ﻿using Stripe;
 using Hood.Models;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class StripeService : IStripeService
     {
         string StripeApiKey { get; set; }
-        public StripeService(ISettingsRepository site)
+        public StripeService()
         {
-            BillingSettings settings = site.GetBillingSettings();
+            BillingSettings settings = Engine.Settings.Billing;
             if (settings.EnableStripeTestMode)
                 StripeApiKey = settings.StripeTestKey;
             else

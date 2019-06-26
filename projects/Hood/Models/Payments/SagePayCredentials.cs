@@ -18,18 +18,9 @@ namespace Hood.Models.Payments
         private const string integrationKeySandbox = "hJYxsw7HLbj40cB8udES8CDRFLhuJ8G54O6rDpUXvE6hYDrria";
         private const string integrationPasswordSandbox = "o2iHSrFybYMZpmWOQMuhsXP52V4fBtpuSDshrKDSWsBY1OiN6hwd9Kb12z4j5Us5u";
 
-        private static BillingSettings BillingSettings
-        {
-            get
-            {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                BillingSettings contentSettings = siteSettings.GetBillingSettings();
-                return contentSettings;
-            }
-        }
-
         public static SagePayCredentials GetCredentials(string forceMode = null)
         {
+            var billingSettings = Engine.Settings.Billing;
             if (forceMode == "Sandbox")
                 return new SagePayCredentials()
                 {
@@ -38,15 +29,15 @@ namespace Hood.Models.Payments
                     Key = integrationKeySandbox,
                     Password = integrationPasswordSandbox
                 };
-            else if (forceMode == "Testing" || BillingSettings.SagePayMode == "Testing")
+            else if (forceMode == "Testing" || billingSettings.SagePayMode == "Testing")
                 return new SagePayCredentials()
                 {
-                    Endpoint = BillingSettings.SagePayTestingEndpoint,
-                    VendorName = BillingSettings.SagePayTestingVendorName,
-                    Key = BillingSettings.SagePayTestingKey,
-                    Password = BillingSettings.SagePayTestingPassword
+                    Endpoint = billingSettings.SagePayTestingEndpoint,
+                    VendorName = billingSettings.SagePayTestingVendorName,
+                    Key = billingSettings.SagePayTestingKey,
+                    Password = billingSettings.SagePayTestingPassword
                 };
-            else if (BillingSettings.SagePayMode == "Sandbox")
+            else if (billingSettings.SagePayMode == "Sandbox")
                 return new SagePayCredentials()
                 {
                     Endpoint = sagePayEndpointSandbox,
@@ -57,10 +48,10 @@ namespace Hood.Models.Payments
             else
                 return new SagePayCredentials()
                 {
-                    Endpoint = BillingSettings.SagePayEndpoint,
-                    VendorName = BillingSettings.SagePayVendorName,
-                    Key = BillingSettings.SagePayKey,
-                    Password = BillingSettings.SagePayPassword
+                    Endpoint = billingSettings.SagePayEndpoint,
+                    VendorName = billingSettings.SagePayVendorName,
+                    Key = billingSettings.SagePayKey,
+                    Password = billingSettings.SagePayPassword
                 };
         }
     }

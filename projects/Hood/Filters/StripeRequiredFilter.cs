@@ -1,4 +1,5 @@
-﻿using Hood.Services;
+﻿using Hood.Core;
+using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -19,21 +20,18 @@ namespace Hood.Filters
         {
             private readonly ILogger _logger;
             private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
 
-            public StripeRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing, ISettingsRepository site)
+            public StripeRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing)
             {
                 _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
                 _billing = billing;
-                _settings = site;
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var result = _settings.StripeEnabled();
-                if (!result.Succeeded)
+                if (!Engine.Settings.Billing.CheckStripe)
                 {
-                    throw new Exception(result.ErrorString);
+                    // Stripe is not enabled, exception will have thrown.
                 }
             }
 

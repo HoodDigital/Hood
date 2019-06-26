@@ -75,15 +75,11 @@ namespace Hood.Models
         {
             get
             {
-                var noImage = "";
+                string noImage;
                 try
                 {
-                    var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                    if (siteSettings != null)
-                    {
-                        var mediaSettings = siteSettings.GetMediaSettings();
-                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
-                    }
+                    var mediaSettings = Engine.Settings.Media;
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
                 }
                 catch
                 {
@@ -96,15 +92,11 @@ namespace Hood.Models
         {
             get
             {
-                var noImage = "";
+                string noImage;
                 try
                 {
-                    var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                    if (siteSettings != null)
-                    {
-                        var mediaSettings = siteSettings.GetMediaSettings();
-                        noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
-                    }
+                    var mediaSettings = Engine.Settings.Media;
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
                 }
                 catch
                 {

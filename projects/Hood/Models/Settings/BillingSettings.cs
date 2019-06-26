@@ -120,6 +120,17 @@ namespace Hood.Models
                 return true;
             }
         }
+        public bool IsBillingEnabled
+        {
+            get
+            {
+                if (!EnableStripe && !EnablePayPal)
+                    return false;
+                if (!StripeSetup && !PayPalSetup)
+                    return false;
+                return true;
+            }
+        }
         /// <summary>
         /// This will check all required settings are correct for Stripe to work, also checks that it is enabled. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
         /// </summary>
@@ -135,6 +146,17 @@ namespace Hood.Models
                 return true;
             }
         }
+        public bool IsStripeEnabled
+        {
+            get
+            {
+                if (!EnableStripe)
+                    return false;
+                if (!StripeSetup)
+                    return false;
+                return true;
+            }
+        }
         /// <summary>
         /// This will check all required settings are correct for PayPal to work, also checks that it is enabled. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
         /// </summary>
@@ -144,9 +166,20 @@ namespace Hood.Models
             get
             {
                 if (!EnablePayPal)
-                    throw new Exception("Stripe is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
+                    return false;
                 if (!PayPalSetup)
-                    throw new Exception("Stripe subscriptions are not set up correctly, please ensure you have set the correct settings in the administrators area, under Settings > Billing Settings.");
+                    return false;
+                return true;
+            }
+        }
+        public bool IsPaypalEnabled
+        {
+            get
+            {
+                if (!EnablePayPal)
+                    return false;
+                if (!PayPalSetup)
+                    return false;
                 return true;
             }
         }
@@ -165,6 +198,17 @@ namespace Hood.Models
                 return true;
             }
         }
+        public bool IsSubscriptionsEnabled
+        {
+            get
+            {
+                if (!EnableStripe)
+                    return false;
+                if (!EnableSubscriptions)
+                    return false;
+                return true;
+            }
+        }
         /// <summary>
         /// This will check all required settings are correct for the cart to work. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
         /// </summary>
@@ -179,6 +223,19 @@ namespace Hood.Models
                     throw new Exception("The shopping cart & checkout is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
                 if (!StripeSetup && !PayPalSetup)
                     throw new Exception("Stripe or PayPal are not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
+                return true;
+            }
+        }
+        public bool IsCartEnabled
+        {
+            get
+            {
+                if (!EnableStripe && !EnablePayPal)
+                    return false;
+                if (!EnableCart)
+                    return false;
+                if (!StripeSetup && !PayPalSetup)
+                    return false;
                 return true;
             }
         }

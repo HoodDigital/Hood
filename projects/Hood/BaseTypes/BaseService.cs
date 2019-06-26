@@ -22,7 +22,6 @@ namespace Hood.Services
         protected readonly RoleManager<IdentityRole> _roleManager;
         protected readonly TContext _db;
         protected readonly IEmailSender _email;
-        protected readonly ISettingsRepository _settings;
         protected readonly IBillingService _billing;
         protected readonly ILogService _logService;
         protected readonly IConfiguration _config;
@@ -39,7 +38,6 @@ namespace Hood.Services
             _roleManager = Engine.Current.Resolve<RoleManager<IdentityRole>>();
             _db = Engine.Current.Resolve<TContext>();
             _email = Engine.Current.Resolve<IEmailSender>();
-            _settings = Engine.Current.Resolve<ISettingsRepository>();
             _billing = Engine.Current.Resolve<IBillingService>();
             _logService = Engine.Current.Resolve<ILogService>();
             _config = Engine.Current.Resolve<IConfiguration>();

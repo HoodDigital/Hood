@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Identity;
@@ -17,18 +18,15 @@ namespace Hood.Filters
     public class LockoutModeFilter : IActionFilter
     {
         private readonly ILogger _logger;
-        private readonly ISettingsRepository _settings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _config;
 
         public LockoutModeFilter(IConfiguration config,
             ILoggerFactory loggerFactory,
             IBillingService billing,
-            ISettingsRepository settings,
             UserManager<ApplicationUser> userManager)
         {
             _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
-            _settings = settings;
             _config = config;
             _userManager = userManager;
         }
@@ -36,7 +34,7 @@ namespace Hood.Filters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-            var basicSettings = _settings.GetBasicSettings();
+            var basicSettings = Engine.Settings.Basic;
             if (basicSettings.LockoutMode)
             {
                 // if this is the login page, or the betalock page allow the user through.
@@ -72,7 +70,7 @@ namespace Hood.Filters
                         return;
                 }
 
-                if (context.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
+                if (context.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
                 {
                     context.Result = result;
                     return;

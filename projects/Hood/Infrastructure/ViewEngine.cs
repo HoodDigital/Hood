@@ -1,3 +1,4 @@
+using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Collections.Generic;
@@ -8,7 +9,6 @@ namespace Hood.Services
     public class ViewLocationExpander : IViewLocationExpander
     {
         private IEnumerable<string> locs;
-        private ISettingsRepository _settings;
 
         public ViewLocationExpander()
         {
@@ -16,8 +16,7 @@ namespace Hood.Services
 
         public void PopulateValues(ViewLocationExpanderContext context)
         {
-            _settings = (ISettingsRepository)context.ActionContext.HttpContext.RequestServices.GetService(typeof(ISettingsRepository));
-            string theme = _settings != null ? _settings["Hood.Settings.Theme"] : null;
+            string theme = Engine.Settings != null ? Engine.Settings["Hood.Settings.Theme"] : null;
             var temp = new List<string>();
 
             // Add Themed Area views first.

@@ -37,12 +37,11 @@ namespace Hood.Models
 
         public MailObject WriteToMailObject(MailObject message)
         {
-            var _settings = Engine.Current.Resolve<ISettingsRepository>();
-            var _accountSettings = _settings.GetAccountSettings();
+            var _accountSettings = Engine.Settings.Account;
             message.Subject = User.ReplacePlaceholders(message.Subject);
             message.PreHeader = User.ReplacePlaceholders(message.PreHeader);
 
-            message.AddH1(_settings.ReplacePlaceholders(_accountSettings.WelcomeTitle));
+            message.AddH1(_accountSettings.WelcomeTitle.ReplaceSiteVariables());
             message.AddDiv(_accountSettings.WelcomeMessage);
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
 

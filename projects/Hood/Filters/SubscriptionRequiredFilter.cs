@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
@@ -56,7 +57,6 @@ namespace Hood.Filters
         {
             private readonly ILogger _logger;
             private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
             private readonly List<string> _ids;
             private readonly List<string> _addons;
             private readonly List<string> _categories;
@@ -67,12 +67,10 @@ namespace Hood.Filters
 
             public SubscriptionRequiredAttributeImpl(
                 HoodDbContext db,
-                IAccountRepository auth,
                 ILoggerFactory loggerFactory,
                 IBillingService billing,
                 IHttpContextAccessor contextAccessor,
                 IHoodCache cache,
-                ISettingsRepository settings,
                 RoleManager<IdentityRole> roleManager,
                 UserManager<ApplicationUser> userManager,
                 string[] Ids,
@@ -80,10 +78,9 @@ namespace Hood.Filters
                 string[] Addons,
                 string[] RoleOverrides)
             {
-                _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
+                _auth = new AccountRepository(db, billing, contextAccessor, cache, userManager, roleManager);
                 _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
                 _billing = billing;
-                _settings = settings;
                 _ids = Ids.ToList();
                 _categories = CategoryList.ToList();
                 _userManager = userManager;
@@ -94,17 +91,16 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var subscriptionsEnabled = _settings.SubscriptionsEnabled();
-                if (!subscriptionsEnabled.Succeeded)
+                if (!Engine.Settings.Billing.CheckSubscriptions)
                 {
-                    throw new Exception(subscriptionsEnabled.ErrorString);
+                    throw new Exception("Subscriptions are not enabled");
                 }
 
                 // Load the account information from the global context (set in the global AccountFilter)
                 AccountInfo _account = context.HttpContext.GetAccountInfo();
 
                 // Set the redirect result for no subscriptions and subscription upgrade required
-                BillingSettings billingSettings = _settings.GetBillingSettings();
+                BillingSettings billingSettings = Engine.Settings.Billing;
                 IActionResult result = billingSettings.GetNewSubscriptionUrl(context.HttpContext);
                 IActionResult changeResult = billingSettings.GetChangeSubscriptionUrl(context.HttpContext);
 

@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -33,44 +34,23 @@ namespace Hood.Filters
         private class ForumAuthorizeFilterImpl : IActionFilter
         {
             private readonly HoodDbContext _db;
-            private readonly ILogger _logger;
-            private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
-
-            private readonly UserManager<ApplicationUser> _userManager;
-            private readonly IAccountRepository _auth;
-            private readonly RoleManager<IdentityRole> _roleManager;
 
             private readonly ForumAccess _access;
 
             public ForumAuthorizeFilterImpl(
                 HoodDbContext db,
-                IAccountRepository auth,
-                ILoggerFactory loggerFactory,
-                IBillingService billing,
-                IHttpContextAccessor contextAccessor,
-                IHoodCache cache,
-                ISettingsRepository settings,
-                RoleManager<IdentityRole> roleManager,
-                UserManager<ApplicationUser> userManager,
                ForumAccess access)
             {
                 _db = db;
-                _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
-                _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
-                _billing = billing;
-                _settings = settings;
-                _userManager = userManager;
-                _roleManager = roleManager;
                 _access = access;
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                ForumSettings _forumSettings = _settings.GetForumSettings();
+                ForumSettings _forumSettings = Engine.Settings.Forum;
 
                 // if user is admin or moderator - let them through, regardless.
-                if (context.HttpContext.User.IsInRole("Admin") || context.HttpContext.User.IsInRole("Moderator"))
+                if (context.HttpContext.User.IsForumModerator())
                     return;
 
                 // Login required stuff
@@ -90,13 +70,12 @@ namespace Hood.Filters
                 AccountInfo _account = context.HttpContext.GetAccountInfo();
 
                 // Subscription required stuff
-                var subscriptionsEnabled = _settings.SubscriptionsEnabled();
                 if ((
                     _forumSettings.PostingRequiresSubscription ||
                     _forumSettings.ViewingRequiresSubscription ||
                     _forumSettings.PostingRequiresSpecificSubscription ||
                     _forumSettings.ViewingRequiresSpecificSubscription
-                ) && !subscriptionsEnabled.Succeeded)
+                ) && !Engine.Settings.Billing.EnableSubscriptions)
                 {
                     throw new Exception("You must enable subscriptions before you can set required subscriptions for forums.");
                 }
@@ -181,7 +160,7 @@ namespace Hood.Filters
                     forum.ViewingRequiresSubscription ||
                     forum.PostingRequiresSpecificSubscription ||
                     forum.ViewingRequiresSpecificSubscription
-                ) && !subscriptionsEnabled.Succeeded)
+                ) && !Engine.Settings.Billing.EnableSubscriptions)
                 {
                     throw new Exception("You must enable subscriptions before you can set required subscriptions for forums.");
                 }
@@ -252,8 +231,7 @@ namespace Hood.Filters
                     // Specific forum based subscription/role required stuff
                     if (context.RouteData.Values.ContainsKey("postId"))
                     {
-                        long postId = 0;
-                        if (long.TryParse(context.RouteData.Values["postId"].ToString(), out postId))
+                        if (long.TryParse(context.RouteData.Values["postId"].ToString(), out long postId))
                         {
                             Post post = _db.Posts.SingleOrDefault(f => f.Id == postId);
                             if (post != null)
@@ -269,8 +247,7 @@ namespace Hood.Filters
                     // check for user access (Author)
                     if (context.RouteData.Values.ContainsKey("topicId"))
                     {
-                        int topicId = 0;
-                        if (int.TryParse(context.RouteData.Values["topicId"].ToString(), out topicId))
+                        if (int.TryParse(context.RouteData.Values["topicId"].ToString(), out int topicId))
                         {
                             Topic topic = _db.Topics.SingleOrDefault(f => f.Id == topicId);
                             if (topic != null)

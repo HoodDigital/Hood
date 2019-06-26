@@ -48,6 +48,7 @@ namespace Hood.Models
         public string AdminNotificationMessage { get; set; }
 
         public string NotificationTitle { get; set; }
+        public string NotificationPreHeader { get; private set; }
         public string NotificationSubject { get; set; }
         public string NotificationMessage { get; set; }
 
@@ -67,21 +68,11 @@ namespace Hood.Models
 
         public MailObject WriteToMailObject(MailObject message)
         {
-            var settings = Engine.Current.Resolve<ISettingsRepository>();
-            var contactSettings = settings.GetContactSettings();
+            var contactSettings = Engine.Settings.Contact;
 
-            message.PreHeader = settings.ReplacePlaceholders(
-                NotificationSubject.IsSet() ? NotificationSubject : contactSettings.Title
-            );
-            message.Subject = settings.ReplacePlaceholders(
-                NotificationSubject.IsSet() ? NotificationSubject : contactSettings.Subject
-            );
-            message.AddH1(settings.ReplacePlaceholders(
-                NotificationTitle.IsSet() ? NotificationTitle : contactSettings.Title
-            ));
-            message.AddParagraph(settings.ReplacePlaceholders(
-                NotificationMessage.IsSet() ? NotificationMessage : contactSettings.Message
-            ));
+            message.PreHeader = NotificationTitle.IsSet() ? NotificationTitle.ReplaceSiteVariables() : contactSettings.Title.ReplaceSiteVariables();
+            message.Subject = NotificationSubject.IsSet() ? NotificationSubject.ReplaceSiteVariables() : contactSettings.Subject.ReplaceSiteVariables();
+            message.AddParagraph(NotificationMessage.IsSet() ? NotificationMessage.ReplaceSiteVariables() : contactSettings.Message.ReplaceSiteVariables());
             message.AddParagraph("Name: <strong>" + Name + "</strong>");
             message.AddParagraph("Email: <strong>" + Email + "</strong>");
             message.AddParagraph("Phone: <strong>" + PhoneNumber + "</strong>");
@@ -94,21 +85,10 @@ namespace Hood.Models
 
         public MailObject WriteNotificationToMailObject(MailObject message)
         {
-            var settings = Engine.Current.Resolve<ISettingsRepository>();
-            var contactSettings = settings.GetContactSettings();
-
-            message.PreHeader = settings.ReplacePlaceholders(
-                AdminNotificationSubject.IsSet() ? AdminNotificationSubject : contactSettings.AdminNoficationSubject
-            );
-            message.Subject = settings.ReplacePlaceholders(
-                AdminNotificationSubject.IsSet() ? AdminNotificationSubject : contactSettings.AdminNoficationSubject
-            );
-            message.AddH1(settings.ReplacePlaceholders(
-                AdminNotificationTitle.IsSet() ? AdminNotificationTitle : contactSettings.AdminNoficationTitle
-            ));
-            message.AddParagraph(settings.ReplacePlaceholders(
-                AdminNotificationMessage.IsSet() ? AdminNotificationMessage : contactSettings.AdminNoficationMessage
-            ));
+            var contactSettings = Engine.Settings.Contact;
+            message.PreHeader = AdminNotificationTitle.IsSet() ? AdminNotificationTitle.ReplaceSiteVariables() : contactSettings.AdminNoficationTitle.ReplaceSiteVariables();
+            message.Subject = AdminNotificationSubject.IsSet() ? AdminNotificationSubject.ReplaceSiteVariables() : contactSettings.AdminNoficationSubject.ReplaceSiteVariables();
+            message.AddParagraph(AdminNotificationMessage.IsSet() ? AdminNotificationMessage.ReplaceSiteVariables() : contactSettings.AdminNoficationMessage.ReplaceSiteVariables());
             message.AddParagraph("Name: <strong>" + Name + "</strong>");
             message.AddParagraph("Email: <strong>" + Email + "</strong>");
             message.AddParagraph("Phone: <strong>" + PhoneNumber + "</strong>");

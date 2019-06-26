@@ -72,7 +72,7 @@ namespace Hood.Controllers
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, model.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -205,7 +205,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Register(string returnUrl = null)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
             if (accountSettings.RegistrationType == "code")
@@ -223,7 +223,7 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
 
@@ -244,7 +244,7 @@ namespace Hood.Controllers
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
 
-                    if (_settings.GetAccountSettings().EnableWelcome)
+                    if (Engine.Settings.Account.EnableWelcome)
                     {
                         var welcomeModel = new WelcomeEmailModel(user, callbackUrl)
                         {
@@ -276,7 +276,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Create(string returnUrl)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
             return View();
@@ -287,7 +287,7 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Create(RegisterCodeViewModel model, string returnUrl)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
 
@@ -336,14 +336,14 @@ namespace Hood.Controllers
                 MailObject message = new MailObject()
                 {
                     To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                    PreHeader = _settings.ReplacePlaceholders("Your access code."),
-                    Subject = _settings.ReplacePlaceholders("Your access code.")
+                    PreHeader ="Your access code.",
+                    Subject = "Your access code."
                 };
-                message.AddH1(_settings.ReplacePlaceholders("Your access code."));
                 message.AddParagraph($"You can use the following access code to complete your registration:");
                 message.AddH2(code.Substring(0, 3) + " - " + code.Substring(3, 3), "#5fba7d", "center");
                 message.AddParagraph($"Once you have entered your code you can create a username and password for the site. Click the button below to enter your code now.");
                 var callbackUrl = Url.Action("Code", "Account", new { uid = user.Id }, protocol: HttpContext.Request.Scheme);
+                message.AddCallToAction("Enter your code", callbackUrl);
                 message.Template = MailSettings.SuccessTemplate;
                 await _emailSender.SendEmailAsync(message);
 
@@ -358,7 +358,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Code(string uid, string returnUrl)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
 
@@ -387,7 +387,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Code(EnterCodeViewModel model, string returnUrl)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
 
@@ -425,7 +425,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Finish(string uid, string returnUrl)
         {
-            var accountSettings = _settings.GetAccountSettings();
+            var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
                 return NotFound();
 
@@ -456,7 +456,7 @@ namespace Hood.Controllers
         {
             try
             {
-                var accountSettings = _settings.GetAccountSettings();
+                var accountSettings = Engine.Settings.Account;
                 if (!accountSettings.EnableRegistration)
                     return NotFound();
 
@@ -484,7 +484,7 @@ namespace Hood.Controllers
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 await _logService.AddLogAsync<BaseAccountController<TContext>>($"User ({user.UserName}) created a new account with password.", userId: user.Id);
 
-                if (_settings.GetAccountSettings().EnableWelcome)
+                if (Engine.Settings.Account.EnableWelcome)
                 {
                     var welcomeModel = new WelcomeEmailModel(user)
                     {
@@ -656,15 +656,14 @@ namespace Hood.Controllers
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
 
                 MailObject message = new MailObject()
                 {
                     To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                    PreHeader = _settings.ReplacePlaceholders("Reset your password."),
-                    Subject = _settings.ReplacePlaceholders("Reset your password.")
+                    PreHeader = "Reset your password.",
+                    Subject = "Reset your password."
                 };
-                message.AddH1(_settings.ReplacePlaceholders("Reset your password."));
                 message.AddParagraph($"Please reset your password by clicking here:");
                 message.AddCallToAction("Reset your password", callbackUrl);
                 message.Template = MailSettings.WarningTemplate;
@@ -786,7 +785,7 @@ namespace Hood.Controllers
                 await _smsSender.SendSmsAsync(await _userManager.GetPhoneNumberAsync(user), "Your security code is: " + code);
             }
 
-            return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
+            return RedirectToAction(nameof(VerifyCode), new { Provider = model.SelectedProvider, model.ReturnUrl, model.RememberMe });
         }
 
         [HttpGet]

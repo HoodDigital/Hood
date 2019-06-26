@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,16 +24,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                // set the site theme
-                bool res = _settings.Set("Hood.Settings.Theme", name);
-                if (res)
-                {
-                    return new Response(true);
-                }
-                else
-                {
-                    throw new Exception("The database could not be updated, please try later.");
-                }
+                Engine.Settings.Set("Hood.Settings.Theme", name);
+                return new Response(true);
             }
             catch (Exception ex)
             {

@@ -13,7 +13,6 @@ namespace Hood.Filters
     /// </summary>
     public class AccountFilter : IActionFilter
     {
-        private readonly ILogger _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAccountRepository _auth;
 
@@ -23,13 +22,9 @@ namespace Hood.Filters
             HoodDbContext db,
             IHttpContextAccessor contextAccessor,
             IHoodCache cache,
-            ISettingsRepository settings,
-            ISettingsRepository site,
-            IBillingService billing,
-            ILoggerFactory loggerFactory)
+            IBillingService billing)
         {
-            _logger = loggerFactory.CreateLogger<AccountFilter>();
-            _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
+            _auth = new AccountRepository(db, billing, contextAccessor, cache, userManager, roleManager);
             _userManager = userManager;
         }
 

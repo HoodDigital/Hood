@@ -16,12 +16,10 @@ namespace Hood.Services
     public class LogService : ILogService
     {
         protected readonly HoodDbContext _db;
-        protected readonly ISettingsRepository _settings;
         protected readonly IConfiguration _config;
 
-        public LogService(ISettingsRepository site, IConfiguration config)
+        public LogService(IConfiguration config)
         {
-            _settings = site;
             _config = config;
 
             var options = new DbContextOptionsBuilder<HoodDbContext>();

@@ -187,8 +187,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                PropertySettings propertySettings = Engine.Settings.Property;
                 decimal rent = 0;
                 if (Rent.HasValue)
                     rent = Rent.Value;
@@ -201,8 +200,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                PropertySettings propertySettings = Engine.Settings.Property;
                 decimal ap = 0;
                 if (AskingPrice.HasValue)
                     ap = AskingPrice.Value;
@@ -215,8 +213,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                PropertySettings propertySettings = Engine.Settings.Property;
                 decimal premium = 0;
                 if (Premium.HasValue)
                     premium = Premium.Value;
@@ -229,8 +226,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                PropertySettings propertySettings = siteSettings.GetPropertySettings();
+                PropertySettings propertySettings = Engine.Settings.Property;
                 decimal fees = 0;
                 if (Fees.HasValue)
                     fees = Fees.Value;

@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -69,7 +70,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("hood/test-email-full/")]
         public IActionResult Terms()
         {
-            var mailSettings = _settings.GetMailSettings();
+            var mailSettings = Engine.Settings.Mail;
             var mail = GetDemoMail();
 
             mail.Subject = "Testing basic email sends";

@@ -128,43 +128,35 @@ namespace Hood.Models
                     }
                 }
 
+                if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
+                {
+                    Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
+                }
+
+                if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))
+                {
+                    // No new settings exist, attempt to copy from deprecated settings, or set new.
+                    if (Options.Any(o => o.Id == "Hood.Settings.Account"))
+                    {
+                        var option = Options.Find("Hood.Settings.Account");
+                        AccountSettings setting = JsonConvert.DeserializeObject<AccountSettings>(option.Value);
+                        Options.Add(new Option { Id = typeof(AccountSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    }
+                    else
+                        Options.Add(new Option { Id = typeof(AccountSettings).ToString(), Value = JsonConvert.SerializeObject(new AccountSettings()) });
+                }
+
                 if (!Options.Any(o => o.Id == typeof(BasicSettings).ToString()))
                 {
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
-                    if (Options.Any(o => o.Id == "Hood.Settings.Theme"))
+                    if (Options.Any(o => o.Id == "Hood.Settings.Basic"))
                     {
-                        var option = Options.Find("Hood.Settings.Theme");
+                        var option = Options.Find("Hood.Settings.Basic");
                         BasicSettings setting = JsonConvert.DeserializeObject<BasicSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(BasicSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
                         Options.Add(new Option { Id = typeof(BasicSettings).ToString(), Value = JsonConvert.SerializeObject(new BasicSettings()) });
-                }
-
-                if (!Options.Any(o => o.Id == typeof(ContactSettings).ToString()))
-                {
-                    // No new settings exist, attempt to copy from deprecated settings, or set new.
-                    if (Options.Any(o => o.Id == "Hood.Settings.Contact"))
-                    {
-                        var option = Options.Find("Hood.Settings.Contact");
-                        ContactSettings setting = JsonConvert.DeserializeObject<ContactSettings>(option.Value);
-                        Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
-                    }
-                    else
-                        Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(new ContactSettings()) });
-                }
-
-                if (!Options.Any(o => o.Id == typeof(IntegrationSettings).ToString()))
-                {
-                    // No new settings exist, attempt to copy from deprecated settings, or set new.
-                    if (Options.Any(o => o.Id == "Hood.Settings.Integrations"))
-                    {
-                        var option = Options.Find("Hood.Settings.Integrations");
-                        IntegrationSettings setting = JsonConvert.DeserializeObject<IntegrationSettings>(option.Value);
-                        Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
-                    }
-                    else
-                        Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(new IntegrationSettings()) });
                 }
 
                 if (!Options.Any(o => o.Id == typeof(BillingSettings).ToString()))
@@ -180,17 +172,17 @@ namespace Hood.Models
                         Options.Add(new Option { Id = typeof(BillingSettings).ToString(), Value = JsonConvert.SerializeObject(new BillingSettings()) });
                 }
 
-                if (!Options.Any(o => o.Id == typeof(MediaSettings).ToString()))
+                if (!Options.Any(o => o.Id == typeof(ContactSettings).ToString()))
                 {
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
-                    if (Options.Any(o => o.Id == "Hood.Settings.Media"))
+                    if (Options.Any(o => o.Id == "Hood.Settings.Contact"))
                     {
-                        var option = Options.Find("Hood.Settings.Media");
-                        MediaSettings setting = JsonConvert.DeserializeObject<MediaSettings>(option.Value);
-                        Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                        var option = Options.Find("Hood.Settings.Contact");
+                        ContactSettings setting = JsonConvert.DeserializeObject<ContactSettings>(option.Value);
+                        Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
-                        Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(new MediaSettings()) });
+                        Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(new ContactSettings()) });
                 }
 
                 if (!Options.Any(o => o.Id == typeof(ContentSettings).ToString()))
@@ -204,6 +196,58 @@ namespace Hood.Models
                     }
                     else
                         Options.Add(new Option { Id = typeof(ContentSettings).ToString(), Value = JsonConvert.SerializeObject(new ContentSettings()) });
+                }
+
+                if (!Options.Any(o => o.Id == typeof(ForumSettings).ToString()))
+                {
+                    // No new settings exist, attempt to copy from deprecated settings, or set new.
+                    if (Options.Any(o => o.Id == "Hood.Settings.Forum"))
+                    {
+                        var option = Options.Find("Hood.Settings.Seo");
+                        ForumSettings setting = JsonConvert.DeserializeObject<ForumSettings>(option.Value);
+                        Options.Add(new Option { Id = typeof(ForumSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    }
+                    else
+                        Options.Add(new Option { Id = typeof(ForumSettings).ToString(), Value = JsonConvert.SerializeObject(new ForumSettings()) });
+                }
+
+                if (!Options.Any(o => o.Id == typeof(IntegrationSettings).ToString()))
+                {
+                    // No new settings exist, attempt to copy from deprecated settings, or set new.
+                    if (Options.Any(o => o.Id == "Hood.Settings.Integrations"))
+                    {
+                        var option = Options.Find("Hood.Settings.Integrations");
+                        IntegrationSettings setting = JsonConvert.DeserializeObject<IntegrationSettings>(option.Value);
+                        Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    }
+                    else
+                        Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(new IntegrationSettings()) });
+                }
+
+                if (!Options.Any(o => o.Id == typeof(MailSettings).ToString()))
+                {
+                    // No new settings exist, attempt to copy from deprecated settings, or set new.
+                    if (Options.Any(o => o.Id == "Hood.Settings.Mail"))
+                    {
+                        var option = Options.Find("Hood.Settings.Mail");
+                        MailSettings setting = JsonConvert.DeserializeObject<MailSettings>(option.Value);
+                        Options.Add(new Option { Id = typeof(MailSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    }
+                    else
+                        Options.Add(new Option { Id = typeof(MailSettings).ToString(), Value = JsonConvert.SerializeObject(new MailSettings()) });
+                }
+
+                if (!Options.Any(o => o.Id == typeof(MediaSettings).ToString()))
+                {
+                    // No new settings exist, attempt to copy from deprecated settings, or set new.
+                    if (Options.Any(o => o.Id == "Hood.Settings.Media"))
+                    {
+                        var option = Options.Find("Hood.Settings.Media");
+                        MediaSettings setting = JsonConvert.DeserializeObject<MediaSettings>(option.Value);
+                        Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
+                    }
+                    else
+                        Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(new MediaSettings()) });
                 }
 
                 if (!Options.Any(o => o.Id == typeof(PropertySettings).ToString()))

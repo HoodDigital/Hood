@@ -11,9 +11,8 @@ namespace Hood.Core
         /// Create a static instance of the Hood engine.
         /// </summary>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static IEngine Create()
+        public static IEngine LoadEngine()
         {
-            //create NopEngine as engine
             if (Singleton<IEngine>.Instance == null)
                 Singleton<IEngine>.Instance = new HoodEngine();
 
@@ -33,7 +32,7 @@ namespace Hood.Core
             {
                 if (Singleton<IEngine>.Instance == null)
                 {
-                    Create();
+                    LoadEngine();
                 }
 
                 return Singleton<IEngine>.Instance;
@@ -46,12 +45,7 @@ namespace Hood.Core
         {
             get
             {
-                if (Singleton<ISettingsRepository>.Instance == null)
-                {
-                    Create();
-                }
-
-                return Singleton<ISettingsRepository>.Instance;
+                return Current.Resolve<ISettingsRepository>();
             }
         }
 

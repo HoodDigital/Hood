@@ -5,35 +5,24 @@ using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
 using SendGrid.Helpers.Mail;
 using Hood.Extensions;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class MailService : IMailService
     {
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISettingsRepository _settings;
-        private readonly IRazorViewRenderer _renderer;
         private readonly IEmailSender _email;
-        private readonly IHostingEnvironment _environment;
 
-        public MailService(IHttpContextAccessor contextAccessor,
-                              ISettingsRepository site,
-                              IRazorViewRenderer renderer,
-                              IEmailSender email,
-                              IHostingEnvironment env)
+        public MailService(IEmailSender email)
         {
-            _contextAccessor = contextAccessor;
-            _settings = site;
             _email = email;
-            _environment = env;
-            _renderer = renderer;
         }
 
         public async Task<Response> ProcessAndSend(IEmailSendable model)
         {
             try
             {
-                ContactSettings contactSettings = _settings.GetContactSettings();
+                ContactSettings contactSettings = Engine.Settings.Contact;
 
                 try
                 {

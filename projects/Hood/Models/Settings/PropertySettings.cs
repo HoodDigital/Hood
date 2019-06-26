@@ -1,7 +1,6 @@
 ﻿using Hood.BaseTypes;
 using Hood.Extensions;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -46,6 +45,33 @@ namespace Hood.Models
         public int DefaultPageSize { get; set; }
 
         public PropertyImporterSettings FTPImporterSettings { get; set; }
+
+        public bool IsBlmImporterEnabled
+        {
+            get
+            {
+                if (FTPImporterSettings == null) return false;
+                if (FTPImporterSettings.UseFTP)
+                {
+                    if (!FTPImporterSettings.Server.IsSet() ||
+                        !FTPImporterSettings.Password.IsSet() ||
+                        !FTPImporterSettings.Filename.IsSet())
+                        return false;
+                }
+                else
+                {
+                    if (!FTPImporterSettings.LocalFolder.IsSet() ||
+                        !FTPImporterSettings.Filename.IsSet())
+                        return false;
+                }
+                if (FTPImporterSettings.RequireUnzip)
+                {
+                    if (!FTPImporterSettings.ZipFile.IsSet())
+                        return false;
+                }
+                return true;
+            }
+        }
 
         public PropertySettings()
         {
@@ -123,278 +149,6 @@ namespace Hood.Models
                 return GetPlanningTypes()[type];
             return "Dwellinghouses";
         }
-    }
-
-    public class PropertyImporterSettings
-    {
-        /// <summary>
-        /// This is the type of importer to use, can be BLM File or Web API.
-        /// </summary>
-        public PropertyImporterMethod Method { get; set; }
-
-        /// <summary>
-        /// Whether or not to use the FTP Service to download the BLM & Image files when using BLM Importer.
-        /// </summary>
-        [Display(Name = "Download from Remote FTP Server")]
-        public bool UseFTP { get; set; }
-        /// <summary>
-        /// Whether or not to use the FTP Service to download the BLM & Image files when using BLM Importer.
-        /// </summary>
-        [Display(Name = "Clear Images Before Downloading new Images")]
-        public bool ClearImagesBeforeImport { get; set; }
-        
-        /// <summary>
-        /// The FTP Server address that is used for the FTP Import
-        /// </summary>
-        [Display(Name = "Remote FTP Server Address")]
-        public string Server { get; set; }
-
-        /// <summary>
-        /// The BLM Filename to be used with the BLM File importer
-        /// </summary>
-        [Display(Name = "BLM Filename (On FTP or Local)")]
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// This is the local folder where files are loaded from if FTP is not used.
-        /// </summary>
-        [Display(Name = "Local folder to load files from (When not using FTP)")]
-        public string LocalFolder { get; set; }
-
-        /// <summary>
-        /// Username for accessing FTP Services or Web APIs
-        /// </summary>
-        [Display(Name = "API/FTP Username")]
-        public string Username { get; set; }
-
-        /// <summary>
-        /// Password for accessing FTP Services or Web APIs
-        /// </summary>
-        [Display(Name = "API/FTP Password")]
-        public string Password { get; set; }
-
-        /// <summary>
-        /// Does the service require a file unzip before importing?
-        /// </summary>
-        [Display(Name = "Require Unzip")]
-        public bool RequireUnzip { get; set; }
-
-        /// <summary>
-        /// Name of the zip file which contains the import data
-        /// </summary>
-        [Display(Name = "Unzip File name")]
-        public string ZipFile { get; set; }
-
-    }
-
-    public enum PropertyImporterMethod
-    {
-        BlmFile, 
-        AltoWebApi,
-    }
-
-    public static class PropertyDetails
-    {
-
-        public static Dictionary<string, string> PlanningTypes = new Dictionary<string, string>()
-        {
-            { "A1",  "Shops" },
-            { "A2",  "Financial and professional services" },
-            { "A3",  "Restaurants and cafes" },
-            { "A4",  "Drinking establishments" },
-            { "A5",  "Hot food takeaways" },
-            { "B1",  "Business" },
-            { "B2",  "General industrial" },
-            { "B8",  "Storage or distribution" },
-            { "C1",  "Hotels" },
-            { "C2",  "Residential institutions" },
-            { "C2A", "Secure Residential Institution" },
-            { "C3",  "Dwellinghouses" },
-            { "C4",  "Houses in multiple occupation" },
-            { "D1",  "Non-residential institutions" },
-            { "D2",  "Assembly and leisure" },
-            { "SG",  "Sui Generis" },
-            { "VAR", "Various / Subject to Planning" }
-        };
-
-        public static Dictionary<int, string> RentFrequency = new Dictionary<int, string>()
-        {
-            { 0,  "{0} weekly" },
-            { 1,  "{0} monthly" },
-            { 2,  "{0} quarterly" },
-            { 3,  "{0} annually" },
-            { 5,  "{0} pppw" },
-            { 101,"At a passing rent of {0}" },
-            { 102,"Offers in excess of {0}" },
-            { 103,"Offers in the region of {0}" },
-            { 104,"Offers invited" },
-            { 105,"Upon Application" },
-            { 106,"Not Applicable" }
-        };
-
-        public static Dictionary<int, string> Fees = new Dictionary<int, string>()
-        {
-            { 0,  "{0} weekly" },
-            { 1,  "{0} monthly" },
-            { 2,  "{0} quarterly" },
-            { 3,  "{0} annually" },
-            { 5,  "{0} pppw" },
-            { 6,  "{0} deposit" }
-        };
-
-        public static Dictionary<int, string> PriceQualifiers = new Dictionary<int, string>()
-        {
-            { 0,  "{0}" },
-            { 1,  "POA" },
-            { 2,  "{0} (Guide)" },
-            { 3,  "{0} (Fixed)" },
-            { 4,  "Offers in Excess of {0}" },
-            { 5,  "Offers in the region of {0}" },
-            { 6,  "Sale by Tender" },
-            { 7,  "From {0}" },
-            { 8,  "Shared Ownership" },
-            { 9,  "Offers Over {0}" },
-            { 10, "Part Buy/Part Rent" },
-            { 101, "{0}" },
-            { 104,"Offers invited" },
-            { 105,"Upon Application" },
-            { 106,"Not Applicable" }
-        };
-
-        public static Dictionary<int, string> Furnished = new Dictionary<int, string>()
-        {
-            { 0, "Furnished" },
-            { 1, "Part Furnished" },
-            { 2, "Furnished" },
-            { 3, "Not Specified" },
-            { 4, "Furnished/Un Furnished" }
-        };
-
-        public static Dictionary<int, string> Status = new Dictionary<int, string>()
-        {
-            { 0, "Available" },
-            { 1, "SSTC" },
-            { 2, "SSTCM" },
-            { 3, "Under Offer" },
-            { 4, "Reserved" },
-            { 5, "Let Agreed" },
-            { 6, "Sold" },
-            { 101,  "New instruction" },
-            { 102,  "Price reduction" },
-            { 103,  "Re-available" },
-            { 104,  "Under offer" }
-       };
-
-        public static Dictionary<int, string> Tenures = new Dictionary<int, string>()
-        {
-            { 1,  "Freehold" },
-            { 2,  "Leasehold " },
-            { 3,  "Feudal" },
-            { 4,  "Commonhold" },
-            { 5,  "Share of Freehold" },
-        };
-
-        public static Dictionary<int, string> ListingTypes = new Dictionary<int, string>()
-        {
-            { 0,  "Not Specified" },
-            { 1,  "Long Term" },
-            { 2,  "Short Term" },
-            { 3,  "Student" },
-            { 4,  "Commercial" },
-            { 5,  "Lease for sale" },
-            { 6,  "Sub-lease" },
-            { 7,  "Sale" }
-        };
-
-        public static Dictionary<int, string> LeaseStatuses = new Dictionary<int, string>()
-        {
-            { 0,  "Available" },
-            { 1,  "Sold Subject To Contract" },
-            { 2,  "Sold Subject to Conclusion of Missives" },
-            { 3,  "Under Offer" },
-            { 4,  "Reserved" },
-            { 5,  "Let Agreed" },
-            { 6,  "Sold" },
-            { 7,  "Let" }
-        };
-
-        public static Dictionary<int, string> PropertyTypes = new Dictionary<int, string>()
-        {
-            { 0,  "Not Specified" },
-            { 51, "Garages" },
-            { 1, "Terraced" },
-            { 52, "Farm House" },
-            { 2, "End of Terrace" },
-            { 53, "Equestrian" },
-            { 3, "Semi-Detached" },
-            { 56, "Duplex" },
-            { 4, "Detached" },
-            { 59, "Triplex" },
-            { 5, "Mews" },
-            { 62, "Longere" },
-            { 6, "Cluster House" },
-            { 65, "Gite" },
-            { 7, "Ground Flat" },
-            { 68, "Barn" },
-            { 8, "Flat" },
-            { 71, "Trulli" },
-            { 9, "Studio" },
-            { 74, "Mill" },
-            { 10, "Ground Maisonette" },
-            { 77, "Ruins" },
-            { 11, "Maisonette" },
-            { 80, "Restaurant" },
-            { 12, "Bungalow" },
-            { 83, "Cafe" },
-            { 13, "Terraced Bungalow" },
-            { 86, "Mill" },
-            { 14, "Semi-Detached Bungalow" },
-            { 89, "Trulli" },
-            { 15, "Detached Bungalow" },
-            { 92, "Castle" },
-            { 16, "Mobile Home" },
-            { 95, "Village House" },
-            { 17, "Hotel" },
-            { 101, "Cave House" },
-            { 18, "Guest House" },
-            { 104, "Cortijo" },
-            { 19, "Commercial Property" },
-            { 107, "Farm Land" },
-            { 20, "Land" },
-            { 110, "Plot" },
-            { 21, "Link Detached House" },
-            { 113, "Country House" },
-            { 22, "Town House" },
-            { 116, "Stone House" },
-            { 23, "Cottage" },
-            { 117, "Caravan" },
-            { 24, "Chalet" },
-            { 118, "Lodge" },
-            { 27, "Villa" },
-            { 119, "Log Cabin" },
-            { 28, "Apartment" },
-            { 120, "Manor House" },
-            { 29, "Penthouse" },
-            { 121, "Stately Home" },
-            { 30, "Finca" },
-            { 125, "Off-Plan" },
-            { 43, "Barn Conversion" },
-            { 128, "Semi-detached Villa" },
-            { 44, "Serviced Apartments" },
-            { 131, "Detached Villa" },
-            { 45, "Parking" },
-            { 134, "Bar" },
-            { 46, "Sheltered Housing" },
-            { 137, "Shop" },
-            { 47, "Retirement Property" },
-            { 140, "Riad" },
-            { 48, "House Share" },
-            { 141, "House Boat" },
-            { 49, "Flat Share" },
-            { 142, "Hotel Room" }
-        };
-
-
     }
 
 }

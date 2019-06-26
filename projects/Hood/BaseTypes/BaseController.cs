@@ -52,7 +52,6 @@ namespace Hood.Controllers
             _emailSender = Engine.Current.Resolve<IEmailSender>();
             _mailService = Engine.Current.Resolve<IMailService>();
             _smsSender = Engine.Current.Resolve<ISmsSender>();
-            _settings = Engine.Current.Resolve<ISettingsRepository>();
             _billing = Engine.Current.Resolve<IBillingService>();
             _logService = Engine.Current.Resolve<ILogService>();
             _config = Engine.Current.Resolve<IConfiguration>();

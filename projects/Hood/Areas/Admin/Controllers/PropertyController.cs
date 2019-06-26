@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -26,13 +27,13 @@ namespace Hood.Areas.Admin.Controllers
         public PropertyController()
             : base()
         {
-            _propertySettings = _settings.GetPropertySettings();
+            _propertySettings = Engine.Settings.Property;
         }
 
         [Route("admin/property/manage/")]
         public async Task<IActionResult> Index(PropertySearchModel model, EditorMessage? message)
         {
-            var propertySettings = _settings.GetPropertySettings();
+            var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
@@ -40,7 +41,7 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Locations = await _property.GetLocations(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
-            PropertySettings settings = _settings.GetPropertySettings();
+            PropertySettings settings = Engine.Settings.Property;
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
             model.AddEditorMessage(message);
@@ -95,7 +96,7 @@ namespace Hood.Areas.Admin.Controllers
 
                 // Try to map the address (Only works with UK)
                 var property = _property.GetPropertyById(post.Id, true);
-                var type = _settings.GetPropertySettings().GetPlanningFromType(post.Planning);
+                var type = Engine.Settings.Property.GetPlanningFromType(post.Planning);
 
                 if (property.HasMeta("PlanningDescription"))
                     property.UpdateMeta("PlanningDescription", type);
@@ -268,7 +269,7 @@ namespace Hood.Areas.Admin.Controllers
                 OperationResult result = _property.Add(property);
                 if (property.Metadata == null)
                     property.Metadata = new List<PropertyMeta>();
-                property.UpdateMeta("PlanningDescription", _settings.GetPropertySettings().GetPlanningTypes().FirstOrDefault().Value);
+                property.UpdateMeta("PlanningDescription", Engine.Settings.Property.GetPlanningTypes().FirstOrDefault().Value);
 
                 for (int i = 0; i < 11; i++)
                 {

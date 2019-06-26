@@ -51,8 +51,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
-    <EmbeddedResource Include="UI\**\*.cshtml" />
-    <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
 
   <ItemGroup>

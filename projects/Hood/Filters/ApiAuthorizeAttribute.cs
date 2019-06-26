@@ -37,7 +37,6 @@ namespace Hood.Filters
             private readonly HoodDbContext _db;
             private readonly ILogService _logService;
             private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
 
             private readonly UserManager<ApplicationUser> _userManager;
             private readonly IAccountRepository _auth;
@@ -47,21 +46,18 @@ namespace Hood.Filters
 
             public ApiAuthorizeAttributeImpl(
                 HoodDbContext db,
-                IAccountRepository auth,
                 ILogService logService,
                 IBillingService billing,
                 IHttpContextAccessor contextAccessor,
                 IHoodCache cache,
-                ISettingsRepository settings,
                 RoleManager<IdentityRole> roleManager,
                 UserManager<ApplicationUser> userManager,
                 AccessLevel access)
             {
                 _db = db;
-                _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
+                _auth = new AccountRepository(db, billing, contextAccessor, cache, userManager, roleManager);
                 _logService = logService;
                 _billing = billing;
-                _settings = settings;
                 _userManager = userManager;
                 _roleManager = roleManager;
                 _access = access;

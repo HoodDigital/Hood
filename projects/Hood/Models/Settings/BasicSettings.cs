@@ -8,6 +8,15 @@ namespace Hood.Models
 {
     public class BasicSettings : SaveableModel
     {
+        public BasicSettings()
+        {
+            Title = "New Website";
+            Logo = "/hood/images/hood-cms-dark.svg";
+            LogoLight = "/hood/images/hood-cms-white.svg";
+            Owner = new Person();
+            Address = new SiteAddress();
+        }
+
         public Person Owner { get; set; }
         public SiteAddress Address { get; set; }
 
@@ -49,12 +58,6 @@ namespace Hood.Models
 
         #endregion
 
-        public BasicSettings()
-        {
-            Title = "New Website";
-            Logo = "/hood/images/hood-cms-dark.svg";
-            LogoLight = "/hood/images/hood-cms-white.svg";
-        }
 
         public string FullTitle
         {
@@ -103,7 +106,7 @@ namespace Hood.Models
         /// No replacement for this. Do not use.
         /// </summary>
         [Obsolete(null, true)]
-        public string OwnerMobile => throw new NotImplementedException();
+        public string OwnerMobile { get; set; }
         /// <summary>
         /// Please use <see cref="BasicSettings.Owner.JobTitle"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
         /// </summary>
@@ -113,22 +116,22 @@ namespace Hood.Models
         /// Please use <see cref="BasicSettings.Title"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
         /// </summary>
         [Obsolete(null, true)]
-        public string SiteTitle { get => Title; set => Title = value; }
+        public string SiteTitle { get; set; }
         /// <summary>
         /// Please use <see cref="BasicSettings.Owner.ToFullName()"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
         /// </summary>
         [Obsolete(null, true)]
-        public string OwnerFullName { get => Owner.ToFullName(); set => throw new NotImplementedException(); }
+        public string OwnerFullName { get; set; }
         /// <summary>
         /// No replacement for this. Do not use.
         /// </summary>
         [Obsolete(null, true)]
-        public string Description => throw new NotImplementedException();
+        public string Description { get; set; }
         /// <summary>
         /// No replacement for this. Do not use.
         /// </summary>
         [Obsolete(null, true)]
-        public string EditorType => throw new NotImplementedException();
+        public string EditorType { get; set; }
 
         #endregion
     }

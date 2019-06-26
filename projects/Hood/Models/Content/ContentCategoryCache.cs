@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Html;
@@ -13,18 +14,15 @@ namespace Hood.Caching
     public class ContentCategoryCache
     {
         private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
-
         private Lazy<Dictionary<int, ContentCategory>> byKey;
         private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>> bySlug;
         private Lazy<ContentCategory[]> topLevel;
 
-        public ContentCategoryCache(IConfiguration config,
-                                    ISettingsRepository settings,
-                                    IEventsService events)
+        public ContentCategoryCache(
+            IConfiguration config,
+            IEventsService events)
         {
             _config = config;
-            _settings = settings;
             EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
             {
                 ResetCache();
@@ -70,7 +68,7 @@ namespace Hood.Caching
                 return q.ToDictionary(c => c.Id);
             });
 
-            ContentSettings contentSettings = _settings.GetContentSettings();
+            ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>();
             foreach (var type in contentSettings.Types.Where(t => t.Enabled))
             {

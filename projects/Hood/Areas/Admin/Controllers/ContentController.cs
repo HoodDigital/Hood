@@ -1,4 +1,5 @@
 using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -34,7 +35,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var qry = Request.Query;
             model = await _content.GetPagedContent(model, false);
-            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             model.AddEditorMessage(message);
             return View(model);
         }
@@ -96,7 +97,7 @@ namespace Hood.Areas.Admin.Controllers
                     for (int i = 0; i < extraneous.Count(); i++)
                         content.RemoveTag(extraneous[i]);
                 }
-                var _contentSettings = _settings.GetContentSettings();
+                var _contentSettings = Engine.Settings.Content;
                 var type = _contentSettings.GetContentType(content.ContentType);
                 // update  meta values
                 var oldTemplate = content.GetMeta("Settings.Template").GetStringValue();
@@ -177,7 +178,7 @@ namespace Hood.Areas.Admin.Controllers
             Content model = new Content()
             {
                 PublishDate = DateTime.Now,
-                Type = _settings.GetContentSettings().GetContentType(type)
+                Type = Engine.Settings.Content.GetContentType(type)
             };
             return View(model);
         }
@@ -220,7 +221,7 @@ namespace Hood.Areas.Admin.Controllers
             var content = _content.GetContentByID(id);
             EditContentModel model = new EditContentModel()
             {
-                ContentType = _settings.GetContentSettings().GetContentType(content.ContentType),
+                ContentType = Engine.Settings.Content.GetContentType(content.ContentType),
                 Content = content
             };
             return View(model);
@@ -230,7 +231,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult CategoryList(string type)
         {
             ContentModel model = new ContentModel();
-            model.ContentType = _settings.GetContentSettings().GetContentType(type);
+            model.ContentType = Engine.Settings.Content.GetContentType(type);
             return View(model);
         }
 
@@ -364,7 +365,7 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Blocks(ListFilters request, string search, string sort, string type)
         {
             string[] templateDirs = {
-                    _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
+                    _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
                     _env.ContentRootPath + "\\Views\\Blocks\\"
                 };
             List<BlockContent> templates = new List<BlockContent>();
@@ -438,11 +439,11 @@ namespace Hood.Areas.Admin.Controllers
         public IActionResult Block(string url)
         {
             string[] templateDirs = {
-                _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
+                _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
                 _env.ContentRootPath + "\\Views\\Blocks\\"
             };
             string[] templateVirtualDirs = {
-                "~/Themes/" + _settings["Hood.Settings.Theme"] + "/Views/Blocks/",
+                "~/Themes/" + Engine.Settings["Hood.Settings.Theme"] + "/Views/Blocks/",
                 "~/Views/Blocks/"
             };
             for (int i = 0; i < templateDirs.Length; i++)
@@ -557,9 +558,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var model = _settings.GetBasicSettings(false);
+                _cache.Remove(typeof(BasicSettings).ToString());
+                var model = Engine.Settings.Basic;
                 model.Homepage = id;
-                _settings.Set("Hood.Settings.Basic", model);
+                Engine.Settings.Set(model);
                 var response = new Response(true, "The homepage has now been set.");
                 response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.HomepageSet });
                 return response;
@@ -766,7 +768,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             EditContentModel model = new EditContentModel()
             {
-                ContentType = _settings.GetContentSettings().GetContentType(content.ContentType),
+                ContentType = Engine.Settings.Content.GetContentType(content.ContentType),
                 Content = content
             };
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
@@ -790,8 +792,7 @@ namespace Hood.Areas.Admin.Controllers
 
         protected async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
         {
-            var result = _settings.SubscriptionsEnabled();
-            if (result.Succeeded)
+            if (Engine.Settings.Billing.CheckSubscriptions)
             {
                 // get subscriptions - if there are any.
                 model.Subscriptions = await _account.GetSubscriptionPlansAsync();
@@ -818,7 +819,7 @@ namespace Hood.Areas.Admin.Controllers
 
             string[] templateDirs = {
                 _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
-                _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
+                _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
             };
 
             foreach (string str in templateDirs)

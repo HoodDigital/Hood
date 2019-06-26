@@ -75,7 +75,7 @@ namespace Hood.Extensions
         public static T Get<T>(this HttpContext context, string key)
         {
             var value = context.Items[key] as string;
-            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
+            return value == null ? default : JsonConvert.DeserializeObject<T>(value);
         }
 
         public static AccountInfo GetAccountInfo(this HttpContext context)
@@ -85,7 +85,7 @@ namespace Hood.Extensions
 
         public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
         {
-            if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
+            if (context.User.IsAdminOrBetter())
                 return false;
 
             if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
@@ -101,7 +101,7 @@ namespace Hood.Extensions
 
         public static bool MatchesAccessCode(this HttpContext context, string code)
         {
-            if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
+            if (context.User.IsAdminOrBetter())
                 return true;
 
             if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))

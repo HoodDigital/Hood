@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
@@ -20,19 +21,13 @@ namespace Hood.Services
     public class MediaManager<TMediaObject> : IMediaManager<TMediaObject>
         where TMediaObject : IMediaObject
     {
-
-        private const int Megabyte = 1048576;
         private CloudStorageAccount _storageAccount;
         private string _container;
         private string _key;
-        private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
 
-        public MediaManager(IConfiguration config, ISettingsRepository site, IHostingEnvironment env)
+        public MediaManager(IHostingEnvironment env)
         {
-            _config = config;
-            _settings = site;
             _env = env;
             Initialise();
         }
@@ -46,7 +41,7 @@ namespace Hood.Services
 
         private void Initialise()
         {
-            var _mediaSettings = _settings.GetMediaSettings(true);
+            var _mediaSettings = Engine.Settings.Media;
             _container = _mediaSettings.ContainerName.ToSeoUrl();
             _key = _mediaSettings.AzureKey;
             try
@@ -207,7 +202,6 @@ namespace Hood.Services
             media.FileType = file.ContentType;
             media.GeneralFileType = media.FileType.ToFileType().ToString();
 
-            ThumbSet thumbs = new ThumbSet();
             var type = media.FileType.ToFileType();
             switch (type)
             {
@@ -291,8 +285,6 @@ namespace Hood.Services
 
         private async Task<TMediaObject> ProcessImageAsync(TMediaObject media)
         {
-            ThumbSet thumbs = new ThumbSet();
-
             string fileName = Path.GetFileNameWithoutExtension(media.Url);
             string fileExt = Path.GetExtension(media.Url);
             string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";

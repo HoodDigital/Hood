@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class ThemesService : IThemesService
     {
-        private ISettingsRepository _settingsConfig;
         private Dictionary<string, IConfiguration> _configs;
         public static object scriptLock = new object();
 
-        public ThemesService(IHostingEnvironment env, ISettingsRepository config, IConfiguration mainConfig)
+        public ThemesService(IHostingEnvironment env)
         {
-            _settingsConfig = config;
-
             _configs = new Dictionary<string, IConfiguration>();
 
             IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
@@ -65,12 +63,12 @@ namespace Hood.Services
         {
             get
             {
-                string loadTheme = _settingsConfig["Hood.Settings.Theme"];
+                string loadTheme = Engine.Settings["Hood.Settings.Theme"];
                 if (string.IsNullOrEmpty(loadTheme))
                 {
-                    _settingsConfig.Set("Hood.Settings.Theme", "default");
+                    Engine.Settings.Set("Hood.Settings.Theme", "default");
                 }
-                return _settingsConfig["Hood.Settings.Theme"];
+                return Engine.Settings["Hood.Settings.Theme"];
             }
         }
 
@@ -80,7 +78,7 @@ namespace Hood.Services
             {
                 if (ThemeConfigs.ContainsKey(themeName))
                 {
-                    _settingsConfig["Hood.Settings.Theme"] = themeName;
+                    Engine.Settings["Hood.Settings.Theme"] = themeName;
                     return true;
                 }
                 return false;

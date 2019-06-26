@@ -1,4 +1,5 @@
-﻿using Hood.Models;
+﻿using Hood.Core;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -34,11 +35,10 @@ namespace Hood.Infrastructure
                     fullUrl = fullUrl.TrimEnd('/');
                 IContentRepository _content = (IContentRepository)httpContext.RequestServices.GetService(typeof(IContentRepository));
                 IMemoryCache _cache = (IMemoryCache)httpContext.RequestServices.GetService(typeof(IMemoryCache));
-                ISettingsRepository _settings = (ISettingsRepository)httpContext.RequestServices.GetService(typeof(ISettingsRepository));
                 try
                 {
                     string[] tokenised = fullUrl.ToLower().Split('/');
-                    var type = _settings.GetContentSettings().GetContentType(tokenised[0]);
+                    var type = Engine.Settings.Content.GetContentType(tokenised[0]);
                     if (type != null)
                     {
                         // if a type is matched, we must use the Hood routes, content CMS routes cannot be overridden.
@@ -89,7 +89,7 @@ namespace Hood.Infrastructure
                     }
                     else
                     {
-                        var settings = _settings.GetPropertySettings();
+                        var settings = Engine.Settings.Property;
                         if (tokenised[0].ToLower() == settings.Slug)
                         {
                             values["action"] = "Index";

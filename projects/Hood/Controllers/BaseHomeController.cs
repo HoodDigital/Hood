@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Microsoft.AspNetCore.Identity;
@@ -27,9 +28,9 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> Index()
         {
 
-            BasicSettings basicSettings = _settings.GetBasicSettings();
+            BasicSettings basicSettings = Engine.Settings.Basic;
 
-            if (basicSettings.LockoutMode && ControllerContext.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
+            if (basicSettings.LockoutMode && ControllerContext.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
             {
                 if (basicSettings.LockoutModeHoldingPage.HasValue)
                     return await Show(basicSettings.LockoutModeHoldingPage.Value);
@@ -56,7 +57,7 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> Feed(ContentModel model, string type)
         {
             model.Type = type;
-            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
 
@@ -78,7 +79,7 @@ namespace Hood.Controllers
                 PageSize = size
             };
             model = await _content.GetPagedContent(model, true);
-            model.ContentType = _settings.GetContentSettings().GetContentType(type);
+            model.ContentType = Engine.Settings.Content.GetContentType(type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
             return View("LoadMore", model);
@@ -99,7 +100,7 @@ namespace Hood.Controllers
                 return NotFound();
 
             model.Type = model.Content.ContentType;
-            model.ContentType = _settings.GetContentSettings().GetContentType(model.Content.ContentType);
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Content.ContentType);
 
             if (model.Type == null || !model.ContentType.Enabled || !model.ContentType.HasPage)
                 return NotFound();
@@ -109,14 +110,14 @@ namespace Hood.Controllers
             model.Next = cn.Next;
 
             // if not admin, and not published, hide.
-            if (!(User.IsInRole("Admin") || User.IsInRole("Editor")) && model.Content.Status != (int)Status.Published)
+            if (!(User.IsEditorOrBetter()) && model.Content.Status != (int)Status.Published)
                 return NotFound();
 
             if (model.ContentType.BaseName == "Page")
             {
                 // if admin only, and not logged in as admin hide.
                 if (model.Content.GetMeta("Settings.Security.AdminOnly") != null)
-                    if (!User.IsInRole("Admin") && model.Content.GetMeta("Settings.Security.AdminOnly").Get<bool>() == true)
+                    if (!User.IsAdminOrBetter() && model.Content.GetMeta("Settings.Security.AdminOnly").Get<bool>() == true)
                         return NotFound();
 
                 // if not public, and not logged in hide.
@@ -124,8 +125,7 @@ namespace Hood.Controllers
                     if (!User.Identity.IsAuthenticated && model.Content.GetMeta("Settings.Security.Public").Get<bool>() == false)
                         return NotFound();
 
-                var result = _settings.SubscriptionsEnabled();
-                if (result.Succeeded)
+                if (Engine.Settings.Billing.CheckSubscriptions)
                 {
                     if (model.Content.GetMeta("Settings.Security.Subscription").IsStored)
                     {
@@ -154,7 +154,7 @@ namespace Hood.Controllers
         [Route("{type}/author/{author}/")]
         public virtual async Task<IActionResult> Author(ContentModel model, string type)
         {
-            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
 
@@ -167,7 +167,7 @@ namespace Hood.Controllers
         [Route("{type}/category/{category}/")]
         public virtual async Task<IActionResult> Category(ContentModel model, string type)
         {
-            model.ContentType = _settings.GetContentSettings().GetContentType(model.Type);
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
 

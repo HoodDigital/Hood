@@ -27,7 +27,6 @@ namespace Hood.Services
         private IConfiguration _config;
         private IMediaManager<MediaObject> _media;
         private PropertySettings _propertySettings;
-        private ISettingsRepository _settings;
         private IHttpContextAccessor _context;
 
         public BlmFileImporter(
@@ -36,7 +35,6 @@ namespace Hood.Services
             IHttpContextAccessor context,
             IConfiguration config,
             IMediaManager<MediaObject> media,
-            ISettingsRepository site,
             IAddressService address,
             ILogService logService)
         {
@@ -61,8 +59,7 @@ namespace Hood.Services
             Warnings = new List<string>();
             StatusMessage = "Not running...";
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(BlmFileImporter) + "\\";
-            _settings = site;
-            _propertySettings = site.GetPropertySettings();
+            _propertySettings = Engine.Settings.Property;
             LocalFolder = env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
             _media = media;
             _context = context;
@@ -122,7 +119,7 @@ namespace Hood.Services
                 Errors = new List<string>();
                 Warnings = new List<string>();
                 StatusMessage = "Starting import, loading property files from FTP Service...";
-                _propertySettings = _settings.GetPropertySettings();
+                _propertySettings = Engine.Settings.Property;
                 // Get a new instance of the HoodDbContext for this import.
                 var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);

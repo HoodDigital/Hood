@@ -1,3 +1,4 @@
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
@@ -247,7 +248,7 @@ namespace Hood.Controllers
         [HttpPost]
         [Route("forum/{slug}/{topicId}/{title}/")]
         [ForumAuthorize(ForumAccess.Post)]
-        public async Task<IActionResult> AddPost(PostModel model, ForumMessage? message)
+        public async Task<IActionResult> AddPost(PostModel model)
         {
             try
             {
@@ -597,10 +598,12 @@ namespace Hood.Controllers
 
                 var reporter = await _userManager.GetUserAsync(User);
 
-                MailObject message = new MailObject();
-                message.PreHeader = _settings.ReplacePlaceholders("Abuse report");
-                message.Subject = _settings.ReplacePlaceholders("Abuse report");
-                message.AddParagraph(_settings.ReplacePlaceholders("The following post has been reported for abuse."));
+                MailObject message = new MailObject
+                {
+                    PreHeader = "Abuse report",
+                    Subject = "Abuse report"
+                };
+                message.AddParagraph("The following post has been reported for abuse.");
                 message = post.WriteToMailObject(message);
                 message.AddParagraph("The report was sent by: ");
                 if (reporter == null)

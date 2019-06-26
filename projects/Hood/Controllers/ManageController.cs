@@ -540,7 +540,7 @@ namespace Hood.Controllers
             // Delete functionality.
             try
             {
-                if (User.IsInRole("Admin") || User.IsInRole("SuperUser"))
+                if (User.IsAdminOrBetter())
                 {
                     return RedirectToAction(nameof(Delete), new { message = EditorMessage.CannotDeleteAdmin });
                 }

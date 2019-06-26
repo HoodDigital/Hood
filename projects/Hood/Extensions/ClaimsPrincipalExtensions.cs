@@ -28,5 +28,22 @@ namespace Hood.Extensions
 
             return isImpersonating;
         }
+        public static bool IsForumModerator(this ClaimsPrincipal principal)
+        {
+            return principal.IsEditorOrBetter() || principal.IsInRole("Forum");
+        }
+        public static bool IsEditorOrBetter(this ClaimsPrincipal principal)
+        {
+            return principal.IsAdminOrBetter() || principal.IsInRole("Editor");
+        }
+        public static bool IsAdminOrBetter(this ClaimsPrincipal principal)
+        {
+            return principal.IsSuperUser() || principal.IsInRole("Admin");
+        }
+        public static bool IsSuperUser(this ClaimsPrincipal principal)
+        {
+            if (!principal.Identity.IsAuthenticated) return false;
+            return principal.IsInRole("SuperUser");
+        }
     }
 }

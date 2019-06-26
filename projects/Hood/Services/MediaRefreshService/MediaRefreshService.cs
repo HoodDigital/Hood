@@ -16,14 +16,16 @@ namespace Hood.Services
 {
     public class MediaRefreshService : IMediaRefreshService
     {
-        private IConfiguration _config;
+        private readonly IConfiguration _config;
+        private readonly IHostingEnvironment _env;
+
         private IMediaManager<MediaObject> _media;
-        private ISettingsRepository _settings;
+
+        private HoodDbContext Database { get; set; }
 
         public MediaRefreshService(
             IHostingEnvironment env,
-            IConfiguration config,
-            ISettingsRepository settings)
+            IConfiguration config)
         {
             _config = config;
             Lock = new ReaderWriterLock();
@@ -36,8 +38,7 @@ namespace Hood.Services
             Succeeded = false;
             StatusMessage = "Not running...";
             _env = env;
-            _settings = settings;
-            _media = new MediaManager<MediaObject>(config, settings, env);
+            _media = new MediaManager<MediaObject>(env);
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(MediaRefreshService) + "\\";
         }
 
@@ -50,10 +51,9 @@ namespace Hood.Services
         private int Processed { get; set; }
         private string StatusMessage { get; set; }
 
-        private IHostingEnvironment _env;
 
         private bool Cancelled { get; set; }
-        private HoodDbContext _db { get; set; }
+
         private bool _killFlag;
         private HttpContext _context;
 
@@ -76,9 +76,9 @@ namespace Hood.Services
                 // Get a new instance of the HoodDbContext for this import.
                 var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                _db = new HoodDbContext(options.Options);
+                Database = new HoodDbContext(options.Options);
 
-                _media = new MediaManager<MediaObject>(_config, _settings, _env);
+                _media = new MediaManager<MediaObject>(_env);
 
                 Lock.ReleaseWriterLock();
 
@@ -113,7 +113,7 @@ namespace Hood.Services
                 // Start by cleaning the temp folder.
                 CleanTempFolder();
 
-                var all = _db.Media;
+                var all = Database.Media;
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Total = all.Count();
@@ -147,57 +147,57 @@ namespace Hood.Services
                 StatusMessage = string.Format("Processed all files, commencing Content updates...");
                 Lock.ReleaseWriterLock();
 
-                await _db.SaveChangesAsync();
+                await Database.SaveChangesAsync();
                 // now we need to iterate through any items that may have media attached, and re-attach.
                 // content
                 // properties
                 // app users
 
-                foreach (var content in _db.Content)
+                foreach (var content in Database.Content)
                 {
                     if (content.FeaturedImage != null)
                     {
-                        var media = _db.Media.Find(content.FeaturedImage.Id);
+                        var media = Database.Media.Find(content.FeaturedImage.Id);
                         content.FeaturedImage = new ContentMedia(media);
                         StatusMessage = string.Format("Refreshing content featured image: {0} {1}", content.Id, content.Title);
                     }
                 }
-                await _db.SaveChangesAsync();
+                await Database.SaveChangesAsync();
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 PercentComplete = 70;
                 StatusMessage = string.Format("Content updated, commencing Properties updates...");
                 Lock.ReleaseWriterLock();
 
-                foreach (var property in _db.Properties)
+                foreach (var property in Database.Properties)
                 {
                     if (property.FeaturedImage != null)
                     {
-                        property.FeaturedImage = _db.Media.Find(property.FeaturedImage.Id);
+                        property.FeaturedImage = Database.Media.Find(property.FeaturedImage.Id);
                         StatusMessage = string.Format("Refreshing property featured image: {0} {1}", property.Id, property.Title);
                     }
                     if (property.InfoDownload != null)
                     {
-                        property.FeaturedImage = _db.Media.Find(property.FeaturedImage.Id);
+                        property.FeaturedImage = Database.Media.Find(property.FeaturedImage.Id);
                         StatusMessage = string.Format("Refreshing property info download: {0} {1}", property.Id, property.Title);
                     }
                 }
-                await _db.SaveChangesAsync();
+                await Database.SaveChangesAsync();
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 PercentComplete = 80;
                 StatusMessage = string.Format("Properties updated, commencing Users updates...");
                 Lock.ReleaseWriterLock();
 
-                foreach (var user in _db.Users)
+                foreach (var user in Database.Users)
                 {
                     if (user.Avatar != null)
                     {
-                        user.Avatar = _db.Media.Find(user.Avatar.Id);
+                        user.Avatar = Database.Media.Find(user.Avatar.Id);
                         StatusMessage = string.Format("Refreshing user avatar: {0} {1}", user.Id, user.ToFullName());
                     }
                 }
-                await _db.SaveChangesAsync();
+                await Database.SaveChangesAsync();
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 PercentComplete = 90;
@@ -206,11 +206,11 @@ namespace Hood.Services
 
                 MailObject message = new MailObject()
                 {
-                    PreHeader = _settings.ReplacePlaceholders("All media files have been refreshed."),
-                    Subject = _settings.ReplacePlaceholders("All media files have been refreshed.")
+                    PreHeader = "All media files have been refreshed.",
+                    Subject = "All media files have been refreshed."
                 };
-                message.AddH1(_settings.ReplacePlaceholders("Complete!"));
-                message.AddParagraph(_settings.ReplacePlaceholders("All media files have been successfully refreshed on " + _context.GetSiteUrl()));
+                message.AddH1("Complete!");
+                message.AddParagraph("All media files have been successfully refreshed on " + _context.GetSiteUrl());
 
                 IEmailSender emailSender = Engine.Current.Resolve<IEmailSender>();
                 await emailSender.NotifyRoleAsync(message, "SuperUser");
@@ -264,9 +264,8 @@ namespace Hood.Services
 
         public bool IsComplete()
         {
-            bool running = false;
             Lock.AcquireWriterLock(Timeout.Infinite);
-            running = Running;
+            bool running = Running;
             Lock.ReleaseWriterLock();
             return !running;
         }
@@ -280,9 +279,8 @@ namespace Hood.Services
         }
         public MediaRefreshReport Report()
         {
-            MediaRefreshReport report = new MediaRefreshReport();
             Lock.AcquireWriterLock(Timeout.Infinite);
-            report = new MediaRefreshReport
+            var report = new MediaRefreshReport
             {
                 Complete = PercentComplete,
                 Succeeded = Succeeded,

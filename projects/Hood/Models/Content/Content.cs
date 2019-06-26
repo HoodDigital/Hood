@@ -67,11 +67,10 @@ namespace Hood.Models
             }
             set
             {
-                    DateTime dt = DateTime.Now;
-                    if (DateTime.TryParse(value, out dt))
-                    {
+                if (DateTime.TryParse(value, out DateTime dt))
+                {
                     PublishDate = new DateTime(dt.Year, dt.Month, dt.Day, PublishDate.Hour, PublishDate.Minute, PublishDate.Second);
-                    }
+                }
             }
         }
         [NotMapped]
@@ -135,9 +134,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                ContentSettings _contentSettings = siteSettings.GetContentSettings();
-                ContentType type = _contentSettings.GetContentType(ContentType);
+                ContentType type = Engine.Settings.Content.GetContentType(ContentType);
 
                 if (type == null)
                     return string.Format("/{0}/{1}", ContentType, Id);
@@ -163,8 +160,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                BasicSettings basicSettings = siteSettings.GetBasicSettings();
+                BasicSettings basicSettings = Engine.Settings.Basic;
                 return Id == basicSettings.Homepage;
             }
         }

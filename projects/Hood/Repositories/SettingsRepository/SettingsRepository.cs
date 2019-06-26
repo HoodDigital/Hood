@@ -18,25 +18,16 @@ namespace Hood.Services
 {
     public class SettingsRepository : ISettingsRepository
     {
-        private HoodDbContext _context;
-
-        private HoodDbContext _db
-        {
-            get
-            {
-                var options = new DbContextOptionsBuilder<HoodDbContext>();
-                options.UseSqlServer(ConnectionString);
-                _context = new HoodDbContext(options.Options);
-                return _context;
-            }
-        }
+        private readonly HoodDbContext _context;
         private readonly IConfiguration _config;
         private IHoodCache _cache { get; set; }
 
         public SettingsRepository(
+            HoodDbContext context,
             IConfiguration config,
             IHoodCache cache)
         {
+            _context = context;
             _config = config;
             _cache = cache;
         }
@@ -53,7 +44,7 @@ namespace Hood.Services
                 Set(key, value);
             }
         }
-        private string Get(string key)
+        public string Get(string key)
         {
             try
             {
@@ -61,7 +52,7 @@ namespace Hood.Services
                     return option.Value;
                 else
                 {
-                    option = _db.Options.AsNoTracking().Where(o => o.Id == key).FirstOrDefault();
+                    option = _context.Options.AsNoTracking().Where(o => o.Id == key).FirstOrDefault();
                     if (option != null)
                     {
                         _cache.Add(key, option);
@@ -79,7 +70,7 @@ namespace Hood.Services
                 return null;
             }
         }
-        private void Set(string key, string value)
+        public void Set(string key, string value)
         {
             try
             {
@@ -144,17 +135,16 @@ namespace Hood.Services
         public void Remove(string key)
         {
             _cache.Remove(key);
-            Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
+            Option option = _context.Options.Where(o => o.Id == key).FirstOrDefault();
             if (option != null)
             {
-                _db.Entry(option).State = EntityState.Deleted;
-                _db.SaveChanges();
+                _context.Entry(option).State = EntityState.Deleted;
+                _context.SaveChanges();
             }
         }
         #endregion
 
         #region Site Settings
-
         public BasicSettings Basic => Get<BasicSettings>();
         public IntegrationSettings Integrations => Get<IntegrationSettings>();
         public ContactSettings Contact => Get<ContactSettings>();
@@ -252,6 +242,12 @@ namespace Hood.Services
 
         [Obsolete(null, true)]
         public string WysiwygEditorClass => throw new NotImplementedException();
+     
+   [Obsolete("Please use Httpcontext.ProcessCaptchaOrThrowAsync() instead.", true)]
+        public Task ProcessCaptchaOrThrowAsync(HttpRequest request)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 
@@ -270,6 +266,7 @@ namespace Hood.Services
         {
             return null;
         }
+
         #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -86,10 +87,10 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-                BillingSettings billingSettings = _settings.GetBillingSettings();
+                BillingSettings billingSettings = Engine.Settings.Billing;
 
                 var newId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString();
-                if (_settings.GetBillingSettings().EnableStripeTestMode)
+                if (Engine.Settings.Billing.EnableStripeTestMode)
                     newId += "-test";
 
                 subscription = new Subscription

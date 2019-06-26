@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
@@ -41,7 +42,7 @@ namespace Hood.Areas.Admin.Controllers
         [AllowAnonymous]
         public IActionResult BlmPropertyImporterTrigger()
         {
-            var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
+            var triggerAuth = Engine.Settings.Property.TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
             {
                 _blm.RunUpdate(HttpContext);

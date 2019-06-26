@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -33,9 +34,9 @@ namespace Hood.Controllers
                 if (model.IsSpambot)
                     return new Response("You have been flagged as a spam bot. If this is not true, please contact us via email.");
 
-                await _settings.ProcessCaptchaOrThrowAsync(Request);
+                await Request.ProcessCaptchaOrThrowAsync();
 
-                var contactSettings = _settings.GetContactSettings();
+                var contactSettings = Engine.Settings.Contact;
 
                 model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";
@@ -65,7 +66,7 @@ namespace Hood.Controllers
             sw.WriteLine("Disallow: /account/ ");
             sw.WriteLine("Disallow: /manage/ ");
             sw.WriteLine("Disallow: /install/ ");
-            foreach (ContentType ct in _settings.GetContentSettings().GetRestrictedTypes())
+            foreach (ContentType ct in Engine.Settings.Content.RestrictedTypes)
             {
                 sw.WriteLine("Disallow: /" + ct.Slug + "/ ");
             }
@@ -97,12 +98,15 @@ namespace Hood.Controllers
             switch (code)
             {
                 case 404:
-                    ViewData["Title"] = "Gone!";
+                    ViewData["Title"] = $"{code} - Not Found";
                     ViewData["Message"] = "Unfortunately, we can't locate what you are looking for...";
                     break;
+                default:
+                    ViewData["Title"] = $"{code}";
+                    ViewData["Message"] = error.Message;
+                    break;
             }
-
-            return View("~/Views/Shared/ErrorCode.cshtml");
+            return View();
         }
 
         [Route("enter-access-code")]
@@ -135,7 +139,7 @@ namespace Hood.Controllers
         [Route("hood/version/")]
         public JsonResult GetVersion()
         {
-            return Json(new { version = _settings.GetVersion() });
+            return Json(new { version = Engine.Version });
         }
     }
 }

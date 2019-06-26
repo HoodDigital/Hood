@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
@@ -303,11 +304,11 @@ namespace Hood.Areas.Admin.Controllers
                         MailObject message = new MailObject()
                         {
                             To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                            PreHeader = "You access information for " + _settings.GetSiteTitle(),
+                            PreHeader = "You access information for " + Engine.Settings.Basic.FullTitle,
                             Subject = "You account has been created."
                         };
                         message.AddH1("Account Created!");
-                        message.AddParagraph("Your new account has been set up on the " + _settings.GetSiteTitle() + " website.");
+                        message.AddParagraph("Your new account has been set up on the " + Engine.Settings.Basic.FullTitle + " website.");
                         message.AddParagraph("Name: <strong>" + user.ToFullName() + "</strong>");
                         message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
@@ -413,7 +414,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var stats = new MailchimpSyncStats();
 
-            var integrations = _settings.GetIntegrationSettings();
+            var integrations = Engine.Settings.Integrations;
             var mailchimpManager = new MailChimpManager(integrations.MailchimpApiKey);
 
             // delete users

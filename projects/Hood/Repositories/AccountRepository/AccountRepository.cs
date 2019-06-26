@@ -19,7 +19,6 @@ namespace Hood.Services
     {
         private readonly HoodDbContext _db;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBillingService _billing;
@@ -27,7 +26,6 @@ namespace Hood.Services
 
         public AccountRepository(
             HoodDbContext db,
-            ISettingsRepository site,
             IBillingService billing,
             IHttpContextAccessor context,
             IHoodCache cache,
@@ -35,7 +33,6 @@ namespace Hood.Services
             RoleManager<IdentityRole> roleManager)
         {
             _db = db;
-            _settings = site;
             _contextAccessor = context;
             _cache = cache;
             _userManager = userManager;

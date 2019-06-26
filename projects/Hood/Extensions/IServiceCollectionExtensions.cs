@@ -27,27 +27,8 @@ namespace Hood.Extensions
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        /// <summary>
-        /// Add required Hood services to the application and configure service provider.
-        /// </summary>
-        /// <param name="services">Collection of service descriptors</param>
-        /// <param name="configuration">Configuration root of the application</param>
-        /// <returns>Configured service provider</returns>
-        public static IServiceProvider AddHood(this IServiceCollection services, IConfiguration configuration)
-        {
-            //add accessor to HttpContext
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            //create, initialize and configure the engine
-            var engine = Engine.Create();
-            engine.Initialize(services);
-            var serviceProvider = engine.ConfigureServices(services, configuration);
-
-            return serviceProvider;
-        }
-
         public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config)
-            where TContext : HoodDbContext
+          where TContext : HoodDbContext
         {
 
             services
@@ -59,10 +40,6 @@ namespace Hood.Extensions
                 services.ConfigureHoodServices();
                 services.ConfigureHoodDatabase<TContext>(config);
                 services.ConfigureAuthentication(config);
-            }
-            else
-            {
-                services.ConfigureUninstalledState();
             }
 
             services.ConfigureViewEngine();
@@ -80,11 +57,6 @@ namespace Hood.Extensions
             return services;
         }
 
-        public static IServiceCollection ConfigureUninstalledState(this IServiceCollection services)
-        {
-            services.AddScoped<ISettingsRepository, SettingsRepositoryStub>();
-            return services;
-        }
         public static IServiceCollection ConfigureHoodServices(this IServiceCollection services)
         {
             // Register singletons.
@@ -96,7 +68,6 @@ namespace Hood.Extensions
             services.AddSingleton<IContentExporter, ContentExporter>();
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
-            services.AddSingleton<ISettingsRepository, SettingsRepository>();
             services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IHoodCache, HoodCache>();
@@ -114,6 +85,7 @@ namespace Hood.Extensions
             services.AddTransient<IBillingService, BillingService>();
 
             // Register scoped.
+            services.AddScoped<ISettingsRepository, SettingsRepository>();
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
@@ -126,6 +98,26 @@ namespace Hood.Extensions
 
             return services;
         }
+
+        /// <summary>
+        /// Add required Hood services to the application and configure service provider.
+        /// </summary>
+        /// <param name="services">Collection of service descriptors</param>
+        /// <param name="configuration">Configuration root of the application</param>
+        /// <returns>Configured service provider</returns>
+        public static IServiceProvider AddHood(this IServiceCollection services, IConfiguration configuration)
+        {
+            //add accessor to HttpContext
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            //create, initialize and configure the engine
+            var engine = Engine.LoadEngine();
+            engine.Initialize(services);
+            var serviceProvider = engine.ConfigureServices(services, configuration);
+
+            return serviceProvider;
+        }
+
         public static IServiceCollection ConfigureHoodDatabase<TContext>(this IServiceCollection services, IConfiguration config)
             where TContext : HoodDbContext
         {

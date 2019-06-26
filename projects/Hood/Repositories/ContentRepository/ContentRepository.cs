@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -23,27 +24,20 @@ namespace Hood.Services
     public class ContentRepository : IContentRepository
     {
         private readonly HoodDbContext _db;
-        private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
         private readonly IHoodCache _cache;
-        private readonly ContentSettings _contentSettings;
         private readonly IEventsService _events;
         private readonly IHostingEnvironment _env;
 
-        public ContentRepository(HoodDbContext db,
-                                 IHoodCache cache,
-                                 IConfiguration config,
-                                 ISettingsRepository site,
-                                 IHostingEnvironment env,
-                                 IEventsService events)
+        public ContentRepository(
+            HoodDbContext db,
+            IHoodCache cache,
+            IHostingEnvironment env,
+            IEventsService events)
         {
             _db = db;
-            _config = config;
-            _settings = site;
             _cache = cache;
             _events = events;
             _env = env;
-            _contentSettings = _settings.GetContentSettings();
         }
 
         // Content CRUD
@@ -595,7 +589,7 @@ namespace Hood.Services
                     Frequency = SitemapFrequency.Never
                 }
             };
-            foreach (ContentType type in _contentSettings.GetAllowedTypes())
+            foreach (ContentType type in Engine.Settings.Content.AllowedTypes)
             {
                 if (type.IsPublic)
                 {
@@ -762,8 +756,7 @@ namespace Hood.Services
         }
         public void RefreshMetas(Content content)
         {
-            var _contentSettings = _settings.GetContentSettings();
-            var type = _contentSettings.GetContentType(content.ContentType);
+            var type = Engine.Settings.Content.GetContentType(content.ContentType);
             if (type == null)
                 return;
             foreach (CustomField field in type.CustomFields)
@@ -792,10 +785,9 @@ namespace Hood.Services
         }
         public void RefreshAllMetas()
         {
-            var _contentSettings = _settings.GetContentSettings();
             foreach (var content in _db.Content.Include(p => p.Metadata).ToList())
             {
-                var type = _contentSettings.GetContentType(content.ContentType);
+                var type = Engine.Settings.Content.GetContentType(content.ContentType);
                 if (type != null)
                 {
                     RefreshMetas(content);
@@ -820,14 +812,14 @@ namespace Hood.Services
             templateName = templateName.Replace("Meta:", "");
 
             // get the right template file (from theme or if it doesnt appear there from base)
-            string templatePath = _env.ContentRootPath + "\\Themes\\" + _settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
+            string templatePath = _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
                 templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
             {
                 templatePath = null;
             }
-            string template = null;
+            string template;
             if (templatePath != null)
             {
                 // get the file contents 
@@ -882,7 +874,7 @@ namespace Hood.Services
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByDate = data.GroupBy(p => p.pubdate).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
-            var byType = data.GroupBy(p => p.type).Select(g => new { type = _settings.GetContentSettings().GetContentType(g.Key), total = g.Count(), typeName = g.Key });
+            var byType = data.GroupBy(p => p.type).Select(g => new { type = Engine.Settings.Content.GetContentType(g.Key), total = g.Count(), typeName = g.Key });
             
             var days = new List<KeyValuePair<string, int>>();
             var publishDays = new List<KeyValuePair<string, int>>();

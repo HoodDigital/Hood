@@ -21,7 +21,7 @@ namespace Hood.Extensions
             {
                 try
                 {
-                    var mediaSettings = Engine.Current.Resolve<ISettingsRepository>().GetMediaSettings();
+                    var mediaSettings = Engine.Settings.Media;
                     if (mediaSettings != null)
                     {
                         hostname = mediaSettings.AzureHost.IsSet() ? mediaSettings.AzureHost : null;

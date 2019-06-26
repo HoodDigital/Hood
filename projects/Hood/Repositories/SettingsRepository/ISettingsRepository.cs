@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Hood.Infrastructure;
 using Hood.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace Hood.Services
@@ -10,7 +12,9 @@ namespace Hood.Services
     {
 
         #region Get/Set/Delete
+        string Get(string key);
         T Get<T>();
+        void Set(string key, string value);
         void Set<T>(T value);
         void Remove<T>();
         void Remove(string key);
@@ -33,6 +37,7 @@ namespace Hood.Services
         #region Other Settings/Properties
         string ConnectionString { get; }
         List<string> LockoutAccessCodes { get; }
+
         #endregion
 
         #region Obsoletes
@@ -120,10 +125,7 @@ namespace Hood.Services
         [Obsolete("Please use Engine.Settings.Billing.SubscriptionsEnabled instead.", true)]
         OperationResult SubscriptionsEnabled();
 
-        /// <summary>
-        /// Please use <see cref="ISettingsRepository.Property.Enabled"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete("No replacement for this function.", true)]
+        [Obsolete("No replacement for this function. Do not use.", true)]
         OperationResult PropertyEnabled();
 
         /// <summary>
@@ -156,11 +158,15 @@ namespace Hood.Services
         [Obsolete("Please use Engine.Version instead.", true)]
         string GetVersion();
 
-        /// <summary>
-        /// Please use <see cref="ISettingsRepository.Basic"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete("Please use Engine.Settings.Basics.WysiwygEditorClass instead.", true)]
+        [Obsolete("No replacement for this function. Do not use.", true)]
         string WysiwygEditorClass { get; }
+
+        /// <summary>
+        /// Please use <see cref="Httpcontext.ProcessCaptchaOrThrowAsync"/> />
+        /// </summary>
+        [Obsolete("Please use Httpcontext.ProcessCaptchaOrThrowAsync() instead.", true)]
+        Task ProcessCaptchaOrThrowAsync(HttpRequest request);
+
         #endregion
 
     }

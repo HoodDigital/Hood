@@ -38,7 +38,7 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (Core.Engine.Settings.Billing.Enabled)
+                if (Core.Engine.Settings.Billing.CheckBilling)
                 {
                     var user = _userManager.GetUserAsync(context.HttpContext.User).Result;
 

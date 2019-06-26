@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Identity;
 using Hood.Models;
 using System.Linq;
 using Hood.Interfaces;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class EmailSender : IEmailSender
     {
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISettingsRepository _settings;
         private Models.MailSettings _mail;
         private Models.BasicSettings _info;
         private readonly IRazorViewRenderer _renderer;
@@ -22,27 +22,25 @@ namespace Hood.Services
 
         public EmailSender(IHttpContextAccessor contextAccessor,
             UserManager<ApplicationUser> userManager,
-            ISettingsRepository site,
             IRazorViewRenderer renderer)
         {
             _contextAccessor = contextAccessor;
             _userManager = userManager;
-            _settings = site;
             _renderer = renderer;
         }
 
         private SendGridClient GetMailClient()
         {
-            _info = _settings.GetBasicSettings();
-            _mail = _settings.GetMailSettings();
+            _info = Engine.Settings.Basic;
+            _mail = Engine.Settings.Mail;
             return new SendGridClient(_mail.SendGridKey);
         }
 
         public EmailAddress GetSiteFromEmail()
         {
-            _info = _settings.GetBasicSettings();
-            _mail = _settings.GetMailSettings();
-            string siteTitle = _settings.GetSiteTitle();
+            _info = Engine.Settings.Basic;
+            _mail = Engine.Settings.Mail;
+            string siteTitle = Engine.Settings.Basic.FullTitle;
             string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
             string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
             return new EmailAddress(fromEmail, fromName);
