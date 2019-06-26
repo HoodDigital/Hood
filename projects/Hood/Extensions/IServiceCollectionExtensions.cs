@@ -100,7 +100,6 @@ namespace Hood.Extensions
             services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IHoodCache, HoodCache>();
-            services.AddSingleton<IPageBuilder, PageBuilder>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
             services.AddSingleton<ForumCategoryCache>();
@@ -120,6 +119,7 @@ namespace Hood.Extensions
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<IContentRepository, ContentRepository>();
             services.AddScoped<IStripeWebHookService, StripeWebHookService>();
+            services.AddScoped<IPageBuilder, PageBuilder>();
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();

@@ -1,5 +1,6 @@
 ﻿using Geocoding.Google;
 using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -31,7 +32,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "Admin,Manager")]
         public IActionResult Basics()
         {
-            BasicSettings model = _settings.GetBasicSettings(true);
+            BasicSettings model = Engine.Settings.Basic;
             if (model == null)
                 model = new BasicSettings();
             return View(model);
@@ -43,7 +44,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                _settings.Set("Hood.Settings.Basic", model);
+                Engine.Settings.Set(model);
                 var location = _address.GeocodeAddress(model.Address);
                 if (location != null)
                 {

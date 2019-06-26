@@ -1,6 +1,4 @@
-﻿﻿ /* IMAGES */
-.hood-image,
-.img {
+﻿.hood-image, .img {
     display: inline-block;
     background-size: cover;
     background-position: center;
@@ -16,7 +14,7 @@
         i {
             position: absolute;
             top: 50%;
-            .transform(translateY(-50%));
+            @include transform(translateY(-50%));
         }
 
         &:before {
@@ -103,9 +101,6 @@
         }
     }
 
-    &.img-circle {
-        border-radius:50%;
-    }
 
     &.img-mobile-card {
         &:after {

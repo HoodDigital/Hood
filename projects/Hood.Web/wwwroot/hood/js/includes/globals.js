@@ -98,7 +98,7 @@ $.fn.characterCounter = function (val) {
         $(counter).text(max - len);
         cls = "text-success";
         if (max - len < max / 10)
-            cls = "text-danger"
+            cls = "text-danger";
         $(counter).parent().removeClass('text-success').removeClass('text-danger').addClass(cls);
     };
     targets.on('keyup', characterCounterHandler);
@@ -118,43 +118,20 @@ $.fn.removeLoader = function () {
 $.fn.warningAlert = function (val) {
     var targets = $(this);
     var warningAlertHandler = function (e) {
-        var target = e.currentTarget;
-        $.loadCss('sweetalert-css', '/lib/sweetalert/dist/sweetalert.css');
-        $.getScript('/lib/sweetalert/dist/sweetalert.min.js', $.proxy(function () {
-            swal({
-                title: "Whoa!",
-                text: $(e.currentTarget).data('warning'),
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, go ahead.",
-                cancelButtonText: "No, cancel!",
-                closeOnConfirm: false,
-                showLoaderOnConfirm: true,
-                closeOnCancel: false
-            },
-                function (isConfirm) {
-                    if (isConfirm) {
-                        url = $(target).attr('href');
-                        window.location = url;
-                    } else {
-                        swal("Cancelled", "It's all good in the hood!", "error");
-                    }
-                });
-        }, this));
+        e.preventDefault();
+        $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('warning') || "Woah!", function (isConfirm) {
+            if (isConfirm) {
+                url = $(e.currentTarget).attr('href');
+                window.location = url;
+            } else {
+                swal("Cancelled", "It's all good in the hood!", "error");
+            }
+        }, type = 'warning', confirmButtonText = 'Ok', cancelButtonText = 'Cancel', footer = $(e.currentTarget).data('footer'));
         return false;
     };
     targets.on('click', warningAlertHandler);
 };
 $('.warning-alert').warningAlert();
-$.getPlaceholders = function (str) {
-    var regex = /\{(\w+)\}/g;
-    var result = [];
-    while (match = regex.exec(str)) {
-        result.push(match[1]);
-    }
-    return result;
-}
 $.commonHeight = function (element, columnTag) {
     var maxHeight = 0;
     element.children(columnTag).each(function () {

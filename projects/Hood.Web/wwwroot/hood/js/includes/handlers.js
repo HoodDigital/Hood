@@ -91,7 +91,7 @@ $.hood.Handlers = {
     Uploaders: {
         Init: function () {
             $(".upload-progress-bar").hide();
-            $.getScript('/lib/dropzone/dist/min/dropzone.min.js', $.proxy(function () {
+            $.getScript('/lib/dropzone/min/dropzone.min.js', $.proxy(function () {
                 $('.image-uploader').each(function () {
                     $.hood.Handlers.Uploaders.SingleImage($(this).attr('id'), $(this).data('json'));
                 });

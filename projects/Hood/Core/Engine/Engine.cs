@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Hood.Services;
+using System.Runtime.CompilerServices;
 
 namespace Hood.Core
 {
@@ -36,6 +37,30 @@ namespace Hood.Core
                 }
 
                 return Singleton<IEngine>.Instance;
+            }
+        }
+        /// <summary>
+        /// Gets the singleton Hood engine used to access Hood services.
+        /// </summary>
+        public static ISettingsRepository Settings
+        {
+            get
+            {
+                if (Singleton<ISettingsRepository>.Instance == null)
+                {
+                    Create();
+                }
+
+                return Singleton<ISettingsRepository>.Instance;
+            }
+        }
+
+        public static string Version
+        {
+            get
+            {
+                var version = typeof(Engine).Assembly.GetName().Version;
+                return string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
             }
         }
 

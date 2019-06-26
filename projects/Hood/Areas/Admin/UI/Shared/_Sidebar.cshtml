@@ -19,9 +19,7 @@
         @{ await Html.RenderPartialAsync("_SidebarProfileBlock"); }
         <ul class="nav metisMenu side-menu">
             @{ await Html.RenderPartialAsync("_ThemeSidebarTop"); }
-            @if (User.IsInRole("Admin") ||
-                User.IsInRole("Manager") ||
-                User.IsInRole("Editor"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
             {
                 <li class="">
                     <a><i class="fa fa-file"></i><span class="nav-label">Content</span> <span class="fa arrow"></span></a>
@@ -58,9 +56,7 @@
                 </li>
             }
             @if (_forumSettings.Enabled &&
-                   (User.IsInRole("Admin") ||
-                       User.IsInRole("Manager") ||
-                       User.IsInRole("Editor")))
+                   (User.IsInRole("Admin") || User.IsInRole("Editor")))
             {
                 <li class="">
                     <a><i class="fa fa-comments"></i><span class="nav-label">Forums</span> <span class="fa arrow"></span></a>
@@ -73,9 +69,7 @@
                     </ul>
                 </li>
             }
-            @if (subscriptions.Succeeded &&
-                  (User.IsInRole("Admin") ||
-                      User.IsInRole("Manager")))
+            @if (subscriptions.Succeeded && User.IsInRole("Admin"))
             {
                 <li class="">
                     <a><i class="fa fa-money"></i><span class="nav-label">Subscriptions</span> <span class="fa arrow"></span></a>
@@ -101,9 +95,7 @@
                     </ul>
                 </li>
             }
-            @if (User.IsInRole("Admin") ||
-                   User.IsInRole("Manager") ||
-                   User.IsInRole("Editor"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
             {
                 <li>
                     <a asp-action="Index" asp-controller="Media" asp-route-area="Admin">
@@ -111,9 +103,7 @@
                     </a>
                 </li>
             }
-            @if (_basicSettings.EnableApiKeys &&
-                    (User.IsInRole("Admin") ||
-                        User.IsInRole("Manager")))
+            @if (_basicSettings.EnableApiKeys && User.IsInRole("Admin"))
             {
                 <li>
                     <a asp-action="Index" asp-controller="Api">
@@ -121,8 +111,7 @@
                     </a>
                 </li>
             }
-            @if (User.IsInRole("Admin") ||
-                    User.IsInRole("Manager"))
+            @if (User.IsInRole("Admin"))
             {
                 <li>
                     <a asp-action="Index" asp-controller="Users">
@@ -130,8 +119,7 @@
                     </a>
                 </li>
             }
-            @if (User.IsInRole("Admin") ||
-                    User.IsInRole("Manager"))
+            @if (User.IsInRole("Admin"))
             {
                 <li>
                     <a asp-action="Index" asp-controller="Logs">
@@ -139,8 +127,7 @@
                     </a>
                 </li>
             }
-            @if (User.IsInRole("Admin") ||
-                    User.IsInRole("Manager"))
+            @if (User.IsInRole("Admin"))
             {
 
                 <li class="">
@@ -162,15 +149,12 @@
                     </ul>
                 </li>
             }
-            @if (User.IsInRole("Admin") ||
-                    User.IsInRole("Manager") ||
-                    User.IsInRole("Editor"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Editor"))
             {
                 <li class="">
                     <a><i class="fa fa-wrench"></i><span class="nav-label">Settings</span> <span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse" style="height: 0px;">
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Basics" asp-controller="Settings" asp-route-area="Admin">
@@ -178,8 +162,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Account" asp-controller="Settings" asp-route-area="Admin">
@@ -187,9 +170,7 @@
                                 </a>
                             </li>
                         }
-                        @if (_basicSettings.EnableThemes &&
-                                (User.IsInRole("Admin") ||
-                                    User.IsInRole("Manager")))
+                        @if (_basicSettings.EnableThemes && User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
@@ -197,8 +178,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Billing" asp-controller="Settings" asp-route-area="Admin">
@@ -206,8 +186,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Contact" asp-controller="Settings" asp-route-area="Admin">
@@ -215,8 +194,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Content" asp-controller="Settings" asp-route-area="Admin">
@@ -224,8 +202,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Forum" asp-controller="Settings" asp-route-area="Admin">
@@ -233,8 +210,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Integrations" asp-controller="Settings" asp-route-area="Admin">
@@ -242,8 +218,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Mail" asp-controller="Settings" asp-route-area="Admin">
@@ -251,8 +226,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Media" asp-controller="Settings" asp-route-area="Admin">
@@ -260,8 +234,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li>
                                 <a asp-action="Property" asp-controller="Settings" asp-route-area="Admin">
@@ -270,7 +243,6 @@
                             </li>
                         }
                         @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager") ||
                                 User.IsInRole("Editor"))
                         {
                             <li>
@@ -279,8 +251,7 @@
                                 </a>
                             </li>
                         }
-                        @if (User.IsInRole("Admin") ||
-                                User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin"))
                         {
                             <li class="divider"></li>
                             <li>

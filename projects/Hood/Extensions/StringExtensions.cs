@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hood.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -406,5 +407,15 @@ namespace Hood.Extensions
             return str.Replace("  ", "&nbsp;&nbsp;").Replace(Environment.NewLine, "<br/>");
         }
 
+        public static string ReplaceSiteVariables(this string text)
+        {
+            var settings = Hood.Core.Engine.Settings.Basic;
+            return text
+                .Replace("{SITETITLE}", settings.FullTitle)
+                .Replace("{COMPANYNAME}", settings.CompanyName)
+                .Replace("{SITEOWNERNAME}", settings.Owner.ToFullName())
+                .Replace("{SITEPHONE}", settings.Phone)
+                .Replace("{SITEEMAIL}", settings.Email);
+        }
     }
 }

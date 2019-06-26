@@ -2,6 +2,7 @@
 using Hood.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -103,5 +104,110 @@ namespace Hood.Models
             }
             return changeResult;
         }
+
+        /// <summary>
+        /// This will check all required settings are correct for any billing services to work. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
+        /// </summary>
+        [JsonIgnore]
+        public bool CheckBilling
+        {
+            get
+            {
+                if (!EnableStripe && !EnablePayPal)
+                    throw new Exception("Stripe or PayPal are not enabled, please enable one of them in the administrators area, under Settings > Billing Settings.");
+                if (!StripeSetup && !PayPalSetup)
+                    throw new Exception("Stripe or PayPal are not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
+                return true;
+            }
+        }
+        /// <summary>
+        /// This will check all required settings are correct for Stripe to work, also checks that it is enabled. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
+        /// </summary>
+        [JsonIgnore]
+        public bool CheckStripe
+        {
+            get
+            {
+                if (!EnableStripe)
+                    throw new Exception("Stripe is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
+                if (!StripeSetup)
+                    throw new Exception("Stripe subscriptions are not set up correctly, please ensure you have set the correct settings in the administrators area, under Settings > Billing Settings.");
+                return true;
+            }
+        }
+        /// <summary>
+        /// This will check all required settings are correct for PayPal to work, also checks that it is enabled. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
+        /// </summary>
+        [JsonIgnore]
+        public bool CheckPaypal
+        {
+            get
+            {
+                if (!EnablePayPal)
+                    throw new Exception("Stripe is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
+                if (!PayPalSetup)
+                    throw new Exception("Stripe subscriptions are not set up correctly, please ensure you have set the correct settings in the administrators area, under Settings > Billing Settings.");
+                return true;
+            }
+        }
+        /// <summary>
+        /// This will check all required settings are correct for subscriptions to work. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
+        /// </summary>
+        [JsonIgnore]
+        public bool CheckSubscriptions
+        {
+            get
+            {
+                if (!EnableStripe)
+                    throw new Exception("Stripe is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
+                if (!EnableSubscriptions)
+                    throw new Exception("Subscriptions are not enabled, please enable them in the administrators area, under Settings > Billing Settings.");
+                return true;
+            }
+        }
+        /// <summary>
+        /// This will check all required settings are correct for the cart to work. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
+        /// </summary>
+        [JsonIgnore]
+        public bool CheckCart
+        {
+            get
+            {
+                if (!EnableStripe && !EnablePayPal)
+                    throw new Exception("Stripe or PayPal are not enabled, please enable one of them in the administrators area, under Settings > Billing Settings.");
+                if (!EnableCart)
+                    throw new Exception("The shopping cart & checkout is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
+                if (!StripeSetup && !PayPalSetup)
+                    throw new Exception("Stripe or PayPal are not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
+                return true;
+            }
+        }
+
+        [JsonIgnore]
+        private bool StripeSetup
+        {
+            get
+            { 
+                if (!StripeLiveKey.IsSet() ||
+                    !StripeLivePublicKey.IsSet() ||
+                    !StripeTestKey.IsSet() ||
+                    !StripeTestPublicKey.IsSet())
+                    return false;
+                return true;
+            }
+        }
+
+        [JsonIgnore]
+        private bool PayPalSetup
+        {
+            get
+            {
+                if (!PayPalSecret.IsSet() ||
+                    !PayPalClientId.IsSet())
+                    return false;
+                return true;
+            }
+        }
+
     }
 }

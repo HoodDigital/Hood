@@ -51,7 +51,7 @@ $.hood.Google = {
                 if ($('#' + component).doesExist()) {
                     $('#' + component).val('');
                     newVal = $.hood.Google.Addresses.AddressForm[component];
-                    placeholders = $.getPlaceholders(newVal);
+                    placeholders = $.hood.Google.GetPlaceholders(newVal);
                     for (var placeholder in placeholders) {
                         newVal = newVal.replace("{" + placeholders[placeholder] + "}", $.hood.Google.Addresses.GetValueFromAddressComponents(placeholders[placeholder]));
                     }
@@ -182,6 +182,14 @@ $.hood.Google = {
         });
 
 
+    },
+    GetPlaceholders: function (str) {
+        var regex = /\{(\w+)\}/g;
+        var result = [];
+        while (match = regex.exec(str)) {
+            result.push(match[1]);
+        }
+        return result;
     }
 };
 function initGoogleMapsComplete() {
@@ -192,4 +200,4 @@ function initGoogleMapsComplete() {
     $.hood.Google.ClusteredMap();
     // try calling initMaps, this may have been added to pages.
     try { initMap(); } catch (ex) { $.noop(); }
-};
+}

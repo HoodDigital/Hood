@@ -29,7 +29,6 @@ namespace Hood.Controllers
         protected readonly IEmailSender _emailSender;
         protected readonly IMailService _mailService;
         protected readonly ISmsSender _smsSender;
-        protected readonly ISettingsRepository _settings;
         protected readonly IBillingService _billing;
         protected readonly ILogService _logService;
         protected readonly IConfiguration _config;

@@ -10,6 +10,7 @@ namespace Hood.Models
     {
         // Loading Animations
         [Display(Name = "Enable Loading Animation")]
+        
         public bool LoadingAnimation { get; set; }
         [Display(Name = "Loading Animation")]
         public string LoadingAnimationType { get; set; }

@@ -1,12 +1,13 @@
 body {
     nav.sidebar {
-        background-color: $hood-dark;
+        background-color: white;
         position: absolute;
         left: 0;
         width: 70px;
         bottom: 0;
         top: 0;
         z-index: 100;
+        border-right: 1px solid $gray-200;
 
         .scroll-area {
             overflow-y: auto;
@@ -15,7 +16,7 @@ body {
             left: 0;
             right: 0;
             bottom: 0;
-            top: 60px;
+            top: 0;
             z-index: 100;
         }
 
@@ -24,53 +25,37 @@ body {
         }
 
         .profile-element {
-            display: none;
-
-            @media (min-width:768px) {
-                display: block;
-            }
+            display: block;
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            height: 80px;
+            background-color: white;
+            border-top: 1px solid $gray-200;
         }
 
-        .big-logo-element {
-            background-color: $hood-yellow;
+        .logo {
             padding: 16px 0;
-            color: white;
             text-align: center;
             font-size: 18px;
             font-weight: 600;
             position: absolute;
+            display: block;
             top: 0;
             left: 0;
             right: 0;
+            background-color: white;
 
             img {
                 height: 26px;
             }
         }
 
-        .logo-element {
-            display: none;
-            background-color: $hood-yellow;
-            padding: 16px 0;
-            color: white;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 600;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-
-            img {
-                height: 27px;
-            }
-
-            @media (max-width:768px) {
-                display: block;
-            }
-        }
-
         ul.side-menu {
+            position: relative;
+            z-index: 1;
 
             li {
                 display: block;
@@ -281,95 +266,6 @@ body {
                     }
                 }
             }
-        }
-    }
-
-    &.mini-nav {
-        nav.sidebar {
-            width: 70px;
-
-            .scroll-area {
-                overflow: visible;
-            }
-
-            .profile-element {
-                display: none;
-            }
-
-            .logo-element {
-                display: block;
-            }
-
-            .big-logo-element {
-                display: none;
-            }
-
-            ul.side-menu {
-
-                li {
-                    display: block;
-
-                    a {
-                        color: $sidebar-link-color;
-                        color: #a7b1c2;
-                        font-weight: 600;
-                        font-size: 18px;
-                        cursor: pointer;
-                        padding: 10px 22px 0;
-                        height: 50px;
-
-                        span.nav-label {
-                            display: none;
-                        }
-                    }
-
-                    ul.nav-second-level {
-                        position: absolute;
-                        left: 70px;
-                        top: 0;
-                        width: 200px;
-                        background-color: $hood-dark;
-
-                        li {
-                            a {
-                                font-size: 13px;
-                                padding: 8px;
-                                color: darken($sidebar-link-color, 4%);
-                                height: auto;
-
-                                i {
-                                    margin-right: 7px;
-                                    color: $sidebar-link-color;
-                                    vertical-align: middle;
-                                }
-                            }
-
-                            &.active {
-                                border-left: 0px;
-                                background-color: #0a0a0a;
-                            }
-
-                            ul.nav-third-level {
-                                li {
-                                    a {
-                                        @media (min-width:768px) {
-                                            padding: 11px 20px 11px 25px;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    &.active {
-                        border-left: 0px;
-                    }
-                }
-            }
-        }
-
-        div.main-content {
-            left: 70px;
         }
     }
 }
