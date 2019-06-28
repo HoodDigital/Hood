@@ -16,4 +16,11 @@ $.backstretch([
     fade: 1000,
     duration: 3000
 });
-$('.code-mask').mask("000-000", {placeholder: "___-___"});
+$('.code-mask').mask("000-000", { placeholder: "___-___" });
+$(window).on('load', function () {
+    $('input:-webkit-autofill').each(function () {
+        if ($(this).val().length !== "") {
+            $(this).siblings('label, i').addClass('active');
+        }
+    });
+});

@@ -5,75 +5,8 @@ $.hood.Subscriptions = {
         $('body').on('click', '.delete-subscription', this.Delete);
         $('body').on('click', '.create-subscription', this.Create.Init);
 
-        if ($('#manage-subscription-list').doesExist())
-            this.Manage.Init();
-        if ($('#manage-subscriber-list').doesExist())
-            this.Subscribers.Init();
         if ($('#edit-subscription').doesExist())
             this.Edit.Init();
-    },
-    Manage: {
-        Init: function () {
-            $('#manage-subscription-list').hoodDataList({
-                url: '/admin/subscriptions/get',
-                params: function () {
-                    return {
-                        search: $('#manage-subscription-search').val(),
-                        sort: $('#manage-subscription-sort').val()
-                    };
-                },
-                pageSize: 12,
-                pagers: '.manage-subscription-pager',
-                template: '#manage-subscription-template',
-                dataBound: function () { },
-                refreshOnChange: ".manage-subscription-change",
-                refreshOnClick: ".manage-subscription-click",
-                serverAction: "GET"
-            });
-        },
-        Filter: function () {
-            return {
-                search: $('#manage-subscription-search').val(),
-                sort: $('#manage-subscription-sort').val()
-            };
-        },
-        Refresh: function () {
-            if ($('#manage-subscription-list').doesExist())
-                $('#manage-subscription-list').data('hoodDataList').Refresh();
-            $.hood.Blades.Reload();
-        }
-    },
-    Subscribers: {
-        Init: function () {
-            $('#manage-subscriber-list').hoodDataList({
-                url: '/admin/subscribers/get',
-                params: function () {
-                    return {
-                        subscriptionId: $('#manage-subscriber-type').val(),
-                        search: $('#manage-subscriber-search').val(),
-                        sort: $('#manage-subscriber-sort').val()
-                    };
-                },
-                pageSize: 12,
-                pagers: '.manage-subscriber-pager',
-                template: '#manage-subscriber-template',
-                dataBound: function () { },
-                refreshOnChange: ".manage-subscriber-change",
-                refreshOnClick: ".manage-subscriber-click",
-                serverAction: "GET"
-            });
-        },
-        Filter: function () {
-            return {
-                search: $('#manage-subscriber-search').val(),
-                sort: $('#manage-subscriber-sort').val()
-            };
-        },
-        Refresh: function () {
-            if ($('#manage-subscriber-list').doesExist())
-                $('#manage-subscriber-list').data('hoodDataList').Refresh();
-            $.hood.Blades.Reload();
-        }
     },
     Delete: function (e) {
         var $this = $(this);

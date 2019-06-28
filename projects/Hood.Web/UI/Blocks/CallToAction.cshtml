@@ -1,0 +1,23 @@
+@{
+    Layout = null;
+    bool fullwidth = true;
+    bool.TryParse(Context.Request.Query["fullwidth"], out fullwidth);
+    var container = "container";
+    if (fullwidth)
+    {
+        container = "";
+    }
+    var align = Context.Request.Query["align"];
+    var cssClass = Context.Request.Query["class"];
+}
+<div class="hood-block">
+    <div class="cta-section @cssClass @align">
+        <div class="@container">
+            <p class="tinymce-text cta-heading">Call to action heading goes here...</p>
+            <p class="tinymce-text cta-text">Enter your paragraph text here...</p>
+            <p class="tinymce-buttons cta-button">
+                <a class="btn btn-default" href="#" role="button">Customisable button &raquo;</a>
+            </p>
+        </div>
+    </div>
+</div>

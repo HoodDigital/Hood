@@ -1,0 +1,16 @@
+@inject IThemesService _themes
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" />
+<environment names="Development,Staging,ErrorTesting">
+    <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
+</environment>
+<environment names="Production,PreProduction">
+    <link rel="stylesheet" href="~/css/preload.min.css" asp-append-version="true" />
+</environment>
+<!--[if lte IE 9]>
+    @{ await Html.RenderPartialAsync("_Styles"); }
+<![endif]-->
+<!--[if gt IE 9]><!-->
+<noscript id="deferred-styles">
+    @{ await Html.RenderPartialAsync("_Styles"); }
+</noscript>
+<!--<![endif]-->

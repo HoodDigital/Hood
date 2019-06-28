@@ -125,7 +125,7 @@ namespace Hood.Controllers
                     if (!User.Identity.IsAuthenticated && model.Content.GetMeta("Settings.Security.Public").Get<bool>() == false)
                         return NotFound();
 
-                if (Engine.Settings.Billing.CheckSubscriptions)
+                if (Engine.Settings.Billing.CheckSubscriptionsThrow())
                 {
                     if (model.Content.GetMeta("Settings.Security.Subscription").IsStored)
                     {

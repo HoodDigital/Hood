@@ -1,0 +1,17 @@
+﻿div.title {
+    border: 0;
+    border-bottom: 1px solid $gray-200;
+    position: relative;
+    margin-bottom: $grid-gutter-width / 2;
+    padding-bottom: $grid-gutter-width / 2;
+
+    @media (min-width:768px) {
+        margin-bottom: $grid-gutter-width;
+        padding-bottom: $grid-gutter-width;
+    }
+
+    ul.dropdown-menu {
+        right: 0;
+        left: auto;
+    }
+}

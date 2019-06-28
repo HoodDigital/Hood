@@ -1,0 +1,115 @@
+@inject IContentRepository _data
+@{
+    Layout = null;
+}
+<div class="sidebar-container">
+    <div class="sidebar-title create">
+        <button type="button" class="close close-blade"><span>&times;</span></button>
+        <h3><i class="fa fa-thumb-tack"></i> Create new property.</h3>
+        <p><i class="fa fa-plus-circle"></i> Add a new property to the website.</p>
+    </div>
+    <form id="create-property-form" asp-antiforgery="true" autocomplete="off">
+        <input id="Latitude" name="cpLatitude" type="hidden">
+        <input id="Longitude" name="cpLongitude" type="hidden">
+       <div class="blade-field">
+            <createField db-field="cpTitle" field-type="text" field-name="Title" db-value="" />
+        </div>
+        <div class="blade-field">
+            <input id="address-autocomplete" onfocus="$.hood.Google.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Enter an address..." />
+        </div>
+        <div class="blade-field">
+            <div class="form-group">
+                <label class="control-label">Address</label>
+                <div class="m-b-xs">
+                    <input id="Number" name="cpNumber" type="text" class="form-control" value="" placeholder="Number" />
+                </div>
+                <div class="m-b-xs">
+                    <input id="Address1" name="cpAddress1" type="text" class="form-control" value="" placeholder="Address 1" />
+                </div>
+                <div class="m-b-xs">
+                    <input id="Address2" name="cpAddress2" type="text" class="form-control" value="" placeholder="Address 2">
+                </div>
+                <div class="m-b-xs">
+                    <input id="City" name="cpCity" type="text" class="form-control" value="" placeholder="City">
+                </div>
+                <div class="m-b-xs">
+                    <input id="County" name="cpCounty" type="text" class="form-control" value="" placeholder="County">
+                </div>
+                <div class="">
+                    <select class="form-control" id="Country" name="cpCountry">
+                        <option value="">-- Choose a country --</option>
+                        @foreach (var itm in _data.AllCountries())
+                        {
+                            if (itm.Name == "United Kingdom")
+                            {
+                                <option value="@itm.Name" selected>@itm.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@itm.Name">@itm.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>        
+        </div>
+        <div class="blade-field">
+            <input id="Postcode" name="cpPostcode" type="text" class="form-control" value="" placeholder="Postcode">
+        </div>
+        <div class="blade-field">
+            <div class="row">
+                <div class="col-xs-6">
+                    <createField db-field="cpPublishDate" field-type="date" field-name="Date to publish" db-value="@DateTime.Now.ToShortDateString()" />
+                </div>
+                <div class="col-xs-6">
+                    <div class="form-group">
+                        <label class="control-label">Time</label>
+                        <div>
+                            <select id="cpPublishHour" name="cpPublishHour" class="form-control half">
+                                @for (int i = 0; i < 24; i++)
+                                {
+                                    if (i == DateTime.Now.Hour)
+                                    {
+                                        <option value="@i" selected>@i.ToString("00")</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i.ToString("00")</option>
+                                    }
+                                }
+                            </select>
+                            <select id="cpPublishMinute" name="cpPublishMinute" class="form-control half">
+                                @for (int i = 0; i < 60; i++)
+                                {
+                                    if (i == DateTime.Now.Minute)
+                                    {
+                                        <option value="@i" selected>@i.ToString("00")</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@i">@i.ToString("00")</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="blade-field">
+            <div class="form-group">
+                <label class="control-label">Create as</label>
+                <div class="">
+                    <select id="cpStatus" name="cpStatus" class="form-control">
+                        <option value="1">Draft</option>
+                        <option value="2">Published</option>
+                    </select>
+                </div>
+            </div>        
+        </div>
+        <div class="blade-field">
+            <button type="button" id="create-property-submit" class="btn btn-primary"><i class="fa fa-content-plus"></i> Create property</button>
+            <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
+        </div>
+    </form>
+</div>

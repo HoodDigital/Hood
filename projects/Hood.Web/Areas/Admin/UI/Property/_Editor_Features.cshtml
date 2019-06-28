@@ -1,0 +1,26 @@
+@model PropertyListing
+@inject IContentRepository _data
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<div id="features" class="tab-pane">
+    <div class="panel-body">
+        @if (Model.Metadata != null)
+        {
+            <fieldset class="form-horizontal">
+                @foreach (var meta in Model.Metadata.Where(m => !m.Name.Contains("FloorPlan") && m.Name.Contains("Feature")).OrderBy(m => m.Name))
+                {
+                    <div class="form-group">
+                        <label for="@string.Format("Meta:{0}", meta.Name)" class="col-sm-3 control-label">
+                            @meta.Name.Replace("Custom.", "").ToSentenceCase().CamelCaseToString().Replace(".", " ")
+                        </label>
+                        <div class="col-sm-8">
+                            @{await Html.RenderPartialAsync("_MetaEditor_Default", meta); }
+                        </div>
+                    </div>
+                }
+            </fieldset>
+        }
+        <a class="btn btn-success" asp-area="Admin" asp-action="AddFeature" asp-controller="Property" asp-route-id="@Model.Id">Add feature slot</a>
+    </div>
+</div>

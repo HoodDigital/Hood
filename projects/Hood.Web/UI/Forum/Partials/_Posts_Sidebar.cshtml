@@ -1,0 +1,3 @@
+@model PostModel
+@{ await Html.RenderPartialAsync("_Posts_Search"); }
+@{ await Html.RenderPartialAsync("_Posts_Recent", Model.Recent); }

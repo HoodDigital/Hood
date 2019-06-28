@@ -1,4 +1,23 @@
-﻿.tiny-mce-body {
+﻿@each $color, $value in $colors {
+    @include bg-variant(".bg-#{$color}", $value);
+}
+@if $enable-gradients {
+    @each $color, $value in $colors {
+        @include bg-gradient-variant(".bg-gradient-#{$color}", $value);
+    }
+}
+// number of cards per line for each breakpoint
+$cards-per-line: ( xs: 1, sm: 2, md: 3, lg: 4, xl: 5 ) !default;
+@each $name, $breakpoint in $grid-breakpoints {
+    @media (min-width: $breakpoint) {
+        .card-deck .card {
+            flex: 0 0 calc(#{100/map-get($cards-per-line, $name)}% - #{$grid-gutter-width});
+            margin-bottom: $grid-gutter-width;
+        }
+    }
+}
+
+.tiny-mce-body {
     padding: 15px;
 }
 

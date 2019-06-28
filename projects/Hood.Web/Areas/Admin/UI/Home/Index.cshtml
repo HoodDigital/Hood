@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    var _propertySettings = Engine.Settings.Property;
+}
+<div class="card-deck admin-stats">
+    <div class="card text-white bg-yellow">
+        <div class="card-body">
+            <h5 class="card-title">Content on the site</h5>
+            <div class="row align-items-center">
+                <div class="col-auto d-md-none d-lg-flex">
+                    <i class="fa fa-pen-fancy fa-3x mr-2"></i>
+                </div>
+                <div class="col">
+                    <p class="h5 m-0"><strong data-plugin="counterup" class="content-totalPosts">0</strong> items</p>
+                    <p class="m-0"><small><b data-plugin="counterup" class="content-totalPublished">0</b> published</small></p>
+                </div>
+            </div>
+            <a class="full-box-link" href="#content-types" data-toggle="collapse">Show content...</a>
+        </div>
+    </div>
+    @if (_propertySettings.Enabled)
+    {
+        <div class="card text-white bg-teal">
+            <div class="card-body">
+                <h5 class="card-title">Property Listings</h5>
+                <div class="row align-items-center">
+                    <div class="col-auto d-md-none d-lg-flex">
+                        <i class="fa fa-user-plus fa-3x mr-2"></i>
+                    </div>
+                    <div class="col">
+                        <p class="h5 m-0"><strong data-plugin="counterup" class="properties-totalPosts">0</strong> properties</p>
+                        <p class="m-0"><small><b data-plugin="counterup" class="properties-totalPublished">0</b> published</small></p>
+                    </div>
+                </div>
+                <a class="full-box-link" asp-action="Index" asp-controller="Property">Show properties...</a>
+            </div>
+        </div>
+    }
+    <div class="card text-white bg-orange">
+        <div class="card-body">
+            <h5 class="card-title">Registered Users</h5>
+            <div class="row align-items-center">
+                <div class="col-auto d-md-none d-lg-flex">
+                    <i class="fa fa-user-plus fa-3x mr-2"></i>
+                </div>
+                <div class="col">
+                    <p class="h5 m-0"><strong data-plugin="counterup" class="users-totalUsers">0</strong> users</p>
+                    <p class="m-0"><small><b data-plugin="counterup" class="users-totalAdmins">0</b> administrators</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card text-white bg-cyan">
+        <div class="card-body">
+            <h5 class="card-title">Active Subscriptions</h5>
+            <div class="row align-items-center">
+                <div class="col-auto d-md-none d-lg-flex">
+                    <i class="fa fa-user-plus fa-3x mr-2"></i>
+                </div>
+                <div class="col">
+                    <p class="h5 m-0"><strong data-plugin="counterup" class="subs-active">0</strong> active</p>
+                    <p class="m-0"><small><b data-plugin="counterup" class="subs-trials">0</b> trials</small></p>
+                </div>
+            </div>
+            <a class="full-box-link" asp-action="Index" asp-controller="Subscriptions">Show subscriptions...</a>
+        </div>
+    </div>
+</div>
+<div class="row collapse" id="content-types">
+    @{
+        var types = Engine.Settings.Content.Types;
+    }
+    @foreach (var t in types)
+    {
+        <div class="col-sm-6 col-lg-3">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto text-black-50">
+                            <i class="fa fa-3x mr-2 @t.Icon"></i>
+                        </div>
+                        <div class="col text-right">
+                            <p class="m-0">@t.TypeNamePlural</p>
+                            <h2 class="m-0"><span data-plugin="counterup" class="content-@t.Type-total">0</span></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a class="full-box-link" href="/admin/content/@t.Type/manage">Show subscriptions...</a>
+        </div>
+    }
+</div>
+<div class="card">
+    <div class="card-header p-3">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5 class="m-0">Site history</h5>
+            </div>
+            <div class="col-2">
+                <select id="history" class="form-control">
+                    <option value="7">Past 7 days</option>
+                    <option value="30">Past 30 days</option>
+                    <option value="90">Past 90 days</option>
+                    <option value="365">Past 12 months</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="card-body" style="height:400px;">
+        <canvas id="admin-stats-chart"></canvas>
+    </div>
+</div>

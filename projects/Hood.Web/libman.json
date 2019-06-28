@@ -28,6 +28,11 @@
       "library": "dropzone@5.5.1"
     },
     {
+      "destination": "wwwroot/lib/feather",
+      "library": "feathericon@1.0.2",
+      "provider": "jsdelivr"
+    },
+    {
       "destination": "wwwroot/lib/fontawesome",
       "library": "font-awesome-5-css@5.4.1",
       "provider": "unpkg"

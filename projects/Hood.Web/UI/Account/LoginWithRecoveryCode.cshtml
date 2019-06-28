@@ -1,0 +1,29 @@
+@model LoginWithRecoveryCodeViewModel
+@{
+    ViewData["Title"] = "Recovery code verification";
+    Layout = "_LoginLayout";
+}
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <p>
+        You have requested to login with a recovery code. This login will not be remembered until you provide
+        an authenticator app code at login or disable 2FA and login again.
+    </p>
+</div>
+<form method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="RecoveryCode" class="form-control" autocomplete="off" />
+            <label asp-for="RecoveryCode"></label>
+        </div>        
+        <span asp-validation-for="RecoveryCode" class="text-danger"></span>
+    </div>
+    <p>
+        <button type="submit" class="btn btn-success btn-block">Log in</button>
+    </p>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

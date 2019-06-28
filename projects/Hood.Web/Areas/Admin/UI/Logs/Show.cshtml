@@ -1,0 +1,25 @@
+@model LogListModel
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-sm-12">
+        @if (Model.List.Count > 0)
+        {
+            @foreach (var log in Model.List)
+            {
+                <partial name="_Template_Log" model="log" />
+            }
+            <p class="text-center"><small>Last refreshed @DateTime.Now.ToLongDisplay()</small></p>
+            <div class="mt-5">
+                <partial name="_Pagination" />
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <p class="text-center m-t-xs m-b-lg">There are no logs to view yet, logs will appear once users are using the system.</p>
+            </div>
+        }
+    </div>
+</div>

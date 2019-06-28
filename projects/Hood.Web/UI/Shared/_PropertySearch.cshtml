@@ -1,0 +1,141 @@
+@model PropertySearchModel
+
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<form method="get">
+    <div class="row m-t-md m-b-md">
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Search</h4>
+                <input type="text" class="form-control m-t-lg" placeholder="Search our portfolio..." asp-for="Search" />
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Transaction</h4>
+                <select class="form-control m-t-lg" asp-for="Transaction">
+                    <option value="" selected>Show All</option>
+                    <option value="Rent">to Rent</option>
+                    <option value="Sale">to Buy</option>
+                    <option value="Student">for Students</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Type</h4>
+                <select class="form-control m-t-lg" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
+                    <option value="">Show All</option>
+                </select>
+            </div>
+        </div>
+        @if (_propertySettings.ShowBedrooms)
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Bedrooms</h4>
+                <select class="form-control m-t-lg half" asp-for="Bedrooms">
+                    <option value="">Show All</option>
+                    @for (int i = 0; i < 13; i++)
+                {
+                    <option value="@i">@(i)</option>
+            }
+                </select>
+            </div>
+        </div>
+}
+        @if (_propertySettings.ShowRent)
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Rent</h4>
+                <select class="form-control m-t-lg half" asp-for="MinRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+                <select class="form-control m-t-lg half" asp-for="MaxRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+            </div>
+        </div>
+}
+        @if (_propertySettings.ShowAskingPrice)
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Asking Price</h4>
+                <select class="form-control m-t-lg half" asp-for="MinRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+                <select class="form-control m-t-lg half" asp-for="MaxRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+            </div>
+        </div>
+}
+        @if (_propertySettings.ShowPremium)
+    {
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Premium</h4>
+                <select class="form-control m-t-lg half" asp-for="MinRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+                <select class="form-control m-t-lg half" asp-for="MaxRent">
+                    <option value="">Show All</option>
+                    <option value="0">£ 0</option>
+                    <option value="100">£ 100</option>
+                </select>
+            </div>
+        </div>
+}
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Planning</h4>
+                <select class="form-control m-t-lg" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
+                    <option value="">Show All</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="well">
+                <h4 class="no-margin">Organise by</h4>
+                <select class="form-control m-t-lg" asp-for="Order">
+                    <optgroup label="Property">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="name+desc">Name (Z-A)</option>
+                        <option value="date+desc">Added Date (Newest)</option>
+                        <option value="date">Added Date (Oldest)</option>
+                        <option value="area">Area (A-Z)</option>
+                        <option value="area+desc">Area (Z-A)</option>
+                    </optgroup>
+                    <optgroup label="Price">
+                        <option value="rent+desc">Rent (£££-£)</option>
+                        <option value="rent">Rent (£-£££)</option>
+                        <option value="premium+desc">Premium (£££-£)</option>
+                        <option value="premium">Premium (£-£££)</option>
+                    </optgroup>
+                    <optgroup label="Listings">
+                        <option value="planning">Planning (A-Z)</option>
+                        <option value="planning+desc">Planning (Z-A)</option>
+                        <option value="type">Listing Type (A-Z)</option>
+                        <option value="type+desc">Listing Type (Z-A)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-12 text-center">
+            <button type="submit" class="btn btn-lg btn-default mt-60 mb-30"><i class="fa fa-refresh m-r-md"></i>Reload Results...</button>
+        </div>
+    </div>
+</form>

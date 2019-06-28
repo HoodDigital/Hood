@@ -1,9 +1,12 @@
-﻿$fa-font-path: "../../lib/fontawesome/webfonts";
+﻿@import "admin/variables.scss";
+@import url('../../lib/chart/chart.min.css');
+@import "../../lib/feather/build/scss/feathericon";
 @import "../../lib/bootstrap/scss/bootstrap.scss";
 @import "../../lib/fontawesome/scss/fontawesome.scss";
-@import "../../lib/fontawesome/scss/brands";
-@import "../../lib/fontawesome/scss/regular";
-@import "../../lib/fontawesome/scss/solid";
+@import "../../lib/fontawesome/scss/brands.scss";
+@import "../../lib/fontawesome/scss/regular.scss";
+@import "../../lib/fontawesome/scss/solid.scss";
+@import "../../lib/sweetalert/src/sweetalert2.scss";
 
 @import "core/mixins.scss";
 @import "core/helpers.scss";
@@ -11,16 +14,12 @@
 @import "core/validation-summary.scss";
 @import "core/toasts.scss";
 @import "core/images.scss";
+@import "core/blades";
 
-@import "admin/variables.scss";
-@import "admin/base.scss";
-@import "admin/breadcrumb.scss";
+@import "admin/nav-tabs";
 @import "admin/editor.scss";
-@import "admin/footer.scss";
-@import "admin/layout.scss";
 @import "admin/media.scss";
-@import "admin/page-heading.scss";
-@import "admin/panels.scss";
 @import "admin/right-sidebar.scss";
-@import "admin/top-bar.scss";
-@import "admin/widgets.scss";
+@import "admin/hood-inline.scss";
+
+@import "admin/layout.scss";

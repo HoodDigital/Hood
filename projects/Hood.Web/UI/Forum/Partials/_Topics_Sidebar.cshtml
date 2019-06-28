@@ -1,0 +1,3 @@
+@model TopicModel
+@{ await Html.RenderPartialAsync("_Topics_Search"); }
+@{ await Html.RenderPartialAsync("_Topics_Recent", Model.Recent); }

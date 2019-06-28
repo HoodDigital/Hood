@@ -1,0 +1,44 @@
+@{
+    BasicSettings _basicSettings  = Engine.Settings.Basic;
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+    IntegrationSettings _plugins = Engine.Settings.Integrations;
+    ContactSettings _contact = Engine.Settings.GetContactSettings();
+    Layout = "_Layout";
+    Content currentContent = ViewData["Content"] as Content;
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section includes {
+    @RenderSection("includes", required: false)
+}
+@section scripts {
+    @RenderSection("scripts", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<div class="jumbotron">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        @if (currentContent != null)
+        {
+            <p>@currentContent.Excerpt</p>
+        }
+        else
+        {
+            <p>@ViewData["SubTitle"]</p>
+        }
+    </div>
+</div>
+<div class="bg-color-light-grey">
+    <div class="container">
+        <div class="m-t-lg m-b-lg">
+            @{ await Html.RenderPartialAsync("_ContactForm", new ContactFormModel(true, true)); }
+        </div>
+    </div>
+</div>
+@if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet())
+{
+    <div class="google-map" data-lat="@_basicSettings.Address?.Latitude" data-long="@_basicSettings.Address?.Longitude" data-marker="@Engine.Settings.Basic.FullTitle" data-zoom="12"></div>
+}

@@ -1,0 +1,134 @@
+@model PropertyListing
+@inject IContentRepository _data
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<div id="details" class="tab-pane">
+    <div class="panel-body">
+        <fieldset class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Property Type:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" asp-for="PropertyType">
+                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PropertyType, "\r\n|\r|\n"))
+                        {
+                            <option value="@s.ToSeoUrl()">@s</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Show in featured list:</label>
+                <div class="col-sm-8">
+                    <div class="checkbox">
+                        <input asp-for="Featured" class="styled">
+                        <label asp-for="Featured"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Is Confidential?:</label>
+                <div class="col-sm-8">
+                    <div class="checkbox">
+                        <input asp-for="Confidential" class="styled">
+                        <label asp-for="Confidential"></label>
+                    </div>
+                </div>
+            </div>
+            @if (_propertySettings.ShowBedrooms)
+            {
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Bedrooms:</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" asp-for="Bedrooms">
+                            <option value="">N/A</option>
+                            <option value="0">Studio</option>
+                            @for (int i = 1; i < 15; i++)
+                            {
+                                <option value="@i">@i.ToString("0")</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <input asp-for="Bedrooms" type="hidden">
+            }
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Planning Classification:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" asp-for="Planning" asp-items="_propertySettings.GetPlanningTypes().Select(p => new SelectListItem() { Value = p.Key, Text = p.Value })"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Lease/Listing Type:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" asp-for="ListingType" asp-items="_propertySettings.GetListingTypes().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Lease/Listing Status:</label>
+                <div class="col-sm-8">
+                    <select class="form-control" asp-for="LeaseStatus" asp-items="_propertySettings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Floor Areas:</label>
+                <div class="col-sm-8">
+                    <div class="p-sm bg-color-lighten">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input type="hidden" asp-for="Floors" />
+                                <div class="floor-list">
+                                    @if (Model.FloorAreas?.Count > 0)
+                                    {
+                                        @foreach (var floor in Model.FloorAreas)
+                                        {
+                                            <div class="row m-b-xs">
+                                                <div class="col-xs-4"><strong>@floor.Name</strong> @floor.Number</div>
+                                                <div class="col-xs-8">
+                                                    @floor.SquareMetres.ToString("N0") m<sup>2</sup>
+                                                    [@floor.SquareFeet.ToString("N0") sq. ft.] <a class="delete-floor btn btn-xs bg-color-red txt-color-white" data-number="@floor.Number"><i class='fa fa-trash-o'></i></a>
+                                                </div>
+                                            </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="no-margin">There are no floor areas added yet...</p>
+                                        }
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <h5>Add new floor:</h5>
+                        <div class="row no-margin">
+                            <div class="col-xs-4 no-padding">
+                                <small>Floor Name:</small>
+                                <input id="Floor-Name" type="text" class="form-control" />
+                            </div>
+                            <div class="col-xs-2 no-padding">
+                                <small>Number:</small>
+                                <input id="Floor-Number" type="number" step="1" class="form-control" value="@(Model.FloorAreas == null ? 0 : Model.FloorAreas.Count)" />
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <small>Metres<sup>2</sup>:</small>
+                                <input id="Floor-SquareMetres" type="number" step="0.1" class="form-control recalc-floor" value="0" />
+                            </div>
+                            <div class="col-xs-3 no-padding">
+                                <small>Sq. Feet:</small>
+                                <input id="Floor-SquareFeet" type="number" step="1" class="form-control recalc-floor" value="0" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <p class="m-t-xs"><a class="add-floor btn btn-xs bg-color-green txt-color-white">Add Floor</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

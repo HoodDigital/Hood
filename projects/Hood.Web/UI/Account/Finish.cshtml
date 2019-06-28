@@ -1,0 +1,47 @@
+@model FinishAccountSetupModel
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = "Finish account setup";
+    Layout = "_LoginLayout";
+}
+<div class="header">
+    <h2>Finish account setup</h2>
+    <p>Great, your email address has been validated, now let's create you a username and password to access the site.</p>
+</div>
+<form method="post">
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <input asp-for="UserId" type="hidden" />
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="FirstName" class="form-control" placeholder="First name" />
+            <label asp-for="FirstName"></label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="LastName" class="form-control" placeholder="Last name" />
+            <label asp-for="LastName"></label>
+        </div>
+    </div>
+    <input type="text" name="prevent_autofill" id="prevent_autofill" value="" style="display:none;" />
+    <input type="password" name="password_fake" id="password_fake" value="" style="display:none;" />
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="Username" class="form-control" placeholder="User name" />
+            <label asp-for="Username"></label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="Password" class="form-control" placeholder="Password" />
+            <label asp-for="Password"></label>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="floating-label">
+            <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+            <label asp-for="ConfirmPassword"></label>
+        </div>
+    </div>
+    <p><button type="submit" class="btn btn-block">Finish account setup</button></p>
+</form>

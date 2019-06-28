@@ -1,5 +1,5 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Designer = {
     Drake: null,
     Init: function () {
@@ -232,11 +232,11 @@ $.hood.Designer = {
         },
         Refresh: function () {
             if ($('#content-block-list').doesExist())
-                $('#content-block-list').data('hoodDataList').Refresh()
+                $('#content-block-list').data('hoodDataList').Refresh();
         },
         Delete: function (e) {
             $(this).parent().remove();
-        },
+        }
     },
     Images: {
         Change: function () {
@@ -254,10 +254,10 @@ $.hood.Designer = {
         $(html).find('.hood-drag-handle').remove();
         $(html).find('.hood-delete-block').remove();
         html = $(html)
-                .find('.tinymce-free')
-                .removeClass('mce-content-body').removeAttr('style').removeAttr('contenteditable').removeAttr('spellcheck').removeAttr('id')
-                .end()
-                .html();
+            .find('.tinymce-free')
+            .removeClass('mce-content-body').removeAttr('style').removeAttr('contenteditable').removeAttr('spellcheck').removeAttr('id')
+            .end()
+            .html();
         params = {
             Id: $('#editable-content').data('id'),
             Body: html
@@ -269,17 +269,17 @@ $.hood.Designer = {
                 $.hood.Alerts.Error(data.ErrorString);
             }
         })
-        .done(function () {
-        })
-        .fail(function () {
-        })
-        .always(function () {
-            $.hood.Designer.InitDragula();
-            $.hood.Designer.InitEditors();
-            $.hood.Designer.Loader.Hide();
-        });
+            .done(function () {
+            })
+            .fail(function () {
+            })
+            .always(function () {
+                $.hood.Designer.InitDragula();
+                $.hood.Designer.InitEditors();
+                $.hood.Designer.Loader.Hide();
+            });
     }
-}
+};
 $(window).on('load', function () {
     $.hood.Designer.Init();
 });

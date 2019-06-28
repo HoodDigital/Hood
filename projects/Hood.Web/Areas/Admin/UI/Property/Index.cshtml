@@ -1,0 +1,48 @@
+@model PropertySearchModel
+@{
+    ViewBag.Title = "Manage Properties";
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+@section scripts {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places"></script>
+}
+@section buttons {
+    @if (_propertySettings.ShowList)
+    {
+        <a class="btn btn-sm btn-info" href="/@_propertySettings.Slug" target="_blank"><i class="fa fa-desktop m-r-sm"></i>Preview</a>
+    }
+    @if (User.IsAdminOrBetter())
+    {
+        <a class="btn btn-sm btn-danger warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!"><i class="fa fa-trash m-r-sm"></i>Delete All</a>
+    }
+    <button class="btn btn-sm btn-success create-property"><i class="fa fa-plus-circle m-r-sm"></i>Create New</button>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+}
+<div class="row">
+    <div class="col-sm-12 col-lg-9">
+        <div class="panel-body">
+            @if (Model.List.Count > 0)
+            {
+                @foreach (var property in Model.List)
+                {
+                    await Html.RenderPartialAsync("_ListTemplate", property);
+                }
+                <div class="text-center m-t-md">
+                    @{ await Html.RenderPartialAsync("_Pagination"); }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <p class="text-center m-t-xs m-b-lg">There are no properties yet, click "Create New" to add your first property.</p>
+                </div>
+            }
+       </div>
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        @{ await Html.RenderPartialAsync("_PropertySearch"); }
+    </div>
+</div>

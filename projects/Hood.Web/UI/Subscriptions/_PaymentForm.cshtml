@@ -1,0 +1,151 @@
+@model SubscriptionModel
+<div class="row m-b-lg">
+    <div class="col-sm-6 col-sm-offset-3">
+        <div class="selected-package form-box">
+            <p>You have selected:</p>
+            <span class="selected-price-text"></span><a class="btn btn-sm btn-primary change-price-option m-l-md">Change</a>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+        <form asp-action="New" method="POST" id="payment-form" class="form-box">
+            <input asp-for="Category" type="hidden" />
+            <input asp-for="returnUrl" type="hidden" />
+            <div class="payment-errors text-danger"></div>
+            <div class="form-group">
+                <div class="input-group hidden">
+                    <select asp-for="PlanId" class="form-control">
+                        @foreach (Subscription plan in Model.Plans.OrderBy(p => p.Amount))
+                        {
+                            if (Model.CurrentSubscription != null && plan.StripeId == Model.CurrentSubscription.StripePlan.Id)
+                            {
+                            }
+                            else
+                            {
+                                <option value="@plan.Id">@plan.Name - @plan.FullPrice</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            @if (Model.Customer != null && Model.Customer.Sources != null)
+            {
+                foreach (var itm in Model.Customer.Sources.Data)
+                {
+                    switch (itm.Type)
+                    {
+                        case Stripe.SourceType.Card:
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <input id="@itm.Card.Id" type="radio" name="CardId" value="@itm.Card.Id" class="styled" />
+                                    <label for="@itm.Card.Id">
+                                        @switch (itm.Card.Brand)
+                                        {
+                                            case "Visa":
+                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/visa.png" />
+                                                break;
+                                            case "American Express":
+                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/AmericanExpress.png" />
+                                                break;
+                                            case "MasterCard":
+                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/MasterCard.png" />
+                                                break;
+                                            case "Discover":
+                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/Discover.png" />
+                                                break;
+                                            case "JCB":
+                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/JCB.png" />
+                                                break;
+                                            case "Diners Club":
+                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/DinersClub.png" />
+                                                break;
+                                        }
+                                        <span>Card ending in <strong>@itm.Card.Last4</strong></span>
+                                        @if (itm.Id == Model.Customer?.DefaultSourceId)
+                                        {
+                                            <span class="label label-default">Default</span>
+                                        }
+                                    </label>
+                                </div>
+                            </div>
+                            break;
+
+                    }
+                }
+            }
+            <div class="form-group">
+                <div class="checkbox">
+                    <input id="new-card" name="CardId" value="" type="radio" checked class="styled">
+                    <label for="new-card">Enter a new card...</label>
+                </div>
+            </div>
+            <div class="collapse in well" id="new-card-form">
+                <div class="form-group">
+                    <label class="control-label">Card Number:</label>
+                    <input size="20" data-stripe="number" class="form-control" placeholder="Card number..." />
+                </div>
+                <div class="form-group">
+                    <label class="control-label">Billing Postcode</label>
+                    <input data-stripe="address_zip" class="form-control" placeholder="Zip or Postal Code..." />
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label">Expiry Date:</label>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <select data-stripe="exp_month" class="form-control">
+                                        @for (int i = 1; i < 13; i++)
+                                        {
+                                            <option value="@i.ToString("D2")">@i.ToString("D2")</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-xs-6">
+                                    <select data-stripe="exp_year" class="form-control">
+                                        @for (int i = DateTime.Now.Year; i < DateTime.Now.Year + 15; i++)
+                                        {
+                                            <option value="@i">@i</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label">Security Code (CVC):</label>
+                            <input data-stripe="cvc" class="form-control" placeholder="CVC Security Number..." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center">
+                <input type="submit" class="submit btn btn-primary" value="Upgrade your account" />
+                <button class="btn btn-primary" id="skip-to-confirm">Upgrade your account</button>
+            </p>
+            @if (Engine.Settings.GetBillingSettings().EnableStripeTestMode)
+            {
+                <div class="powered-by alert alert-info">
+                    <p>
+                        While in test mode, you can create authorised payments for testing by entering the following:
+                    </p>
+                    <p style="line-height:1.5em;margin:0;">
+                        Card number: <strong>4242424242424242</strong><br />
+                        Postcode: <strong>Any postcode</strong><br />
+                        Expiry Date: <strong>Any future date</strong><br />
+                        Security code: <strong>123</strong>
+                    </p>
+                </div>
+            }
+            <div class="powered-by text-center">
+                <a href="http://stripe.com"><img src="~/hood/images/powered-by-stripe.svg" /></a>
+                <p>
+                    Secure payments, powered by <a href="http://stripe.com">Stripe</a>.
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+<p class="text-center m-t-lg m-b-lg"><strong>Please note, YOU WILL NOT BE CHARGED at all until the end of your trial, if you have selected one. You may cancel at any time and leave without being charged.<br />We DO NOT store any card details ourselves, all payments are handled by <a href="https://stripe.com/about" target="_blank">Stripe</a>.</strong></p>

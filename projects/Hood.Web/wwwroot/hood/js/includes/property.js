@@ -7,72 +7,8 @@ $.hood.Property = {
         $('body').on('click', '.publish-property', this.Publish);
         $('body').on('click', '.create-property', this.Create.Init);
 
-        if ($('#manage-property-list').doesExist())
-            this.Manage.Init();
         if ($('#edit-property').doesExist())
             this.Edit.Init();
-    },
-    Manage: {
-        Loaded: false,
-        Init: function () {
-            vars = $.getUrlVars();
-            if (typeof (vars["search"]) !== 'undefined' && vars["search"] !== '')
-                $('#manage-property-search').val($.decodeUrl(vars["search"]));
-            if (typeof (vars["sort"]) !== 'undefined' && vars["sort"] !== '')
-                $('#manage-property-sort').val($.decodeUrl(vars["sort"]));
-            if (typeof (vars["type"]) !== 'undefined' && vars["type"] !== '')
-                $('#manage-property-type').val($.decodeUrl(vars["type"]));
-            if (typeof (vars["planning"]) !== 'undefined' && vars["planning"] !== '')
-                $('#manage-property-planning').val($.decodeUrl(vars["planning"]));
-            if (vars["all"] === 'false')
-                $('#manage-property-showall').prop("checked", false);
-            else
-                $('#manage-property-showall').prop("checked", true);
-
-            $('#manage-property-list').hoodDataList({
-                url: '/admin/property/get',
-                params: this.Params,
-                pageSize: 12,
-                pagers: '.manage-property-pager',
-                template: '#manage-property-template',
-                dataBound: function () {
-                    if (!$.hood.Property.Manage.Loaded) {
-                        page = $.getUrlVars()["page"];
-                        if (isNaN(page))
-                            page = 1;
-                        this.dataSource.page(page);
-                        $.hood.Property.Manage.Loaded = true;
-                    }
-                    if (history.pushState) {
-                        var newurl = location.pathname + '?' + $.param($.hood.Property.Manage.Params()) + '&page=' + this.dataSource.page();
-                        window.history.pushState({ path: newurl }, '', newurl);
-                    }
-                },
-                refreshOnChange: ".manage-property-change",
-                refreshOnClick: ".manage-property-click",
-                serverAction: "GET"
-            });
-        },
-        Params: function () {
-            return {
-                search: $('#manage-property-search').val(),
-                sort: $('#manage-property-sort').val(),
-                type: $('#manage-property-type').val(),
-                planning: $('#manage-property-planning').val(),
-                all: $('#manage-property-showall').is(':checked')
-            };
-        },
-        Filter: function () {
-            return {
-                search: $('#manage-property-search').val(),
-                sort: $('#manage-property-sort').val()
-            };
-        },
-        Refresh: function () {
-            if ($('#manage-property-list').doesExist())
-                $('#manage-property-list').data('hoodDataList').Refresh();
-            $.hood.Blades.Reload();
-        }
     },
     Delete: function (e) {
         var $this = $(this);

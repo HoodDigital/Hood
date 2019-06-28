@@ -29,7 +29,7 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (!Engine.Settings.Billing.CheckStripe)
+                if (!Engine.Settings.Billing.CheckStripeOrThrow())
                 {
                     // Stripe is not enabled, exception will have thrown.
                 }

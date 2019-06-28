@@ -1,0 +1,67 @@
+.nav-tabs {
+    border-bottom: 1px solid transparent;
+
+    > li {
+
+        > a {
+
+            &:hover {
+                color: black;
+                border-color: transparent;
+            }
+        }
+
+        &.active {
+            > a {
+                background-color: white;
+                border-color: white;
+            }
+        }
+    }
+
+    .nav-item {
+        margin-left: .75rem;
+        margin-right: .75rem;
+
+        &:first-child {
+            margin-left: 0
+        }
+
+        &:last-child {
+            margin-right: 0
+        }
+
+        .nav-link {
+            padding: 1rem 0;
+            border: 1px solid transparent;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom: 1px solid transparent;
+            border-left-width: 0;
+            border-right-width: 0;
+            border-top-width: 0;
+
+            &:not(.active) {
+                color: #95aac9
+            }
+
+            &:not(.active):hover {
+                color: #6e84a3
+            }
+        }
+
+        &.show .nav-link {
+            border-color: transparent
+        }
+    }
+
+    &.card-header-tabs {
+        font-size: .8125rem;
+        margin: -.5rem 0;
+
+        .nav-link {
+            padding-top: calc((3.75rem - 1em * 1.5) / 2) !important;
+            padding-bottom: calc((3.75rem - 1em * 1.5) / 2) !important
+        }
+    }
+}

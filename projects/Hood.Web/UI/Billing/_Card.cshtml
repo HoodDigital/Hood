@@ -1,0 +1,65 @@
+@model Stripe.StripeCard
+<div class="panel panel-default no-margin accordion-section">
+    <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-card-{0}", Model.Id)">
+        @if (Model.Id == Model.Customer.DefaultSourceId)
+        {
+            <span class="pull-right label label-default">Default</span>
+        }
+        @switch (Model.Brand)
+        {
+            case "Visa":
+                <img class="card-icon m-r-xs" src="~/hood/images/cards/visa.png" />
+                break;
+            case "American Express":
+                <img class="card-icon m-r-xs" src="~/hood/images/cards/AmericanExpress.png" />
+                break;
+            case "MasterCard":
+                <img class="card-icon m-r-xs" src="~/hood/images/cards/MasterCard.png" />
+                break;
+            case "Discover":
+                <img class="card-icon m-r-xs" src="~/hood/images/cards/Discover.png" />
+                break;
+            case "JCB":
+                <img class="card-icon m-r-xs" src="~/hood/images/cards/JCB.png" />
+                break;
+            case "Diners Club":
+                <img class="card-icon m-r-xs" src="~/hood/images/cards/DinersClub.png" />
+                break;
+        }
+        <span>Card ending in <strong>@Model.Last4</strong></span>
+    </div>
+    <div id="@string.Format("#collapse-card-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-card-{0}", Model.Id)">
+        <div class="panel-body">
+            <dl class="dl-horizontal">
+                <dt>
+                    Brand
+                </dt>
+                <dd>
+                    @Model.Brand
+                </dd>
+                <dt>
+                    Last 4 digits
+                </dt>
+                <dd>
+                    @Model.Last4
+                </dd>
+                <dt>
+                    Postcode
+                </dt>
+                <dd>
+                    @Model.AddressZip
+                </dd>
+                <dt>
+                    Expiry Date
+                </dt>
+                <dd>
+                    @Model.ExpirationMonth / @Model.ExpirationYear
+                </dd>
+            </dl>
+            <p class="text-right">
+                <a class="btn btn-xs btn-primary" asp-action="SetDefaultCard" asp-route-uid="@Model.Id">Make Default</a>
+                <a class="btn btn-xs btn-danger" asp-action="DeleteCard" asp-route-uid="@Model.Id">Delete</a>
+            </p>
+        </div>
+    </div>
+</div>

@@ -8,8 +8,11 @@ console.log = console.log || function () { };
 console.warn = console.warn || function () { };
 console.error = console.error || function () { };
 console.info = console.info || function () { };
+$.fn.exists = function () {
+    return $(this).length;
+};
 $.fn.doesExist = function () {
-    return $(this).length > 0;
+    return $(this).length;
 };
 $.fn.restrictToSlug = function (restrictPattern) {
     var targets = $(this);
@@ -115,16 +118,14 @@ $.fn.removeLoader = function () {
     $(this).empty().html($(this).data('loadercontent'));
     $(this).removeClass('loading');
 };
-$.fn.warningAlert = function (val) {
+$.fn.warningAlert = function () {
     var targets = $(this);
     var warningAlertHandler = function (e) {
         e.preventDefault();
-        $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('warning') || "Woah!", function (isConfirm) {
-            if (isConfirm) {
+        $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('title') || "Woah!", function (result) {
+            if (result.value) {
                 url = $(e.currentTarget).attr('href');
                 window.location = url;
-            } else {
-                swal("Cancelled", "It's all good in the hood!", "error");
             }
         }, type = 'warning', confirmButtonText = 'Ok', cancelButtonText = 'Cancel', footer = $(e.currentTarget).data('footer'));
         return false;

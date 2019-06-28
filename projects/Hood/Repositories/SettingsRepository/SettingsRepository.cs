@@ -213,22 +213,22 @@ namespace Hood.Services
         [Obsolete("Please use Engine.Settings.Forum instead.", true)]
         public ForumSettings GetForumSettings(bool noCache = false) => throw new NotImplementedException();
 
-        [Obsolete("Please use Engine.Settings.Billing.CheckStripe instead.", true)]
+        [Obsolete("Please use Engine.Settings.Billing.CheckStripeOrThrow() instead.", true)]
         public OperationResult StripeEnabled() => throw new NotImplementedException();
 
-        [Obsolete("Please use Engine.Settings.Billing.CheckPaypal instead.", true)]
+        [Obsolete("Please use Engine.Settings.Billing.CheckPaypalOrThrow() instead.", true)]
         public OperationResult PayPalEnabled() => throw new NotImplementedException();
 
-        [Obsolete("Please use Engine.Settings.Billing.CheckSubscriptions instead.", true)]
+        [Obsolete("Please use Engine.Settings.Billing.CheckSubscriptionsOrThrow() instead.", true)]
         public OperationResult SubscriptionsEnabled() => throw new NotImplementedException();
 
         [Obsolete(null, true)]
         public OperationResult PropertyEnabled() => throw new NotImplementedException();
 
-        [Obsolete("Please use Engine.Settings.Billing.CheckCart instead.", true)]
+        [Obsolete("Please use Engine.Settings.Billing.CheckCartOrThrow() instead.", true)]
         public OperationResult CartEnabled() => throw new NotImplementedException();
 
-        [Obsolete("Please use Engine.Settings.Billing.CheckBilling instead.", true)]
+        [Obsolete("Please use Engine.Settings.Billing.CheckBillingOrThrow() instead.", true)]
         public OperationResult BillingEnabled() => throw new NotImplementedException();
 
         [Obsolete("Please use Engine.Settings.Basics.SiteTitle instead.", true)]

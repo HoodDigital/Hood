@@ -150,7 +150,6 @@ gulp.task('js:package:admin', function () {
         hood.js + 'includes/helpers.js',
         hood.js + 'includes/forms.js',
         hood.js + 'includes/handlers.js',
-        hood.js + 'includes/datalist.js',
         hood.js + 'includes/fileupload.js',
         hood.js + 'includes/pager.js',
         hood.js + 'includes/validator.js',

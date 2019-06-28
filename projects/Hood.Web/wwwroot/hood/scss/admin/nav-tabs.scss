@@ -1,0 +1,38 @@
+﻿.nav-tabs.card-header-tabs {
+    border-bottom: 1px solid transparent;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin: -.75rem 0;
+
+    .nav-item {
+        margin: 0;
+
+        &:first-child {
+            margin-left: 0
+        }
+
+        &:last-child {
+            margin-right: 0
+        }
+
+        .nav-link {
+            padding: 1rem;
+            border: 1px solid transparent;
+            background: transparent;
+            border-radius: 0;
+            margin-bottom: -2px;
+            color: $gray-400;
+            font-weight: $font-weight-bold;
+
+            &.active {
+                color: black;
+                border-bottom: 1px solid $black;
+            }
+
+            &:not(.active):hover {
+                color: $gray-600;
+                border-bottom: 1px solid $gray-600;
+            }
+        }
+    }
+}

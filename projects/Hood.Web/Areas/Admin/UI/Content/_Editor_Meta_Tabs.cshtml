@@ -1,0 +1,14 @@
+@model EditContentModel
+@if (Model.ContentType.Templates)
+{<li class=""><a data-toggle="tab" href="#template-settings" aria-expanded="false"> Template</a></li>}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.ContentType.BaseName + ".")).Count() > 0 || 
+    Model.Content.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
+{<li class=""><a data-toggle="tab" href="#type-settings" aria-expanded="false"> @Model.ContentType.TypeName Settings</a></li>}
+@if (Model.ContentType.Gallery)
+{<li class=""><a data-toggle="tab" href="#gallery" aria-expanded="false"> Gallery</a></li>}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
+{<li class=""><a data-toggle="tab" href="#seo-settings" aria-expanded="false"> SEO</a></li>}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0)
+{<li class=""><a data-toggle="tab" href="#image-settings" aria-expanded="false"> Image Settings</a></li>}
+@if (Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
+{<li class=""><a data-toggle="tab" href="#security-settings" aria-expanded="false"> Security</a></li>}

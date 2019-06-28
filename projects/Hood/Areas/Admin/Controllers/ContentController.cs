@@ -792,7 +792,7 @@ namespace Hood.Areas.Admin.Controllers
 
         protected async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
         {
-            if (Engine.Settings.Billing.CheckSubscriptions)
+            if (Engine.Settings.Billing.CheckSubscriptionsThrow())
             {
                 // get subscriptions - if there are any.
                 model.Subscriptions = await _account.GetSubscriptionPlansAsync();
