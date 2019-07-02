@@ -1,0 +1,8 @@
+﻿.code-viewer {
+    height: auto;
+
+    @include media-breakpoint-up(sm) {
+        height: 500px;
+        overflow:auto;
+    }
+}

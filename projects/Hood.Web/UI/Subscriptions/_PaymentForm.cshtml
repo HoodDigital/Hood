@@ -18,60 +18,48 @@
                     <select asp-for="PlanId" class="form-control">
                         @foreach (Subscription plan in Model.Plans.OrderBy(p => p.Amount))
                         {
-                            if (Model.CurrentSubscription != null && plan.StripeId == Model.CurrentSubscription.StripePlan.Id)
-                            {
-                            }
-                            else
-                            {
-                                <option value="@plan.Id">@plan.Name - @plan.FullPrice</option>
-                            }
+                            <option value="@plan.Id">@plan.Name - @plan.FullPrice</option>
                         }
                     </select>
                 </div>
             </div>
             @if (Model.Customer != null && Model.Customer.Sources != null)
             {
-                foreach (var itm in Model.Customer.Sources.Data)
+                foreach (Stripe.Card itm in Model.Customer.Sources)
                 {
-                    switch (itm.Type)
-                    {
-                        case Stripe.SourceType.Card:
-                            <div class="form-group">
-                                <div class="checkbox">
-                                    <input id="@itm.Card.Id" type="radio" name="CardId" value="@itm.Card.Id" class="styled" />
-                                    <label for="@itm.Card.Id">
-                                        @switch (itm.Card.Brand)
-                                        {
-                                            case "Visa":
-                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/visa.png" />
-                                                break;
-                                            case "American Express":
-                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/AmericanExpress.png" />
-                                                break;
-                                            case "MasterCard":
-                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/MasterCard.png" />
-                                                break;
-                                            case "Discover":
-                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/Discover.png" />
-                                                break;
-                                            case "JCB":
-                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/JCB.png" />
-                                                break;
-                                            case "Diners Club":
-                                                <img class="card-icon m-r-xs" src="~/hood/images/cards/DinersClub.png" />
-                                                break;
-                                        }
-                                        <span>Card ending in <strong>@itm.Card.Last4</strong></span>
-                                        @if (itm.Id == Model.Customer?.DefaultSourceId)
-                                        {
-                                            <span class="label label-default">Default</span>
-                                        }
-                                    </label>
-                                </div>
-                            </div>
-                            break;
-
-                    }
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <input id="@itm.Id" type="radio" name="CardId" value="@itm.Id" class="styled" />
+                            <label for="@itm.Id">
+                                @switch (itm.Brand)
+                                {
+                                    case "Visa":
+                                        <img class="card-icon m-r-xs" src="~/hood/images/cards/visa.png" />
+                                        break;
+                                    case "American Express":
+                                        <img class="card-icon m-r-xs" src="~/hood/images/cards/AmericanExpress.png" />
+                                        break;
+                                    case "MasterCard":
+                                        <img class="card-icon m-r-xs" src="~/hood/images/cards/MasterCard.png" />
+                                        break;
+                                    case "Discover":
+                                        <img class="card-icon m-r-xs" src="~/hood/images/cards/Discover.png" />
+                                        break;
+                                    case "JCB":
+                                        <img class="card-icon m-r-xs" src="~/hood/images/cards/JCB.png" />
+                                        break;
+                                    case "Diners Club":
+                                        <img class="card-icon m-r-xs" src="~/hood/images/cards/DinersClub.png" />
+                                        break;
+                                }
+                                <span>Card ending in <strong>@itm.Last4</strong></span>
+                                @if (itm.Id == Model.Customer?.DefaultSourceId)
+                                {
+                                    <span class="label label-default">Default</span>
+                                }
+                            </label>
+                        </div>
+                    </div>
                 }
             }
             <div class="form-group">
@@ -125,7 +113,7 @@
                 <input type="submit" class="submit btn btn-primary" value="Upgrade your account" />
                 <button class="btn btn-primary" id="skip-to-confirm">Upgrade your account</button>
             </p>
-            @if (Engine.Settings.GetBillingSettings().EnableStripeTestMode)
+            @if (Engine.Settings.Billing.EnableStripeTestMode)
             {
                 <div class="powered-by alert alert-info">
                     <p>

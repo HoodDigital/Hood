@@ -257,7 +257,6 @@ namespace Hood.Areas.Admin.Controllers
                 ShowCategories = true,
                 ShowBanner = true,
                 ShowImage = true,
-                ShowMeta = true,
                 Gallery = false,
                 Templates = false,
                 TemplateFolder = "Templates",

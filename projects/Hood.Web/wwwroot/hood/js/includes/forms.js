@@ -1,6 +1,12 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Forms = {
+    Init: function () {
+        $('.floating-label > label').each(function () {
+            var $me = $(this);
+            $me.parent().append($me);
+        });
+    },
     GetAllowedExtensions: function (section) {
         switch (section) {
             case "Image":
@@ -48,3 +54,4 @@ $.hood.Forms = {
         $(e).closest('label').removeClass('state-success').addClass('state-error');
     }
 };
+$.hood.Forms.Init();

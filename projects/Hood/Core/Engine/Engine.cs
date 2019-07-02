@@ -48,6 +48,16 @@ namespace Hood.Core
                 return Current.Resolve<ISettingsRepository>();
             }
         }
+        /// <summary>
+        /// Gets the singleton Hood engine used to access Hood services.
+        /// </summary>
+        public static IThemesService Themes
+        {
+            get
+            {
+                return Current.Resolve<IThemesService>();
+            }
+        }
 
         public static string Version
         {

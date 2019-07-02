@@ -94,29 +94,6 @@ nav.sidebar {
                 }
             }
 
-            &.landing-link {
-                a {
-                    background: $success;
-                    color: white;
-
-                    i {
-                        color: white;
-                    }
-
-                    &:hover {
-                        background: darken($success, 10%);
-                    }
-                }
-            }
-
-            &.active {
-                background-color: #111;
-
-                @media (min-width:768px) {
-                    border-left: 3px solid $hood-yellow;
-                }
-            }
-
             ul.nav {
                 li {
                     a.nav-link {

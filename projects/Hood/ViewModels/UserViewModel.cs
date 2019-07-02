@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using Hood.Interfaces;
 using Hood.Enums;
 using Hood.BaseTypes;
+using Microsoft.AspNetCore.Identity;
 
 namespace Hood.ViewModels
 {
-    public class IndexViewModel : SaveableModel
+    public class UserViewModel : SaveableModel, ISaveableModel
     {
         public string UserId { get; set; }
 
@@ -25,10 +26,11 @@ namespace Hood.ViewModels
 
         public string StatusMessage { get; set; }
 
-        public UserProfile Profile { get; set; }
+        public UserProfileViewModel Profile { get; set; }
 
         public IMediaObject Avatar { get; set; }
 
         public IList<string> Roles { get; set; }
+        public IList<IdentityRole> AllRoles { get; set; }
     }
 }

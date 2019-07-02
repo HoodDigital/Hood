@@ -5,6 +5,7 @@ using Hood.Filters;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

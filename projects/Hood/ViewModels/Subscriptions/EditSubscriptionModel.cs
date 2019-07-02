@@ -1,6 +1,7 @@
 ﻿using Hood.Infrastructure;
+using Hood.Models;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class EditSubscriptionModel
     {

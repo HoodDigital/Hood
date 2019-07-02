@@ -1,15 +1,10 @@
-// Hood Variables
-$hood-yellow: #d9b50b;
-$hood-dark: #171818;
-
 $sidebar-width: 250px;
 $sidebar-link-color: #a7b1c2;
 $grid-gutter-width: 24px;
 $font-size-base: .9rem;
 $body-bg: #f9fbfd;
 $body-color: #171818;
-$primary: $hood-yellow;
-$secondary: $hood-dark;
+$primary: #f39327;
 
 $fa-font-path: "../../lib/fontawesome/webfonts";
 $feathericon-font-path: "../../lib/feather/build/fonts/";
@@ -19,4 +14,6 @@ $card-border-color: #efefef;
 $card-cap-bg: white;
 $card-border-radius: 7px;
 
-
+$input-height: auto;
+$input-padding-y: .75rem;
+$input-padding-x: .75rem;

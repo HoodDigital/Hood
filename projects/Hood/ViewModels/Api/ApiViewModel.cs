@@ -5,7 +5,7 @@ using Hood.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class ApiViewModel : SaveableModel
     {

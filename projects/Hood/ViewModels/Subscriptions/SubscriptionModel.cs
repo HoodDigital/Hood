@@ -2,8 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using Stripe;
 using Hood.BaseTypes;
+using Hood.Models;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class SubscriptionModel : SaveableModel
     {
@@ -22,12 +23,12 @@ namespace Hood.Models
         [Display(Name = "Current Category")]
         public string Category { get; set; }
 
-        public List<Subscription> Plans { get; set; }
-        public List<Subscription> Addons { get; set; }
+        public List<Models.Subscription> Plans { get; set; }
+        public List<Models.Subscription> Addons { get; set; }
         public Stripe.Subscription CurrentSubscription { get; set; }
         public Stripe.Customer Customer { get; set; }
         public ApplicationUser User { get; set; }
         public IEnumerable<Stripe.Card> Cards { get; set; }
-        public Subscription CurrentPlan { get; set; }
+        public Models.Subscription CurrentPlan { get; set; }
     }
 }

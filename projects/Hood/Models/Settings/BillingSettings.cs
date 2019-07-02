@@ -12,9 +12,9 @@ namespace Hood.Models
     public class BillingSettings : SaveableModel
     {
         // Paypal
-        [Display(Name = "Enable PayPal")]
+        [Display(Name = "Enable PayPal", Description = "To enable paypal, you must also supply a Paypal Client Id and a Client Secret in your application settings (appsettings.json or Env variables).")]
         public bool EnablePayPal { get; set; }
-        [Display(Name = "PayPal Sandbox Mode")]
+        [Display(Name = "PayPal Sandbox Mode", Description = "Transactions processed will use the PayPal sandbox.")]
         public bool PayPalSandboxMode { get; set; }
         [Display(Name = "PayPal Client Id")]
         public string PayPalClientId { get; set; }
@@ -22,12 +22,12 @@ namespace Hood.Models
         public string PayPalSecret { get; set; }
 
         // SagePay
-        [Display(Name = "Enable SagePay")]
+        [Display(Name = "Enable SagePay", Description = "To enable stripe, you must also supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).")]
         public bool EnableSagePay { get; set; }
-        [Display(Name = "SagePayMode")]
+        [Display(Name = "SagePay Mode")]
         public string SagePayMode { get; set; }
 
-        [Display(Name = "SagePay Endpoint")]
+        [Display(Name = "SagePay Endpoint",Description = "This would normally be <code>https://pi-live.sagepay.com/api/v1</code>")]
         public string SagePayEndpoint { get; set; }
         [Display(Name = "SagePay Key")]
         public string SagePayKey { get; set; }
@@ -37,7 +37,7 @@ namespace Hood.Models
         public string SagePayVendorName { get; set; }
 
         // SagePay Testing
-        [Display(Name = "SagePay Testing Endpoint")]
+        [Display(Name = "SagePay Testing Endpoint", Description = "This would normally be <code>https://pi-test.sagepay.com/api/v1</code>")]
         public string SagePayTestingEndpoint { get; set; }
         [Display(Name = "SagePay Testing Key")]
         public string SagePayTestingKey { get; set; }
@@ -47,21 +47,21 @@ namespace Hood.Models
         public string SagePayTestingVendorName { get; set; }
 
         // Store
-        [Display(Name = "Enable Shopping Cart / Checkout")]
+        [Display(Name = "Enable Shopping Cart / Checkout", Description = "To enable the shopping cart system, you must also enable Stripe or Paypal in your application settings (appsettings.json or Env variables).")]
         public bool EnableCart { get; set; }
 
         // Stripe
-        [Display(Name = "Enable Stripe")]
+        [Display(Name = "Enable Stripe", Description = "To enable stripe, you must also supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).")]
         public bool EnableStripe { get; set; }
-        [Display(Name = "Enable Subscriptions")]
+        [Display(Name = "Enable Subscriptions", Description = "To enable subscriptions, you must also enable Stripe and supply a Stripe Key and a Stripe Public Key in your application settings (appsettings.json or Env variables).")]
         public bool EnableSubscriptions { get; set; }
-        [Display(Name = "Stripe Test Mode")]
+        [Display(Name = "Stripe Test Mode", Description = "Transactions processed will use the test service and process using your Test Api keys.")]
         public bool EnableStripeTestMode { get; set; }
-        [Display(Name = "Subscription Upgrad ePage")]
+        [Display(Name = "Subscription Upgrade Page", Description = "Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/change ] - <strong>Default: /subscriptions/change</strong>")]
         public string SubscriptionUpgradePage { get; set; }
-        [Display(Name = "Subscription Create Page")]
+        [Display(Name = "Subscription Create Page", Description = "Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/get ] - <strong>Default: /subscriptions/get</strong>")]
         public string SubscriptionCreatePage { get; set; }
-        [Display(Name = "Subscription Addon Page")]
+        [Display(Name = "Subscription Addon Page", Description = "Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/addon ] - <strong>Default: /subscriptions/addon</strong>")]
         public string SubscriptionAddonPage { get; set; }
         [Display(Name = "Webhook Logs")]
         public string SubscriptionWebhookLogs { get; set; }

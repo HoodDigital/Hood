@@ -1,4 +1,5 @@
 ﻿using Hood.Interfaces;
+using Hood.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -85,7 +86,7 @@ namespace Hood.Extensions
 
         public static string ToHtmlLineBreaks(this string str)
         {
-            return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br>").Replace("\r", "<br>").Replace("\n", "<br>");
+            return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br />").Replace("\r", "<br />").Replace("\n", "<br />");
         }
 
         public static bool IsNullOrEmpty(this string str)
@@ -402,20 +403,34 @@ namespace Hood.Extensions
             return x.Link(x);
         }
 
-        public static string AddHtmlBreaks(this string str)
-        {
-            return str.Replace("  ", "&nbsp;&nbsp;").Replace(Environment.NewLine, "<br/>");
-        }
-
         public static string ReplaceSiteVariables(this string text)
         {
             var settings = Hood.Core.Engine.Settings.Basic;
             return text
-                .Replace("{SITETITLE}", settings.FullTitle)
-                .Replace("{COMPANYNAME}", settings.CompanyName)
-                .Replace("{SITEOWNERNAME}", settings.Owner.ToFullName())
-                .Replace("{SITEPHONE}", settings.Phone)
-                .Replace("{SITEEMAIL}", settings.Email);
+                .Replace("{Site.Title}", settings.FullTitle)
+                .Replace("{Site.CompanyName}", settings.CompanyName)
+                .Replace("{Site.Phone}", settings.Phone)
+                .Replace("{Site.Logo}", settings.Logo)
+                .Replace("{Site.LogoLight}", settings.LogoLight)
+                .Replace("{Site.Address}", settings.Address.ToFormat(Enums.AddressFormat.SingleLine))
+                .Replace("{Site.Owner.Name}", settings.Owner.ToFullName())
+                .Replace("{Site.Owner.Phone}", settings.Owner.Phone)
+                .Replace("{Site.Owner.Email}", settings.Owner.Email);
+        }
+        public static string ReplaceUserVariables(this string text, IUserProfile user)
+        {
+            return text
+                .Replace("{User.Username}", user.UserName)
+                .Replace("{User.Email}", user.Email)
+                .Replace("{User.PhoneNumber}", user.PhoneNumber)
+                .Replace("{User.Facebook}", user.Facebook)
+                .Replace("{User.LinkedIn}", user.LinkedIn)
+                .Replace("{User.Twitter}", user.Twitter)
+                .Replace("{User.Instagram}", user.Instagram)
+                .Replace("{User.WebsiteUrl}", user.WebsiteUrl)
+                .Replace("{User.FullName}", user.ToFullName())
+                .Replace("{User.FirstName}", user.FirstName)
+                .Replace("{User.LastName}", user.LastName);
         }
     }
 }

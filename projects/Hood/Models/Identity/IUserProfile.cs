@@ -1,28 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using Hood.Interfaces;
+using System.Collections.Generic;
 
 namespace Hood.Models
 {
     /// <summary>
-    /// REMOVE THIS COMPLETELY - ADD EDITORS FOR CUSTOM VARS THAT CAN BE ADDED TO FRONTPAGES.
+    /// IUserProfile is used for setting the user's profile and passing data to views, while excluding sensetive data from the IdentityUser classes.
     /// </summary>
-    public interface IUserProfile
+    public interface IUserProfile : IName
     {
+        string UserName { get; set; }
+        string Email { get; set; }
+        string PhoneNumber { get; set; }
         string Bio { get; set; }
         string CompanyName { get; set; }
-        string DisplayName { get; set; }
         string Facebook { get; set; }
-        string FirstName { get; set; }
-        string GooglePlus { get; set; }
+        string Instagram { get; set; }
         string JobTitle { get; set; }
-        string LastName { get; set; }
         string LinkedIn { get; set; }
         string Twitter { get; set; }
         string TwitterHandle { get; set; }
         string WebsiteUrl { get; set; }
-        string Notes { get; set; }
-
-        Dictionary<string, string> UserVariables { get; set; }
-
-        void SetProfile(IUserProfile profile);
     }
 }

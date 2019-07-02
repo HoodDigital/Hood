@@ -21,7 +21,7 @@
             background: transparent;
             border-radius: 0;
             margin-bottom: -2px;
-            color: $gray-400;
+            color: $gray-600;
             font-weight: $font-weight-bold;
 
             &.active {
@@ -30,8 +30,8 @@
             }
 
             &:not(.active):hover {
-                color: $gray-600;
-                border-bottom: 1px solid $gray-600;
+                color: $gray-700;
+                border-bottom: 1px solid $gray-700;
             }
         }
     }

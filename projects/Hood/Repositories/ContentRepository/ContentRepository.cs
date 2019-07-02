@@ -5,6 +5,7 @@ using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.IO;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -708,16 +709,16 @@ namespace Hood.Services
                 return tweets;
             }
         }
+        [Obsolete("Use List<Country> Country.AllCountries from now on.", true)]
         public List<Country> AllCountries()
         {
-            return Country.AllCountries;
+            return Countries.All;
         }
+        [Obsolete("Use static Country Country.GetCountry(string name) from now on.", true)]
         public Country GetCountry(string name)
         {
-            var country = AllCountries().Where(c => c.Name == name).FirstOrDefault();
-            return country;
+            return Countries.GetCountry(name);
         }
-
         public void UpdateTemplateMetas(Content content, List<string> newMetas)
         {
             // iterate through content metas that start with Template_

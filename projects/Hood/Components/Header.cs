@@ -2,6 +2,7 @@
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using Hood.Extensions;
+using Hood.ViewModels;
 
 namespace Hood.ViewComponents
 {

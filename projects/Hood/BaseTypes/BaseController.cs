@@ -1,5 +1,6 @@
 ﻿using Hood.Caching;
 using Hood.Core;
+using Hood.Enums;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +38,11 @@ namespace Hood.Controllers
         protected readonly IMediaManager<MediaObject> _media;
         protected readonly IAddressService _address;
         protected readonly IEventsService _eventService;
+
+        [TempData]
+        public string SaveMessage { get; set; }
+        [TempData]
+        public AlertType MessageType { get; set; }
 
         public BaseController()
         {

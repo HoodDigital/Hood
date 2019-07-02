@@ -2,20 +2,11 @@
 @{
     ViewData["Title"] = "Forum Settings";
     Layout = "_Layout_Settings";
-
-    BasicSettings _basicSettings = Engine.Settings.Basic;
-    Hood.Infrastructure.OperationResult subResult = Engine.Settings.SubscriptionsEnabled();
-    bool subsEnabled = subResult.Succeeded;
 }
 @section buttons {
     @if (User.IsAdminOrBetter()) { 
         <a asp-action="ResetForum" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
     }
-}
-@section description {
-    <p class="no-margin">
-        Settings for site's forums.
-    </p>
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">
@@ -59,7 +50,7 @@
                                 Viewer Subscriptions:
                             </label>
                             <div class="col-sm-8">
-                                @if (subsEnabled && Model.Subscriptions.Count() > 0)
+                                @if (Engine.Settings.Billing.IsSubscriptionsEnabled && Model.Subscriptions.Count() > 0)
                                 {
                                     List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingSubscriptions.IsSet() ? Model.ViewingSubscriptions : "[]");
                                     <p class="m-t-xs">Select subscriptions that can view the forums. <em>If you select none, then then any subscription can (if subscriptions are required).</em></p>
@@ -95,7 +86,7 @@
                                 Viewer Roles:
                             </label>
                             <div class="col-sm-8">
-                                @if (subsEnabled && Model.Roles.Count() > 0)
+                                @if (Engine.Settings.Billing.IsSubscriptionsEnabled && Model.Roles.Count() > 0)
                                 {
                                     List<string> roles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingRoles.IsSet() ? Model.ViewingRoles : "[]");
                                     <p class="m-t-xs">Select roles that can ALWAYS view the forums. <em>These roles will not require a subscription to access the forums, even if a specific forum requires it.</em></p>

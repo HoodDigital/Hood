@@ -150,6 +150,14 @@
         <li class="nav-item">
             <h4>Settings</h4>
         </li>
+        @if (User.IsAdminOrBetter() && Engine.Settings.Basic.EnableThemes)
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
+                    <i class="fa fa-paint-brush"></i>Theme
+                </a>
+            </li>
+        }
         @if (User.IsAdminOrBetter())
         {
             <li class="nav-item">
@@ -163,6 +171,14 @@
             <li class="nav-item">
                 <a class="nav-link" asp-action="Seo" asp-controller="Settings" asp-route-area="Admin">
                     <i class="fa fa-tag"></i>SEO Settings
+                </a>
+            </li>
+        }
+        @if (User.IsAdminOrBetter() && Engine.Settings.Basic.EnableApiKeys)
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index" asp-controller="Api">
+                    <i class="fa fa-key"></i>Api Keys
                 </a>
             </li>
         }
@@ -196,22 +212,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-action="Account" asp-controller="Settings" asp-route-area="Admin">
                                 <i class="fa fa-user-plus"></i>Account Settings
-                            </a>
-                        </li>
-                    }
-                    @if (User.IsAdminOrBetter() && Engine.Settings.Basic.EnableApiKeys)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-action="Index" asp-controller="Api">
-                                <i class="fa fa-key"></i>Api Keys
-                            </a>
-                        </li>
-                    }
-                    @if (User.IsAdminOrBetter() && Engine.Settings.Basic.EnableThemes)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
-                                <i class="fa fa-paint-brush"></i>Theme
                             </a>
                         </li>
                     }

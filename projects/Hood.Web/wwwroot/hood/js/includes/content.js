@@ -34,11 +34,19 @@ $.hood.Content = {
             var fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
             exists = false;
             $.each(fields, function (key, value) {
-                if (value.Name == name)
+                if (value.Name === name)
                     exists = true;
             });
+            if (!name) {
+                $.hood.Alerts.Error("You have to name the field.");
+                return;
+            }
+            if (!fields) {
+                $.hood.Alerts.Error("The field list is empty.");
+                return;
+            }
             if (exists) {
-                $.hood.Alerts.Error("Cannot insert two fields with the same number.");
+                $.hood.Alerts.Error("Cannot insert two fields with the same key.");
                 return;
             }
             // Add the new item.
@@ -50,29 +58,29 @@ $.hood.Content = {
             };
             fields.push(newField);
             $.hood.Content.Types.ReRenderFields(fields, $(this).data('id'));
-            $('#fields-' + $(this).data('id')).val(JSON.stringify(fields));
+            $('#custom-fields-' + $(this).data('id')).val(JSON.stringify(fields));
             $.hood.Alerts.Success("Added field.");
         },
         DeleteField: function () {
             var fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
             var name = $(this).data('name');
             fields = $.grep(fields, function (e) {
-                return e.Name != name;
+                return e.Name !== name;
             });
             $.hood.Content.Types.ReRenderFields(fields, $(this).data('id'));
-            $('#fields-' + $(this).data('id')).val(JSON.stringify(fields));
+            $('#custom-fields-' + $(this).data('id')).val(JSON.stringify(fields));
             $.hood.Alerts.Success("Deleted field.");
         },
         GetFieldsList: function (id) {
             // Take the contents of the fields input. 
-            fieldsInput = $('#fields-' + id).val();
+            fieldsInput = $('#custom-fields-' + id).val();
             // if it is null, we need a new object.
-            if (fieldsInput != null && fieldsInput != '') {
+            if (fieldsInput !== null && fieldsInput !== '') {
                 var obj = JSON.parse(fieldsInput);
                 // if not, we can deserialise to an array of FieldAreas
                 for (var x in obj) {
                     if (obj[x].hasOwnProperty('Name')) {
-                        return obj
+                        return obj;
                     }
                 }
             }
@@ -90,7 +98,7 @@ $.hood.Content = {
                     fld += '<span class="label label-default">System Field</span>';
                 }
                 fld += "</td></tr>";
-                newList.append(fld)
+                newList.append(fld);
             }
         }
     },

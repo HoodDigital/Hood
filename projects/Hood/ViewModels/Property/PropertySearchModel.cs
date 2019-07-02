@@ -1,10 +1,10 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Services;
+using Hood.Models;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class PropertySearchModel : PagedList<PropertyListing>, IPageableModel
     {

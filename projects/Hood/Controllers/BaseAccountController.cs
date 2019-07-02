@@ -72,7 +72,7 @@ namespace Hood.Controllers
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, model.RememberMe });
+                    return RedirectToAction(nameof(SendCode), new { returnUrl, model.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -207,14 +207,11 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
-            if (accountSettings.RegistrationType == "code")
-            {
-                var url = "/account/create";
-                if (returnUrl != null)
-                    url += "?returnUrl=" + System.Net.WebUtility.UrlEncode(returnUrl);
-                return Redirect(url);
-            }
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Code)
+                return RedirectToAction(nameof(Create), new { returnUrl });
+
             return View();
         }
 
@@ -225,7 +222,10 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Code)
+                return RedirectToAction(nameof(Create), new { returnUrl });
 
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -278,7 +278,11 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Default)
+                return RedirectToAction(nameof(Register), new { returnUrl });
+
             return View();
         }
 
@@ -289,7 +293,10 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Default)
+                return RedirectToAction(nameof(Register), new { returnUrl });
 
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
@@ -360,7 +367,10 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Default)
+                return RedirectToAction(nameof(Register), new { returnUrl });
 
             // Here we must flag the account as email confirmed. If the code entered matches. 
 
@@ -389,7 +399,10 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Default)
+                return RedirectToAction(nameof(Register), new { returnUrl });
 
             // check if they have a current valid code, if not forward them back to the create page to set up a new code.
             var user = _account.GetUserById(model.UserId);
@@ -427,7 +440,10 @@ namespace Hood.Controllers
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
-                return NotFound();
+                return RegistrationClosed();
+
+            if (accountSettings.RegistrationType == RegistrationType.Default)
+                return RedirectToAction(nameof(Register), new { returnUrl });
 
             // Here we must flag the account as email confirmed. If the code entered matches. 
 
@@ -458,7 +474,10 @@ namespace Hood.Controllers
             {
                 var accountSettings = Engine.Settings.Account;
                 if (!accountSettings.EnableRegistration)
-                    return NotFound();
+                    return RegistrationClosed();
+
+                if (accountSettings.RegistrationType == RegistrationType.Default)
+                    return RedirectToAction(nameof(Register), new { returnUrl });
 
                 // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
                 var user = _account.GetUserById(model.UserId);
@@ -828,6 +847,24 @@ namespace Hood.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid code.");
                 return View(model);
             }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public virtual IActionResult RegistrationClosed(string returnUrl = null)
+        {
+            var accountSettings = Engine.Settings.Account;
+
+            if (accountSettings.EnableRegistration)
+                switch (accountSettings.RegistrationType)
+                {
+                    case RegistrationType.Default:
+                        return RedirectToAction(nameof(Register), new { returnUrl });
+                    case RegistrationType.Code:
+                        return RedirectToAction(nameof(Code), new { returnUrl });
+                }
+
+            return View();
         }
 
         #region Helpers

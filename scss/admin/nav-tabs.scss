@@ -1,27 +1,11 @@
-.nav-tabs {
+.nav-tabs.card-header-tabs {
     border-bottom: 1px solid transparent;
-
-    > li {
-
-        > a {
-
-            &:hover {
-                color: black;
-                border-color: transparent;
-            }
-        }
-
-        &.active {
-            > a {
-                background-color: white;
-                border-color: white;
-            }
-        }
-    }
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin: -.75rem 0;
 
     .nav-item {
-        margin-left: .75rem;
-        margin-right: .75rem;
+        margin: 0;
 
         &:first-child {
             margin-left: 0
@@ -32,36 +16,23 @@
         }
 
         .nav-link {
-            padding: 1rem 0;
+            padding: 1rem;
             border: 1px solid transparent;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            border-bottom: 1px solid transparent;
-            border-left-width: 0;
-            border-right-width: 0;
-            border-top-width: 0;
+            background: transparent;
+            border-radius: 0;
+            margin-bottom: -2px;
+            color: $gray-600;
+            font-weight: $font-weight-bold;
 
-            &:not(.active) {
-                color: #95aac9
+            &.active {
+                color: black;
+                border-bottom: 1px solid $black;
             }
 
             &:not(.active):hover {
-                color: #6e84a3
+                color: $gray-700;
+                border-bottom: 1px solid $gray-700;
             }
-        }
-
-        &.show .nav-link {
-            border-color: transparent
-        }
-    }
-
-    &.card-header-tabs {
-        font-size: .8125rem;
-        margin: -.5rem 0;
-
-        .nav-link {
-            padding-top: calc((3.75rem - 1em * 1.5) / 2) !important;
-            padding-bottom: calc((3.75rem - 1em * 1.5) / 2) !important
         }
     }
 }

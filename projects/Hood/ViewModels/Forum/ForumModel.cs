@@ -1,9 +1,10 @@
 ﻿using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class ForumModel : PagedList<Forum>, IPageableModel
     {

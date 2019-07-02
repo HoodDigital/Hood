@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Models;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class UserSearchModel : PagedList<ApplicationUser>, IPageableModel
     {

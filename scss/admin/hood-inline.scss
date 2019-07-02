@@ -1,11 +1,11 @@
-div.hood-inline {
+div.hood-inline, div.hood-inline-list {
     position: relative;
 
-    div.hood-inline.loading {
+    &.loading {
         min-height: 80px;
     }
 
-    div.hood-inline.loading:after {
+    &.loading:after {
         content: '';
         position: absolute;
         top: 0;
@@ -16,8 +16,7 @@ div.hood-inline {
         z-index: 2;
     }
 
-
-    .hood-inline.loading i.fa.fa-refresh.fa-adjust-hue {
+    &.loading i.fa.fa-refresh.fa-adjust-hue {
         position: absolute;
         top: 50%;
         left: 50%;

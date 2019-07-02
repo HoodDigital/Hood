@@ -19,8 +19,8 @@ namespace Hood.Services
             IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
             {
                 ["Name"] = "default",
-                ["ThemeFullName"] = "Default",
-                ["ThemeBaseColour"] = "#C33610",
+                ["FullName"] = "Default",
+                ["BaseColour"] = "#C33610",
                 ["Author"] = "Hood - Digital Architects.",
                 ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
                 ["Public"] = "true"
@@ -44,21 +44,6 @@ namespace Hood.Services
 
         }
 
-        public List<string> Themes
-        {
-            get
-            {
-                return _configs.Keys.ToList();
-            }
-        }
-
-        public IConfiguration Config(string themeName)
-        {
-            if (_configs.ContainsKey(themeName))
-                return _configs[themeName];
-            return null;
-        }
-
         public string CurrentTheme
         {
             get
@@ -71,12 +56,39 @@ namespace Hood.Services
                 return Engine.Settings["Hood.Settings.Theme"];
             }
         }
+        public Theme Current
+        {
+            get
+            {
+                if (_configs.ContainsKey(CurrentTheme))
+                    return new Theme(_configs[CurrentTheme]);
+                else
+                    return Default;
+            }
+        }
+        private Theme Default
+        {
+            get
+            {
+                IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
+                {
+                    ["Name"] = "default",
+                    ["FullName"] = "Default",
+                    ["BaseColour"] = "#C33610",
+                    ["Author"] = "Hood - Digital Architects.",
+                    ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
+                    ["Public"] = "true"
+                };
+                return new Theme(new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+            }
+        }
 
         public bool SetTheme(string themeName)
         {
             try
             {
-                if (ThemeConfigs.ContainsKey(themeName))
+
+                if (Themes.Any(t => t.Name == themeName))
                 {
                     Engine.Settings["Hood.Settings.Theme"] = themeName;
                     return true;
@@ -89,20 +101,14 @@ namespace Hood.Services
             }
         }
 
-        public Dictionary<string, IConfiguration> ThemeConfigs
+        public List<Theme> Themes
         {
             get
             {
-                return _configs;
+                return _configs.Select(c => new Theme(c.Value)).ToList();
             }
         }
 
-        public IConfiguration Current
-        {
-            get
-            {
-                return Config(CurrentTheme);
-            }
-        }
+        public bool IsDefault { get { return CurrentTheme != "default"; } }
     }
 }

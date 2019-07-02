@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Hood.Infrastructure;
+﻿using Hood.Infrastructure;
 using Hood.Models;
-using Stripe;
-using System;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Hood.Services
 {

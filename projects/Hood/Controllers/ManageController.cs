@@ -24,11 +24,6 @@ namespace Hood.Controllers
         private readonly UrlEncoder _urlEncoder;
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-        [TempData]
-        public string SaveMessage { get; set; }
-        [TempData]
-        public AlertType MessageType { get; set; }
-
         public ManageController(UrlEncoder urlEncoder)
             : base()
         {
@@ -44,10 +39,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-            var profile = new UserProfile();
-            profile.SetProfile(user);
-
-            var model = new IndexViewModel
+            var model = new UserViewModel
             {
                 UserId = user.Id,
                 Username = user.UserName,
@@ -56,7 +48,7 @@ namespace Hood.Controllers
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
-                Profile = profile,
+                Profile = user.Profile as UserProfileViewModel,
                 Roles = await _userManager.GetRolesAsync(user)
             };
 
@@ -68,7 +60,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(IndexViewModel model)
+        public async Task<IActionResult> Index(UserViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -106,10 +98,12 @@ namespace Hood.Controllers
                     }
                 }
 
-                user.SetProfile(model.Profile);
+                user.Profile = model.Profile;
                 _account.UpdateUser(user);
-                SaveMessage = "Saved!";
+
+                SaveMessage = "Your profile has been updated.";
                 MessageType = Enums.AlertType.Success;
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
@@ -118,16 +112,10 @@ namespace Hood.Controllers
                 {
                     throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
-                var profile = new UserProfile();
-                profile.SetProfile(user);
                 SaveMessage = "Something went wrong: " + ex.Message;
                 MessageType = Enums.AlertType.Danger;
                 return RedirectToAction(nameof(Index));
             }
-
-            SaveMessage = "Your profile has been updated";
-            MessageType = Enums.AlertType.Success;
-            return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
@@ -161,7 +149,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendVerificationEmail(IndexViewModel model)
+        public async Task<IActionResult> SendVerificationEmail(UserViewModel model)
         {
             if (!ModelState.IsValid)
             {

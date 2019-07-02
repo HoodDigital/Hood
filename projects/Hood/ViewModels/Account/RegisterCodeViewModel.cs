@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class RegisterCodeViewModel
     {

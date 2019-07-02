@@ -17,6 +17,8 @@ namespace Hood.Models
         public string Phone { get; set; }
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
+        [Display(Name = "Job Title")]
+        public string Email { get; set; }
 
         public string ContactName { get => this.ToFullName(); set { } }
         public string Number { get; set; }

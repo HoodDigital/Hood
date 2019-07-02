@@ -1,25 +1,26 @@
-@import "admin/variables.scss";
+@import "admin/variables";
 @import url('../../lib/chart/chart.min.css');
 @import "../../lib/feather/build/scss/feathericon";
-@import "../../lib/bootstrap/scss/bootstrap.scss";
-@import "../../lib/fontawesome/scss/fontawesome.scss";
-@import "../../lib/fontawesome/scss/brands.scss";
-@import "../../lib/fontawesome/scss/regular.scss";
-@import "../../lib/fontawesome/scss/solid.scss";
-@import "../../lib/sweetalert/src/sweetalert2.scss";
+@import "../../lib/bootstrap/scss/bootstrap";
+@import "../../lib/fontawesome/scss/fontawesome";
+@import "../../lib/fontawesome/scss/brands";
+@import "../../lib/fontawesome/scss/regular";
+@import "../../lib/fontawesome/scss/solid";
+@import "../../lib/sweetalert/src/sweetalert2";
 
-@import "core/mixins.scss";
-@import "core/helpers.scss";
-@import "core/floating-label.scss";
-@import "core/validation-summary.scss";
-@import "core/toasts.scss";
-@import "core/images.scss";
+@import "core/mixins";
+@import "core/helpers";
+@import "core/forms";
+@import "core/floating-label";
+@import "core/validation-summary";
+@import "core/toasts";
+@import "core/images";
 @import "core/blades";
 
 @import "admin/nav-tabs";
-@import "admin/editor.scss";
-@import "admin/media.scss";
-@import "admin/right-sidebar.scss";
-@import "admin/hood-inline.scss";
+@import "admin/media";
+@import "admin/hood-inline";
+@import "admin/cards";
+@import "admin/code-viewer";
 
-@import "admin/layout.scss";
+@import "admin/layout";

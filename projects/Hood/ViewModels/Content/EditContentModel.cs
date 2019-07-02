@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Hood.Models;
+using System;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public partial class EditContentModel
     {

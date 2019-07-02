@@ -4,7 +4,7 @@ using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace Hood.Services
+namespace Hood.ViewModels
 {
     public class SubscriberSearchModel : PagedList<ApplicationUser>, IPageableModel
     {

@@ -34,7 +34,6 @@
             max-width: none !important;
             width: auto !important;
         }
-
         // Image captions
         .caption {
             padding: $grid-gutter-width / 2;
@@ -44,8 +43,8 @@
     .k-loading-mask {
         position: relative;
         display: block;
-        background: lighten($hood-yellow, 40%);
-        border: 1px solid $hood-yellow;
+        background: lighten($primary, 40%);
+        border: 1px solid $primary;
         width: auto !important;
         padding: $grid-gutter-width / 2 $grid-gutter-width;
         margin: $grid-gutter-width / 2;
@@ -87,13 +86,13 @@ span.no-items {
             }
 
             &.active > a {
-                background-color: $hood-yellow;
+                background-color: $primary;
                 color: white;
 
                 &:hover,
                 &:focus {
                     color: white;
-                    background-color: darken($hood-yellow, 10%);
+                    background-color: darken($primary, 10%);
                 }
             }
         }

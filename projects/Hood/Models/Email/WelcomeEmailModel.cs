@@ -38,8 +38,8 @@ namespace Hood.Models
         public MailObject WriteToMailObject(MailObject message)
         {
             var _accountSettings = Engine.Settings.Account;
-            message.Subject = User.ReplacePlaceholders(message.Subject);
-            message.PreHeader = User.ReplacePlaceholders(message.PreHeader);
+            message.Subject = message.Subject.ReplaceUserVariables(User);
+            message.PreHeader = message.PreHeader.ReplaceUserVariables(User);
 
             message.AddH1(_accountSettings.WelcomeTitle.ReplaceSiteVariables());
             message.AddDiv(_accountSettings.WelcomeMessage);

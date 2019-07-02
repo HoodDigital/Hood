@@ -6,6 +6,7 @@ using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

@@ -14,4 +14,14 @@
         right: 0;
         left: auto;
     }
+
+    h1 {
+        letter-spacing: -.05rem;
+        font-size: 2rem;
+        font-weight: bold;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        text-shadow: rgba(0,0,0,.01) 0 0 1px;
+    }
 }

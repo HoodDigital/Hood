@@ -84,7 +84,12 @@
                         <label class="col-sm-3 control-label">Url Slug:</label>
                         <div class="col-sm-8">
                             <input asp-for="Slug" class="form-control restrict-to-slug" />
-                            <p class="no-margin m-l-xs text-warning"><small><b>&nbsp;NOTE: Only use lowercase letters, no spaces.<br />&nbsp;<span class="text-danger">WARNING: changing this will affect external linking.</span></b></small></p>
+                            <p class="no-margin m-l-xs text-warning">
+                            <small>
+                                <strong>
+                                Only use lowercase letters, no spaces.</strong><br />
+                                <span class="text-danger">WARNING: changing this will affect external linking.</span></small>
+                            </p>
                         </div>
                     </div>
                 </fieldset>

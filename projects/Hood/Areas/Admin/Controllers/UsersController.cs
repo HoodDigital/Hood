@@ -86,54 +86,76 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/edit/{id}/")]
         public async Task<IActionResult> Edit(string id)
         {
-            EditUserModel um = new EditUserModel()
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
-                User = _account.GetUserById(id)
+                throw new ApplicationException($"Unable to load user with ID '{id}'.");
+            }
+            var model = new UserViewModel
+            {
+                UserId = user.Id,
+                Username = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                IsEmailConfirmed = user.EmailConfirmed,
+                StatusMessage = SaveMessage,
+                Avatar = user.Avatar,
+                Profile = user.Profile as UserProfileViewModel,
+                Roles = await _userManager.GetRolesAsync(user),
+                AllRoles = _account.GetAllRoles()
             };
-            um.Roles = await _userManager.GetRolesAsync(um.User);
-            um.AllRoles = _account.GetAllRoles();
-            return View(um);
+            return View(model);
         }
 
         [Route("admin/users/edit/{id}/")]
         [HttpPost]
-        public async Task<IActionResult> Edit(string id, SaveProfileModel model)
+        public async Task<IActionResult> Edit(UserViewModel model)
         {
-            EditUserModel um = new EditUserModel()
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
             {
-                User = _account.GetUserById(id)
-            };
+                throw new ApplicationException($"Unable to load user with ID '{model.UserId}'.");
+            }
+
             try
             {
-                model.User.CopyProperties(um.User);
-                _account.UpdateUser(um.User);
+                var email = user.Email;
+                if (model.Email != email)
+                {
+                    var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+                    if (!setEmailResult.Succeeded)
+                    {
+                        throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
+                    }
+                }
 
+                var phoneNumber = user.PhoneNumber;
+                if (model.PhoneNumber != phoneNumber)
+                {
+                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                    if (!setPhoneResult.Succeeded)
+                    {
+                        model.Email = phoneNumber;
+                        throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
+                    }
+                }
+
+                user.Profile = model.Profile;
+                _account.UpdateUser(user);
                 // reload model
 
-                um.Roles = await _userManager.GetRolesAsync(um.User);
-                um.AllRoles = _account.GetAllRoles();
-                um.SaveMessage = "Saved!";
-                um.MessageType = Enums.AlertType.Success;
-                return View(um);
+                model.SaveMessage = "Saved!";
+                model.MessageType = Enums.AlertType.Success;
+                return View(model);
             }
             catch (Exception ex)
             {
-                um.SaveMessage = "There was an error while saving: " + ex.Message;
-                um.MessageType = Enums.AlertType.Danger;
-                return View(um);
+                model.SaveMessage = "There was an error while saving: " + ex.Message;
+                model.MessageType = Enums.AlertType.Danger;
             }
-        }
-
-        [Route("admin/users/blade/{id}/")]
-        public async Task<IActionResult> Blade(string id)
-        {
-            EditUserModel um = new EditUserModel()
-            {
-                User = _account.GetUserById(id)
-            };
-            um.Roles = await _userManager.GetRolesAsync(um.User);
-            um.AllRoles = _account.GetAllRoles();
-            return View(um);
+            model.Roles = await _userManager.GetRolesAsync(user);
+            model.AllRoles = _account.GetAllRoles();
+            return View(model);
         }
 
         [Route("admin/users/create/")]
@@ -285,10 +307,14 @@ namespace Hood.Areas.Admin.Controllers
                     FirstName = model.cuFirstName,
                     LastName = model.cuLastName,
                     CreatedOn = DateTime.Now,
-                    LastLogOn = DateTime.Now,
-                    SystemNotes = string.Format("[{0}] User created via admin panel by {1}.", DateTime.Now, User.Identity.Name) + Environment.NewLine
+                    LastLogOn = DateTime.Now
                 };
-
+                user.AddUserNote(new UserNote()
+                {
+                    CreatedBy = User.GetUserId(),
+                    CreatedOn = DateTime.Now,
+                    Note = $"User created via admin panel by {User.Identity.Name}."
+                });
                 var result = await _userManager.CreateAsync(user, model.cuPassword);
                 if (!result.Succeeded)
                 {

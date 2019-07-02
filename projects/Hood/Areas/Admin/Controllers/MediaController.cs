@@ -2,6 +2,7 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

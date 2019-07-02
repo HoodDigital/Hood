@@ -1,15 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Hood.Enums;
+using Hood.Extensions;
+using Hood.Filters;
 using Hood.Models;
 using Hood.Services;
-using Hood.Extensions;
-using System.IO;
-using Hood.Filters;
-using Hood.Enums;
-using System.Collections.Generic;
+using Hood.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {

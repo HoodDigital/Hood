@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class CreatePropertyModel
     {
