@@ -17,6 +17,10 @@ namespace Hood.Models
 
         [Display(Name = "Enable Forums")]
         public bool Enabled { get; set; }
+        [Display(Name = "Forum Area Name", Description = "Rename your forums, you may wish to call them something else, such as 'Discussions' etc.")]
+        public string ForumAreaName { get; set; }
+        [Display(Name = "Forum Area Name (Plural)", Description = "Rename your forums, you may wish to call them something else, such as 'Discussions' etc.")]
+        public string ForumAreaNamePlural { get; set; }
     }
 
 }

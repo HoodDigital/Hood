@@ -8,14 +8,7 @@
 @import "../../lib/fontawesome/scss/solid";
 @import "../../lib/sweetalert/src/sweetalert2";
 
-@import "core/mixins";
-@import "core/helpers";
-@import "core/forms";
-@import "core/floating-label";
-@import "core/validation-summary";
-@import "core/toasts";
-@import "core/images";
-@import "core/blades";
+@import "core/all";
 
 @import "admin/nav-tabs";
 @import "admin/media";
