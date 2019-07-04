@@ -8,16 +8,6 @@ namespace Hood.Models
     [Serializable]
     public class IntegrationSettings : SaveableModel
     {
-        // Loading Animations
-        [Display(Name = "Enable Loading Animation")]
-        
-        public bool LoadingAnimation { get; set; }
-        [Display(Name = "Loading Animation")]
-        public string LoadingAnimationType { get; set; }
-
-        [Display(Name = "Use Hood CDN")]
-        public bool UseCDN { get; set; }
-
         // Twitter Feed
         [Display(Name = "Twitter Feed")]
         public bool EnableTwitter { get; set; }
@@ -63,11 +53,6 @@ namespace Hood.Models
         public bool EnableChat { get; set; }
         [Display(Name = "Script for Chat Plugin")]
         public string ChatCode { get; set; }
-
-        public IntegrationSettings()
-        {
-            UseCDN = false;
-        }
     }
 
 }

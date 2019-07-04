@@ -16,8 +16,6 @@ namespace Hood.Models
         public string TwitterHandle { get; set; }
         [Display(Name = "Facebook URL")]
         public string Facebook { get; set; }
-        [Display(Name = "Google+ URL")]
-        public string GooglePlus { get; set; }
         [Display(Name = "LinkedIn URL")]
         public string LinkedIn { get; set; }
         [Display(Name = "TripAdvisor URL")]
@@ -28,18 +26,15 @@ namespace Hood.Models
         public string Instagram { get; set; }
         [Display(Name = "Pinterest URL")]
         public string Pinterest { get; set; }
-        
-        public bool HasSocials()
-        {
-            return Twitter.IsSet() || Facebook.IsSet() || GooglePlus.IsSet() || LinkedIn.IsSet() || GitHub.IsSet() || Instagram.IsSet() || Pinterest.IsSet();
-        }
+
+        public bool HasSocials => Twitter.IsSet() || Facebook.IsSet() || LinkedIn.IsSet() || GitHub.IsSet() || Instagram.IsSet() || Pinterest.IsSet();
 
         // basic
         [Display(Name = "Google Analytics Code")]
         public string GoogleAnalytics { get; set; }
-        [Display(Name = "Header Scripts (Rendered before closing </head> tag)")]
+        [Display(Name = "Header Scripts", Description = "Rendered before closing <code>&lt;/head&gt;</code> tag.")]
         public string HeadTags { get; set; }
-        [Display(Name = "Body Scripts (Rendered before closing </body> tag)")]
+        [Display(Name = "Body Scripts", Description = "Rendered before closing <code>&lt;/body&gt;</code> tag.")]
         public string BodyTags { get; set; }
         [Display(Name = "Facebook Application ID")]
         public string FacebookAppId { get; set; }

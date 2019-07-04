@@ -12,7 +12,7 @@ using System.IO;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "SuperUser,Admin")]
     public class ImportController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         private readonly IFTPService _ftp;

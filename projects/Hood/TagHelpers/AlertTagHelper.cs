@@ -35,39 +35,45 @@ namespace Hood.TagHelpers
         {
             output.TagName = "div";
             output.TagMode = TagMode.StartTagAndEndTag;
+
             string alertTemplate = (await output.GetChildContentAsync()).GetContent();
-            string iconTemplate = "";
-            string alertClass = "";
-            switch (Size)
+
+            if (alertTemplate.IsSet())
             {
-                case AlertSize.Small:
-                    iconTemplate = Icon.IsSet() ? $"<div class='p-1'><i class='{Icon} {Size.ToIconSizeCssClass()}'></i></div>" : "";
-                    alertTemplate = $"{iconTemplate}<div class='p-1 flex-grow-1'>{alertTemplate}</div>";
-                    alertClass = "d-flex flex-row align-items-center p-1";
-                    break;
-                case AlertSize.Medium:
-                    iconTemplate = Icon.IsSet() ? $"<div class='p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
-                    alertTemplate = $"{iconTemplate}<div class='p-2'>{alertTemplate}</div>";
-                    alertClass = "d-flex flex-row align-items-center p-2";
-                    break;
-                case AlertSize.Large:
-                    iconTemplate = Icon.IsSet() ? $"<div class='p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
-                    alertTemplate = $"{iconTemplate}<div class='p-2'>{alertTemplate}</div>";
-                    alertClass = "d-flex flex-row align-items-center p-2";
-                    break;
-                case AlertSize.Epic:
-                    iconTemplate = Icon.IsSet() ? $"<div class='p-3'><i class='{Icon} {Size.ToIconSizeCssClass()}'></i></div>" : "";
-                    alertTemplate = $"{iconTemplate}<div class='p-3'>{alertTemplate}</div>";
-                    alertClass = "d-flex flex-column p-3";
-                    break;
+                string iconTemplate;
+                string alertClass;
+                switch (Size)
+                {
+                    case AlertSize.Small:
+                    default:
+                        iconTemplate = Icon.IsSet() ? $"<div class='p-1'><i class='{Icon} {Size.ToIconSizeCssClass()}'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='p-1 flex-grow-1'>{alertTemplate}</div>";
+                        alertClass = "d-flex flex-row align-items-center p-1";
+                        break;
+                    case AlertSize.Medium:
+                        iconTemplate = Icon.IsSet() ? $"<div class='p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='p-2'>{alertTemplate}</div>";
+                        alertClass = "d-flex flex-row align-items-center p-2";
+                        break;
+                    case AlertSize.Large:
+                        iconTemplate = Icon.IsSet() ? $"<div class='p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='p-2'>{alertTemplate}</div>";
+                        alertClass = "d-flex flex-row align-items-center p-2";
+                        break;
+                    case AlertSize.Epic:
+                        iconTemplate = Icon.IsSet() ? $"<div class='p-3'><i class='{Icon} {Size.ToIconSizeCssClass()}'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='p-3'>{alertTemplate}</div>";
+                        alertClass = "d-flex flex-column p-3";
+                        break;
+                }
+
+                if (output.Attributes.ContainsName("class"))
+                    output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} alert {Type.ToCssClass()} {alertClass}");
+                else
+                    output.Attributes.SetAttribute("class", $"alert {Type.ToCssClass()} {alertClass}");
+
+                output.Content.SetHtmlContent(alertTemplate);
             }
-
-            if (output.Attributes.ContainsName("class"))
-                output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} alert {Type.ToCssClass()} {alertClass}");
-            else
-                output.Attributes.SetAttribute("class", $"alert {Type.ToCssClass()} {alertClass}");
-
-            output.Content.SetHtmlContent(alertTemplate);
         }
     }
 }

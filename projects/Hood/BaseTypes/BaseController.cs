@@ -1,6 +1,7 @@
 ﻿using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -66,6 +67,19 @@ namespace Hood.Controllers
             _address = Engine.Current.Resolve<IAddressService>();
             _eventService = Engine.Current.Resolve<IEventsService>();
             _media = Engine.Current.Resolve<IMediaManager<MediaObject>>();
+        }
+
+        public ViewResult View(ISaveableModel model)
+        {
+            model.MessageType = MessageType;
+            model.SaveMessage = SaveMessage;
+            return base.View(model);
+        }
+        public ViewResult View(string viewName, ISaveableModel model)
+        {
+            model.MessageType = MessageType;
+            model.SaveMessage = SaveMessage;
+            return base.View(viewName, model);
         }
     }
 }

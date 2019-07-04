@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "SuperUser,Admin")]
     public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public ApiController()
@@ -104,7 +104,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/api/keys/activate/{id}/")]
-        [HttpPost()]
+        [HttpPost]
         public async Task<Response> Activate(string id)
         {
             try
@@ -128,7 +128,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/api/keys/deactivate/{id}")]
-        [HttpPost()]
+        [HttpPost]
         public async Task<Response> Deactivate(string id)
         {
             try
@@ -151,7 +151,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("admin/api/keys/delete/{id}")]
         public async Task<Response> Delete(string id)
         {

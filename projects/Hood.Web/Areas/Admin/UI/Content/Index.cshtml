@@ -36,7 +36,7 @@
 }
 @if (Model.SaveMessage.IsSet())
 {
-    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">

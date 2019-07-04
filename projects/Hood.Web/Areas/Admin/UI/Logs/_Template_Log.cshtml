@@ -104,7 +104,7 @@
                         <div class="form-group">
                             <label>Detail</label>
                             <div class="code-viewer p-2 bg-gray text-white" style="font-family:monospace;">
-                                @Html.Raw(Model.Detail.AddHtmlBreaks().ToFormattedJson())
+                                @Html.Raw(Model.Detail.ToHtmlLineBreaks().ToFormattedJson())
                             </div>
                         </div>
                     }

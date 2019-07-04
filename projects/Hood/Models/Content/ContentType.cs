@@ -30,6 +30,8 @@ namespace Hood.Models
         public string TypeNamePlural { get; set; }
         [Display(Name = "Icon", Description = "Choose a Font-Awesome icon class for this content type (for sidebar link).")]
         public string Icon { get; set; }
+        [Display(Name = "No Image (Override)", Description = "Override the site default 'No Image' for this content type. Leave it blank to use the site default.")]
+        public string NoImage { get; set; }
         [Display(Name = "Accessed via Url", Description = "Show individual pages for each record of this type.")]
         public bool HasPage { get; set; }
         [Display(Name = "Has Public Page", Description = "Show a page list or grid page showing all types, with search etc. for this type.")]

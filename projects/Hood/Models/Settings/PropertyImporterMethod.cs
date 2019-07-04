@@ -2,9 +2,8 @@
 {
     public enum PropertyImporterMethod
     {
-        BlmFile, 
-        AltoWebApi,
+        FtpBlm,
+        Directory
     }
-
 }
 

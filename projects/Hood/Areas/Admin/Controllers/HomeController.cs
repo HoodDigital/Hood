@@ -22,14 +22,13 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/theme/")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "SuperUser,Admin")]
         public IActionResult Theme()
         {
             return View();
         }
 
         [Route("admin/stats/")]
-        [Authorize(Roles = "Admin,Manager")]
         public IActionResult Stats()
         {
             var content = _content.GetStatistics();

@@ -27,7 +27,7 @@
 <form method="post" id="edit-property" data-id="@Model.Id">
     @if (Model.SaveMessage.IsSet())
     {
-        @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
     }
     <div class="row">
         <div class="col-md-8">

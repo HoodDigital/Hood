@@ -16,7 +16,7 @@
         <div class="row align-items-center">
             <ul class="nav nav-tabs card-header-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="basics-tab" data-toggle="tab" href="#basics" role="tab" aria-controls="basics" aria-selected="false">
+                    <a class="nav-link active" id="basics-tab" data-toggle="tab" href="#basics" role="tab" aria-controls="basics" aria-selected="true">
                         Basics
                     </a>
                 </li>
@@ -99,44 +99,8 @@
                     </div>
                     <small asp-for="EnablePreload"></small>
                 </div>
-                <div class="form-group mt-5">
-                    <label asp-for="Logo"></label>
-                    <hr class="mt-0" />
-                    <div class="row image-cell">
-                        <div class="col-auto">
-                            <fixedImage src="@Model.Logo" class="img img-xxs img-circle Logo" />
-                        </div>
-                        <div class="col">
-                            <div class="input-group">
-                                <input asp-for="Logo" type="url" class="form-control Logo" placeholder="Enter a url..." />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default btn-lg hood-image-set" data-target=".Logo" data-restrict="image" type="button">
-                                        <i class="fa fa-camera"></i>
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label asp-for="LogoLight"></label>
-                    <hr class="mt-0" />
-                    <div class="row image-cell">
-                        <div class="col-auto">
-                            <fixedImage src="@Model.LogoLight" class="img img-xxs img-circle LogoLight" />
-                        </div>
-                        <div class="col">
-                            <div class="input-group">
-                                <input asp-for="LogoLight" type="url" class="form-control LogoLight" placeholder="Enter a url..." />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default btn-lg hood-image-set" data-target=".LogoLight" data-restrict="image" type="button">
-                                        <i class="fa fa-camera"></i>
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <editor asp-image="Logo" asp-background-size="contain"></editor>
+                <editor asp-image="LogoLight" asp-background-size="contain"></editor>
             </div>
             <div id="address" class="tab-pane" role="tabpanel" aria-labelledby="address-tab">
                 <div class="row">

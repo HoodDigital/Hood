@@ -12,13 +12,13 @@ namespace Hood.Caching
     {
         private readonly IMemoryCache _cache;
 
-        private IList<string> _entries { get; set; }
+        private IDictionary<string, DateTime> _entries { get; set; }
 
         public HoodCache(IMemoryCache cache,
                          IEventsService events)
         {
             _cache = cache;
-            _entries = new List<string>();
+            _entries = new Dictionary<string, DateTime>();
             events.ContentChanged += onContentChanged;
             events.PropertiesChanged += onPropertiesChanged;
             events.OptionsChanged += onOptionsChanged;
@@ -31,34 +31,38 @@ namespace Hood.Caching
             else
                 _cache.Set(key, cacheItem, options);
             if (_entries == null)
-                _entries = new List<string>();
-            if (!_entries.Contains(key))
-                _entries.Add(key);
+                _entries = new Dictionary<string, DateTime>();
+            if (!_entries.Keys.Contains(key))
+                _entries.Add(key, DateTime.Now);
+            else
+                _entries[key] = DateTime.Now;
             return key;
         }
 
-        public IList<string> Keys
+        /// <summary>
+        /// A key/value list of all Keys in the Cache, along with the DateTime they were added to it.
+        /// </summary>
+        public IDictionary<string, DateTime> Entries
         {
             get
             {
                 if (_entries == null)
-                    _entries = new List<string>();
+                    _entries = new Dictionary<string, DateTime>();
                 return _entries;
             }
         }
 
-
         public bool TryGetValue<T>(string key, out T cacheItem)
         {
             if (_entries == null)
-                _entries = new List<string>();
+                _entries = new Dictionary<string, DateTime>();
             if (_cache.TryGetValue(key, out cacheItem)) // Get the value from cache.
             {
-                if (!_entries.Contains(key)) // Item is in cache, but not entry dictionary. Add it.
-                    _entries.Add(key);
+                if (!_entries.Keys.Contains(key)) // Item is in cache, but not entry dictionary. Add it.
+                    _entries.Add(key, DateTime.Now);
                 return true;
             }
-            if (_entries.Contains(key)) // Item has fallen out of cache, remove from entries.
+            if (_entries.Keys.Contains(key)) // Item has fallen out of cache, remove from entries.
                 _entries.Remove(key);
             return false;
 
@@ -67,41 +71,32 @@ namespace Hood.Caching
         public void Remove(string key)
         {
             if (_entries == null)
-                _entries = new List<string>();
+                _entries = new Dictionary<string, DateTime>();
             if (!key.IsSet())
                 return;
-            if (_entries.Contains(key)) // Item has fallen out of cache, remove from entries.
+            if (_entries.Keys.Contains(key)) // Item has fallen out of cache, remove from entries.
                 _entries.Remove(key);
             _cache.Remove(key);
         }
 
-        public void RemoveWhere(Func<string, bool> predicate)
-        {
-            if (_entries == null)
-                _entries = new List<string>();
-            var toRemove = _entries.Where(predicate).ToList();
-            foreach (string key in toRemove)
-                Remove(key);
-        }
 
         public void RemoveByType(Type type)
         {
             if (_entries == null)
-                _entries = new List<string>();
+                _entries = new Dictionary<string, DateTime>();
             if (type == null)
                 return;
-            var toRemove = _entries.Where(e => e.StartsWith(type.ToString())).ToList();
-            foreach (string key in toRemove)
-                Remove(key);
+            var toRemove = _entries.Where(e => e.Key.StartsWith(type.ToString())).ToList();
+            foreach (var entry in toRemove)
+                Remove(entry.Key);
         }
 
         public void ResetCache()
         {
             if (_entries == null)
-                _entries = new List<string>();
-            var toRemove = _entries.ToList();
-            foreach (string key in toRemove)
-                Remove(key);
+                _entries = new Dictionary<string, DateTime>();
+            foreach (var entry in _entries)
+                Remove(entry.Key);
         }
 
         #region "Events"

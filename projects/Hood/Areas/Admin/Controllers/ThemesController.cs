@@ -10,7 +10,7 @@ using System;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "SuperUser,Admin")]
     public class ThemesController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public ThemesController()

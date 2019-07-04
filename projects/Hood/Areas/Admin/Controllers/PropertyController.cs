@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor,Manager")]
+    [Authorize(Roles = "SuperUser,Admin,Editor")]
     public class PropertyController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         protected readonly PropertySettings _propertySettings;

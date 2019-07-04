@@ -172,16 +172,18 @@ namespace Hood.Services
                 CleanTempFolder();
 
                 // open a socket to the FTP site, and pull the property file out
-                if (_propertySettings.FTPImporterSettings.UseFTP)
-                    GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
-                else
+                switch (_propertySettings.FTPImporterSettings.Method)
                 {
-                    if (_propertySettings.FTPImporterSettings.RequireUnzip)
-                    {
-                        UnzipLocalFile();
-                    }
-
-                    GetFileFromLocal(_propertySettings.FTPImporterSettings.Filename);
+                    case PropertyImporterMethod.Directory:
+                        if (_propertySettings.FTPImporterSettings.RequireUnzip)
+                        {
+                            UnzipLocalFile();
+                        }
+                        GetFileFromLocal(_propertySettings.FTPImporterSettings.Filename);
+                        break;
+                    case PropertyImporterMethod.FtpBlm:
+                        GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
+                        break;
                 }
 
                 if (HasFileError())
@@ -470,10 +472,15 @@ namespace Hood.Services
                 if (data[key].IsSet())
                 {
                     // We have a document, download it with the FTPService
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -516,10 +523,15 @@ namespace Hood.Services
                 if (data[key].IsSet())
                 {
                     // We have a floor plan reference, download it with the FTPService
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -576,10 +588,15 @@ namespace Hood.Services
                 if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
                 {
                     // We have an image, download it with the FTPService
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -631,10 +648,15 @@ namespace Hood.Services
                 else if (data[key].IsSet() && key.Contains("60"))
                 {
                     // We have an EPC, download it with the FTPService.
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {

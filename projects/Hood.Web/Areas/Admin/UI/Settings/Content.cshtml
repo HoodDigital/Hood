@@ -13,7 +13,7 @@
     </a>
 }
 <form method="post" id="settings-form">
-    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType)
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
     <div class="row">
         <div class="col-12 col-lg-3 col-xl-2">
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -150,6 +150,7 @@
                                                 <input asp-for="Types[i].Icon" class="form-control" />
                                                 <small asp-for="Types[i].Icon"></small>
                                             </div>
+                                            <editor asp-image="Types[i].NoImage"></editor>
                                             <div class="form-group">
                                                 <div class="custom-control custom-checkbox">
                                                     <input asp-for="Types[i].IsPublic" class="custom-control-input">

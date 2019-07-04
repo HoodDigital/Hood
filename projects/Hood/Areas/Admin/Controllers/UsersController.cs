@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "SuperUser,Admin")]
     public class UsersController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public UsersController()
