@@ -35,7 +35,7 @@ namespace Hood.Models
             {
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key));
 
-                var _contextAccessor = Engine.Current.Resolve<IHttpContextAccessor>();
+                var _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
                 var claims = new Claim[] {
                     new Claim(ClaimTypes.NameIdentifier, Id),
                     new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddDays(7)).ToUnixTimeSeconds()}")
@@ -55,7 +55,7 @@ namespace Hood.Models
                 privateKey += Engine.Settings.Get("Hood.Api.SystemPrivateKey");
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
 
-                var _contextAccessor = Engine.Current.Resolve<IHttpContextAccessor>();
+                var _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
                 var claims = new Claim[] {
                     new Claim(ClaimTypes.NameIdentifier, Id),
                     new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddDays(7)).ToUnixTimeSeconds()}")

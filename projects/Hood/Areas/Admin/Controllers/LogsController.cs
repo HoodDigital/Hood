@@ -15,7 +15,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class LogsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class LogsController : BaseController
     {
         public LogsController()
             : base()

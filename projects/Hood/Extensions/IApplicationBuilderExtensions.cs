@@ -37,7 +37,7 @@ namespace Hood.Extensions
                 throw new ArgumentNullException(nameof(config));
 
             // Register all Hood Components
-            var typeFinder = Engine.Current.Resolve<ITypeFinder>();
+            var typeFinder = Engine.Services.Resolve<ITypeFinder>();
             var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
 
             var instances = dependencies

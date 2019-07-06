@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Core
 {
-    class HoodEngine : IEngine
+    class HoodServiceProvider : IHoodServiceProvider
     {
         private IServiceProvider _serviceProvider { get; set; }
         public virtual IServiceProvider ServiceProvider => _serviceProvider;
@@ -40,7 +40,7 @@ namespace Hood.Core
         {
 
             // Register engine
-            services.AddSingleton<IEngine>(this);
+            services.AddSingleton<IHoodServiceProvider>(this);
 
             // Register type finder
             var typeFinder = new TypeFinder();

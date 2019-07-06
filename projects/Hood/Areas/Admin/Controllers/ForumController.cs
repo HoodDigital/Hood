@@ -20,7 +20,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class ForumController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ForumController : BaseController
     {
         public ForumController()
             : base()

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Api.Controllers
 {
     [Area("Api")]
-    public class UsersController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class UsersController : BaseController
     {
         public UsersController()
             : base()

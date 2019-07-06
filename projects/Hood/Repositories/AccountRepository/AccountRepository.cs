@@ -42,29 +42,9 @@ namespace Hood.Services
         }
 
         [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
-        public AccountInfo LoadAccountInfo(string userId)
-        {
-            AccountInfo result = new AccountInfo();
-            result = new AccountInfo()
-            {
-                User = GetUserById(userId, false)
-            };
-            if (result.User != null)
-            {
-                result.Roles = _userManager.GetRolesAsync(result.User).Result;
-            }
-            if (result.User?.Subscriptions != null)
-            {
-                foreach (UserSubscription sub in result.User.Subscriptions)
-                {
-                    if (sub.Status == "trialing" || sub.Status == "active")
-                    {
-                        result.ActiveSubscriptions.Add(sub);
-                    }
-                }
-            }
-            return result;
-        }
+        public AccountInfo LoadAccountInfo(string userId) => throw new NotImplementedException();
+
+        #region User Get/Update/Delete
 
         public ApplicationUser GetUserById(string userId, bool track = true)
         {
@@ -184,6 +164,8 @@ namespace Hood.Services
             return;
         }
 
+        #endregion
+
         public void ResetBillingInfo()
         {
             var user = GetCurrentUser();
@@ -191,13 +173,17 @@ namespace Hood.Services
             UpdateUser(user);
         }
 
-        // Roles
+        #region Addresses
+
         public IList<IdentityRole> GetAllRoles()
         {
             return _db.Roles.ToList();
         }
 
-        // Addresses
+        #endregion
+
+        #region Addresses
+
         public Models.Address GetAddressById(int id)
         {
             return _db.Addresses.Where(a => a.Id == id).FirstOrDefault();
@@ -247,6 +233,7 @@ namespace Hood.Services
                 return new OperationResult(ex);
             }
         }
+
         public OperationResult SetDeliveryAddress(string userId, int id)
         {
             try
@@ -264,20 +251,9 @@ namespace Hood.Services
                 return new OperationResult(ex);
             }
         }
-        public async Task<UserSubscription> SaveUserSubscription(UserSubscription newUserSub)
-        {
-            await _db.UserSubscriptions.AddAsync(newUserSub);
-            _db.SaveChanges();
-            return newUserSub;
-        }
-        public async Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub)
-        {
-            _db.Entry(newUserSub).State = EntityState.Modified;
-            await _db.SaveChangesAsync();
-            return newUserSub;
-        }
+        #endregion
 
-        // Subscriptions
+        #region Subscriptions
         public async Task<Models.Subscription> AddSubscriptionPlan(Models.Subscription subscription)
         {
             // try adding to stripe
@@ -417,7 +393,10 @@ namespace Hood.Services
             return;
         }
 
-        // Stripe customer object
+        #endregion
+
+        #region Stripe customer object
+
         public async Task<Customer> LoadCustomerObject(string stripeId, bool allowNullObject)
         {
             // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
@@ -451,7 +430,9 @@ namespace Hood.Services
                 throw new Exception(BillingMessage.NoStripeId.ToString());
         }
 
-        // User Subscriptions
+        #endregion
+
+        #region User Subscriptions
         private IQueryable<ApplicationUser> GetSubscribers(string subcription, string search = "", string sort = "")
         {
             IQueryable<ApplicationUser> users = _db.Users
@@ -602,7 +583,14 @@ namespace Hood.Services
             newUserSub.CustomerId = user.StripeId;
             newUserSub.UserId = user.Id;
             newUserSub.SubscriptionId = subscription.Id;
-            newUserSub = await SaveUserSubscription(newUserSub);
+            await _db.UserSubscriptions.AddAsync(newUserSub);
+            _db.SaveChanges();
+            return newUserSub;
+        }
+        public async Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub)
+        {
+            _db.Entry(newUserSub).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
             return newUserSub;
         }
         public async Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId)
@@ -683,8 +671,9 @@ namespace Hood.Services
             UpdateUser(user);
             return userSub;
         }
+        #endregion
 
-        // [UserSubscription] Helpers
+        #region UserSubscription Helpers
         private UserSubscription GetUserSubscription(ApplicationUser user, int userSubscriptionId)
         {
             UserSubscription subscription = user.Subscriptions.Where(us => us.Id == userSubscriptionId).FirstOrDefault();
@@ -699,8 +688,9 @@ namespace Hood.Services
                 throw new Exception(BillingMessage.NoSubscription.ToString());
             return subscription;
         }
+        #endregion
 
-        // WebHooks - ALL MUST RUN SYNCRONOUSLY
+        #region WebHooks - ALL MUST RUN SYNCRONOUSLY
         public string ConfirmSubscriptionObject(Stripe.Subscription created, DateTime? eventTime)
         {
             StringWriter sw = new StringWriter();
@@ -805,8 +795,9 @@ namespace Hood.Services
                                 .FirstOrDefault(c => c.StripeId == id);
             return userSub;
         }
+        #endregion
 
-
+        #region Statistics
         public object GetStatistics()
         {
             var totalUsers = _db.Users.Count();
@@ -867,6 +858,6 @@ namespace Hood.Services
 
             return new { total, trials, active, days, months };
         }
-
+        #endregion
     }
 }

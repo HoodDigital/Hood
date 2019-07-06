@@ -18,7 +18,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-    public class MediaController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class MediaController : BaseController
     {
         public MediaController()
             : base()

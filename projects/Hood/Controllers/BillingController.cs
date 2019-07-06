@@ -14,7 +14,7 @@ namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
-    public class BillingController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class BillingController : BaseController
     {
         public BillingController()
             : base()

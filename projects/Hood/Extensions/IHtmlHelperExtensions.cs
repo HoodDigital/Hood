@@ -23,12 +23,12 @@ namespace Hood.Extensions
 
         public static void AddInlineScriptParts(this IHtmlHelper html, ResourceLocation location, string script)
         {
-            var pageHeadBuilder = Engine.Current.Resolve<IPageBuilder>();
+            var pageHeadBuilder = Engine.Services.Resolve<IPageBuilder>();
             pageHeadBuilder.AddInlineScriptParts(location, script);
         }
         public static void AppendInlineScriptParts(this IHtmlHelper html, ResourceLocation location, string script)
         {
-            var pageHeadBuilder = Engine.Current.Resolve<IPageBuilder>();
+            var pageHeadBuilder = Engine.Services.Resolve<IPageBuilder>();
             pageHeadBuilder.AppendInlineScriptParts(location, script);
         }
         public static void AddScriptParts(this IHtmlHelper html, string src, string debugSrc = "", bool excludeFromBundle = false, bool isAsync = false)
@@ -37,7 +37,7 @@ namespace Hood.Extensions
         }
         public static void AddScriptParts(this IHtmlHelper html, ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false, bool isAsync = false)
         {
-            var pageHeadBuilder = Engine.Current.Resolve<IPageBuilder>();
+            var pageHeadBuilder = Engine.Services.Resolve<IPageBuilder>();
             pageHeadBuilder.AddScriptParts(location, src, debugSrc, excludeFromBundle, isAsync);
         }
         public static void AppendScriptParts(this IHtmlHelper html, string src, string debugSrc = "", bool excludeFromBundle = false, bool isAsync = false)
@@ -46,17 +46,17 @@ namespace Hood.Extensions
         }
         public static void AppendScriptParts(this IHtmlHelper html, ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false, bool isAsync = false)
         {
-            var pageHeadBuilder = Engine.Current.Resolve<IPageBuilder>();
+            var pageHeadBuilder = Engine.Services.Resolve<IPageBuilder>();
             pageHeadBuilder.AppendScriptParts(location, src, debugSrc, excludeFromBundle, isAsync);
         }
         public static IHtmlContent RenderScripts(this IHtmlHelper html, IUrlHelper urlHelper, ResourceLocation location, bool bundleFiles = false)
         {
-            var pageHeadBuilder = Engine.Current.Resolve<IPageBuilder>();
+            var pageHeadBuilder = Engine.Services.Resolve<IPageBuilder>();
             return new HtmlString(pageHeadBuilder.GenerateScripts(urlHelper, location, bundleFiles));
         }
         public static IHtmlContent RenderInlineScripts(this IHtmlHelper html, IUrlHelper urlHelper, ResourceLocation location)
         {
-            var pageHeadBuilder = Engine.Current.Resolve<IPageBuilder>();
+            var pageHeadBuilder = Engine.Services.Resolve<IPageBuilder>();
             return new HtmlString(pageHeadBuilder.GenerateInlineScripts(urlHelper, location));
         }
 

@@ -17,7 +17,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ApiController : BaseController
     {
         public ApiController()
             : base()

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public class HoodController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class HoodController : BaseController
     {
         public HoodController()
             : base()

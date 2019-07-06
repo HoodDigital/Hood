@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize(Roles= "Admin,Api")]
-    public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ApiController : BaseController
     {
         private readonly UrlEncoder _urlEncoder;
 

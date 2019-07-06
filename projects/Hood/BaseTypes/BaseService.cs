@@ -33,18 +33,18 @@ namespace Hood.Services
 
         public BaseService()
         {
-            _userManager = Engine.Current.Resolve<UserManager<ApplicationUser>>();
-            _signInManager = Engine.Current.Resolve<SignInManager<ApplicationUser>>();
-            _roleManager = Engine.Current.Resolve<RoleManager<IdentityRole>>();
-            _db = Engine.Current.Resolve<TContext>();
-            _email = Engine.Current.Resolve<IEmailSender>();
-            _billing = Engine.Current.Resolve<IBillingService>();
-            _logService = Engine.Current.Resolve<ILogService>();
-            _config = Engine.Current.Resolve<IConfiguration>();
-            _env = Engine.Current.Resolve<IHostingEnvironment>();
-            _cache = Engine.Current.Resolve<IHoodCache>();
-            _address = Engine.Current.Resolve<IAddressService>();
-            _eventService = Engine.Current.Resolve<IEventsService>();
+            _userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
+            _signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+            _roleManager = Engine.Services.Resolve<RoleManager<IdentityRole>>();
+            _db = Engine.Services.Resolve<TContext>();
+            _email = Engine.Services.Resolve<IEmailSender>();
+            _billing = Engine.Services.Resolve<IBillingService>();
+            _logService = Engine.Services.Resolve<ILogService>();
+            _config = Engine.Services.Resolve<IConfiguration>();
+            _env = Engine.Services.Resolve<IHostingEnvironment>();
+            _cache = Engine.Services.Resolve<IHoodCache>();
+            _address = Engine.Services.Resolve<IAddressService>();
+            _eventService = Engine.Services.Resolve<IEventsService>();
         }
     }
 }

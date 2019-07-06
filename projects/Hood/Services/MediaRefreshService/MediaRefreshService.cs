@@ -212,7 +212,7 @@ namespace Hood.Services
                 message.AddH1("Complete!");
                 message.AddParagraph("All media files have been successfully refreshed on " + _context.GetSiteUrl());
 
-                IEmailSender emailSender = Engine.Current.Resolve<IEmailSender>();
+                IEmailSender emailSender = Engine.Services.Resolve<IEmailSender>();
                 await emailSender.NotifyRoleAsync(message, "SuperUser");
 
                 // Clean the temp directory...

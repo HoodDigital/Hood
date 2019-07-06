@@ -24,7 +24,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor,Manager")]
-    public class ContentController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ContentController : BaseController
     {
         public ContentController()
             : base()

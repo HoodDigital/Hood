@@ -19,7 +19,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class SettingsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class SettingsController : BaseController
     {
         protected IMediaRefreshService _mediaRefresh;
 

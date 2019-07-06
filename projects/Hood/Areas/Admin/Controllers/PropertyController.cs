@@ -21,7 +21,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-    public class PropertyController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class PropertyController : BaseController
     {
         protected readonly PropertySettings _propertySettings;
 

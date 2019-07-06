@@ -25,7 +25,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class UsersController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class UsersController : BaseController
     {
         public UsersController()
             : base()
@@ -412,7 +412,7 @@ namespace Hood.Areas.Admin.Controllers
 
             await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, userPrincipal); // <-- This has changed from the previous version.
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
 
         [AllowAnonymous]

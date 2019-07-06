@@ -17,7 +17,7 @@ namespace Hood.Controllers
     [Authorize]
     [StripeRequired]
     //[Area("Hood")]
-    public class SubscriptionsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class SubscriptionsController : BaseController
     {
 
         private readonly IStripeWebHookService _webHooks;

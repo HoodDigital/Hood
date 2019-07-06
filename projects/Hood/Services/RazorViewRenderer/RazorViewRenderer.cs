@@ -75,7 +75,7 @@ namespace Hood.Services
         {
             var httpContext = new DefaultHttpContext()
             {
-                RequestServices = Engine.Current.Resolve<IServiceProvider>()
+                RequestServices = Engine.Services.Resolve<IServiceProvider>()
             };
             return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
         }

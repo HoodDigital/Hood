@@ -94,7 +94,7 @@ namespace Hood.TagHelpers
             else
                 output.Attributes.SetAttribute("class", $"{GroupClass}");
 
-            var _urlHelperFactory = Engine.Current.Resolve<IUrlHelperFactory>();
+            var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
             var attachUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new { area = "Admin", doAction = MediaWindowAction.Select.ToString(), tag = $".{fieldId}", fileType = FileType, restrict = true }); ;
 
             output.Content.SetHtmlContent($@"

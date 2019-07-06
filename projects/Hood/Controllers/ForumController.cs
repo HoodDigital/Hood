@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public class ForumController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ForumController : BaseController
     {
         public ForumController()
             : base()

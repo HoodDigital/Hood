@@ -9,7 +9,7 @@ using System;
 namespace Hood.Controllers
 {
     [Authorize]
-    public class AddressController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class AddressController : BaseController
     {
         public AddressController()
             : base()

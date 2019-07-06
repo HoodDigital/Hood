@@ -33,7 +33,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
+                var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerForumChanged), ex);
             }
         }
@@ -84,7 +84,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
+                var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerPropertiesChanged), ex);
             }
         }
@@ -115,7 +115,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
+                var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerOptionsChanged), ex);
             }
         }
@@ -146,7 +146,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
+                var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerUserSubcriptionChanged), ex);
             }
         }
@@ -177,7 +177,7 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
+                var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerStripeWebhook), ex);
             }
         }

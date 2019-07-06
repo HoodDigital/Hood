@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public class PropertyController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class PropertyController : BaseController
     {
         public PropertyController()
             : base()

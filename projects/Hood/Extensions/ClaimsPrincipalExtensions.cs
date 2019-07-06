@@ -16,12 +16,12 @@ namespace Hood.Extensions
                 return null;
 
             principal.GetUserId();
-            var contextAccessor = Engine.Current.Resolve<IHttpContextAccessor>();
+            var contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
 
             var view = contextAccessor.HttpContext.Items[nameof(UserSubscriptionsView)] as UserSubscriptionsView;
             if (view == null)
             {
-                var context = Engine.Current.Resolve<HoodDbContext>();
+                var context = Engine.Services.Resolve<HoodDbContext>();
                 view = context.UserSubscriptionView.SingleOrDefault(us => us.Id == principal.GetUserId());
                 if (view != null)
                     contextAccessor.HttpContext.Items[nameof(UserSubscriptionsView)] = view;

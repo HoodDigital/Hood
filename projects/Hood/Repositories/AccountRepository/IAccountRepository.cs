@@ -41,7 +41,6 @@ namespace Hood.Services
 
         // User Subscriptions
         Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model);
-        Task<UserSubscription> SaveUserSubscription(UserSubscription newUserSub);
         Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub);
         Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId);
         Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId);

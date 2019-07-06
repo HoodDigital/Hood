@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize]
-    public class ManageController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ManageController : BaseController
     {
         private readonly UrlEncoder _urlEncoder;
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";

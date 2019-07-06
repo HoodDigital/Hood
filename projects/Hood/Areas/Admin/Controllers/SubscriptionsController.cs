@@ -19,7 +19,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class SubscriptionsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class SubscriptionsController : BaseController
     {
         public SubscriptionsController()
             : base()

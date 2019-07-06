@@ -15,7 +15,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles="SuperUser,Admin")]
-    public class MailController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class MailController : BaseController
     {
         public MailController()
             : base()

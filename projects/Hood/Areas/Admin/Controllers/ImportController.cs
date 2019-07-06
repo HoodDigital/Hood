@@ -13,7 +13,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class ImportController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ImportController : BaseController
     {
         private readonly IFTPService _ftp;
         private readonly IPropertyImporter _blm;

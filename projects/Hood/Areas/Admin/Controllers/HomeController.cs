@@ -10,7 +10,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor,Manager")]
-    public class HomeController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class HomeController : BaseController
     {
         public HomeController()
             : base()

@@ -11,7 +11,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class ThemesController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ThemesController : BaseController
     {
         public ThemesController()
             : base()
