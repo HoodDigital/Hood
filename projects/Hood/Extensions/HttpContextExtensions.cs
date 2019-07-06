@@ -78,6 +78,7 @@ namespace Hood.Extensions
             return value == null ? default : JsonConvert.DeserializeObject<T>(value);
         }
 
+        [Obsolete("Use User.GetUserSubscriptionsView() from now on.", true)]
         public static AccountInfo GetAccountInfo(this HttpContext context)
         {
             return context.Items["AccountInfo"] as AccountInfo;

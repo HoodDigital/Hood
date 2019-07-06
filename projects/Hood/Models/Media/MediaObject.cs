@@ -6,6 +6,7 @@ using Hood.Interfaces;
 using Hood.Services;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
@@ -41,35 +42,49 @@ namespace Hood.Models
         {
             mediaResult.CopyProperties(this);
         }
-
+        [Display(Name = "File Size (bytes)")]
         public long FileSize { get; set; }
+        [Display(Name = "File Type (mime)")]
         public string FileType { get; set; }
+        [Display(Name = "Filename")]
         public string Filename { get; set; }
+        [Display(Name = "Directory")]
         public string Directory { get; set; }
+        [Display(Name = "Blob Reference")]
         public string BlobReference { get; set; }
+        [Display(Name = "Url")]
         public string Url { get; set; }
+        [Display(Name = "Uploaded On")]
         public DateTime CreatedOn { get; set; }
-        public string GeneralFileType { get; set; }
+        [Display(Name = "Thumbnail Url", Description = "Large URL for the file (250x250 Max Size)")]
         public string ThumbUrl { get; set; }
+        [Display(Name = "Small Url", Description = "Large URL for the file (640x640 Max Size)")]
         public string SmallUrl { get; set; }
+        [Display(Name = "Medium Url", Description = "Large URL for the file (1280x1280 Max Size)")]
         public string MediumUrl { get; set; }
+        [Display(Name = "Large Url", Description = "Large URL for the file (1920x1920 Max Size)")]
         public string LargeUrl { get; set; }
+        [Display(Name = "Unique Id", Description = "Unique file reference for the filename generation.")]
         public string UniqueId { get; set; }
+        public GenericFileType GenericFileType { get; set; }
 
         public virtual string Container
         {
             get
             {
-                if (GeneralFileType == "Directory")
+                if (GenericFileType == GenericFileType.Directory)
                     return "N/A";
                 return Directory;
             }
         }
+        [Display(Name = "Url")]
         public virtual string DownloadUrl => Url.Replace("https://", "http://");
+        [Display(Name = "Secure Url")]
         public virtual string DownloadUrlHttps => Url.Replace("http://", "https://");
+        [Display(Name = "Icon")]
         public virtual string Icon => this.ToIcon();
+        [Display(Name = "File Size (Kb)")]
         public virtual string FormattedSize => (FileSize / 1024).ToString() + "Kb";
-        public virtual GenericFileType GenericFileType => FileType.ToFileType();
 
         public static string NoImageUrl
         {
@@ -116,5 +131,11 @@ namespace Hood.Models
                 return ret;
             }
         }
+
+        /// <summary>
+        /// Please use IMediaObject.GenericFileType instead.
+        /// </summary>
+        [Obsolete("Please use IMediaObject.GenericFileType instead.", true)]
+        public string GeneralFileType { get; set; }
     }
 }

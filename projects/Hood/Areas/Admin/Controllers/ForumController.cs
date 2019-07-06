@@ -277,8 +277,6 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // User must have an organisation.
-                AccountInfo account = HttpContext.GetAccountInfo();
-
                 // check if category is on club already
                 if (!model.DisplayName.IsSet())
                     throw new Exception("You need to enter a category!");

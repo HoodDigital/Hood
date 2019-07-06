@@ -56,6 +56,9 @@ namespace Hood.Models
         // Logs
         public DbSet<Log> Logs { get; set; }
 
+        // Views
+        public DbQuery<UserSubscriptionsView> UserSubscriptionView { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

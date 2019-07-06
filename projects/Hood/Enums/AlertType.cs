@@ -20,7 +20,7 @@
     }
     public static class AlertExtensions
     {
-        public static string ToCssClass(this AlertType alertType)
+        public static string ToAlertCssClass(this AlertType alertType)
         {
             return $"alert-{alertType.ToString().ToLower()}";
         }

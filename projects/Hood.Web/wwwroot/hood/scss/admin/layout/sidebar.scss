@@ -52,67 +52,7 @@
         }
     }
 
-    ul.navbar-nav {
-        flex-direction: column;
-        margin-left: -1.5rem;
-        margin-right: -1.5rem;
-
-        li {
-            display: block;
-
-            h4 {
-                display: flex;
-                align-items: center;
-                margin-bottom: 0;
-                margin-top: 1rem;
-                padding: .5rem 1.5rem;
-                color: $gray-400;
-                font-size: small;
-                text-transform: uppercase;
-            }
-
-            a.nav-link {
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                padding: .5rem 1.5rem;
-                color: $gray-600;
-
-                i {
-                    margin-right: 10px;
-                    vertical-align: middle;
-                    text-align: center;
-                    width: 25px;
-
-                    @media (min-width:768px) {
-                        display: inline-block;
-                    }
-                }
-
-                &:hover {
-                    color: $black;
-                }
-            }
-
-            ul.nav {
-                li {
-                    a.nav-link {
-                        padding: .4rem 2rem;
-                        font-size: .9em;
-                    }
-                }
-
-                ul.nav {
-                    li {
-                        a.nav-link {
-                            padding: .3rem 2.5rem;
-                            font-size: .8em;
-                        }
-                    }
-                }
-            }
-        }
-    }
+    @import "../../core/navbars";
 
     .navbar-user {
         margin-left: -1.5rem;

@@ -30,33 +30,29 @@ namespace Hood.Extensions
         }
         public static string ToIcon(this IMediaObject mediaObject)
         {
-            GenericFileType type = GenericFileType.Unknown;
-            string output = "";
-            if (Enum.TryParse(mediaObject.GeneralFileType, out type))
+            string output;
+            switch (mediaObject.GenericFileType)
             {
-                switch (type)
-                {
-                    case GenericFileType.Image:
-                        output = mediaObject.SmallUrl;
-                        break;
-                    case GenericFileType.Excel:
-                        return "/hood/images/icons/excel.png";
-                    case GenericFileType.PDF:
-                        return "/hood/images/icons/pdf.png";
-                    case GenericFileType.PowerPoint:
-                        return "/hood/images/icons/powerpoint.png";
-                    case GenericFileType.Word:
-                        return "/hood/images/icons/word.png";
-                    case GenericFileType.Photoshop:
-                        return "/hood/images/icons/photoshop.png";
-                    case GenericFileType.Audio:
-                        return "/hood/images/icons/audio.png";
-                    case GenericFileType.Video:
-                        return "/hood/images/icons/video.png";
-                    case GenericFileType.Unknown:
-                    default:
-                        return "/hood/images/icons/file.png";
-                }
+                case GenericFileType.Image:
+                    output = mediaObject.SmallUrl;
+                    break;
+                case GenericFileType.Excel:
+                    return "/hood/images/icons/excel.png";
+                case GenericFileType.PDF:
+                    return "/hood/images/icons/pdf.png";
+                case GenericFileType.PowerPoint:
+                    return "/hood/images/icons/powerpoint.png";
+                case GenericFileType.Word:
+                    return "/hood/images/icons/word.png";
+                case GenericFileType.Photoshop:
+                    return "/hood/images/icons/photoshop.png";
+                case GenericFileType.Audio:
+                    return "/hood/images/icons/audio.png";
+                case GenericFileType.Video:
+                    return "/hood/images/icons/video.png";
+                case GenericFileType.Unknown:
+                default:
+                    return "/hood/images/icons/file.png";
             }
             if (!output.IsSet())
             {

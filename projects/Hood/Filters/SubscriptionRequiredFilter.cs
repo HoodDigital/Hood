@@ -96,12 +96,9 @@ namespace Hood.Filters
                     throw new Exception("Subscriptions are not enabled");
                 }
 
-                // Load the account information from the global context (set in the global AccountFilter)
-                AccountInfo _account = context.HttpContext.GetAccountInfo();
-
                 // Set the redirect result for no subscriptions and subscription upgrade required
                 BillingSettings billingSettings = Engine.Settings.Billing;
-                IActionResult result = billingSettings.GetNewSubscriptionUrl(context.HttpContext);
+                IActionResult newsubResult = billingSettings.GetNewSubscriptionUrl(context.HttpContext);
                 IActionResult changeResult = billingSettings.GetChangeSubscriptionUrl(context.HttpContext);
 
                 // Set the redirect location
@@ -118,7 +115,7 @@ namespace Hood.Filters
                         baseUri.Query = queryToAppend;
                     if (_categories.Count == 1)
                         baseUri.Query += "&category=" + _categories[0];
-                    result = new RedirectResult(baseUri.ToString());
+                    newsubResult = new RedirectResult(baseUri.ToString());
                 }
 
                 // If an addon is required, this takes preference, and should be purchased to continue, as it may be a standalone addon required.
@@ -127,7 +124,7 @@ namespace Hood.Filters
                     bool go = _ids.Count == 0;
                     foreach (string addon in _addons)
                     {
-                        if (!_account.IsSubscribed(addon))
+                        if (!context.HttpContext.User.IsSubscribed(addon))
                         {
                             IActionResult addonResult = new RedirectToActionResult("Addon", "Subscriptions", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent(), required = addon });
                             if (billingSettings.SubscriptionAddonPage.IsSet())
@@ -149,26 +146,26 @@ namespace Hood.Filters
                 }
 
                 // If they are in an override role, let them through.
-                if (_userManager.GetRolesAsync(_account.User).Result.Any(r => _roles.Contains(r)))
+                if (_userManager.GetRolesAsync(context.HttpContext.User.AccountInfo().AsUser()).Result.Any(r => _roles.Contains(r)))
                     return;
 
                 // If we reached this point then we are on the hunt for a tiered subscription of some kind.
                 // Check for general tiered subscriptions - one is always required to proceed further.
-                if (!_account.HasTieredSubscription)
+                if (!context.HttpContext.User.HasActiveSubscription())
                 {
-                    context.Result = result;
+                    context.Result = newsubResult;
                     return;
                 }
 
                 // If a category is set, then check that one of the user's subscriptions has that category.
-                if (_categories.Count > 0 && !_categories.Any(i => _account.IsSubscribedToCategory(i)))
+                if (_categories.Count > 0 && !_categories.Any(i => context.HttpContext.User.IsSubscribedToCategory(i)))
                 {
                     context.Result = categoryResult;
                     return;
                 }
 
                 // If an Id is set, then check that one of the user's subscriptions has that Id.
-                if (_ids.Count > 0 && !_ids.Any(i => _account.IsSubscribed(i)))
+                if (_ids.Count > 0 && !_ids.Any(i => context.HttpContext.User.IsSubscribed(i)))
                 {
                     context.Result = changeResult;
                     return;

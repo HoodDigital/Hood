@@ -134,8 +134,7 @@ namespace Hood.Controllers
                         if (subs != null)
                             if (subs.Count > 0)
                             {
-                                AccountInfo subscribeResult = ControllerContext.HttpContext.GetAccountInfo();
-                                if (!subs.Any(s => subscribeResult.IsSubscribed(s)))
+                                if (!subs.Any(s => User.IsSubscribed(s)))
                                     return RedirectToAction("Index", "Subscriptions", new { message = BillingMessage.UpgradeRequired });
                             }
                     }

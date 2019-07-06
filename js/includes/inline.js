@@ -5,7 +5,7 @@ $.hood.Inline = {
     Init: function () {
         $('.hood-inline:not(.refresh)').each($.hood.Inline.Load);
         $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
-        $.hood.Inline.DataLists.Init();
+        $.hood.Inline.DataList.Init();
     },
     Refresh: function () {
         $('.hood-inline').each($.hood.Inline.Load);
@@ -71,7 +71,7 @@ $.hood.Inline = {
                 $(e.currentTarget).removeClass('loading');
             });
     },
-    DataLists: {
+    DataList: {
         Init: function () {
             $('.hood-inline-list.query').each(function () {
                 $(this).data('url', $(this).data('url') + window.location.search);
@@ -83,12 +83,7 @@ $.hood.Inline = {
                 var url = document.createElement('a');
                 url.href = $(this).attr('href');
                 $list = $(this).parents('.hood-inline-list');
-                if (history.pushState) {
-                    var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + url.href.substring(url.href.indexOf('?') + 1);
-                    window.history.pushState({ path: newurl }, '', newurl);
-                }
-                $list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
-                $.hood.Inline.Reload($list, $list.data('complete'));
+                $.hood.Inline.DataList.Reload($list, url);
             });
             $('body').on('submit', '.hood-inline-list form', function (e) {
                 e.preventDefault();
@@ -98,10 +93,39 @@ $.hood.Inline = {
                 var url = document.createElement('a');
                 url.href = $list.data('url');
                 url.search = "?" + $form.serialize();
-                $list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
-                $.hood.Inline.Reload($list, $list.data('complete'));
+                $.hood.Inline.DataList.Reload($list, url);
             });
+            $('body').on('submit', 'form.inline', function (e) {
+                e.preventDefault();
+                $.hood.Loader(true);
+                $form = $(this);
+                $list = $($form.data('target'));
+                var url = document.createElement('a');
+                url.href = $list.data('url');
+                url.search = "?" + $form.serialize();
+                $.hood.Inline.DataList.Reload($list, url);
+            });
+            $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form', function (e) {
+                e.preventDefault();
+                $.hood.Loader(true);
+                $form = $(this).parents('form');
+                $list = $($form.data('target'));
+                var url = document.createElement('a');
+                url.href = $list.data('url');
+                url.search = "?" + $form.serialize();
+                $.hood.Inline.DataList.Reload($list, url);
+            });
+        },
+        Reload: function(list, url) {
+            if (history.pushState && list.hasClass('query')) {
+                var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + url.href.substring(url.href.indexOf('?') + 1);
+                window.history.pushState({ path: newurl }, '', newurl);
+            }
+            list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
+            $.hood.Inline.Reload(list, list.data('complete'));
         }
     }
 };
 $.hood.Inline.Init();
+
+ 

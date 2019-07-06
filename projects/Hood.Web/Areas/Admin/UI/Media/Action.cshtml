@@ -1,0 +1,41 @@
+@model MediaListModel
+@{
+    Layout = null;
+}
+<div class="modal fade modal-right" id="media-select-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-blade" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <div>
+                    <h5 class="modal-title">
+                        Choose image...
+                    </h5>
+                    <p class="m-0 text-primary">
+                        <i class="fa fa-file mr-2"></i> You can either select from existing site media, previously set versions, or upload a new file.
+                    </p>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="inline" data-target="#media-list">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <partial name="_Media_Filters" />
+                        </div>
+                        <div class="col-sm">
+                            <partial name="_Media_Uploader" />
+                            <div id="media-list" class="hood-inline-list" data-url="@Url.Action("List", new { doAction = Model.Action.ToString(), tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field, refresh = Model.Refresh, media = Model.MediaId  })" data-complete="$.hood.Media.Loaded">
+                                <alert icon="fa fa-4x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading Media...</alert>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                 <partial name="_Media_Actions" />
+           </div>
+        </div>
+    </div>
+</div>

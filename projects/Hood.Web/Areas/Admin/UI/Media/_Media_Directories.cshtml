@@ -1,0 +1,10 @@
+@model MediaListModel
+<ul class="nav flex-column nav-pills nav-buttons">
+    <li class="nav-item"><a class="nav-link @(Model.Directory == "" || !Model.Directory.IsSet() ? "active" : "") click-select media-click text-dark" data-toggle="pill" data-target="Directory" data-value="" href="javascript:void(0);">All Directories</a></li>
+    @{
+        foreach (string s in Model.Directories)
+        {
+            <li class="nav-item"><a class="nav-link @(Model.Directory == s ? "active" : "") click-select media-click text-dark" data-toggle="pill" data-target="Directory" data-value="@s" href="javascript:void(0);">@s</a></li>
+        }
+    }
+</ul>

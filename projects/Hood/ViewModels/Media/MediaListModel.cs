@@ -1,0 +1,80 @@
+﻿using Hood.Enums;
+using Hood.Extensions;
+using Hood.Interfaces;
+using Hood.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace Hood.ViewModels
+{
+    public class MediaListModel : PagedList<MediaObject>, IPageableModel
+    {
+        public MediaListModel()
+        {
+            PageSize = 20;
+            PageIndex = 1;
+        }
+        public List<string> Directories { get; set; }
+
+        [FromQuery(Name = "sort")]
+        [Display(Name = "Sort Order", Description = "Choose a sort order")]
+        public string Order { get; set; }
+
+        [FromQuery(Name = "search")]
+        [Display(Name = "Search", Description = "Search for media files")]
+        public string Search { get; set; }
+
+        [FromQuery(Name = "user")]
+        public string UserId { get; set; }
+        [FromQuery(Name = "fileType")]
+        public GenericFileType? GenericFileType { get; set; }
+        [FromQuery(Name = "restrict")]
+        public bool Restrict { get; set; }
+        [FromQuery(Name = "dir")]
+        public string Directory { get; set; }
+
+        #region Actions
+        [FromQuery(Name = "doAction")]
+        public MediaWindowAction? Action { get; set; }
+        [FromQuery(Name = "id")]
+        public string Id { get; set; }
+        [FromQuery(Name = "entity")]
+        public string Entity { get; set; }
+        [FromQuery(Name = "field")]
+        public string Field { get; set; }
+        [FromQuery(Name = "type")]
+        public string Type { get; set; }
+        [FromQuery(Name = "refresh")]
+        public string Refresh { get; set; }
+        [FromQuery(Name = "tag")]
+        public string Tag { get; set; }
+        [FromQuery(Name = "media")]
+        public int? MediaId { get; set; }
+        #endregion
+
+
+        public string GetPageUrl(int pageIndex)
+        {
+            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
+            query += Action.HasValue ? "&doAction=" + Action : "";
+            query += Search.IsSet() ? "&search=" + Search : "";
+            query += Directory.IsSet() ? "&dir=" + Directory : "";
+            query += Restrict ? "&restrict=" + Restrict : "";
+            query += GenericFileType.HasValue ? "&fileType=" + GenericFileType : "";
+            query += Order.IsSet() ? "&sort=" + Order : "";
+            query += UserId.IsSet() ? "&user=" + UserId : "";
+
+
+            query += Id.IsSet() ? "&id=" + Id : "";
+            query += Entity.IsSet() ? "&entity=" + Entity : "";
+            query += Field.IsSet() ? "&field=" + Field : "";
+            query += Type.IsSet() ? "&type=" + Type : "";
+            query += Tag.IsSet() ? "&tag=" + Tag : "";
+            query += Refresh.IsSet() ? "&refresh=" + Refresh : "";
+            query += MediaId.HasValue ? "&media=" + MediaId : "";
+
+            return query;
+        }
+    }
+}

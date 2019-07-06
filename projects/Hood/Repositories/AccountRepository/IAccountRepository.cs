@@ -11,6 +11,7 @@ namespace Hood.Services
     public interface IAccountRepository
     {
         // Account stuff
+        [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
         AccountInfo LoadAccountInfo(string userId);
         ApplicationUser GetCurrentUser(bool track = true);
         ApplicationUser GetUserById(string userId, bool track = true);

@@ -20,10 +20,8 @@ namespace Hood.ViewComponents
         {
             HeaderModel model = new HeaderModel()
             {
-                Pages = _content.GetContentByType("page"),
-                Subscription = HttpContext.GetAccountInfo()
+                Pages = _content.GetContentByType("page")
             };
-            model.User = model.Subscription.User;
             return View(model);
         }
     }

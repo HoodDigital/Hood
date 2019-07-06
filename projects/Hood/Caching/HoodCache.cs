@@ -95,8 +95,9 @@ namespace Hood.Caching
         {
             if (_entries == null)
                 _entries = new Dictionary<string, DateTime>();
-            foreach (var entry in _entries)
-                Remove(entry.Key);
+            var keys = _entries.Select(e => e.Key);
+            foreach (var key in keys)
+                Remove(key);
         }
 
         #region "Events"

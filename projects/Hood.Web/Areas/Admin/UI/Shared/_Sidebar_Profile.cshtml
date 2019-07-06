@@ -1,5 +1,4 @@
 @{
-    AccountInfo account = Context.GetAccountInfo();
 }
 <div class="navbar-user justify-content-around" id="sidebarUser">
     <div class="row align-items-center text-center">
@@ -33,7 +32,7 @@
             </div>
         </div>
         <div class="col">
-            <fixedImage src="@account.User?.Avatar?.SmallUrl" class="img-xxs img-circle m-0" />
+            <fixedImage src="@Account.Avatar?.SmallUrl" class="img-xxs img-circle m-0" />
         </div>
         <div class="col">
             <a class="icon-link" href="javascript:document.getElementById('logoutForm').submit()" title="Sign out">

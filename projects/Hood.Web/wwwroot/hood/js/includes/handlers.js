@@ -59,6 +59,7 @@ $.hood.Handlers = {
         var $this = $(this);
         targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));
+        $(targetId).trigger('change');
         $('.click-select[data-target="' + $this.data('target') + '"]').each(function () { $(this).html($(this).data('temp')).removeClass('active'); });
         $('.click-select[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).data('temp', $(this).html()).html('Selected').addClass('active'); });
     },
@@ -66,6 +67,7 @@ $.hood.Handlers = {
         var $this = $(this);
         targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));
+        $(targetId).trigger('change');
         $('.click-select.clean[data-target="' + $this.data('target') + '"]').each(function () { $(this).removeClass('active'); });
         $('.click-select.clean[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).addClass('active'); });
     },

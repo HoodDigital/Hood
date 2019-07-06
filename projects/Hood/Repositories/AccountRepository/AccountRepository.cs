@@ -41,7 +41,7 @@ namespace Hood.Services
             _billing = billing;
         }
 
-        // Users
+        [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
         public AccountInfo LoadAccountInfo(string userId)
         {
             AccountInfo result = new AccountInfo();
@@ -65,6 +65,7 @@ namespace Hood.Services
             }
             return result;
         }
+
         public ApplicationUser GetUserById(string userId, bool track = true)
         {
             if (string.IsNullOrEmpty(userId))

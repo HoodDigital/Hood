@@ -63,10 +63,7 @@ namespace Hood.Filters
                 // If they are in an override role, let them through.
                 if (context.HttpContext.User.Identity.IsAuthenticated)
                 {
-                    AccountInfo _account = context.HttpContext.GetAccountInfo();
-
-                    string[] _roles = { "SuperUser", "Admin" };
-                    if (_userManager.GetRolesAsync(_account.User).Result.Any(r => _roles.Contains(r)))
+                    if (context.HttpContext.User.IsInRole("SuperUser") || context.HttpContext.User.IsInRole("Admin"))
                         return;
                 }
 

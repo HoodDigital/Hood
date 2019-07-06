@@ -1,0 +1,82 @@
+@model MediaListModel
+@{
+    Layout = null;
+}
+<div class="card-deck @(Model.Action.HasValue ? "card-deck-3" : "card-deck-5")">
+    @foreach (var media in Model.List)
+    {
+        <div class="card text-center hover">
+            @switch (Model.Action)
+            {
+                case MediaWindowAction.Select:
+                    <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
+                    break;
+                case MediaWindowAction.Insert:
+                    <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-insert" data-tag="@Model.Tag" data-url="@media.Url" />
+                    break;
+                case MediaWindowAction.Attach:
+                    <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-attach" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="@media.Id" />
+                    break;
+                default:
+                    <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
+                    break;
+            }
+            <p class="m-0 font-weight-bold text-truncate">
+                @media.Filename
+            </p>
+            <p>
+                <small>@media.FormattedSize</small>
+            </p>
+            @switch (Model.Action)
+            {
+                case MediaWindowAction.Select:
+                    <p>
+                        <a class="media-select btn btn-sm btn-outline-dark btn-default" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
+                            <span>
+                                Small
+                            </span>
+                        </a>
+                        <a class="media-select btn btn-sm btn-outline-dark btn-default" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
+                            <span>
+                                Medium
+                            </span>
+                        </a>
+                        <a class="media-select btn btn-sm btn-outline-dark btn-default" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
+                            <span>
+                                Large
+                            </span>
+                        </a>
+                    </p>
+                    break;
+                case MediaWindowAction.Insert:
+                    <p>
+                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ SmallUrl }" href="javascript:void(0);">
+                            Small
+                        </a>
+                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ MediumUrl }" href="javascript:void(0);">
+                            Medium
+                        </a>
+                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ LargeUrl }" href="javascript:void(0);">
+                            Large
+                        </a>
+                    </p>
+                    break;
+                case MediaWindowAction.Attach:
+                    <p class="no-margin">
+                        <a class="attach-media-select action-button btn btn-xs btn-success" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="@media.Id" href="javascript:void(0);">
+                            <i class="fa fa-clone m-r-xs"></i>
+                            <span>
+                                Attach
+                            </span>
+                        </a>
+                    </p>
+                    break;
+                default:
+                    <a data-toggle="modal" href="@string.Format("#media-object-{0}", media.Id)" class="full-box-link"></a>
+                    break;
+            }
+        </div>
+        <partial name="_Blade_Media" model="media" />
+    }
+</div>
+<partial name="_Pagination" />

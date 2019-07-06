@@ -23,14 +23,11 @@ namespace Hood.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
-            AccountInfo account = HttpContext.GetAccountInfo();
-            BillingHomeModel model = new BillingHomeModel()
-            {
-                User = account.User
-            };
+
+            BillingHomeModel model = new BillingHomeModel();
             try
             {
-                model.Customer = await _account.LoadCustomerObject(model.User?.StripeId, true);
+                model.Customer = await _account.LoadCustomerObject(Account.StripeId, true);
                 if (model.Customer != null)
                 {
                     model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);
@@ -113,8 +110,7 @@ namespace Hood.Controllers
         {
             try
             {
-                AccountInfo account = HttpContext.GetAccountInfo();
-                await _billing.Customers.SetDefaultCard(account.User.StripeId, uid);
+                await _billing.Customers.SetDefaultCard(Account.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
             }
             catch (Exception)
@@ -128,8 +124,7 @@ namespace Hood.Controllers
         {
             try
             {
-                AccountInfo account = HttpContext.GetAccountInfo();
-                await _billing.Cards.DeleteCard(account.User.StripeId, uid);
+                await _billing.Cards.DeleteCard(Account.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
             }
             catch (Exception)

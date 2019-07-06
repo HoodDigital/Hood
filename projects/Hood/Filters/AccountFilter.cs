@@ -1,10 +1,12 @@
 ﻿using Hood.Caching;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Hood.Filters
 {
@@ -13,29 +15,16 @@ namespace Hood.Filters
     /// </summary>
     public class AccountFilter : IActionFilter
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IAccountRepository _auth;
-
-        public AccountFilter(
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
-            HoodDbContext db,
-            IHttpContextAccessor contextAccessor,
-            IHoodCache cache,
-            IBillingService billing)
+        public AccountFilter()
         {
-            _auth = new AccountRepository(db, billing, contextAccessor, cache, userManager, roleManager);
-            _userManager = userManager;
-        }
-
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            AccountInfo info = _auth.LoadAccountInfo(_userManager.GetUserId(context.HttpContext.User));
-            context.HttpContext.Items["AccountInfo"] = info;
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
+        }
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {           
         }
     }
 }

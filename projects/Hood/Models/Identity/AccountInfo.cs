@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,7 +31,7 @@ namespace Hood.Models
         {
             get
             {
-                return ActiveSubscriptions.Where(s => s.Tiered).Count() > 0;
+                return ActiveSubscriptions.Where(s =>! s.Tiered).Count() > 0;
             }
         }
         public AccountInfo()

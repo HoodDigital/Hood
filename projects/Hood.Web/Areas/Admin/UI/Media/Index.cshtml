@@ -1,16 +1,23 @@
-@model ManageMediaModel
+@model MediaListModel
 @{
     ViewBag.Title = "Website Media";
 }
 @section scripts {
     <script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js"></script>
 }
-<div class="panel-body">
-    <strong>Website Media</strong>
-    <p>
-        This shows all media uploaded to the site, organised by directory on the left. You can upload new media by selecting the "Upload" tab above...
-    </p>
-</div>
-<div class="panel-body">
-    <div id="media-list" class="hood-inline-list query" data-url="@Url.Action("List")"></div>
-</div>
+@section buttons {
+    <partial name="_Media_Actions" />
+}
+<form class="inline" data-target="#media-list">
+    <div class="row">
+        <div class="col-sm-3">
+            <partial name="_Media_Filters" />
+        </div>
+        <div class="col-sm">
+            <partial name="_Media_Uploader" />
+            <div id="media-list" class="hood-inline-list query" data-url="@Url.Action("List")" data-complete="$.hood.Media.Loaded">
+                <alert icon="fa fa-4x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading Media...</alert>
+            </div>
+        </div>
+    </div>
+</form>

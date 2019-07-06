@@ -2,7 +2,6 @@
 @model HeaderModel
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
-    AccountInfo _account = Context.GetAccountInfo();
 }
 <div class="row">
     <div class="col-sm-4">
@@ -59,9 +58,9 @@
         </ul>
     </div>
     <div class="col-sm-3 text-right">
-        <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs sidebar-avatar @string.Format("avatar-{0}", Model.User.Id)" />
+        <fixedImage src="@User.AccountInfo().Avatar.SmallUrl" class="img-xs sidebar-avatar @string.Format("avatar-{0}", User.AccountInfo().Id)" />
         <p class="m-t-xs">
-            Logged in as <strong class="font-bold">@Model.User.ToDisplayName()</strong><br />
+            Logged in as <strong class="font-bold">@User.AccountInfo().ToDisplayName()</strong><br />
             <a href="javascript:document.getElementById('logoutForm').submit()">
                 Log out
             </a>

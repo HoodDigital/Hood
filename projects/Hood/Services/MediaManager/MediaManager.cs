@@ -200,10 +200,9 @@ namespace Hood.Services
             media.CreatedOn = DateTime.Now;
             media.FileSize = file.Length;
             media.FileType = file.ContentType;
-            media.GeneralFileType = media.FileType.ToFileType().ToString();
+            media.GenericFileType = media.FileType.ToFileType();
 
-            var type = media.FileType.ToFileType();
-            switch (type)
+            switch (media.GenericFileType)
             {
                 case GenericFileType.Image:
                     media = await ProcessImageAsync(media);
@@ -230,7 +229,7 @@ namespace Hood.Services
             media.CreatedOn = DateTime.Now;
             media.FileSize = file.Length;
             media.FileType = filetype;
-            media.GeneralFileType = filetype.ToFileType().ToString();
+            media.GenericFileType = filetype.ToFileType();
 
             var type = filetype.ToFileType();
             switch (type)

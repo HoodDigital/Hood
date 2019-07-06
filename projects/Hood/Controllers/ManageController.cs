@@ -48,7 +48,7 @@ namespace Hood.Controllers
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
-                Profile = user.Profile as UserProfileViewModel,
+                Profile = user.Profile as UserProfile,
                 Roles = await _userManager.GetRolesAsync(user)
             };
 

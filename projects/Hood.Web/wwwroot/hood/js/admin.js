@@ -54,7 +54,7 @@ $.hood.Admin = {
                 toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image media hoodimage | code',
                 link_class_list: $.hood.LinkClasses,
                 image_class_list: $.hood.ImageClasses,
-                setup: $.hood.Uploader.Load.Insert,
+                setup: $.hood.Media.Actions.Load.Insert,
                 image_dimensions: false,
                 content_css: [
                     '/css/site.min.css'
@@ -91,7 +91,7 @@ $.hood.Admin = {
                 toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image media hoodimage | code',
                 link_class_list: $.hood.LinkClasses,
                 image_class_list: $.hood.ImageClasses,
-                setup: $.hood.Uploader.Load.Insert,
+                setup: $.hood.Media.Actions.Load.Insert,
                 image_dimensions: false,
                 content_css: [
                     '/css/site.min.css'

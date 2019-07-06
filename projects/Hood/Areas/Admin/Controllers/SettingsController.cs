@@ -54,13 +54,13 @@ namespace Hood.Areas.Admin.Controllers
                     model.Address.Latitude = location.Coordinates.Latitude;
                     model.Address.Longitude = location.Coordinates.Longitude;
                     Engine.Settings.Set(model);
-                    model.SaveMessage = "Settings saved & address geocoded via Google API.";
-                    model.MessageType = Enums.AlertType.Success;
+                    SaveMessage = "Settings saved & address geocoded via Google API.";
+                    MessageType = Enums.AlertType.Success;
                 }
                 else
                 {
-                    model.SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
-                    model.MessageType = Enums.AlertType.Warning;
+                    SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
+                    MessageType = Enums.AlertType.Warning;
                 }
             }
             catch (GoogleGeocodingException ex)
@@ -68,23 +68,23 @@ namespace Hood.Areas.Admin.Controllers
                 switch (ex.Status)
                 {
                     case GoogleStatus.RequestDenied:
-                        model.SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a RequestDenied status] this means your API account is not activated for Geocoding Requests.";
-                        model.MessageType = Enums.AlertType.Warning;
+                        SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a RequestDenied status] this means your API account is not activated for Geocoding Requests.";
+                        MessageType = Enums.AlertType.Warning;
                         break;
                     case GoogleStatus.OverQueryLimit:
-                        model.SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a OverQueryLimit status] this means your API account is has run out of Geocoding Requests.";
-                        model.MessageType = Enums.AlertType.Warning;
+                        SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a OverQueryLimit status] this means your API account is has run out of Geocoding Requests.";
+                        MessageType = Enums.AlertType.Warning;
                         break;
                     default:
-                        model.SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled. Google returned a status of " + ex.Status.ToString();
-                        model.MessageType = Enums.AlertType.Warning;
+                        SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled. Google returned a status of " + ex.Status.ToString();
+                        MessageType = Enums.AlertType.Warning;
                         break;
                 }
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -94,8 +94,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new BasicSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Basics");
+            return RedirectWithResetMessage("Basics");
         }
+
 
 
         [Route("admin/integrations/")]
@@ -115,13 +116,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -131,7 +132,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new IntegrationSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Integrations");
+            return RedirectWithResetMessage("Integrations");
         }
 
 
@@ -152,13 +153,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -168,18 +169,17 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new ContactSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Contact");
+            return RedirectWithResetMessage("Contact");
         }
 
 
         [Route("admin/settings/content/")]
-        public IActionResult Content(EditorMessage? message)
+        public IActionResult Content()
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;
             if (model == null)
                 model = new ContentSettings();
-            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -197,13 +197,13 @@ namespace Hood.Areas.Admin.Controllers
                 _content.RefreshAllMetas();
 
 
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -215,7 +215,7 @@ namespace Hood.Areas.Admin.Controllers
             Engine.Settings.Set(model);
             // refresh all content metas and things
             _content.RefreshAllMetas();
-            return RedirectToAction("Content");
+            return RedirectWithResetMessage("Content");
         }
 
         [Route("admin/settings/content/add-type/")]
@@ -228,7 +228,9 @@ namespace Hood.Areas.Admin.Controllers
             var types = model.Types.ToList();
             if (types.Any(t => t.Type == "new-content"))
             {
-                return RedirectToAction("Content", new { message = EditorMessage.Exists });
+                SaveMessage = "Could not add new content type, as you need to customise the last one you added first.";
+                MessageType = AlertType.Danger;
+                return RedirectToAction("Content");
             }
             types.Add(new ContentType()
             {
@@ -264,10 +266,10 @@ namespace Hood.Areas.Admin.Controllers
             // refresh all content metas and things
             _content.RefreshAllMetas();
 
-            model.SaveMessage = "Settings saved!";
-            model.MessageType = Enums.AlertType.Success;
+            MessageType = AlertType.Success;
+            SaveMessage = "Created successfully.";
 
-            return RedirectToAction("Content", new { message = EditorMessage.Created });
+            return RedirectToAction("Content");
         }
 
         [Route("admin/settings/content/delete-type/")]
@@ -282,7 +284,9 @@ namespace Hood.Areas.Admin.Controllers
             var types = model.Types.ToList();
             if (!types.Any(t => t.Type == type))
             {
-                return RedirectToAction("Content", new { message = EditorMessage.Deleted });
+                MessageType = AlertType.Info;
+                SaveMessage = "Deleted successfully.";
+                return RedirectToAction("Content");
             }
             types.RemoveAll(t => t.Type == type);
             model.Types = types.ToArray();
@@ -293,10 +297,10 @@ namespace Hood.Areas.Admin.Controllers
             // refresh all content metas and things
             _content.RefreshAllMetas();
 
-            model.SaveMessage = "Settings saved!";
-            model.MessageType = Enums.AlertType.Success;
+            MessageType = AlertType.Info;
+            SaveMessage = "Deleted successfully.";
 
-            return RedirectToAction("Content", new { message = EditorMessage.Created });
+            return RedirectToAction("Content");
         }
 
         [Route("admin/settings/property/")]
@@ -315,13 +319,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -331,7 +335,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new PropertySettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Property");
+            return RedirectWithResetMessage("Property");
         }
 
 
@@ -351,13 +355,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -367,11 +371,11 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new BillingSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Billing");
+            return RedirectWithResetMessage("Billing");
         }
 
         [Route("admin/settings/account/")]
-        public IActionResult Account()
+        public IActionResult AccountSettings()
         {
             _cache.Remove(typeof(AccountSettings).ToString());
             AccountSettings model = Engine.Settings.Account;
@@ -381,18 +385,18 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/account/")]
-        public IActionResult Account(AccountSettings model)
+        public IActionResult AccountSettings(AccountSettings model)
         {
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -402,7 +406,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new AccountSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Account");
+            return RedirectWithResetMessage("Account");
         }
 
 
@@ -423,13 +427,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -439,7 +443,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new SeoSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Seo");
+            return RedirectWithResetMessage("Seo");
         }
 
 
@@ -462,13 +466,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
 
             model.UpdateReport = _mediaRefresh.Report();
@@ -481,13 +485,17 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new MediaSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Media");
+            return RedirectWithResetMessage("Media");
         }
         [Route("admin/settings/media/refresh/")]
         public IActionResult RefreshMedia()
         {
             _mediaRefresh.Kill();
             _mediaRefresh.RunUpdate(HttpContext);
+
+            SaveMessage = "Media refreshing...";
+            MessageType = Enums.AlertType.Success;
+
             return RedirectToAction("Media");
         }
         [HttpPost]
@@ -515,13 +523,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             return View(model);
         }
@@ -531,7 +539,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new MailSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Mail");
+            return RedirectWithResetMessage("Mail");
         }
 
         [Route("admin/settings/forum/")]
@@ -553,13 +561,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                model.SaveMessage = "Settings saved!";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Settings saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
             model.Subscriptions = await _account.GetSubscriptionPlansAsync();
             model.Roles = _account.GetAllRoles();
@@ -571,7 +579,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             var model = new ForumSettings();
             Engine.Settings.Set(model);
-            return RedirectToAction("Forum");
+            return RedirectWithResetMessage("Forum");
         }
 
 
@@ -597,6 +605,15 @@ namespace Hood.Areas.Admin.Controllers
             SaveMessage = $"The site cache has been cleared.";
             MessageType = AlertType.Success;
             return RedirectToAction("Advanced");
+        }
+        #endregion
+
+        #region Helpers 
+        public IActionResult RedirectWithResetMessage(string actionName)
+        {
+            SaveMessage = $"The settings have been reset to their default values.";
+            MessageType = AlertType.Success;
+            return RedirectToAction(actionName);
         }
         #endregion
     }

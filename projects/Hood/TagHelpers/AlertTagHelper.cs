@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Hood.TagHelpers
 {
-    [HtmlTargetElement("alert", Attributes = "type,size")]
+    [HtmlTargetElement("alert")]
     public class AlertTagHelper : TagHelper
     {
         public override int Order { get; } = int.MaxValue;
@@ -68,9 +68,9 @@ namespace Hood.TagHelpers
                 }
 
                 if (output.Attributes.ContainsName("class"))
-                    output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} alert {Type.ToCssClass()} {alertClass}");
+                    output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} alert {Type.ToAlertCssClass()} {alertClass}");
                 else
-                    output.Attributes.SetAttribute("class", $"alert {Type.ToCssClass()} {alertClass}");
+                    output.Attributes.SetAttribute("class", $"alert {Type.ToAlertCssClass()} {alertClass}");
 
                 output.Content.SetHtmlContent(alertTemplate);
             }

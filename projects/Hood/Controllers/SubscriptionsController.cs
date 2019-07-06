@@ -31,10 +31,8 @@ namespace Hood.Controllers
         [SubscriptionRequired(Roles: "SuperUser")]
         public async Task<IActionResult> Index(BillingMessage? message = null)
         {
-            AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel()
             {
-                User = account.User,
                 Plans = await _account.GetSubscriptionPlanLevels(),
                 Addons = await _account.GetSubscriptionPlanAddons()
             };
@@ -46,10 +44,8 @@ namespace Hood.Controllers
         [SubscriptionRequired(Roles: "SuperUser")]
         public async Task<IActionResult> Change(string category, BillingMessage? message = null)
         {
-            AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel()
             {
-                User = account.User,
                 Category = category,
                 Plans = await _account.GetSubscriptionPlanLevels(category),
                 Addons = await _account.GetSubscriptionPlanAddons()
@@ -190,14 +186,12 @@ namespace Hood.Controllers
 
         private async Task<SubscriptionModel> GetCreateModel(string category, string returnUrl)
         {
-            AccountInfo account = HttpContext.GetAccountInfo();
             SubscriptionModel model = new SubscriptionModel()
             {
-                User = account.User,
                 Category = category,
                 Plans = await _account.GetSubscriptionPlanLevels(category),
                 Addons = await _account.GetSubscriptionPlanAddons(),
-                Customer = await _account.LoadCustomerObject(account.User.StripeId, true)
+                Customer = await _account.LoadCustomerObject(Account.StripeId, true)
             };
             ViewData["ReturnUrl"] = returnUrl;
             return model;

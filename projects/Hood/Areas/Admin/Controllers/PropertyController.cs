@@ -384,7 +384,6 @@ namespace Hood.Areas.Admin.Controllers
             PropertyListing property = _property.GetPropertyById(id);
             if (property == null)
                 return NotFound();
-            AccountInfo account = HttpContext.GetAccountInfo();
 
             try
             {
@@ -429,7 +428,6 @@ namespace Hood.Areas.Admin.Controllers
             PropertyListing property = _property.GetPropertyById(id);
             if (property == null)
                 return NotFound();
-            AccountInfo account = HttpContext.GetAccountInfo();
 
             try
             {

@@ -1,45 +1,191 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Media = {
     Init: function () {
-        $('body').on('click', '.delete-media', this.Delete);
-        $('body').on('click', '.delete-directory', this.DeleteDirectory);
-        $('body').on('click', '.create-directory', this.CreateDirectory)
-        if ($('#media-list').doesExist())
-            this.Manage.Init();
-        if ($('#media-upload').doesExist())
-            this.Upload.Init();
+        $('body').on('click', '.delete-media', $.hood.Media.Delete);
+        $('body').on('click', '.delete-directory', $.hood.Media.Directories.Delete);
+        $('body').on('click', '.create-directory', $.hood.Media.Directories.Create);
+        $.hood.Media.Upload.Init();
+        $.hood.Media.Actions.Init();
     },
-    Manage: {
+
+    Loaded: function (data) {
+        $.hood.Loader(false);
+    },
+    Reload: function (complete) {
+        $.hood.Inline.Reload($('#media-list'), complete);
+    },
+
+    Actions: {
         Init: function () {
-            $('#media-list').hoodDataList({
-                url: '/admin/media/get',
-                params: function () {
-                    return {
-                        search: $('#media-search').val(),
-                        status: $('#media-status').val(),
-                        sort: $('#media-sort').val(),
-                        type: $('#media-type').val(),
-                        directory: $('#media-directory').val()
-                    };
-                },
-                pageSize: 36,
-                pagers: '.media-pager',
-                template: '#media-template',
-                dataBound: function () { },
-                refreshOnChange: ".media-change",
-                refreshOnClick: ".media-click",
-                serverAction: "GET"
-            });
+            // ATTACH FUNCTION - ATTACHES THE IMAGE TO A SPECIFIC ENTITY ATTACHABLE FIELD
+            $('body').on('click', '.hood-image-attach', $.hood.Media.Actions.Load.Attach);
+
+            // INSERT FUNCTION - INSERTS AN IMAGE TAG INTO THE CURRENTLY SELECTED EDITOR
+            $('body').on('click', '.hood-image-insert', $.hood.Media.Actions.Load.Insert);
+
+            // SET FUNCTION - SETS THE VALUE OF THE TAGGED INPUT
+            $('body').on('click', '.hood-media-select', $.hood.Media.Actions.Load.Select);
+
+            // SWITCH FUNCTION - REPLACES IMAGES IN THE DESIGNER
+            $('body').on('click', '.hood-image-switch', $.hood.Media.Actions.Load.Switch);
         },
-        Refresh: function () {
-            $.hood.Media.RefreshDirectories();
-            if ($('#media-list').doesExist())
-                $('#media-list').data('hoodDataList').Refresh()
+        Switching: null,
+        Current: {
+            Attach: null
+        },
+        Load: {
+            Attach: function (e) {
+                $.hood.Media.Actions.Attacher = {
+                    Id: $(this).data('id'),
+                    Entity: $(this).data('entity'),
+                    Field: $(this).data('field'),
+                    Type: $(this).data('type'),
+                    Refresh: $(this).data('refresh'),
+                    Tag: $(this).data('tag'),
+                    Title: $(this).attr('title'),
+                    JsonField: $(this).data('json')
+                };
+                $.hood.Modals.Open('/admin/media/attach/', $.hood.Media.Actions.Attacher, '.hood-image-attach', function () {
+                    $.hood.Media.Reload(function () {
+                        $('body').off('click');
+                        $('body').on('click', '.attach-media-select', $.hood.Media.Actions.Complete.Attach);
+                    });
+                    $.hood.Media.Upload.Init();
+                });
+
+            },
+            Insert: function (editor) {
+                editor.addButton('hoodimage', {
+                    text: 'Insert image...',
+                    icon: false,
+                    onclick: function () {
+                        $.hood.Modals.Open('/admin/media/insert/', null, '.hood-image-attach', function () {
+                            $.hood.Media.Reload(function () {
+                                $('body').off('click');
+                                $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
+                            });
+                            $.hood.Media.Upload.Init();
+                        });
+                    }
+                });
+            },
+            Select: function (e) {
+                $.hood.Media.Actions.Switching = $($(this).data('target'));
+                $.hood.Modals.Open($(this).data('url'), null, '.hood-image-select', function () {
+                    $.hood.Media.Reload(function () {
+                        $('body').off('click', '.media-select');
+                        $('body').on('click', '.media-select', $.hood.Media.Actions.Complete.Select);
+                    });
+                    $.hood.Media.Upload.Init();
+                });
+            },
+            Switch: function (e) {
+                $.hood.Media.Actions.Switching = $(this);
+                $.hood.Modals.Open($(this).data('url'), null, '.hood-image-switch', function () {
+                    $.hood.Media.Reload(function () {
+                        $('body').off('click');
+                        $('body').on('click', '.media-select', $.hood.Media.Actions.Complete.Switch);
+                    });
+                    $.hood.Media.Upload.Init();
+                });
+            }
+        },
+        Complete: {
+            Attach: function (e) {
+                $(this).data('temp', $(this).html());
+                $(this).addClass('loading').append('<i class="fa fa-refresh fa-spin"></i>');
+                var $image = $('.' + $.hood.Media.Actions.Attacher.Tag);
+                params = {
+                    Id: $(this).data('id'),
+                    Entity: $(this).data('entity'),
+                    Field: $(this).data('field'),
+                    MediaId: $(this).data('media')
+                };
+                $.post('/admin/media/attach/', params, function (data) {
+                    if (data.Success) {
+                        $.hood.Alerts.Success("Attached!");
+                        $image.addClass('loading');
+                        icon = data.Media.Icon;
+                        if (data.Media.GeneralFileType === "Image") {
+                            icon = data.Media.MediumUrl;
+                        }
+                        $image.css({
+                            'background-image': 'url(' + icon + ')'
+                        });
+                        $image.find('img').attr('src', icon);
+                        $image.removeClass('loading');
+                        if (!$.hood.Helpers.IsNullOrUndefined($.hood.Media.Actions.Attacher.JsonField)) {
+                            $jsonField = $('#' + $.hood.Media.Actions.Attacher.JsonField);
+                            $jsonField.val(data.Json);
+                        }
+                    } else {
+                        $.hood.Alerts.Error(data.Errors, "Error attaching.");
+                    }
+                })
+                    .done(function () {
+                    })
+                    .fail(function (data) {
+                        $.hood.Alerts.Error(data.status + " - " + data.statusText, "Error communicating.");
+                    })
+                    .always($.proxy(function (data) {
+                        $(this).removeClass('loading').html($(this).data('temp'));
+                        $.hood.Modals.Close('#attach-media-modal');
+                    }, this));
+            },
+            Insert: function (e) {
+                url = $(e.target).data('url');
+                editor = this;
+                editor.insertContent('<img alt="Your image..." src="' + url + '"/>');
+                $.hood.Modals.Close('#attach-media-modal');
+            },
+            Select: function (e) {
+                url = $(this).data('url');
+                tag = $.hood.Media.Actions.Switching;
+                $(tag).each(function () {
+                    if ($(this).is("input")) {
+                        $(this).val(url);
+                    } else {
+                        $(this).attr('src', url);
+                        $(this).css({
+                            'background-image': 'url(' + url + ')'
+                        });
+                        $(this).find('img').attr('src', url);
+                    }
+                });
+                $.hood.Alerts.Success("Image URL has been inserted.<br /><strong>Remember to press save!</strong>");
+                $('#media-select-modal').modal('hide');
+            },
+            Switch: function (e) {
+                url = $(this).data('url');
+                $tag = $.hood.Media.Actions.Switching;
+                $tag.css({
+                    'background-image': 'url(' + url + ')'
+                });
+                $tag.find('img').attr('src', url);
+                $.hood.Modals.Close('#attach-media-modal');
+                $.hood.Alerts.Success("Attached!");
+            }
+        },
+        RefreshImage: function (tag, url, id) {
+            var $image = $(tag);
+            $image.addClass('loading');
+            $.get(url, { id: id }, $.proxy(function (data) {
+                $image.css({
+                    'background-image': 'url(' + data.SmallUrl + ')'
+                });
+                $image.find('img').attr('src', data.SmallUrl);
+                $image.removeClass('loading');
+            }, this));
         }
     },
+
     Upload: {
         Init: function () {
+            if (!$('#media-add').doesExist())
+                return;
+
+            $('#media-total-progress').hide();
 
             Dropzone.autoDiscover = false;
 
@@ -66,77 +212,37 @@ $.hood.Media = {
             });
 
             myDropzone.on("addedfile", function (file) {
-                // Hookup the start button
             });
 
             // Update the total progress bar
             myDropzone.on("totaluploadprogress", function (progress) {
-                document.querySelector("#media-total-progress .progress-bar").style.width = progress + "%";
+                $('#media-total-progress .progress-bar').css({ width: progress + "%" });
+                $('#media-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
             myDropzone.on("sending", function (file) {
                 // Show the total progress bar when upload starts
-                document.querySelector("#media-total-progress").style.opacity = "1";
+                $('#media-total-progress').fadeIn();
+                $('#media-total-progress .progress-bar').css({ width: "0%" });
+                $('#media-total-progress .progress-bar .percentage').html("0%");
             });
 
             // Hide the total progress bar when nothing's uploading anymore
             myDropzone.on("complete", function (file) {
-                $.hood.Media.Manage.Refresh();
+                $.hood.Media.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
             myDropzone.on("queuecomplete", function (progress) {
-                document.querySelector("#media-total-progress").style.opacity = "0";
-                $.hood.Media.Manage.Refresh();
+                $('#media-total-progress').hide();
+                $.hood.Media.Reload();
             });
         },
         UploadUrl: function () {
-            return "/admin/media/upload/simple?directory=" + $('#media-directory').val();
+            return "/admin/media/upload/simple?directory=" + $('#Directory').val();
         }
     },
-    RefreshDirectories: function () {
-        $.hood.Inline.Reload('.directories', function () {
-            $('.media-click').parent('li').removeClass('active');
-            $('.media-click[data-value="' + $('#media-directory').val() + '"]').parent('li').addClass('active');
-        });
-    },
-    RestrictDir: function () {
-        var pattern = /[^0-9A-Za-z- ]*/g; // default pattern
-        var val = $(this).val();
-        var newVal = val.replace(pattern, '');
-        // This condition is to prevent selection and keyboard navigation issues
-        if (val !== newVal) {
-            $(this).val(newVal);
-        }
-    },
-    CreateDirectory: function () {
-        $('body').on('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
-        swal({
-            title: "Create directory",
-            text: "Please enter a name for your new directory:",
-            type: "input",
-            showCancelButton: true,
-            closeOnCancel: true,
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            animation: "slide-from-top",
-            inputPlaceholder: "Directory name..."
-        }, function (inputValue) {
-            if (inputValue === false) return false; if (inputValue === "") {
-                swal.showInputError("You didn't supply a directory name, we can't create one without it!"); return false
-            }
-            $.get('/admin/media/addDirectory/', { directory: inputValue }, function (data) {
-                if (data.Success) {
-                    $.hood.Media.Manage.Refresh();
-                    swal("Woohoo!", "Directory has been successfully added...", "success");
-                } else {
-                    swal("Oops!", "There was a problem creating the new directory:\n\n" + data.Errors, "error");
-                }
-            });
-            $('body').off('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
-            return true;
-        });
-    },
+
     Delete: function (e) {
         var $this = $(this);
         swal({
@@ -156,8 +262,7 @@ $.hood.Media = {
                     // delete functionality
                     $.post('/admin/media/delete', { id: $this.data('id') }, function (data) {
                         if (data.Success) {
-                            $.hood.Media.Manage.Refresh();
-                            $.hood.Blades.Close();
+                            $.hood.Media.Reload();
                             swal({
                                 title: "Deleted!",
                                 text: "The media file has now been removed from the website.",
@@ -178,51 +283,90 @@ $.hood.Media = {
                 }
             });
     },
-    DeleteDirectory: function (e) {
-        var $this = $(this);
-        message = "The directory and all files will be permanently removed.\n\nWarning: Ensure these files are not attached to any posts, pages or features of the site, or it will appear as a broken image or file.";
-        if ($('#media-directory').val() === "") {
-            message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
+
+    RestrictDir: function () {
+        var pattern = /[^0-9A-Za-z- ]*/g; // default pattern
+        var val = $(this).val();
+        var newVal = val.replace(pattern, '');
+        // This condition is to prevent selection and keyboard navigation issues
+        if (val !== newVal) {
+            $(this).val(newVal);
         }
-        swal({
-            title: "Are you sure?",
-            text: message,
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/media/directory/delete', { directory: $('#media-directory').val() }, function (data) {
-                        if (data.Success) {
-                            $.hood.Media.Manage.Refresh();
-                            $.hood.Blades.Close();
-                            swal({
-                                title: "Deleted!",
-                                text: "The directory has now been removed from the website.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem directory the . " + data.Errors,
-                                timer: 1300,
-                                type: "error"
-                            });
-                        }
+    },
+
+    Directories: {
+        Create: function () {
+            $('body').on('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
+            Swal.fire({
+                title: "Create directory",
+                text: "Please enter a name for your new directory:",
+                input: 'text',
+                inputAttributes: {
+                    placeholder: "Directory name...",
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Add Directory',
+                showLoaderOnConfirm: true,
+                preConfirm: (directory) => {
+                    if (directory === false) return false; if (directory === "") {
+                        Swal.showValidationMessage(
+                            "You didn't supply a directory name, we can't create one without it!"
+                        );
+                        return false;
+                    }
+                    return fetch(`/admin/media/directory/add?directory=${directory}`)
+                        .then(response => {
+                            return response.json();
+                        })
+                        .catch(error => {
+                            Swal.showValidationMessage(
+                                `Request failed: ${error}`
+                            );
+                        });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.value.Success) {
+                    $.hood.Media.Reload();
+                    Swal.fire({
+                        title: "Woohoo!",
+                        text: "Directory has been successfully added...",
+                        type: "success"
                     });
                 } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
+                    Swal.showValidationMessage(
+                        `There was a problem creating the new directory:\n\n${result.value.Errors}`
+                    );
                 }
+                $('body').off('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
             });
+        },
+        Delete: function (e) {
+            var $this = $(this);
+            message = "The directory and all files will be permanently removed.\n\nWarning: Ensure these files are not attached to any posts, pages or features of the site, or it will appear as a broken image or file.";
+            if ($('#Directory').val() === "Default") {
+                $.hood.Alerts.Error("You have to select a directory to delete.", "Error!", true, '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> You cannot delete the "Default" directory.</span>', true, 5000);
+            } else {
+                if ($('#Directory').val() === "")
+                    message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
+                deleteDirectoryCallback = function (result) {
+                    if (result.value) {
+                        $.post('/admin/media/directory/delete', { directory: $('#Directory').val() }, function (data) {
+                            if (data.Success) {
+                                $.hood.Media.Reload();
+                                $.hood.Alerts.Success("The directory has now been removed from the website.", "Deleted!", true, null, true, 5000);
+                            } else {
+                                $.hood.Alerts.Error("There was a problem deleting the directory.", "Error!", true, null, true, 5000);
+                            }
+                        });
+                    }
+                };
+                $.hood.Alerts.Confirm(message, "Are you sure?", deleteDirectoryCallback);
+            }
+        }
     },
+
     Players: {},
     LoadMediaPlayers: function (tag) {
         var videoOptions = {

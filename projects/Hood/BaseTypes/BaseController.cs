@@ -1,6 +1,7 @@
 ﻿using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -80,6 +81,11 @@ namespace Hood.Controllers
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
             return base.View(viewName, model);
+        }
+
+        public UserSubscriptionsView Account
+        {
+            get => User.AccountInfo();
         }
     }
 }

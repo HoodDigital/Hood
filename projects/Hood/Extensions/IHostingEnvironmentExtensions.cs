@@ -5,6 +5,7 @@ namespace Hood.Extensions
 {
     public static class IHostingEnvironmentExtensions
     {
+        [Obsolete("Needs looking at, but should be logged through the LogService really.", false)]
         public static void WriteLogToFile<T>(this IHostingEnvironment env, string log) where T : class
         {
             var logPath = env.ContentRootPath + "\\Logs\\" + typeof(T).ToString() + "\\";

@@ -1,0 +1,48 @@
+@{
+    ViewData["Title"] = "Debug Testing Area";
+}
+<h4>Account Info</h4>
+<div class="text-monospace">
+    <p>User.HasActiveSubscription() = @User.HasActiveSubscription()</p>
+    <p>User.AccountInfo().UserName = @User.AccountInfo().UserName</p>
+    <p>User.AccountInfo().Email = @User.AccountInfo().Email</p>
+    <p>User.AccountInfo().Id = @User.AccountInfo().Id</p>
+    <p>User.AccountInfo().BillingAddressJson = @User.AccountInfo().BillingAddressJson</p>
+    <p>User.AccountInfo().DeliveryAddressJson = @User.AccountInfo().DeliveryAddressJson</p>
+    <p>User.AccountInfo().BillingAddress = @User.AccountInfo().BillingAddress.ToFormat(AddressFormat.SingleLine)</p>
+    <p>User.AccountInfo().DeliveryAddress = @User.AccountInfo().DeliveryAddress.ToFormat(AddressFormat.SingleLine)</p>
+    <p>User.AccountInfo().ToFullName() = @User.AccountInfo().ToFullName()</p>
+    <p>User.AccountInfo().ToDisplayName() = @User.AccountInfo().ToDisplayName()</p>
+    <p>User.AccountInfo().AvatarJson = @User.AccountInfo().AvatarJson</p>
+    <p>User.AccountInfo().Avatar.Small = <br /><img class="img-fluid" src="@User.AccountInfo().Avatar.SmallUrl" /></p>
+    <p>User.AccountInfo().Avatar.MediumUrl = <br /><img class="img-fluid" src="@User.AccountInfo().Avatar.MediumUrl" /></p>
+    <p>User.AccountInfo().Avatar.Large = <br /><img class="img-fluid" src="@User.AccountInfo().Avatar.LargeUrl" /></p>
+    <p>User.AccountInfo().Avatar.Thumb = <br /><img class="img-fluid" src="@User.AccountInfo().Avatar.ThumbUrl" /></p>
+    <p>User.AccountInfo().LastLogOn = @User.AccountInfo().LastLogOn</p>
+    <p>User.AccountInfo().LastLoginIP = @User.AccountInfo().LastLoginIP</p>
+    <p>User.AccountInfo().LastLoginLocation = @User.AccountInfo().LastLoginLocation</p>
+    <p>User.AccountInfo().ActiveCount = @User.AccountInfo().TotalSubscriptions</p>
+    <p>User.AccountInfo().ActiveCount = @User.AccountInfo().ActiveCount</p>
+    <p>User.AccountInfo().ActiveCount = @User.AccountInfo().ActiveCount</p>
+    <p>User.AccountInfo().OverDueCount = @User.AccountInfo().OverDueCount</p>
+    <p>User.AccountInfo().Facebook = @User.AccountInfo().Facebook</p>
+    <p>User.AccountInfo().Twitter = @User.AccountInfo().Twitter</p>
+    <p>User.AccountInfo().TwitterHandle = @User.AccountInfo().TwitterHandle</p>
+    <p>User.AccountInfo().WebsiteUrl = @User.AccountInfo().WebsiteUrl</p>
+</div>
+<h4>Subscriptions</h4>
+<div class="text-monospace">
+    @foreach (var sub in User.AccountInfo().Subscriptions)
+    {
+        <p>@sub.Name - @sub.StripeId - @sub.StripeSubscriptionId - @sub.Status</p>
+    }
+</div>
+<h4>Notes</h4>
+<div class="text-monospace">
+    @foreach (var note in User.AccountInfo().Notes)
+    {
+        <p class="font-weight-bold">@note.CreatedOn.ToDisplay() by @note.CreatedBy</p>
+        <p>@note.Note</p>
+        <p><small>Note Id: @note.Id</small></p>
+    }
+</div>

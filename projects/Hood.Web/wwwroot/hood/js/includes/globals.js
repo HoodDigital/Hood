@@ -122,12 +122,21 @@ $.fn.warningAlert = function () {
     var targets = $(this);
     var warningAlertHandler = function (e) {
         e.preventDefault();
-        $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('title') || "Woah!", function (result) {
+        warningAlertCallback = function (result) {
             if (result.value) {
                 url = $(e.currentTarget).attr('href');
                 window.location = url;
             }
-        }, type = 'warning', confirmButtonText = 'Ok', cancelButtonText = 'Cancel', footer = $(e.currentTarget).data('footer'));
+        };
+        $.hood.Alerts.Confirm(
+            $(e.currentTarget).data('warning'),
+            $(e.currentTarget).data('title'),
+            warningAlertCallback,
+            type = 'warning',
+            footer = $(e.currentTarget).data('footer'),
+            confirmButtonText = 'Ok',
+            cancelButtonText = 'Cancel'
+        );
         return false;
     };
     targets.on('click', warningAlertHandler);
@@ -171,7 +180,7 @@ $.decodeUrl = function (str) {
     return decodeURIComponent(str).replace('+', ' ');
 }
 $.numberWithCommas = function (x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 if (typeof kendo !== 'undefined') {
     kendo.data.binders.date = kendo.data.Binder.extend({

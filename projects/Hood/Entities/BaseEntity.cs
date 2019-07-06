@@ -13,7 +13,7 @@ namespace Hood.Entities
         /// Gets or sets the entity identifier
         /// </summary>
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public TKey Id { get; set; }
+        public virtual TKey Id { get; set; }
 
         /// <summary>
         /// Is transient

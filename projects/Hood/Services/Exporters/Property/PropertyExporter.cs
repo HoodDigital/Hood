@@ -336,7 +336,6 @@ namespace Hood.Services
                 FileError = false,
                 HasFile = false
             };
-            Account = context.GetAccountInfo();
             Status.Message = "Starting import, loading property files from FTP Service...";
             _propertySettings = Engine.Settings.Property;
 

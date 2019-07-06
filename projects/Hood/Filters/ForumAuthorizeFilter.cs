@@ -67,12 +67,8 @@ namespace Hood.Filters
                     return;
                 }
 
-                AccountInfo _account = context.HttpContext.GetAccountInfo();
-
                 // Subscription required stuff
                 if ((
-                    _forumSettings.PostingRequiresSubscription ||
-                    _forumSettings.ViewingRequiresSubscription ||
                     _forumSettings.PostingRequiresSpecificSubscription ||
                     _forumSettings.ViewingRequiresSpecificSubscription
                 ) && !Engine.Settings.Billing.EnableSubscriptions)
@@ -82,32 +78,10 @@ namespace Hood.Filters
 
                 IActionResult unauthorizedResult = new RedirectToActionResult("Unauthorized", "Forum", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
 
-                // Check if forums in general can be viewed without subscription, of not check for a tier sub
-                if (!_account.HasTieredSubscription && _access == ForumAccess.View && _forumSettings.ViewingRequiresSubscription)
-                {
-                    if (CheckForOverrideRoles(_forumSettings.ViewingRoles, context))
-                        return;
-
-                    context.Result = unauthorizedResult;
-                    return;
-                }
-
-                // Check if forums in general can be posted in without subscription, of not check for a tier sub
-                if (!_account.HasTieredSubscription && _access == ForumAccess.Post && _forumSettings.PostingRequiresSubscription)
-                {
-                    if (CheckForOverrideRoles(_forumSettings.PostingRoles, context))
-                        return;
-
-                    context.Result = unauthorizedResult;
-                    return;
-                }
-
-                // Specific subscription/role required stuff
-
                 // Check if forums in general can be viewed without a SPECIFIC subscription, if one is required, make sure the user is in that subscription
                 if (_access == ForumAccess.View && _forumSettings.ViewingRequiresSpecificSubscription)
                 {
-                    if (!_forumSettings.ViewingSubscriptionList.Any(s => _account.IsSubscribed(s)))
+                    if (!_forumSettings.ViewingSubscriptionList.Any(s => context.HttpContext.User.IsSubscribed(s)))
                     {
                         // if the user is in an override role (code access for example, or role granted by admin)
                         if (CheckForOverrideRoles(_forumSettings.ViewingRoles, context))
@@ -120,7 +94,7 @@ namespace Hood.Filters
                 // Check if forums in general can be posted in without a SPECIFIC subscription, if one is required, make sure the user is in that subscription
                 if (_access == ForumAccess.Post && _forumSettings.PostingRequiresSpecificSubscription)
                 {
-                    if (!_forumSettings.PostingSubscriptionList.Any(s => _account.IsSubscribed(s)))
+                    if (!_forumSettings.PostingSubscriptionList.Any(s => context.HttpContext.User.IsSubscribed(s)))
                     {
                         // if the user is in an override role (code access for example, or role granted by admin)
                         if (CheckForOverrideRoles(_forumSettings.PostingRoles, context))
@@ -156,8 +130,6 @@ namespace Hood.Filters
 
 
                 if ((
-                    forum.PostingRequiresSubscription ||
-                    forum.ViewingRequiresSubscription ||
                     forum.PostingRequiresSpecificSubscription ||
                     forum.ViewingRequiresSpecificSubscription
                 ) && !Engine.Settings.Billing.EnableSubscriptions)
@@ -165,34 +137,10 @@ namespace Hood.Filters
                     throw new Exception("You must enable subscriptions before you can set required subscriptions for forums.");
                 }
 
-                // Check if the current forum can be viewed without subscription, of not check for a tier sub
-                if (!_account.HasTieredSubscription && _access == ForumAccess.View && forum.ViewingRequiresSubscription)
-                {
-                    if (CheckForOverrideRoles(_forumSettings.ViewingRoles, context))
-                        return;
-                    if (CheckForOverrideRoles(forum.ViewingRoles, context))
-                        return;
-
-                    context.Result = unauthorizedResult;
-                    return;
-                }
-
-                // Check if the current forum can be posted in without subscription, of not check for a tier sub
-                if (!_account.HasTieredSubscription && _access == ForumAccess.Post && forum.PostingRequiresSubscription)
-                {
-                    if (CheckForOverrideRoles(_forumSettings.PostingRoles, context))
-                        return;
-                    if (CheckForOverrideRoles(forum.PostingRoles, context))
-                        return;
-
-                    context.Result = unauthorizedResult;
-                    return;
-                }
-
                 // Check if the current forum can be viewed without a SPECIFIC subscription, if one is required, make sure the user is in that subscription
                 if (_access == ForumAccess.View && forum.ViewingRequiresSpecificSubscription)
                 {
-                    if (!forum.ViewingSubscriptionList.Any(s => _account.IsSubscribed(s)))
+                    if (!forum.ViewingSubscriptionList.Any(s => context.HttpContext.User.IsSubscribed(s)))
                     {
                         // if the user is in an override role (code access for example, or role granted by admin)
                         if (CheckForOverrideRoles(_forumSettings.ViewingRoles, context))
@@ -207,7 +155,7 @@ namespace Hood.Filters
                 // Check if the current forum can be posted in without a SPECIFIC subscription, if one is required, make sure the user is in that subscription
                 if (_access == ForumAccess.Post && forum.PostingRequiresSpecificSubscription)
                 {
-                    if (!forum.PostingSubscriptionList.Any(s => _account.IsSubscribed(s)))
+                    if (!forum.PostingSubscriptionList.Any(s => context.HttpContext.User.IsSubscribed(s)))
                     {
                         // if the user is in an override role (code access for example, or role granted by admin)
                         if (CheckForOverrideRoles(_forumSettings.PostingRoles, context))
@@ -221,10 +169,11 @@ namespace Hood.Filters
 
                 if (_access == ForumAccess.Moderate)
                 {
+                    var userId = context.HttpContext.User.GetUserId();
                     bool moderator = false;
 
                     // if is forum owner
-                    if (forum.AuthorId == _account.User.Id)
+                    if (forum.AuthorId == userId)
                         moderator = true;
 
                     // if this is a post (postId is a route variable)
@@ -237,7 +186,7 @@ namespace Hood.Filters
                             if (post != null)
                             {
                                 // if user is author, allow through.
-                                if (post.AuthorId == _account.User.Id)
+                                if (post.AuthorId == userId)
                                     moderator = true;
                             }
                         }
@@ -253,7 +202,7 @@ namespace Hood.Filters
                             if (topic != null)
                             {
                                 // if user is author, allow through.
-                                if (topic.AuthorId == _account.User.Id)
+                                if (topic.AuthorId == userId)
                                     moderator = true;
                             }
                         }

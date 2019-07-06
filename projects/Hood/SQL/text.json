@@ -1,0 +1,92 @@
+[
+  {
+    "StripeSubscriptionId": "sub_9v8Yorl1nRMTLm",
+    "StripeId": "bigger",
+    "Status": "canceled",
+    "Name": "Business Hosting",
+    "Category": "Hosting",
+    "Public": 1,
+    "Level": 2,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_CFW3R3qKMEm2B1",
+    "StripeId": "top",
+    "Status": "canceled",
+    "Name": "All Inclusive",
+    "Category": "Maintenance",
+    "Public": 1,
+    "Level": 1,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_CFWyYCqBrqGQoF",
+    "StripeId": "bigger",
+    "Status": "canceled",
+    "Name": "Business Hosting",
+    "Category": "Hosting",
+    "Public": 1,
+    "Level": 2,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_CGdzSKzambByTK",
+    "StripeId": "teast",
+    "Status": "canceled",
+    "Name": "Basic Hosting",
+    "Category": "Hosting",
+    "Public": 1,
+    "Level": 1,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_CsUBd0RmpYpaUJ",
+    "StripeId": "top",
+    "Status": "canceled",
+    "Name": "All Inclusive",
+    "Category": "Maintenance",
+    "Public": 1,
+    "Level": 1,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_CvaIviwZUmoeHH",
+    "StripeId": "bigger",
+    "Status": "canceled",
+    "Name": "Business Hosting",
+    "Category": "Hosting",
+    "Public": 1,
+    "Level": 2,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_D1esaMVAdvR8mV",
+    "StripeId": "bigger",
+    "Status": "canceled",
+    "Name": "Business Hosting",
+    "Category": "Hosting",
+    "Public": 1,
+    "Level": 2,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_EZTdLxrv7HNb7L",
+    "StripeId": "top",
+    "Status": "trialing",
+    "Name": "All Inclusive",
+    "Category": "Maintenance",
+    "Public": 1,
+    "Level": 1,
+    "Addon": 0
+  },
+  {
+    "StripeSubscriptionId": "sub_EZTel1qPqYPw3E",
+    "StripeId": "teast",
+    "Status": "active",
+    "Name": "Basic Hosting",
+    "Category": "Hosting",
+    "Public": 1,
+    "Level": 1,
+    "Addon": 0
+  }
+]

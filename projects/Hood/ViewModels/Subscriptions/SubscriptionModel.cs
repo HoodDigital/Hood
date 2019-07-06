@@ -27,7 +27,6 @@ namespace Hood.ViewModels
         public List<Models.Subscription> Addons { get; set; }
         public Stripe.Subscription CurrentSubscription { get; set; }
         public Stripe.Customer Customer { get; set; }
-        public ApplicationUser User { get; set; }
         public IEnumerable<Stripe.Card> Cards { get; set; }
         public Models.Subscription CurrentPlan { get; set; }
     }
