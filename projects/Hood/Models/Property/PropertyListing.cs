@@ -34,7 +34,7 @@ namespace Hood.Models
         public double Longitude { get; set; }
 
         // Publish Status
-        public int Status { get; set; }
+        public ContentStatus Status { get; set; }
 
         // Dates
         public DateTime PublishDate { get; set; }
@@ -290,19 +290,19 @@ namespace Hood.Models
         {
             get
             {
-                switch ((Enums.Status)Status)
+                switch ((Enums.ContentStatus)Status)
                 {
-                    case Enums.Status.Published:
+                    case Enums.ContentStatus.Published:
                         if (PublishDate > DateTime.Now)
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         else
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
-                    case Enums.Status.Draft:
+                    case Enums.ContentStatus.Draft:
                     default:
                         return "Draft";
-                    case Enums.Status.Archived:
+                    case Enums.ContentStatus.Archived:
                         return "Archived";
-                    case Enums.Status.Deleted:
+                    case Enums.ContentStatus.Deleted:
                         return "Deleted";
                 }
             }

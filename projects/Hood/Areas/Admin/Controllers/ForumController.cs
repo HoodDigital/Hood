@@ -95,8 +95,10 @@ namespace Hood.Areas.Admin.Controllers
             model.Authors = await GetAuthorsAsync();
             model.AddEditorMessage(message);
 
-            model.Subscriptions = await _account.GetSubscriptionPlansAsync();
-            model.Roles = _account.GetAllRoles();
+            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            model.Subscriptions = subs.List;
+
+            model.Roles = await _account.GetAllRolesAsync();
 
             return View(model);
         }
@@ -150,8 +152,10 @@ namespace Hood.Areas.Admin.Controllers
                 model.MessageType = AlertType.Danger;
             }
 
-            model.Subscriptions = await _account.GetSubscriptionPlansAsync();
-            model.Roles = _account.GetAllRoles();
+            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            model.Subscriptions = subs.List;
+
+            model.Roles = await _account.GetAllRolesAsync();
 
             return View(model);
         }
@@ -195,8 +199,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Forums.Add(model);
                 await _db.SaveChangesAsync();
 
-                var response = new Response(true, "Created successfully.");
-                response.Url = Url.Action("Edit", new { id = model.Id, message = EditorMessage.Created });
+                var response = new Response(true, "Created successfully.")
+                {
+                    Url = Url.Action("Edit", new { id = model.Id, message = EditorMessage.Created })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -370,8 +376,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Forums.Update(model);
                 await _db.SaveChangesAsync();
 
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Published });
+                var response = new Response(true, "Published successfully.")
+                {
+                    Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Published })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -392,8 +400,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Forums.Update(model);
                 await _db.SaveChangesAsync();
 
-                var response = new Response(true, "Archived successfully.");
-                response.Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Published });
+                var response = new Response(true, "Archived successfully.")
+                {
+                    Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Published })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -413,8 +423,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
 
-                var response = new Response(true, "Deleted!");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                var response = new Response(true, "Deleted!")
+                {
+                    Url = Url.Action("Index", new { message = EditorMessage.Deleted })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -470,8 +482,10 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
-                var response = new Response(true, "The image has been cleared!");
-                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+                var response = new Response(true, "The image has been cleared!")
+                {
+                    Url = Url.Action("Edit", new { id, message = EditorMessage.MediaRemoved })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -491,8 +505,10 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
-                var response = new Response(true, "The image has been cleared!");
-                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+                var response = new Response(true, "The image has been cleared!")
+                {
+                    Url = Url.Action("Edit", new { id, message = EditorMessage.MediaRemoved })
+                };
                 return response;
             }
             catch (Exception ex)

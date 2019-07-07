@@ -17,14 +17,6 @@ namespace Hood.ViewModels
         }
         public List<string> Directories { get; set; }
 
-        [FromQuery(Name = "sort")]
-        [Display(Name = "Sort Order", Description = "Choose a sort order")]
-        public string Order { get; set; }
-
-        [FromQuery(Name = "search")]
-        [Display(Name = "Search", Description = "Search for media files")]
-        public string Search { get; set; }
-
         [FromQuery(Name = "user")]
         public string UserId { get; set; }
         [FromQuery(Name = "fileType")]
@@ -54,15 +46,14 @@ namespace Hood.ViewModels
         #endregion
 
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
+            var query = base.GetPageUrl(pageIndex);
+
             query += Action.HasValue ? "&doAction=" + Action : "";
-            query += Search.IsSet() ? "&search=" + Search : "";
             query += Directory.IsSet() ? "&dir=" + Directory : "";
             query += Restrict ? "&restrict=" + Restrict : "";
             query += GenericFileType.HasValue ? "&fileType=" + GenericFileType : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
             query += UserId.IsSet() ? "&user=" + UserId : "";
 
 

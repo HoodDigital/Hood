@@ -100,9 +100,9 @@ namespace Hood.Infrastructure
                     var pages = _content.GetPages();
                     if (pages.Select(p => p.Url).Contains(fullUrl))
                     {
-                        SitemapPage pg = pages.Where(p => p.Url == fullUrl).FirstOrDefault();
+                        var pg = pages.Where(p => p.Url == fullUrl).FirstOrDefault();
                         if (!values.ContainsKey("id"))
-                            values.Add("id", pg.PageId);
+                            values.Add("id", pg.Id);
                         return true;
                     }
                     return false;

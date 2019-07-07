@@ -29,21 +29,21 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/subscriptions/")]
         public async Task<IActionResult> Index(SubscriptionSearchModel model)
         {
-            model = await _account.GetPagedSubscriptionPlans(model);
+            model = await _account.GetSubscriptionPlansAsync(model);
             return View(model);
         }
 
         [Route("admin/subscribers/")]
-        public async Task<IActionResult> Subscribers(SubscriberSearchModel model)
+        public async Task<IActionResult> Subscribers(UserSubscriptionListModel model)
         {
-            model = await _account.GetPagedSubscribers(model);
+            model = await _account.GetUserSubscriptionsAsync(model);
             return View(model);
         }
 
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
-            var model = await _account.GetSubscriptionPlanById(id);
+            var model = await _account.GetSubscriptionPlanByIdAsync(id);
             model.AddEditorMessage(message);
             return View(model);
         }
@@ -54,7 +54,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                await _account.UpdateSubscription(model);
+                await _account.UpdateSubscriptionAsync(model);
                 model.SaveMessage = "Subscription saved.";
                 model.MessageType = Enums.AlertType.Success;
             }
@@ -112,7 +112,7 @@ namespace Hood.Areas.Admin.Controllers
                     TrialPeriodDays = model.TrialPeriodDays,
                     LiveMode = billingSettings.EnableStripeTestMode
                 };
-                subscription = await _account.AddSubscriptionPlan(subscription);
+                subscription = await _account.AddSubscriptionPlanAsync(subscription);
                 await _logService.AddLogAsync<SubscriptionsController>(
                     string.Format("Subscription ({0}) added with name: {1}", subscription.StripeId, subscription.Name),
                     JsonConvert.SerializeObject(subscription),
@@ -121,8 +121,10 @@ namespace Hood.Areas.Admin.Controllers
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
 
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Edit", new { id = subscription.Id, message = EditorMessage.Created });
+                var response = new Response(true, "Published successfully.")
+                {
+                    Url = Url.Action("Edit", new { id = subscription.Id, message = EditorMessage.Created })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -144,8 +146,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var subscription = await _account.GetSubscriptionPlanById(id);
-                await _account.DeleteSubscriptionPlan(id);
+                var subscription = await _account.GetSubscriptionPlanByIdAsync(id);
+                await _account.DeleteSubscriptionPlanAsync(id);
                 await _logService.AddLogAsync<SubscriptionsController>(
                     string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
                     JsonConvert.SerializeObject(subscription),

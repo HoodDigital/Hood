@@ -86,10 +86,11 @@ namespace Hood.Extensions
 
             // Register scoped.
             services.AddScoped<ISettingsRepository, SettingsRepository>();
-            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<IContentRepository, ContentRepository>();
+
+            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
             services.AddScoped<IStripeWebHookService, StripeWebHookService>();
             services.AddScoped<IPageBuilder, PageBuilder>();
             services.AddScoped<IMailService, MailService>();

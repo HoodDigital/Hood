@@ -10,57 +10,69 @@ namespace Hood.Services
 {
     public interface IAccountRepository
     {
-        // Account stuff
+        #region Account stuff
+        Task<ApplicationUser> GetCurrentUserAsync(bool track = true);
+        Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true);
+        Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
+        Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true);
+        Task UpdateUserAsync(ApplicationUser user);
+        Task DeleteUserAsync(ApplicationUser user);
+        Task<UserProfile> GetProfileAsync(string id);
+        Task UpdateProfileAsync(UserProfile user);
+        #endregion
+
+        #region Roles
+        Task<IList<IdentityRole>> GetAllRolesAsync();
+        #endregion
+
+        #region Addresses
+        Task DeleteAddressAsync(int id);
+        Task<Address> GetAddressByIdAsync(int id);
+        Task UpdateAddressAsync(Models.Address address);
+        Task SetBillingAddressAsync(string userId, int id);
+        Task SetDeliveryAddressAsync(string userId, int id);
+        #endregion
+
+        #region Stripe customer object
+        Task<Stripe.Customer> LoadCustomerObjectAsync(string stripeId, bool allowNullObject);
+        #endregion
+
+        #region Subscription Plans
+        Task<SubscriptionSearchModel> GetSubscriptionPlansAsync(SubscriptionSearchModel model = null);
+        Task<Subscription> GetSubscriptionPlanByIdAsync(int id);
+        Task<Subscription> GetSubscriptionPlanByStripeIdAsync(string stripeId);
+        Task<Subscription> AddSubscriptionPlanAsync(Models.Subscription subscription);
+        Task UpdateSubscriptionAsync(Subscription model);
+        Task DeleteSubscriptionPlanAsync(int id);
+        #endregion
+
+        #region User Subscriptions
+        Task<UserSubscriptionListModel> GetUserSubscriptionsAsync(UserSubscriptionListModel model);
+        Task<UserSubscription> CreateUserSubscriptionAsync(int planId, string stripeToken, string cardId);
+        Task<UserSubscription> UpdateUserSubscriptionAsync(UserSubscription userSubscription);
+        Task<UserSubscription> UpgradeUserSubscriptionAsync(int subscriptionId, int planId);
+        Task<UserSubscription> CancelUserSubscriptionAsync(int subscriptionId);
+        Task<UserSubscription> ReactivateUserSubscriptionAsync(int subscriptionId);
+        Task<UserSubscription> RemoveUserSubscriptionAsync(int subscriptionId);
+        #endregion
+
+        #region WebHooks
+        Task ConfirmSubscriptionObjectAsync(Stripe.Subscription created, DateTime? eventTime);
+        Task UpdateSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime);
+        Task RemoveUserSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime);
+        Task<UserSubscription> GetUserSubscriptionByStripeIdAsync(string id);
+
+        #endregion
+
+        #region Statistics
+        Task<object> GetStatisticsAsync();
+        Task<object> GetSubscriptionStatisticsAsync();
+
+        #endregion
+
+        #region Obsolete
         [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
         AccountInfo LoadAccountInfo(string userId);
-        ApplicationUser GetCurrentUser(bool track = true);
-        ApplicationUser GetUserById(string userId, bool track = true);
-        ApplicationUser GetUserByEmail(string email, bool track = true);
-        OperationResult UpdateUser(ApplicationUser user);
-        Task DeleteUserAsync(ApplicationUser user);
-        Task<IUserProfile> GetProfileAsync(string id);
-        Task<Response> UpdateProfileAsync(IUserProfile user);
-
-        IList<IdentityRole> GetAllRoles();
-
-        // Addresses
-        OperationResult DeleteAddress(int id);
-        Models.Address GetAddressById(int id);
-        OperationResult UpdateAddress(Models.Address address);
-        OperationResult SetBillingAddress(string userId, int id);
-        OperationResult SetDeliveryAddress(string userId, int id);
-
-        // Subscription Plans
-        Task<Models.Subscription> AddSubscriptionPlan(Models.Subscription subscription);
-        Task<List<Models.Subscription>> GetSubscriptionPlansAsync();
-        Task<List<Models.Subscription>> GetSubscriptionPlanLevels(string category = null);
-        Task<List<Models.Subscription>> GetSubscriptionPlanAddons();
-        Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model);
-        Task<Models.Subscription> GetSubscriptionPlanById(int id);
-        Task<Models.Subscription> GetSubscriptionPlanByStripeId(string stripeId);
-        Task DeleteSubscriptionPlan(int id);
-        Task UpdateSubscription(Models.Subscription model);
-
-        // User Subscriptions
-        Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model);
-        Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub);
-        Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId);
-        Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId);
-        Task<UserSubscription> CancelUserSubscription(int subscriptionId);
-        Task<UserSubscription> RemoveUserSubscription(int subscriptionId);
-        Task<UserSubscription> ReactivateUserSubscription(int subscriptionId);
-
-        // Customer Objects
-        void ResetBillingInfo();
-        Task<ApplicationUser> GetUserByStripeId(string stripeId);
-        Task<Stripe.Customer> LoadCustomerObject(string stripeId, bool allowNullObject);
-        string ConfirmSubscriptionObject(Stripe.Subscription created, DateTime? eventTime);
-        string UpdateSubscriptionObject(Stripe.Subscription updated, DateTime? eventTime);
-        string RemoveUserSubscriptionObject(Stripe.Subscription updated, DateTime? eventTime);
-        UserSubscription FindUserSubscriptionByStripeId(string id);
-
-        // Stats
-        object GetStatistics();
-        object GetSubscriptionStatistics();
+        #endregion
     }
 }

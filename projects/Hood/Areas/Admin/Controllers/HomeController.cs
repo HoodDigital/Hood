@@ -48,12 +48,12 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/stats/")]
-        public IActionResult Stats()
+        public async Task<IActionResult> StatsAsync()
         {
-            var content = _content.GetStatistics();
-            var users = _account.GetStatistics();
-            var subs = _account.GetSubscriptionStatistics();
-            var properties = _property.GetStatistics();
+            var content = await _content.GetStatisticsAsync();
+            var users = await _account.GetStatisticsAsync();
+            var subs = await _account.GetSubscriptionStatisticsAsync();
+            var properties = await _property.GetStatisticsAsync();
 
             return Json(new { content, users, subs, properties });
         }

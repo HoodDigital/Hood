@@ -37,5 +37,28 @@ namespace Hood.Models
         public int Level => Subscription != null ? Subscription.Level : 0;
 
         public bool IsActive => Status == "trialing" || Status == "active";
+
+
+    }
+
+    public static class UserSubscriptionExtensions
+    {
+        public static UserSubscription UpdateFromStripe(this UserSubscription userSubscription, Stripe.Subscription stripeSubscription)
+        {
+            userSubscription.CancelAtPeriodEnd = stripeSubscription.CancelAtPeriodEnd;
+            userSubscription.CanceledAt = stripeSubscription.CanceledAt;
+            userSubscription.CurrentPeriodEnd = stripeSubscription.CurrentPeriodEnd;
+            userSubscription.CurrentPeriodStart = stripeSubscription.CurrentPeriodStart;
+            userSubscription.EndedAt = stripeSubscription.EndedAt;
+            userSubscription.Quantity = stripeSubscription.Quantity ?? 0;
+            userSubscription.Start = stripeSubscription.StartDate;
+            userSubscription.Status = stripeSubscription.Status;
+            userSubscription.TrialEnd = stripeSubscription.TrialEnd;
+            userSubscription.TrialStart = stripeSubscription.TrialStart;
+            userSubscription.Notes += DateTime.Now.ToShortDateString() + " at " + DateTime.Now.ToShortTimeString() + " Stripe.Event - Updated Subscription" + Environment.NewLine;
+            userSubscription.LastUpdated = DateTime.Now;
+            return userSubscription;
+        }
+
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using Stripe;
 using System;
+using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -22,9 +23,7 @@ namespace Hood.Services
 
         protected MailObject _mailObject;
 
-        public StripeWebHookService(
-            IHttpContextAccessor contextAccessor
-            )
+        public StripeWebHookService(IHttpContextAccessor contextAccessor)
             : base()
         {
             _auth = Engine.Services.Resolve<IAccountRepository>();
@@ -45,15 +44,12 @@ namespace Hood.Services
             _mailObject.AddH2("Log:");
         }
 
-        public void ProcessEvent(string json)
-        {
-            var stripeEvent = Stripe.EventUtility.ParseEvent(json);
-            ProcessEvent(stripeEvent);
-        }
-        public void ProcessEvent(Stripe.Event stripeEvent)
+        public async Task ProcessEventAsync(string eventJson)
         {
             try
             {
+                var stripeEvent = Stripe.EventUtility.ParseEvent(eventJson);
+
                 var args = new StripeWebHookTriggerArgs(stripeEvent);
 
                 _mailObject.AddParagraph("Stripe Event detected: <strong>" + stripeEvent.GetEventName() + "</strong>");
@@ -61,7 +57,7 @@ namespace Hood.Services
                 if (stripeEvent.GetEventName() == "invalid.event.object")
                     throw new Exception("The event object was invalid.");
 
-                this.ProcessEventByType(stripeEvent);
+                await ProcessEventByTypeAsync(stripeEvent);
 
                 switch (_billingSettings.SubscriptionWebhookLogs)
                 {
@@ -71,128 +67,110 @@ namespace Hood.Services
                         break;
                 }
 
-                if (!_env.IsProduction())
-                {
-                    _logService.AddLogAsync<StripeWebHookService>("Stripe webhook processed.", JsonConvert.SerializeObject(new { Event = stripeEvent }), Models.LogType.Success);
-                }
-
                 // Fire the event to allow any other packages to process the webhook.
                 _eventService.TriggerStripeWebhook(this, args);
+
+                await _logService.AddLogAsync<StripeWebHookService>("Stripe webhook processed.", JsonConvert.SerializeObject(new { Event = stripeEvent }), Models.LogType.Success);
             }
             catch (Exception ex)
             {
-                _logService.AddLogAsync<StripeWebHookService>("An error occurred processing a stripe webhook.", new { Message = ex.Message, Event = stripeEvent, Exception = ex }, Models.LogType.Error);
-
+                await _logService.AddExceptionAsync<StripeWebHookService>("An error occurred processing a stripe webhook.", ex);
                 _mailObject.PreHeader = "An error occurred processing a stripe webhook.";
                 _mailObject.Subject = _mailObject.PreHeader;
                 _mailObject.Template = MailSettings.DangerTemplate;
-
-                _email.NotifyRoleAsync(_mailObject, "SuperUser").GetAwaiter().GetResult();
-
-                // Throw the error back to the application, for creating the response object.
+                await _email.NotifyRoleAsync(_mailObject, "Admin");
                 throw ex;
             }
         }
+        public async Task ProcessEventByTypeAsync(Stripe.Event stripeEvent)
+        {
+            switch (stripeEvent.GetEventName())
+            {
+                case "customer.created":
+                    await CustomerCreatedAsync(stripeEvent);
+                    break;
+                case "customer.updated":
+                    await CustomerUpdatedAsync(stripeEvent);
+                    break;
+                case "customer.deleted":
+                    await CustomerDeletedAsync(stripeEvent);
+                    break;
 
+                case "customer.subscription.created":
+                    await SubscriptionCreatedAsync(stripeEvent);
+                    break;
+                case "customer.subscription.updated":
+                    await SubscriptionUpdatedAsync(stripeEvent);
+                    break;
+                case "customer.subscription.deleted":
+                    await SubscriptionDeletedAsync(stripeEvent);
+                    break;
+                case "customer.subscription.trial_will_end":
+                    await SubscriptionTrialWillEndAsync(stripeEvent);
+                    break;
 
-        /// <summary>
-        /// Occurs whenever a card is removed from a customer.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void CustomerCardDeleted(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
+                case "invoice.payment_failed":
+                    await InvoicePaymentFailedAsync(stripeEvent);
+                    break;
+                case "invoice.payment_succeeded":
+                    await InvoicePaymentSucceededAsync(stripeEvent);
+                    break;
+
+                case "plan.created":
+                    await PlanCreatedAsync(stripeEvent);
+                    break;
+                case "plan.updated":
+                    await PlanUpdatedAsync(stripeEvent);
+                    break;
+                case "plan.deleted":
+                    await PlanDeletedAsync(stripeEvent);
+                    break;
+
+                default:
+                    await _logService.AddLogAsync<StripeWebHookService>($"The event name could not resolve to a web hook handler: {stripeEvent.GetEventName()}", stripeEvent, LogType.Warning);
+                    break;
+            }
         }
-        /// <summary>
-        /// Occurs whenever a card's details are changed.
-        /// TODO: Save card updated, might happen when the card is close to expire
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void CustomerCardUpdated(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever a new card is created for the customer.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void CustomerCardCreated(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever any property of a customer changes.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void CustomerUpdated(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
+
+        #region Customer Webhooks
         /// <summary>
         /// Occurs whenever a new customer is created.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerCreated(Stripe.Event stripeEvent)
+        public async Task CustomerCreatedAsync(Stripe.Event stripeEvent)
         {
-            UnhandledWebHook(stripeEvent);
+#warning TODO: Sync customer with site on create on Stripe - Make a user if one doesnt exist.
+            await Task.Delay(10);
+            throw new NotImplementedException();
         }
         /// <summary>
-        /// Occurs whenever a charge description or metadata is updated.
+        /// Occurs whenever a new customer is updated.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void ChargeUpdated(Stripe.Event stripeEvent)
+        public async Task CustomerUpdatedAsync(Stripe.Event stripeEvent)
         {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever a previously uncaptured charge is captured.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void ChargeCaptured(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever a charge is refunded, including partial refunds.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void ChargeRefunded(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever a failed charge attempt occurs.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void ChargeFailed(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever a new charge is created and is successful.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void ChargeSucceeded(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
+#warning TODO: Sync customer with site on update from Stripe - Make a user if one doesnt exist.
+            await Task.Delay(10);
+            throw new NotImplementedException();
         }
         /// <summary>
         /// Occurs whenever a customer is deleted.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void CustomerDeleted(Stripe.Event stripeEvent)
+        public async Task CustomerDeletedAsync(Stripe.Event stripeEvent)
         {
+#warning TODO: Sync customer with site on delete from Stripe.
             _mailObject.AddParagraph("[Customer Deleted] processing...");
             Stripe.Customer deletedCustomer = Stripe.Mapper<Stripe.Customer>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddParagraph("Customer Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(deletedCustomer).ToFormattedJson() + Environment.NewLine);
-            var dcUser = _auth.GetUserByStripeId(deletedCustomer.Id).Result;
+            var dcUser = await _auth.GetUserByStripeIdAsync(deletedCustomer.Id);
             if (dcUser != null)
             {
                 _mailObject.AddParagraph("Customer Object:");
                 _mailObject.AddParagraph(JsonConvert.SerializeObject(dcUser).ToFormattedJson() + Environment.NewLine);
                 dcUser.StripeId = null;
-                _auth.UpdateUser(dcUser);
+                await _auth.UpdateUserAsync(dcUser);
                 _mailObject.AddParagraph("Stripe Id removed from customer.");
                 _mailObject.AddParagraph("[Customer Deleted] complete!");
             }
@@ -201,45 +179,16 @@ namespace Hood.Services
                 _mailObject.AddParagraph("Could not load customer from id: " + deletedCustomer.Id);
             }
         }
-        /// <summary>
-        /// Occurs whenever an invoice changes (for example, the amount could change).
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void InvoiceCreated(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever an invoice item is created.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void InvoiceItemCreated(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever an invoice item is deleted.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void InvoiceItemDeleted(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever an invoice item is updated.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void InvoiceItemUpdated(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
-        }
+        #endregion
+
+        #region Invoice Webhooks
         /// <summary>
         /// Occurs whenever an invoice attempts to be paid, and the payment fails. 
         /// This can occur either due to a declined payment, or because the customer has no active card.
         /// A particular case of note is that if a customer with no active card reaches the end of its free trial, an invoice.payment_failed notification will occur.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoicePaymentFailed(Stripe.Event stripeEvent)
+        public async Task InvoicePaymentFailedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentFailed] processing...");
             Stripe.Invoice failedInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
@@ -252,7 +201,7 @@ namespace Hood.Services
                 _mailObject.AddParagraph("StripeSubscription Object:");
                 _mailObject.AddParagraph(JsonConvert.SerializeObject(failedInvoiceSubscription).ToFormattedJson() + Environment.NewLine);
 
-                UserSubscription failedInvoiceUserSub = _auth.FindUserSubscriptionByStripeId(failedInvoiceSubscription.Id);
+                UserSubscription failedInvoiceUserSub = await _auth.GetUserSubscriptionByStripeIdAsync(failedInvoiceSubscription.Id);
                 if (failedInvoiceUserSub != null)
                 {
                     _mailObject.AddParagraph("Local User Subscription Object:");
@@ -267,7 +216,7 @@ namespace Hood.Services
                     };
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
-                    message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the service.");
+                    message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the");
                     message.Template = MailSettings.DangerTemplate;
                     _email.SendEmailAsync(message).GetAwaiter().GetResult();
 
@@ -278,7 +227,7 @@ namespace Hood.Services
                     _mailObject.AddParagraph("Cancelling subscription...");
                     _billing.Subscriptions.CancelSubscriptionAsync(failedInvoice.CustomerId, failedInvoice.SubscriptionId, false).GetAwaiter().GetResult();
                     _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
-                    var failedInvoiceUser = _auth.GetUserByStripeId(failedInvoice.CustomerId).Result;
+                    var failedInvoiceUser = await _auth.GetUserByStripeIdAsync(failedInvoice.CustomerId);
 
                     MailObject message = new MailObject()
                     {
@@ -288,7 +237,7 @@ namespace Hood.Services
                     };
                     message.AddH1("Oops!");
                     message.AddParagraph("Seems there was an error with your subscription.");
-                    message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the service.");
+                    message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the");
                     message.Template = MailSettings.DangerTemplate;
                     _email.SendEmailAsync(message).GetAwaiter().GetResult();
                 }
@@ -299,7 +248,7 @@ namespace Hood.Services
         /// Occurs whenever an invoice attempts to be paid, and the payment succeeds.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoicePaymentSucceeded(Stripe.Event stripeEvent)
+        public async Task InvoicePaymentSucceededAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentSucceeded] processing...");
             Stripe.Invoice successfulInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
@@ -312,7 +261,7 @@ namespace Hood.Services
                 Stripe.Subscription subscription = _billing.Subscriptions.FindById(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId).Result;
                 _mailObject.AddParagraph($"StripeSubscription Object loaded from Stripe: {successfulInvoice.SubscriptionId}");
 
-                UserSubscription userSub = _auth.FindUserSubscriptionByStripeId(subscription.Id);
+                UserSubscription userSub = await _auth.GetUserSubscriptionByStripeIdAsync(subscription.Id);
                 // if ths sub is set up in the db ALL IS WELL. Continuer
                 if (userSub == null)
                 {
@@ -326,7 +275,7 @@ namespace Hood.Services
                     _mailObject.AddParagraph("Subscription Cancelled.");
 
                     _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
-                    var successfulInvoiceUser = _auth.GetUserByStripeId(successfulInvoice.CustomerId).Result;
+                    var successfulInvoiceUser = await _auth.GetUserByStripeIdAsync(successfulInvoice.CustomerId);
 
                     MailObject message = new MailObject()
                     {
@@ -345,7 +294,7 @@ namespace Hood.Services
                 {
                     _mailObject.AddParagraph($"Local User Subscription Object located with Id: {userSub.Id}");
                     _mailObject.AddParagraph("Sending an email to the customer letting them know they have been charged...");
-                    var successfulInvoiceUser = _auth.GetUserByStripeId(successfulInvoice.CustomerId).Result;
+                    var successfulInvoiceUser = await _auth.GetUserByStripeIdAsync(successfulInvoice.CustomerId);
 
                     MailObject message = new MailObject()
                     {
@@ -363,83 +312,84 @@ namespace Hood.Services
                 }
             }
         }
+        #endregion
+
+        #region Subscription / Stripe.Plan Webhooks
         /// <summary>
-        /// Occurs whenever an invoice is updated.
+        /// Occurs whenever a plan is created.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void InvoiceUpdated(Stripe.Event stripeEvent)
+        public async Task PlanCreatedAsync(Stripe.Event stripeEvent)
         {
-            UnhandledWebHook(stripeEvent);
-        }
-        /// <summary>
-        /// Occurs whenever a plan is deleted.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void PlanDeleted(Stripe.Event stripeEvent)
-        {
-            UnhandledWebHook(stripeEvent);
+#warning TODO: Sync plan with site on create on Stripe.
+            await Task.Delay(10);
+            throw new NotImplementedException();
         }
         /// <summary>
         /// Occurs whenever a plan is updated.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void PlanUpdated(Stripe.Event stripeEvent)
+        public async Task PlanUpdatedAsync(Stripe.Event stripeEvent)
         {
-            UnhandledWebHook(stripeEvent);
+#warning TODO: Sync plan with site on update from Stripe.
+            await Task.Delay(10);
+            throw new NotImplementedException();
         }
         /// <summary>
-        /// Occurs whenever a plan is created.
+        /// Occurs whenever a plan is deleted.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void PlanCreated(Stripe.Event stripeEvent)
+        public async Task PlanDeletedAsync(Stripe.Event stripeEvent)
         {
-            UnhandledWebHook(stripeEvent);
+#warning TODO: Sync plan with site on delete from Stripe.
+            await Task.Delay(10);
+            throw new NotImplementedException();
         }
+        #endregion
+
+        #region UserSubscription / Stripe.Subscription Webhooks
         /// <summary>
         /// Occurs whenever a customer with no subscription is signed up for a plan.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionCreated(Stripe.Event stripeEvent)
+        public async Task SubscriptionCreatedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Created] processing...");
             Stripe.Subscription created = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            var log = _auth.ConfirmSubscriptionObject(created, stripeEvent.Created);
-            _mailObject.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
+            await _auth.ConfirmSubscriptionObjectAsync(created, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Created] complete!");
         }
         /// <summary>
         /// Occurs whenever a subscription changes. Examples would include switching from one plan to another, or switching status from trial to active.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionUpdated(Stripe.Event stripeEvent)
+        public async Task SubscriptionUpdatedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Updated] processing...");
             Stripe.Subscription updated = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            var log = _auth.UpdateSubscriptionObject(updated, stripeEvent.Created);
-            _mailObject.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
+            await _auth.UpdateSubscriptionObjectAsync(updated, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Updated] complete!");
         }
         /// <summary>
         /// Occurs whenever a customer ends their subscription.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionDeleted(Stripe.Event stripeEvent)
+        public async Task SubscriptionDeletedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Deleted] processing...");
             Stripe.Subscription deleted = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            _mailObject.AddH2("Log:");
-            var log = _auth.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
+            await _auth.RemoveUserSubscriptionObjectAsync(deleted, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Deleted] complete!");
         }
         /// <summary>
         /// Occurs three days before the trial period of a subscription is scheduled to end.
         /// </summary>
         /// <param name="stripeEvent"></param>
-        public void SubscriptionTrialWillEnd(Stripe.Event stripeEvent)
+        public async Task SubscriptionTrialWillEndAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription TrialWillEnd] processing...");
             Stripe.Subscription endTrialSubscription = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
-            UserSubscription endTrialUserSub = _auth.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
+            UserSubscription endTrialUserSub = await _auth.GetUserSubscriptionByStripeIdAsync(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {
                 _mailObject.AddParagraph($"Local User Subscription object found: {endTrialUserSub.Id}");
@@ -454,7 +404,7 @@ namespace Hood.Services
                 message.AddH1("The end is near!");
                 message.AddParagraph("Your trial subscription will soon run out.");
                 message.AddParagraph(endTrialSubscription.TrialEnd.Value.ToShortDateString() + " " + endTrialSubscription.TrialEnd.Value.ToShortTimeString());
-                message.AddParagraph("If you have not added a card to your account, please log in and do so now in order to continue using the service.");
+                message.AddParagraph("If you have not added a card to your account, please log in and do so now in order to continue using the");
                 message.AddParagraph("Alternatively, if you no longer wish to continue using the service, please log in and cancel your subscription to ensure you do not get charged when the trial runs out.");
                 _email.SendEmailAsync(message).GetAwaiter().GetResult();
 
@@ -465,7 +415,7 @@ namespace Hood.Services
                 _mailObject.AddParagraph("There is no subscription, so ensure that there is no subscription left on stripe.");
                 _billing.Subscriptions.CancelSubscriptionAsync(endTrialSubscription.CustomerId, endTrialSubscription.Id, false).GetAwaiter().GetResult();
                 _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
-                var endTrialUser = _auth.GetUserByStripeId(endTrialSubscription.CustomerId).Result;
+                var endTrialUser = await _auth.GetUserByStripeIdAsync(endTrialSubscription.CustomerId);
 
                 MailObject message = new MailObject()
                 {
@@ -483,14 +433,6 @@ namespace Hood.Services
             }
             _mailObject.AddParagraph("[Subscription TrialWillEnd] complete!");
         }
-        /// <summary>
-        /// Called whenever an unknown webhook arrives from stripe.
-        /// </summary>
-        /// <param name="stripeEvent"></param>
-        public void UnhandledWebHook(Stripe.Event stripeEvent)
-        {
-            _logService.AddLogAsync<StripeWebHookService>("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName(), stripeEvent, LogType.Warning);
-            _mailObject.AddParagraph("The event name could not resolve to a web hook handler: " + stripeEvent.GetEventName());
-        }
+        #endregion
     }
 }

@@ -9,23 +9,33 @@ namespace Hood.Services
 {
     public interface IPropertyRepository
     {
-        OperationResult<PropertyListing> Add(PropertyListing property);
-        Task<PropertySearchModel> GetPagedProperties(PropertySearchModel propertyFilters, bool published = true);
-        Task<List<MapMarker>> GetLocations(PropertySearchModel filters);
-        PropertyListing GetPropertyById(int id, bool nocache = false);
-        void ClearField(int id, string field);
-        OperationResult Delete(int id);
-        OperationResult<PropertyListing> UpdateProperty(PropertyListing model);
-        OperationResult<PropertyListing> SetStatus(int id, Status status);
-        Task<OperationResult> DeleteAll();
-        Task<OperationResult<PropertyListing>> AddImage(PropertyListing property, PropertyMedia media);
-        Task<OperationResult<PropertyListing>> AddFloorplan(PropertyListing property, PropertyFloorplan media);
-        Task<List<PropertyListing>> GetFeatured();
-        Task<List<PropertyListing>> GetRecent();
+        #region Property CRUD
+        Task<PropertyListModel> GetPropertiesAsync(PropertyListModel model);
+        Task<List<MapMarker>> GetLocationsAsync(PropertyListModel filters);
+        Task<PropertyListModel> GetFeaturedAsync();
+        Task<PropertyListModel> GetRecentAsync();
+        Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false);
+        Task<PropertyListing> AddAsync(PropertyListing property);
+        Task UpdateAsync(PropertyListing property);
+        Task SetStatusAsync(int id, ContentStatus status);
+        Task DeleteAsync(int id);
+        Task DeleteAllAsync();
+        #endregion
+
+        #region Direct Field Editing
+        Task ClearFieldAsync(int id, string field);
+        #endregion
+
+        #region Media / Floor Plans
+        Task AddMediaAsync(PropertyListing property, PropertyMedia media);
+        Task AddFloorplanAsync(PropertyListing property, PropertyFloorplan media);
         Task<PropertyListing> RemoveMediaAsync(int id, int mediaId);
         Task<PropertyListing> RemoveFloorplanAsync(int id, int mediaId);
+        #endregion
 
-        // Stats
-        object GetStatistics();
+        #region Statistics
+        Task<object> GetStatisticsAsync();
+        #endregion
+
     }
 }

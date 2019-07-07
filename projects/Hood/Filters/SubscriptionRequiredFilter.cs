@@ -55,36 +55,21 @@ namespace Hood.Filters
 
         private class SubscriptionRequiredAttributeImpl : IActionFilter
         {
-            private readonly ILogger _logger;
-            private readonly IBillingService _billing;
             private readonly List<string> _ids;
             private readonly List<string> _addons;
             private readonly List<string> _categories;
             private readonly List<string> _roles;
             private readonly UserManager<ApplicationUser> _userManager;
-            private readonly IAccountRepository _auth;
-            private readonly RoleManager<IdentityRole> _roleManager;
-
             public SubscriptionRequiredAttributeImpl(
-                HoodDbContext db,
-                ILoggerFactory loggerFactory,
-                IBillingService billing,
-                IHttpContextAccessor contextAccessor,
-                IHoodCache cache,
-                RoleManager<IdentityRole> roleManager,
                 UserManager<ApplicationUser> userManager,
                 string[] Ids,
                 string[] CategoryList,
                 string[] Addons,
                 string[] RoleOverrides)
             {
-                _auth = new AccountRepository(db, billing, contextAccessor, cache, userManager, roleManager);
-                _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
-                _billing = billing;
                 _ids = Ids.ToList();
                 _categories = CategoryList.ToList();
                 _userManager = userManager;
-                _roleManager = roleManager;
                 _addons = Addons.ToList();
                 _roles = RoleOverrides.ToList();
             }

@@ -1,5 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Entities;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
@@ -35,7 +36,7 @@ namespace Hood.Models
         public ContentType Type { get; set; }
 
         // Publish Status
-        public int Status { get; set; }
+        public ContentStatus Status { get; set; }
 
         // Creator/Editor
         public DateTime CreatedOn { get; set; }
@@ -103,19 +104,19 @@ namespace Hood.Models
         {
             get
             {
-                switch ((Enums.Status)Status)
+                switch ((Enums.ContentStatus)Status)
                 {
-                    case Enums.Status.Published:
+                    case Enums.ContentStatus.Published:
                         if (PublishDate > DateTime.Now)
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         else
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
-                    case Enums.Status.Draft:
+                    case Enums.ContentStatus.Draft:
                     default:
                         return "Draft";
-                    case Enums.Status.Archived:
+                    case Enums.ContentStatus.Archived:
                         return "Archived";
-                    case Enums.Status.Deleted:
+                    case Enums.ContentStatus.Deleted:
                         return "Deleted";
                 }
             }
@@ -124,7 +125,7 @@ namespace Hood.Models
         {
             get
             {
-                if (Status == (int)Enums.Status.Published)
+                if (Status == ContentStatus.Published)
                     return PublishDate > DateTime.Now;
                 else
                     return false;

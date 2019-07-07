@@ -3,6 +3,7 @@ using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using Hood.Extensions;
 using Hood.ViewModels;
+using System.Threading.Tasks;
 
 namespace Hood.ViewComponents
 {
@@ -20,7 +21,7 @@ namespace Hood.ViewComponents
         {
             HeaderModel model = new HeaderModel()
             {
-                Pages = _content.GetContentByType("page")
+                Pages = _content.GetPages()
             };
             return View(model);
         }

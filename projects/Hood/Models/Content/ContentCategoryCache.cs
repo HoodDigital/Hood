@@ -63,7 +63,7 @@ namespace Hood.Caching
                             ParentCategoryId = d.ParentCategoryId,
                             ParentCategory = d.ParentCategory,
                             Children = d.Children,
-                            Count = d.Content.Where(c => c.Content.Status == (int)Status.Published).Count(),
+                            Count = d.Content.Where(c => c.Content.Status == ContentStatus.Published).Count(),
                         };
                 return q.ToDictionary(c => c.Id);
             });
@@ -87,7 +87,7 @@ namespace Hood.Caching
                                     ParentCategoryId = d.ParentCategoryId,
                                     ParentCategory = d.ParentCategory,
                                     Children = d.Children,
-                                    Count = d.Content.Where(c => c.Content.Status == (int)Status.Published).Count(),
+                                    Count = d.Content.Where(c => c.Content.Status == ContentStatus.Published).Count(),
                                 };
                         return q.ToDictionary(c => c.Slug);
                     })

@@ -891,7 +891,7 @@ namespace Hood.Services
         {
             CheckForCancel();
 
-            property.Status = data["PUBLISHED_FLAG"] == "1" ? (int)Status.Published : (int)Status.Archived;
+            property.Status = data["PUBLISHED_FLAG"] == "1" ? ContentStatus.Published : ContentStatus.Archived;
 
             property.Reference = data["AGENT_REF"];
 

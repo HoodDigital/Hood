@@ -99,7 +99,7 @@ namespace Hood.Controllers
                 }
 
                 user.Profile = model.Profile;
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
 
                 SaveMessage = "Your profile has been updated.";
                 MessageType = Enums.AlertType.Success;
@@ -121,7 +121,7 @@ namespace Hood.Controllers
         public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
-            var user = _account.GetUserById(userId);
+            var user = await _account.GetUserByIdAsync(userId);
             if (user == null)
                 return NotFound();
 
@@ -137,7 +137,7 @@ namespace Hood.Controllers
                     }
                     mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = string.Format("users/{0}/", userId) });
                     user.Avatar = mediaResult;
-                    _account.UpdateUser(user);
+                    await _account.UpdateUserAsync(user);
                 }
                 return Json(new { Success = true, Image = mediaResult });
             }

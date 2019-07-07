@@ -188,7 +188,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/media/attach/")]
-        public async Task<MediaResponse> Attach(MediaListModel model)
+        public async Task<Response> Attach(MediaListModel model)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(Content).ToString() + ".Single." + contentId;
                         _cache.Remove(cacheKey);
-                        return new MediaResponse(true, media);
+                        return new Response(true, media);
 
                     case "Forum":
 
@@ -235,7 +235,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
                         await _db.SaveChangesAsync();
-                        return new MediaResponse(true, media);
+                        return new Response(true, media);
 
                     case "ApplicationUser":
 
@@ -253,7 +253,7 @@ namespace Hood.Areas.Admin.Controllers
                         cacheKey = typeof(ApplicationUser).ToString() + ".Single." + model.Id;
                         _cache.Remove(cacheKey);
                         await _db.SaveChangesAsync();
-                        return new MediaResponse(true, media);
+                        return new Response(true, media);
 
                     case "PropertyListing":
 
@@ -273,7 +273,7 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
                         _cache.Remove(cacheKey);
-                        return new MediaResponse(true, media);
+                        return new Response(true, media);
 
                     case "ContentMeta":
 
@@ -285,16 +285,16 @@ namespace Hood.Areas.Admin.Controllers
                             throw new Exception("Could not update the database");
                         cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
                         _cache.Remove(cacheKey);
-                        return new MediaResponse(true, media);
+                        return new Response(true, media);
 
                     default:
-                        return new MediaResponse(false);
+                        return new Response(false);
                 }
 
             }
             catch (Exception ex)
             {
-                return new MediaResponse(ex.Message);
+                return new Response(ex.Message);
             }
         }
 
@@ -323,7 +323,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Message = ex.Message });
+                return Json(new { Success = false, ex.Message });
             }
         }
 
@@ -348,7 +348,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Message = ex.Message });
+                return Json(new { Success = false, ex.Message });
             }
         }
 

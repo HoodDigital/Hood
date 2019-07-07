@@ -37,6 +37,7 @@ namespace Hood.Models
         {
             get => Types.Where(t => !t.IsPublic || !t.Enabled).ToList();
         }
+
         internal void CheckBaseFields()
         {
             foreach (var systemType in ContentTypes.All)

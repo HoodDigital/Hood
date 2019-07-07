@@ -1,9 +1,9 @@
 /* Subscriptions View */
 
-IF EXISTS(select * FROM sys.views where name = 'HoodSubscriptionView') DROP VIEW HoodSubscriptionView
+IF EXISTS(select * FROM sys.views where name = 'HoodSubscriptionsView') DROP VIEW HoodSubscriptionsView
 GO
 
-CREATE VIEW HoodSubscriptionView AS
+CREATE VIEW HoodSubscriptionsView AS
 SELECT        
 	dbo.HoodSubscriptions.Id, 
 	dbo.HoodSubscriptions.Addon, 
@@ -42,7 +42,7 @@ GROUP BY
     dbo.HoodSubscriptions.TrialPeriodDays, dbo.HoodSubscriptions.ForumId, dbo.HoodSubscriptions.TopicId, dbo.HoodSubscriptions.Addon, dbo.HoodSubscriptions.LiveMode, dbo.HoodSubscriptions.[Public]
 GO
 
-/* UserSubscriptions View */
+/* UserSubscriptions - Used by HoodUserProfiles View */
 
 IF EXISTS(select * FROM sys.views where name = 'HoodUserSubscriptionsView') DROP VIEW HoodUserSubscriptionsView
 GO
@@ -99,6 +99,7 @@ SELECT
 							'Public:', '', dbo.HoodSubscriptions.[Public], ',',
 							'Level:', '', dbo.HoodSubscriptions.Level, ',',
 							'Addon:', '', dbo.HoodSubscriptions.Addon, ',',
+							'CurrentPeriodEnd:', '"', dbo.HoodUserSubscriptions.CurrentPeriodEnd, '",',
 						'}'
 					)
 				ELSE 

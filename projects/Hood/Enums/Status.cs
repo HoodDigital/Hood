@@ -1,7 +1,7 @@
 ﻿namespace Hood.Enums
 {
 
-    public enum Status
+    public enum ContentStatus
     {
         Private = 0,
         Draft = 1,

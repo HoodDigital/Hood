@@ -75,9 +75,9 @@ namespace Hood.Controllers
         }
 
         [Route("sitemap.xml")]
-        public ActionResult SitemapXml()
+        public async Task<ActionResult> SitemapXmlAsync()
         {
-            string xml = _content.GetSitemapDocument(Url);
+            string xml = await _content.GetSitemapDocumentAsync(Url);
             return Content(xml, "text/xml", Encoding.UTF8);
         }
 

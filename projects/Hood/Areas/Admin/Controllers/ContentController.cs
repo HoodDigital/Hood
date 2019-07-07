@@ -34,8 +34,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/manage/")]
         public async Task<IActionResult> Index(ContentModel model, EditorMessage? message)
         {
-            var qry = Request.Query;
-            model = await _content.GetPagedContent(model, false);
+            model = await _content.GetContentAsync(model);
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             model.AddEditorMessage(message);
             return View(model);
@@ -44,7 +43,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
-            var content = _content.GetContentByID(id, true);
+            var content = await _content.GetContentByIdAsync(id, true);
             if (content == null)
                 return NotFound();
             EditContentModel model = await GetEditorModel(content);
@@ -56,7 +55,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<ActionResult> Edit(EditContentModelSend post)
         {
-            var content = _content.GetContentByID(post.Id, true);
+            var content = await _content.GetContentByIdAsync(post.Id, true);
             try
             {
                 post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
@@ -69,14 +68,14 @@ namespace Hood.Areas.Admin.Controllers
 
                 if (content.Slug.IsSet())
                 {
-                    if (!_content.CheckSlug(content.Slug, content.Id))
+                    if (!await _content.CheckSlugAsync(content.Slug, content.Id))
                         throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
                 }
                 else
                 {
                     var generator = new KeyGenerator();
                     content.Slug = generator.UrlSlug();
-                    while (!_content.CheckSlug(content.Slug))
+                    while (!await _content.CheckSlugAsync(content.Slug))
                         content.Slug = generator.UrlSlug();
                 }
 
@@ -86,11 +85,10 @@ namespace Hood.Areas.Admin.Controllers
                 foreach (string tag in tags)
                 {
                     // check if it exists in the db, if not add it. 
-                    var tagResult = await _content.AddTag(tag);
+                    var tagResult = await _content.AddTagAsync(tag);
 
                     // add it to the model object.
-                    if (tagResult.Succeeded)
-                        content.AddTag(tagResult.Item.Value);
+                    content.AddTag(tagResult.Value);
                 }
                 if (content.Tags != null)
                 {
@@ -136,7 +134,7 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
 
-                OperationResult result = _content.Update(content);
+                await _content.UpdateAsync(content);
 
                 EditContentModel model = await GetEditorModel(content);
                 model.Content.SaveMessage = "Saved!";
@@ -154,23 +152,30 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/{id}/gallery/")]
-        public IActionResult EditorGallery(int id)
+        public async Task<IActionResult> EditorGallery(int id)
         {
-            var model = _content.GetContentByID(id);
+            var model = await _content.GetContentByIdAsync(id);
             return View(model);
         }
 
         [HttpPost()]
         [Route("admin/content/designer/save/")]
-        public OperationResult SaveDesigner(DesignContentModel post)
+        public async Task<Response> SaveDesigner(DesignContentModel post)
         {
-            var content = _content.GetContentByID(post.Id, true);
-            content.Body = post.Body;
-            content.Body = Regex.Replace(content.Body, @"contenteditable=""true""", "", RegexOptions.IgnoreCase);
-            content.Body = Regex.Replace(content.Body, @"id=""mce_[^;]+""", "", RegexOptions.IgnoreCase);
-            content.Body = Regex.Replace(content.Body, @"mce-content-body", "", RegexOptions.IgnoreCase);
-            OperationResult result = _content.Update(content);
-            return result;
+            try
+            {
+                var content = await _content.GetContentByIdAsync(post.Id, true);
+                content.Body = post.Body;
+                content.Body = Regex.Replace(content.Body, @"contenteditable=""true""", "", RegexOptions.IgnoreCase);
+                content.Body = Regex.Replace(content.Body, @"id=""mce_[^;]+""", "", RegexOptions.IgnoreCase);
+                content.Body = Regex.Replace(content.Body, @"mce-content-body", "", RegexOptions.IgnoreCase);
+                await _content.UpdateAsync(content);
+                return new Response(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
         }
 
         [Route("admin/content/{type}/create/")]
@@ -201,13 +206,11 @@ namespace Hood.Areas.Admin.Controllers
                 model.Public = true;
                 model.ShareCount = 0;
                 model.Views = 0;
-                OperationResult result = _content.Add(model);
-                if (!result.Succeeded)
+                await _content.AddAsync(model);
+                var response = new Response(true, "Published successfully.")
                 {
-                    throw new Exception(result.ErrorString);
-                }
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Edit", new { id = model.Id, message = EditorMessage.Created });
+                    Url = Url.Action("Edit", new { id = model.Id, message = EditorMessage.Created })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -217,9 +220,9 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/{id}/categories/")]
-        public IActionResult Categories(int id)
+        public async Task<IActionResult> CategoriesAsync(int id)
         {
-            var content = _content.GetContentByID(id);
+            var content = await _content.GetContentByIdAsync(id);
             EditContentModel model = new EditContentModel()
             {
                 ContentType = Engine.Settings.Content.GetContentType(content.ContentType),
@@ -231,8 +234,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/{type}/")]
         public IActionResult CategoryList(string type)
         {
-            ContentModel model = new ContentModel();
-            model.ContentType = Engine.Settings.Content.GetContentType(type);
+            ContentModel model = new ContentModel
+            {
+                ContentType = Engine.Settings.Content.GetContentType(type)
+            };
             return View(model);
         }
 
@@ -243,7 +248,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 // User must have an organisation.
-                await _content.AddCategoryToContent(contentId, categoryId);
+                await _content.AddCategoryToContentAsync(contentId, categoryId);
                 _contentCategoryCache.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
@@ -255,11 +260,11 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/categories/remove/")]
-        public IActionResult RemoveCategory(int contentId, int categoryId)
+        public async Task<IActionResult> RemoveCategoryAsync(int contentId, int categoryId)
         {
             try
             {
-                _content.RemoveCategoryFromContent(contentId, categoryId);
+                await _content.RemoveCategoryFromContentAsync(contentId, categoryId);
                 _contentCategoryCache.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
@@ -282,7 +287,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
                 // check if it exists in the db, if not add it. 
-                var categoryResult = await _content.AddCategory(category);
+                var categoryResult = await _content.AddCategoryAsync(category);
                 _contentCategoryCache.ResetCache();
                 // If we reached here, display the organisation home.
                 return Json(new { Success = true });
@@ -296,7 +301,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/categories/edit/{id}/")]
         public async Task<IActionResult> EditCategory(int id, string type)
         {
-            var model = await _content.GetCategoryById(id);
+            var model = await _content.GetCategoryByIdAsync(id);
             model.Categories = _contentCategoryCache.TopLevel(type);
             return View(model);
         }
@@ -316,15 +321,8 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("You cannot set the parent to be a child of this category!");
                 }
 
-                OperationResult result = await _content.UpdateCategory(model);
-                if (result.Succeeded)
-                {
-                    return new Response(true);
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database.");
-                }
+                await _content.UpdateCategoryAsync(model);
+                return new Response(true);
             }
             catch (Exception ex)
             {
@@ -337,15 +335,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var result = await _content.DeleteCategory(id);
-                if (result.Succeeded)
-                {
-                    return new Response(true);
-                }
-                else
-                {
-                    throw new Exception("There was a problem updating the database.");
-                }
+                await _content.DeleteCategoryAsync(id);
+                return new Response(true);
             }
             catch (Exception ex)
             {
@@ -462,22 +453,13 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/content/{id}/publish")]
         [HttpPost()]
-        public Response Publish(int id)
+        public async Task<Response> Publish(int id)
         {
             try
             {
-                OperationResult<Content> result = _content.SetStatus(id, Status.Published);
-                var content = _content.GetContentByID(id);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Published successfully.");
-                    response.Url = Url.Action("Index", new { type = content.ContentType, message = EditorMessage.Published });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                await _content.SetStatusAsync(id, ContentStatus.Published);
+                var content = await _content.GetContentByIdAsync(id);
+                return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
             {
@@ -486,22 +468,13 @@ namespace Hood.Areas.Admin.Controllers
         }
         [Route("admin/content/{id}/archive")]
         [HttpPost()]
-        public Response Archive(int id)
+        public async Task<Response> Archive(int id)
         {
             try
             {
-                OperationResult<Content> result = _content.SetStatus(id, Status.Archived);
-                var content = _content.GetContentByID(id);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Archived successfully.");
-                    response.Url = Url.Action("Index", new { type = content.ContentType, message = EditorMessage.Archived });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                await _content.SetStatusAsync(id, ContentStatus.Archived);
+                var content = await _content.GetContentByIdAsync(id);
+                return new Response(true, "Archived successfully.");
             }
             catch (Exception ex)
             {
@@ -511,23 +484,12 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost()]
         [Route("admin/content/{id}/delete")]
-        public Response Delete(int id)
+        public async Task<Response> Delete(int id)
         {
             try
             {
-                var content = _content.GetContentByID(id);
-                var type = content.ContentType;
-                OperationResult result = _content.Delete(id);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Deleted!");
-                    response.Url = Url.Action("Index", new { type = type, message = EditorMessage.Deleted });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                await _content.DeleteAsync(id);
+                return new Response(true, "Deleted!");
             }
             catch (Exception ex)
             {
@@ -540,8 +502,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var newContent = _content.DuplicateContent(id);
-
+                var newContent = await _content.DuplicateContentAsync(id);
                 return RedirectToAction("Edit", new { message = EditorMessage.Duplicated, newContent.Id });
             }
             catch (Exception ex)
@@ -560,9 +521,7 @@ namespace Hood.Areas.Admin.Controllers
                 var model = Engine.Settings.Basic;
                 model.Homepage = id;
                 Engine.Settings.Set(model);
-                var response = new Response(true, "The homepage has now been set.");
-                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.HomepageSet });
-                return response;
+                return new Response(true, "The homepage has now been set.");
             }
             catch (Exception ex)
             {
@@ -574,7 +533,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> UploadToGallery(List<IFormFile> files, int id)
         {
             // User must have an organisation.
-            Content content = _content.GetContentByID(id);
+            Content content = await _content.GetContentByIdAsync(id);
             if (content == null)
                 return NotFound();
 
@@ -593,7 +552,7 @@ namespace Hood.Areas.Admin.Controllers
                     foreach (IFormFile file in files)
                     {
                         mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = content.ContentType.ToTitleCase() });
-                        await _content.AddImage(content, new ContentMedia(mediaResult));
+                        await _content.AddImageAsync(content, new ContentMedia(mediaResult));
                     }
                 }
                 return Json(new { Success = true, Image = mediaResult });
@@ -610,41 +569,43 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/content/{id}/media/remove/{mediaId}")]
-        public IActionResult RemoveMedia(int id, int mediaId)
+        public async Task<IActionResult> RemoveMedia(int id, int mediaId)
         {
             try
             {
-                Content content = _content.GetContentByID(id, true);
+                Content content = await _content.GetContentByIdAsync(id, true);
                 ContentMedia media = content.Media.Find(m => m.Id == mediaId);
                 if (media != null)
                     content.Media.Remove(media);
-                _content.Update(content);
+                await _content.UpdateAsync(content);
             }
-            catch (Exception)
-            { }
-            return RedirectToAction("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+            catch (Exception ex)
+            {
+                await _logService.AddExceptionAsync<ContentController>("Error removing media item", ex);
+            }
+            return RedirectToAction("Edit", new { id, message = EditorMessage.MediaRemoved });
         }
 
         [HttpGet]
         [Route("admin/content/{id}/media/setfeatured/{mediaId}")]
-        public IActionResult SetFeatured(int id, int mediaId)
+        public async Task<IActionResult> SetFeaturedAsync(int id, int mediaId)
         {
-            Content content = _content.GetContentByID(id, true);
+            Content content = await _content.GetContentByIdAsync(id, true);
             ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
             if (media != null)
             {
                 content.FeaturedImage = new MediaObject(media);
-                _content.Update(content);
+                await _content.UpdateAsync(content);
             }
-            return RedirectToAction("Edit", new { id = id, message = EditorMessage.ImageUpdated });
+            return RedirectToAction("Edit", new { id, message = EditorMessage.ImageUpdated });
         }
 
         [Route("admin/content/getfeaturedimage/{id}")]
-        public IMediaObject GetFeaturedImage(int id)
+        public async Task<IMediaObject> GetFeaturedImageAsync(int id)
         {
             try
             {
-                Content content = _content.GetContentByID(id);
+                Content content = await _content.GetContentByIdAsync(id);
                 if (content != null && content.FeaturedImage != null)
                     return content.FeaturedImage;
                 else
@@ -657,11 +618,11 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/getsharerimage/{id}")]
-        public IMediaObject GetSharerImage(int id)
+        public async Task<IMediaObject> GetSharerImageAsync(int id)
         {
             try
             {
-                Content content = _content.GetContentByID(id);
+                Content content = await _content.GetContentByIdAsync(id);
                 if (content != null && content.ShareImage != null)
                     return content.ShareImage;
                 else
@@ -674,11 +635,11 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/getmetaimage/{id}")]
-        public IMediaObject GetMetaImage(int id, string field)
+        public async Task<IMediaObject> GetMetaImageAsync(int id, string field)
         {
             try
             {
-                Content content = _content.GetContentByID(id);
+                Content content = await _content.GetContentByIdAsync(id);
                 if (content != null)
                     return content.GetMeta(field).Get<IMediaObject>();
                 else
@@ -691,15 +652,17 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/clearimage/{id}")]
-        public Response ClearImage(int id)
+        public async Task<Response> ClearImage(int id)
         {
             try
             {
-                Content content = _content.GetContentByID(id);
+                Content content = await _content.GetContentByIdAsync(id);
                 content.FeaturedImage = null;
-                _content.Update(content);
-                var response = new Response(true, "The image has been cleared!");
-                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+                await _content.UpdateAsync(content);
+                var response = new Response(true, "The image has been cleared!")
+                {
+                    Url = Url.Action("Edit", new { id, message = EditorMessage.MediaRemoved })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -709,15 +672,17 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/clearshareimage/{id}")]
-        public Response ClearShareImage(int id)
+        public async Task<Response> ClearShareImage(int id)
         {
             try
             {
-                Content content = _content.GetContentByID(id);
+                Content content = await _content.GetContentByIdAsync(id);
                 content.ShareImage = null;
-                _content.Update(content);
-                var response = new Response(true, "The image has been cleared!");
-                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+                await _content.UpdateAsync(content);
+                var response = new Response(true, "The image has been cleared!")
+                {
+                    Url = Url.Action("Edit", new { id, message = EditorMessage.MediaRemoved })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -727,15 +692,17 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/clearmeta/{id}")]
-        public Response ClearMeta(int id, string field)
+        public async Task<Response> ClearMeta(int id, string field)
         {
             try
             {
-                var content = _content.GetContentByID(id);
+                var content = await _content.GetContentByIdAsync(id);
                 content.UpdateMeta(field, "");
-                _content.Update(content);
-                var response = new Response(true, "The data has been cleared!");
-                response.Url = Url.Action("Edit", new { id = id, message = EditorMessage.ImageUpdated });
+                await _content.UpdateAsync(content);
+                var response = new Response(true, "The data has been cleared!")
+                {
+                    Url = Url.Action("Edit", new { id, message = EditorMessage.ImageUpdated })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -748,7 +715,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/delete/all/")]
         public async Task<IActionResult> DeleteAll(string type)
         {
-            await _content.DeleteAll(type);
+            await _content.DeleteAllAsync(type);
             return RedirectToAction("Index", new { message = EditorMessage.Deleted });
         }
 
@@ -789,10 +756,12 @@ namespace Hood.Areas.Admin.Controllers
 
         protected async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
         {
+
             if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
             {
                 // get subscriptions - if there are any.
-                model.Subscriptions = await _account.GetSubscriptionPlansAsync();
+                var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+                model.Subscriptions = subs.List;
             }
             return model;
         }
@@ -830,7 +799,7 @@ namespace Hood.Areas.Admin.Controllers
                         {
                             var key = Path.GetFileNameWithoutExtension(temp);
                             var value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
-                            if (!templates.ContainsKey(key)) 
+                            if (!templates.ContainsKey(key))
                                 templates.Add(key, value);
                         }
                     }

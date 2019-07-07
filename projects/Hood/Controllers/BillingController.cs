@@ -28,7 +28,7 @@ namespace Hood.Controllers
             BillingHomeModel model = new BillingHomeModel();
             try
             {
-                model.Customer = await _account.LoadCustomerObject(Engine.Account.StripeId, true);
+                model.Customer = await _account.LoadCustomerObjectAsync(Engine.Account.StripeId, true);
                 if (model.Customer != null)
                 {
                     model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);

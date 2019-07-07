@@ -21,8 +21,8 @@ namespace Hood.Services
         private readonly IHoodCache _cache;
 
         public PropertyRepository(
-            HoodDbContext db, 
-            IHoodCache cache, 
+            HoodDbContext db,
+            IHoodCache cache,
             IConfiguration config)
         {
             _db = db;
@@ -30,57 +30,8 @@ namespace Hood.Services
             _cache = cache;
         }
 
-        public OperationResult<PropertyListing> Add(PropertyListing property)
-        {
-            try
-            {
-
-
-                _db.Properties.Add(property);
-                _db.SaveChanges();
-                var result = new OperationResult<PropertyListing>(property);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message) as OperationResult<PropertyListing>;
-            }
-        }
-        public OperationResult Delete(int id)
-        {
-            try
-            {
-                PropertyListing property = _db.Properties.Include(p => p.Media).Where(p => p.Id == id).FirstOrDefault();
-                _db.Entry(property).State = EntityState.Deleted;
-                _db.SaveChanges();
-                ClearPropertyCache(id);
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message);
-            }
-        }
-        public PropertyListing GetPropertyById(int id, bool nocache = false)
-        {
-            string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
-            if (_cache.TryGetValue(cacheKey, out PropertyListing property) && !nocache)
-                return property;
-            else
-            {
-                property = _db.Properties
-                    .Include(p => p.Media)
-                    .Include(p => p.FloorPlans)
-                    .Include(p => p.Agent)
-                    .Include(p => p.Metadata)
-                    .AsNoTracking()
-                    .FirstOrDefault(c => c.Id == id);
-
-                _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
-                return property;
-            }
-        }
-        private IQueryable<PropertyListing> GetProperties(PropertySearchModel propertyFilters, bool published)
+        #region Property CRUD
+        public async Task<PropertyListModel> GetPropertiesAsync(PropertyListModel model)
         {
             IQueryable<PropertyListing> properties = _db.Properties
                 .Include(p => p.Media)
@@ -89,16 +40,16 @@ namespace Hood.Services
                 .Include(p => p.Metadata);
 
             // published?
-            if (published)
-                properties = properties.Where(p => p.Status == (int)Status.Published);
+            if (model.PublishStatus.HasValue)
+                properties = properties.Where(p => p.Status == model.PublishStatus);
 
-            if (!string.IsNullOrEmpty(propertyFilters.Transaction))
+            if (!string.IsNullOrEmpty(model.Transaction))
             {
-                if (propertyFilters.Transaction == "Student")
+                if (model.Transaction == "Student")
                 {
                     properties = properties.Where(n => n.ListingType == "Student");
                 }
-                else if (propertyFilters.Transaction == "Sale")
+                else if (model.Transaction == "Sale")
                 {
                     properties = properties.Where(n => n.ListingType == "Sale");
                 }
@@ -109,52 +60,52 @@ namespace Hood.Services
             }
             else
             {
-                if (!string.IsNullOrEmpty(propertyFilters.Type))
-                    properties = properties.Where(n => n.ListingType == propertyFilters.Type);
+                if (!string.IsNullOrEmpty(model.Type))
+                    properties = properties.Where(n => n.ListingType == model.Type);
             }
 
-            if (!string.IsNullOrEmpty(propertyFilters.Agent))
-                properties = properties.Where(n => n.Agent.UserName == propertyFilters.Agent);
+            if (!string.IsNullOrEmpty(model.Agent))
+                properties = properties.Where(n => n.Agent.UserName == model.Agent);
 
-            if (!string.IsNullOrEmpty(propertyFilters.PlanningType))
-                properties = properties.Where(n => n.Planning == propertyFilters.PlanningType);
+            if (!string.IsNullOrEmpty(model.PlanningType))
+                properties = properties.Where(n => n.Planning == model.PlanningType);
 
-            if (!string.IsNullOrEmpty(propertyFilters.Status))
-                properties = properties.Where(n => n.LeaseStatus == propertyFilters.Status);
+            if (!string.IsNullOrEmpty(model.Status))
+                properties = properties.Where(n => n.LeaseStatus == model.Status);
 
-            if (propertyFilters.Bedrooms.HasValue)
+            if (model.Bedrooms.HasValue)
             {
-                if (propertyFilters.MaxBedrooms.HasValue)
+                if (model.MaxBedrooms.HasValue)
                 {
-                    if (propertyFilters.Bedrooms != -1)
-                        properties = properties.Where(n => n.Bedrooms >= propertyFilters.Bedrooms.Value);
-                    if (propertyFilters.MaxBedrooms != -1)
-                        properties = properties.Where(n => n.Bedrooms <= propertyFilters.MaxBedrooms.Value);
+                    if (model.Bedrooms != -1)
+                        properties = properties.Where(n => n.Bedrooms >= model.Bedrooms.Value);
+                    if (model.MaxBedrooms != -1)
+                        properties = properties.Where(n => n.Bedrooms <= model.MaxBedrooms.Value);
                 }
                 else
-                    properties = properties.Where(n => n.Bedrooms == propertyFilters.Bedrooms.Value);
+                    properties = properties.Where(n => n.Bedrooms == model.Bedrooms.Value);
             }
 
-            if (propertyFilters.MinRent.HasValue)
-                properties = properties.Where(n => n.Rent >= propertyFilters.MinRent.Value);
-            if (propertyFilters.MaxRent.HasValue)
-                properties = properties.Where(n => n.Rent <= propertyFilters.MaxRent.Value);
+            if (model.MinRent.HasValue)
+                properties = properties.Where(n => n.Rent >= model.MinRent.Value);
+            if (model.MaxRent.HasValue)
+                properties = properties.Where(n => n.Rent <= model.MaxRent.Value);
 
-            if (propertyFilters.MinPremium.HasValue)
-                properties = properties.Where(n => n.Premium >= propertyFilters.MinPremium.Value);
-            if (propertyFilters.MaxPremium.HasValue)
-                properties = properties.Where(n => n.Premium <= propertyFilters.MaxPremium.Value);
+            if (model.MinPremium.HasValue)
+                properties = properties.Where(n => n.Premium >= model.MinPremium.Value);
+            if (model.MaxPremium.HasValue)
+                properties = properties.Where(n => n.Premium <= model.MaxPremium.Value);
 
-            if (propertyFilters.MinPrice.HasValue)
-                properties = properties.Where(n => n.AskingPrice >= propertyFilters.MinPrice.Value);
-            if (propertyFilters.MaxPrice.HasValue)
-                properties = properties.Where(n => n.AskingPrice <= propertyFilters.MaxPrice.Value);
+            if (model.MinPrice.HasValue)
+                properties = properties.Where(n => n.AskingPrice >= model.MinPrice.Value);
+            if (model.MaxPrice.HasValue)
+                properties = properties.Where(n => n.AskingPrice <= model.MaxPrice.Value);
 
             // search the collection
-            if (!string.IsNullOrEmpty(propertyFilters.Search))
+            if (!string.IsNullOrEmpty(model.Search))
             {
 
-                string[] searchTerms = propertyFilters.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 properties = properties.Where(n => searchTerms.Any(s => n.Title != null && n.Title.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Address1 != null && n.Address1.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Address2 != null && n.Address2.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -170,9 +121,9 @@ namespace Hood.Services
             }
 
             // sort the collection and then output it.
-            if (!string.IsNullOrEmpty(propertyFilters.Order))
+            if (!string.IsNullOrEmpty(model.Order))
             {
-                switch (propertyFilters.Order)
+                switch (model.Order)
                 {
                     case "name":
                     case "title":
@@ -227,161 +178,129 @@ namespace Hood.Services
                         break;
                 }
             }
-            return properties;
-        }
-        public async Task<PropertySearchModel> GetPagedProperties(PropertySearchModel model, bool published = true)
-        {
-            var propertiesQuery = GetProperties(model, published);
-            await model.ReloadAsync(propertiesQuery);
+
+            await model.ReloadAsync(properties);
             return model;
         }
-        public Task<List<MapMarker>> GetLocations(PropertySearchModel filters)
+        public async Task<List<MapMarker>> GetLocationsAsync(PropertyListModel filters)
         {
-            var propertiesQuery = GetProperties(filters, true);
-            return propertiesQuery.AsNoTracking().Select(p =>
-                new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(),p.Url, p.FeaturedImage.Url)
-            ).ToListAsync();
-
-
+            var propertiesQuery = await GetPropertiesAsync(filters);
+            return propertiesQuery.List.Select(p =>
+                new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(), p.Url, p.FeaturedImage.Url)
+            ).ToList();
         }
-        public OperationResult<PropertyListing> UpdateProperty(PropertyListing property)
+        public async Task<PropertyListModel> GetFeaturedAsync()
         {
-            try
+            string cacheKey = typeof(PropertyListModel) + ".Featured";
+            if (_cache.TryGetValue(cacheKey, out PropertyListModel properties))
+                return properties;
+            else
             {
-                var changes = _db.Update(property);
-                _db.SaveChanges();
-                _db.Entry(property).State = EntityState.Detached;
-                ClearPropertyCache(property.Id);
-                return new OperationResult<PropertyListing>(property);
-            }
-            catch (DbUpdateException ex)
-            {
-                return new OperationResult(ex) as OperationResult<PropertyListing>;
+                properties = await GetPropertiesAsync(new PropertyListModel() { Featured = true, PageSize = int.MaxValue });
+                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                return properties;
             }
         }
-        public void ClearField(int id, string field)
+        public async Task<PropertyListModel> GetRecentAsync()
+        {
+            string cacheKey = typeof(PropertyListModel) + ".Recent";
+            if (_cache.TryGetValue(cacheKey, out PropertyListModel properties))
+                return properties;
+            else
+            {
+                properties = await GetPropertiesAsync(new PropertyListModel() { PageSize = int.MaxValue, Order = "DateDesc" });
+                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                return properties;
+            }
+        }
+        public async Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false)
+        {
+            string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
+            if (_cache.TryGetValue(cacheKey, out PropertyListing property) && !nocache)
+                return property;
+            else
+            {
+                property = await _db.Properties
+                    .Include(p => p.Media)
+                    .Include(p => p.FloorPlans)
+                    .Include(p => p.Agent)
+                    .Include(p => p.Metadata)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                return property;
+            }
+        }
+        public async Task<PropertyListing> AddAsync(PropertyListing property)
+        {
+            _db.Properties.Add(property);
+            await _db.SaveChangesAsync();
+            return property;
+        }
+        public async Task UpdateAsync(PropertyListing property)
+        {
+            _db.Update(property);
+            await _db.SaveChangesAsync();
+            _db.Entry(property).State = EntityState.Detached;
+            ClearPropertyCache(property.Id);
+        }
+        public async Task SetStatusAsync(int id, ContentStatus status)
+        {
+            PropertyListing property = _db.Properties.Where(p => p.Id == id).FirstOrDefault();
+            property.Status = status;
+            await _db.SaveChangesAsync();
+            ClearPropertyCache(property.Id);
+        }
+        public async Task DeleteAsync(int id)
+        {
+            PropertyListing property = _db.Properties.Include(p => p.Media).Where(p => p.Id == id).FirstOrDefault();
+            _db.Entry(property).State = EntityState.Deleted;
+            await _db.SaveChangesAsync();
+            ClearPropertyCache(id);
+        }
+        public async Task DeleteAllAsync()
+        {
+            _db.Properties.ForEach(p =>
+            {
+                _db.Entry(p).State = EntityState.Deleted;
+            });
+            await _db.SaveChangesAsync();
+            ClearPropertyCache();
+        }
+        #endregion
+
+        #region Direct Field Editing
+        public async Task ClearFieldAsync(int id, string field)
         {
             PropertyListing property = _db.Properties.FirstOrDefault(c => c.Id == id);
             _db.Entry(property).Property(field).CurrentValue = null;
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             ClearPropertyCache(id);
         }
-        public OperationResult<PropertyListing> SetStatus(int id, Status status)
-        {
-            try
-            {
-                PropertyListing property = _db.Properties.Where(p => p.Id == id).FirstOrDefault();
-                property.Status = (int)status;
-                _db.SaveChanges();
-                ClearPropertyCache(property.Id);
-                return new OperationResult<PropertyListing>(property);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message) as OperationResult<PropertyListing>;
-            }
-        }
-        public async Task<OperationResult> DeleteAll()
-        {
-            try
-            {
-                _db.Properties.ForEach(p =>
-                {
-                    _db.Entry(p).State = EntityState.Deleted;
-                });
-                await _db.SaveChangesAsync();
-                ClearPropertyCache();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message);
-            }
-        }
-        public async Task<OperationResult<PropertyListing>> AddImage(PropertyListing property, PropertyMedia media)
-        {
-            try
-            {
-                if (property.Media == null)
-                    property.Media = new List<PropertyMedia>();
-                property.Media.Add(media);
-                _db.Media.Add(new MediaObject(media));
-                _db.Properties.Update(property);
-                await _db.SaveChangesAsync();
-                ClearPropertyCache(property.Id);
-                return new OperationResult<PropertyListing>(property);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message) as OperationResult<PropertyListing>;
-            }
-        }
-        public async Task<OperationResult<PropertyListing>> AddFloorplan(PropertyListing property, PropertyFloorplan media)
-        {
-            try
-            {
-                if (property.FloorPlans == null)
-                    property.FloorPlans = new List<PropertyFloorplan>();
-                property.FloorPlans.Add(media);
-                _db.Media.Add(new MediaObject(media));
-                _db.Properties.Update(property);
-                await _db.SaveChangesAsync();
-                ClearPropertyCache(property.Id);
-                return new OperationResult<PropertyListing>(property);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message) as OperationResult<PropertyListing>;
-            }
-        }
-        public async Task<List<PropertyListing>> GetFeatured()
-        {
-            string cacheKey = typeof(PropertyListing) + ".Featured";
-            if (_cache.TryGetValue(cacheKey, out List<PropertyListing> properties))
-                return properties;
-            else
-            {
-                properties = await _db.Properties
-                    .Include(p => p.Media)
-                    .Include(p => p.FloorPlans)
-                    .Include(p => p.Agent)
-                    .Include(p => p.Metadata)
-                    .Where(c => c.Featured && c.Status == (int)Status.Published)
-                    .Take(20)
-                    .ToListAsync();
-                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
-                return properties;
-            }
-        }
-        public async Task<List<PropertyListing>> GetRecent()
-        {
-            string cacheKey = typeof(PropertyListing) + ".Recent";
-            if (_cache.TryGetValue(cacheKey, out List<PropertyListing> properties))
-                return properties;
-            else
-            {
-                properties = await _db.Properties
-                    .Include(p => p.Media)
-                    .Include(p => p.FloorPlans)
-                    .Include(p => p.Agent)
-                    .Include(p => p.Metadata)
-                    .Where(c => c.Status == (int)Status.Published)
-                    .OrderByDescending(p => p.LastEditedOn)
-                    .ThenByDescending(p => p.CreatedOn)
-                    .Take(20)
-                    .ToListAsync();
-                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
-                return properties;
-            }
-        }
-        private void ClearPropertyCache(int? id = null)
-        {
-            _cache.Remove("Property:Featured");
-            _cache.Remove("Property:Recent");
-            if (id.HasValue)
-                _cache.Remove("Property:Listing:" + id.ToString());
-        }
+        #endregion
 
+        #region Media / Floor Plans
+        public async Task AddMediaAsync(PropertyListing property, PropertyMedia media)
+        {
+            if (property.Media == null)
+                property.Media = new List<PropertyMedia>();
+            property.Media.Add(media);
+            _db.Media.Add(new MediaObject(media));
+            _db.Properties.Update(property);
+            await _db.SaveChangesAsync();
+            ClearPropertyCache(property.Id);
+        }
+        public async Task AddFloorplanAsync(PropertyListing property, PropertyFloorplan media)
+        {
+            if (property.FloorPlans == null)
+                property.FloorPlans = new List<PropertyFloorplan>();
+            property.FloorPlans.Add(media);
+            _db.Media.Add(new MediaObject(media));
+            _db.Properties.Update(property);
+            await _db.SaveChangesAsync();
+            ClearPropertyCache(property.Id);
+        }
         public async Task<PropertyListing> RemoveMediaAsync(int id, int mediaId)
         {
             var property = await _db.Properties.Include(p => p.Media).SingleOrDefaultAsync(p => p.Id == id);
@@ -391,7 +310,6 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return property;
         }
-
         public async Task<PropertyListing> RemoveFloorplanAsync(int id, int mediaId)
         {
             var property = await _db.Properties.Include(p => p.FloorPlans).SingleOrDefaultAsync(p => p.Id == id);
@@ -401,12 +319,24 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return property;
         }
+        #endregion
 
-        public object GetStatistics()
+        #region Cache
+        private void ClearPropertyCache(int? id = null)
         {
-            var totalPosts = _db.Properties.Count();
-            var totalPublished = _db.Properties.Where(c => c.Status == (int)Status.Published && c.PublishDate < DateTime.Now).Count();
-            var data = _db.Properties.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToList();
+            _cache.Remove("Property:Featured");
+            _cache.Remove("Property:Recent");
+            if (id.HasValue)
+                _cache.Remove("Property:Listing:" + id.ToString());
+        }
+        #endregion
+
+        #region Statistics
+        public async Task<object> GetStatisticsAsync()
+        {
+            var totalPosts = await _db.Properties.CountAsync();
+            var totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
+            var data = await _db.Properties.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
@@ -441,6 +371,6 @@ namespace Hood.Services
 
             return new { totalPosts, totalPublished, days, months, publishDays, publishMonths };
         }
-
+        #endregion
     }
 }

@@ -8,16 +8,18 @@ namespace Hood.ViewModels
 {
     public class SubscriptionSearchModel : PagedList<Subscription>, IPageableModel
     {
-        [FromQuery(Name = "sort")]
-        public string Order { get; set; }
-        [FromQuery(Name = "search")]
-        public string Search { get; set; }
+        [FromQuery(Name = "category")]
+        public string Category { get; set; }
+        [FromQuery(Name = "addon")]
+        public bool Addon { get; set; }
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
+            var query = base.GetPageUrl(pageIndex);
+            query += Category.IsSet() ? "&category=" + Category : "";
             query += Search.IsSet() ? "&search=" + Search : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
+            query += Order.IsSet() ? "&order=" + Order : "";
+            query += Addon ? "&addon=true" : "";
             return query;
         }
 

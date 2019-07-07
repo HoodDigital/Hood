@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
@@ -18,14 +19,14 @@ namespace Hood.Controllers
 
         public ActionResult Index()
         {
-            var user = _account.GetCurrentUser(false);
+            var user = _account.GetCurrentUserAsync(false);
             return View(user);
         }
 
         [HttpGet]
-        public List<Address> Get()
+        public async Task<List<Address>> Get()
         {
-            var user = _account.GetCurrentUser();
+            var user =await _account.GetCurrentUserAsync();
             return user.Addresses;
         }
 
@@ -38,7 +39,7 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Address address)
+        public async Task<IActionResult> Create(Address address)
         {
             try
             {
@@ -49,17 +50,17 @@ namespace Hood.Controllers
                     address.SetLocation(location.Coordinates);
                 }
 
-                var user = _account.GetCurrentUser(false);
+                var user = await _account.GetCurrentUserAsync(false);
                 address.UserId = user.Id;
                 user.Addresses.Add(address);
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
 
                 if (user.BillingAddress == null)
                     user.BillingAddress = address.CloneTo<Address>();
                 if (user.DeliveryAddress == null)
                     user.DeliveryAddress = address.CloneTo<Address>();
 
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
 
                 return Json(new Response(true));
             }
@@ -69,13 +70,13 @@ namespace Hood.Controllers
             }
         }
 
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            return View(_account.GetAddressById(id));
+            return View(await _account.GetAddressByIdAsync(id));
         }
 
         [HttpPost]
-        public IActionResult Edit(Address address)
+        public async Task<IActionResult> EditAsync(Address address)
         {
             try
             {
@@ -86,7 +87,7 @@ namespace Hood.Controllers
                     address.SetLocation(location.Coordinates);
                 }
 
-                OperationResult result = _account.UpdateAddress(address);
+                await _account.UpdateAddressAsync(address);
                 return Json(new Response(true));
             }
             catch (Exception ex)
@@ -96,49 +97,46 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(int id)
+        public async Task<Response> DeleteAsync(int id)
         {
             try
             {
-                OperationResult result = _account.DeleteAddress(id);
-                if (result.Succeeded)
-                    return Json(new { success = true });
-                else
-                    throw new Exception(result.ErrorString);
+                await _account.DeleteAddressAsync(id);
+                return new Response(true);
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message });
+                return new Response(ex);
             }
         }
 
         [HttpPost]
-        public ActionResult SetBilling(int id)
+        public async Task<Response> SetBillingAsync(int id)
         {
             try
             {
                 string userId = _userManager.GetUserId(User);
-                OperationResult result = _account.SetBillingAddress(userId, id);
-                return Json(new { success = true });
+                await _account.SetBillingAddressAsync(userId, id);
+                return new Response(true);
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message });
+                return new Response(ex);
             }
         }
 
         [HttpPost]
-        public ActionResult SetDelivery(int id)
+        public async Task<Response> SetDeliveryAsync(int id)
         {
             try
             {
                 string userId = _userManager.GetUserId(User);
-                OperationResult result = _account.SetDeliveryAddress(userId, id);
-                return Json(new { success = true });
+                await _account.SetDeliveryAddressAsync(userId, id);
+                return new Response(true);
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message });
+                return new Response(ex);
             }
         }
     }

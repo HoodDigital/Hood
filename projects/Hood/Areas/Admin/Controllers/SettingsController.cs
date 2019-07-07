@@ -7,6 +7,7 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -185,7 +186,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/settings/content/")]
-        public IActionResult Content(ContentSettings model)
+        public async Task<IActionResult> ContentAsync(ContentSettings model)
         {
             try
             {
@@ -194,7 +195,7 @@ namespace Hood.Areas.Admin.Controllers
                 Engine.Settings.Set(model);
 
                 // refresh all content metas and things
-                _content.RefreshAllMetas();
+                await _content.RefreshAllMetasAsync();
 
 
                 SaveMessage = "Settings saved!";
@@ -209,17 +210,17 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/content/reset/")]
-        public IActionResult ResetContent()
+        public async Task<IActionResult> ResetContentAsync()
         {
             var model = new ContentSettings();
             Engine.Settings.Set(model);
             // refresh all content metas and things
-            _content.RefreshAllMetas();
+            await _content.RefreshAllMetasAsync();
             return RedirectWithResetMessage("Content");
         }
 
         [Route("admin/settings/content/add-type/")]
-        public IActionResult AddContentType()
+        public async Task<IActionResult> AddContentTypeAsync()
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;
@@ -264,7 +265,7 @@ namespace Hood.Areas.Admin.Controllers
             Engine.Settings.Set(model);
 
             // refresh all content metas and things
-            _content.RefreshAllMetas();
+            await _content.RefreshAllMetasAsync();
 
             MessageType = AlertType.Success;
             SaveMessage = "Created successfully.";
@@ -273,7 +274,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/content/delete-type/")]
-        public IActionResult DeleteContentType(string type)
+        public async Task<IActionResult> DeleteContentTypeAsync(string type)
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;
@@ -295,7 +296,7 @@ namespace Hood.Areas.Admin.Controllers
             Engine.Settings.Set(model);
 
             // refresh all content metas and things
-            _content.RefreshAllMetas();
+            await _content.RefreshAllMetasAsync();
 
             MessageType = AlertType.Info;
             SaveMessage = "Deleted successfully.";
@@ -550,8 +551,11 @@ namespace Hood.Areas.Admin.Controllers
             if (model == null)
                 model = new ForumSettings();
             model.AddEditorMessage(status);
-            model.Subscriptions = await _account.GetSubscriptionPlansAsync();
-            model.Roles = _account.GetAllRoles();
+
+            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            model.Subscriptions = subs.List;
+
+            model.Roles = await _account.GetAllRolesAsync();
             return View(model);
         }
         [HttpPost]
@@ -569,8 +573,10 @@ namespace Hood.Areas.Admin.Controllers
                 SaveMessage = "An error occurred while saving: " + ex.Message;
                 MessageType = Enums.AlertType.Danger;
             }
-            model.Subscriptions = await _account.GetSubscriptionPlansAsync();
-            model.Roles = _account.GetAllRoles();
+            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            model.Subscriptions = subs.List;
+
+            model.Roles = await _account.GetAllRolesAsync();
             return View(model);
         }
 

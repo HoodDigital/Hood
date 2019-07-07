@@ -2,6 +2,7 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Hood.Services
@@ -41,73 +43,56 @@ namespace Hood.Services
             _billing = billing;
         }
 
-        [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
-        public AccountInfo LoadAccountInfo(string userId) => throw new NotImplementedException();
-
         #region User Get/Update/Delete
-
-        public ApplicationUser GetUserById(string userId, bool track = true)
+        private IQueryable<ApplicationUser> UserQuery
         {
-            if (string.IsNullOrEmpty(userId))
+            get
+            {
+                var query = _db.Users
+                    .Include(u => u.Addresses)
+                    .Include(u => u.AccessCodes)
+                    .Include(u => u.Subscriptions).ThenInclude(u => u.Subscription);
+                return query;
+            }
+        }
+        public async Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true)
+        {
+            if (id.IsSet())
                 return null;
-            ApplicationUser user;
-            var userQ = _db.Users.Include(u => u.Addresses)
-                                   .Include(u => u.AccessCodes)
-                                   .Include(u => u.Subscriptions)
-                                   .ThenInclude(u => u.Subscription)
-                                   .Where(u => u.Id == userId);
+            var query = UserQuery;
             if (!track)
-                userQ = userQ.AsNoTracking();
-            user = userQ.FirstOrDefault();
-            return user;
+                query = query.AsNoTracking();
+            return await query.SingleOrDefaultAsync(u => u.Id == id);
         }
-        public ApplicationUser GetUserByEmail(string email, bool track = true)
+        public async Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true)
         {
-            if (string.IsNullOrEmpty(email))
+            if (email.IsSet())
                 return null;
-            ApplicationUser user;
-            var userQ = _db.Users.Include(u => u.Addresses)
-                                   .Include(u => u.AccessCodes)
-                                   .Include(u => u.Subscriptions)
-                                   .ThenInclude(u => u.Subscription)
-                                   .Where(u => u.Email == email);
+            var query = UserQuery;
             if (!track)
-                userQ = userQ.AsNoTracking();
-            user = userQ.FirstOrDefault();
-            return user;
+                query = query.AsNoTracking();
+            return await query.SingleOrDefaultAsync(u => u.Email == email);
         }
-        public async Task<ApplicationUser> GetUserByStripeId(string stripeId)
+        public async Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true)
         {
-            if (string.IsNullOrEmpty(stripeId))
+            if (stripeId.IsSet())
                 return null;
-            ApplicationUser user;
-            user = await _db.Users.Include(u => u.Addresses)
-                                     .Include(u => u.AccessCodes)
-                                      .Include(u => u.Subscriptions)
-                                      .ThenInclude(u => u.Subscription)
-                                      .Where(u => u.StripeId == stripeId).FirstOrDefaultAsync();
-            return user;
+            var query = UserQuery;
+            if (!track)
+                query = query.AsNoTracking();
+            return await query.SingleOrDefaultAsync(u => u.StripeId == stripeId);
         }
-        public ApplicationUser GetCurrentUser(bool track = true)
+        public async Task<ApplicationUser> GetCurrentUserAsync(bool track = true)
         {
             if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
-                return GetUserById(_userManager.GetUserId(_contextAccessor.HttpContext.User), track);
+                return await GetUserByIdAsync(_userManager.GetUserId(_contextAccessor.HttpContext.User), track);
             else
                 return null;
         }
-        public OperationResult UpdateUser(ApplicationUser user)
+        public async Task UpdateUserAsync(ApplicationUser user)
         {
-            try
-            {
-                _db.Update(user);
-                _db.SaveChanges();
-
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            _db.Update(user);
+            await _db.SaveChangesAsync();
         }
         public async Task DeleteUserAsync(ApplicationUser user)
         {
@@ -128,7 +113,7 @@ namespace Hood.Services
                 await _userManager.RemoveClaimAsync(user, claim);
             }
 
-            var userSubs = GetUserById(user.Id);
+            var userSubs = await GetUserByIdAsync(user.Id);
             if (userSubs.Subscriptions != null)
             {
                 if (userSubs.Subscriptions.Count > 0)
@@ -157,132 +142,157 @@ namespace Hood.Services
                         }
                     }
                     userSubs.Subscriptions.Clear();
-                    UpdateUser(userSubs);
+                    await UpdateUserAsync(userSubs);
                 }
             }
             await _db.SaveChangesAsync();
             await _userManager.DeleteAsync(user);
             return;
         }
-
         #endregion
 
         #region Profiles 
-
-        public async Task<IUserProfile> GetProfileAsync(string id)
+        public async Task<UserProfile> GetProfileAsync(string id)
         {
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(u => u.Id == id);
             return profile;
         }
-        public async Task<Response> UpdateProfileAsync(IUserProfile user)
+        public async Task UpdateProfileAsync(UserProfile user)
         {
-            try
-            {
-                var userToUpdate = await _db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+            var userToUpdate = await _db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
 
-                userToUpdate.Profile = user;
+            foreach (PropertyInfo property in typeof(IUserProfile).GetProperties())
+                property.SetValue(userToUpdate, property.GetValue(user));
 
-                _db.Update(userToUpdate);
-                _db.SaveChanges();
+            foreach (PropertyInfo property in typeof(IName).GetProperties())
+                property.SetValue(userToUpdate, property.GetValue(user));
 
-                return new Response(true);
-            }
-            catch (Exception ex)
-            {
-                return new Response(ex);
-            }
+            foreach (PropertyInfo property in typeof(IAvatar).GetProperties())
+                property.SetValue(userToUpdate, property.GetValue(user));
+
+            foreach (PropertyInfo property in typeof(IJsonMetadata).GetProperties())
+                property.SetValue(userToUpdate, property.GetValue(user));
+
+            _db.Update(userToUpdate);
+            _db.SaveChanges();
         }
         #endregion
 
-        public void ResetBillingInfo()
+        #region Roles
+        public async Task<IList<IdentityRole>> GetAllRolesAsync()
         {
-            var user = GetCurrentUser();
-            user.StripeId = null;
-            UpdateUser(user);
+#warning TODO: Cache this method.
+            return await _db.Roles.ToListAsync();
         }
-
-        #region Addresses
-
-        public IList<IdentityRole> GetAllRoles()
-        {
-            return _db.Roles.ToList();
-        }
-
         #endregion
 
         #region Addresses
-
-        public Models.Address GetAddressById(int id)
+        public async Task<Models.Address> GetAddressByIdAsync(int id)
         {
-            return _db.Addresses.Where(a => a.Id == id).FirstOrDefault();
+            return await _db.Addresses.Where(a => a.Id == id).FirstOrDefaultAsync();
         }
-        public OperationResult DeleteAddress(int id)
+        public async Task DeleteAddressAsync(int id)
         {
-            try
-            {
-                Models.Address address = _db.Addresses.Where(u => u.Id == id).FirstOrDefault();
-                _db.Entry(address).State = EntityState.Deleted;
-                OperationResult result = new OperationResult();
-                _db.SaveChanges();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex.Message);
-            }
+            var address = GetAddressByIdAsync(id);
+            _db.Entry(address).State = EntityState.Deleted;
+            await _db.SaveChangesAsync();
         }
-        public OperationResult UpdateAddress(Models.Address address)
+        public async Task UpdateAddressAsync(Models.Address address)
         {
-            try
-            {
-                _db.Update(address);
-                _db.SaveChanges();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            _db.Update(address);
+            await _db.SaveChangesAsync();
         }
-        public OperationResult SetBillingAddress(string userId, int id)
+        public async Task SetBillingAddressAsync(string userId, int id)
         {
-            try
-            {
-                var user = _db.Users.Include(u => u.Addresses).Where(u => u.Id == userId).FirstOrDefault();
-                var add = user.Addresses.SingleOrDefault(a => a.Id == id);
-                if (add != null)
-                    user.BillingAddress = add.CloneTo<Models.Address>();
-                _db.Update(user);
-                _db.SaveChanges();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            var user = await GetUserByIdAsync(userId);
+            var add = user.Addresses.SingleOrDefault(a => a.Id == id);
+            if (add != null)
+                user.BillingAddress = add.CloneTo<Models.Address>();
+            await UpdateUserAsync(user);
         }
-
-        public OperationResult SetDeliveryAddress(string userId, int id)
+        public async Task SetDeliveryAddressAsync(string userId, int id)
         {
-            try
-            {
-                var user = _db.Users.Include(u => u.Addresses).Where(u => u.Id == userId).FirstOrDefault();
-                var add = user.Addresses.SingleOrDefault(a => a.Id == id);
-                if (add != null)
-                    user.DeliveryAddress = add.CloneTo<Models.Address>();
-                _db.Update(user);
-                _db.SaveChanges();
-                return new OperationResult(true);
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult(ex);
-            }
+            var user = await GetUserByIdAsync(userId);
+            var add = user.Addresses.SingleOrDefault(a => a.Id == id);
+            if (add != null)
+                user.DeliveryAddress = add.CloneTo<Models.Address>();
+            await UpdateUserAsync(user);
         }
         #endregion
 
         #region Subscriptions
-        public async Task<Models.Subscription> AddSubscriptionPlan(Models.Subscription subscription)
+        public async Task<SubscriptionSearchModel> GetSubscriptionPlansAsync(SubscriptionSearchModel model = null)
+        {
+            IQueryable<Models.Subscription> query = _db.Subscriptions.Include(s => s.Features);
+
+            if (model == null)
+                model = new SubscriptionSearchModel();
+
+            // search the collection
+            if (!string.IsNullOrEmpty(model.Search))
+            {
+
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                query = query.Where(n => searchTerms.Any(s => n.Name != null && n.Name.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.Description != null && n.Description.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.StripeId != null && n.StripeId.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.StatementDescriptor != null && n.StatementDescriptor.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+            }
+
+
+            // sort the collection and then output it.
+            if (!string.IsNullOrEmpty(model.Order))
+            {
+                switch (model.Order)
+                {
+                    case "Title":
+                        query = query.OrderBy(n => n.Name);
+                        break;
+                    case "Date":
+                        query = query.OrderBy(n => n.Created);
+                        break;
+                    case "Price":
+                        query = query.OrderBy(n => n.Amount);
+                        break;
+
+                    case "TitleDesc":
+                        query = query.OrderByDescending(n => n.Name);
+                        break;
+                    case "DateDesc":
+                        query = query.OrderByDescending(n => n.Created);
+                        break;
+                    case "PriceDesc":
+                        query = query.OrderByDescending(n => n.Amount);
+                        break;
+
+                    default:
+                        query = query.OrderByDescending(n => n.Created).ThenBy(n => n.Id);
+                        break;
+                }
+            }
+
+            await model.ReloadAsync(query);
+
+            return model;
+        }
+        public async Task<Models.Subscription> GetSubscriptionPlanByIdAsync(int id)
+        {
+            Models.Subscription subscription = await _db.Subscriptions
+                                    .Include(s => s.Users)
+                                    .Include(s => s.Features)
+                                    .FirstOrDefaultAsync(c => c.Id == id);
+            return subscription;
+        }
+        public async Task<Models.Subscription> GetSubscriptionPlanByStripeIdAsync(string stripeId)
+        {
+            Models.Subscription subscription = await _db.Subscriptions
+                                .Include(s => s.Users)
+                                .Include(s => s.Features)
+                                .FirstOrDefaultAsync(c => c.StripeId == stripeId);
+
+            return subscription;
+        }
+        public async Task<Models.Subscription> AddSubscriptionPlanAsync(Models.Subscription subscription)
         {
             // try adding to stripe
             var myPlan = new PlanCreateOptions()
@@ -304,7 +314,18 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return subscription;
         }
-        public async Task DeleteSubscriptionPlan(int id)
+        public async Task UpdateSubscriptionAsync(Models.Subscription subscription)
+        {
+            var myPlan = new PlanUpdateOptions()
+            {
+                Nickname = subscription.Name
+            };
+            Plan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
+            _db.Update(subscription);
+            await _db.SaveChangesAsync();
+            return;
+        }
+        public async Task DeleteSubscriptionPlanAsync(int id)
         {
             Models.Subscription subscription = _db.Subscriptions.Where(p => p.Id == id).FirstOrDefault();
             try
@@ -318,114 +339,10 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return;
         }
-        public async Task<Models.Subscription> GetSubscriptionPlanById(int id)
-        {
-            Models.Subscription subscription = await _db.Subscriptions
-                                    .Include(s => s.Users)
-                                    .Include(s => s.Features)
-                                    .FirstOrDefaultAsync(c => c.Id == id);
-            return subscription;
-        }
-        public async Task<Models.Subscription> GetSubscriptionPlanByStripeId(string stripeId)
-        {
-            Models.Subscription subscription = await _db.Subscriptions
-                                .Include(s => s.Users)
-                                .Include(s => s.Features)
-                                .FirstOrDefaultAsync(c => c.StripeId == stripeId);
-
-            return subscription;
-        }
-        private IQueryable<Models.Subscription> GetSubscriptionPlans(string search = "", string sort = "", bool includeUsers = false)
-        {
-            IQueryable<Models.Subscription> subscriptions = _db.Subscriptions.Include(s => s.Features);
-
-            if (includeUsers)
-                subscriptions = subscriptions.Include(s => s.Users);
-
-            // search the collection
-            if (!string.IsNullOrEmpty(search))
-            {
-
-                string[] searchTerms = search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                subscriptions = subscriptions.Where(n => searchTerms.Any(s => n.Name != null && n.Name.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Description != null && n.Description.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.StripeId != null && n.StripeId.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.StatementDescriptor != null && n.StatementDescriptor.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
-            }
-
-
-            // sort the collection and then output it.
-            if (!string.IsNullOrEmpty(sort))
-            {
-                switch (sort)
-                {
-                    case "title":
-                        subscriptions = subscriptions.OrderBy(n => n.Name);
-                        break;
-                    case "date":
-                        subscriptions = subscriptions.OrderBy(n => n.Created);
-                        break;
-                    case "price":
-                        subscriptions = subscriptions.OrderBy(n => n.Amount);
-                        break;
-
-                    case "title+desc":
-                        subscriptions = subscriptions.OrderByDescending(n => n.Name);
-                        break;
-                    case "date+desc":
-                        subscriptions = subscriptions.OrderByDescending(n => n.Created);
-                        break;
-                    case "price+desc":
-                        subscriptions = subscriptions.OrderByDescending(n => n.Amount);
-                        break;
-
-                    default:
-                        subscriptions = subscriptions.OrderByDescending(n => n.Created).ThenBy(n => n.Id);
-                        break;
-                }
-            }
-            return subscriptions;
-        }
-        public async Task<List<Models.Subscription>> GetSubscriptionPlansAsync()
-        {
-            return await GetSubscriptionPlans().ToListAsync();
-        }
-        public async Task<List<Models.Subscription>> GetSubscriptionPlanLevels(string category = null)
-        {
-            var subs = GetSubscriptionPlans().Where(s => s.Public && !s.Addon);
-            if (category.IsSet())
-            {
-                subs = subs.Where(s => s.Category == category);
-            }
-            return await subs.OrderBy(s => s.Level).ToListAsync();
-        }
-        public async Task<List<Models.Subscription>> GetSubscriptionPlanAddons()
-        {
-            return await GetSubscriptionPlans().Where(s => s.Public && s.Addon).ToListAsync();
-        }
-        public async Task<SubscriptionSearchModel> GetPagedSubscriptionPlans(SubscriptionSearchModel model)
-        {
-            var subs = await GetSubscriptionPlans(model.Search, model.Order, true).ToListAsync();
-            model.List = subs;
-            return model;
-        }
-        public async Task UpdateSubscription(Models.Subscription subscription)
-        {
-            var myPlan = new PlanUpdateOptions()
-            {
-                Nickname = subscription.Name
-            };
-            Plan response = await _billing.Stripe.PlanService.UpdateAsync(subscription.StripeId, myPlan);
-            _db.Update(subscription);
-            await _db.SaveChangesAsync();
-            return;
-        }
-
         #endregion
 
         #region Stripe customer object
-
-        public async Task<Customer> LoadCustomerObject(string stripeId, bool allowNullObject)
+        public async Task<Customer> LoadCustomerObjectAsync(string stripeId, bool allowNullObject)
         {
             // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
             if (stripeId.IsSet())
@@ -434,14 +351,14 @@ namespace Hood.Services
                     var customer = await _billing.Customers.FindByIdAsync(stripeId);
                     if (customer.Deleted.HasValue && customer.Deleted.Value)
                     {
-                        ResetBillingInfo();
+                        await ResetBillingInfoAsync();
                         customer = null;
                     }
                     if (customer == null)
                         if (!allowNullObject)
                             throw new Exception(BillingMessage.NoCustomerObject.ToString());
                         else
-                            ResetBillingInfo();
+                            await ResetBillingInfoAsync();
                     return customer;
                 }
                 catch (StripeException)
@@ -457,25 +374,30 @@ namespace Hood.Services
             else
                 throw new Exception(BillingMessage.NoStripeId.ToString());
         }
-
+        private async Task ResetBillingInfoAsync()
+        {
+            var user = await GetCurrentUserAsync();
+            user.StripeId = null;
+            await UpdateUserAsync(user);
+        }
         #endregion
 
         #region User Subscriptions
-        private IQueryable<ApplicationUser> GetSubscribers(string subcription, string search = "", string sort = "")
+        public async Task<UserSubscriptionListModel> GetUserSubscriptionsAsync(UserSubscriptionListModel model)
         {
             IQueryable<ApplicationUser> users = _db.Users
                 .Include(u => u.Subscriptions).ThenInclude(u => u.Subscription);
 
-            if (subcription.IsSet())
-                users = users.Where(u => u.Subscriptions.Any(s => s.Subscription.StripeId == subcription && (s.Status == "trialing" || s.Status == "active")));
+            if (model.Subscription.IsSet())
+                users = users.Where(u => u.Subscriptions.Any(s => s.Subscription.StripeId == model.Subscription && (s.Status == "trialing" || s.Status == "active")));
             else
                 users = users.Where(u => u.Subscriptions.Any(s => s.Status == "trialing" || s.Status == "active"));
 
             // search the collection
-            if (!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(model.Search))
             {
 
-                string[] searchTerms = search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 users = users.Where(n => searchTerms.Any(s => n.FirstName != null && n.FirstName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.LastName != null && n.LastName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.StripeId != null && n.StripeId.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -484,9 +406,9 @@ namespace Hood.Services
 
 
             // sort the collection and then output it.
-            if (!string.IsNullOrEmpty(sort))
+            if (!string.IsNullOrEmpty(model.Order))
             {
-                switch (sort)
+                switch (model.Order)
                 {
                     case "UserName":
                         users = users.OrderBy(n => n.UserName);
@@ -516,27 +438,22 @@ namespace Hood.Services
                         break;
                 }
             }
-            return users;
-        }
-        public async Task<SubscriberSearchModel> GetPagedSubscribers(SubscriberSearchModel model)
-        {
-            var subs = await GetSubscribers(model.Subscription, model.Search, model.Order).ToListAsync();
-            model.List = subs;
+            await model.ReloadAsync(users);
             return model;
         }
-        public async Task<UserSubscription> CreateUserSubscription(int planId, string stripeToken, string cardId)
+        public async Task<UserSubscription> CreateUserSubscriptionAsync(int planId, string stripeToken, string cardId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            ApplicationUser user = await GetCurrentUserAsync();
 
             // Load the subscription plan.
-            Models.Subscription subscription = await GetSubscriptionPlanById(planId);
+            Models.Subscription subscription = await GetSubscriptionPlanByIdAsync(planId);
 
             // Get the stripe subscription plan object.
             Plan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
 
             // Check for customer or throw, but allow it to be null.
-            Customer customer = await LoadCustomerObject(user.StripeId, true);
+            Customer customer = await LoadCustomerObjectAsync(user.StripeId, true);
 
             // The object for the new user subscription to be recieved from stripe.
             Stripe.Subscription newSubscription = null;
@@ -576,7 +493,7 @@ namespace Hood.Services
                     // if it does not, create it, add the card and subscribe the plan.
                     customer = await _billing.Customers.CreateCustomer(user, stripeToken);
                     user.StripeId = customer.Id;
-                    var updateResult = UpdateUser(user);
+                    await UpdateUserAsync(user);
                     newSubscription = await _billing.Subscriptions.SubscribeUserAsync(user.StripeId, plan.Id);
                 }
                 else
@@ -606,7 +523,7 @@ namespace Hood.Services
                 throw new Exception(BillingMessage.Error.ToString());
 
             UserSubscription newUserSub = new UserSubscription();
-            newUserSub = UpdateUserSubscriptionFromStripe(newUserSub, newSubscription);
+            newUserSub = newUserSub.UpdateFromStripe(newSubscription);
             newUserSub.StripeId = newSubscription.Id;
             newUserSub.CustomerId = user.StripeId;
             newUserSub.UserId = user.Id;
@@ -615,22 +532,22 @@ namespace Hood.Services
             _db.SaveChanges();
             return newUserSub;
         }
-        public async Task<UserSubscription> UpdateUserSubscription(UserSubscription newUserSub)
+        public async Task<UserSubscription> UpdateUserSubscriptionAsync(UserSubscription newUserSub)
         {
             _db.Entry(newUserSub).State = EntityState.Modified;
             await _db.SaveChangesAsync();
             return newUserSub;
         }
-        public async Task<UserSubscription> UpgradeUserSubscription(int subscriptionId, int planId)
+        public async Task<UserSubscription> UpgradeUserSubscriptionAsync(int subscriptionId, int planId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            ApplicationUser user = await GetCurrentUserAsync();
 
-            Models.Subscription subscription = await GetSubscriptionPlanById(planId);
+            Models.Subscription subscription = await GetSubscriptionPlanByIdAsync(planId);
             UserSubscription userSub = GetUserSubscription(user, subscriptionId);
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
 
             if (customer.DefaultSourceId.IsSet() || customer.Sources?.Count() > 0)
             {
@@ -638,65 +555,64 @@ namespace Hood.Services
                 // Load the plan from stripe, then add to the user's subscription.
                 Stripe.Plan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
                 Stripe.Subscription sub = await _billing.Subscriptions.UpdateSubscriptionAsync(customer.Id, userSub.StripeId, plan);
-                userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
+                userSub = userSub.UpdateFromStripe(sub);
                 userSub.Subscription = subscription;
                 userSub.SubscriptionId = subscription.Id;
-                UpdateUser(user);
+                await UpdateUserAsync(user);
             }
             else
                 throw new Exception(BillingMessage.NoPaymentSource.ToString());
 
             return userSub;
         }
-        public async Task<UserSubscription> CancelUserSubscription(int userSubscriptionId)
+        public async Task<UserSubscription> CancelUserSubscriptionAsync(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
             Stripe.Subscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, true);
-            userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
-            UpdateUser(user);
+            userSub = userSub.UpdateFromStripe(sub);
+            await UpdateUserAsync(user);
             return userSub;
         }
-        public async Task<UserSubscription> RemoveUserSubscription(int userSubscriptionId)
+        public async Task<UserSubscription> RemoveUserSubscriptionAsync(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
             Stripe.Subscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, false);
-            userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
-            UpdateUser(user);
+            userSub = userSub.UpdateFromStripe(sub);
+            await UpdateUserAsync(user);
             return userSub;
         }
-        public async Task<UserSubscription> ReactivateUserSubscription(int userSubscriptionId)
+        public async Task<UserSubscription> ReactivateUserSubscriptionAsync(int userSubscriptionId)
         {
             // Load user object and clear cache.
-            ApplicationUser user = GetCurrentUser();
+            ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObject(user.StripeId, false);
+            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
             Stripe.Subscription sub = await _billing.Subscriptions.FindById(user.StripeId, userSub.StripeId);
-            Stripe.SubscriptionUpdateOptions options = new Stripe.SubscriptionUpdateOptions();
 
             sub = await _billing.Subscriptions.UpdateSubscriptionAsync(customer.Id, sub.Id, sub.Plan);
-            userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
-            UpdateUser(user);
+            userSub = userSub.UpdateFromStripe(sub);
+            await UpdateUserAsync(user);
             return userSub;
         }
         #endregion
@@ -718,11 +634,10 @@ namespace Hood.Services
         }
         #endregion
 
-        #region WebHooks - ALL MUST RUN SYNCRONOUSLY
-        public string ConfirmSubscriptionObject(Stripe.Subscription created, DateTime? eventTime)
+        #region WebHooks
+        public async Task ConfirmSubscriptionObjectAsync(Stripe.Subscription created, DateTime? eventTime)
         {
-            StringWriter sw = new StringWriter();
-            ApplicationUser user = GetUserByStripeId(created.CustomerId).Result;
+            ApplicationUser user = await GetUserByStripeIdAsync(created.CustomerId);
             if (user == null)
                 throw new Exception($"Could not locate user from Stripe id: {created.CustomerId}");
 
@@ -733,20 +648,16 @@ namespace Hood.Services
             // Check the timestamp of the event, with the last update of the object
             // If this was updated last before the event, therefore the event is valid and should be applied.
             if (eventTime.HasValue && userSub.LastUpdated > eventTime)
-            {
-                return sw.ToString();
-            }
+                return;
 
-            userSub = UpdateUserSubscriptionFromStripe(userSub, created);
+            userSub = userSub.UpdateFromStripe(created);
             userSub.Confirmed = true;
-            _db.SaveChanges();
-
-            return sw.ToString();
+            userSub.LastUpdated = DateTime.Now;
+            await _db.SaveChangesAsync();
         }
-        public string UpdateSubscriptionObject(Stripe.Subscription updated, DateTime? eventTime)
+        public async Task UpdateSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime)
         {
-            StringWriter sw = new StringWriter();
-            ApplicationUser user = GetUserByStripeId(updated.CustomerId).Result;
+            ApplicationUser user = await GetUserByStripeIdAsync(updated.CustomerId);
             if (user == null)
                 throw new Exception($"Could not locate user from Stripe id: {updated.CustomerId}");
 
@@ -754,7 +665,7 @@ namespace Hood.Services
             if (userSub == null)
                 throw new Exception($"Could not locate user's subscription from Stripe id: {updated.Id}");
 
-            Models.Subscription plan = GetSubscriptionPlanByStripeId(updated.Plan.Id).Result;
+            Models.Subscription plan = await GetSubscriptionPlanByStripeIdAsync(updated.Plan.Id);
             if (plan == null)
                 throw new Exception($"Could not locate subscription plan object from Stripe id: {updated.Plan.Id}");
 
@@ -767,19 +678,15 @@ namespace Hood.Services
             // If this was updated last before the event, therefore the event is valid and should be applied.
 
             if (eventTime.HasValue && userSub.LastUpdated > eventTime)
-            {
-                return sw.ToString();
-            }
+                return;
 
-            userSub = UpdateUserSubscriptionFromStripe(userSub, updated);
-            _db.SaveChanges();
-
-            return sw.ToString();
+            userSub = userSub.UpdateFromStripe(updated);
+            userSub.LastUpdated = DateTime.Now;
+            await _db.SaveChangesAsync();
         }
-        public string RemoveUserSubscriptionObject(Stripe.Subscription deleted, DateTime? eventTime)
+        public async Task RemoveUserSubscriptionObjectAsync(Stripe.Subscription deleted, DateTime? eventTime)
         {
-            StringWriter sw = new StringWriter();
-            ApplicationUser user = GetUserByStripeId(deleted.CustomerId).Result;
+            ApplicationUser user = await GetUserByStripeIdAsync(deleted.CustomerId);
             if (user == null)
                 throw new Exception($"Could not locate user from Stripe id: {deleted.CustomerId}");
 
@@ -790,47 +697,29 @@ namespace Hood.Services
             // Check the timestamp of the event, with the last update of the object
             // If this was updated last before the event, therefore the event is valid and should be applied.
             if (eventTime.HasValue && userSub.LastUpdated > eventTime)
-            {
-                return sw.ToString();
-            }
-            userSub = UpdateUserSubscriptionFromStripe(userSub, deleted);
+                return;
+
+            userSub = userSub.UpdateFromStripe(deleted);
             userSub.Deleted = true;
             userSub.DeletedAt = DateTime.Now;
-            _db.SaveChanges();
-            return sw.ToString();
+            userSub.LastUpdated = DateTime.Now;
+            await _db.SaveChangesAsync();
         }
-        private UserSubscription UpdateUserSubscriptionFromStripe(UserSubscription userSubscription, Stripe.Subscription stripeSubscription)
+        public async Task<UserSubscription> GetUserSubscriptionByStripeIdAsync(string id)
         {
-            userSubscription.CancelAtPeriodEnd = stripeSubscription.CancelAtPeriodEnd;
-            userSubscription.CanceledAt = stripeSubscription.CanceledAt;
-            userSubscription.CurrentPeriodEnd = stripeSubscription.CurrentPeriodEnd;
-            userSubscription.CurrentPeriodStart = stripeSubscription.CurrentPeriodStart;
-            userSubscription.EndedAt = stripeSubscription.EndedAt;
-            userSubscription.Quantity = stripeSubscription.Quantity ?? 0;
-            userSubscription.Start = stripeSubscription.StartDate;
-            userSubscription.Status = stripeSubscription.Status;
-            userSubscription.TrialEnd = stripeSubscription.TrialEnd;
-            userSubscription.TrialStart = stripeSubscription.TrialStart;
-            userSubscription.Notes += DateTime.Now.ToShortDateString() + " at " + DateTime.Now.ToShortTimeString() + " Stripe.Event - Updated Subscription" + Environment.NewLine;
-            userSubscription.LastUpdated = DateTime.Now;
-            return userSubscription;
-        }
-        public UserSubscription FindUserSubscriptionByStripeId(string id)
-        {
-            UserSubscription userSub = _db.UserSubscriptions
-                                .Include(s => s.User)
-                                .Include(s => s.Subscription)
-                                .FirstOrDefault(c => c.StripeId == id);
-            return userSub;
+            return await _db.UserSubscriptions
+                .Include(s => s.User)
+                .Include(s => s.Subscription)
+                .SingleOrDefaultAsync(c => c.StripeId == id);
         }
         #endregion
 
         #region Statistics
-        public object GetStatistics()
+        public async Task<object> GetStatisticsAsync()
         {
-            var totalUsers = _db.Users.Count();
-            var totalAdmins = _userManager.GetUsersInRoleAsync("Admin").Result.Count;
-            var data = _db.Users.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month }).ToList();
+            var totalUsers = await _db.Users.CountAsync();
+            var totalAdmins = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
+            var data = await _db.Users.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
@@ -854,14 +743,13 @@ namespace Hood.Services
 
             return new { totalUsers, totalAdmins, days, months };
         }
-
-        public object GetSubscriptionStatistics()
+        public async Task<object> GetSubscriptionStatisticsAsync()
         {
-            var total = _db.UserSubscriptions.Count();
-            var trials = _db.UserSubscriptions.Where(c => c.Status == "trialing").Count();
-            var active = _db.UserSubscriptions.Where(c => c.Status == "active").Count();
+            var total = await _db.UserSubscriptions.CountAsync();
+            var trials = await _db.UserSubscriptions.Where(c => c.Status == "trialing").CountAsync();
+            var active = await _db.UserSubscriptions.Where(c => c.Status == "active").CountAsync();
 
-            var data = _db.UserSubscriptions.Where(c => c.Created.HasValue).Select(c => new { date = c.Created.Value.Date, month = c.Created.Value.Month }).ToList();
+            var data = await _db.UserSubscriptions.Where(c => c.Created.HasValue).Select(c => new { date = c.Created.Value.Date, month = c.Created.Value.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
@@ -883,9 +771,17 @@ namespace Hood.Services
                 months.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
             }
 
-
             return new { total, trials, active, days, months };
         }
         #endregion
+
+        #region Obsolete
+
+        [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
+        public AccountInfo LoadAccountInfo(string userId) => throw new NotImplementedException();
+
+        #endregion
     }
+
+
 }

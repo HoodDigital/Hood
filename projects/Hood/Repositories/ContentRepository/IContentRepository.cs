@@ -1,64 +1,87 @@
-﻿using Hood.Enums;
-using Hood.Infrastructure;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Hood.Enums;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Hood.Services
 {
     public interface IContentRepository
     {
-        // Content CRUD
-        Task<ContentModel> GetPagedContent(ContentModel model, bool publishedOnly = true);
-        List<Content> GetContentByType(string type, string categorySlug = null, bool publishedOnly = true);
-        Content GetContentByID(int id, bool clearCache = false, bool track = true);
-        OperationResult Add(Content content);
-        OperationResult Update(Content content);
-        OperationResult Delete(int id);
-        OperationResult<Content> SetStatus(int id, Status status);
-        Task<OperationResult> DeleteAll(string type);
-        Task<OperationResult<Content>> AddImage(Content content, ContentMedia contentMedia);
-        Content DuplicateContent(int id);
+        #region Content CRUD
+        Task<ContentModel> GetContentAsync(ContentModel model);
+        Task<Content> GetContentByIdAsync(int id, bool clearCache = false, bool track = true);
+        Task AddAsync(Content content);
+        Task UpdateAsync(Content content);
+        Task DeleteAsync(int id);
+        Task SetStatusAsync(int id, ContentStatus status);
+        Task DeleteAllAsync(string type);
+        #endregion
 
-        // Content Views
-        List<Content> GetRecent(string type, string categorySlug = null);
-        List<Content> GetFeatured(string type, string categorySlug = null);
-        ContentNeighbours GetNeighbourContent(int id, string type, string categorySlug = null);
+        #region Duplicate
+        Task<Content> DuplicateContentAsync(int id);
+        #endregion
 
-        // Other Content functions
+        #region Images
+        Task AddImageAsync(Content content, ContentMedia media);
+        #endregion
+
+        #region Content Views
+        Task<ContentModel> GetRecentAsync(string type, string category = null);
+        Task<ContentModel> GetFeaturedAsync(string type, string category = null);
+        Task<ContentNeighbours> GetNeighbourContentAsync(int id, string type, string category = null);
+        #endregion
+
+        #region Tags
+        Task<ContentTag> AddTagAsync(string value);
+        Task DeleteTagAsync(string value);
+        #endregion
+
+        #region Categories 
+        Task<ContentCategory> GetCategoryByIdAsync(int categoryId);
+        Task<IEnumerable<ContentCategory>> GetCategoriesAsync(int contentId);
+        Task<ContentCategory> AddCategoryAsync(string value, string type);
+        Task<ContentCategory> AddCategoryAsync(ContentCategory category);
+        Task DeleteCategoryAsync(int categoryId);
+        Task UpdateCategoryAsync(ContentCategory category);
+        Task AddCategoryToContentAsync(int contentId, int categoryId);
+        Task RemoveCategoryFromContentAsync(int contentId, int categoryId);
+        #endregion
+
+        #region Sitemap
+        // Sitemap
+        List<Content> GetPages(string category = null);
+        Task<string> GetSitemapDocumentAsync(IUrlHelper urlHelper);
+
+        #endregion
+
+        #region Metadata
         void UpdateTemplateMetas(Content content, List<string> newMetas);
-        void RefreshMetas(Content content);
-        void RefreshAllMetas();
+        Task RefreshMetasAsync(Content content);
+        Task RefreshAllMetasAsync();
         List<string> GetMetasForTemplate(string templateName, string folder);
-        bool CheckSlug(string slug, int? id = null);
+        #endregion
 
-        // Tags
-        Task<OperationResult<ContentTag>> AddTag(string value);
-        Task<OperationResult> DeleteTag(string value);
+        #region Helpers
+        Task<bool> CheckSlugAsync(string slug, int? id = null);
+        #endregion
 
-        // Categories
-        Task<ContentCategory> GetCategoryById(int categoryId);
-        IEnumerable<ContentCategory> GetCategories(int contentId);
-        Task<OperationResult<ContentCategory>> AddCategory(ContentCategory category);
-        Task<OperationResult<ContentCategory>> AddCategory(string value, string type);
-        Task<OperationResult> AddCategoryToContent(int contentId, int categoryId);
-        OperationResult RemoveCategoryFromContent(int contentId, int categoryId);
-        Task<OperationResult> DeleteCategory(int categoryId);
-        Task<OperationResult> UpdateCategory(ContentCategory model);
+        #region Statistics
+        Task<object> GetStatisticsAsync();
+        #endregion
 
-        // Sitemap Functions
-        List<SitemapPage> GetPages(string categorySlug = null, bool publishedOnly = true);
-        string GetSitemapDocument(IUrlHelper urlHelper);
-
-        // Non Content Related
-        Task<List<LinqToTwitter.Status>> GetTweets(string name, int count);
+        #region Obsoletes 
+        [Obsolete("Use List<Country> Country.AllCountries from now on.", true)]
         List<Country> AllCountries();
+        [Obsolete("Use static Country Country.GetCountry(string name) from now on.", true)]
         Country GetCountry(string name);
+        #endregion
 
-        //Stats
-        object GetStatistics();
-
+        #region LinqToTwitter
+        [Obsolete("No longer supported, should be loaded in theme if required. Will be removed in next version.", true)]
+        Task<List<LinqToTwitter.Status>> GetTweets(string name, int count = 6);
+        #endregion
     }
 }

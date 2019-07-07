@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -40,7 +41,7 @@ namespace Hood.Areas.Admin.Controllers
         [HttpPost]
         [Route("admin/property/import/blm/trigger")]
         [AllowAnonymous]
-        public IActionResult BlmPropertyImporterTrigger()
+        public async Task<IActionResult> BlmPropertyImporterTrigger()
         {
             var triggerAuth = Engine.Settings.Property.TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
@@ -59,7 +60,7 @@ namespace Hood.Areas.Admin.Controllers
             logWriter.WriteLine("Blm Importer Report: ");
             logWriter.Write(status.ToFormattedJson());
 
-            _env.WriteLogToFile<IPropertyImporter>(logWriter.ToString());
+            await _logService.AddLogAsync<ImportController>("Unauthorized API access attempt.", logWriter.ToString(), LogType.Warning);
 
             return StatusCode(401);
         }

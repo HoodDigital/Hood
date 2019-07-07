@@ -32,6 +32,7 @@ namespace Hood.Models
         #endregion
 
         #region IName 
+        [Display(Name = "Anonymous", Description = "If set, user will details will not show up in public areas of the site.")]
         public virtual bool Anonymous { get; set; }
         [NotMapped]
         public virtual string FullName { get; set; }
@@ -109,6 +110,17 @@ namespace Hood.Models
                     list.Add(key, value);
                 Metadata = list;
             }
+        }
+        #endregion
+
+        #region GDPR 
+        [NotMapped]
+        [PersonalData]
+        [Display(Name = "Marketing Emails", Description = "Whether or not you consent to marketing emails.")]
+        public virtual bool MarketingEmails
+        {
+            get { return this[nameof(MarketingEmails)] != null ? JsonConvert.DeserializeObject<bool>(this[nameof(MarketingEmails)]) : false; }
+            set { this[nameof(MarketingEmails)] = JsonConvert.SerializeObject(value); }
         }
         #endregion
 

@@ -6,32 +6,6 @@ using System;
 
 namespace Hood.Models
 {
-    [Obsolete("Use Hood.Models.Response from now on.", false)]
-    public class MediaResponse : Response
-    {
-        public MediaResponse(Array data, int count, string message = "Succeeded!")
-            : base(data, count, message)
-        { }
-        public MediaResponse(string errors)
-            : base(errors)
-        { }
-        public MediaResponse(bool success, string message = "Succeeded!")
-            : base(success, message)
-        { }
-        public MediaResponse(bool success, IMediaObject media)
-            : base(success)
-        {
-            Media = media;
-            Json = media.ToJson();
-        }
-        public MediaResponse(Exception ex)
-               : base(ex)
-        { }
-
-        public IMediaObject Media { get; set; }
-        public string Json { get; set; }
-    }
-
     public class Response
     {
         public Array Data { get; set; }
@@ -41,6 +15,7 @@ namespace Hood.Models
         public bool Success { get; set; }
         public string Url { get; set; }
         public Exception Exception { get; set; }
+        public IMediaObject Image { get; set; }
 
         public Response(Array data, int count, string message = "Succeeded!")
         {
@@ -50,9 +25,10 @@ namespace Hood.Models
             Count = count;
         }
 
-        public Response(string errors)
+        public Response(string errors, string message = "An error occurred!")
         {
             Success = false;
+            Message = message;
             Errors = errors;
         }
 
@@ -60,11 +36,20 @@ namespace Hood.Models
         {
             Success = success;
             Message = message;
+            Errors = message;
+        }
+        public Response(bool success, IMediaObject media, string message = "Succeeded!")
+        {
+            Success = success;
+            Message = message;
+            Errors = message;
+            Image = media;
         }
 
-        public Response(IEnumerable<IdentityError> errors)
+        public Response(IEnumerable<IdentityError> errors, string message = "An error occurred!")
         {
             Success = false;
+            Message = message;
             Errors = "";
             foreach (IdentityError err in errors)
             {
@@ -72,12 +57,12 @@ namespace Hood.Models
 
             }
         }
-        public Response(Exception ex)
+        public Response(Exception ex, string message = "An error occurred!")
         {
             Errors = ex.Message;
+            Message = message;
             Success = false;
             Exception = ex;
         }
     }
-
 }

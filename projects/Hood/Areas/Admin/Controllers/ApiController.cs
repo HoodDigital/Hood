@@ -93,8 +93,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.ApiKeys.Add(model);
                 await _db.SaveChangesAsync();
 
-                var response = new Response(true, "Created successfully.");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Created });
+                var response = new Response(true, "Created successfully.")
+                {
+                    Url = Url.Action("Index", new { message = EditorMessage.Created })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -117,8 +119,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.ApiKeys.Update(model);
                 await _db.SaveChangesAsync();
 
-                var response = new Response(true, "Activated successfully.");
-                response.Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Activated });
+                var response = new Response(true, "Activated successfully.")
+                {
+                    Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Activated })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -141,8 +145,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.ApiKeys.Update(model);
                 await _db.SaveChangesAsync();
 
-                var response = new Response(true, "Deactivated successfully.");
-                response.Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Deactivated });
+                var response = new Response(true, "Deactivated successfully.")
+                {
+                    Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Deactivated })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -165,8 +171,10 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
 
-                var response = new Response(true, "Deleted!");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                var response = new Response(true, "Deleted!")
+                {
+                    Url = Url.Action("Index", new { message = EditorMessage.Deleted })
+                };
                 return response;
             }
             catch (Exception ex)

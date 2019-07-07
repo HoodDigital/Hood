@@ -14,9 +14,6 @@ namespace Hood.ViewModels
             PageIndex = 1;
         }
 
-        public string Order { get; set; }
-        public string Search { get; set; }
-
         [FromQuery(Name = "userId")]
         public string UserId { get; set; }
         [FromQuery(Name = "logType")]
@@ -24,13 +21,11 @@ namespace Hood.ViewModels
         [FromQuery(Name = "source")]
         public string Source { get; set; }
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
-            query += Search.IsSet() ? "&search=" + Search : "";
+            var query = base.GetPageUrl(pageIndex);
             query += Source.IsSet() ? "&source=" + Source : "";
             query += LogType.HasValue ? "&logType=" + LogType : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
             query += UserId.IsSet() ? "&userId=" + UserId : "";
             return query;
         }

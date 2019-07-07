@@ -304,7 +304,7 @@ namespace Hood.Controllers
                 var keyGen = new KeyGenerator(true, true, true, false);
 
                 // check if the user is registered, if so forward to login, filling in the email address.
-                var user = _account.GetUserByEmail(model.Email);
+                var user = await _account.GetUserByEmailAsync(model.Email);
 
                 if (user == null)
                 {
@@ -363,7 +363,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual IActionResult Code(string uid, string returnUrl)
+        public virtual async Task<IActionResult> Code(string uid, string returnUrl)
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
@@ -382,7 +382,7 @@ namespace Hood.Controllers
             }
 
             // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
-            var user = _account.GetUserById(uid);
+            var user = await _account.GetUserByIdAsync(uid);
             if (!CheckForAccessCodes(user))
             {
                 // generate one with their account info, and re-display the code page.
@@ -395,7 +395,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public virtual IActionResult Code(EnterCodeViewModel model, string returnUrl)
+        public virtual async Task<IActionResult> Code(EnterCodeViewModel model, string returnUrl)
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
@@ -405,7 +405,7 @@ namespace Hood.Controllers
                 return RedirectToAction(nameof(Register), new { returnUrl });
 
             // check if they have a current valid code, if not forward them back to the create page to set up a new code.
-            var user = _account.GetUserById(model.UserId);
+            var user = await _account.GetUserByIdAsync(model.UserId);
             if (!CheckForAccessCodes(user))
             {
                 return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
@@ -425,7 +425,7 @@ namespace Hood.Controllers
                 {
                     // We found a matching code. Update the user as confirmed, and then redirect on to the complete setup page.
                     user.EmailConfirmed = true;
-                    _account.UpdateUser(user);
+                    await _account.UpdateUserAsync(user);
                     return RedirectWithReturnUrl("/account/finish?uid=" + user.Id, returnUrl);
                 }
             }
@@ -436,7 +436,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public virtual IActionResult Finish(string uid, string returnUrl)
+        public virtual async Task<IActionResult> Finish(string uid, string returnUrl)
         {
             var accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
@@ -455,7 +455,7 @@ namespace Hood.Controllers
             }
 
             // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
-            var user = _account.GetUserById(uid);
+            var user = await _account.GetUserByIdAsync(uid);
             if (!user.EmailConfirmed)
             {
                 // generate one with their account info, and re-display the code page.
@@ -480,7 +480,7 @@ namespace Hood.Controllers
                     return RedirectToAction(nameof(Register), new { returnUrl });
 
                 // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
-                var user = _account.GetUserById(model.UserId);
+                var user = await _account.GetUserByIdAsync(model.UserId);
                 if (!user.EmailConfirmed)
                 {
                     // generate one with their account info, and re-display the code page.
@@ -495,7 +495,7 @@ namespace Hood.Controllers
                 user.UserName = model.Username;
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await _userManager.ResetPasswordAsync(user, token, model.Password);

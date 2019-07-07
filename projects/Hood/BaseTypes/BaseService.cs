@@ -3,6 +3,7 @@ using Hood.Core;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,11 +13,19 @@ using System.Text;
 
 namespace Hood.Services
 {
+    public abstract class BaseService : BaseService<HoodDbContext, ApplicationUser, IdentityRole>
+    {
+        public BaseService()
+            : base()
+        { }
+    }
+
     public abstract class BaseService<TContext, TUser, TRole>
          where TContext : HoodDbContext
          where TUser : ApplicationUser
          where TRole : IdentityRole
     {
+        protected readonly IHttpContextAccessor _contextAccessor;
         protected readonly UserManager<ApplicationUser> _userManager;
         protected readonly SignInManager<ApplicationUser> _signInManager;
         protected readonly RoleManager<IdentityRole> _roleManager;
@@ -33,6 +42,7 @@ namespace Hood.Services
 
         public BaseService()
         {
+            _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
             _userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
             _signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
             _roleManager = Engine.Services.Resolve<RoleManager<IdentityRole>>();

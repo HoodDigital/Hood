@@ -16,15 +16,16 @@ namespace Hood.Controllers
             : base()
         { }
 
-        public async Task<IActionResult> Index(PropertySearchModel model)
+        public async Task<IActionResult> Index(PropertyListModel model)
         {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
-            model = await _property.GetPagedProperties(model, true);
+            model.PublishStatus = ContentStatus.Published;
+            model = await _property.GetPropertiesAsync(model);
 
-            model.Locations = await _property.GetLocations(model);
+            model.Locations = await _property.GetLocationsAsync(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             PropertySettings settings = Engine.Settings.Property;
             model.Types = settings.GetListingTypes();
@@ -34,7 +35,7 @@ namespace Hood.Controllers
         }
 
         [Route("property/{id}/{city}/{postcode}/{title}")]
-        public IActionResult Show(int id)
+        public async Task<IActionResult> Show(int id)
         {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowItem)
@@ -42,29 +43,29 @@ namespace Hood.Controllers
 
             ShowPropertyModel um = new ShowPropertyModel()
             {
-                Property = _property.GetPropertyById(id)
+                Property = await _property.GetPropertyByIdAsync(id)
             };
 
             if (um.Property == null)
                 return RedirectToAction("NotFound");
 
             // if not admin, and not published, hide.
-            if (!(User.IsEditorOrBetter()) && um.Property.Status != (int)Status.Published)
+            if (!(User.IsEditorOrBetter()) && um.Property.Status != ContentStatus.Published)
                 return RedirectToAction("NotFound");
 
             return View(um);
         }
 
         [Route("property/modal")]
-        public IActionResult Modal(int id)
+        public async Task<IActionResult> Modal(int id)
         {
             ShowPropertyModel um = new ShowPropertyModel()
             {
-                Property = _property.GetPropertyById(id)
+                Property = await _property.GetPropertyByIdAsync(id)
             };
 
             // if not admin, and not published, hide.
-            if (!User.IsEditorOrBetter() && um.Property.Status != (int)Status.Published)
+            if (!User.IsEditorOrBetter() && um.Property.Status != ContentStatus.Published)
                 return NotFound();
 
             return View(um);

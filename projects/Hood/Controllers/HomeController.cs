@@ -55,35 +55,45 @@ namespace Hood.Controllers
         #region "Content"
 
         [ResponseCache(CacheProfileName = "Hour")]
-        public virtual async Task<IActionResult> Feed(ContentModel model, string type)
+        public virtual async Task<IActionResult> Feed(ContentModel model)
         {
-            model.Type = type;
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
 
-            model = await _content.GetPagedContent(model, true);
-            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
+            model = await _content.GetContentAsync(model);
+            model.Recent = await _content.GetRecentAsync(model.Type);
+
+            if (model.Inline)
+                return View("_Inline_Feed", model);
+
             return View("Feed", model);
         }
 
-        // Add your custom actions and site functionality here, or create new controllers, do whatever!
         [ResponseCache(CacheProfileName = "Hour")]
-        [Route("{type}/load-more/")]
-        public async Task<IActionResult> LoadMore(string type, string search, string sort = "PublishDateDesc", int page = 1, int size = 12)
+        [Route("{type}/author/{author}/")]
+        public virtual async Task<IActionResult> Author(ContentModel model)
         {
-            ContentModel model = new ContentModel()
-            {
-                Search = search,
-                Order = sort,
-                PageIndex = page,
-                PageSize = size
-            };
-            model = await _content.GetPagedContent(model, true);
-            model.ContentType = Engine.Settings.Content.GetContentType(type);
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
-            return View("LoadMore", model);
+
+            model = await _content.GetContentAsync(model);
+            model.Recent = await _content.GetRecentAsync(model.Type);
+            return View("Feed", model);
+        }
+
+        [ResponseCache(CacheProfileName = "Hour")]
+        [Route("{type}/category/{category}/")]
+        public virtual async Task<IActionResult> Category(ContentModel model)
+        {
+            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
+            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
+                return NotFound();
+
+            model = await _content.GetContentAsync(model);
+            model.Recent = await _content.GetRecentAsync(model.Type, model.Category);
+            return View("Feed", model);
         }
 
         [ResponseCache(CacheProfileName = "Day")]
@@ -95,7 +105,7 @@ namespace Hood.Controllers
             ContentModel model = new ContentModel()
             {
                 EditMode = editMode,
-                Content = _content.GetContentByID(id)
+                Content = await _content.GetContentByIdAsync(id)
             };
             if (model.Content == null)
                 return NotFound();
@@ -106,12 +116,12 @@ namespace Hood.Controllers
             if (model.Type == null || !model.ContentType.Enabled || !model.ContentType.HasPage)
                 return NotFound();
 
-            ContentNeighbours cn = _content.GetNeighbourContent(id, model.ContentType.Type);
+            ContentNeighbours cn = await _content.GetNeighbourContentAsync(id, model.ContentType.Type);
             model.Previous = cn.Previous;
             model.Next = cn.Next;
 
             // if not admin, and not published, hide.
-            if (!(User.IsEditorOrBetter()) && model.Content.Status != (int)Status.Published)
+            if (!(User.IsEditorOrBetter()) && model.Content.Status != ContentStatus.Published)
                 return NotFound();
 
             if (model.ContentType.BaseName == "Page")
@@ -141,7 +151,7 @@ namespace Hood.Controllers
                 }
             }
 
-            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = model.Type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
+            model.Recent = await _content.GetContentAsync(new ContentModel() { Category = model.Category, PageSize = int.MaxValue, Order = "DateDesc" });
 
             foreach (ContentMeta cm in model.Content.Metadata)
             {
@@ -150,31 +160,6 @@ namespace Hood.Controllers
             return View("Show", model);
         }
 
-        [ResponseCache(CacheProfileName = "Hour")]
-        [Route("{type}/author/{author}/")]
-        public virtual async Task<IActionResult> Author(ContentModel model, string type)
-        {
-            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
-            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
-                return NotFound();
-
-            model = await _content.GetPagedContent(model, true);
-            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
-            return View("Feed", model);
-        }
-
-        [ResponseCache(CacheProfileName = "Hour")]
-        [Route("{type}/category/{category}/")]
-        public virtual async Task<IActionResult> Category(ContentModel model, string type)
-        {
-            model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
-            if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
-                return NotFound();
-
-            model = await _content.GetPagedContent(model, true);
-            model.Recent = await _content.GetPagedContent(new ContentModel() { Type = type, PageIndex = 1, PageSize = 5, Order = "PublishDateDesc" }, true);
-            return View("Feed", model);
-        }
 
         #endregion
 

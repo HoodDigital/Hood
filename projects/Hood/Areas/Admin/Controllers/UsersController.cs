@@ -86,7 +86,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id) as UserProfile;
-            model.AllRoles = _account.GetAllRoles();
+            model.AllRoles = await _account.GetAllRolesAsync();
             return View(model);
         }
 
@@ -120,17 +120,16 @@ namespace Hood.Areas.Admin.Controllers
 
                 await _account.UpdateProfileAsync(model);
 
-                model.SaveMessage = "Saved!";
-                model.MessageType = Enums.AlertType.Success;
-                return View(model);
+                SaveMessage = "Saved!";
+                MessageType = Enums.AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "There was an error while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "There was an error while saving: " + ex.Message;
+                MessageType = Enums.AlertType.Danger;
             }
 
-            model.AllRoles = _account.GetAllRoles();
+            model.AllRoles = await _account.GetAllRolesAsync();
 
             return View(model);
         }
@@ -200,8 +199,10 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Edit", new { id = user.Id, message = EditorMessage.Created });
+                var response = new Response(true, "Published successfully.")
+                {
+                    Url = Url.Action("Edit", new { id = user.Id, message = EditorMessage.Created })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -223,8 +224,10 @@ namespace Hood.Areas.Admin.Controllers
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
                 await _account.DeleteUserAsync(user);
 
-                var response = new Response(true, "Deleted successfully.");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                var response = new Response(true, "Deleted successfully.")
+                {
+                    Url = Url.Action("Index", new { message = EditorMessage.Deleted })
+                };
                 return response;
 
             }
@@ -240,11 +243,11 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/users/avatar/get/")]
         [HttpGet]
-        public IMediaObject GetAvatar(string id)
+        public async Task<IMediaObject> GetAvatar(string id)
         {
             try
             {
-                var user = _account.GetUserById(id);
+                var user = await _account.GetUserByIdAsync(id);
                 if (user != null)
                 {
                     if (user.Avatar == null)
@@ -261,13 +264,13 @@ namespace Hood.Areas.Admin.Controllers
         }
         [Route("admin/users/avata/clear/")]
         [HttpGet]
-        public Response ClearAvatar(string id)
+        public async Task<Response> ClearAvatar(string id)
         {
             try
             {
-                var user = _account.GetUserById(id);
+                var user = await _account.GetUserByIdAsync(id);
                 user.Avatar = null;
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
@@ -286,7 +289,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             ApplicationUser user = await _userManager.FindByIdAsync(id);
             IList<string> roles = await _userManager.GetRolesAsync(user);
-            return Json(new { success = true, roles = roles });
+            return Json(new { success = true, roles });
         }
 
         [Route("admin/users/addtorole/")]

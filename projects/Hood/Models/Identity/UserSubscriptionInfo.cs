@@ -1,4 +1,6 @@
-﻿namespace Hood.Models
+﻿using System;
+
+namespace Hood.Models
 {
     public class UserSubscriptionInfo
     {
@@ -7,6 +9,7 @@
         public string Status { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
+        public DateTime? CurrentPeriodEnd { get; set; }
         public bool Public { get; set; }
         public int Level { get; set; }
         public bool Addon { get; set; }

@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -32,34 +31,37 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/manage/")]
-        public async Task<IActionResult> Index(PropertySearchModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(PropertyListModel model, EditorMessage? message)
         {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
 
-            model = await _property.GetPagedProperties(model, false);
+            model = await _property.GetPropertiesAsync(model);
 
-            model.Locations = await _property.GetLocations(model);
+            model.Locations = await _property.GetLocationsAsync(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
+
             PropertySettings settings = Engine.Settings.Property;
+
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
+
             model.AddEditorMessage(message);
             return View(model);
         }
 
         [Route("admin/property/gallery/{id}/")]
-        public IActionResult EditorGallery(int id)
+        public async Task<IActionResult> EditorGalleryAsync(int id)
         {
-            var model = _property.GetPropertyById(id, true);
+            var model = await _property.GetPropertyByIdAsync(id, true);
             return View(model);
         }
 
         [Route("admin/property/floorplans/{id}/")]
-        public IActionResult EditorFloorplans(int id)
+        public async Task<IActionResult> EditorFloorplans(int id)
         {
-            var model = _property.GetPropertyById(id, true);
+            var model = await _property.GetPropertyByIdAsync(id, true);
             return View(model);
         }
 
@@ -67,37 +69,37 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/edit/{id}/")]
         public async Task<IActionResult> Edit(int id, EditorMessage? message)
         {
-            var model = await ReloadProperty(_property.GetPropertyById(id, true));
+            var model = await _property.GetPropertyByIdAsync(id, true);
+            model = await LoadAgents(model);
             model.AutoGeocode = true;
             model.AddEditorMessage(message);
             return View(model);
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("admin/property/edit/{id}/")]
-        public async Task<ActionResult> Edit(PropertyListing post)
+        public async Task<ActionResult> Edit(PropertyListing model)
         {
             try
             {
-                post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
-                post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
-                post.LastEditedBy = User.Identity.Name;
-                post.LastEditedOn = DateTime.Now;
+                model.PublishDate = model.PublishDate.AddHours(model.PublishHour);
+                model.PublishDate = model.PublishDate.AddMinutes(model.PublishMinute);
+                model.LastEditedBy = User.Identity.Name;
+                model.LastEditedOn = DateTime.Now;
 
-                if (post.AutoGeocode)
+                if (model.AutoGeocode)
                 {
-                    var address = _address.GeocodeAddress(post);
+                    var address = _address.GeocodeAddress(model);
                     if (address != null)
                     {
-                        post.SetLocation(address.Coordinates);
+                        model.SetLocation(address.Coordinates);
                     }
                 }
 
-                OperationResult result = _property.UpdateProperty(post);
+                await _property.UpdateAsync(model);
 
-                // Try to map the address (Only works with UK)
-                var property = _property.GetPropertyById(post.Id, true);
-                var type = Engine.Settings.Property.GetPlanningFromType(post.Planning);
+                var property = await _property.GetPropertyByIdAsync(model.Id, true);
+                var type = Engine.Settings.Property.GetPlanningFromType(model.Planning);
 
                 if (property.HasMeta("PlanningDescription"))
                     property.UpdateMeta("PlanningDescription", type);
@@ -108,19 +110,16 @@ namespace Hood.Areas.Admin.Controllers
                     property.AddMeta(new PropertyMeta("PlanningDescription", type));
                 }
 
-                // if the site's edit form has special properties, add them to metas:
                 foreach (var val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
-                        // bosh we have a meta
                         if (property.HasMeta(val.Key.Replace("Meta:", "")))
                         {
                             property.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                         else
                         {
-                            // Add it...
                             property.AddMeta(new PropertyMeta()
                             {
                                 PropertyId = property.Id,
@@ -132,40 +131,25 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
-
-                result = _property.UpdateProperty(property);
-                if (result.Succeeded)
-                {
-                    var model = await ReloadProperty(post);
-                    model.SaveMessage = "Saved";
-                    model.MessageType = AlertType.Success;
-                    return View(model);
-                }
-                else
-                {
-                    var model = await ReloadProperty(post);
-                    model.SaveMessage = "Something went wrong while saving: " + result.ErrorString;
-                    model.MessageType = AlertType.Success;
-                    return View(model);
-                }
+                await _property.UpdateAsync(property);
+                model = await LoadAgents(model);
+                model.SaveMessage = "Saved";
+                model.MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                var model = await ReloadProperty(post);
                 model.SaveMessage = "An error occurred: " + ex.Message;
                 model.MessageType = AlertType.Danger;
-                return View(model);
             }
+            return View(model);
         }
-        private async Task<PropertyListing> ReloadProperty(PropertyListing listing)
+        private async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
-            listing = _property.GetPropertyById(listing.Id, true);
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
             listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
             return listing;
         }
-
 
         [Route("admin/property/create/")]
         public IActionResult Create()
@@ -174,9 +158,9 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/addfeature/{id}/")]
-        public IActionResult AddFeature(int id)
+        public async Task<IActionResult> AddFeature(int id)
         {
-            var property = _property.GetPropertyById(id, true);
+            var property = await _property.GetPropertyByIdAsync(id, true);
             int? count = property.Metadata?.Where(m => m.Name.Contains("Feature")).Count();
             if (!count.HasValue)
                 count = 0;
@@ -188,7 +172,7 @@ namespace Hood.Areas.Admin.Controllers
                 Type = "System.String",
                 BaseValue = JsonConvert.SerializeObject("")
             });
-            _property.UpdateProperty(property);
+            await _property.UpdateAsync(property);
 
             return RedirectToAction("Edit", new { id = property.Id });
         }
@@ -197,7 +181,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/delete/all/")]
         public async Task<IActionResult> DeleteAll()
         {
-            await _property.DeleteAll();
+            await _property.DeleteAllAsync();
             return RedirectToAction("Index", new { message = EditorMessage.Deleted });
         }
 
@@ -267,7 +251,7 @@ namespace Hood.Areas.Admin.Controllers
                     property.SetLocation(address.Coordinates);
                 }
 
-                OperationResult result = _property.Add(property);
+                await _property.AddAsync(property);
                 if (property.Metadata == null)
                     property.Metadata = new List<PropertyMeta>();
                 property.UpdateMeta("PlanningDescription", Engine.Settings.Property.GetPlanningTypes().FirstOrDefault().Value);
@@ -283,14 +267,12 @@ namespace Hood.Areas.Admin.Controllers
                     });
                 }
 
-                result = _property.UpdateProperty(property);
+                await _property.UpdateAsync(property);
 
-                if (!result.Succeeded)
+                var response = new Response(true, "Published successfully.")
                 {
-                    throw new Exception(result.ErrorString);
-                }
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Edit", new { id = property.Id, message = EditorMessage.Created });
+                    Url = Url.Action("Edit", new { id = property.Id, message = EditorMessage.Created })
+                };
                 return response;
             }
             catch (Exception ex)
@@ -301,21 +283,13 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/property/delete")]
         [HttpPost()]
-        public Response Delete(int id)
+        public async Task<Response> DeleteAsync(int id)
         {
             try
             {
-                OperationResult result = _property.Delete(id);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Deleted!");
-                    response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                await _property.DeleteAsync(id);
+                var response = new Response(true, "Deleted!");
+                return response;
             }
             catch (Exception ex)
             {
@@ -325,21 +299,12 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/property/publish")]
         [HttpPost()]
-        public Response Publish(int id)
+        public async Task<Response> Publish(int id)
         {
             try
             {
-                OperationResult<PropertyListing> result = _property.SetStatus(id, Status.Published);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Published successfully.");
-                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Published });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                await _property.SetStatusAsync(id, ContentStatus.Published);
+                return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
             {
@@ -349,21 +314,12 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/property/archive")]
         [HttpPost()]
-        public Response Archive(int id)
+        public async Task<Response> Archive(int id)
         {
             try
             {
-                OperationResult<PropertyListing> result = _property.SetStatus(id, Status.Archived);
-                if (result.Succeeded)
-                {
-                    var response = new Response(true, "Archived successfully.");
-                    response.Url = Url.Action("Index", new { id = id, message = EditorMessage.Archived });
-                    return response;
-                }
-                else
-                {
-                    return new Response("There was a problem updating the database");
-                }
+                await _property.SetStatusAsync(id, ContentStatus.Archived);
+                return new Response(true, "Archived successfully.");
             }
             catch (Exception ex)
             {
@@ -378,40 +334,31 @@ namespace Hood.Areas.Admin.Controllers
         /// <returns></returns>
         [Authorize]
         [Route("admin/property/upload/gallery")]
-        public async Task<IActionResult> UploadToGallery(List<IFormFile> files, int id)
+        public async Task<Response> UploadToGallery(List<IFormFile> files, int id)
         {
-            // User must have an organisation.
-            PropertyListing property = _property.GetPropertyById(id);
-            if (property == null)
-                return NotFound();
-
             try
             {
+                PropertyListing property = await _property.GetPropertyByIdAsync(id);
+                if (property == null)
+                    throw new Exception("Property not found!");
+
                 MediaObject mediaResult = null;
                 if (files != null)
                 {
                     if (files.Count == 0)
-                        return Json(new
-                        {
-                            Success = false,
-                            Error = "There are no files attached!"
-                        });
+                        throw new Exception("There are no files attached!");
 
                     foreach (IFormFile file in files)
                     {
                         mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = "Property" });
-                        await _property.AddImage(property, new PropertyMedia(mediaResult));
+                        await _property.AddMediaAsync(property, new PropertyMedia(mediaResult));
                     }
                 }
-                return Json(new { Success = true, Image = mediaResult });
+                return new Response(true, mediaResult);
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    Success = false,
-                    Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message
-                });
+                return new Response(ex);
             }
         }
 
@@ -422,50 +369,41 @@ namespace Hood.Areas.Admin.Controllers
         /// <returns></returns>
         [Authorize]
         [Route("admin/property/upload/floorplan")]
-        public async Task<IActionResult> UploadFloorplan(List<IFormFile> files, int id)
+        public async Task<Response> UploadFloorplan(List<IFormFile> files, int id)
         {
-            // User must have an organisation.
-            PropertyListing property = _property.GetPropertyById(id);
-            if (property == null)
-                return NotFound();
-
             try
             {
+                PropertyListing property = await _property.GetPropertyByIdAsync(id);
+                if (property == null)
+                    throw new Exception("Property not found!");
+
                 MediaObject mediaResult = null;
                 if (files != null)
                 {
                     if (files.Count == 0)
-                        return Json(new
-                        {
-                            Success = false,
-                            Error = "There are no files attached!"
-                        });
+                        throw new Exception("There are no files attached!");
 
                     foreach (IFormFile file in files)
                     {
                         mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = "Property" });
-                        await _property.AddFloorplan(property, new PropertyFloorplan(mediaResult));
+                        await _property.AddFloorplanAsync(property, new PropertyFloorplan(mediaResult));
                     }
                 }
-                return Json(new { Success = true, Image = mediaResult });
+                return new Response(true, mediaResult);
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    Success = false,
-                    Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message
-                });
+                return new Response(ex);
             }
         }
 
         [HttpGet]
         [Route("admin/property/getmedia/")]
-        public IMediaObject GetMedia(int id, string type)
+        public async Task<IMediaObject> GetMediaAsync(int id, string type)
         {
             try
             {
-                PropertyListing property = _property.GetPropertyById(id, true);
+                PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
                 if (property != null)
                     switch (type)
                     {
@@ -487,11 +425,11 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/property/clearfield/")]
-        public Response ClearField(int id, string field)
+        public async Task<Response> ClearFieldAsync(int id, string field)
         {
             try
             {
-                _property.ClearField(id, field);
+                await _property.ClearFieldAsync(id, field);
                 return new Response(true, "The field has been cleared!");
             }
             catch (Exception ex)
@@ -502,21 +440,21 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/property/media/setfeatured/{id}/{mediaId}")]
-        public IActionResult SetFeatured(int id, int mediaId)
+        public async Task<IActionResult> SetFeatured(int id, int mediaId)
         {
             try
             {
-                PropertyListing property = _property.GetPropertyById(id, true);
+                PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
                 PropertyMedia media = property.Media.SingleOrDefault(m => m.Id == mediaId);
                 if (media != null)
                 {
                     property.FeaturedImage = new MediaObject(media);
-                    _property.UpdateProperty(property);
+                    await _property.UpdateAsync(property);
                 }
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id, message = EditorMessage.ImageUpdated });
+            return RedirectToAction("Edit", new { id, message = EditorMessage.ImageUpdated });
         }
 
         [HttpGet]
@@ -529,7 +467,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+            return RedirectToAction("Edit", new { id, message = EditorMessage.MediaRemoved });
         }
 
         [HttpGet]
@@ -542,7 +480,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception)
             { }
-            return RedirectToAction("Edit", new { id = id, message = EditorMessage.MediaRemoved });
+            return RedirectToAction("Edit", new { id, message = EditorMessage.MediaRemoved });
         }
 
 

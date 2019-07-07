@@ -18,19 +18,20 @@ namespace Hood.Services
 {
     public class SettingsRepository : ISettingsRepository
     {
-        private readonly HoodDbContext _context;
+        private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
         private IHoodCache _cache { get; set; }
 
         public SettingsRepository(
-            HoodDbContext context,
+            HoodDbContext db,
             IConfiguration config,
             IHoodCache cache)
         {
-            _context = context;
+            _db = db;
             _config = config;
             _cache = cache;
         }
+
 
         #region Get/Set/Delete
         public string this[string key]
@@ -52,7 +53,7 @@ namespace Hood.Services
                     return option.Value;
                 else
                 {
-                    option = _context.Options.AsNoTracking().Where(o => o.Id == key).FirstOrDefault();
+                    option = _db.Options.AsNoTracking().Where(o => o.Id == key).FirstOrDefault();
                     if (option != null)
                     {
                         _cache.Add(key, option);
@@ -74,7 +75,7 @@ namespace Hood.Services
         {
             try
             {
-                Option option = _context.Options.Where(o => o.Id == key).FirstOrDefault();
+                Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
                 if (option == null)
                 {
                     option = new Option()
@@ -82,13 +83,13 @@ namespace Hood.Services
                         Id = key,
                         Value = value
                     };
-                    _context.Options.Add(option);
+                    _db.Options.Add(option);
                 }
                 else
                 {
                     option.Value = value;
                 }
-                _context.SaveChanges();
+                _db.SaveChanges();
                 _cache.Remove(key);
             }
             catch (DbUpdateException ex)
@@ -135,11 +136,11 @@ namespace Hood.Services
         public void Remove(string key)
         {
             _cache.Remove(key);
-            Option option = _context.Options.Where(o => o.Id == key).FirstOrDefault();
+            Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
             if (option != null)
             {
-                _context.Entry(option).State = EntityState.Deleted;
-                _context.SaveChanges();
+                _db.Entry(option).State = EntityState.Deleted;
+                _db.SaveChanges();
             }
         }
         #endregion
