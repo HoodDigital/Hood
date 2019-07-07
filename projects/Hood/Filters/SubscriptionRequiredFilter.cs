@@ -91,7 +91,7 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (!Engine.Settings.Billing.CheckSubscriptionsThrow())
+                if (!Engine.Settings.Billing.CheckSubscriptionsOrThrow())
                 {
                     throw new Exception("Subscriptions are not enabled");
                 }

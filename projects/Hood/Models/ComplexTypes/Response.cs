@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Hood.Interfaces;
 using Hood.Extensions;
+using System;
 
 namespace Hood.Models
 {
+    [Obsolete("Use Hood.Models.Response from now on.", false)]
     public class MediaResponse : Response
     {
         public MediaResponse(Array data, int count, string message = "Succeeded!")

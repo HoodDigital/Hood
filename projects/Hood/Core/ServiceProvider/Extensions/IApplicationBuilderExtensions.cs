@@ -1,6 +1,5 @@
 ﻿using Hood.Core;
 using Hood.Interfaces;
-using Hood.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -137,6 +136,11 @@ namespace Hood.Extensions
                          name: "Billing",
                          template: "account/billing/{action=Index}/{id?}",
                          defaults: new { controller = "Billing" }
+                    );
+                    routes.MapRoute(
+                         name: "Addresses",
+                         template: "account/addresses/{action=Index}/{id?}",
+                         defaults: new { controller = "Address" }
                     );
                     routes.MapRoute(
                          name: "Api",

@@ -12,7 +12,7 @@ namespace Hood.Infrastructure
 {
     public class CmsUrlConstraint : IRouteConstraint
     {
-        private Object codeLock = new Object();
+        private object codeLock = new Object();
 
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {

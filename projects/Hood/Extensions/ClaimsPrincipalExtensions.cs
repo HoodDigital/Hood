@@ -10,7 +10,7 @@ namespace Hood.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static UserSubscriptionsView AccountInfo(this ClaimsPrincipal principal)
+        public static UserProfile AccountInfo(this ClaimsPrincipal principal)
         {
             if (!principal.Identity.IsAuthenticated)
                 return null;
@@ -18,13 +18,13 @@ namespace Hood.Extensions
             principal.GetUserId();
             var contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
 
-            var view = contextAccessor.HttpContext.Items[nameof(UserSubscriptionsView)] as UserSubscriptionsView;
+            var view = contextAccessor.HttpContext.Items[nameof(UserProfile)] as UserProfile;
             if (view == null)
             {
                 var context = Engine.Services.Resolve<HoodDbContext>();
-                view = context.UserSubscriptionView.SingleOrDefault(us => us.Id == principal.GetUserId());
+                view = context.UserProfiles.SingleOrDefault(us => us.Id == principal.GetUserId());
                 if (view != null)
-                    contextAccessor.HttpContext.Items[nameof(UserSubscriptionsView)] = view;
+                    contextAccessor.HttpContext.Items[nameof(UserProfile)] = view;
             }
 
             return view;

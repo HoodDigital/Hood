@@ -101,6 +101,7 @@ namespace Hood.Services
             {
                 _db.Update(user);
                 _db.SaveChanges();
+
                 return new OperationResult(true);
             }
             catch (Exception ex)
@@ -164,6 +165,33 @@ namespace Hood.Services
             return;
         }
 
+        #endregion
+
+        #region Profiles 
+
+        public async Task<IUserProfile> GetProfileAsync(string id)
+        {
+            var profile = await _db.UserProfiles.FirstOrDefaultAsync(u => u.Id == id);
+            return profile;
+        }
+        public async Task<Response> UpdateProfileAsync(IUserProfile user)
+        {
+            try
+            {
+                var userToUpdate = await _db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+
+                userToUpdate.Profile = user;
+
+                _db.Update(userToUpdate);
+                _db.SaveChanges();
+
+                return new Response(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex);
+            }
+        }
         #endregion
 
         public void ResetBillingInfo()

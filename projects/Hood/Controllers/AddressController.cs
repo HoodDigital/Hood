@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 
 namespace Hood.Controllers
 {
@@ -20,6 +21,14 @@ namespace Hood.Controllers
             var user = _account.GetCurrentUser(false);
             return View(user);
         }
+
+        [HttpGet]
+        public List<Address> Get()
+        {
+            var user = _account.GetCurrentUser();
+            return user.Addresses;
+        }
+
 
         public ActionResult Create()
         {

@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Hood.Web;
 
-namespace Hood.Controllers
+namespace Hood.Web.Controllers
 {
-    public class AccountController : BaseAccountController
+    public class AccountController : Hood.Controllers.AccountController
     {
         public AccountController()
             : base()

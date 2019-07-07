@@ -19,16 +19,16 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize]
-    public abstract class BaseAccountController : BaseAccountController<HoodDbContext>
+    public abstract class AccountController : AccountController<HoodDbContext>
     {
-        public BaseAccountController() : base() { }
+        public AccountController() : base() { }
     }
 
     [Authorize]
-    public abstract class BaseAccountController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class AccountController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
          where TContext : HoodDbContext
     {
-        public BaseAccountController()
+        public AccountController()
             : base()
         { }
 
@@ -67,7 +67,7 @@ namespace Hood.Controllers
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
 
-                    await _logService.AddLogAsync<BaseAccountController<TContext>>($"User ({model.Username}) logged in.");
+                    await _logService.AddLogAsync<AccountController<TContext>>($"User ({model.Username}) logged in.");
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -129,7 +129,7 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
-                await _logService.AddLogAsync<BaseAccountController<TContext>>($"User with ID {user.Id} logged in with 2fa.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with 2fa.", userId: user.Id);
                 return RedirectToLocal(returnUrl);
             }
             else if (result.IsLockedOut)
@@ -138,7 +138,7 @@ namespace Hood.Controllers
             }
             else
             {
-                await _logService.AddLogAsync<BaseAccountController<TContext>>($"Invalid authenticator code entered for user with ID {user.Id}.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"Invalid authenticator code entered for user with ID {user.Id}.", userId: user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return View();
             }
@@ -182,7 +182,7 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
-                await _logService.AddLogAsync<BaseAccountController<TContext>>($"User with ID {user.Id} logged in with a recovery code.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with a recovery code.", userId: user.Id);
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
@@ -191,7 +191,7 @@ namespace Hood.Controllers
             }
             else
             {
-                await _logService.AddLogAsync<BaseAccountController<TContext>>($"Invalid recovery code entered for user with ID {user.Id}", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"Invalid recovery code entered for user with ID {user.Id}", userId: user.Id);
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return View();
             }
@@ -501,7 +501,7 @@ namespace Hood.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                await _logService.AddLogAsync<BaseAccountController<TContext>>($"User ({user.UserName}) created a new account with password.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created a new account with password.", userId: user.Id);
 
                 if (Engine.Settings.Account.EnableWelcome)
                 {
@@ -530,7 +530,7 @@ namespace Hood.Controllers
         {
             var user = User.Identity;
             await _signInManager.SignOutAsync();
-            await _logService.AddLogAsync<BaseAccountController<TContext>>($"User ({user.Name}) logged out.");
+            await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.Name}) logged out.");
             return RedirectToAction("Index", "Home");
         }
 
@@ -579,7 +579,7 @@ namespace Hood.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                await _logService.AddLogAsync<BaseAccountController<TContext>>($"User ({info.Principal.FindFirstValue(ClaimTypes.Email)}) created an account using {info.LoginProvider} provider.");
+                await _logService.AddLogAsync<AccountController<TContext>>($"User ({info.Principal.FindFirstValue(ClaimTypes.Email)}) created an account using {info.LoginProvider} provider.");
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
@@ -617,7 +617,7 @@ namespace Hood.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        await _logService.AddLogAsync<BaseAccountController<TContext>>($"User ({user.UserName}) created an account using {info.LoginProvider} provider.", userId: user.Id);
+                        await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created an account using {info.LoginProvider} provider.", userId: user.Id);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -636,7 +636,7 @@ namespace Hood.Controllers
         {
             if (userId == null || code == null)
             {
-                return RedirectToAction(nameof(BaseHomeController<TContext>.Index), "Home");
+                return RedirectToAction(nameof(HomeController<TContext>.Index), "Home");
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)

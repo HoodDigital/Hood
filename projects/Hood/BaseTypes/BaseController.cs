@@ -88,7 +88,7 @@ namespace Hood.Controllers
             return base.View(viewName, model);
         }
 
-        public UserSubscriptionsView Account
+        public UserProfile Account
         {
             get => User.AccountInfo();
         }

@@ -1,5 +1,6 @@
 ﻿using Hood.Extensions;
 using Hood.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace Hood.Models
 {
-    public class UserSubscriptionsView : UserProfile
+    public class UserProfile : UserProfileBase
     {
         #region Subscription Data
         public int ActiveCount { get; set; }
@@ -25,10 +26,25 @@ namespace Hood.Models
             set { _Subscriptions = JsonConvert.SerializeObject(value); }
         }
 
+        public int RoleCount { get; set; }
+        internal string _Roles { get; set; }
+        public List<IdentityRole> Roles
+        {
+            get { return !_Roles.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(_Roles); }
+            set { _Roles = JsonConvert.SerializeObject(value); }
+        }
+
         internal ApplicationUser AsUser()
         {
             return (ApplicationUser)(IUserProfile)this;
         }
+        #endregion
+
+        #region View Model Stuff
+
+        [NotMapped]
+        public IList<IdentityRole> AllRoles { get; set; }
+
         #endregion
 
         #region Prevent Mapping Sensitive Fields

@@ -78,11 +78,8 @@ namespace Hood.Extensions
             return value == null ? default : JsonConvert.DeserializeObject<T>(value);
         }
 
-        [Obsolete("Use User.GetUserSubscriptionsView() from now on.", true)]
-        public static AccountInfo GetAccountInfo(this HttpContext context)
-        {
-            return context.Items["AccountInfo"] as AccountInfo;
-        }
+        [Obsolete("Use Hood.Core.Engine.Account from now on.", true)]
+        public static AccountInfo GetAccountInfo(this HttpContext context) => throw new NotImplementedException();
 
         public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
         {
@@ -91,6 +88,7 @@ namespace Hood.Extensions
 
             if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
                 return true;
+
             var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
 
             if (allowedCodes.Contains(betaCode))

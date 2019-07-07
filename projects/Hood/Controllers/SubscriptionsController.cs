@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Models;
@@ -191,7 +192,7 @@ namespace Hood.Controllers
                 Category = category,
                 Plans = await _account.GetSubscriptionPlanLevels(category),
                 Addons = await _account.GetSubscriptionPlanAddons(),
-                Customer = await _account.LoadCustomerObject(Account.StripeId, true)
+                Customer = await _account.LoadCustomerObject(Engine.Account.StripeId, true)
             };
             ViewData["ReturnUrl"] = returnUrl;
             return model;

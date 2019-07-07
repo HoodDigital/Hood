@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Models;
@@ -27,7 +28,7 @@ namespace Hood.Controllers
             BillingHomeModel model = new BillingHomeModel();
             try
             {
-                model.Customer = await _account.LoadCustomerObject(Account.StripeId, true);
+                model.Customer = await _account.LoadCustomerObject(Engine.Account.StripeId, true);
                 if (model.Customer != null)
                 {
                     model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);
@@ -110,7 +111,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _billing.Customers.SetDefaultCard(Account.StripeId, uid);
+                await _billing.Customers.SetDefaultCard(Engine.Account.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
             }
             catch (Exception)
@@ -124,7 +125,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _billing.Cards.DeleteCard(Account.StripeId, uid);
+                await _billing.Cards.DeleteCard(Engine.Account.StripeId, uid);
                 return RedirectToAction("Index", "Billing");
             }
             catch (Exception)

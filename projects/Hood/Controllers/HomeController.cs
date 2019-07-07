@@ -14,16 +14,16 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public abstract class BaseHomeController : BaseHomeController<HoodDbContext>
+    public abstract class HomeController : HomeController<HoodDbContext>
     {
-        public BaseHomeController() : base() { }
+        public HomeController() : base() { }
     }
 
-    public abstract class BaseHomeController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class HomeController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
          where TContext : HoodDbContext
     {
 
-        public BaseHomeController() : base() { }
+        public HomeController() : base() { }
 
         [ResponseCache(CacheProfileName = "Day")]
         public virtual async Task<IActionResult> Index()
@@ -126,7 +126,7 @@ namespace Hood.Controllers
                     if (!User.Identity.IsAuthenticated && model.Content.GetMeta("Settings.Security.Public").Get<bool>() == false)
                         return NotFound();
 
-                if (Engine.Settings.Billing.CheckSubscriptionsThrow())
+                if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
                 {
                     if (model.Content.GetMeta("Settings.Security.Subscription").IsStored)
                     {
@@ -177,8 +177,6 @@ namespace Hood.Controllers
         }
 
         #endregion
-
-
 
     }
 }

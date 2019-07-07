@@ -18,6 +18,8 @@ namespace Hood.Services
         ApplicationUser GetUserByEmail(string email, bool track = true);
         OperationResult UpdateUser(ApplicationUser user);
         Task DeleteUserAsync(ApplicationUser user);
+        Task<IUserProfile> GetProfileAsync(string id);
+        Task<Response> UpdateProfileAsync(IUserProfile user);
 
         IList<IdentityRole> GetAllRoles();
 

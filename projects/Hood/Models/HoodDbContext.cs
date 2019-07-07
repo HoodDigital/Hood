@@ -57,7 +57,7 @@ namespace Hood.Models
         public DbSet<Log> Logs { get; set; }
 
         // Views
-        public DbQuery<UserSubscriptionsView> UserSubscriptionView { get; set; }
+        public DbQuery<UserProfile> UserProfiles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

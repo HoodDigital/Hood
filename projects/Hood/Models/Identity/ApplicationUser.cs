@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public partial class ApplicationUser : UserProfile
+    public partial class ApplicationUser : UserProfileBase
     {
         #region Related Tables
         [JsonIgnore]
@@ -37,6 +37,9 @@ namespace Hood.Models
         #endregion
 
         #region Profile Get/Set 
+        /// <summary>
+        /// A Get/Set to allow the loading from or saving to a IUserProfile.
+        /// </summary>
         [NotMapped]
         public IUserProfile Profile
         {

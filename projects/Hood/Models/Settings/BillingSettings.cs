@@ -184,8 +184,10 @@ namespace Hood.Models
         {
             if (!EnableStripe && !EnablePayPal)
                 throw new Exception("Stripe or PayPal are not enabled, please enable one of them in the administrators area, under Settings > Billing Settings.");
-            if (!StripeSetup && !PayPalSetup)
-                throw new Exception("Stripe or PayPal are not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
+            if (EnableStripe && !StripeSetup)
+                throw new Exception("Stripe is not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
+            if (EnablePayPal && !PayPalSetup)
+                throw new Exception("PayPal is not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
             return true;
         }
         /// <summary>
@@ -196,7 +198,7 @@ namespace Hood.Models
             if (!EnableStripe)
                 throw new Exception("Stripe is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
             if (!StripeSetup)
-                throw new Exception("Stripe subscriptions are not set up correctly, please ensure you have set the correct settings in the administrators area, under Settings > Billing Settings.");
+                throw new Exception("Stripe is not set up correctly, please ensure you have set the correct settings in the administrators area, under Settings > Billing Settings.");
             return true;
         }
         /// <summary>
@@ -224,26 +226,27 @@ namespace Hood.Models
         /// <summary>
         /// This will check all required settings are correct for subscriptions to work. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
         /// </summary>
-        public bool CheckSubscriptionsThrow()
+        public bool CheckSubscriptionsOrThrow()
         {
-            if (!EnableStripe)
-                throw new Exception("Stripe is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
-            if (!EnableSubscriptions)
+            CheckStripeOrThrow();
+            if (EnableSubscriptions)
+                return true;
+            else
                 throw new Exception("Subscriptions are not enabled, please enable them in the administrators area, under Settings > Billing Settings.");
-            return true;
         }
         /// <summary>
         /// This will check all required settings are correct for the cart to work. Will throw an <see cref="Exception"/> when not setup explaining how to setup correctly.
         /// </summary>
         public bool CheckCartOrThrow()
         {
-            if (!EnableStripe && !EnablePayPal)
-                throw new Exception("Stripe or PayPal are not enabled, please enable one of them in the administrators area, under Settings > Billing Settings.");
+            CheckBillingOrThrow();
             if (!EnableCart)
                 throw new Exception("The shopping cart & checkout is not enabled, please enable it in the administrators area, under Settings > Billing Settings.");
-            if (!StripeSetup && !PayPalSetup)
-                throw new Exception("Stripe or PayPal are not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
-            return true;
+            else
+                if (StripeSetup || PayPalSetup)
+                    return true;
+                else
+                    throw new Exception("Stripe or PayPal are not set up correctly, please ensure you have set the correct  settings in the administrators area, under Settings > Billing Settings.");
         }
     }
 }

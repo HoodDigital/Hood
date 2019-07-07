@@ -1,10 +1,22 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Reflection;
 
 namespace Hood.Extensions
 {
     public static class ObjectExtensions
     {
+        /// <summary>
+        /// Will return a string representation of the object and all it's child members. In JSON format.
+        /// </summary>
+        /// <param name="element">The object or class you want to print to JSON.</param>
+        /// <param name="indentSize">The number of tab characters inserted onto each sub line.</param>
+        /// <returns>String Json content</returns>
+        public static string ToJson(this object element)
+        {
+            return JsonConvert.SerializeObject(element);
+        }
+
         /// <summary>
         /// Extension for 'Object' that copies the properties to a destination object.
         /// </summary>

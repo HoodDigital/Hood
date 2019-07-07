@@ -111,7 +111,7 @@ namespace Hood.Extensions
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //create, initialize and configure the engine
-            var engine = Engine.LoadEngine();
+            var engine = Engine.CreateHoodServiceProvider();
             engine.Initialize(services);
             var serviceProvider = engine.ConfigureServices(services, configuration);
 
@@ -266,10 +266,7 @@ namespace Hood.Extensions
         {
             services.Configure<MvcOptions>(options =>
             {
-                // Global filters
-                options.Filters.Add(typeof(AccountFilter));
                 options.Filters.Add(typeof(LockoutModeFilter));
-
             });
 
             return services;

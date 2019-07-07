@@ -79,7 +79,6 @@ namespace Hood.Caching
             _cache.Remove(key);
         }
 
-
         public void RemoveByType(Type type)
         {
             if (_entries == null)

@@ -7,9 +7,9 @@ using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Hood.Web;
 
-namespace Hood.Controllers
+namespace Hood.Web.Controllers
 {
-    public class HomeController : BaseHomeController
+    public class HomeController : Hood.Controllers.HomeController
     {
         public HomeController()
             : base()

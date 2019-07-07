@@ -107,9 +107,9 @@ namespace Hood.Models
             builder.Entity<PropertyFloorplan>().ToTable("HoodPropertyFloorplans");
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
 
-            builder.Query<UserSubscriptionsView>().ToView("HoodUserSubscriptionsView");
-
-            builder.Query<UserSubscriptionsView>().Property(b => b._Subscriptions).HasColumnName("Subscriptions");
+            builder.Query<UserProfile>().ToView("HoodProfiles");
+            builder.Query<UserProfile>().Property(b => b._Roles).HasColumnName("Roles");
+            builder.Query<UserProfile>().Property(b => b._Subscriptions).HasColumnName("Subscriptions");
         }
 
         public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction

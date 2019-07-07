@@ -143,9 +143,9 @@ GROUP BY
 	dbo.AspNetUsers.UserVars
 GO
 
-IF EXISTS(select * FROM sys.views where name = 'HoodAccountView') DROP VIEW HoodAccountView
+IF EXISTS(select * FROM sys.views where name = 'HoodUserProfiles') DROP VIEW HoodUserProfiles
 GO
-CREATE VIEW HoodAccountView AS
+CREATE VIEW HoodUserProfiles AS
 SELECT 
 	dbo.HoodUserSubscriptionsView.Id, 
 	dbo.HoodUserSubscriptionsView.UserName, 

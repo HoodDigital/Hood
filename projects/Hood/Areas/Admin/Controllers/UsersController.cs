@@ -19,8 +19,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -29,11 +27,10 @@ namespace Hood.Areas.Admin.Controllers
     {
         public UsersController()
             : base()
-        {
-        }
+        {}
 
         [Route("admin/users/")]
-        public async Task<IActionResult> Index(UserSearchModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(UserListModel model, EditorMessage? message)
         {
             IList<ApplicationUser> users = new List<ApplicationUser>();
             if (!string.IsNullOrEmpty(model.Role))
@@ -83,40 +80,21 @@ namespace Hood.Areas.Admin.Controllers
             return View(model);
         }
 
+        #region Edit
+
         [Route("admin/users/edit/{id}/")]
         public async Task<IActionResult> Edit(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{id}'.");
-            }
-            var model = new UserViewModel
-            {
-                UserId = user.Id,
-                Username = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = SaveMessage,
-                Avatar = user.Avatar,
-                Profile = user.Profile as UserProfile,
-                Roles = await _userManager.GetRolesAsync(user),
-                AllRoles = _account.GetAllRoles()
-            };
+            UserProfile model = await _account.GetProfileAsync(id) as UserProfile;
+            model.AllRoles = _account.GetAllRoles();
             return View(model);
         }
 
         [Route("admin/users/edit/{id}/")]
         [HttpPost]
-        public async Task<IActionResult> Edit(UserViewModel model)
+        public async Task<IActionResult> Edit(UserProfile model)
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{model.UserId}'.");
-            }
-
+            var user = await _userManager.FindByIdAsync(model.Id);
             try
             {
                 var email = user.Email;
@@ -140,9 +118,7 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
-                user.Profile = model.Profile;
-                _account.UpdateUser(user);
-                // reload model
+                await _account.UpdateProfileAsync(model);
 
                 model.SaveMessage = "Saved!";
                 model.MessageType = Enums.AlertType.Success;
@@ -153,10 +129,15 @@ namespace Hood.Areas.Admin.Controllers
                 model.SaveMessage = "There was an error while saving: " + ex.Message;
                 model.MessageType = Enums.AlertType.Danger;
             }
-            model.Roles = await _userManager.GetRolesAsync(user);
+
             model.AllRoles = _account.GetAllRoles();
+
             return View(model);
         }
+
+        #endregion       
+        
+        #region Create
 
         [Route("admin/users/create/")]
         public IActionResult Create()
@@ -164,28 +145,64 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        [Route("admin/users/reset/")]
+        [Route("admin/users/add/")]
         [HttpPost]
-        public async Task<Response> ResetPassword(string id, string password)
+        public async Task<Response> Create(CreateUserModel model)
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, token, password);
-                if (result.Succeeded)
+                var user = new ApplicationUser
                 {
-                    return new Response(true);
+                    UserName = model.cuUserName,
+                    Email = model.cuUserName,
+                    FirstName = model.cuFirstName,
+                    LastName = model.cuLastName,
+                    CreatedOn = DateTime.Now,
+                    LastLogOn = DateTime.Now
+                };
+                user.AddUserNote(new UserNote()
+                {
+                    CreatedBy = User.GetUserId(),
+                    CreatedOn = DateTime.Now,
+                    Note = $"User created via admin panel by {User.Identity.Name}."
+                });
+                var result = await _userManager.CreateAsync(user, model.cuPassword);
+                if (!result.Succeeded)
+                {
+                    return new Response(result.Errors);
                 }
-                else
+                if (model.cuNotifyUser)
                 {
-                    string error = "";
-                    foreach (var err in result.Errors)
+                    // Send the email to the user, letting em know n' shit.
+                    // Create the email content
+
+                    try
                     {
-                        error += err.Description + Environment.NewLine;
+                        MailObject message = new MailObject()
+                        {
+                            To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                            PreHeader = "You access information for " + Engine.Settings.Basic.FullTitle,
+                            Subject = "You account has been created."
+                        };
+                        message.AddH1("Account Created!");
+                        message.AddParagraph("Your new account has been set up on the " + Engine.Settings.Basic.FullTitle + " website.");
+                        message.AddParagraph("Name: <strong>" + user.ToFullName() + "</strong>");
+                        message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
+                        message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
+                        message.AddCallToAction("Log in here", ControllerContext.HttpContext.GetSiteUrl() + "/account/login", "#32bc4e", "center");
+                        await _emailSender.SendEmailAsync(message);
                     }
-                    throw new Exception(error);
+                    catch (Exception)
+                    {
+                        // roll back!
+                        var deleteUser = await _userManager.FindByEmailAsync(model.cuUserName);
+                        await _userManager.DeleteAsync(deleteUser);
+                        throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
+                    }
                 }
+                var response = new Response(true, "Published successfully.");
+                response.Url = Url.Action("Edit", new { id = user.Id, message = EditorMessage.Created });
+                return response;
             }
             catch (Exception ex)
             {
@@ -193,23 +210,35 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [Route("admin/users/getaddresses/")]
-        [HttpGet]
-        public List<Address> GetAddresses()
+        #endregion
+
+        #region Delete
+
+        [Route("admin/users/delete/")]
+        [HttpPost]
+        public async Task<Response> Delete(string id)
         {
-            var user = _account.GetCurrentUser();
-            return user.Addresses;
+            try
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                await _account.DeleteUserAsync(user);
+
+                var response = new Response(true, "Deleted successfully.");
+                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
         }
 
-        [Route("admin/users/getusernames/")]
-        public List<string> GetUserNames(bool normalised = false)
-        {
-            if (normalised)
-                return _db.Users.Select(u => u.NormalizedUserName).ToList();
-            return _db.Users.Select(u => u.UserName).ToList();
-        }
+        #endregion
 
-        [Route("admin/users/getavatar/")]
+        #region Avatars
+
+        [Route("admin/users/avatar/get/")]
         [HttpGet]
         public IMediaObject GetAvatar(string id)
         {
@@ -230,6 +259,26 @@ namespace Hood.Areas.Admin.Controllers
                 return MediaObject.Blank;
             }
         }
+        [Route("admin/users/avata/clear/")]
+        [HttpGet]
+        public Response ClearAvatar(string id)
+        {
+            try
+            {
+                var user = _account.GetUserById(id);
+                user.Avatar = null;
+                _account.UpdateUser(user);
+                return new Response(true, "The image has been cleared!");
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Roles
 
         [Route("admin/users/getroles/")]
         [HttpGet]
@@ -294,108 +343,9 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [Route("admin/users/add/")]
-        [HttpPost]
-        public async Task<Response> Add(CreateUserModel model)
-        {
-            try
-            {
-                var user = new ApplicationUser
-                {
-                    UserName = model.cuUserName,
-                    Email = model.cuUserName,
-                    FirstName = model.cuFirstName,
-                    LastName = model.cuLastName,
-                    CreatedOn = DateTime.Now,
-                    LastLogOn = DateTime.Now
-                };
-                user.AddUserNote(new UserNote()
-                {
-                    CreatedBy = User.GetUserId(),
-                    CreatedOn = DateTime.Now,
-                    Note = $"User created via admin panel by {User.Identity.Name}."
-                });
-                var result = await _userManager.CreateAsync(user, model.cuPassword);
-                if (!result.Succeeded)
-                {
-                    return new Response(result.Errors);
-                }
-                if (model.cuNotifyUser)
-                {
-                    // Send the email to the user, letting em know n' shit.
-                    // Create the email content
+        #endregion
 
-                    try
-                    {
-                        MailObject message = new MailObject()
-                        {
-                            To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                            PreHeader = "You access information for " + Engine.Settings.Basic.FullTitle,
-                            Subject = "You account has been created."
-                        };
-                        message.AddH1("Account Created!");
-                        message.AddParagraph("Your new account has been set up on the " + Engine.Settings.Basic.FullTitle + " website.");
-                        message.AddParagraph("Name: <strong>" + user.ToFullName() + "</strong>");
-                        message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
-                        message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
-                        message.AddCallToAction("Log in here", ControllerContext.HttpContext.GetSiteUrl() + "/account/login", "#32bc4e", "center");
-                        await _emailSender.SendEmailAsync(message);
-                    }
-                    catch (Exception)
-                    {
-                        // roll back!
-                        var deleteUser = await _userManager.FindByEmailAsync(model.cuUserName);
-                        await _userManager.DeleteAsync(deleteUser);
-                        throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
-                    }
-                }
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Edit", new { id = user.Id, message = EditorMessage.Created });
-                return response;
-            }
-            catch (Exception ex)
-            {
-                return new Response(ex.Message);
-            }
-        }
-
-        [Route("admin/users/clearimage/")]
-        [HttpGet]
-        public Response ClearImage(string id)
-        {
-            try
-            {
-                var user = _account.GetUserById(id);
-                user.Avatar = null;
-                _account.UpdateUser(user);
-                return new Response(true, "The image has been cleared!");
-            }
-            catch (Exception ex)
-            {
-                return new Response(ex.Message);
-            }
-        }
-
-        [Route("admin/users/delete/")]
-        [HttpPost()]
-        public async Task<Response> Delete(string id)
-        {
-            try
-            {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
-                await _account.DeleteUserAsync(user);
-
-                var response = new Response(true, "Deleted successfully.");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
-                return response;
-
-            }
-            catch (Exception ex)
-            {
-                return new Response(ex.Message);
-            }
-        }
-
+        #region Impersonation
         public async Task<IActionResult> Impersonate(string id)
         {
             if (!id.IsSet())
@@ -434,6 +384,42 @@ namespace Hood.Areas.Admin.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+        #endregion
+
+        #region Password
+
+        [Route("admin/users/reset/")]
+        [HttpPost]
+        public async Task<Response> ResetPassword(string id, string password)
+        {
+            try
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, password);
+                if (result.Succeeded)
+                {
+                    return new Response(true);
+                }
+                else
+                {
+                    string error = "";
+                    foreach (var err in result.Errors)
+                    {
+                        error += err.Description + Environment.NewLine;
+                    }
+                    throw new Exception(error);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Mailchimp
 
         [Route("admin/users/sync/mailchimp/")]
         public async Task<IActionResult> SyncToMailchimp()
@@ -487,5 +473,7 @@ namespace Hood.Areas.Admin.Controllers
             stats.UnsubscribedUsers = unsubscribed.Select(m => m.EmailAddress).ToList();
             return View(stats);
         }
+
+        #endregion
     }
 }

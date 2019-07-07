@@ -24,7 +24,7 @@ $.hood.Addresses = {
     Refresh: function () {
         $.hood.Inline.Reload('.address-list');
         // reload any selectlists that contain billing or delivery addresses (checkouts etc.)
-        $.get('/admin/users/getaddresses', null, function (data) {
+        $.get('/account/addresses/get', null, function (data) {
             $('.address-select').empty().append($('<option>', { value: '', text: '--- Choose an address ---' }));
             for (var i in data) {
                 var id = data[i].Id;

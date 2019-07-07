@@ -13,22 +13,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
-    public class UserProfile : IdentityUser, IUserProfile
+    public abstract class UserProfileBase : IdentityUser, IUserProfile
     {
 
         #region LogOn Information
         [Display(Name = "Account Activated")]
-        public bool Active { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime LastLogOn { get; set; }
+        public virtual bool Active { get; set; }
+        public virtual DateTime CreatedOn { get; set; }
+        public virtual DateTime LastLogOn { get; set; }
         [ProtectedPersonalData]
-        public string LastLoginIP { get; set; }
+        public virtual string LastLoginIP { get; set; }
         [ProtectedPersonalData]
-        public string LastLoginLocation { get; set; }
+        public virtual string LastLoginLocation { get; set; }
         [ProtectedPersonalData]
-        public string Latitude { get; set; }
+        public virtual string Latitude { get; set; }
         [ProtectedPersonalData]
-        public string Longitude { get; set; }
+        public virtual string Longitude { get; set; }
         #endregion
 
         #region IName 
@@ -47,19 +47,19 @@ namespace Hood.Models
         #endregion
 
         #region Addresses 
-        public List<Address> Addresses { get; set; }
+        public virtual List<Address> Addresses { get; set; }
 
-        public string BillingAddressJson { get; set; }
+        public virtual string BillingAddressJson { get; set; }
         [NotMapped]
-        public Address DeliveryAddress
+        public virtual Address DeliveryAddress
         {
             get { return DeliveryAddressJson.IsSet() ? JsonConvert.DeserializeObject<Address>(DeliveryAddressJson) : null; }
             set { DeliveryAddressJson = JsonConvert.SerializeObject(value); }
         }
 
-        public string DeliveryAddressJson { get; set; }
+        public virtual string DeliveryAddressJson { get; set; }
         [NotMapped]
-        public Address BillingAddress
+        public virtual Address BillingAddress
         {
             get { return BillingAddressJson.IsSet() ? JsonConvert.DeserializeObject<Address>(BillingAddressJson) : null; }
             set { BillingAddressJson = JsonConvert.SerializeObject(value); }
@@ -70,7 +70,7 @@ namespace Hood.Models
 
         [Display(Name = "Stripe Customer Id")]
         [ProtectedPersonalData]
-        public string StripeId { get; set; }
+        public virtual string StripeId { get; set; }
 
         #endregion
 
@@ -160,12 +160,12 @@ namespace Hood.Models
 
         #region Notes 
         [NotMapped]
-        public List<UserNote> Notes
+        public virtual List<UserNote> Notes
         {
             get { return this[nameof(Notes)] != null ? JsonConvert.DeserializeObject<List<UserNote>>(this[nameof(Notes)]) : new List<UserNote>(); }
             set { this[nameof(Notes)] = JsonConvert.SerializeObject(value); }
         }
-        public void AddUserNote(UserNote note)
+        public virtual void AddUserNote(UserNote note)
         {
             var notes = this.Notes;
             notes.Add(note);
@@ -181,7 +181,5 @@ namespace Hood.Models
         [JsonIgnore]
         public virtual string SaveMessage { get; set; }
         #endregion
-
     }
-
 }

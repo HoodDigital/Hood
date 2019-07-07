@@ -1,4 +1,8 @@
-﻿using Hood.Services;
+﻿using Hood.Caching;
+using Hood.Extensions;
+using Hood.Models;
+using Hood.Services;
+using Microsoft.AspNetCore.Http;
 using System.Runtime.CompilerServices;
 
 namespace Hood.Core
@@ -14,7 +18,7 @@ namespace Hood.Core
         /// Create a static instance of the Hood engine.
         /// </summary>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static IHoodServiceProvider LoadEngine()
+        public static IHoodServiceProvider CreateHoodServiceProvider()
         {
             if (Singleton<IHoodServiceProvider>.Instance == null)
                 Singleton<IHoodServiceProvider>.Instance = new HoodServiceProvider();
@@ -24,7 +28,7 @@ namespace Hood.Core
 
         #endregion
 
-        #region Properties
+        #region Static Accessors
 
         /// <summary>
         /// Gets the singleton HoodServiceProvider used to manage and provide global access to Hood services.
@@ -35,7 +39,7 @@ namespace Hood.Core
             {
                 if (Singleton<IHoodServiceProvider>.Instance == null)
                 {
-                    LoadEngine();
+                    CreateHoodServiceProvider();
                 }
 
                 return Singleton<IHoodServiceProvider>.Instance;
@@ -49,6 +53,37 @@ namespace Hood.Core
             get
             {
                 return Services.Resolve<ISettingsRepository>();
+            }
+        }
+        /// <summary>
+        /// Gets the current resolvable version of the IHoodCache.
+        /// </summary>
+        public static IHoodCache Cache
+        {
+            get
+            {
+                return Services.Resolve<IHoodCache>();
+            }
+        }
+        /// <summary>
+        /// Gets the current resolvable version of the ILogService.
+        /// </summary>
+        public static ILogService Logs
+        {
+            get
+            {
+                return Services.Resolve<ILogService>();
+            }
+        }
+        /// <summary>
+        /// Gets the current user's account, from context, cache or datastore.
+        /// </summary>
+        public static UserProfile Account
+        {
+            get
+            {
+                var _contextAccessor = Services.Resolve<IHttpContextAccessor>();
+                return _contextAccessor.HttpContext.User.AccountInfo();
             }
         }
         /// <summary>

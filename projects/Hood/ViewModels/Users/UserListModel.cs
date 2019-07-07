@@ -6,7 +6,7 @@ using Hood.Models;
 
 namespace Hood.ViewModels
 {
-    public class UserSearchModel : PagedList<ApplicationUser>, IPageableModel
+    public class UserListModel : PagedList<ApplicationUser>, IPageableModel
     {
         [FromQuery(Name = "sort")]
         public string Order { get; set; }
@@ -14,6 +14,8 @@ namespace Hood.ViewModels
         public string Role { get; set; }
         [FromQuery(Name = "search")]
         public string Search { get; set; }
+        [FromQuery(Name = "sub")]
+        public string Subscription { get; set; }
 
         public string GetPageUrl(int pageIndex)
         {
