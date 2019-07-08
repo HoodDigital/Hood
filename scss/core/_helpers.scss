@@ -1,0 +1,60 @@
+@each $color, $value in $colors {
+    @include bg-variant(".bg-#{$color}", $value);
+}
+@if $enable-gradients {
+    @each $color, $value in $colors {
+        @include bg-gradient-variant(".bg-gradient-#{$color}", $value);
+    }
+}
+// number of cards per line for each breakpoint
+$cards-per-line-3: ( xs: 1, sm: 2, md: 3, lg: 3, xl: 3 ) !default;
+$cards-per-line-4: ( xs: 1, sm: 2, md: 3, lg: 4, xl: 4 ) !default;
+$cards-per-line-5: ( xs: 1, sm: 2, md: 3, lg: 4, xl: 5 ) !default;
+@each $name, $breakpoint in $grid-breakpoints {
+    @media (min-width: $breakpoint) {
+        .card-deck-3 .card {
+            flex: 0 0 calc(#{100/map-get($cards-per-line-3, $name)}% - #{$grid-gutter-width});
+            margin-bottom: $grid-gutter-width;
+        }
+    }
+    @media (min-width: $breakpoint) {
+        .card-deck-4 .card {
+            flex: 0 0 calc(#{100/map-get($cards-per-line-4, $name)}% - #{$grid-gutter-width});
+            margin-bottom: $grid-gutter-width;
+        }
+    }
+    @media (min-width: $breakpoint) {
+        .card-deck-5 .card {
+            flex: 0 0 calc(#{100/map-get($cards-per-line-5, $name)}% - #{$grid-gutter-width});
+            margin-bottom: $grid-gutter-width;
+        }
+    }
+}
+
+.tiny-mce-body {
+    padding: 15px;
+}
+
+.no-wrap {
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.word-wrap, .pre-line, .user-text {
+    white-space: pre-line;
+}
+
+a.full-box-link {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-indent: -10000px;
+    overflow: hidden;
+    cursor: pointer;
+    z-index: 1;
+}

@@ -5,13 +5,13 @@
     var stripeUrl = string.Format("https://dashboard.stripe.com{0}", Engine.Settings.Billing.EnableStripeTestMode ? "/test" : "");
 }
 @section buttons {
-    @if (Model.StripeId.IsSet())
+    @if (Model.Customer != null)
     {
         <a class="btn btn-info" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, Model.StripeId)">
-            <i class="fa fa-cc-stripe"></i><span>&nbsp;View on Stripe</span>
+            <i class="fa fa-external-link-alt"></i><span>&nbsp;View on Stripe</span>
         </a>
     }
-    <a class="btn btn-dark reset-password"><i class="fa fa-lock"></i> Reset Password</a>
+    <a class="btn btn-dark reset-password text-white"><i class="fa fa-lock"></i> Reset Password</a>
     <a class="btn btn-warning" asp-action="Impersonate" asp-route-id="@Model.Id"><i class="fa fa-user-secret"></i> Impersonate</a>
     <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
 }
@@ -110,6 +110,13 @@
                         </div>
                         <small asp-for="Anonymous"></small>
                     </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input asp-for="MarketingEmails" class="custom-control-input">
+                            <label asp-for="MarketingEmails" class="custom-control-label"></label>
+                        </div>
+                        <small asp-for="MarketingEmails"></small>
+                    </div>
                     <hr class="mt-4 mb-4" />
                     <div class="form-group row align-items-center">
                         <div class="col-auto">
@@ -197,6 +204,37 @@
                 </div>
                 <div id="subscriptions" class="tab-pane" role="tabpanel" aria-labelledby="subscriptions-tab">
                     <div class="list-group list-group-flush">
+                        <div class="list-group-item p-3">
+                            @if (Model.Customer == null)
+                            {
+                                if (Model.MatchedCustomerObjects == null || Model.MatchedCustomerObjects.Count() == 0)
+                                {
+                                    <alert type="Warning" size="Medium" icon="fa-exclamation-triangle" class="m-0">There is no Stripe customer account associated with this user account.</alert>
+                                }
+                                else
+                                {
+                                    <alert type="Info" size="Large" icon="fa-info-circle" class="m-0">
+                                        <p>We found a matching Stripe customer account, but it is not attached to this user. Attach it now?</p>
+                                        @foreach (var match in Model.MatchedCustomerObjects)
+                                        {
+                                            <p class="m-0">
+                                                <span class="font-weight-bold">Customer Id: @match.Id</span>
+                                                <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, match.Id)">
+                                                    <i class="fa fa-external-link-alt mr-2"></i>Stripe
+                                                </a>
+                                                <a class="btn btn-sm btn-success" asp-action="LinkToStripe" asp-route-id="@Model.Id" asp-route-customerId="@match.Id">
+                                                    <i class="fa fa-link mr-2"></i>Link to Stripe
+                                                </a>
+                                            </p>
+                                        }
+                                    </alert>
+                                }
+                            }
+                            else
+                            {
+                                <alert type="Success" size="Medium" icon="fa-thumbs-up" class="m-0">The Stripe customer account (@Model.StripeId) is linked correctly to this account.</alert>
+                            }
+                        </div>
                         <div class="list-group-item">
                             <h5 class="m-0 text-success">Active Subscriptions</h5>
                         </div>
@@ -278,28 +316,47 @@
                         }
                     </div>
                 </div>
-                @*<div id="codes" class="tab-pane p-4" role="tabpanel" aria-labelledby="codes-tab">
-                        <div class="panel-body">
-                            <h5>Access Codes</h5>
-
-                            <div class="tag-list">
-                                @foreach (var code in Model.AccessCodes)
-                                {
-                                    <ul>
-                                        <li>
-                                            <p>
-                                                @code.Type - @code.Code - @code.Expiry.ToDisplay()
-                                            </p>
-                                        </li>
-                                    </ul>
-                                }
-                                @if (Model.AccessCodes.Count() == 0)
-                                {
-                                    @Html.BootstrapAlert("No access codes.", AlertType.Info, false)
-                                }
-                            </div>
+                <div id="codes" class="tab-pane" role="tabpanel" aria-labelledby="codes-tab">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <h5 class="m-0 text-success">Access Codes</h5>
                         </div>
-                    </div>*@
+                        @foreach (var code in Model.AccessCodes)
+                        {
+                            <div class="list-group-item list-group-item-action">
+                                <div class=" row align-items-center">
+                                    <div class="col">
+                                        <p class=" m-0">
+                                            <strong>@code.Code</strong> <small class="text-info">Expires @code.Expiry.ToDisplay()</small>
+                                        </p>
+                                        <p class="mb-0">
+                                            @if (code.Used)
+                                            {
+                                                <span class="badge-success badge">Used on @code.DateUsed.ToDisplay()</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">Unused</span>
+                                            }
+                                            <span class="badge badge-default">Type: @code.Type</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a class="btn btn-danger btn-sm" target="_blank" asp-action="DeleteAccessCode" asp-route-id="@code.Id">
+                                            <i class="fa fa-external-link-alt mr-2"></i>Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.AccessCodes.Count() == 0)
+                        {
+                            <div class="list-group-item">
+                                <p class="m-0 text-muted">No access codes created.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
                 <div id="notes" class="tab-pane" role="tabpanel" aria-labelledby="notes-tab">
                     <div class="list-group list-group-flush">
                         <div class="list-group-item">
@@ -312,6 +369,12 @@
                                     <p class="mb-0">@note.Note</p>
                                     <footer class="blockquote-footer">@note.CreatedBy <cite title="Source Title">@note.CreatedOn.ToDisplay()</cite></footer>
                                 </blockquote>
+                            </div>
+                        }
+                        @if (subs.Count() == 0)
+                        {
+                            <div class="list-group-item">
+                                <p class="m-0 text-muted">No notes created.</p>
                             </div>
                         }
                         <div class="list-group-item list-group-item-action">

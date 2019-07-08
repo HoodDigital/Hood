@@ -18,6 +18,7 @@ namespace Hood.Services
         Task UpdateUserAsync(ApplicationUser user);
         Task DeleteUserAsync(ApplicationUser user);
         Task<UserProfile> GetProfileAsync(string id);
+        Task<List<UserAccessCode>> GetAccessCodesAsync(string id);
         Task UpdateProfileAsync(UserProfile user);
         #endregion
 
@@ -34,7 +35,8 @@ namespace Hood.Services
         #endregion
 
         #region Stripe customer object
-        Task<Stripe.Customer> LoadCustomerObjectAsync(string stripeId, bool allowNullObject);
+        Task<Stripe.Customer> GetCustomerObjectAsync(string stripeId, bool allowNullObject);
+        Task<List<Stripe.Customer>> GetMatchingCustomerObjectsAsync(string email);
         #endregion
 
         #region Subscription Plans
@@ -67,7 +69,6 @@ namespace Hood.Services
         #region Statistics
         Task<object> GetStatisticsAsync();
         Task<object> GetSubscriptionStatisticsAsync();
-
         #endregion
 
         #region Obsolete

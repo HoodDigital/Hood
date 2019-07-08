@@ -1,197 +1,70 @@
-﻿using Hood.BaseTypes;
-using Hood.Entities;
-using Hood.Enums;
-using Hood.Extensions;
+﻿using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using Stripe;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
 
 namespace Hood.Models
 {
-    public abstract class UserProfileBase : IdentityUser, IUserProfile
+    public class UserProfile : UserProfileBase
     {
+        #region Subscription Data
+        public int ActiveCount { get; set; }
+        public int TrialCount { get; set; }
+        public int InactiveCount { get; set; }
+        public int OverDueCount { get; set; }
+        public int TotalSubscriptions { get; set; }
 
-        #region LogOn Information
-        [Display(Name = "Account Activated")]
-        public virtual bool Active { get; set; }
-        public virtual DateTime CreatedOn { get; set; }
-        public virtual DateTime LastLogOn { get; set; }
-        [ProtectedPersonalData]
-        public virtual string LastLoginIP { get; set; }
-        [ProtectedPersonalData]
-        public virtual string LastLoginLocation { get; set; }
-        [ProtectedPersonalData]
-        public virtual string Latitude { get; set; }
-        [ProtectedPersonalData]
-        public virtual string Longitude { get; set; }
-        #endregion
-
-        #region IName 
-        [Display(Name = "Anonymous", Description = "If set, user will details will not show up in public areas of the site.")]
-        public virtual bool Anonymous { get; set; }
-        [NotMapped]
-        public virtual string FullName { get; set; }
-        [Display(Name = "First name")]
-        [ProtectedPersonalData]
-        public virtual string FirstName { get; set; }
-        [Display(Name = "Last name")]
-        [ProtectedPersonalData]
-        public virtual string LastName { get; set; }
-        [ProtectedPersonalData]
-        [Display(Name = "Display name")]
-        public virtual string DisplayName { get; set; }
-        #endregion
-
-        #region Addresses 
-        public virtual List<Address> Addresses { get; set; }
-
-        public virtual string BillingAddressJson { get; set; }
-        [NotMapped]
-        public virtual Address DeliveryAddress
+        internal string _Subscriptions { get; set; }
+        public List<UserSubscriptionInfo> Subscriptions
         {
-            get { return DeliveryAddressJson.IsSet() ? JsonConvert.DeserializeObject<Address>(DeliveryAddressJson) : null; }
-            set { DeliveryAddressJson = JsonConvert.SerializeObject(value); }
+            get { return !_Subscriptions.IsSet() ? new List<UserSubscriptionInfo>() : JsonConvert.DeserializeObject<List<UserSubscriptionInfo>>(_Subscriptions); }
+            set { _Subscriptions = JsonConvert.SerializeObject(value); }
         }
 
-        public virtual string DeliveryAddressJson { get; set; }
-        [NotMapped]
-        public virtual Address BillingAddress
+        public int RoleCount { get; set; }
+        internal string _Roles { get; set; }
+        public List<IdentityRole> Roles
         {
-            get { return BillingAddressJson.IsSet() ? JsonConvert.DeserializeObject<Address>(BillingAddressJson) : null; }
-            set { BillingAddressJson = JsonConvert.SerializeObject(value); }
+            get { return !_Roles.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(_Roles); }
+            set { _Roles = JsonConvert.SerializeObject(value); }
+        }
+
+        internal ApplicationUser AsUser()
+        {
+            return (ApplicationUser)(IUserProfile)this;
         }
         #endregion
 
-        #region Billing 
-
-        [Display(Name = "Stripe Customer Id")]
-        [ProtectedPersonalData]
-        public virtual string StripeId { get; set; }
-
+        #region View Model Stuff
+        [NotMapped]
+        public IList<IdentityRole> AllRoles { get; set; }
+        [NotMapped]
+        public Customer Customer { get; set; }
+        [NotMapped]
+        public List<Customer> MatchedCustomerObjects { get; set; }
         #endregion
 
-        #region Avatar
-        public virtual string AvatarJson { get; set; }
+        #region Prevent Mapping Sensitive Fields
         [NotMapped]
-        public virtual IMediaObject Avatar
-        {
-            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.Blank; }
-            set { AvatarJson = JsonConvert.SerializeObject(value); }
-        }
-        #endregion
-
-        #region Metadata
-        public virtual string UserVars { get; set; }
+        public override DateTimeOffset? LockoutEnd { get; set; }
         [NotMapped]
-        public virtual Dictionary<string, string> Metadata
-        {
-            get { return UserVars.IsSet() ? JsonConvert.DeserializeObject<Dictionary<string, string>>(UserVars) : new Dictionary<string, string>(); }
-            set { UserVars = JsonConvert.SerializeObject(value); }
-        }
-        public virtual string this[string key]
-        {
-            get
-            {
-                if (Metadata.ContainsKey(key))
-                    return Metadata[key];
-                return null;
-            }
-            set
-            {
-                var list = Metadata;
-                if (list.ContainsKey(key))
-                    list[key] = value;
-                else
-                    list.Add(key, value);
-                Metadata = list;
-            }
-        }
-        #endregion
-
-        #region GDPR 
+        public override string ConcurrencyStamp { get; set; }
         [NotMapped]
-        [PersonalData]
-        [Display(Name = "Marketing Emails", Description = "Whether or not you consent to marketing emails.")]
-        public virtual bool MarketingEmails
-        {
-            get { return this[nameof(MarketingEmails)] != null ? JsonConvert.DeserializeObject<bool>(this[nameof(MarketingEmails)]) : false; }
-            set { this[nameof(MarketingEmails)] = JsonConvert.SerializeObject(value); }
-        }
-        #endregion
-
-        #region Socials 
+        public override string SecurityStamp { get; set; }
         [NotMapped]
-        [PersonalData]
-        [Display(Name = "Website URL")]
-        public virtual string WebsiteUrl { get => this[nameof(WebsiteUrl)]; set => this[nameof(WebsiteUrl)] = value; }
+        public override string PasswordHash { get; set; }
         [NotMapped]
-        [PersonalData]
-        [Display(Name = "Twitter URL")]
-        public virtual string Twitter { get => this[nameof(Twitter)]; set => this[nameof(Twitter)] = value; }
+        public override string NormalizedEmail { get; set; }
         [NotMapped]
-        [PersonalData]
-        [Display(Name = "Twitter Handle (@yourname)")]
-        public virtual string TwitterHandle { get => this[nameof(TwitterHandle)]; set => this[nameof(TwitterHandle)] = value; }
+        public override string NormalizedUserName { get; set; }
         [NotMapped]
-        [PersonalData]
-        [Display(Name = "Facebook URL")]
-        public virtual string Facebook { get => this[nameof(Facebook)]; set => this[nameof(Facebook)] = value; }
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "Instagram URL")]
-        public virtual string Instagram { get => this[nameof(Instagram)]; set => this[nameof(Instagram)] = value; }
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "LinkedIn URL")]
-        public virtual string LinkedIn { get => this[nameof(LinkedIn)]; set => this[nameof(LinkedIn)] = value; }
-        #endregion
-
-        #region Extra Profile Fields
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "Forum Signature")]
-        public virtual string ForumSignature { get => this[nameof(ForumSignature)]; set => this[nameof(ForumSignature)] = value; }
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "Company name")]
-        public virtual string CompanyName { get => this[nameof(CompanyName)]; set => this[nameof(CompanyName)] = value; }
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "Bio")]
-        public virtual string Bio { get => this[nameof(Bio)]; set => this[nameof(Bio)] = value; }
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "Job Title")]
-        public virtual string JobTitle { get => this[nameof(JobTitle)]; set => this[nameof(JobTitle)] = value; }
-        #endregion
-
-        #region Notes 
-        [NotMapped]
-        public virtual List<UserNote> Notes
-        {
-            get { return this[nameof(Notes)] != null ? JsonConvert.DeserializeObject<List<UserNote>>(this[nameof(Notes)]) : new List<UserNote>(); }
-            set { this[nameof(Notes)] = JsonConvert.SerializeObject(value); }
-        }
-        public virtual void AddUserNote(UserNote note)
-        {
-            var notes = this.Notes;
-            notes.Add(note);
-            this.Notes = notes;
-        }
-        #endregion
-
-        #region ISaveableModel
-        [NotMapped]
-        [JsonIgnore]
-        public virtual AlertType MessageType { get; set; }
-        [NotMapped]
-        [JsonIgnore]
-        public virtual string SaveMessage { get; set; }
+        public override int AccessFailedCount { get; set; }
         #endregion
     }
 }

@@ -1,0 +1,13 @@
+.form-group {
+    label {
+        font-weight: $font-weight-bold;
+    }
+
+    &.image-editor {
+        figure {
+            margin: 0;
+            border: 3px solid white;
+            box-shadow: 0 0 3px rgba($black, .5);
+        }
+    }
+}

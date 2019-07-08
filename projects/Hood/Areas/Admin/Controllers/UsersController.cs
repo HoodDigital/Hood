@@ -81,15 +81,13 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #region Edit
-
         [Route("admin/users/edit/{id}/")]
         public async Task<IActionResult> Edit(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id) as UserProfile;
-            model.AllRoles = await _account.GetAllRolesAsync();
+            await LoadAndCheckProfile(model);
             return View(model);
         }
-
         [Route("admin/users/edit/{id}/")]
         [HttpPost]
         public async Task<IActionResult> Edit(UserProfile model)
@@ -129,15 +127,49 @@ namespace Hood.Areas.Admin.Controllers
                 MessageType = Enums.AlertType.Danger;
             }
 
-            model.AllRoles = await _account.GetAllRolesAsync();
-
+            await LoadAndCheckProfile(model);
             return View(model);
         }
+        [Route("admin/users/stripe/link/{id}/")]
+        public async Task<IActionResult> LinkToStripe(string id, string customerId)
+        {
+            try
+            {
+                var user = await _account.GetUserByIdAsync(id);
+                var customer = await _account.GetCustomerObjectAsync(user.StripeId, true);
+                if (customer == null)
+                {
+                    customer = await _account.GetCustomerObjectAsync(customerId, true);
+                    if (customer == null)
+                        throw new Exception("The customer object does could not be validated.");
+                    if (customer.Email.ToLower() != user.Email.ToLower())
+                        throw new Exception("The email for the customer object does not match the user's email.");
 
-        #endregion       
-        
+                    user.StripeId = customerId;
+                    await _account.UpdateUserAsync(user);
+                    SaveMessage = "Account has been successfully linked with the Stripe customer account.";
+                    MessageType = Enums.AlertType.Success;
+                }
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while linking the customer object: {ex.Message}";
+                MessageType = Enums.AlertType.Success;
+                await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Edit), new { id });
+        }
+        private async Task LoadAndCheckProfile(UserProfile model)
+        {
+            model.AllRoles = await _account.GetAllRolesAsync();
+            model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
+            model.Customer = await _account.GetCustomerObjectAsync(model.StripeId, true);
+            if (model.Customer == null)
+                model.MatchedCustomerObjects = await _account.GetMatchingCustomerObjectsAsync(model.Email);
+        }
+        #endregion
+
         #region Create
-
         [Route("admin/users/create/")]
         public IActionResult Create()
         {
@@ -210,11 +242,9 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex.Message);
             }
         }
-
         #endregion
 
         #region Delete
-
         [Route("admin/users/delete/")]
         [HttpPost]
         public async Task<Response> Delete(string id)
@@ -236,11 +266,9 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex.Message);
             }
         }
-
         #endregion
 
         #region Avatars
-
         [Route("admin/users/avatar/get/")]
         [HttpGet]
         public async Task<IMediaObject> GetAvatar(string id)
@@ -278,11 +306,9 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex.Message);
             }
         }
-
         #endregion
 
         #region Roles
-
         [Route("admin/users/getroles/")]
         [HttpGet]
         public async Task<JsonResult> GetRoles(string id)
@@ -291,7 +317,6 @@ namespace Hood.Areas.Admin.Controllers
             IList<string> roles = await _userManager.GetRolesAsync(user);
             return Json(new { success = true, roles });
         }
-
         [Route("admin/users/addtorole/")]
         [HttpPost]
         public async Task<Response> AddToRole(string id, string role)
@@ -322,7 +347,6 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex.Message);
             }
         }
-
         [Route("admin/users/removefromrole/")]
         [HttpPost]
         public async Task<Response> RemoveFromRole(string id, string role)
@@ -345,7 +369,6 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex.Message);
             }
         }
-
         #endregion
 
         #region Impersonation
@@ -367,7 +390,6 @@ namespace Hood.Areas.Admin.Controllers
 
             return RedirectToAction("Index", "Home", new { area = "" });
         }
-
         [AllowAnonymous]
         public async Task<IActionResult> StopImpersonation()
         {
@@ -390,7 +412,6 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Password
-
         [Route("admin/users/reset/")]
         [HttpPost]
         public async Task<Response> ResetPassword(string id, string password)
@@ -419,11 +440,9 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex.Message);
             }
         }
-
         #endregion
 
         #region Mailchimp
-
         [Route("admin/users/sync/mailchimp/")]
         public async Task<IActionResult> SyncToMailchimp()
         {
@@ -476,7 +495,6 @@ namespace Hood.Areas.Admin.Controllers
             stats.UnsubscribedUsers = unsubscribed.Select(m => m.EmailAddress).ToList();
             return View(stats);
         }
-
         #endregion
     }
 }

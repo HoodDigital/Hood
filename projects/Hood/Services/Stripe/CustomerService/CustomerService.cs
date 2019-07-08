@@ -47,14 +47,18 @@ namespace Hood.Services
             return stripeCustomer;
         }
 
-        public async Task<IEnumerable<Stripe.Customer>> GetAllAsync()
+        public async Task<IEnumerable<Stripe.Customer>> GetAsync(string email)
         {
-            return await _stripe.CustomerService.ListAsync(new Stripe.CustomerListOptions()
-            {
-                
-            }, new Stripe.RequestOptions() {
+            return await _stripe.CustomerService.ListAsync(
+                new Stripe.CustomerListOptions()
+                {
+                    Email = email
+                }, 
+                new Stripe.RequestOptions()
+                {
 
-            });
+                }
+            );
         }
 
         public async Task SetDefaultCard(string customerId, string cardId)

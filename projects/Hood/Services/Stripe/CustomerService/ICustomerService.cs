@@ -22,7 +22,7 @@ namespace Hood.Services
         /// Returns all the subscription customers for this account.
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Stripe.Customer>> GetAllAsync();
+        Task<IEnumerable<Stripe.Customer>> GetAsync(string email);
 
         /// <summary>
         /// This creates a new customer on stripe, and if set, adds them to the provided plan id.

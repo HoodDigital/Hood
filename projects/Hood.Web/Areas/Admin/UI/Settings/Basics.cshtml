@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "Site Settings";
     Layout = "_Layout_Settings";
-    var pages = _content.GetPages();
 }
 @section buttons {
     @if (User.IsAdminOrBetter())
@@ -71,9 +70,9 @@
                     <label asp-for="Homepage"></label>
                     <select asp-for="Homepage" class="form-control">
                         <option value="">Default Homepage</option>
-                        @foreach (var content in pages)
+                        @foreach (var content in _content.GetPages())
                         {
-                            <option value="@content.PageId">@content.Title</option>
+                            <option value="@content.Id">@content.Title</option>
                         }
                     </select>
                     <small asp-for="Homepage"></small>
@@ -213,9 +212,9 @@
                     <label asp-for="LockoutModeHoldingPage"></label>
                     <select asp-for="LockoutModeHoldingPage" class="form-control">
                         <option value="">Default Holding Page</option>
-                        @foreach (var content in pages)
+                        @foreach (var content in _content.GetPages())
                         {
-                            <option value="@content.PageId">@content.Title</option>
+                            <option value="@content.Id">@content.Title</option>
                         }
                     </select>
                     <small asp-for="LockoutModeHoldingPage"></small>

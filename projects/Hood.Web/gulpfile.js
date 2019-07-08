@@ -4,6 +4,7 @@
 // In production, you should install the nuget and bower packages to your HoodCMS project.
 
 var gulp = require('gulp'),
+    babel = require('gulp-babel'),
     sass = require('gulp-sass'),
     rimraf = require('gulp-rimraf'),
     concat = require('gulp-concat'),
@@ -80,6 +81,9 @@ gulp.task('js', function () {
         l.end();
     });
     return gulp.src([hood.js + '**/*.js', '!' + hood.js + '**/*.min.js', '!' + hood.js + '**/*.packaged.js'], { base: hood.js })
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
         .pipe(gulp.dest(output.js))
         .pipe(l)
         .pipe(rename({ suffix: '.min' }))
@@ -88,6 +92,42 @@ gulp.task('js', function () {
 });
 
 // Bundle the app into the packaged form and copies the output to the output directories.
+gulp.task('js:core', function () {
+    l = uglify({});
+    l.on('error', function (e) {
+        console.log(e);
+        l.end();
+    });
+    return gulp.src([
+
+        hood.js + 'core/production.js',
+        hood.js + 'core/globals.js',
+
+        hood.js + 'core/helpers.js',
+        hood.js + 'core/handlers.js',
+        hood.js + 'core/stringhelpers.js',
+        hood.js + 'core/validator.js',
+
+        hood.js + 'core/alerts.js',
+        hood.js + 'core/forms.js',
+        hood.js + 'core/inline.js',
+        hood.js + 'core/media.js',
+        hood.js + 'core/modals.js',
+        hood.js + 'core/addresses.js'
+
+    ], { base: '.' })
+        .pipe(concat('core.js'))
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
+        .pipe(gulp.dest(hood.js))
+        .pipe(gulp.dest(output.js))
+        .pipe(l)
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest(hood.js))
+        .pipe(gulp.dest(output.js));
+});
+
 gulp.task('js:package:app', function () {
     l = uglify({});
     l.on('error', function (e) {
@@ -95,21 +135,14 @@ gulp.task('js:package:app', function () {
         l.end();
     });
     return gulp.src([
-        hood.js + 'includes/production.js',
-        hood.js + 'includes/globals.js',
-        hood.js + 'includes/stringhelpers.js',
-        hood.js + 'includes/alerts.js',
-        hood.js + 'includes/helpers.js',
-        hood.js + 'includes/forms.js',
-        hood.js + 'includes/handlers.js',
-        hood.js + 'includes/pager.js',
-        hood.js + 'includes/validator.js',
-        hood.js + 'includes/modals.js',
-        hood.js + 'includes/inline.js',
-        hood.js + 'includes/addresses.js',
-        hood.js + 'includes/cart.js',
+
+        hood.js + 'app/cart.js',
         hood.js + 'app.js'
+
     ], { base: '.' })
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
         .pipe(concat('app.packaged.js'))
         .pipe(l)
         .pipe(gulp.dest(hood.js))
@@ -124,10 +157,16 @@ gulp.task('js:package:login', function () {
         l.end();
     });
     return gulp.src([
+
         lib + 'jquery-mask/jquery.mask.js',
-        hood.js + 'includes/production.js',
+        hood.js + 'core.js',
+
         hood.js + 'login.js'
+
     ], { base: '.' })
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
         .pipe(concat('login.packaged.js'))
         .pipe(l)
         .pipe(gulp.dest(hood.js))
@@ -142,41 +181,37 @@ gulp.task('js:package:admin', function () {
         l.end();
     });
     return gulp.src([
-        hood.js + 'includes/production.js',
-        hood.js + 'includes/globals.js',
-        hood.js + 'includes/stringhelpers.js',
-        hood.js + 'includes/uploader.js',
-        hood.js + 'includes/alerts.js',
-        hood.js + 'includes/helpers.js',
-        hood.js + 'includes/forms.js',
-        hood.js + 'includes/handlers.js',
-        hood.js + 'includes/fileupload.js',
-        hood.js + 'includes/pager.js',
-        hood.js + 'includes/validator.js',
-        hood.js + 'includes/blades.js',
-        hood.js + 'includes/modals.js',
-        hood.js + 'includes/inline.js',
-        hood.js + 'includes/media.js',
-        hood.js + 'includes/users.js',
-        hood.js + 'includes/themes.js',
-        hood.js + 'includes/property.js',
-        hood.js + 'includes/subscriptions.js',
-        hood.js + 'includes/content.js',
-        hood.js + 'includes/forums.js',
-        hood.js + 'includes/logs.js',
-        hood.js + 'includes/google.js',
+
+        hood.js + 'core.js',
+
+        hood.js + 'admin/content.js',
+        hood.js + 'admin/forums.js',
+        hood.js + 'admin/import.property.js',
+        hood.js + 'admin/io.reporter.js',
+        hood.js + 'admin/logs.js',
+        hood.js + 'admin/subscriptions.js',
+        hood.js + 'admin/themes.js',
+        hood.js + 'admin/users.js',
+
+        hood.js + 'app/google.js',
         hood.js + 'admin.js'
+
     ], { base: '.' })
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
         .pipe(concat('admin.packaged.js'))
         .pipe(l)
         .pipe(gulp.dest(hood.js))
         .pipe(gulp.dest(output.js));
+
 });
 
-gulp.task('package', gulp.series('js:package:admin', 'js:package:app', 'js:package:login'));
+gulp.task('package', gulp.series('js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
 gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images'), gulp.parallel('scss:copy', 'cssnano', 'package')));
 
 // Site workload, for the local site to compile files for use.
+
 gulp.task('site:js', function () {
     l = uglify({});
     l.on('error', function (e) {

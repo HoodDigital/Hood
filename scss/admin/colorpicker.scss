@@ -1,0 +1,28 @@
+.colorpicker-component {
+    width: 100%;
+}
+
+.colorpicker-element .input-group-addon,
+.colorpicker-element .add-on {
+    background-image: url(/hood/images/transparent.png);
+    padding: 0px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    width: 41px;
+}
+
+.colorpicker-element .input-group-addon i,
+.colorpicker-element .add-on i {
+    display: inline-block;
+    cursor: pointer;
+    height: 100%;
+    vertical-align: text-top;
+    width: 41px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

@@ -192,7 +192,7 @@ namespace Hood.Controllers
                 Category = category,
                 Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Category = category, Addon = false })).List,
                 Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List,
-                Customer = await _account.LoadCustomerObjectAsync(Engine.Account.StripeId, true)
+                Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId, true)
             };
             ViewData["ReturnUrl"] = returnUrl;
             return model;

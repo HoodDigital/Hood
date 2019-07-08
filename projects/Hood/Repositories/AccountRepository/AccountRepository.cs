@@ -57,7 +57,7 @@ namespace Hood.Services
         }
         public async Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true)
         {
-            if (id.IsSet())
+            if (!id.IsSet())
                 return null;
             var query = UserQuery;
             if (!track)
@@ -66,7 +66,7 @@ namespace Hood.Services
         }
         public async Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true)
         {
-            if (email.IsSet())
+            if (!email.IsSet())
                 return null;
             var query = UserQuery;
             if (!track)
@@ -75,7 +75,7 @@ namespace Hood.Services
         }
         public async Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true)
         {
-            if (stripeId.IsSet())
+            if (!stripeId.IsSet())
                 return null;
             var query = UserQuery;
             if (!track)
@@ -156,6 +156,10 @@ namespace Hood.Services
         {
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(u => u.Id == id);
             return profile;
+        }
+        public async Task<List<UserAccessCode>> GetAccessCodesAsync(string id)
+        {
+            return await _db.AccessCodes.Where(u => u.UserId == id).ToListAsync();
         }
         public async Task UpdateProfileAsync(UserProfile user)
         {
@@ -342,7 +346,7 @@ namespace Hood.Services
         #endregion
 
         #region Stripe customer object
-        public async Task<Customer> LoadCustomerObjectAsync(string stripeId, bool allowNullObject)
+        public async Task<Customer> GetCustomerObjectAsync(string stripeId, bool allowNullObject)
         {
             // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
             if (stripeId.IsSet())
@@ -354,11 +358,10 @@ namespace Hood.Services
                         await ResetBillingInfoAsync();
                         customer = null;
                     }
-                    if (customer == null)
-                        if (!allowNullObject)
-                            throw new Exception(BillingMessage.NoCustomerObject.ToString());
-                        else
-                            await ResetBillingInfoAsync();
+                    if (!allowNullObject)
+                        throw new Exception(BillingMessage.NoCustomerObject.ToString());
+                    else
+                        await ResetBillingInfoAsync();
                     return customer;
                 }
                 catch (StripeException)
@@ -373,6 +376,22 @@ namespace Hood.Services
                 return null;
             else
                 throw new Exception(BillingMessage.NoStripeId.ToString());
+        }
+        public async Task<List<Customer>> GetMatchingCustomerObjectsAsync(string email)
+        {
+            // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
+            if (email.IsSet())
+                try
+                {
+                    var customers = await _billing.Customers.GetAsync(email);
+                    return customers.ToList();
+                }
+                catch (StripeException)
+                {
+                    return new List<Customer>();
+                }
+            else
+                return new List<Customer>();
         }
         private async Task ResetBillingInfoAsync()
         {
@@ -453,7 +472,7 @@ namespace Hood.Services
             Plan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
 
             // Check for customer or throw, but allow it to be null.
-            Customer customer = await LoadCustomerObjectAsync(user.StripeId, true);
+            Customer customer = await GetCustomerObjectAsync(user.StripeId, true);
 
             // The object for the new user subscription to be recieved from stripe.
             Stripe.Subscription newSubscription = null;
@@ -547,7 +566,7 @@ namespace Hood.Services
             UserSubscription userSub = GetUserSubscription(user, subscriptionId);
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId, false);
 
             if (customer.DefaultSourceId.IsSet() || customer.Sources?.Count() > 0)
             {
@@ -571,7 +590,7 @@ namespace Hood.Services
             ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
@@ -587,7 +606,7 @@ namespace Hood.Services
             ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
@@ -603,7 +622,7 @@ namespace Hood.Services
             ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await LoadCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId, false);
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
