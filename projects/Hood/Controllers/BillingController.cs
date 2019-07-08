@@ -22,7 +22,7 @@ namespace Hood.Controllers
         { }
 
         [HttpGet]
-        public async Task<IActionResult> Index(BillingMessage? message = null)
+        public async Task<IActionResult> Index()
         {
 
             BillingHomeModel model = new BillingHomeModel();
@@ -41,14 +41,21 @@ namespace Hood.Controllers
                         model.NextInvoice = null;
                     }
                 }
-                model.Message = message;
-                return View(model);
             }
             catch (Exception ex)
             {
-                model.Message = ex.Message.ToEnum(BillingMessage.Error);
-                return View(model);
+                SaveMessage = $"An error occurred while loading billing information for {Engine.Account.UserName}: {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
+            return View(model);
+        }
+        
+        internal async Task<IActionResult> NoCustomerAccount()
+        {
+            SaveMessage = $"Your customer account object was not found, so we have created one for you.";
+            MessageType = Enums.AlertType.Info;
+            return await Index();
         }
 
         public async Task<IActionResult> AddCard()
@@ -88,22 +95,18 @@ namespace Hood.Controllers
                     await _billing.Cards.CreateCard(model.Customer.Id, model.StripeToken);
                 }
 
-                return RedirectToAction("Index");
+                SaveMessage = $"The card has been added successfully.";
+                MessageType = Enums.AlertType.Success;
 
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                BillingMessage bm = BillingMessage.Null;
-                if (Enum.TryParse(ex.Message, out bm))
-                {
-                    model.AddBillingMessage(bm);
-                }
-                else
-                {
-                    model.AddBillingMessage(BillingMessage.StripeError);
-                }
-                return View(model);
+                SaveMessage = $"An error occurred while loading billing information for {Engine.Account.UserName}: {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
+            return View(model);
         }
 
         [StripeAccountRequired]
@@ -112,12 +115,16 @@ namespace Hood.Controllers
             try
             {
                 await _billing.Customers.SetDefaultCard(Engine.Account.StripeId, uid);
-                return RedirectToAction("Index", "Billing");
+                SaveMessage = $"Default card set.";
+                MessageType = Enums.AlertType.Success;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return RedirectToAction("Index", "Billing", new { Message = BillingMessage.Error });
+                SaveMessage = $"An error occurred while setting a default card: {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
+            return RedirectToAction(nameof(Index));
         }
 
         [StripeAccountRequired]
@@ -126,12 +133,16 @@ namespace Hood.Controllers
             try
             {
                 await _billing.Cards.DeleteCard(Engine.Account.StripeId, uid);
-                return RedirectToAction("Index", "Billing");
+                SaveMessage = $"Card deleted.";
+                MessageType = Enums.AlertType.Success;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return RedirectToAction("Index", "Billing", new { Message = BillingMessage.Error });
+                SaveMessage = $"An error occurred while deleting a card: {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
+            return RedirectToAction(nameof(Index));
         }
 
     }

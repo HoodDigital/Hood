@@ -291,7 +291,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 SaveMessage = $"An error occurred while creating a new property: {ex.Message}";
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 
@@ -309,7 +309,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 SaveMessage = $"An error occurred while deleting a property: {ex.Message}";
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 
@@ -326,7 +326,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 SaveMessage = $"An error occurred while publishing a property: {ex.Message}";
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 
@@ -343,7 +343,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 SaveMessage = $"An error occurred while archiving a property: {ex.Message}";
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 
@@ -460,7 +460,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 SaveMessage = $"An error occurred while clearing the field: {ex.Message}";
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 

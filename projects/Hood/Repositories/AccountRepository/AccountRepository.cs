@@ -411,7 +411,7 @@ namespace Hood.Services
                         customer = null;
                     }
                     if (!allowNullObject)
-                        throw new Exception(BillingMessage.NoCustomerObject.ToString());
+                        throw new Exception("There is no customer account associated with this user.");
                     else
                         await ResetBillingInfoAsync();
                     return customer;
@@ -421,13 +421,13 @@ namespace Hood.Services
                     if (allowNullObject)
                         return null;
                     else
-                        throw new Exception(BillingMessage.NoCustomerObject.ToString());
+                        throw new Exception("There is no customer account associated with this user.");
                 }
             else
                 if (allowNullObject)
                 return null;
             else
-                throw new Exception(BillingMessage.NoStripeId.ToString());
+                throw new Exception("There is no customer account associated with this user.");
         }
         public async Task<List<Customer>> GetMatchingCustomerObjectsAsync(string email)
         {
@@ -533,7 +533,7 @@ namespace Hood.Services
             if (cardId.IsSet())
             {
                 if (customer == null)
-                    throw new Exception(BillingMessage.NoCustomerObject.ToString());
+                    throw new Exception("There is no customer account associated with this user.");
 
                 // set the card as the default for the user, then subscribe the user.
                 await _billing.Customers.SetDefaultCard(customer.Id, cardId);
@@ -543,7 +543,7 @@ namespace Hood.Services
                 if (sub != null)
                 {
                     // there is an existing subscription, which is not cancelleed and matches the plan. BAIL OUT!                   
-                    throw new Exception(BillingMessage.SubscriptionExists.ToString());
+                    throw new Exception("There is already a matching active subscription to this plan.");
                 }
                 else
                 {
@@ -556,7 +556,7 @@ namespace Hood.Services
                 // if not, then the user must have supplied a token
                 Stripe.Token stripeTokenObj = _billing.Stripe.TokenService.Get(stripeToken);
                 if (stripeTokenObj == null)
-                    throw new Exception(BillingMessage.InvalidToken.ToString());
+                    throw new Exception("The payment method token was invalid.");
 
                 // Check if the customer object exists.
                 if (customer == null)
@@ -574,7 +574,7 @@ namespace Hood.Services
                     if (sub != null)
                     {
                         // there is an existing subscription, which is not cancelleed and matches the plan. BAIL OUT!                   
-                        throw new Exception(BillingMessage.SubscriptionExists.ToString());
+                        throw new Exception("There is already a matching active subscription to this plan.");
                     }
                     else
                     {
@@ -591,7 +591,7 @@ namespace Hood.Services
 
             // We got this far, let's add the detail to the local DB.
             if (newSubscription == null)
-                throw new Exception(BillingMessage.Error.ToString());
+                throw new Exception("The new subscription was not created correctly, please try again.");
 
             UserSubscription newUserSub = new UserSubscription();
             newUserSub = newUserSub.UpdateFromStripe(newSubscription);
@@ -632,7 +632,7 @@ namespace Hood.Services
                 await UpdateUserAsync(user);
             }
             else
-                throw new Exception(BillingMessage.NoPaymentSource.ToString());
+                throw new Exception("There is no currently active payment source on the account, please add one before upgrading.");
 
             return userSub;
         }
@@ -693,14 +693,14 @@ namespace Hood.Services
         {
             UserSubscription subscription = user.Subscriptions.Where(us => us.Id == userSubscriptionId).FirstOrDefault();
             if (subscription == null)
-                throw new Exception(BillingMessage.NoSubscription.ToString());
+                throw new Exception("Could not load the subscription for the user.");
             return subscription;
         }
         private UserSubscription GetUserSubscriptionByStripeId(ApplicationUser user, string stripeId)
         {
             UserSubscription subscription = user.Subscriptions.Where(us => us.StripeId == stripeId).FirstOrDefault();
             if (subscription == null)
-                throw new Exception(BillingMessage.NoSubscription.ToString());
+                throw new Exception("Could not load the subscription for the user.");
             return subscription;
         }
         #endregion

@@ -145,7 +145,11 @@ namespace Hood.Controllers
                             if (subs.Count > 0)
                             {
                                 if (!subs.Any(s => User.IsSubscribed(s)))
-                                    return RedirectToAction("Index", "Subscriptions", new { message = BillingMessage.UpgradeRequired });
+                                {
+                                    SaveMessage = "You need to purchase, upgrade or change your package to view this.";
+                                    MessageType = AlertType.Warning;
+                                    return RedirectToAction("Index", "Subscriptions");
+                                }
                             }
                     }
                 }

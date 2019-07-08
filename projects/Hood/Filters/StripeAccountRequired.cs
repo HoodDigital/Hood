@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Controllers;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
@@ -42,7 +43,7 @@ namespace Hood.Filters
 
                     if (!user.StripeId.IsSet())
                     {
-                        context.Result = new RedirectToActionResult("Index", "Billing", new { message = BillingMessage.NoStripeId });
+                        context.Result = new RedirectToActionResult(nameof(BillingController.NoCustomerAccount), "Billing", null);
                         return;
                     }
 
@@ -50,7 +51,7 @@ namespace Hood.Filters
 
                     if (customer == null)
                     {
-                        context.Result = new RedirectToActionResult("Index", "Billing", new { message = BillingMessage.NoCustomerObject });
+                        context.Result = new RedirectToActionResult(nameof(BillingController.NoCustomerAccount), "Billing", null);
                         return;
                     }
                 }

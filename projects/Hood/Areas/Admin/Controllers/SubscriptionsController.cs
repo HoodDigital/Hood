@@ -13,7 +13,6 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -123,14 +122,15 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name);
                 await _logService.AddExceptionAsync<SubscriptionsController>(
-                    string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name),
+                    SaveMessage,
                     ex,
                     LogType.Error,
                     _userManager.GetUserId(User),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 
@@ -142,8 +142,9 @@ namespace Hood.Areas.Admin.Controllers
             {
                 var subscription = await _account.GetSubscriptionPlanByIdAsync(id);
                 await _account.DeleteSubscriptionPlanAsync(id);
+                SaveMessage = string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name);
                 await _logService.AddLogAsync<SubscriptionsController>(
-                    string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
+                    SaveMessage,
                     JsonConvert.SerializeObject(subscription),
                     LogType.Success,
                     _userManager.GetUserId(User),
@@ -154,14 +155,15 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = string.Format("Error deleting subscription with id: {0}", id);
                 await _logService.AddExceptionAsync<SubscriptionsController>(
-                    string.Format("Error deleting subscription with id: {0}", id),
+                    SaveMessage,
                     ex,
                     LogType.Error,
                     _userManager.GetUserId(User),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
-                return new Response(ex.Message);
+                return new Response(SaveMessage);
             }
         }
 

@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -146,6 +145,8 @@ namespace Hood.Areas.Admin.Controllers
 
                 model.SaveMessage = "There was a problem saving: " + ex.Message;
                 model.MessageType = AlertType.Danger;
+
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
             }
 
             var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
@@ -200,7 +201,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while creating a forum: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -212,14 +215,14 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/forums/categories/add/")]
-        public async Task<IActionResult> AddCategory(int forumId, int categoryId)
+        public async Task<Response> AddCategory(int forumId, int categoryId)
         {
             try
             {
                 var model = await LoadForum(forumId, false);
 
                 if (model.IsInCategory(categoryId))
-                    return Json(new { Success = true });
+                    return new Response(true, "Forum already is in that category.");
 
                 var category = await _db.ForumCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
                 if (category == null)
@@ -231,29 +234,32 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
                 _forumCategoryCache.ResetCache();
 
-                return Json(new { Success = true });
+#warning TODO: Handle response in JS.
+                return new Response(true, "Added the category to the forum.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                SaveMessage = $"An error occurred while adding a forum category: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
         [HttpPost]
         [Route("admin/forums/categories/remove/")]
-        public async Task<IActionResult> RemoveCategory(int forumId, int categoryId)
+        public async Task<Response> RemoveCategory(int forumId, int categoryId)
         {
             try
             {
                 var model = await LoadForum(forumId, false);
 
                 if (!model.IsInCategory(categoryId))
-                    return Json(new { Success = true });
+                    return new Response(true, "Forum is not in that category.");
 
                 var cat = model.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
 
                 if (cat == null)
-                    return Json(new { Success = true });
+                    throw new Exception("The category does not exist.");
 
                 model.Categories.Remove(cat);
 
@@ -261,17 +267,20 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
                 _forumCategoryCache.ResetCache();
 
-                return Json(new { Success = true });
+#warning TODO: Handle response in JS.
+                return new Response(true, "Removed the category from the forum.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                SaveMessage = $"An error occurred while removing a forum category: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
         [HttpPost]
         [Route("admin/forums/categories/create/")]
-        public async Task<IActionResult> CreateCategory(ForumCategory model)
+        public async Task<Response> CreateCategory(ForumCategory model)
         {
             try
             {
@@ -296,11 +305,14 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
                 _forumCategoryCache.ResetCache();
 
-                return Json(new { Success = true });
+#warning TODO: Handle response in JS.
+                return new Response(true, "The category was created successfully.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                SaveMessage = $"An error occurred while removing a forum category: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -333,7 +345,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while updating a forum category: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -350,8 +364,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<ForumController>($"Error deleting {nameof(ForumCategory)} with Id: {id}", ex);
-                return new Response("Have you made sure this has no sub-categories attached to it, you cannot delete a category until you remove all the sub-categories from it");
+                SaveMessage = $"An error occurred while deleting a category, did you make sure it was empty first?";
+                await _logService.AddExceptionAsync<ContentController>($"Error deleting a forum category with Id: {id}", ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -375,7 +390,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while publishing a forum: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         [Route("admin/forums/archive/{id}")]
@@ -397,7 +414,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while archiving a forum: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -417,7 +436,10 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+
+                SaveMessage = $"An error occurred while deleting a forum: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -473,7 +495,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while clearing an image from a forum: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -493,7 +517,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while clearing a share image from a forum: {ex.Message}";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 

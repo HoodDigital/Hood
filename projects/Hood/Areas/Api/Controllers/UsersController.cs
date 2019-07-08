@@ -10,8 +10,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Hood.Areas.Api.Controllers
 {
     [Area("Api")]

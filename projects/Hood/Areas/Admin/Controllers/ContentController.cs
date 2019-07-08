@@ -18,7 +18,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -144,7 +143,7 @@ namespace Hood.Areas.Admin.Controllers
                 EditContentModel model = await GetEditorModel(content);
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
                 return View(model);
             }
         }
@@ -172,7 +171,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while saving the designer view: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -211,7 +212,7 @@ namespace Hood.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 SaveMessage = $"An error occurred while publishing: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
                 return new Response(SaveMessage);
             }
         }
@@ -240,58 +241,61 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/categories/add/")]
-        public async Task<IActionResult> AddCategoryToContent(int contentId, int categoryId)
+        public async Task<Response> AddCategoryToContent(int contentId, int categoryId)
         {
             try
             {
-                // User must have an organisation.
                 await _content.AddCategoryToContentAsync(contentId, categoryId);
                 _contentCategoryCache.ResetCache();
-                // If we reached here, display the organisation home.
-                return Json(new { Success = true });
+#warning TODO: Handle response in JS.
+                return new Response(true, "Added the category to the content.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                SaveMessage = $"An error occurred while adding a content category: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
         [Route("admin/content/categories/remove/")]
-        public async Task<IActionResult> RemoveCategoryAsync(int contentId, int categoryId)
+        public async Task<Response> RemoveCategoryAsync(int contentId, int categoryId)
         {
             try
             {
                 await _content.RemoveCategoryFromContentAsync(contentId, categoryId);
                 _contentCategoryCache.ResetCache();
-                // If we reached here, display the organisation home.
-                return Json(new { Success = true });
+#warning TODO: Handle response in JS.
+                return new Response(true, "Removed the category from the content.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                SaveMessage = $"An error occurred while removing a content category: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
         [HttpPost]
         [Route("admin/categories/add/")]
-        public async Task<IActionResult> AddCategory(ContentCategory category)
+        public async Task<Response> AddCategory(ContentCategory category)
         {
             try
             {
-                // check if category is on club already
                 if (!category.DisplayName.IsSet())
                     throw new Exception("You need to enter a category!");
 
-
-                // check if it exists in the db, if not add it. 
                 var categoryResult = await _content.AddCategoryAsync(category);
                 _contentCategoryCache.ResetCache();
-                // If we reached here, display the organisation home.
-                return Json(new { Success = true });
+
+                #warning TODO: Handle response in JS.
+                return new Response(true, "Added the category.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                SaveMessage = $"An error occurred while adding a content category: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -323,7 +327,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while updating a category: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -337,8 +343,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<ContentController>($"Error deleting {nameof(ContentCategory)}  with Id: {id}", ex);
-                return new Response("Have you made sure this has no sub-categories attached to it, you cannot delete a category until you remove all the sub-categories from it");
+                SaveMessage = $"An error occurred while deleting a category, did you make sure it was empty first?";
+                await _logService.AddExceptionAsync<ContentController>($"Error deleting a content category with Id: {id}", ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -460,7 +467,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while publishing content with Id {id}: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         [Route("admin/content/{id}/archive")]
@@ -475,7 +484,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while archiving content with Id {id}: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -490,7 +501,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while deleting content with Id {id}: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -504,15 +517,15 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while : {ex.Message}";
+                SaveMessage = $"An error occurred while duplicating: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
                 return RedirectToAction(nameof(Edit), new { id });
             }
         }
 
         [Route("admin/content/{id}/sethomepage")]
-        public Response SetHomepage(int id)
+        public async Task<Response> SetHomepage(int id)
         {
             try
             {
@@ -524,7 +537,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while setting a homepage: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -663,7 +678,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while clearing a content image: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -680,7 +697,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while clearing a content share image: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -697,7 +716,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while clearing a content meta object: {ex.Message}";
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -715,7 +736,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 SaveMessage = $"An error occurred while : {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
             }
             return RedirectToAction(nameof(Index));
         }

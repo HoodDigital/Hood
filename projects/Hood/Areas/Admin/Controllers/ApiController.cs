@@ -9,7 +9,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -93,7 +92,10 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while creating an API key: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
+
             }
         }
 
@@ -115,7 +117,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while activating an API key: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -137,7 +141,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while deactivating an API key: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -159,7 +165,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while deleting an API key: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 

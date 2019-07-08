@@ -28,20 +28,19 @@ namespace Hood.Controllers
 
         [HttpGet]
         [SubscriptionRequired(Roles: "SuperUser")]
-        public async Task<IActionResult> Index(BillingMessage? message = null)
+        public async Task<IActionResult> Index()
         {
             SubscriptionModel model = new SubscriptionModel()
             {
                 Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = false })).List,
                 Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List
             };
-            model.AddBillingMessage(message);
             return View(model);
         }
 
         [HttpGet]
         [SubscriptionRequired(Roles: "SuperUser")]
-        public async Task<IActionResult> Change(string category, BillingMessage? message = null)
+        public async Task<IActionResult> Change(string category)
         {
             SubscriptionModel model = new SubscriptionModel()
             {
@@ -49,15 +48,13 @@ namespace Hood.Controllers
                 Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Category = category, Addon = false })).List,
                 Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List
             };
-            model.AddBillingMessage(message);
             return View(model);
         }
 
         [HttpGet]
-        public async Task<IActionResult> New(string category, string returnUrl = null, BillingMessage? message = null)
+        public async Task<IActionResult> New(string category, string returnUrl = null)
         {
             SubscriptionModel model = await GetCreateModel(category, returnUrl);
-            model.AddBillingMessage(message);
             return View(model);
         }
 
@@ -68,31 +65,28 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.CreateUserSubscriptionAsync(model.PlanId, model.StripeToken, model.CardId);
-                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"New subscription created by user {User.Identity.Name}", sub));
-                returnUrl = GetReturnUrl(BillingMessage.SubscriptionCreated, sub.SubscriptionId, returnUrl);
+
+                SaveMessage = $"New subscription created by user {User.Identity.Name}";
+                MessageType = AlertType.Success;
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(SaveMessage, sub));
+
+                returnUrl = GetReturnUrl(sub.SubscriptionId, returnUrl);
                 return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
                 model = await GetCreateModel(model.Category, returnUrl);
-                BillingMessage bm = BillingMessage.Null;
-                if (Enum.TryParse(ex.Message, out bm))
-                {
-                    model.AddBillingMessage(bm);
-                }
-                else
-                {
-                    model.AddBillingMessage(BillingMessage.StripeError);
-                }
+                SaveMessage = $"An error occurred while : {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
                 return View(model);
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> Addon(string category, string required, string returnUrl = null, BillingMessage? message = null)
+        public async Task<IActionResult> Addon(string category, string required, string returnUrl = null)
         {
             SubscriptionModel model = await GetCreateModel(category, returnUrl);
-            model.AddBillingMessage(message);
             return View(model);
         }
 
@@ -104,13 +98,21 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.UpgradeUserSubscriptionAsync(id, plan);
-                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription upgraded by user {User.Identity.Name}", sub));
-                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionUpdated, sub.SubscriptionId, null);
+
+                SaveMessage = $"Subscription upgraded by user {User.Identity.Name}";
+                MessageType = AlertType.Success;
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(SaveMessage, sub));
+
+                var returnUrl = GetReturnUrl(sub.SubscriptionId);
                 return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                var returnUrl = GetReturnUrl(BillingMessage.ErrorUpdatingSubscription, id, null, ex.Message);
+                SaveMessage = $"An error occurred while upgrading a subscription: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
+
+                var returnUrl = GetReturnUrl(id);
                 return Redirect(returnUrl);
             }
         }
@@ -121,13 +123,21 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.CancelUserSubscriptionAsync(id);
-                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription cancelled by user {User.Identity.Name}", sub));
-                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionCancelled, sub.SubscriptionId, null);
+
+                SaveMessage = $"Subscription cancelled by user {User.Identity.Name}";
+                MessageType = AlertType.Success;
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(SaveMessage, sub));
+
+                var returnUrl = GetReturnUrl(sub.SubscriptionId);
                 return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                var returnUrl = GetReturnUrl(BillingMessage.ErrorCancellingSubscription, id, null, ex.Message);
+                SaveMessage = $"An error occurred while cancelling a subscription: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
+
+                var returnUrl = GetReturnUrl(id);
                 return Redirect(returnUrl);
             }
         }
@@ -138,13 +148,21 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.RemoveUserSubscriptionAsync(id);
-                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription removed by user {User.Identity.Name}", sub));
-                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionEnded, sub.SubscriptionId, null);
+
+                SaveMessage = $"Subscription removed by user {User.Identity.Name}";
+                MessageType = AlertType.Success;
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(SaveMessage, sub));
+
+                var returnUrl = GetReturnUrl(sub.SubscriptionId);
                 return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                var returnUrl = GetReturnUrl(BillingMessage.ErrorRemovingSubscription, id, null, ex.Message);
+                SaveMessage = $"An error occurred while cancelling a subscription: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
+
+                var returnUrl = GetReturnUrl(id);
                 return Redirect(returnUrl);
             }
         }
@@ -155,13 +173,21 @@ namespace Hood.Controllers
             try
             {
                 var sub = await _account.ReactivateUserSubscriptionAsync(id);
-                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs($"Subscription re-activated by user {User.Identity.Name}", sub));
-                var returnUrl = GetReturnUrl(BillingMessage.SubscriptionReactivated, sub.SubscriptionId, null);
+
+                SaveMessage = $"Subscription re-activated by user {User.Identity.Name}";
+                MessageType = AlertType.Success;
+                _eventService.TriggerUserSubcriptionChanged(this, new UserSubscriptionChangeEventArgs(SaveMessage, sub));
+
+                var returnUrl = GetReturnUrl(sub.SubscriptionId);
                 return Redirect(returnUrl);
             }
             catch (Exception ex)
             {
-                var returnUrl = GetReturnUrl(BillingMessage.ErrorReactivatingSubscription, id, null, ex.Message);
+                SaveMessage = $"An error occurred while reactivating a subscription: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
+
+                var returnUrl = GetReturnUrl(id);
                 return Redirect(returnUrl);
             }
         }
@@ -196,19 +222,15 @@ namespace Hood.Controllers
             return model;
         }
 
-        private string GetReturnUrl(BillingMessage? message, int? planId, string returnUrl, string errors = null)
+        private string GetReturnUrl(int? planId, string returnUrl = null)
         {
             if (!returnUrl.IsSet())
             {
                 returnUrl = Url.Action("Index", "Subscriptions");
             }
             var newParams = new Dictionary<string, string>();
-            if (message.HasValue)
-                newParams.Add("message", message.ToString());
             if (planId.HasValue)
                 newParams.Add("plan", planId.Value.ToString());
-            if (errors.IsSet())
-                newParams.Add("errors", errors);
             if (!returnUrl.IsAbsoluteUrl())
                 returnUrl = ControllerContext.HttpContext.GetSiteUrl() + returnUrl.TrimStart('/');             
             var uri = returnUrl.AddParameterToUrl(newParams);

@@ -191,7 +191,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while creating a user via the admin panel: {ex.Message}";
+                await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         #endregion
@@ -211,7 +213,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while deleting a user via the admin panel: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         #endregion
@@ -252,7 +256,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while clearing a user's avatar via the admin panel: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         #endregion
@@ -293,7 +299,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while adding a user to a role via the admin panel: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         [Route("admin/users/removefromrole/")]
@@ -315,7 +323,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while removing a user from a role via the admin panel: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         #endregion
@@ -405,7 +415,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while resetting a user's password via the admin panel: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
         #endregion

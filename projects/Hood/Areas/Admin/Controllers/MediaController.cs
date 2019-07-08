@@ -112,7 +112,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while deleting a media object: {ex.Message}";
+                await _logService.AddExceptionAsync<MediaController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -177,7 +179,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while deleting a directory: {ex.Message}";
+                await _logService.AddExceptionAsync<MediaController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -292,7 +296,9 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while attaching a media file to an entity: {ex.Message}";
+                await _logService.AddExceptionAsync<MediaController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
