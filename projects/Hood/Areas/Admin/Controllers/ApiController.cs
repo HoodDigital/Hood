@@ -1,11 +1,8 @@
 using Hood.Controllers;
-using Hood.Enums;
-using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,7 +22,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/api/keys/manage/")]
-        public async Task<IActionResult> Index(ApiKeyModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(ApiKeyModel model)
         {
             IQueryable<ApiKey> apiKeys = _db.ApiKeys
                 .Include(f => f.User)
@@ -64,7 +61,6 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             await model.ReloadAsync(apiKeys);
-            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -92,12 +88,8 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Add(model);
                 await _db.SaveChangesAsync();
-
-                var response = new Response(true, "Created successfully.")
-                {
-                    Url = Url.Action("Index", new { message = EditorMessage.Created })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Created successfully.");
             }
             catch (Exception ex)
             {
@@ -118,12 +110,8 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Update(model);
                 await _db.SaveChangesAsync();
-
-                var response = new Response(true, "Activated successfully.")
-                {
-                    Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Activated })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Activated successfully.");
             }
             catch (Exception ex)
             {
@@ -144,12 +132,8 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Update(model);
                 await _db.SaveChangesAsync();
-
-                var response = new Response(true, "Deactivated successfully.")
-                {
-                    Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Deactivated })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Deactivated successfully.");
             }
             catch (Exception ex)
             {
@@ -170,12 +154,8 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
-
-                var response = new Response(true, "Deleted!")
-                {
-                    Url = Url.Action("Index", new { message = EditorMessage.Deleted })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Deleted!");
             }
             catch (Exception ex)
             {

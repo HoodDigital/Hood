@@ -375,15 +375,15 @@ namespace Hood.Extensions
         }
         public static string ParseURL(this string s)
         {
-            return Regex.Replace(s, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?", new MatchEvaluator(StringExtensions.URL));
+            return Regex.Replace(s, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?", new MatchEvaluator(URL));
         }
         public static string ParseUsername(this string s)
         {
-            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(StringExtensions.Username));
+            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Username));
         }
         public static string ParseHashtag(this string s)
         {
-            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(StringExtensions.Hashtag));
+            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Hashtag));
         }
         private static string Hashtag(Match m)
         {
@@ -405,7 +405,7 @@ namespace Hood.Extensions
 
         public static string ReplaceSiteVariables(this string text)
         {
-            var settings = Hood.Core.Engine.Settings.Basic;
+            var settings = Core.Engine.Settings.Basic;
             return text
                 .Replace("{Site.Title}", settings.FullTitle)
                 .Replace("{Site.CompanyName}", settings.CompanyName)

@@ -1,8 +1,4 @@
 ﻿using Hood.Core;
-using Hood.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Hood.Models.Payments
 {

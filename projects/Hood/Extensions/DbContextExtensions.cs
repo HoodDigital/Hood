@@ -1,12 +1,5 @@
-﻿using Hood.Infrastructure;
-using Hood.Models.Payments;
-using Microsoft.AspNetCore.Identity;
+﻿using Hood.Models.Payments;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Newtonsoft.Json;
-using System;
-using System.Linq;
 
 namespace Hood.Models
 {
@@ -108,8 +101,8 @@ namespace Hood.Models
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
 
             builder.Query<UserProfile>().ToView("HoodUserProfiles");
-            builder.Query<UserProfile>().Property(b => b._Roles).HasColumnName("Roles");
-            builder.Query<UserProfile>().Property(b => b._Subscriptions).HasColumnName("Subscriptions");
+            builder.Query<UserProfile>().Property(b => b.RolesJson).HasColumnName("Roles");
+            builder.Query<UserProfile>().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
         }
 
         public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction

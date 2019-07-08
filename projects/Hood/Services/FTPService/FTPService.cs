@@ -110,7 +110,7 @@ namespace Hood.Services
                     }
 
                     outputStream = new FileStream(destination + filename, FileMode.OpenOrCreate);
-                    FtpWebRequest reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(server + filename));
+                    FtpWebRequest reqFTP = (FtpWebRequest)WebRequest.Create(new Uri(server + filename));
                     reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
                     reqFTP.UseBinary = true;
                     reqFTP.Credentials = new NetworkCredential(username, password);

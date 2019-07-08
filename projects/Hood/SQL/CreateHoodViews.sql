@@ -1,5 +1,7 @@
 /* Subscriptions View */
 
+IF EXISTS(select * FROM sys.views where name = 'HoodSubscription') DROP VIEW HoodSubscription
+GO
 IF EXISTS(select * FROM sys.views where name = 'HoodSubscriptionsView') DROP VIEW HoodSubscriptionsView
 GO
 
@@ -111,7 +113,30 @@ SELECT
 		),
 		']'
 	)
-	AS Subscriptions
+	AS Subscriptions,
+	STRING_AGG
+		(
+			ISNULL
+			(
+				CASE 
+					dbo.HoodUserSubscriptions.Status
+				WHEN 
+					'active'
+				THEN 
+					dbo.HoodUserSubscriptions.StripeId
+				WHEN 
+					'trialing'
+				THEN 
+					dbo.HoodUserSubscriptions.StripeId
+				ELSE 
+					NULL 
+				END,
+				NULL
+			)
+			, ','
+		)
+	AS ActiveSubscriptionIds
+
 
 FROM            
 	dbo.HoodUserSubscriptions INNER JOIN
@@ -206,7 +231,24 @@ SELECT
 			, ','
 		),
 		']'
-	) AS Roles
+	) AS Roles,
+	STRING_AGG
+		(
+			ISNULL
+			(
+				CASE 
+				WHEN 
+					dbo.AspNetRoles.Id IS NOT NULL
+				THEN 
+					dbo.AspNetRoles.Id
+				ELSE 
+					NULL 
+				END,
+				NULL
+			)
+			, ','
+		)
+	AS RoleIds
 FROM            
 	dbo.AspNetUserRoles INNER JOIN
 	dbo.AspNetRoles ON dbo.AspNetUserRoles.RoleId = dbo.AspNetRoles.Id RIGHT OUTER JOIN

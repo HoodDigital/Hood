@@ -1,5 +1,4 @@
 ﻿using Hood.Entities;
-using Newtonsoft.Json;
 using System;
 
 namespace Hood.Models

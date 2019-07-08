@@ -20,26 +20,32 @@
 @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
 <environment names="Development,Staging,ErrorTesting">
-    <script src="~/hood/js/includes/globals.js"></script>
-    <script src="~/hood/js/includes/stringhelpers.js"></script>
-    <script src="~/hood/js/includes/alerts.js"></script>
-    <script src="~/hood/js/includes/helpers.js"></script>
-    <script src="~/hood/js/includes/forms.js"></script>
-    <script src="~/hood/js/includes/handlers.js"></script>
-    <script src="~/hood/js/includes/fileupload.js"></script>
-    <script src="~/hood/js/includes/validator.js"></script>
-    <script src="~/hood/js/includes/blades.js"></script>
-    <script src="~/hood/js/includes/modals.js"></script>
-    <script src="~/hood/js/includes/inline.js"></script>
-    <script src="~/hood/js/includes/media.js"></script>
-    <script src="~/hood/js/includes/users.js"></script>
-    <script src="~/hood/js/includes/themes.js"></script>
-    <script src="~/hood/js/includes/property.js"></script>
-    <script src="~/hood/js/includes/subscriptions.js"></script>
-    <script src="~/hood/js/includes/content.js"></script>
-    <script src="~/hood/js/includes/forums.js"></script>
-    <script src="~/hood/js/includes/logs.js"></script>
-    <script src="~/hood/js/includes/google.js"></script>
+
+    <script src="~/hood/js/core/production.js"></script>
+    <script src="~/hood/js/core/globals.js"></script>
+    <script src="~/hood/js/core/handlers.js"></script>
+    <script src="~/hood/js/core/helpers.js"></script>
+
+    <script src="~/hood/js/core/addresses.js"></script>
+    <script src="~/hood/js/core/alerts.js"></script>
+    <script src="~/hood/js/core/forms.js"></script>
+    <script src="~/hood/js/core/inline.js"></script>
+    <script src="~/hood/js/core/media.js"></script>
+    <script src="~/hood/js/core/validator.js"></script>
+    <script src="~/hood/js/core/stringhelpers.js"></script>
+    <script src="~/hood/js/core/modals.js"></script>
+    <script src="~/hood/js/admin/content.js"></script>
+    <script src="~/hood/js/admin/forums.js"></script>
+    <script src="~/hood/js/admin/import.property.js"></script>
+    <script src="~/hood/js/admin/io.reporter.js"></script>
+    <script src="~/hood/js/admin/logs.js"></script>
+    <script src="~/hood/js/admin/property.js"></script>
+    <script src="~/hood/js/admin/subscriptions.js"></script>
+    <script src="~/hood/js/admin/themes.js"></script>
+    <script src="~/hood/js/admin/users.js"></script>
+
+    <script src="~/hood/js/app/google.js"></script>
+
     <script src="~/hood/js/admin.js"></script>
 </environment>
 <environment names="Production,PreProduction">

@@ -1,6 +1,4 @@
 ﻿using Hood.Enums;
-using Hood.Models;
-using Stripe;
 using System.Collections.Generic;
 
 namespace Hood.ViewModels

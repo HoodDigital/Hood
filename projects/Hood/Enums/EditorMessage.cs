@@ -1,5 +1,8 @@
-﻿namespace Hood.Enums
+﻿using System;
+
+namespace Hood.Enums
 {
+    [Obsolete("Use inline messages now, with TempData and SaveMessage/MessageType.",true)]
     public enum EditorMessage
     {
         Saved,

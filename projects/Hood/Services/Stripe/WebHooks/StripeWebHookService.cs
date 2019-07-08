@@ -2,7 +2,6 @@
 using Hood.Events;
 using Hood.Extensions;
 using Hood.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
@@ -48,7 +47,7 @@ namespace Hood.Services
         {
             try
             {
-                var stripeEvent = Stripe.EventUtility.ParseEvent(eventJson);
+                var stripeEvent = EventUtility.ParseEvent(eventJson);
 
                 var args = new StripeWebHookTriggerArgs(stripeEvent);
 
@@ -70,7 +69,7 @@ namespace Hood.Services
                 // Fire the event to allow any other packages to process the webhook.
                 _eventService.TriggerStripeWebhook(this, args);
 
-                await _logService.AddLogAsync<StripeWebHookService>("Stripe webhook processed.", JsonConvert.SerializeObject(new { Event = stripeEvent }), Models.LogType.Success);
+                await _logService.AddLogAsync<StripeWebHookService>("Stripe webhook processed.", JsonConvert.SerializeObject(new { Event = stripeEvent }), LogType.Success);
             }
             catch (Exception ex)
             {
@@ -161,7 +160,7 @@ namespace Hood.Services
         {
 #warning TODO: Sync customer with site on delete from Stripe.
             _mailObject.AddParagraph("[Customer Deleted] processing...");
-            Stripe.Customer deletedCustomer = Stripe.Mapper<Stripe.Customer>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Customer deletedCustomer = Mapper<Customer>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddParagraph("Customer Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(deletedCustomer).ToFormattedJson() + Environment.NewLine);
             var dcUser = await _auth.GetUserByStripeIdAsync(deletedCustomer.Id);
@@ -191,7 +190,7 @@ namespace Hood.Services
         public async Task InvoicePaymentFailedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentFailed] processing...");
-            Stripe.Invoice failedInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Invoice failedInvoice = Mapper<Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddParagraph("StripeInvoice Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(failedInvoice).ToFormattedJson() + Environment.NewLine);
             if (failedInvoice.SubscriptionId.IsSet())
@@ -251,7 +250,7 @@ namespace Hood.Services
         public async Task InvoicePaymentSucceededAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentSucceeded] processing...");
-            Stripe.Invoice successfulInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Invoice successfulInvoice = Mapper<Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
             _mailObject.AddH3("StripeInvoice Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(successfulInvoice).ToFormattedJson() + Environment.NewLine);
 
@@ -355,7 +354,7 @@ namespace Hood.Services
         public async Task SubscriptionCreatedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Created] processing...");
-            Stripe.Subscription created = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription created = Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             await _auth.ConfirmSubscriptionObjectAsync(created, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Created] complete!");
         }
@@ -366,7 +365,7 @@ namespace Hood.Services
         public async Task SubscriptionUpdatedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Updated] processing...");
-            Stripe.Subscription updated = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription updated = Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             await _auth.UpdateSubscriptionObjectAsync(updated, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Updated] complete!");
         }
@@ -377,7 +376,7 @@ namespace Hood.Services
         public async Task SubscriptionDeletedAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Deleted] processing...");
-            Stripe.Subscription deleted = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription deleted = Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             await _auth.RemoveUserSubscriptionObjectAsync(deleted, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Deleted] complete!");
         }
@@ -388,7 +387,7 @@ namespace Hood.Services
         public async Task SubscriptionTrialWillEndAsync(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription TrialWillEnd] processing...");
-            Stripe.Subscription endTrialSubscription = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription endTrialSubscription = Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
             UserSubscription endTrialUserSub = await _auth.GetUserSubscriptionByStripeIdAsync(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {

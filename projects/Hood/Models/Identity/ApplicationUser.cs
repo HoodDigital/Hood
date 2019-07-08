@@ -1,11 +1,6 @@
-﻿using Hood.Enums;
-using Hood.Extensions;
-using Hood.Interfaces;
-using Microsoft.AspNetCore.Identity;
+﻿using Hood.Extensions;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
@@ -14,8 +9,6 @@ namespace Hood.Models
     public partial class ApplicationUser : UserProfileBase
     {
         #region Related Tables
-        [JsonIgnore]
-        public List<UserAccessCode> AccessCodes { get; set; }
         [JsonIgnore]
         public List<ApiKey> ApiKeys { get; set; }
         [JsonIgnore]

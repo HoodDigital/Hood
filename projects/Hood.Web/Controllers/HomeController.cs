@@ -1,11 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
-using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Hood.Web;
 
 namespace Hood.Web.Controllers
 {

@@ -1,11 +1,4 @@
-﻿using Hood.Core;
-using Hood.Enums;
-using Hood.Extensions;
-using Hood.Interfaces;
-using Hood.Services;
-using Newtonsoft.Json;
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Hood.Interfaces;
 
 namespace Hood.Models
 {

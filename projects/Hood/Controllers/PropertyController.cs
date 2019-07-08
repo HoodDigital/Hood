@@ -3,7 +3,6 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;

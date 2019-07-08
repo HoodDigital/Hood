@@ -1,5 +1,4 @@
 ﻿using Hood.Core;
-using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

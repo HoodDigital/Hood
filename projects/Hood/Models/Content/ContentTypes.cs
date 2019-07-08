@@ -1,5 +1,4 @@
-﻿using Hood.Extensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Hood.Models
 {

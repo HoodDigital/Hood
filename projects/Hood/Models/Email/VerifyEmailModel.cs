@@ -1,6 +1,5 @@
 ﻿using Hood.Services;
 using Hood.Extensions;
-using Newtonsoft.Json;
 using Hood.Core;
 using SendGrid.Helpers.Mail;
 using System.Collections.Generic;
@@ -35,7 +34,7 @@ namespace Hood.Models
         public List<EmailAddress> NotifyEmails { get; set; }
         public string NotifyRole { get; set; }
 
-        public string Template { get; set; } = Hood.Models.MailSettings.SuccessTemplate;
+        public string Template { get; set; } = MailSettings.SuccessTemplate;
 
         public MailObject WriteToMailObject(MailObject message)
         {

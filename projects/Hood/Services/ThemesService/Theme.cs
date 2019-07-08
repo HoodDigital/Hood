@@ -1,6 +1,5 @@
 ﻿using Hood.Core;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 
 namespace Hood.Services
 {

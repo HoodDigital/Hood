@@ -1,9 +1,6 @@
 ﻿using Hood.Services;
-using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using Hood.Extensions;
 using Hood.ViewModels;
-using System.Threading.Tasks;
 
 namespace Hood.ViewComponents
 {

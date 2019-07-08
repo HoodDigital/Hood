@@ -1,10 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Events;
-using Hood.Interfaces;
-using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace Hood.Services
 {

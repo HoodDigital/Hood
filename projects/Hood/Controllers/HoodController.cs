@@ -1,13 +1,8 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using System.Text;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Hood.Interfaces;
-using Hood.Enums;
 using Hood.BaseTypes;
 using Microsoft.AspNetCore.Identity;
 

@@ -1,14 +1,12 @@
 ﻿using Hood.Entities;
 using Hood.Extensions;
 using Hood.Services;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Hood.Models
 {

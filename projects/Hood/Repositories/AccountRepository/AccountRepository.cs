@@ -1,7 +1,6 @@
 ﻿using Hood.Caching;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
@@ -11,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Stripe;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -152,6 +150,60 @@ namespace Hood.Services
         #endregion
 
         #region Profiles 
+        public async Task<UserListModel> GetUserProfilesAsync(UserListModel model)
+        {
+            var query = _db.UserProfiles.AsQueryable();
+
+            if (model.Role.IsSet())
+            {
+                query = query.Where(q => q.RoleIds.Contains(model.Role));
+            }
+
+            if (model.Subscription.IsSet())
+            {
+                query = query.Where(q => q.ActiveSubscriptionIds.Contains(model.Role));
+            }
+
+            if (!string.IsNullOrEmpty(model.Search))
+            {
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                query = query.Where(n => searchTerms.Any(s => n.UserName.ToLower().Contains(s.ToLower())));
+            }
+
+            switch (model.Order)
+            {
+                case "UserName":
+                    query = query.OrderBy(n => n.UserName);
+                    break;
+                case "Email":
+                    query = query.OrderBy(n => n.Email);
+                    break;
+                case "LastName":
+                    query = query.OrderBy(n => n.LastName);
+                    break;
+                case "LastLogOn":
+                    query = query.OrderByDescending(n => n.LastLogOn);
+                    break;
+
+                case "UserNameDesc":
+                    query = query.OrderByDescending(n => n.UserName);
+                    break;
+                case "EmailDesc":
+                    query = query.OrderByDescending(n => n.Email);
+                    break;
+                case "LastNameDesc":
+                    query = query.OrderByDescending(n => n.LastName);
+                    break;
+
+                default:
+                    query = query.OrderBy(n => n.UserName);
+                    break;
+            }
+
+            await model.ReloadAsync(query);
+
+            return model;
+        }
         public async Task<UserProfile> GetProfileAsync(string id)
         {
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(u => u.Id == id);

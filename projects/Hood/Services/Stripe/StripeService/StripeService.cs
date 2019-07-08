@@ -1,5 +1,4 @@
-﻿using Stripe;
-using Hood.Models;
+﻿using Hood.Models;
 using Hood.Core;
 
 namespace Hood.Services

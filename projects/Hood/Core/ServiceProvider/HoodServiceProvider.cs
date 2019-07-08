@@ -1,27 +1,13 @@
-﻿using Hood.Caching;
-using Hood.Extensions;
-using Hood.Filters;
-using Hood.Infrastructure;
-using Hood.Interfaces;
-using Hood.IO;
-using Hood.Models;
+﻿using Hood.Interfaces;
 using Hood.Services;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Hood.Core
 {

@@ -194,7 +194,7 @@ namespace Hood.Services
 
                 // Output the lot to json
                 MarkCompleteTask("Outputting all content data to JSON...");
-                System.IO.File.WriteAllText(_contentFolder + "index.json", JsonConvert.SerializeObject(export));
+                File.WriteAllText(_contentFolder + "index.json", JsonConvert.SerializeObject(export));
 
                 // Zip the file
                 MarkCompleteTask("Zipping files...");

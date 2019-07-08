@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,56 +26,12 @@ namespace Hood.Areas.Admin.Controllers
     {
         public UsersController()
             : base()
-        {}
+        { }
 
         [Route("admin/users/")]
-        public async Task<IActionResult> Index(UserListModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(UserListModel model)
         {
-            IList<ApplicationUser> users = new List<ApplicationUser>();
-            if (!string.IsNullOrEmpty(model.Role))
-            {
-                users = await _userManager.GetUsersInRoleAsync(model.Role);
-            }
-            else
-            {
-                users = await _userManager.Users.ToListAsync();
-            }
-            if (!string.IsNullOrEmpty(model.Search))
-            {
-                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                users = users.Where(n => searchTerms.Any(s => n.UserName.ToLower().Contains(s.ToLower()))).ToList();
-            }
-            switch (model.Order)
-            {
-                case "UserName":
-                    users = users.OrderBy(n => n.UserName).ToList();
-                    break;
-                case "Email":
-                    users = users.OrderBy(n => n.Email).ToList();
-                    break;
-                case "LastName":
-                    users = users.OrderBy(n => n.LastName).ToList();
-                    break;
-                case "LastLogOn":
-                    users = users.OrderByDescending(n => n.LastLogOn).ToList();
-                    break;
-
-                case "UserNameDesc":
-                    users = users.OrderByDescending(n => n.UserName).ToList();
-                    break;
-                case "EmailDesc":
-                    users = users.OrderByDescending(n => n.Email).ToList();
-                    break;
-                case "LastNameDesc":
-                    users = users.OrderByDescending(n => n.LastName).ToList();
-                    break;
-
-                default:
-                    users = users.OrderBy(n => n.UserName).ToList();
-                    break;
-            }
-            model.Reload(users, model.PageIndex, model.PageSize);
-            model.AddEditorMessage(message);
+            model = await _account.GetUserProfilesAsync(model);
             return View(model);
         }
 
@@ -119,12 +74,12 @@ namespace Hood.Areas.Admin.Controllers
                 await _account.UpdateProfileAsync(model);
 
                 SaveMessage = "Saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "There was an error while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
 
             await LoadAndCheckProfile(model);
@@ -148,13 +103,13 @@ namespace Hood.Areas.Admin.Controllers
                     user.StripeId = customerId;
                     await _account.UpdateUserAsync(user);
                     SaveMessage = "Account has been successfully linked with the Stripe customer account.";
-                    MessageType = Enums.AlertType.Success;
+                    MessageType = AlertType.Success;
                 }
             }
             catch (Exception ex)
             {
                 SaveMessage = $"An error occurred while linking the customer object: {ex.Message}";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
             }
             return RedirectToAction(nameof(Edit), new { id });
@@ -231,11 +186,8 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
-                var response = new Response(true, "Published successfully.")
-                {
-                    Url = Url.Action("Edit", new { id = user.Id, message = EditorMessage.Created })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Published successfully."); ;
             }
             catch (Exception ex)
             {
@@ -253,12 +205,8 @@ namespace Hood.Areas.Admin.Controllers
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
                 await _account.DeleteUserAsync(user);
-
-                var response = new Response(true, "Deleted successfully.")
-                {
-                    Url = Url.Action("Index", new { message = EditorMessage.Deleted })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Deleted successfully.");
 
             }
             catch (Exception ex)
@@ -299,6 +247,7 @@ namespace Hood.Areas.Admin.Controllers
                 var user = await _account.GetUserByIdAsync(id);
                 user.Avatar = null;
                 await _account.UpdateUserAsync(user);
+#warning TODO: Handle response in JS.
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
@@ -374,40 +323,59 @@ namespace Hood.Areas.Admin.Controllers
         #region Impersonation
         public async Task<IActionResult> Impersonate(string id)
         {
-            if (!id.IsSet())
-                RedirectToAction("Index", new { message = EditorMessage.Error });
+            try
+            {
+                if (!id.IsSet())
+                    throw new Exception("Cannot impersonate a user with no Id!");
+                var impersonatedUser = await _userManager.FindByIdAsync(id);
+                var userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
 
-            var impersonatedUser = await _userManager.FindByIdAsync(id);
-            var userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
+                userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetUserId()));
+                userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
 
-            userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetUserId()));
-            userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
+                // sign out the current user
+                await _signInManager.SignOutAsync();
 
-            // sign out the current user
-            await _signInManager.SignOutAsync();
+                await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, userPrincipal); // <-- This has changed from the previous version.
 
-            await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, userPrincipal); // <-- This has changed from the previous version.
-
-            return RedirectToAction("Index", "Home", new { area = "" });
+                return RedirectToAction("Index", "Home", new { area = "" });
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while impersonating User ({id}): {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Edit), new { id });
         }
         [AllowAnonymous]
         public async Task<IActionResult> StopImpersonation()
         {
-            if (!User.Identity.IsAuthenticated)
-                throw new Exception("You are not impersonating now. Can't stop impersonation!");
+            try
+            {
+                if (!User.Identity.IsAuthenticated)
+                    throw new Exception("You are not logged in.");
 
-            if (!User.IsImpersonating())
-                throw new Exception("You are not impersonating now. Can't stop impersonation!");
+                if (!User.IsImpersonating())
+                    throw new Exception("You are not impersonating.");
 
-            var originalUserId = User.FindFirst("OriginalUserId").Value;
+                var originalUserId = User.FindFirst("OriginalUserId").Value;
 
-            var originalUser = await _userManager.FindByIdAsync(originalUserId);
+                var originalUser = await _userManager.FindByIdAsync(originalUserId);
 
-            await _signInManager.SignOutAsync();
+                await _signInManager.SignOutAsync();
 
-            await _signInManager.SignInAsync(originalUser, isPersistent: true);
+                await _signInManager.SignInAsync(originalUser, isPersistent: true);
 
-            return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Home", new { area = "" });
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while stopping impersonating: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
+            }
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
         #endregion
 

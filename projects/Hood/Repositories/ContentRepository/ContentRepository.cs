@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -187,29 +186,31 @@ namespace Hood.Services
         }
         public async Task UpdateAsync(Content content)
         {
+            string cacheKey = typeof(Content).ToString() + ".Single." + content.Id;
             _db.Update(content);
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
+            _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
         }
         public async Task DeleteAsync(int id)
         {
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
             _db.Entry(content).State = EntityState.Deleted;
-            await _db.SaveChangesAsync();
-            _eventService.TriggerContentChanged(this);
+            await UpdateAsync(content);
         }
         public async Task SetStatusAsync(int id, ContentStatus status)
         {
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
             content.Status = status;
-            await _db.SaveChangesAsync();
-            _eventService.TriggerContentChanged(this);
+            await UpdateAsync(content);
         }
         public async Task DeleteAllAsync(string type)
         {
             _db.Content.Where(c => c.ContentType == type).ForEach(p =>
             {
                 _db.Entry(p).State = EntityState.Deleted;
+                string cacheKey = typeof(Content).ToString() + ".Single." + p.Id;
+                _cache.Remove(cacheKey);
             });
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
@@ -277,14 +278,9 @@ namespace Hood.Services
         {
             if (content.Media == null)
                 content.Media = new List<ContentMedia>();
-
-            content.Media.Add(media);
-            _db.Content.Update(content);
-
             _db.Media.Add(new MediaObject(media));
-
-            await _db.SaveChangesAsync();
-            _eventService.TriggerContentChanged(this);
+            content.Media.Add(media);
+            await UpdateAsync(content);
         }
         #endregion
 
@@ -441,7 +437,6 @@ namespace Hood.Services
             content.Categories.Add(new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id });
 
             await UpdateAsync(content);
-
         }
         public async Task RemoveCategoryFromContentAsync(int contentId, int categoryId)
         {
@@ -458,7 +453,6 @@ namespace Hood.Services
             content.Categories.Remove(cat);
 
             await UpdateAsync(content);
-
         }
         #endregion
 
@@ -477,7 +471,10 @@ namespace Hood.Services
         }
         public async Task<string> GetSitemapDocumentAsync(IUrlHelper urlHelper)
         {
-            List<SitemapNode> nodes = new List<SitemapNode>
+            string cacheKey = typeof(Content).ToString() + ".SitemapDocument";
+            if (!_cache.TryGetValue(cacheKey, out string pages))
+            {
+                List<SitemapNode> nodes = new List<SitemapNode>
             {
                 new SitemapNode()
                 {
@@ -492,55 +489,58 @@ namespace Hood.Services
                     Frequency = SitemapFrequency.Never
                 }
             };
-            foreach (ContentType type in Engine.Settings.Content.AllowedTypes)
-            {
-                if (type.IsPublic)
+                foreach (ContentType type in Engine.Settings.Content.AllowedTypes)
                 {
-                    nodes.Add(new SitemapNode()
-                    {
-                        Url = urlHelper.AbsoluteUrl(type.Slug),
-                        Frequency = SitemapFrequency.Weekly,
-                        Priority = 0.8
-                    });
-                }
-                if (type.HasPage)
-                {
-                    var typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
-                    foreach (var content in typeContent.List.OrderByDescending(c => c.PublishDate))
+                    if (type.IsPublic)
                     {
                         nodes.Add(new SitemapNode()
                         {
-                            Url = urlHelper.AbsoluteUrl(content.Url.TrimStart('/')),
-                            LastModified = content.PublishDate,
+                            Url = urlHelper.AbsoluteUrl(type.Slug),
                             Frequency = SitemapFrequency.Weekly,
-                            Priority = 0.7
+                            Priority = 0.8
                         });
                     }
+                    if (type.HasPage)
+                    {
+                        var typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
+                        foreach (var content in typeContent.List.OrderByDescending(c => c.PublishDate))
+                        {
+                            nodes.Add(new SitemapNode()
+                            {
+                                Url = urlHelper.AbsoluteUrl(content.Url.TrimStart('/')),
+                                LastModified = content.PublishDate,
+                                Frequency = SitemapFrequency.Weekly,
+                                Priority = 0.7
+                            });
+                        }
+                    }
                 }
+
+                XNamespace xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9";
+                XElement root = new XElement(xmlns + "urlset");
+
+                foreach (SitemapNode sitemapNode in nodes)
+                {
+                    XElement urlElement = new XElement(
+                        xmlns + "url",
+                        new XElement(xmlns + "loc", Uri.EscapeUriString(sitemapNode.Url)),
+                        sitemapNode.LastModified == null ? null : new XElement(
+                            xmlns + "lastmod",
+                            sitemapNode.LastModified.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:sszzz")),
+                        sitemapNode.Frequency == null ? null : new XElement(
+                            xmlns + "changefreq",
+                            sitemapNode.Frequency.Value.ToString().ToLowerInvariant()),
+                        sitemapNode.Priority == null ? null : new XElement(
+                            xmlns + "priority",
+                            sitemapNode.Priority.Value.ToString("F1", CultureInfo.InvariantCulture)));
+                    root.Add(urlElement);
+                }
+
+                XDocument document = new XDocument(root);
+                pages = document.ToString();
+                _cache.Add(cacheKey, pages, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }
-
-            XNamespace xmlns = "http://www.sitemaps.org/schemas/sitemap/0.9";
-            XElement root = new XElement(xmlns + "urlset");
-
-            foreach (SitemapNode sitemapNode in nodes)
-            {
-                XElement urlElement = new XElement(
-                    xmlns + "url",
-                    new XElement(xmlns + "loc", Uri.EscapeUriString(sitemapNode.Url)),
-                    sitemapNode.LastModified == null ? null : new XElement(
-                        xmlns + "lastmod",
-                        sitemapNode.LastModified.Value.ToLocalTime().ToString("yyyy-MM-ddTHH:mm:sszzz")),
-                    sitemapNode.Frequency == null ? null : new XElement(
-                        xmlns + "changefreq",
-                        sitemapNode.Frequency.Value.ToString().ToLowerInvariant()),
-                    sitemapNode.Priority == null ? null : new XElement(
-                        xmlns + "priority",
-                        sitemapNode.Priority.Value.ToString("F1", CultureInfo.InvariantCulture)));
-                root.Add(urlElement);
-            }
-
-            XDocument document = new XDocument(root);
-            return document.ToString();
+            return pages;
         }
 
         #endregion

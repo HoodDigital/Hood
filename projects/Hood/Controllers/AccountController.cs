@@ -1,5 +1,4 @@
-﻿using Hood.Caching;
-using Hood.Core;
+﻿using Hood.Core;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
@@ -9,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -244,7 +242,7 @@ namespace Hood.Controllers
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
 
-                    if (Engine.Settings.Account.EnableWelcome)
+                    if (Engine.Settings.Account.EnableWelcome && Engine.Settings.Mail.IsSetup)
                     {
                         var welcomeModel = new WelcomeEmailModel(user, callbackUrl)
                         {

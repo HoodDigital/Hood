@@ -1,8 +1,4 @@
-﻿using Hood.BaseTypes;
-using Microsoft.AspNetCore.Identity;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models

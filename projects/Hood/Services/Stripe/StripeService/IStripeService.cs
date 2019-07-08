@@ -1,6 +1,4 @@
-﻿using Stripe;
-
-namespace Hood.Services
+﻿namespace Hood.Services
 {
     /// <summary>
     /// Interface to provide direct communication with the Stripe Api

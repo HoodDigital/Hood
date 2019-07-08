@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Hood.Interfaces;
-using Hood.Extensions;
 using System;
 
 namespace Hood.Models

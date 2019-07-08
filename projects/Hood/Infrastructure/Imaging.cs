@@ -52,7 +52,7 @@ namespace Hood.Infrastructure
                             using (encoderParameters = new System.Drawing.Imaging.EncoderParameters(1))
                             {
                                 // use jpeg info[1] and set quality to 90
-                                encoderParameters.Param[0] = new System.Drawing.Imaging.EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 90L);
+                                encoderParameters.Param[0] = new System.Drawing.Imaging.EncoderParameter(Encoder.Quality, 90L);
                                 bmp.Save(FileNameOutput, info[1], encoderParameters);
                             }
                         }

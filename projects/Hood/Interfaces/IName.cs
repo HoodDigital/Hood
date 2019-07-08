@@ -1,7 +1,4 @@
 ﻿using Hood.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Hood.Interfaces
 {

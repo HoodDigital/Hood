@@ -1,8 +1,6 @@
-﻿using Hood.Core;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Interfaces;
 using Hood.Models;
-using Hood.Services;
 using System;
 
 namespace Hood.Extensions

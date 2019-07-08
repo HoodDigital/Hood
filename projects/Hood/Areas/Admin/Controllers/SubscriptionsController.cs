@@ -5,7 +5,6 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -41,10 +40,9 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/subscriptions/edit/{id}/")]
-        public async Task<IActionResult> Edit(int id, EditorMessage? message)
+        public async Task<IActionResult> Edit(int id)
         {
             var model = await _account.GetSubscriptionPlanByIdAsync(id);
-            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -55,13 +53,13 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 await _account.UpdateSubscriptionAsync(model);
-                model.SaveMessage = "Subscription saved.";
-                model.MessageType = Enums.AlertType.Success;
+                SaveMessage = "Subscription saved.";
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
+                SaveMessage = "An error occurred while saving: " + ex.Message;
+                MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
                    ex,
@@ -120,12 +118,8 @@ namespace Hood.Areas.Admin.Controllers
                     _userManager.GetUserId(User),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
-
-                var response = new Response(true, "Published successfully.")
-                {
-                    Url = Url.Action("Edit", new { id = subscription.Id, message = EditorMessage.Created })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
             {
@@ -155,6 +149,7 @@ namespace Hood.Areas.Admin.Controllers
                     _userManager.GetUserId(User),
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
+#warning TODO: Handle response in JS.
                 return new Response(true);
             }
             catch (Exception ex)

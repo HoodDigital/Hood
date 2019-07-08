@@ -204,7 +204,7 @@
                 </div>
                 <div id="subscriptions" class="tab-pane" role="tabpanel" aria-labelledby="subscriptions-tab">
                     <div class="list-group list-group-flush">
-                        <div class="list-group-item p-3">
+                        <div class="list-group-item  p-3">
                             @if (Model.Customer == null)
                             {
                                 if (Model.MatchedCustomerObjects == null || Model.MatchedCustomerObjects.Count() == 0)
@@ -241,7 +241,7 @@
                         @{ var subs = Model.Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing"); }
                         @foreach (var sub in subs)
                         {
-                            <div class="list-group-item">
+                            <div class="list-group-item list-group-item-action">
                                 <div class=" row align-items-center">
                                     <div class="col">
                                         <p class=" m-0">

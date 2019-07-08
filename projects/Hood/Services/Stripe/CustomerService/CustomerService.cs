@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Stripe;
 using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Hood.Caching;

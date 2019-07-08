@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Models
 {

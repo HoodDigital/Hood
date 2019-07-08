@@ -1,8 +1,6 @@
-﻿using Hood.Entities;
-using Hood.Interfaces;
+﻿using Hood.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {

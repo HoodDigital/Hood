@@ -1,15 +1,10 @@
 ﻿using Hood.Caching;
 using Hood.Core;
 using Hood.Models;
-using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Hood.Services
 {

@@ -1,7 +1,6 @@
 ﻿using Hood.Caching;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Infrastructure;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.EntityFrameworkCore;

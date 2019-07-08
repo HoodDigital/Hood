@@ -2,10 +2,8 @@
 using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Mail;
 using System;
@@ -58,13 +56,17 @@ namespace Hood.Areas.Admin.Controllers
                 mail.PreHeader = "This is a test email from HoodCMS.";
                 mail.Template = template;
                 await _emailSender.SendEmailAsync(mail);
-                return RedirectToAction("Mail", "Settings", new { status = EditorMessage.Sent });
+
+                SaveMessage = $"Test message sent to {email}.";
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<MailController>($"Error sending test email to {email}", ex);
-                return RedirectToAction("Mail", "Settings", new { status = EditorMessage.ErrorSending });
+                SaveMessage = $"Error sending test email to {email}.";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<MailController>(SaveMessage, ex);
             }
+            return RedirectToAction("Mail", "Settings");
         }
 
         [Route("hood/test-email-full/")]

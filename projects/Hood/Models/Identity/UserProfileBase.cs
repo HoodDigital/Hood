@@ -1,9 +1,6 @@
-﻿using Hood.BaseTypes;
-using Hood.Entities;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using System;

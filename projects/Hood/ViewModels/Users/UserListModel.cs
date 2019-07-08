@@ -6,7 +6,7 @@ using Hood.Models;
 
 namespace Hood.ViewModels
 {
-    public class UserListModel : PagedList<ApplicationUser>, IPageableModel
+    public class UserListModel : PagedList<UserProfile>, IPageableModel
     {
         [FromQuery(Name = "role")]
         public string Role { get; set; }

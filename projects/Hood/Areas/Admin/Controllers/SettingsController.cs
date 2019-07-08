@@ -3,13 +3,10 @@ using Hood.BaseTypes;
 using Hood.Controllers;
 using Hood.Core;
 using Hood.Enums;
-using Hood.Extensions;
-using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -56,12 +53,12 @@ namespace Hood.Areas.Admin.Controllers
                     model.Address.Longitude = location.Coordinates.Longitude;
                     Engine.Settings.Set(model);
                     SaveMessage = "Settings saved & address geocoded via Google API.";
-                    MessageType = Enums.AlertType.Success;
+                    MessageType = AlertType.Success;
                 }
                 else
                 {
                     SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
-                    MessageType = Enums.AlertType.Warning;
+                    MessageType = AlertType.Warning;
                 }
             }
             catch (GoogleGeocodingException ex)
@@ -70,22 +67,22 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     case GoogleStatus.RequestDenied:
                         SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a RequestDenied status] this means your API account is not activated for Geocoding Requests.";
-                        MessageType = Enums.AlertType.Warning;
+                        MessageType = AlertType.Warning;
                         break;
                     case GoogleStatus.OverQueryLimit:
                         SaveMessage = "Settings were saved, but because there was an error with the Google API [Google returned a OverQueryLimit status] this means your API account is has run out of Geocoding Requests.";
-                        MessageType = Enums.AlertType.Warning;
+                        MessageType = AlertType.Warning;
                         break;
                     default:
                         SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled. Google returned a status of " + ex.Status.ToString();
-                        MessageType = Enums.AlertType.Warning;
+                        MessageType = AlertType.Warning;
                         break;
                 }
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -118,12 +115,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -155,12 +152,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -199,12 +196,12 @@ namespace Hood.Areas.Admin.Controllers
 
 
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -321,12 +318,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -357,12 +354,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -392,12 +389,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -429,12 +426,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -468,12 +465,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
 
             model.UpdateReport = _mediaRefresh.Report();
@@ -495,7 +492,7 @@ namespace Hood.Areas.Admin.Controllers
             _mediaRefresh.RunUpdate(HttpContext);
 
             SaveMessage = "Media refreshing...";
-            MessageType = Enums.AlertType.Success;
+            MessageType = AlertType.Success;
 
             return RedirectToAction("Media");
         }
@@ -508,13 +505,12 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/mail/")]
-        public IActionResult Mail(EditorMessage? status)
+        public IActionResult Mail()
         {
             _cache.Remove(typeof(MailSettings).ToString());
             MailSettings model = Engine.Settings.Mail;
             if (model == null)
                 model = new MailSettings();
-            model.AddEditorMessage(status);
             return View(model);
         }
         [HttpPost]
@@ -525,12 +521,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             return View(model);
         }
@@ -544,13 +540,12 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/forum/")]
-        public async Task<IActionResult> Forum(EditorMessage? status)
+        public async Task<IActionResult> Forum()
         {
             _cache.Remove(typeof(ForumSettings).ToString());
             ForumSettings model = Engine.Settings.Forum;
             if (model == null)
                 model = new ForumSettings();
-            model.AddEditorMessage(status);
 
             var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
             model.Subscriptions = subs.List;
@@ -566,12 +561,12 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set(model);
                 SaveMessage = "Settings saved!";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
                 SaveMessage = "An error occurred while saving: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
             }
             var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
             model.Subscriptions = subs.List;

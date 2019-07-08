@@ -1,5 +1,4 @@
 ﻿using Hood.Models;
-using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
 
 namespace Hood.Services

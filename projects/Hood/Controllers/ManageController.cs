@@ -1,15 +1,12 @@
-﻿using Hood.Core;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Text;
@@ -102,7 +99,7 @@ namespace Hood.Controllers
                 await _account.UpdateUserAsync(user);
 
                 SaveMessage = "Your profile has been updated.";
-                MessageType = Enums.AlertType.Success;
+                MessageType = AlertType.Success;
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -113,7 +110,7 @@ namespace Hood.Controllers
                     throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
                 SaveMessage = "Something went wrong: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
+                MessageType = AlertType.Danger;
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -508,10 +505,9 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        public IActionResult Delete(EditorMessage? message)
+        public IActionResult Delete()
         {
             var model = new Hood.BaseTypes.SaveableModel();
-            model.AddEditorMessage(message);
             return View(nameof(Delete), model);
         }
 
@@ -519,19 +515,15 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmDelete()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction(nameof(Delete), new { message = EditorMessage.NotFound });
-            }
-
-            // Delete functionality.
             try
             {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    throw new Exception("User not found.");
+
+                // Delete functionality.
                 if (User.IsAdminOrBetter())
-                {
-                    return RedirectToAction(nameof(Delete), new { message = EditorMessage.CannotDeleteAdmin });
-                }
+                    throw new Exception("You are not an admin, so cannot delete users.");
 
                 await _signInManager.SignOutAsync();
 
@@ -543,16 +535,17 @@ namespace Hood.Controllers
                     log.UserId = null;
                 }
                 _db.SaveChanges();
-
                 await _account.DeleteUserAsync(user);
 
                 return RedirectToAction(nameof(Deleted));
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<ManageController>($"Error when user with Id {user.Id} tried to deleted their account.", ex, userId: user.Id);
-                return RedirectToAction(nameof(Delete), new { message = EditorMessage.Error });
+                SaveMessage = $"An error occurred while : {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
             }
+            return RedirectToAction(nameof(Delete));
         }
 
         [AllowAnonymous]

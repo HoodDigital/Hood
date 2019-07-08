@@ -1,6 +1,5 @@
 ﻿using Hood.Services;
 using Hood.Extensions;
-using Newtonsoft.Json;
 using Hood.Core;
 using SendGrid.Helpers.Mail;
 using System.Collections.Generic;

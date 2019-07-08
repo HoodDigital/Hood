@@ -2,11 +2,9 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
-using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

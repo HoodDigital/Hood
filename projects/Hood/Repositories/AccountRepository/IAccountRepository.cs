@@ -1,5 +1,4 @@
-﻿using Hood.Infrastructure;
-using Hood.Models;
+﻿using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -17,11 +16,15 @@ namespace Hood.Services
         Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true);
         Task UpdateUserAsync(ApplicationUser user);
         Task DeleteUserAsync(ApplicationUser user);
-        Task<UserProfile> GetProfileAsync(string id);
         Task<List<UserAccessCode>> GetAccessCodesAsync(string id);
-        Task UpdateProfileAsync(UserProfile user);
         #endregion
 
+        #region Profiles
+        Task<UserListModel> GetUserProfilesAsync(UserListModel model);
+        Task<UserProfile> GetProfileAsync(string id);
+        Task UpdateProfileAsync(UserProfile user);
+        #endregion        
+        
         #region Roles
         Task<IList<IdentityRole>> GetAllRolesAsync();
         #endregion

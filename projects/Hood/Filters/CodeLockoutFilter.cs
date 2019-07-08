@@ -1,14 +1,9 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
-using Hood.Models;
 using Hood.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 
 namespace Hood.Filters
 {

@@ -1,13 +1,10 @@
 ﻿using Hood.Enums;
 using Hood.Infrastructure;
-using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 

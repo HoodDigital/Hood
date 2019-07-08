@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Hood.Interfaces;
-using Geocoding;
-using Geocoding.Google;
-using Hood.Extensions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hood.Models;
 using System;
 using Newtonsoft.Json;

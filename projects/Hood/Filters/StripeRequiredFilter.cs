@@ -3,7 +3,6 @@ using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Hood.Filters
 {

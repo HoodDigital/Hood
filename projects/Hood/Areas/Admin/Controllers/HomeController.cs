@@ -1,7 +1,6 @@
 ﻿using Hood.Controllers;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;

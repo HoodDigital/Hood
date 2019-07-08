@@ -3,8 +3,6 @@ using Hood.Entities;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Services;
-using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
 

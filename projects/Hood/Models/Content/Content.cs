@@ -3,7 +3,6 @@ using Hood.Entities;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -106,17 +105,17 @@ namespace Hood.Models
             {
                 switch ((Enums.ContentStatus)Status)
                 {
-                    case Enums.ContentStatus.Published:
+                    case ContentStatus.Published:
                         if (PublishDate > DateTime.Now)
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         else
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
-                    case Enums.ContentStatus.Draft:
+                    case ContentStatus.Draft:
                     default:
                         return "Draft";
-                    case Enums.ContentStatus.Archived:
+                    case ContentStatus.Archived:
                         return "Archived";
-                    case Enums.ContentStatus.Deleted:
+                    case ContentStatus.Deleted:
                         return "Deleted";
                 }
             }

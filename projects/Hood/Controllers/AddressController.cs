@@ -1,8 +1,6 @@
 ﻿using Hood.Extensions;
-using Hood.Infrastructure;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -88,6 +86,7 @@ namespace Hood.Controllers
                 }
 
                 await _account.UpdateAddressAsync(address);
+#warning TODO: Handle response in JS.
                 return Json(new Response(true));
             }
             catch (Exception ex)
@@ -102,6 +101,7 @@ namespace Hood.Controllers
             try
             {
                 await _account.DeleteAddressAsync(id);
+#warning TODO: Handle response in JS.
                 return new Response(true);
             }
             catch (Exception ex)
@@ -117,6 +117,7 @@ namespace Hood.Controllers
             {
                 string userId = _userManager.GetUserId(User);
                 await _account.SetBillingAddressAsync(userId, id);
+#warning TODO: Handle response in JS.
                 return new Response(true);
             }
             catch (Exception ex)
@@ -132,6 +133,7 @@ namespace Hood.Controllers
             {
                 string userId = _userManager.GetUserId(User);
                 await _account.SetDeliveryAddressAsync(userId, id);
+#warning TODO: Handle response in JS.
                 return new Response(true);
             }
             catch (Exception ex)

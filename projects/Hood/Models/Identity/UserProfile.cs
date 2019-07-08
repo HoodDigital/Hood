@@ -1,13 +1,10 @@
 ﻿using Hood.Extensions;
-using Hood.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
 using Stripe;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
 
 namespace Hood.Models
 {
@@ -19,20 +16,22 @@ namespace Hood.Models
         public int InactiveCount { get; set; }
         public int OverDueCount { get; set; }
         public int TotalSubscriptions { get; set; }
+        public string ActiveSubscriptionIds { get; set; }
+        public string RoleIds { get; set; }
 
-        internal string _Subscriptions { get; set; }
+        internal string SubscriptionsJson { get; set; }
         public List<UserSubscriptionInfo> Subscriptions
         {
-            get { return !_Subscriptions.IsSet() ? new List<UserSubscriptionInfo>() : JsonConvert.DeserializeObject<List<UserSubscriptionInfo>>(_Subscriptions); }
-            set { _Subscriptions = JsonConvert.SerializeObject(value); }
+            get { return !SubscriptionsJson.IsSet() ? new List<UserSubscriptionInfo>() : JsonConvert.DeserializeObject<List<UserSubscriptionInfo>>(SubscriptionsJson); }
+            set { SubscriptionsJson = JsonConvert.SerializeObject(value); }
         }
 
         public int RoleCount { get; set; }
-        internal string _Roles { get; set; }
+        internal string RolesJson { get; set; }
         public List<IdentityRole> Roles
         {
-            get { return !_Roles.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(_Roles); }
-            set { _Roles = JsonConvert.SerializeObject(value); }
+            get { return !RolesJson.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(RolesJson); }
+            set { RolesJson = JsonConvert.SerializeObject(value); }
         }
 
         internal ApplicationUser AsUser()

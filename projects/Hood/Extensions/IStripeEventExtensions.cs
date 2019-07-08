@@ -1,6 +1,4 @@
-﻿using Stripe;
-
-namespace Hood.Extensions
+﻿namespace Hood.Extensions
 {
     public static class StripeEventExtensions
     {

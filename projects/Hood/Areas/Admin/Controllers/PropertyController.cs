@@ -2,13 +2,11 @@
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -31,7 +29,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/manage/")]
-        public async Task<IActionResult> Index(PropertyListModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(PropertyListModel model)
         {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
@@ -47,7 +45,6 @@ namespace Hood.Areas.Admin.Controllers
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
 
-            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -67,12 +64,11 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/property/edit/{id}/")]
-        public async Task<IActionResult> Edit(int id, EditorMessage? message)
+        public async Task<IActionResult> Edit(int id)
         {
             var model = await _property.GetPropertyByIdAsync(id, true);
             model = await LoadAgents(model);
             model.AutoGeocode = true;
-            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -160,7 +156,9 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/property/addfeature/{id}/")]
         public async Task<IActionResult> AddFeature(int id)
         {
-            var property = await _property.GetPropertyByIdAsync(id, true);
+            try
+            {
+                var property = await _property.GetPropertyByIdAsync(id, true);
             int? count = property.Metadata?.Where(m => m.Name.Contains("Feature")).Count();
             if (!count.HasValue)
                 count = 0;
@@ -173,16 +171,34 @@ namespace Hood.Areas.Admin.Controllers
                 BaseValue = JsonConvert.SerializeObject("")
             });
             await _property.UpdateAsync(property);
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while : {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+            }
 
-            return RedirectToAction("Edit", new { id = property.Id });
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [Authorize(Roles = "SuperUser,Admin")]
         [Route("admin/property/delete/all/")]
         public async Task<IActionResult> DeleteAll()
         {
-            await _property.DeleteAllAsync();
-            return RedirectToAction("Index", new { message = EditorMessage.Deleted });
+            try
+            {
+                await _property.DeleteAllAsync();
+                SaveMessage = $"All the properties have been deleted.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while : {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -268,15 +284,13 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
                 await _property.UpdateAsync(property);
-
-                var response = new Response(true, "Published successfully.")
-                {
-                    Url = Url.Action("Edit", new { id = property.Id, message = EditorMessage.Created })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Created successfully."); ;
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while creating a new property: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex.Message);
             }
         }
@@ -293,6 +307,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while deleting a property: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex.Message);
             }
         }
@@ -308,6 +324,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while publishing a property: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex.Message);
             }
         }
@@ -323,6 +341,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while archiving a property: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex.Message);
             }
         }
@@ -358,6 +378,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while uploading media to the gallery: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex);
             }
         }
@@ -393,6 +415,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while uploading a floorplan: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex);
             }
         }
@@ -434,6 +458,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
+                SaveMessage = $"An error occurred while clearing the field: {ex.Message}";
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
                 return new Response(ex.Message);
             }
         }
@@ -451,10 +477,16 @@ namespace Hood.Areas.Admin.Controllers
                     property.FeaturedImage = new MediaObject(media);
                     await _property.UpdateAsync(property);
                 }
+                SaveMessage = $"Featured image has been updated.";
+                MessageType = AlertType.Success;
             }
-            catch (Exception)
-            { }
-            return RedirectToAction("Edit", new { id, message = EditorMessage.ImageUpdated });
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while setting featured image: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]
@@ -464,10 +496,16 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 PropertyListing property = await _property.RemoveMediaAsync(id, mediaId);
+                SaveMessage = $"The media has been removed.";
+                MessageType = AlertType.Success;
             }
-            catch (Exception)
-            { }
-            return RedirectToAction("Edit", new { id, message = EditorMessage.MediaRemoved });
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while removing media: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]
@@ -477,10 +515,16 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 PropertyListing property = await _property.RemoveFloorplanAsync(id, mediaId);
+                SaveMessage = $"The floorplan has been removed.";
+                MessageType = AlertType.Success;
             }
-            catch (Exception)
-            { }
-            return RedirectToAction("Edit", new { id, message = EditorMessage.MediaRemoved });
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while removing floorplan: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
 

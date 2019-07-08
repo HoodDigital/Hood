@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Stripe;
 using Hood.BaseTypes;
-using Hood.Models;
 
 namespace Hood.ViewModels
 {

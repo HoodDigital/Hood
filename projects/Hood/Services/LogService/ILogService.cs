@@ -1,6 +1,4 @@
-﻿using Geocoding;
-using Hood.Interfaces;
-using Hood.Models;
+﻿using Hood.Models;
 using System;
 using System.Threading.Tasks;
 

@@ -9,7 +9,6 @@ using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -32,22 +31,20 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/{type}/manage/")]
-        public async Task<IActionResult> Index(ContentModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(ContentModel model)
         {
             model = await _content.GetContentAsync(model);
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
-            model.AddEditorMessage(message);
             return View(model);
         }
 
         [Route("admin/content/{id}/edit/")]
-        public async Task<IActionResult> Edit(int id, EditorMessage? message)
+        public async Task<IActionResult> Edit(int id)
         {
             var content = await _content.GetContentByIdAsync(id, true);
             if (content == null)
                 return NotFound();
             EditContentModel model = await GetEditorModel(content);
-            model.Content.AddEditorMessage(message);
             return View(model);
         }
 
@@ -137,16 +134,17 @@ namespace Hood.Areas.Admin.Controllers
                 await _content.UpdateAsync(content);
 
                 EditContentModel model = await GetEditorModel(content);
-                model.Content.SaveMessage = "Saved!";
-                model.Content.MessageType = AlertType.Success;
+                SaveMessage = "Saved!";
+                MessageType = AlertType.Success;
                 return View(model);
 
             }
             catch (Exception ex)
             {
                 EditContentModel model = await GetEditorModel(content);
-                model.Content.SaveMessage = "There was a problem saving: " + ex.Message;
-                model.Content.MessageType = AlertType.Danger;
+                SaveMessage = "There was a problem saving: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
                 return View(model);
             }
         }
@@ -207,15 +205,14 @@ namespace Hood.Areas.Admin.Controllers
                 model.ShareCount = 0;
                 model.Views = 0;
                 await _content.AddAsync(model);
-                var response = new Response(true, "Published successfully.")
-                {
-                    Url = Url.Action("Edit", new { id = model.Id, message = EditorMessage.Created })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                SaveMessage = $"An error occurred while publishing: {ex.Message}";
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return new Response(SaveMessage);
             }
         }
 
@@ -503,12 +500,14 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 var newContent = await _content.DuplicateContentAsync(id);
-                return RedirectToAction("Edit", new { message = EditorMessage.Duplicated, newContent.Id });
+                return RedirectToAction(nameof(Edit), new { newContent.Id });
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<ContentController>($"Error duplicating {nameof(Content)} with Id: {id}", ex);
-                return RedirectToAction("Edit", new { message = EditorMessage.ErrorDuplicating, id });
+                SaveMessage = $"An error occurred while : {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                return RedirectToAction(nameof(Edit), new { id });
             }
         }
 
@@ -583,7 +582,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 await _logService.AddExceptionAsync<ContentController>("Error removing media item", ex);
             }
-            return RedirectToAction("Edit", new { id, message = EditorMessage.MediaRemoved });
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]
@@ -597,7 +596,7 @@ namespace Hood.Areas.Admin.Controllers
                 content.FeaturedImage = new MediaObject(media);
                 await _content.UpdateAsync(content);
             }
-            return RedirectToAction("Edit", new { id, message = EditorMessage.ImageUpdated });
+            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [Route("admin/content/getfeaturedimage/{id}")]
@@ -659,11 +658,8 @@ namespace Hood.Areas.Admin.Controllers
                 Content content = await _content.GetContentByIdAsync(id);
                 content.FeaturedImage = null;
                 await _content.UpdateAsync(content);
-                var response = new Response(true, "The image has been cleared!")
-                {
-                    Url = Url.Action("Edit", new { id, message = EditorMessage.MediaRemoved })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
             {
@@ -679,11 +675,8 @@ namespace Hood.Areas.Admin.Controllers
                 Content content = await _content.GetContentByIdAsync(id);
                 content.ShareImage = null;
                 await _content.UpdateAsync(content);
-                var response = new Response(true, "The image has been cleared!")
-                {
-                    Url = Url.Action("Edit", new { id, message = EditorMessage.MediaRemoved })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
             {
@@ -699,11 +692,8 @@ namespace Hood.Areas.Admin.Controllers
                 var content = await _content.GetContentByIdAsync(id);
                 content.UpdateMeta(field, "");
                 await _content.UpdateAsync(content);
-                var response = new Response(true, "The data has been cleared!")
-                {
-                    Url = Url.Action("Edit", new { id, message = EditorMessage.ImageUpdated })
-                };
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "The data has been cleared!");
             }
             catch (Exception ex)
             {
@@ -715,8 +705,19 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{type}/delete/all/")]
         public async Task<IActionResult> DeleteAll(string type)
         {
-            await _content.DeleteAllAsync(type);
-            return RedirectToAction("Index", new { message = EditorMessage.Deleted });
+            try
+            {
+                await _content.DeleteAllAsync(type);
+                SaveMessage = $"All the content has been deleted.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"An error occurred while : {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         [Route("admin/content/categories/suggestions/{type}/")]
