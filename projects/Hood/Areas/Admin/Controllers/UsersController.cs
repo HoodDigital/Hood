@@ -43,6 +43,7 @@ namespace Hood.Areas.Admin.Controllers
             await LoadAndCheckProfile(model);
             return View(model);
         }
+
         [Route("admin/users/edit/{id}/")]
         [HttpPost]
         public async Task<IActionResult> Edit(UserProfile model)
@@ -75,15 +76,16 @@ namespace Hood.Areas.Admin.Controllers
 
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
+                return RedirectToAction(nameof(Edit), new { id = model.Id });
             }
             catch (Exception ex)
             {
                 SaveMessage = "There was an error while saving: " + ex.Message;
                 MessageType = AlertType.Danger;
-            }
 
-            await LoadAndCheckProfile(model);
-            return View(model);
+                await LoadAndCheckProfile(model);
+                return View(model);
+            }
         }
         [Route("admin/users/stripe/link/{id}/")]
         public async Task<IActionResult> LinkToStripe(string id, string customerId)

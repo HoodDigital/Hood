@@ -6,10 +6,10 @@ $.hood.Import = {
     UpdateInterval: -1,
     Init: function Init() {
       $.hood.Import.Property.Update();
-      $('#runUpdate').click(function () {
+      $('#import-property-start').click(function () {
         //$(this).addLoader();
         $.ajax({
-          url: "/admin/property/import/blm/start/",
+          url: $('#import-property-start').data('url'),
           type: "POST",
           error: function error(jqXHR, textStatus, errorThrown) {
             $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -21,10 +21,10 @@ $.hood.Import = {
           }
         });
       });
-      $('#cancel').click(function () {
+      $('#import-property-cancel').click(function () {
         //$(this).addLoader();
         $.ajax({
-          url: "/admin/property/import/blm/cancel/",
+          url: $('#import-property-cancel').data('url'),
           type: "POST",
           error: function error(jqXHR, textStatus, errorThrown) {
             $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -39,7 +39,7 @@ $.hood.Import = {
     },
     Update: function Update() {
       $.ajax({
-        url: "/admin/property/import/blm/status/",
+        url: $('#import-property-status').data('url'),
         type: "POST",
         error: function error(jqXHR, textStatus, errorThrown) {
           $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -77,9 +77,9 @@ $.hood.Import = {
               errorHtml += '<p class="text-danger">' + result.Importer.Errors[i] + '</p>';
             }
 
-            $('#Errors').html(errorHtml);
+            $('#import-property-errors').html(errorHtml);
           } else {
-            $('#Errors').html("<p>No errors reported.</p>");
+            $('#import-property-errors').html("<p>No errors reported.</p>");
           }
 
           if (result.Importer.Warnings.length) {
@@ -89,26 +89,26 @@ $.hood.Import = {
               warningHtml += '<p class="text-warning">' + result.Importer.Warnings[i] + '</p>';
             }
 
-            $('#Warnings').html(warningHtml);
+            $('#import-property-warnings').html(warningHtml);
           } else {
-            $('#Warnings').html("<p>No warnings reported.</p>");
+            $('#import-property-warnings').html("<p>No warnings reported.</p>");
           }
         }
       });
     },
     View: {
       HideInfo: function HideInfo() {
-        $('#runUpdate').removeAttr('disabled');
-        $('#cancel').attr('disabled', 'disabled');
-        $('#update-progress').hide();
+        $('#import-property-start').removeAttr('disabled');
+        $('#import-property-cancel').attr('disabled', 'disabled');
+        $('#import-property-progress').hide();
       },
       ShowInfo: function ShowInfo() {
-        $('#cancel').removeAttr('disabled');
-        $('#runUpdate').attr('disabled', 'disabled');
-        $('#update-progress').show();
+        $('#import-property-cancel').removeAttr('disabled');
+        $('#import-property-start').attr('disabled', 'disabled');
+        $('#import-property-progress').show();
       },
       ShowError: function ShowError(string) {
-        $('#error').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
+        $('#import-property-error-message').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
       }
     }
   }

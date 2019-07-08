@@ -399,8 +399,8 @@ $.hood.Content = {
   Edit: {
     Init: function Init() {
       this.LoadEditors('#edit-content');
-      $.hood.Content.Upload.InitImageUploader();
-      if ($('#designer-window').doesExist()) this.Designer.Init();
+      $.hood.Content.Upload.InitImageUploader(); //if ($('#designer-window').doesExist())
+      //    this.Designer.Init();
     },
     Designer: {
       Window: $('#designer-window'),

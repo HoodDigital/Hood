@@ -51,11 +51,7 @@ $.hood.Users = {
         Init: function (e) {
             // close open blade
             $('button.create-user').removeClass('btn-primary').addClass('btn-default').html('<i class="fa fa-refresh fa-spin"></i>&nbsp;Loading...');
-            $('#right-sidebar').removeClass('animate-all sidebar-open');
-            setTimeout(function () {
-                $('#right-sidebar').empty();
-            });
-            $('#right-sidebar').addClass('animate-all');
+
             // load in the create user blade
             $.get('/admin/users/create/', null, function (data) {
                 $('#right-sidebar').html(data);
@@ -65,7 +61,6 @@ $.hood.Users = {
                 $.hood.Users.Create.SetupCreateForm();
                 $.hood.Helpers.ResetSidebarScroll();
             });
-
         },
         CancelCreate: function (e) {
             // close open blade
@@ -73,7 +68,6 @@ $.hood.Users = {
             setTimeout(function () {
                 $('#right-sidebar').empty();
             });
-
         },
         SetupCreateForm: function () {
             $('#create-user-form').hoodValidator({
@@ -113,9 +107,9 @@ $.hood.Users = {
         },
         GeneratePassword: function () {
             if ($(this).is(':checked')) {
-                $('#cuPassword').val($.hood.Helpers.GenerateRandomString(0))
+                $('#cuPassword').val($.hood.Helpers.GenerateRandomString(0));
             } else {
-                $('#cuPassword').val('')
+                $('#cuPassword').val('');
             }
         }
     },

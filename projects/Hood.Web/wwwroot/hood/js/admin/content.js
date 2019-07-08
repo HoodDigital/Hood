@@ -401,8 +401,8 @@ $.hood.Content = {
 
             $.hood.Content.Upload.InitImageUploader();
 
-            if ($('#designer-window').doesExist())
-                this.Designer.Init();
+            //if ($('#designer-window').doesExist())
+            //    this.Designer.Init();
 
         },
         Designer: {

@@ -4,35 +4,37 @@ $.hood.IO = {
     Reporter: {
         UpdateInterval: -1,
         Init: function () {
-            $.hood.IO.Reporter.Update();
-            $('#runUpdate').click(function () {
-                $.ajax({
-                    url: $('#runUpdate').data('start'),
-                    type: "POST",
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
-                    },
-                    success: function (result) {
-                        $.hood.IO.Reporter.Update();
-                    }
+            if ($('#import-property-start').doesExist()) {
+                $.hood.IO.Reporter.Update();
+                $('#import-property-start').click(function () {
+                    $.ajax({
+                        url: $('#import-property-start').data('start'),
+                        type: "POST",
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
+                        },
+                        success: function (result) {
+                            $.hood.IO.Reporter.Update();
+                        }
+                    });
                 });
-            });
-            $('#cancel').click(function () {
-                $.ajax({
-                    url: $('#runUpdate').data('cancel'),
-                    type: "POST",
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
-                    },
-                    success: function (result) {
-                        $.hood.IO.Reporter.Update();
-                    }
+                $('#import-property-cancel').click(function () {
+                    $.ajax({
+                        url: $('#import-property-start').data('import-property-cancel'),
+                        type: "POST",
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
+                        },
+                        success: function (result) {
+                            $.hood.IO.Reporter.Update();
+                        }
+                    });
                 });
-            });
+            }
         },
         Update: function () {
             $.ajax({
-                url: $('#runUpdate').data('update'),
+                url: $('#import-property-start').data('update'),
                 type: "POST",
                 error: function (jqXHR, textStatus, errorThrown) {
                     $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -65,17 +67,17 @@ $.hood.IO = {
         },
         View: {
             HideInfo: function () {
-                $('#runUpdate').removeAttr('disabled');
-                $('#cancel').attr('disabled', 'disabled');
-                $('#update-progress').hide();
+                $('#import-property-start').removeAttr('disabled');
+                $('#import-property-cancel').attr('disabled', 'disabled');
+                $('#import-property-progress').hide();
             },
             ShowInfo: function () {
-                $('#cancel').removeAttr('disabled');
-                $('#runUpdate').attr('disabled', 'disabled');
-                $('#update-progress').show();
+                $('#import-property-cancel').removeAttr('disabled');
+                $('#import-property-start').attr('disabled', 'disabled');
+                $('#import-property-progress').show();
             },
             ShowError: function (string) {
-                $('#error').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
+                $('#import-property-error-message').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
             }
         }
     }

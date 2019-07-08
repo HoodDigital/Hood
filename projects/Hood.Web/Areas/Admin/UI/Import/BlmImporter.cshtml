@@ -6,16 +6,15 @@
 @section buttons {
     <a class="btn btn-sm btn-primary" asp-action="Manage" asp-controller="Property" asp-area="Admin"><i class="fa fa-list-ol m-r-sm"></i>Back to List</a>
 }
-<script src="~/hood/js/includes/import.property.js" asp-location="AfterScripts"></script>
 <div class="panel-body">
     <h4 class="font-bold">
         <span>Update from FTP Service</span>
     </h4>
     <p>Here you can run the update from the remote FTP service. Click 'Run Update' to start the automatic update.</p>
-    <button id="cancel" class="btn" value="">Cancel</button>
-    <button id="runUpdate" class="btn btn-primary">Run Update</button>
-    <div id="error"></div>
-    <div id="update-progress" class="alert alert-info m-t-lg">
+    <button id="import-property-cancel" data-url="@Url.Action("Start")" class="btn" value="">Cancel</button>
+    <button id="import-property-start" data-url="@Url.Action("Cancel")" class="btn btn-primary">Run Update</button>
+    <div id="import-property-error-message"></div>
+    <div id="import-property-progress" class="alert alert-info m-t-lg">
         <h3><span class="pc">0.0</span>% Complete</h3>
         <div id="progresscontainer" class="progress progress-striped">
             <div id="progressbar" class="progress-bar progress-bar-inverse" style="width: 0%"></div>
@@ -26,7 +25,7 @@
     <h4 class="font-bold">
         <span>Activity</span>
     </h4>
-    <div id="progress">
+    <div id="import-property-status" data-url="@Url.Action("Progress")">
         <div class="well-lg">
             <p>Current Task: <strong id="pt"></strong></p>
             <p>FTP Service Activity: <strong id="ft"></strong></p>
@@ -51,7 +50,7 @@
     <h4 class="font-bold">
         <span>Errors</span>
     </h4>
-    <div id="Errors">
+    <div id="import-property-errors">
         <p>No errors reported.</p>
     </div>
 </div>
@@ -59,7 +58,7 @@
     <h4 class="font-bold">
     Warnings
     </h4>
-    <div id="Warnings">
+    <div id="import-property-warnings">
         <p>No warnings reported.</p>
     </div>
 </div>

@@ -6,9 +6,9 @@ $.hood.IO = {
     UpdateInterval: -1,
     Init: function Init() {
       $.hood.IO.Reporter.Update();
-      $('#runUpdate').click(function () {
+      $('#import-property-start').click(function () {
         $.ajax({
-          url: $('#runUpdate').data('start'),
+          url: $('#import-property-start').data('start'),
           type: "POST",
           error: function error(jqXHR, textStatus, errorThrown) {
             $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -18,9 +18,9 @@ $.hood.IO = {
           }
         });
       });
-      $('#cancel').click(function () {
+      $('#import-property-cancel').click(function () {
         $.ajax({
-          url: $('#runUpdate').data('cancel'),
+          url: $('#import-property-start').data('import-property-cancel'),
           type: "POST",
           error: function error(jqXHR, textStatus, errorThrown) {
             $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -33,7 +33,7 @@ $.hood.IO = {
     },
     Update: function Update() {
       $.ajax({
-        url: $('#runUpdate').data('update'),
+        url: $('#import-property-start').data('update'),
         type: "POST",
         error: function error(jqXHR, textStatus, errorThrown) {
           $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
@@ -69,17 +69,17 @@ $.hood.IO = {
     },
     View: {
       HideInfo: function HideInfo() {
-        $('#runUpdate').removeAttr('disabled');
-        $('#cancel').attr('disabled', 'disabled');
-        $('#update-progress').hide();
+        $('#import-property-start').removeAttr('disabled');
+        $('#import-property-cancel').attr('disabled', 'disabled');
+        $('#import-property-progress').hide();
       },
       ShowInfo: function ShowInfo() {
-        $('#cancel').removeAttr('disabled');
-        $('#runUpdate').attr('disabled', 'disabled');
-        $('#update-progress').show();
+        $('#import-property-cancel').removeAttr('disabled');
+        $('#import-property-start').attr('disabled', 'disabled');
+        $('#import-property-progress').show();
       },
       ShowError: function ShowError(string) {
-        $('#error').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
+        $('#import-property-error-message').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
       }
     }
   }

@@ -203,6 +203,7 @@ SELECT
 	dbo.HoodUserSubscriptionsView.OverDueCount, 
 	dbo.HoodUserSubscriptionsView.TotalSubscriptions, 
 	dbo.HoodUserSubscriptionsView.Subscriptions,
+	dbo.HoodUserSubscriptionsView.ActiveSubscriptionIds,
 	COUNT(dbo.AspNetRoles.Name) AS RoleCount,
 	CONCAT
 	(
@@ -283,5 +284,6 @@ GROUP BY
 	dbo.HoodUserSubscriptionsView.InactiveCount, 
 	dbo.HoodUserSubscriptionsView.OverDueCount, 
 	dbo.HoodUserSubscriptionsView.TotalSubscriptions, 
-	dbo.HoodUserSubscriptionsView.Subscriptions
+	dbo.HoodUserSubscriptionsView.Subscriptions, 
+	dbo.HoodUserSubscriptionsView.ActiveSubscriptionIds
 GO
