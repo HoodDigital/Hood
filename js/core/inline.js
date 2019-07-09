@@ -7,50 +7,51 @@ $.hood.Inline = {
     $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
     $.hood.Inline.DataList.Init();
   },
-  Refresh: function Refresh() {
-    $('.hood-inline').each($.hood.Inline.Load);
+  Refresh: function Refresh(tag) {
+    $(tag || '.hood-inline').each($.hood.Inline.Load);
   },
   Load: function Load(e) {
     $.hood.Inline.Reload(this);
   },
   Reload: function Reload(tag, complete) {
-    $(tag).addClass('loading');
-    params = null;
+    $tag = $(tag);
+    $tag.addClass('loading');
+    var urlLoad = $tag.data('url');
+    $.get(urlLoad, function (data) {
+      $tag.html(data);
+      $tag.removeClass('loading');
+    }).done(function (data) {
+      $.hood.Inline.RunComplete(complete, data, $tag);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
+  },
+  Modal: function Modal(url, complete) {
+    $.get(url, function (data) {
+      modalId = '#' + $(data).attr('id');
+      $(data).addClass('hood-inline-modal');
 
-    if ($(tag).attr('data-params')) {
-      params = eval($(tag).data('params'));
-    }
-
-    var urlLoad = $(tag).data('url');
-    $.get(urlLoad, params, function (data) {
-      $(tag).html(data);
-
-      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-        if ($.hood.Helpers.IsFunction(complete)) complete(data);else eval(complete + "(data)");
+      if ($(modalId).length) {
+        $(modalId).remove();
       }
 
-      if ($(tag).attr("data-complete")) {
-        eval($(tag).data('complete') + "(data)");
-      }
-    }).fail(function (data) {
-      $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
-    }).always(function (data) {
-      $.hood.Modals.Loading = false;
-      $(tag).removeClass('loading');
-    });
+      $('body').append(data);
+      $(modalId).modal(); // Workaround for sweetalert popups.
+
+      $(modalId).on('shown.bs.modal', function () {
+        $(document).off('focusin.modal');
+      });
+    }).done(function (data) {
+      $.hood.Inline.RunComplete(complete, data);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   Task: function Task(e) {
-    $.hood.Loader(true);
     e.preventDefault();
     $tag = $(e.currentTarget);
-    $tagcontents = $(e.currentTarget).html();
-    $(e.currentTarget).addClass('loading');
-    var urlLoad = $(e.currentTarget).attr('href');
-    $.get(urlLoad, null, function (data) {
+    $tag.addClass('loading');
+    $.get($tag.attr('href'), function (data) {
       if (data.Success) {
         $.hood.Alerts.Success(data.Message);
       } else {
-        $.hood.Alerts.Error(data.Errors);
+        $.hood.Alerts.Error(data.Errors, data.Message);
       }
 
       if (data.Url) {
@@ -59,16 +60,10 @@ $.hood.Inline = {
         }, 500);
       }
 
-      if ($tag.attr("data-complete")) {
-        eval($tag.data('complete') + "(data)");
-      }
-    }).fail(function (data) {
-      $.hood.Alerts.Error("There was an error processing the request:<br/><strong>" + urlLoad + "</strong>");
-    }).always(function (data) {
-      $.hood.Loader(false);
-      $.hood.Modals.Loading = false;
-      $(e.currentTarget).removeClass('loading');
-    });
+      $tag.removeClass('loading');
+    }).done(function (data) {
+      $.hood.Inline.RunComplete(complete, data);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   DataList: {
     Init: function Init() {
@@ -126,6 +121,46 @@ $.hood.Inline = {
       list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
       $.hood.Inline.Reload(list, list.data('complete'));
     }
+  },
+  HandleError: function HandleError(xhr) {
+    if (xhr.status === 500) {
+      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: There was an error processing the content, please contact an administrator if this continues.<br/>");
+    } else if (xhr.status === 404) {
+      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: The content could not be found.<br/>");
+    } else if (xhr.status === 401) {
+      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: You are not allowed to view this resource, are you logged in correctly?<br/>");
+    }
+  },
+  Finish: function Finish(data) {
+    // Function can be overridden, to add global functionality to end of inline loads.
+    $.hood.Loader(false);
+  },
+  RunComplete: function RunComplete(complete) {
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var tag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    func = $(tag).attr("data-complete");
+
+    if (data !== null) {
+      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "(data)");
+      }
+
+      if (tag !== null && func) {
+        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "(data)");
+      }
+    } else {
+      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "()");
+      }
+
+      if (tag !== null && func) {
+        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "()");
+      }
+    }
   }
 };
-$.hood.Inline.Init();
+$.hood.Inline.Init(); // Backwards compatibility.
+
+$.hood.Modals = {
+  Open: $.hood.Inline.Modal
+};

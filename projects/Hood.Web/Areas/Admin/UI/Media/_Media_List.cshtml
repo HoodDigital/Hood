@@ -75,8 +75,8 @@
                     <a data-toggle="modal" href="@string.Format("#media-object-{0}", media.Id)" class="full-box-link"></a>
                     break;
             }
+            <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">${ Filename }</a>
         </div>
-        <partial name="_Blade_Media" model="media" />
     }
 </div>
 <partial name="_Pagination" />

@@ -108,12 +108,11 @@ gulp.task('js:core', function () {
         hood.js + 'core/stringhelpers.js',
         hood.js + 'core/validator.js',
 
+        hood.js + 'core/addresses.js',
         hood.js + 'core/alerts.js',
         hood.js + 'core/forms.js',
         hood.js + 'core/inline.js',
-        hood.js + 'core/media.js',
-        hood.js + 'core/modals.js',
-        hood.js + 'core/addresses.js'
+        hood.js + 'core/media.js'
 
     ], { base: '.' })
         .pipe(concat('core.js'))
@@ -186,14 +185,14 @@ gulp.task('js:package:admin', function () {
 
         hood.js + 'admin/content.js',
         hood.js + 'admin/forums.js',
-        hood.js + 'admin/import.property.js',
-        hood.js + 'admin/io.reporter.js',
         hood.js + 'admin/logs.js',
+        hood.js + 'admin/property.js',
         hood.js + 'admin/subscriptions.js',
         hood.js + 'admin/themes.js',
         hood.js + 'admin/users.js',
 
         hood.js + 'app/google.js',
+
         hood.js + 'admin.js'
 
     ], { base: '.' })

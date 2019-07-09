@@ -203,7 +203,12 @@ $.hood.Media = {
           $.hood.Alerts.Success("Uploads completed successfully.");
         }
       });
-      myDropzone.on("addedfile", function (file) {}); // Update the total progress bar
+      myDropzone.on("addedfile", function (file) {
+        $('#media-total-progress .progress-bar').css({
+          width: 0 + "%"
+        });
+        $('#media-total-progress .progress-bar .percentage').html(0 + "%");
+      }); // Update the total progress bar
 
       myDropzone.on("totaluploadprogress", function (progress) {
         $('#media-total-progress .progress-bar').css({
@@ -235,44 +240,25 @@ $.hood.Media = {
   },
   Delete: function Delete(e) {
     var $this = $(this);
-    swal({
-      title: "Are you sure?",
-      text: "The media file will be permanently removed.\n\nWarning: Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Yes, go ahead.",
-      cancelButtonText: "No, cancel!",
-      closeOnConfirm: false,
-      showLoaderOnConfirm: true,
-      closeOnCancel: false
-    }, function (isConfirm) {
-      if (isConfirm) {
+
+    deleteMediaCallback = function deleteMediaCallback(confirmed) {
+      if (confirmed) {
         // delete functionality
         $.post('/admin/media/delete', {
           id: $this.data('id')
         }, function (data) {
           if (data.Success) {
             $.hood.Media.Reload();
-            swal({
-              title: "Deleted!",
-              text: "The media file has now been removed from the website.",
-              timer: 1300,
-              type: "success"
-            });
+            $('.modal-backdrop').remove();
+            $.hood.Alerts.Success("The file has now been removed from the website.");
           } else {
-            swal({
-              title: "Error!",
-              text: "There was a problem deleting the media file: " + data.Errors,
-              timer: 1300,
-              type: "error"
-            });
+            $.hood.Alerts.Error("There was a problem deleting the file.");
           }
         });
-      } else {
-        swal("Cancelled", "It's all good in the hood!", "error");
       }
-    });
+    };
+
+    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, type = 'warning', footer = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
   },
   RestrictDir: function RestrictDir() {
     var pattern = /[^0-9A-Za-z- ]*/g; // default pattern
@@ -339,22 +325,22 @@ $.hood.Media = {
       } else {
         if ($('#Directory').val() === "") message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
 
-        deleteDirectoryCallback = function deleteDirectoryCallback(result) {
-          if (result.value) {
+        deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
+          if (confirmed) {
             $.post('/admin/media/directory/delete', {
               directory: $('#Directory').val()
             }, function (data) {
               if (data.Success) {
                 $.hood.Media.Reload();
-                $.hood.Alerts.Success("The directory has now been removed from the website.", "Deleted!", true, null, true, 5000);
+                $.hood.Alerts.Success("The directory has now been removed from the website.");
               } else {
-                $.hood.Alerts.Error("There was a problem deleting the directory.", "Error!", true, null, true, 5000);
+                $.hood.Alerts.Error("There was a problem deleting the directory.");
               }
             });
           }
         };
 
-        $.hood.Alerts.Confirm(message, "Are you sure?", deleteDirectoryCallback);
+        $.hood.Alerts.Message("Cancelled, nothing to worry about.");
       }
     }
   },

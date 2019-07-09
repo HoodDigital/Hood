@@ -2,7 +2,7 @@
 @{
     Layout = null;
 }
-<div class="modal fade modal-right" id="@string.Format("media-object-{0}", Model.Id)" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade modal-right media-blade" id="@string.Format("media-object-{0}", Model.Id)" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-blade" role="document">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white">
@@ -22,20 +22,18 @@
                 @switch (Model.GenericFileType)
                 {
                     case GenericFileType.Audio:
-                        <div class="embed-responsive embed-responsive-16by9 mb-3">
-                            <video id="mediaplayer-@Model.Id"
-                                   class="mediaplayer audio azuremediaplayer amp-default-skin always-show-controls embed-responsive-item"
-                                   tabindex="0"
-                                   seeking
-                                   data-id="@Model.Id"
-                                   data-file="@Model.DownloadUrlHttps"
-                                   data-type="@Model.FileType"></video>
-                        </div>
+                        <video id="mediaplayer-@Model.Id"
+                                class="hood-media mediaplayer audio azuremediaplayer amp-default-skin always-show-controls embed-responsive-item mb-3"
+                                tabindex="0"
+                                seeking
+                                data-id="@Model.Id"
+                                data-file="@Model.DownloadUrlHttps"
+                                data-type="@Model.FileType"></video>
                         break;
                     case GenericFileType.Video:
                         <div class="embed-responsive embed-responsive-16by9 mb-3">
                             <video id="mediaplayer-@Model.Id"
-                                   class="mediaplayer video azuremediaplayer amp-default-skin vjs-fluid amp-big-play-centered embed-responsive-item"
+                                   class="hood-media mediaplayer video azuremediaplayer amp-default-skin vjs-fluid amp-big-play-centered embed-responsive-item"
                                    tabindex="0"
                                    seeking data-id="@Model.Id"
                                    data-file="@Model.DownloadUrlHttps"
@@ -84,4 +82,3 @@
         </div>
     </div>
 </div>
-

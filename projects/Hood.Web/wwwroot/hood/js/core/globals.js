@@ -122,8 +122,8 @@ $.fn.warningAlert = function () {
     var targets = $(this);
     var warningAlertHandler = function (e) {
         e.preventDefault();
-        warningAlertCallback = function (result) {
-            if (result.value) {
+        warningAlertCallback = function (confirmed) {
+            if (confirmed) {
                 url = $(e.currentTarget).attr('href');
                 window.location = url;
             }

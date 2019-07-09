@@ -5,31 +5,33 @@ $.hood.IO = {
   Reporter: {
     UpdateInterval: -1,
     Init: function Init() {
-      $.hood.IO.Reporter.Update();
-      $('#import-property-start').click(function () {
-        $.ajax({
-          url: $('#import-property-start').data('start'),
-          type: "POST",
-          error: function error(jqXHR, textStatus, errorThrown) {
-            $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
-          },
-          success: function success(result) {
-            $.hood.IO.Reporter.Update();
-          }
+      if ($('#import-property-start').doesExist()) {
+        $.hood.IO.Reporter.Update();
+        $('#import-property-start').click(function () {
+          $.ajax({
+            url: $('#import-property-start').data('start'),
+            type: "POST",
+            error: function error(jqXHR, textStatus, errorThrown) {
+              $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
+            },
+            success: function success(result) {
+              $.hood.IO.Reporter.Update();
+            }
+          });
         });
-      });
-      $('#import-property-cancel').click(function () {
-        $.ajax({
-          url: $('#import-property-start').data('import-property-cancel'),
-          type: "POST",
-          error: function error(jqXHR, textStatus, errorThrown) {
-            $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
-          },
-          success: function success(result) {
-            $.hood.IO.Reporter.Update();
-          }
+        $('#import-property-cancel').click(function () {
+          $.ajax({
+            url: $('#import-property-start').data('import-property-cancel'),
+            type: "POST",
+            error: function error(jqXHR, textStatus, errorThrown) {
+              $.hood.IO.Reporter.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
+            },
+            success: function success(result) {
+              $.hood.IO.Reporter.Update();
+            }
+          });
         });
-      });
+      }
     },
     Update: function Update() {
       $.ajax({

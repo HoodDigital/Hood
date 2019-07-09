@@ -54,7 +54,7 @@ $.hood.Alerts = {
       confirmButtonText: confirmButtonText || 'Ok',
       cancelButtonText: cancelButtonText || 'Cancel'
     }).then(function (result) {
-      callback(result);
+      callback(result.value);
     });
   }
 };

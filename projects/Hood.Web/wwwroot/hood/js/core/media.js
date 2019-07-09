@@ -12,6 +12,9 @@ $.hood.Media = {
     Loaded: function (data) {
         $.hood.Loader(false);
     },
+    BladeLoaded: function (data) {
+        $.hood.Media.LoadMediaPlayers();
+    },
     Reload: function (complete) {
         $.hood.Inline.Reload($('#media-list'), complete);
     },
@@ -212,6 +215,8 @@ $.hood.Media = {
             });
 
             myDropzone.on("addedfile", function (file) {
+                $('#media-total-progress .progress-bar').css({ width: 0 + "%" });
+                $('#media-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
@@ -244,44 +249,32 @@ $.hood.Media = {
     },
 
     Delete: function (e) {
+
         var $this = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "The media file will be permanently removed.\n\nWarning: Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/media/delete', { id: $this.data('id') }, function (data) {
-                        if (data.Success) {
-                            $.hood.Media.Reload();
-                            swal({
-                                title: "Deleted!",
-                                text: "The media file has now been removed from the website.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem deleting the media file: " + data.Errors,
-                                timer: 1300,
-                                type: "error"
-                            });
-                        }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
+        deleteMediaCallback = function (confirmed) {
+            if (confirmed) {
+                // delete functionality
+                $.post('/admin/media/delete', { id: $this.data('id') }, function (data) {
+                    if (data.Success) {
+                        $.hood.Media.Reload();
+                        $('.modal-backdrop').remove();
+                        $.hood.Alerts.Success("The file has now been removed from the website.");
+                    } else {
+                        $.hood.Alerts.Error("There was a problem deleting the file.");
+                    }
+                });
+            } 
+        };
+
+        $.hood.Alerts.Confirm(
+            "The media file will be permanently removed. This cannot be undone.",
+            "Are you sure?",
+            deleteMediaCallback,
+            type = 'warning',
+            footer = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>',
+            confirmButtonText = 'Ok',
+            cancelButtonText = 'Cancel'
+        );
     },
 
     RestrictDir: function () {
@@ -350,25 +343,25 @@ $.hood.Media = {
             } else {
                 if ($('#Directory').val() === "")
                     message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
-                deleteDirectoryCallback = function (result) {
-                    if (result.value) {
+                deleteDirectoryCallback = function (confirmed) {
+                    if (confirmed) {
                         $.post('/admin/media/directory/delete', { directory: $('#Directory').val() }, function (data) {
                             if (data.Success) {
                                 $.hood.Media.Reload();
-                                $.hood.Alerts.Success("The directory has now been removed from the website.", "Deleted!", true, null, true, 5000);
+                                $.hood.Alerts.Success("The directory has now been removed from the website.");
                             } else {
-                                $.hood.Alerts.Error("There was a problem deleting the directory.", "Error!", true, null, true, 5000);
+                                $.hood.Alerts.Error("There was a problem deleting the directory.");
                             }
                         });
-                    }
+                    } 
                 };
-                $.hood.Alerts.Confirm(message, "Are you sure?", deleteDirectoryCallback);
+                $.hood.Alerts.Message("Cancelled, nothing to worry about.");
             }
         }
     },
 
     Players: {},
-    LoadMediaPlayers: function (tag) {
+    LoadMediaPlayers: function (tag = '.hood-media') {
         var videoOptions = {
             techOrder: ["azureHtml5JS", "flashSS", "html5FairPlayHLS", "silverlightSS", "html5"],
             nativeControlsForTouch: false,
@@ -377,17 +370,26 @@ $.hood.Media = {
             seeking: true
         };
         $(tag).each(function () {
-            player = $.hood.Media.Players[$(this).data('id')];
-            if (player)
-                player.dispose();
-            $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
-            player = $.hood.Media.Players[$(this).data('id')];
-            player.src([
-                {
-                    src: $(this).data('file'),
-                    type: $(this).data('type')
+            try {
+                player = $.hood.Media.Players[$(this).data('id')];
+                if (player) {
+                    try {
+                        player.dispose();
+                    } catch (ex) {
+                        console.log(`There was a problem disposing the old media player: ${ex}`);
+                    }
                 }
-            ]);
+                $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
+                player = $.hood.Media.Players[$(this).data('id')];
+                player.src([
+                    {
+                        src: $(this).data('file'),
+                        type: $(this).data('type')
+                    }
+                ]);
+            } catch (ex) {
+                console.log(`There was a problem playing the media file: ${ex}`);
+            }
         });
     }
 };

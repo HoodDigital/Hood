@@ -144,8 +144,8 @@ $.fn.warningAlert = function () {
   var warningAlertHandler = function warningAlertHandler(e) {
     e.preventDefault();
 
-    warningAlertCallback = function warningAlertCallback(result) {
-      if (result.value) {
+    warningAlertCallback = function warningAlertCallback(confirmed) {
+      if (confirmed) {
         url = $(e.currentTarget).attr('href');
         window.location = url;
       }
@@ -1007,6 +1007,143 @@ $.fn.hoodValidator = function (options) {
   });
 };
 
+if (!$.hood) $.hood = {};
+$.hood.Addresses = {
+  Init: function Init() {
+    $('body').on('click', '.add-new-address', $.hood.Addresses.New);
+    $('body').on('click', '.set-billing', $.hood.Addresses.SetBilling);
+    $('body').on('click', '.set-delivery', $.hood.Addresses.SetDelivery);
+    $('body').on('click', '.delete-address', $.hood.Addresses.Delete);
+    $('body').on('click', '.edit-address', $.hood.Addresses.Edit);
+
+    if ($(".address-select").length > 0) {
+      $.hood.Addresses.Refresh();
+    }
+  },
+  New: function New(e) {
+    $(this).data('temp', $(this).html());
+    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
+    $.hood.Modals.Open('/account/addresses/create', null, '', $.hood.Addresses.PostLoad);
+  },
+  Edit: function Edit() {
+    $(this).data('temp', $(this).html());
+    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
+    $.hood.Modals.Open('/account/addresses/edit', {
+      id: $(this).data('id')
+    }, '', $.hood.Addresses.PostLoad);
+  },
+  Refresh: function Refresh() {
+    $.hood.Inline.Reload('.address-list'); // reload any selectlists that contain billing or delivery addresses (checkouts etc.)
+
+    $.get('/account/addresses/get', null, function (data) {
+      $('.address-select').empty().append($('<option>', {
+        value: '',
+        text: '--- Choose an address ---'
+      }));
+
+      for (var i in data) {
+        var id = data[i].Id;
+        var address = data[i].FullAddress;
+        $('.address-select').append($('<option>', {
+          value: id,
+          text: address
+        }));
+      }
+    });
+  },
+  PostLoad: function PostLoad() {
+    $.hood.Google.Addresses.InitAutocomplete();
+    $('.btn-loading').each(function () {
+      $(this).removeClass('btn-loading').html($(this).data('temp'));
+    });
+    $('#address-form').hoodValidator({
+      validationRules: {
+        Number: {
+          required: true
+        },
+        Address1: {
+          required: true
+        },
+        City: {
+          required: true
+        },
+        County: {
+          required: true
+        },
+        Postcode: {
+          required: true
+        },
+        Country: {
+          required: true
+        }
+      },
+      submitButtonTag: $('#save-address'),
+      submitUrl: $('#address-form').attr('action'),
+      submitFunction: function submitFunction(data) {
+        if (data.Success) {
+          $.hood.Addresses.Refresh();
+          $.hood.Modals.Close('#add-address-modal');
+        } else {
+          $.hood.Alerts.Error(data.Errors, "Error Saving Address!");
+        }
+      }
+    });
+  },
+  SetBilling: function SetBilling(e) {
+    $(this).data('temp', $(this).html());
+    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
+    $.post('/account/addresses/setbilling?id=' + $(this).data('id'), null, function (data) {
+      $('.btn-loading').each(function () {
+        $(this).removeClass('btn-loading').html($(this).data('temp'));
+      });
+
+      if (data.success) {
+        $.hood.Alerts.Success("Your billing address has been updated.", "Billing Address Updated!");
+        $.hood.Addresses.Refresh();
+      } else {
+        $.hood.Alerts.Error("Couldn't update your billing address...", "Couldn't Update Billing Address!");
+      }
+    });
+    e.preventDefault();
+  },
+  SetDelivery: function SetDelivery(e) {
+    $(this).data('temp', $(this).html());
+    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
+    $.post('/account/addresses/setdelivery?id=' + $(this).data('id'), function (data) {
+      $('.btn-loading').each(function () {
+        $(this).removeClass('btn-loading').html($(this).data('temp'));
+      });
+
+      if (data.success) {
+        $.hood.Alerts.Success("Your delivery address has been updated.", "Delivery Address Updated!");
+        $.hood.Addresses.Refresh();
+      } else {
+        $.hood.Alerts.Error("Couldn't update your delivery address...", "Couldn't Update Delivery Address!");
+      }
+    });
+    e.preventDefault();
+  },
+  Delete: function Delete(e) {
+    $(this).data('temp', $(this).html());
+    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
+    $.post('/account/addresses/delete', {
+      id: $(this).data('id')
+    }, function (data) {
+      $('.btn-loading').each(function () {
+        $(this).removeClass('btn-loading').html($(this).data('temp'));
+      });
+
+      if (data.success) {
+        $.hood.Alerts.Success("Your address has been deleted.", "Address Deleted!");
+        $.hood.Addresses.Refresh();
+      } else {
+        $.hood.Alerts.Error("Couldn't delete your address, it may be in use as your billing or delivery address...", "Couldn't Delete Address!");
+      }
+    });
+    e.preventDefault();
+  }
+};
+$.hood.Addresses.Init();
 var swalWithBootstrapButtons = Swal.mixin({
   customClass: {
     confirmButton: 'btn btn-success btn-lg m-1 pl-4 pr-4',
@@ -1061,7 +1198,7 @@ $.hood.Alerts = {
       confirmButtonText: confirmButtonText || 'Ok',
       cancelButtonText: cancelButtonText || 'Cancel'
     }).then(function (result) {
-      callback(result);
+      callback(result.value);
     });
   }
 };
@@ -1131,50 +1268,51 @@ $.hood.Inline = {
     $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
     $.hood.Inline.DataList.Init();
   },
-  Refresh: function Refresh() {
-    $('.hood-inline').each($.hood.Inline.Load);
+  Refresh: function Refresh(tag) {
+    $(tag || '.hood-inline').each($.hood.Inline.Load);
   },
   Load: function Load(e) {
     $.hood.Inline.Reload(this);
   },
   Reload: function Reload(tag, complete) {
-    $(tag).addClass('loading');
-    params = null;
+    $tag = $(tag);
+    $tag.addClass('loading');
+    var urlLoad = $tag.data('url');
+    $.get(urlLoad, function (data) {
+      $tag.html(data);
+      $tag.removeClass('loading');
+    }).done(function (data) {
+      $.hood.Inline.RunComplete(complete, data, $tag);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
+  },
+  Modal: function Modal(url, complete) {
+    $.get(url, function (data) {
+      modalId = '#' + $(data).attr('id');
+      $(data).addClass('hood-inline-modal');
 
-    if ($(tag).attr('data-params')) {
-      params = eval($(tag).data('params'));
-    }
-
-    var urlLoad = $(tag).data('url');
-    $.get(urlLoad, params, function (data) {
-      $(tag).html(data);
-
-      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-        if ($.hood.Helpers.IsFunction(complete)) complete(data);else eval(complete + "(data)");
+      if ($(modalId).length) {
+        $(modalId).remove();
       }
 
-      if ($(tag).attr("data-complete")) {
-        eval($(tag).data('complete') + "(data)");
-      }
-    }).fail(function (data) {
-      $.hood.Alerts.Error("There was an error loading the inline panel's URL:<br/><strong>" + urlLoad + "</strong>");
-    }).always(function (data) {
-      $.hood.Modals.Loading = false;
-      $(tag).removeClass('loading');
-    });
+      $('body').append(data);
+      $(modalId).modal(); // Workaround for sweetalert popups.
+
+      $(modalId).on('shown.bs.modal', function () {
+        $(document).off('focusin.modal');
+      });
+    }).done(function (data) {
+      $.hood.Inline.RunComplete(complete, data);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   Task: function Task(e) {
-    $.hood.Loader(true);
     e.preventDefault();
     $tag = $(e.currentTarget);
-    $tagcontents = $(e.currentTarget).html();
-    $(e.currentTarget).addClass('loading');
-    var urlLoad = $(e.currentTarget).attr('href');
-    $.get(urlLoad, null, function (data) {
+    $tag.addClass('loading');
+    $.get($tag.attr('href'), function (data) {
       if (data.Success) {
         $.hood.Alerts.Success(data.Message);
       } else {
-        $.hood.Alerts.Error(data.Errors);
+        $.hood.Alerts.Error(data.Errors, data.Message);
       }
 
       if (data.Url) {
@@ -1183,16 +1321,10 @@ $.hood.Inline = {
         }, 500);
       }
 
-      if ($tag.attr("data-complete")) {
-        eval($tag.data('complete') + "(data)");
-      }
-    }).fail(function (data) {
-      $.hood.Alerts.Error("There was an error processing the request:<br/><strong>" + urlLoad + "</strong>");
-    }).always(function (data) {
-      $.hood.Loader(false);
-      $.hood.Modals.Loading = false;
-      $(e.currentTarget).removeClass('loading');
-    });
+      $tag.removeClass('loading');
+    }).done(function (data) {
+      $.hood.Inline.RunComplete(complete, data);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   DataList: {
     Init: function Init() {
@@ -1250,9 +1382,49 @@ $.hood.Inline = {
       list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
       $.hood.Inline.Reload(list, list.data('complete'));
     }
+  },
+  HandleError: function HandleError(xhr) {
+    if (xhr.status === 500) {
+      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: There was an error processing the content, please contact an administrator if this continues.<br/>");
+    } else if (xhr.status === 404) {
+      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: The content could not be found.<br/>");
+    } else if (xhr.status === 401) {
+      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: You are not allowed to view this resource, are you logged in correctly?<br/>");
+    }
+  },
+  Finish: function Finish(data) {
+    // Function can be overridden, to add global functionality to end of inline loads.
+    $.hood.Loader(false);
+  },
+  RunComplete: function RunComplete(complete) {
+    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var tag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    func = $(tag).attr("data-complete");
+
+    if (data !== null) {
+      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "(data)");
+      }
+
+      if (tag !== null && func) {
+        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "(data)");
+      }
+    } else {
+      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "()");
+      }
+
+      if (tag !== null && func) {
+        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "()");
+      }
+    }
   }
 };
-$.hood.Inline.Init();
+$.hood.Inline.Init(); // Backwards compatibility.
+
+$.hood.Modals = {
+  Open: $.hood.Inline.Modal
+};
 if (!$.hood) $.hood = {};
 $.hood.Media = {
   Init: function Init() {
@@ -1456,7 +1628,12 @@ $.hood.Media = {
           $.hood.Alerts.Success("Uploads completed successfully.");
         }
       });
-      myDropzone.on("addedfile", function (file) {}); // Update the total progress bar
+      myDropzone.on("addedfile", function (file) {
+        $('#media-total-progress .progress-bar').css({
+          width: 0 + "%"
+        });
+        $('#media-total-progress .progress-bar .percentage').html(0 + "%");
+      }); // Update the total progress bar
 
       myDropzone.on("totaluploadprogress", function (progress) {
         $('#media-total-progress .progress-bar').css({
@@ -1488,44 +1665,25 @@ $.hood.Media = {
   },
   Delete: function Delete(e) {
     var $this = $(this);
-    swal({
-      title: "Are you sure?",
-      text: "The media file will be permanently removed.\n\nWarning: Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Yes, go ahead.",
-      cancelButtonText: "No, cancel!",
-      closeOnConfirm: false,
-      showLoaderOnConfirm: true,
-      closeOnCancel: false
-    }, function (isConfirm) {
-      if (isConfirm) {
+
+    deleteMediaCallback = function deleteMediaCallback(confirmed) {
+      if (confirmed) {
         // delete functionality
         $.post('/admin/media/delete', {
           id: $this.data('id')
         }, function (data) {
           if (data.Success) {
             $.hood.Media.Reload();
-            swal({
-              title: "Deleted!",
-              text: "The media file has now been removed from the website.",
-              timer: 1300,
-              type: "success"
-            });
+            $('.modal-backdrop').remove();
+            $.hood.Alerts.Success("The file has now been removed from the website.");
           } else {
-            swal({
-              title: "Error!",
-              text: "There was a problem deleting the media file: " + data.Errors,
-              timer: 1300,
-              type: "error"
-            });
+            $.hood.Alerts.Error("There was a problem deleting the file.");
           }
         });
-      } else {
-        swal("Cancelled", "It's all good in the hood!", "error");
       }
-    });
+    };
+
+    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, type = 'warning', footer = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
   },
   RestrictDir: function RestrictDir() {
     var pattern = /[^0-9A-Za-z- ]*/g; // default pattern
@@ -1592,22 +1750,22 @@ $.hood.Media = {
       } else {
         if ($('#Directory').val() === "") message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
 
-        deleteDirectoryCallback = function deleteDirectoryCallback(result) {
-          if (result.value) {
+        deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
+          if (confirmed) {
             $.post('/admin/media/directory/delete', {
               directory: $('#Directory').val()
             }, function (data) {
               if (data.Success) {
                 $.hood.Media.Reload();
-                $.hood.Alerts.Success("The directory has now been removed from the website.", "Deleted!", true, null, true, 5000);
+                $.hood.Alerts.Success("The directory has now been removed from the website.");
               } else {
-                $.hood.Alerts.Error("There was a problem deleting the directory.", "Error!", true, null, true, 5000);
+                $.hood.Alerts.Error("There was a problem deleting the directory.");
               }
             });
           }
         };
 
-        $.hood.Alerts.Confirm(message, "Are you sure?", deleteDirectoryCallback);
+        $.hood.Alerts.Message("Cancelled, nothing to worry about.");
       }
     }
   },
@@ -1633,187 +1791,3 @@ $.hood.Media = {
   }
 };
 $.hood.Media.Init();
-if (!$.hood) $.hood = {};
-$.hood.Modals = {
-  Loading: false,
-  Open: function Open(url, params, target, completeFunction) {
-    if ($.hood.Modals.Loading) return;
-    $.hood.Modals.Loading = true;
-    $(target).data('temp', $(target).html());
-    $(target).addClass('loading').append('<i class="fa fa-refresh fa-spin m-l-sm"></i>');
-    $.get(url, params, function (data) {
-      // get the id of the new modal object in the data.
-      modalId = '#' + $(data).attr('id');
-
-      if ($(modalId).length) {
-        $(modalId).remove();
-      }
-
-      $('body').append(data);
-      $(modalId).modal(); // Workaround for sweetalert popups.
-
-      $(modalId).on('shown.bs.modal', function () {
-        $(document).off('focusin.modal');
-      });
-    }).done(function () {
-      if (!$.hood.Helpers.IsNullOrUndefined(completeFunction)) {
-        try {
-          completeFunction();
-        } catch (ex) {
-          $.hood.Alerts.Error(ex.message);
-        }
-      }
-    }).fail(function (data) {
-      $.hood.Alerts.Error("There was an error loading the modal window.<br/><br />" + data.status + " - " + data.statusText);
-    }).always(function (data) {
-      $(target).removeClass('loading').html($(target).data('temp'));
-      $('body').css({
-        'padding-right': 0
-      });
-      $.hood.Modals.Loading = false;
-    });
-  },
-  Close: function Close(target) {
-    $(target).modal('hide');
-    $(target).remove();
-    $('body').removeClass('modal-open');
-    $('.modal-backdrop').remove();
-  }
-};
-if (!$.hood) $.hood = {};
-$.hood.Addresses = {
-  Init: function Init() {
-    $('body').on('click', '.add-new-address', $.hood.Addresses.New);
-    $('body').on('click', '.set-billing', $.hood.Addresses.SetBilling);
-    $('body').on('click', '.set-delivery', $.hood.Addresses.SetDelivery);
-    $('body').on('click', '.delete-address', $.hood.Addresses.Delete);
-    $('body').on('click', '.edit-address', $.hood.Addresses.Edit);
-
-    if ($(".address-select").length > 0) {
-      $.hood.Addresses.Refresh();
-    }
-  },
-  New: function New(e) {
-    $(this).data('temp', $(this).html());
-    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
-    $.hood.Modals.Open('/account/addresses/create', null, '', $.hood.Addresses.PostLoad);
-  },
-  Edit: function Edit() {
-    $(this).data('temp', $(this).html());
-    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
-    $.hood.Modals.Open('/account/addresses/edit', {
-      id: $(this).data('id')
-    }, '', $.hood.Addresses.PostLoad);
-  },
-  Refresh: function Refresh() {
-    $.hood.Inline.Reload('.address-list'); // reload any selectlists that contain billing or delivery addresses (checkouts etc.)
-
-    $.get('/account/addresses/get', null, function (data) {
-      $('.address-select').empty().append($('<option>', {
-        value: '',
-        text: '--- Choose an address ---'
-      }));
-
-      for (var i in data) {
-        var id = data[i].Id;
-        var address = data[i].FullAddress;
-        $('.address-select').append($('<option>', {
-          value: id,
-          text: address
-        }));
-      }
-    });
-  },
-  PostLoad: function PostLoad() {
-    $.hood.Google.Addresses.InitAutocomplete();
-    $('.btn-loading').each(function () {
-      $(this).removeClass('btn-loading').html($(this).data('temp'));
-    });
-    $('#address-form').hoodValidator({
-      validationRules: {
-        Number: {
-          required: true
-        },
-        Address1: {
-          required: true
-        },
-        City: {
-          required: true
-        },
-        County: {
-          required: true
-        },
-        Postcode: {
-          required: true
-        },
-        Country: {
-          required: true
-        }
-      },
-      submitButtonTag: $('#save-address'),
-      submitUrl: $('#address-form').attr('action'),
-      submitFunction: function submitFunction(data) {
-        if (data.Success) {
-          $.hood.Addresses.Refresh();
-          $.hood.Modals.Close('#add-address-modal');
-        } else {
-          $.hood.Alerts.Error(data.Errors, "Error Saving Address!");
-        }
-      }
-    });
-  },
-  SetBilling: function SetBilling(e) {
-    $(this).data('temp', $(this).html());
-    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
-    $.post('/account/addresses/setbilling?id=' + $(this).data('id'), null, function (data) {
-      $('.btn-loading').each(function () {
-        $(this).removeClass('btn-loading').html($(this).data('temp'));
-      });
-
-      if (data.success) {
-        $.hood.Alerts.Success("Your billing address has been updated.", "Billing Address Updated!");
-        $.hood.Addresses.Refresh();
-      } else {
-        $.hood.Alerts.Error("Couldn't update your billing address...", "Couldn't Update Billing Address!");
-      }
-    });
-    e.preventDefault();
-  },
-  SetDelivery: function SetDelivery(e) {
-    $(this).data('temp', $(this).html());
-    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
-    $.post('/account/addresses/setdelivery?id=' + $(this).data('id'), function (data) {
-      $('.btn-loading').each(function () {
-        $(this).removeClass('btn-loading').html($(this).data('temp'));
-      });
-
-      if (data.success) {
-        $.hood.Alerts.Success("Your delivery address has been updated.", "Delivery Address Updated!");
-        $.hood.Addresses.Refresh();
-      } else {
-        $.hood.Alerts.Error("Couldn't update your delivery address...", "Couldn't Update Delivery Address!");
-      }
-    });
-    e.preventDefault();
-  },
-  Delete: function Delete(e) {
-    $(this).data('temp', $(this).html());
-    $(this).addClass('btn-loading').append('<i class="fa fa-refresh fa-spin m-l-xs"></i>');
-    $.post('/account/addresses/delete', {
-      id: $(this).data('id')
-    }, function (data) {
-      $('.btn-loading').each(function () {
-        $(this).removeClass('btn-loading').html($(this).data('temp'));
-      });
-
-      if (data.success) {
-        $.hood.Alerts.Success("Your address has been deleted.", "Address Deleted!");
-        $.hood.Addresses.Refresh();
-      } else {
-        $.hood.Alerts.Error("Couldn't delete your address, it may be in use as your billing or delivery address...", "Couldn't Delete Address!");
-      }
-    });
-    e.preventDefault();
-  }
-};
-$.hood.Addresses.Init();

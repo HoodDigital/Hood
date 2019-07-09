@@ -52,12 +52,7 @@ $.hood.Users = {
   Create: {
     Init: function Init(e) {
       // close open blade
-      $('button.create-user').removeClass('btn-primary').addClass('btn-default').html('<i class="fa fa-refresh fa-spin"></i>&nbsp;Loading...');
-      $('#right-sidebar').removeClass('animate-all sidebar-open');
-      setTimeout(function () {
-        $('#right-sidebar').empty();
-      });
-      $('#right-sidebar').addClass('animate-all'); // load in the create user blade
+      $('button.create-user').removeClass('btn-primary').addClass('btn-default').html('<i class="fa fa-refresh fa-spin"></i>&nbsp;Loading...'); // load in the create user blade
 
       $.get('/admin/users/create/', null, function (data) {
         $('#right-sidebar').html(data); // slide open the blade

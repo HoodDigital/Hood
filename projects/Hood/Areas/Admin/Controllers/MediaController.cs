@@ -91,11 +91,11 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> Action(MediaListModel model) => await List(model, "Action");
 
         [HttpGet]
-        [Route("admin/media/getbyid/")]
-        public async Task<JsonResult> GetById(int id)
+        [Route("admin/media/blade/")]
+        public async Task<IActionResult> Blade(int id)
         {
-            IList<MediaObject> media = await _db.Media.Where(u => u.Id == id).ToListAsync();
-            return Json(media.ToArray());
+            MediaObject media = await _db.Media.SingleOrDefaultAsync(u => u.Id == id);
+            return View("_Blade_Media", media);
         }
 
         [HttpPost()]
