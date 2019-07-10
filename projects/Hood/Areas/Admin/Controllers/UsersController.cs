@@ -29,26 +29,30 @@ namespace Hood.Areas.Admin.Controllers
         { }
 
         [Route("admin/users/")]
-        public async Task<IActionResult> Index(UserListModel model)
+        public async Task<IActionResult> Index(UserListModel model) => await List(model, "Index");
+
+        [HttpGet]
+        [Route("admin/users/list/")]
+        public async Task<IActionResult> List(UserListModel model, string viewName = "_List_Users")
         {
             model = await _account.GetUserProfilesAsync(model);
-            return View(model);
+            return View(viewName, model);
         }
 
         #region Edit
-        [Route("admin/users/edit/{id}/")]
+        [Route("admin/users/{id}/edit/")]
         public async Task<IActionResult> Edit(string id)
         {
-            UserProfile model = await _account.GetProfileAsync(id) as UserProfile;
+            UserProfile model = await _account.GetProfileAsync(id);
             await LoadAndCheckProfile(model);
             return View(model);
         }
 
-        [Route("admin/users/edit/{id}/")]
+        [Route("admin/users/{id}/edit/")]
         [HttpPost]
         public async Task<IActionResult> Edit(UserProfile model)
         {
-            var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _account.GetUserByIdAsync(model.Id);
             try
             {
                 var email = user.Email;
@@ -87,16 +91,16 @@ namespace Hood.Areas.Admin.Controllers
                 return View(model);
             }
         }
-        [Route("admin/users/stripe/link/{id}/")]
+        [Route("admin/users/{id}/stripe/link/")]
         public async Task<IActionResult> LinkToStripe(string id, string customerId)
         {
             try
             {
                 var user = await _account.GetUserByIdAsync(id);
-                var customer = await _account.GetCustomerObjectAsync(user.StripeId, true);
+                var customer = await _account.GetCustomerObjectAsync(user.StripeId);
                 if (customer == null)
                 {
-                    customer = await _account.GetCustomerObjectAsync(customerId, true);
+                    customer = await _account.GetCustomerObjectAsync(customerId);
                     if (customer == null)
                         throw new Exception("The customer object does could not be validated.");
                     if (customer.Email.ToLower() != user.Email.ToLower())
@@ -110,7 +114,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while linking the customer object: {ex.Message}";
+                SaveMessage = $"Error linking the customer object";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
             }
@@ -120,7 +124,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             model.AllRoles = await _account.GetAllRolesAsync();
             model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
-            model.Customer = await _account.GetCustomerObjectAsync(model.StripeId, true);
+            model.Customer = await _account.GetCustomerObjectAsync(model.StripeId);
             if (model.Customer == null)
                 model.MatchedCustomerObjects = await _account.GetMatchingCustomerObjectsAsync(model.Email);
         }
@@ -133,20 +137,26 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        [Route("admin/users/add/")]
+        [Route("admin/users/create/")]
         [HttpPost]
-        public async Task<Response> Create(CreateUserModel model)
+        public async Task<Response> Create(RegisterViewModel model)
         {
             try
             {
                 var user = new ApplicationUser
                 {
-                    UserName = model.cuUserName,
-                    Email = model.cuUserName,
-                    FirstName = model.cuFirstName,
-                    LastName = model.cuLastName,
+                    UserName = model.Username,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    DisplayName = model.DisplayName,
+                    PhoneNumber = model.Phone,
+                    JobTitle = model.JobTitle,
+                    Anonymous = model.Anonymous,
                     CreatedOn = DateTime.Now,
-                    LastLogOn = DateTime.Now
+                    LastLogOn = DateTime.Now,
+                    LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
+                    LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
                 };
                 user.AddUserNote(new UserNote()
                 {
@@ -154,16 +164,15 @@ namespace Hood.Areas.Admin.Controllers
                     CreatedOn = DateTime.Now,
                     Note = $"User created via admin panel by {User.Identity.Name}."
                 });
-                var result = await _userManager.CreateAsync(user, model.cuPassword);
+                var result = await _userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
                 {
                     return new Response(result.Errors);
                 }
-                if (model.cuNotifyUser)
+                if (model.NotifyUser)
                 {
                     // Send the email to the user, letting em know n' shit.
                     // Create the email content
-
                     try
                     {
                         MailObject message = new MailObject()
@@ -175,33 +184,30 @@ namespace Hood.Areas.Admin.Controllers
                         message.AddH1("Account Created!");
                         message.AddParagraph("Your new account has been set up on the " + Engine.Settings.Basic.FullTitle + " website.");
                         message.AddParagraph("Name: <strong>" + user.ToFullName() + "</strong>");
-                        message.AddParagraph("Username: <strong>" + model.cuUserName + "</strong>");
-                        message.AddParagraph("Password: <strong>" + model.cuPassword + "</strong>");
+                        message.AddParagraph("Username: <strong>" + model.Username + "</strong>");
+                        message.AddParagraph("Password: <strong>" + model.Password + "</strong>");
                         message.AddCallToAction("Log in here", ControllerContext.HttpContext.GetSiteUrl() + "/account/login", "#32bc4e", "center");
                         await _emailSender.SendEmailAsync(message);
                     }
                     catch (Exception)
                     {
                         // roll back!
-                        var deleteUser = await _userManager.FindByEmailAsync(model.cuUserName);
+                        var deleteUser = await _userManager.FindByEmailAsync(model.Username);
                         await _userManager.DeleteAsync(deleteUser);
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
-#warning TODO: Handle response in JS.
-                return new Response(true, "Published successfully."); ;
+                return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while creating a user via the admin panel: {ex.Message}";
-                await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<UsersController>($"Error creating a user via the admin panel.", ex);
             }
         }
         #endregion
 
         #region Delete
-        [Route("admin/users/delete/")]
+        [Route("admin/users/{id}/delete/")]
         [HttpPost]
         public async Task<Response> Delete(string id)
         {
@@ -215,15 +221,65 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a user via the admin panel: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<UsersController>($"Error deleting a user via the admin panel.", ex);
+            }
+        }
+        #endregion
+
+        #region Notes 
+        [Route("admin/users/{id}/notes/")]
+        public async Task<IActionResult> Notes(string id)
+        {
+            UserProfile model = await _account.GetProfileAsync(id);
+            return View("_Inline_Notes", model);
+        }
+
+        [Route("admin/users/{id}/notes/add/")]
+        [HttpPost]
+        public async Task<Response> AddNote(string id, string note)
+        {
+            try
+            {
+                var user = await _account.GetUserByIdAsync(id);
+                user.AddUserNote(new UserNote()
+                {
+                    Id = Guid.NewGuid(),
+                    Note = note,
+                    CreatedBy = User.Identity.Name,
+                    CreatedOn = DateTime.Now
+                });
+                await _account.UpdateUserAsync(user);
+                return new Response(true, "The note has been saved.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<UsersController>($"Error adding a user note via the admin panel.", ex);
+            }
+        }
+
+        [Route("admin/users/{id}/notes/delete/")]
+        public async Task<Response> DeleteNote(string id, Guid noteId)
+        {
+            try
+            {
+                var user = await _account.GetUserByIdAsync(id);
+                var notes = user.Notes;
+                var note = notes.SingleOrDefault(n => n.Id == noteId);
+                if (note != null && notes.Contains(note))
+                    notes.Remove(note);
+                user.Notes = notes;
+                await _account.UpdateUserAsync(user);
+                return new Response(true, "The note has been deleted.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<UsersController>($"Error deleting a note from a user.", ex);
             }
         }
         #endregion
 
         #region Avatars
-        [Route("admin/users/avatar/get/")]
+        [Route("admin/users/{id}/avatar/get/")]
         [HttpGet]
         public async Task<IMediaObject> GetAvatar(string id)
         {
@@ -244,7 +300,7 @@ namespace Hood.Areas.Admin.Controllers
                 return MediaObject.Blank;
             }
         }
-        [Route("admin/users/avata/clear/")]
+        [Route("admin/users/{id}/avatar/clear/")]
         [HttpGet]
         public async Task<Response> ClearAvatar(string id)
         {
@@ -258,15 +314,13 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing a user's avatar via the admin panel: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<UsersController>($"Error clearing a user's avatar via the admin panel.", ex);
             }
         }
         #endregion
 
         #region Roles
-        [Route("admin/users/getroles/")]
+        [Route("admin/users/{id}/getroles/")]
         [HttpGet]
         public async Task<JsonResult> GetRoles(string id)
         {
@@ -274,7 +328,7 @@ namespace Hood.Areas.Admin.Controllers
             IList<string> roles = await _userManager.GetRolesAsync(user);
             return Json(new { success = true, roles });
         }
-        [Route("admin/users/addtorole/")]
+        [Route("admin/users/{id}/addtorole/")]
         [HttpPost]
         public async Task<Response> AddToRole(string id, string role)
         {
@@ -287,7 +341,7 @@ namespace Hood.Areas.Admin.Controllers
                 IdentityResult result = await _userManager.AddToRoleAsync(user, role);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    return new Response(true, $"The user has been added to the {role} role.");
                 }
                 else
                 {
@@ -301,12 +355,10 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while adding a user to a role via the admin panel: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<UsersController>($"Error adding a user to a role via the admin panel.", ex);
             }
         }
-        [Route("admin/users/removefromrole/")]
+        [Route("admin/users/{id}/removefromrole/")]
         [HttpPost]
         public async Task<Response> RemoveFromRole(string id, string role)
         {
@@ -316,7 +368,7 @@ namespace Hood.Areas.Admin.Controllers
                 IdentityResult result = await _userManager.RemoveFromRoleAsync(user, role);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    return new Response(true, $"The user has been removed from the {role} role.");
                 }
                 else
                 {
@@ -325,9 +377,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while removing a user from a role via the admin panel: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<UsersController>($"Error removing a user from a role via the admin panel.", ex);
             }
         }
         #endregion
@@ -354,7 +404,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while impersonating User ({id}): {ex.Message}";
+                SaveMessage = $"Error impersonating user with {id}";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
             }
@@ -383,7 +433,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while stopping impersonating: {ex.Message}";
+                SaveMessage = $"Error stopping impersonating user";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
             }
@@ -392,7 +442,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Password
-        [Route("admin/users/reset/")]
+        [Route("admin/users/{id}/reset/")]
         [HttpPost]
         public async Task<Response> ResetPassword(string id, string password)
         {
@@ -403,7 +453,8 @@ namespace Hood.Areas.Admin.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, token, password);
                 if (result.Succeeded)
                 {
-                    return new Response(true);
+                    await _logService.AddLogAsync<UsersController>($"The password has been reset by an admin for user with Id: {id}", type: LogType.Success);
+                    return new Response(true, $"The user's password has been reset.");
                 }
                 else
                 {
@@ -417,9 +468,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while resetting a user's password via the admin panel: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<UsersController>($"Error resetting a password via the admin panel for user with Id: {id}", ex);
             }
         }
         #endregion

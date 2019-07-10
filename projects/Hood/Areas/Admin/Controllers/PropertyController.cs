@@ -174,7 +174,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while : {ex.Message}";
+                SaveMessage = $"Error adding a property feature.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
             }
@@ -194,7 +194,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while : {ex.Message}";
+                SaveMessage = $"Error deleting all properties.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
             }
@@ -289,9 +289,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while creating a new property: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<PropertyController>($"Error creating a new property.", ex);
             }
         }
 
@@ -307,9 +305,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a property: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<PropertyController>($"Error deleting a property.", ex);
             }
         }
 
@@ -324,9 +320,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while publishing a property: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<PropertyController>($"Error publishing a property.", ex);
             }
         }
 
@@ -341,9 +335,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while archiving a property: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<PropertyController>($"Error archiving a property.", ex);
             }
         }
 
@@ -378,9 +370,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while uploading media to the gallery: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex);
+                return await ErrorResponseAsync<PropertyController>($"Error uploading media to the gallery.", ex);
             }
         }
 
@@ -415,9 +405,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while uploading a floorplan: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(ex);
+                return await ErrorResponseAsync<PropertyController>($"Error uploading a floorplan.", ex);
             }
         }
 
@@ -458,9 +446,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing the field: {ex.Message}";
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<PropertyController>($"Error clearing the field.", ex);
             }
         }
 
@@ -482,7 +468,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while setting featured image: {ex.Message}";
+                SaveMessage = $"Error setting featured image";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
             }
@@ -491,40 +477,32 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/property/media/remove/{id}/{mediaId}")]
-        public async Task<IActionResult> RemoveMedia(int id, int mediaId)
+        public async Task<Response> RemoveMedia(int id, int mediaId)
         {
             try
             {
                 PropertyListing property = await _property.RemoveMediaAsync(id, mediaId);
-                SaveMessage = $"The media has been removed.";
-                MessageType = AlertType.Success;
+                return new Response(true, $"The media has been removed.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while removing media: {ex.Message}";
-                MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+                return await ErrorResponseAsync<PropertyController>($"Error removing media.", ex);
             }
-            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]
         [Route("admin/property/floorplan/remove/{id}/{mediaId}")]
-        public async Task<IActionResult> RemoveFloorplan(int id, int mediaId)
+        public async Task<Response> RemoveFloorplan(int id, int mediaId)
         {
             try
             {
                 PropertyListing property = await _property.RemoveFloorplanAsync(id, mediaId);
-                SaveMessage = $"The floorplan has been removed.";
-                MessageType = AlertType.Success;
+                return new Response(true, $"The floorplan has been removed.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while removing floorplan: {ex.Message}";
-                MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+                return await ErrorResponseAsync<PropertyController>($"Error removing floorplan.", ex);
             }
-            return RedirectToAction(nameof(Edit), new { id });
         }
 
 

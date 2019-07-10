@@ -28,7 +28,7 @@ namespace Hood.Controllers
             BillingHomeModel model = new BillingHomeModel();
             try
             {
-                model.Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId, true);
+                model.Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId);
                 if (model.Customer != null)
                 {
                     model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);
@@ -44,7 +44,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while loading billing information for {Engine.Account.UserName}: {ex.Message}";
+                SaveMessage = $"Error loading billing information for {Engine.Account.UserName}.";
                 MessageType = Enums.AlertType.Danger;
                 await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
@@ -102,7 +102,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while loading billing information for {Engine.Account.UserName}: {ex.Message}";
+                SaveMessage = $"Error loading billing information for {Engine.Account.UserName}.";
                 MessageType = Enums.AlertType.Danger;
                 await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
@@ -120,7 +120,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while setting a default card: {ex.Message}";
+                SaveMessage = $"Error setting a default card.";
                 MessageType = Enums.AlertType.Danger;
                 await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }
@@ -138,7 +138,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a card: {ex.Message}";
+                SaveMessage = $"Error deleting a card.";
                 MessageType = Enums.AlertType.Danger;
                 await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
             }

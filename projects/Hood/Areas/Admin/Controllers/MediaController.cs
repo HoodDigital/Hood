@@ -28,7 +28,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("admin/media/list/")]
-        public async Task<IActionResult> List(MediaListModel model, string viewName = "_Media_List")
+        public async Task<IActionResult> List(MediaListModel model, string viewName = "_List_Media")
         {
             var media = _db.Media.AsQueryable();
 
@@ -108,13 +108,11 @@ namespace Hood.Areas.Admin.Controllers
                 try { await _media.DeleteStoredMedia(media); } catch (Exception) { }
                 _db.Media.Remove(media);
                 await _db.SaveChangesAsync();
-                return new Response(true);
+                return new Response(true, $"The media has been deleted.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a media object: {ex.Message}";
-                await _logService.AddExceptionAsync<MediaController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<MediaController>($"Error deleting a media object.", ex);
             }
         }
 
@@ -175,13 +173,11 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
                 await _db.SaveChangesAsync();
-                return new Response(true);
+                return new Response(true, $"The directory has been deleted.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a directory: {ex.Message}";
-                await _logService.AddExceptionAsync<MediaController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<MediaController>($"Error deleting a directory.", ex);
             }
         }
 
@@ -296,9 +292,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while attaching a media file to an entity: {ex.Message}";
-                await _logService.AddExceptionAsync<MediaController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
             }
         }
 

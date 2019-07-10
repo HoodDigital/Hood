@@ -102,7 +102,7 @@ namespace Hood.Controllers
             {
                 await _account.DeleteAddressAsync(id);
 #warning TODO: Handle response in JS.
-                return new Response(true);
+                return new Response(true, $"The address has been deleted.");
             }
             catch (Exception ex)
             {
@@ -118,7 +118,7 @@ namespace Hood.Controllers
                 string userId = _userManager.GetUserId(User);
                 await _account.SetBillingAddressAsync(userId, id);
 #warning TODO: Handle response in JS.
-                return new Response(true);
+                return new Response(true, $"The billing address has been updated.");
             }
             catch (Exception ex)
             {
@@ -134,7 +134,7 @@ namespace Hood.Controllers
                 string userId = _userManager.GetUserId(User);
                 await _account.SetDeliveryAddressAsync(userId, id);
 #warning TODO: Handle response in JS.
-                return new Response(true);
+                return new Response(true, $"The delivery address has been updated.");
             }
             catch (Exception ex)
             {

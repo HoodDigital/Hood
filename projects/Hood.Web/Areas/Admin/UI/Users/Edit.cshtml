@@ -5,15 +5,22 @@
     var stripeUrl = string.Format("https://dashboard.stripe.com{0}", Engine.Settings.Billing.EnableStripeTestMode ? "/test" : "");
 }
 @section buttons {
-    @if (Model.Customer != null)
-    {
-        <a class="btn btn-info" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, Model.StripeId)">
-            <i class="fa fa-external-link-alt"></i><span>&nbsp;View on Stripe</span>
-        </a>
-    }
-    <a class="btn btn-dark reset-password text-white"><i class="fa fa-lock"></i> Reset Password</a>
-    <a class="btn btn-warning" asp-action="Impersonate" asp-route-id="@Model.Id"><i class="fa fa-user-secret"></i> Impersonate</a>
     <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (Model.Customer != null)
+        {
+            <a class="dropdown-item" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, Model.StripeId)">
+                <i class="fa fa-external-link-alt"></i><span>&nbsp;View on Stripe</span>
+            </a>
+        }
+        <a class="dropdown-item user-reset-password" asp-action="ResetPassword" asp-route-id="@Model.Id"><i class="fa fa-lock"></i> Reset Password</a>
+        <a class="dropdown-item" asp-action="Impersonate" asp-route-id="@Model.Id"><i class="fa fa-user-secret"></i> Impersonate User</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item user-delete" asp-action="Index"><i class="fa fa-trash-alt"></i> Delete User</a>
+    </div>
 }
 @section breadcrumbs {
     <nav aria-label="breadcrumb">
@@ -29,7 +36,7 @@
     <div class="card">
         <div class="card-header">
             <div class="row align-items-center">
-                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
                     <li class="nav-item">
                         <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">
                             Profile
@@ -66,7 +73,6 @@
         <div class="card-body p-0">
             <div class="tab-content">
                 <div id="profile" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="profile-tab">
-                    <h5>Basic Profile &amp; Contact Info</h5>
                     <div class="form-group floating-label">
                         <label asp-for="UserName"></label>
                         <input type="text" class="form-control" asp-for="UserName">
@@ -362,15 +368,9 @@
                         <div class="list-group-item">
                             <h5 class="m-0 text-success">User Notes</h5>
                         </div>
-                        @foreach (var note in Model.Notes)
-                        {
-                            <div class="list-group-item list-group-item-action">
-                                <blockquote class="blockquote m-0">
-                                    <p class="mb-0">@note.Note</p>
-                                    <footer class="blockquote-footer">@note.CreatedBy <cite title="Source Title">@note.CreatedOn.ToDisplay()</cite></footer>
-                                </blockquote>
-                            </div>
-                        }
+                        <div id="user-notes" class="hood-inline" data-url="@Url.Action("Notes", new { id = Model.Id })">
+                            <partial name="_Inline_Notes" />
+                        </div>
                         @if (subs.Count() == 0)
                         {
                             <div class="list-group-item">
@@ -378,7 +378,7 @@
                             </div>
                         }
                         <div class="list-group-item list-group-item-action">
-                            <a class="stretched-link text-success text-decoration-none"><i class="fa fa-plus-circle mr-2"></i>Add note</a>
+                            <a class="stretched-link text-success text-decoration-none user-notes-add" asp-action="AddNote" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2"></i>Add note</a>
                         </div>
                     </div>
                 </div>

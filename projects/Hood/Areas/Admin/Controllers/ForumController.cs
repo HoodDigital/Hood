@@ -201,9 +201,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while creating a forum: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error creating a forum.", ex);
             }
         }
 
@@ -239,9 +237,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while adding a forum category: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error adding a forum category", ex);
             }
         }
 
@@ -272,9 +268,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while removing a forum category: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error removing a forum category.", ex);
             }
         }
 
@@ -297,7 +291,7 @@ namespace Hood.Areas.Admin.Controllers
                 int counter = 1;
                 while (await _db.ForumCategories.CountAsync(cc => cc.Slug == model.Slug) > 0)
                 {
-                    model.Slug = model.DisplayName.ToSeoUrl() + "-" + counter;
+                    model.Slug = model.DisplayName.ToSeoUrl() + "-" + counter; 
                     counter++;
                 }
 
@@ -310,9 +304,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while removing a forum category: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error removing a forum category.", ex);
             }
         }
 
@@ -341,13 +333,11 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
-                return new Response(true);
+                return new Response(true, $"The category has been saved.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while updating a forum category: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error updating a forum category.", ex);
             }
         }
 
@@ -360,13 +350,11 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Entry(category).State = EntityState.Deleted;
                 await _db.SaveChangesAsync();
                 _forumCategoryCache.ResetCache();
-                return new Response(true);
+                return new Response(true, $"The category has been deleted.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a category, did you make sure it was empty first?";
-                await _logService.AddExceptionAsync<ContentController>($"Error deleting a forum category with Id: {id}", ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error deleting a forum category, did you make sure it was empty first?", ex);
             }
         }
 
@@ -385,14 +373,12 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
 
 
-#warning TODO: Handle response in JS.     
+#warning TODO: Handle response in JS.
                 return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while publishing a forum: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error publishing a forum.", ex);
             }
         }
         [Route("admin/forums/archive/{id}")]
@@ -414,9 +400,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while archiving a forum: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error archiving a forum.", ex);
             }
         }
 
@@ -431,15 +415,12 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
 
-#warning TODO: Handle response in JS.     
+#warning TODO: Handle response in JS.
                 return new Response(true, "Deleted!");
             }
             catch (Exception ex)
             {
-
-                SaveMessage = $"An error occurred while deleting a forum: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error deleting a forum.", ex);
             }
         }
 
@@ -453,7 +434,7 @@ namespace Hood.Areas.Admin.Controllers
                 if (model != null && model.FeaturedImage != null)
                     return model.FeaturedImage;
                 else
-                    throw new Exception("No featured image found");
+                    throw new Exception("No featured image found.");
             }
             catch (Exception)
             {
@@ -490,14 +471,12 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
-#warning TODO: Handle response in JS.     
+#warning TODO: Handle response in JS.
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing an image from a forum: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error clearing an image from a forum.", ex);
             }
         }
 
@@ -512,19 +491,17 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Update(model);
                 await _db.SaveChangesAsync();
-#warning TODO: Handle response in JS.     
+#warning TODO: Handle response in JS.
                 return new Response(true, "The image has been cleared!");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing a share image from a forum: {ex.Message}";
-                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ForumController>($"Error clearing a share image from a forum.", ex);
             }
         }
 
-        [Route("admin/forums/categories/suggestions/{type}/")]
-        public IActionResult CategorySuggestions(string type)
+        [Route("admin/forums/categories/suggestions/")]
+        public IActionResult CategorySuggestions()
         {
             var suggestions = _forumCategoryCache.GetSuggestions().Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
             return Json(suggestions.ToArray());

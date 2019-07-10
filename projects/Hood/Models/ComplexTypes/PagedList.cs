@@ -133,7 +133,7 @@ namespace System.Collections.Generic
 
         public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source, int pageIndex, int pageSize)
         {
-            var total = source.Count();
+            var total = await source.CountAsync();
             this.TotalCount = total;
             this.TotalPages = (int)Math.Ceiling((double)total / pageSize);
             if (pageIndex > TotalPages)
@@ -147,7 +147,7 @@ namespace System.Collections.Generic
 
         public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source)
         {
-            var total = source.Count();
+            var total = await source.CountAsync();
             this.TotalCount = total;
             this.TotalPages = (int)Math.Ceiling((double)total / PageSize);
             if (PageIndex > TotalPages)

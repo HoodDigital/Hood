@@ -15,7 +15,7 @@ namespace Hood.Services
             _email = email;
             _logService = logService;
         }
-
+#warning TODO: Ensure this is only used in try/catch - and remove the exception handling from the method, so error bubbles up.
         public async Task<Response> ProcessAndSend(IEmailSendable model)
         {
             try
@@ -44,7 +44,7 @@ namespace Hood.Services
                 if (model.NotifyRole.IsSet())
                     await _email.NotifyRoleAsync(message, model.NotifyRole, model.From);
 
-                return new Response(true);
+                return new Response(true, $"The message has been sent.");
             }
             catch (Exception sendEx)
             {

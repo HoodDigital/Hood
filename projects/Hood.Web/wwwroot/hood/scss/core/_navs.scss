@@ -12,3 +12,18 @@
         }
     }
 }
+.dropdown-menu {
+    .dropdown-item {
+        padding: .5rem 2rem;
+        padding-left: 1.5rem;
+
+        i {
+            padding: 0.5rem;
+            padding-left: 0;
+        }
+    }
+
+    a {
+        cursor: pointer;
+    }
+}

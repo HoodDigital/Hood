@@ -24,6 +24,23 @@ namespace Hood.Areas.Admin.Controllers
         {
             return await Show(model);
         }
+        public async Task<IActionResult> Clear()
+        {
+            try
+            {
+                var logs = _db.Logs;
+                logs.ForEach(a => _db.Entry(a).State = EntityState.Deleted);
+                await _db.SaveChangesAsync();
+                SaveMessage = "Logs have been cleared.";
+                MessageType = Enums.AlertType.Success;
+            } catch (Exception ex)
+            {
+                SaveMessage = "Error clearing the site logs.";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<LogsController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Index));
+        }
 
         public async Task<IActionResult> Show(LogListModel model)
         {

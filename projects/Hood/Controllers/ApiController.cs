@@ -62,7 +62,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while rolling an API key ({keyId}): {ex.Message}";
+                SaveMessage = $"Error rolling an API key ({keyId}).";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
             }

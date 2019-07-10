@@ -273,6 +273,31 @@ if (!$.mobile.Android) {
 } else {
   $.body.addClass("desktop-device");
   $.device = "desktop";
+} // Force prevent autocomplete
+// Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
+
+
+preventAutoComplete = true; // modifier to allow or disallow autocomplete
+
+trackInputs = {
+  password: "0",
+  username: "0"
+}; //Password and username fields ids as object's property, and "0" as its their values
+
+if (preventAutoComplete) {
+  $('body').on('change', '.prevent-autocomplete', function (e) {
+    // Change event is fired as autocomplete occurred at the input field 
+    trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
+
+    if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
+      //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
+      $(this).val(''); // empty the field
+    }
+  });
+  $('body').on('keyup', '.prevent-autocomplete', function (e) {
+    trackId = $(this).attr('id');
+    trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
+  });
 } // Custom Event polyfill
 
 
@@ -371,79 +396,6 @@ $.hood.Loader = function (show) {
 
 if (!$.hood) $.hood = {};
 $.hood.Helpers = {
-  InIframe: function InIframe() {
-    try {
-      return window.self !== window.top;
-    } catch (e) {
-      return true;
-    }
-  },
-  GetQueryStringParamByName: function GetQueryStringParamByName(name) {
-    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
-        results = regex.exec(location.search);
-    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-  },
-  InsertQueryStringParam: function InsertQueryStringParam(key, value) {
-    key = escape(key);
-    value = escape(value);
-    var kvp = document.location.search.substr(1).split('&');
-
-    if (kvp == '') {
-      document.location.search = '?' + key + '=' + value;
-    } else {
-      var i = kvp.length;
-      var x;
-
-      while (i--) {
-        x = kvp[i].split('=');
-
-        if (x[0] == key) {
-          x[1] = value;
-          kvp[i] = x.join('=');
-          break;
-        }
-      }
-
-      if (i < 0) {
-        kvp[kvp.length] = [key, value].join('=');
-      } //this will reload the page, it's likely better to store this until finished
-
-
-      document.location.search = kvp.join('&');
-    }
-  },
-  InsertQueryStringParamToUrl: function InsertQueryStringParamToUrl(url, key, value) {
-    key = escape(key);
-    value = escape(value);
-    var kvp = url.search.substr(1).split('&');
-
-    if (kvp == '') {
-      url.search = '?' + key + '=' + value;
-    } else {
-      var i = kvp.length;
-      var x;
-
-      while (i--) {
-        x = kvp[i].split('=');
-
-        if (x[0] == key) {
-          x[1] = value;
-          kvp[i] = x.join('=');
-          break;
-        }
-      }
-
-      if (i < 0) {
-        kvp[kvp.length] = [key, value].join('=');
-      } //this will reload the page, it's likely better to store this until finished
-
-
-      url.search = kvp.join('&');
-    }
-
-    return url;
-  },
   IsNullOrUndefined: function IsNullOrUndefined(a) {
     var rc = false;
 
@@ -469,7 +421,7 @@ $.hood.Helpers = {
 
     if (!isSupported) {
       el.setAttribute(eventName, 'return;');
-      isSupported = typeof el[eventName] == 'function';
+      isSupported = typeof el[eventName] === 'function';
     }
 
     el = null;
@@ -478,6 +430,22 @@ $.hood.Helpers = {
   IsFunction: function IsFunction(functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
   },
+  IsUrlExternal: function IsUrlExternal(url) {
+    var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
+    if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
+    if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + {
+      "http:": 80,
+      "https:": 443
+    }[location.protocol] + ")?$"), "") !== location.host) return true;
+    return false;
+  },
+  IsInIframe: function IsInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  },
   HtmlEncode: function HtmlEncode(value) {
     //create a in-memory div, set it's inner text(which jQuery automatically encodes)
     //then grab the encoded contents back out.  The div never exists on the page.
@@ -485,18 +453,6 @@ $.hood.Helpers = {
   },
   HtmlDecode: function HtmlDecode(value) {
     return $('<div/>').html(value).text();
-  },
-  SlimScrollTopBottom: function SlimScrollTopBottom(elem, scrollUp) {
-    if (scrollUp) {
-      $(elem).slimScroll({
-        scrollTo: '0px'
-      });
-    } else {
-      var scrollTo_val = $(elem).prop('scrollHeight') + 'px';
-      $(elem).slimScroll({
-        scrollTo: scrollTo_val
-      });
-    }
   },
   FormatCurrency: function FormatCurrency(n, currency) {
     return currency + " " + n.toFixed(2).replace(/./g, function (c, i, a) {
@@ -516,34 +472,97 @@ $.hood.Helpers = {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   },
-  IsUrlExternal: function IsUrlExternal(url) {
-    var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
-    if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
-    if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + {
-      "http:": 80,
-      "https:": 443
-    }[location.protocol] + ")?$"), "") !== location.host) return true;
-    return false;
+  ProcessResponse: function ProcessResponse(data) {
+    var $tag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    title = '';
+    if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");
+
+    if (data.Success) {
+      $.hood.Alerts.Success("".concat(title).concat(data.Message));
+
+      if ($tag && $tag.data('redirect')) {
+        setTimeout(function () {
+          window.location = $tag.data('redirect');
+        }, 1500);
+      }
+    } else {
+      $.hood.Alerts.Error("".concat(title).concat(data.Errors));
+    }
+  },
+  GetQueryStringParamByName: function GetQueryStringParamByName(name) {
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  },
+  InsertQueryStringParam: function InsertQueryStringParam(key, value) {
+    key = escape(key);
+    value = escape(value);
+    var kvp = document.location.search.substr(1).split('&');
+
+    if (kvp === '') {
+      document.location.search = '?' + key + '=' + value;
+    } else {
+      var i = kvp.length;
+      var x;
+
+      while (i--) {
+        x = kvp[i].split('=');
+
+        if (x[0] === key) {
+          x[1] = value;
+          kvp[i] = x.join('=');
+          break;
+        }
+      }
+
+      if (i < 0) {
+        kvp[kvp.length] = [key, value].join('=');
+      } //this will reload the page, it's likely better to store this until finished
+
+
+      document.location.search = kvp.join('&');
+    }
+  },
+  InsertQueryStringParamToUrl: function InsertQueryStringParamToUrl(url, key, value) {
+    key = escape(key);
+    value = escape(value);
+    var kvp = url.search.substr(1).split('&');
+
+    if (kvp === '') {
+      url.search = '?' + key + '=' + value;
+    } else {
+      var i = kvp.length;
+      var x;
+
+      while (i--) {
+        x = kvp[i].split('=');
+
+        if (x[0] === key) {
+          x[1] = value;
+          kvp[i] = x.join('=');
+          break;
+        }
+      }
+
+      if (i < 0) {
+        kvp[kvp.length] = [key, value].join('=');
+      } //this will reload the page, it's likely better to store this until finished
+
+
+      url.search = kvp.join('&');
+    }
+
+    return url;
   },
   UrlToLocationObject: function UrlToLocationObject(href) {
     var l = document.createElement("a");
     l.href = href;
     return l;
   },
-  SeoUrl: function SeoUrl(txt_src) {
-    var output = txt_src.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").toLowerCase();
-    /* remove first dash */
-
-    if (output.charAt(0) == '-') output = output.substring(1);
-    /* remove last dash */
-
-    var last = output.length - 1;
-    if (output.charAt(last) == '-') output = output.substring(0, last);
-    return output;
-  },
   FindAndRemoveFromArray: function FindAndRemoveFromArray(array, property, value) {
     $.each(array, function (index, result) {
-      if (result[property] == value) {
+      if (result[property] === value) {
         //Remove from array
         array.splice(index, 1);
       }
@@ -552,7 +571,7 @@ $.hood.Helpers = {
   FindAndReturnFromArray: function FindAndReturnFromArray(array, property, value) {
     var outputItem = null;
     $.each(array, function (index, result) {
-      if (result[property] == value) {
+      if (result[property] === value) {
         //return it
         outputItem = result;
       }
@@ -611,30 +630,6 @@ $.hood.Helpers = {
 
     return ret;
   },
-  SubmitPageToForm: function myFunction(action, method, input) {
-    'use strict';
-
-    var form;
-    form = $('<form />', {
-      action: action,
-      method: method,
-      style: 'display: none;'
-    });
-
-    if (typeof input !== 'undefined' && input !== null) {
-      for (var key in input) {
-        if (input.hasOwnProperty(key)) {
-          $('<input />', {
-            type: 'hidden',
-            name: key,
-            value: input[key]
-          }).appendTo(form);
-        }
-      }
-    }
-
-    form.appendTo('body').submit();
-  },
   GenerateRandomString: function GenerateRandomString(numSpecials) {
     specials = '!@#$&*';
     lowercase = 'abcdefghijklmnopqrstuvwxyz';
@@ -643,16 +638,6 @@ $.hood.Helpers = {
     all = lowercase + uppercase + numbers;
     password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
     return password;
-  },
-  ResetSidebarScroll: function ResetSidebarScroll() {
-    $('.sidebar-container').slimScroll({
-      height: '100%',
-      railOpacity: 0.4,
-      wheelStep: 10
-    });
-  },
-  InitMetisMenu: function InitMetisMenu(tag) {
-    $(tag).find('.metisMenu').metisMenu();
   }
 };
 if (!$.hood) $.hood = {};
@@ -883,7 +868,7 @@ $.hood.Handlers = {
 $.hood.Handlers.Init();
 
 String.prototype.contains = function (it) {
-  return this.indexOf(it) != -1;
+  return this.indexOf(it) !== -1;
 };
 
 String.prototype.pick = function (min, max) {
@@ -918,6 +903,18 @@ String.prototype.shuffle = function () {
   return array.join('');
 };
 
+String.prototype.toSeoUrl = function () {
+  var output = this.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").toLowerCase();
+  /* remove first dash */
+
+  if (output.charAt(0) === '-') output = output.substring(1);
+  /* remove last dash */
+
+  var last = output.length - 1;
+  if (output.charAt(last) === '-') output = output.substring(0, last);
+  return output;
+};
+
 if (!$.hood) $.hood = {};
 
 $.hood.FormValidator = function (element, options) {
@@ -929,12 +926,6 @@ $.hood.FormValidator = function (element, options) {
     submitButtonTag: null,
     submitUrl: null,
     submitFunction: null,
-    errorElement: 'div',
-    errorClass: 'text-danger help-block small',
-    invalidHandler: $.hood.Forms.ValidationInvalid,
-    highlight: $.hood.Forms.ValidationHighlight,
-    success: $.hood.Forms.ValidationSuccess,
-    errorPlacement: $.hood.Forms.ValidationErrorPlacement,
     serializationFunction: function serializationFunction() {
       rtn = $(this.formTag).serialize();
       return rtn;
@@ -943,8 +934,8 @@ $.hood.FormValidator = function (element, options) {
 
   this.LoadValidation = function () {
     if ($.hood.Helpers.IsNullOrUndefined(this.Options.formTag)) return;
-    $(this.Options.formTag).find('input, select').keypress($.proxy(function (e) {
-      if (e.which == 13) {
+    $(this.Options.formTag).find('input, textarea, select').keypress($.proxy(function (e) {
+      if (e.which === 13) {
         $.proxy(this.submitForm(), this);
         e.preventDefault();
         return false;
@@ -957,19 +948,7 @@ $.hood.FormValidator = function (element, options) {
       errorClass: this.Options.errorClass,
       focusInvalid: false,
       rules: this.Options.validationRules,
-      messages: this.Options.validationMessages,
-      invalidHandler: this.Options.invalidHandler,
-      errorPlacement: $.proxy(function (error, element) {
-        element.siblings().remove();
-        if (this.Options.placeBelow) error.insertAfter(element);else error.insertBefore(element);
-      }, this),
-      errorElement: this.Options.errorElement,
-      highlight: function highlight(element) {
-        $(element).parent().removeClass("has-success").addClass("has-error"); //$(element).siblings("label").addClass("hide");
-      },
-      success: function success(element) {
-        $(element).parent().removeClass("has-error").addClass("has-success"); //$(element).siblings("label").removeClass("hide");
-      }
+      messages: this.Options.validationMessages
     });
     if ($.hood.Helpers.IsNullOrUndefined(this.Options.submitButtonTag)) return;
     $(this.Options.submitButtonTag).click($.proxy(this.submitForm, this));
@@ -1186,7 +1165,9 @@ $.hood.Alerts = {
       footer: footer,
       showConfirmButton: showConfirmButton,
       timer: timer
-    }).then(callback);
+    }).then(function (result) {
+      if (!result.dismiss) callback(result);
+    });
   },
   Confirm: function Confirm(msg, title, callback, type, footer, confirmButtonText, cancelButtonText) {
     swalWithBootstrapButtons.fire({
@@ -1198,7 +1179,24 @@ $.hood.Alerts = {
       confirmButtonText: confirmButtonText || 'Ok',
       cancelButtonText: cancelButtonText || 'Cancel'
     }).then(function (result) {
-      callback(result.value);
+      if (!result.dismiss) callback(result.value);
+    });
+  },
+  Prompt: function Prompt(msg, title, callback, inputType, type, footer, confirmButtonText, cancelButtonText, inputAttributes) {
+    swalWithBootstrapButtons.fire({
+      input: inputType || 'text',
+      inputAttributes: inputAttributes || {
+        autocapitalize: 'off'
+      },
+      title: title || 'Enter a value',
+      html: msg || 'Fill in the field and press Ok to continue.',
+      type: type || 'info',
+      footer: footer,
+      showCancelButton: true,
+      confirmButtonText: confirmButtonText || 'Ok',
+      cancelButtonText: cancelButtonText || 'Cancel'
+    }).then(function (result) {
+      if (!result.dismiss) callback(result.value);
     });
   }
 };
@@ -1233,31 +1231,6 @@ $.hood.Forms = {
       case "All":
         return '';
     }
-  },
-  ValidationErrorPlacement: function ValidationErrorPlacement(error, element) {
-    if (element.is(':checkbox') || element.is(':radio')) {
-      var controls = element.closest('div[class*="col-"]');
-      if (controls.find(':checkbox,:radio').length > 1) controls.append(error);else error.insertAfter(element.nextAll('.lbl:eq(0)').eq(0));
-    } else if (element.is('.select2')) {
-      error.insertAfter(element.siblings('[class*="select2-container"]:eq(0)'));
-    } else if (element.is('.chosen-select')) {
-      error.insertAfter(element.siblings('[class*="chosen-container"]:eq(0)'));
-    }
-
-    if (element.is('.drop-error')) {
-      error.insertAfter(element.parents('.input-group'));
-    } else error.insertAfter(element.parent());
-  },
-  ValidationSuccess: function ValidationSuccess(e) {
-    $(e).closest('label').removeClass('state-error').addClass('state-success');
-    $(e).remove();
-  },
-  ValidationInvalid: function ValidationInvalid(event, validator) {
-    //display error alert on form submit   
-    $('.alert-error', $('.login-form')).show();
-  },
-  ValidationHighlight: function ValidationHighlight(e) {
-    $(e).closest('label').removeClass('state-success').addClass('state-error');
   }
 };
 $.hood.Forms.Init();
@@ -1266,6 +1239,10 @@ $.hood.Inline = {
   Init: function Init() {
     $('.hood-inline:not(.refresh)').each($.hood.Inline.Load);
     $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
+    $('body').on('click', '.hood-modal', function (e) {
+      e.preventDefault();
+      $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'));
+    });
     $.hood.Inline.DataList.Init();
   },
   Refresh: function Refresh(tag) {
@@ -1274,7 +1251,7 @@ $.hood.Inline = {
   Load: function Load(e) {
     $.hood.Inline.Reload(this);
   },
-  Reload: function Reload(tag, complete) {
+  Reload: function Reload(tag) {
     $tag = $(tag);
     $tag.addClass('loading');
     var urlLoad = $tag.data('url');
@@ -1282,7 +1259,7 @@ $.hood.Inline = {
       $tag.html(data);
       $tag.removeClass('loading');
     }).done(function (data) {
-      $.hood.Inline.RunComplete(complete, data, $tag);
+      $.hood.Inline.RunComplete($tag.data('complete'), data);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   Modal: function Modal(url, complete) {
@@ -1398,24 +1375,16 @@ $.hood.Inline = {
   },
   RunComplete: function RunComplete(complete) {
     var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    var tag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    func = $(tag).attr("data-complete");
 
-    if (data !== null) {
-      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "(data)");
-      }
+    if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+      var func = eval(complete);
 
-      if (tag !== null && func) {
-        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "(data)");
-      }
-    } else {
-      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "()");
-      }
-
-      if (tag !== null && func) {
-        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "()");
+      if (typeof func === 'function') {
+        if (data !== null) {
+          func(data);
+        } else {
+          func();
+        }
       }
     }
   }
@@ -1436,6 +1405,9 @@ $.hood.Media = {
   },
   Loaded: function Loaded(data) {
     $.hood.Loader(false);
+  },
+  BladeLoaded: function BladeLoaded(data) {
+    $.hood.Media.LoadMediaPlayers();
   },
   Reload: function Reload(complete) {
     $.hood.Inline.Reload($('#media-list'), complete);
@@ -1675,6 +1647,7 @@ $.hood.Media = {
           if (data.Success) {
             $.hood.Media.Reload();
             $('.modal-backdrop').remove();
+            $('.modal').modal('hide');
             $.hood.Alerts.Success("The file has now been removed from the website.");
           } else {
             $.hood.Alerts.Error("There was a problem deleting the file.");
@@ -1770,7 +1743,8 @@ $.hood.Media = {
     }
   },
   Players: {},
-  LoadMediaPlayers: function LoadMediaPlayers(tag) {
+  LoadMediaPlayers: function LoadMediaPlayers() {
+    var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.hood-media';
     var videoOptions = {
       techOrder: ["azureHtml5JS", "flashSS", "html5FairPlayHLS", "silverlightSS", "html5"],
       nativeControlsForTouch: false,
@@ -1779,14 +1753,26 @@ $.hood.Media = {
       seeking: true
     };
     $(tag).each(function () {
-      player = $.hood.Media.Players[$(this).data('id')];
-      if (player) player.dispose();
-      $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
-      player = $.hood.Media.Players[$(this).data('id')];
-      player.src([{
-        src: $(this).data('file'),
-        type: $(this).data('type')
-      }]);
+      try {
+        player = $.hood.Media.Players[$(this).data('id')];
+
+        if (player) {
+          try {
+            player.dispose();
+          } catch (ex) {
+            console.log("There was a problem disposing the old media player: ".concat(ex));
+          }
+        }
+
+        $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
+        player = $.hood.Media.Players[$(this).data('id')];
+        player.src([{
+          src: $(this).data('file'),
+          type: $(this).data('type')
+        }]);
+      } catch (ex) {
+        console.log("There was a problem playing the media file: ".concat(ex));
+      }
     });
   }
 };

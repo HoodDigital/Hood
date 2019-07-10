@@ -167,13 +167,11 @@ namespace Hood.Areas.Admin.Controllers
                 content.Body = Regex.Replace(content.Body, @"id=""mce_[^;]+""", "", RegexOptions.IgnoreCase);
                 content.Body = Regex.Replace(content.Body, @"mce-content-body", "", RegexOptions.IgnoreCase);
                 await _content.UpdateAsync(content);
-                return new Response(true);
+                return new Response(true, $"The designer view has been saved.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while saving the designer view: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error saving the designer view.", ex);
             }
         }
 
@@ -211,9 +209,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while publishing: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error publishing content.", ex);
             }
         }
 
@@ -252,9 +248,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while adding a content category: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error adding a content category.", ex);
             }
         }
 
@@ -270,9 +264,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while removing a content category: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error removing a content category.", ex);
             }
         }
 
@@ -293,9 +285,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while adding a content category: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error adding a content category.", ex);
             }
         }
 
@@ -323,13 +313,11 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
                 await _content.UpdateCategoryAsync(model);
-                return new Response(true);
+                return new Response(true, $"The category has been saved.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while updating a category: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error updating a content category.", ex);
             }
         }
 
@@ -339,13 +327,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 await _content.DeleteCategoryAsync(id);
-                return new Response(true);
+                return new Response(true, $"The category has been deleted.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting a category, did you make sure it was empty first?";
-                await _logService.AddExceptionAsync<ContentController>($"Error deleting a content category with Id: {id}", ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error deleting a content category, did you make sure it was empty first?", ex);
             }
         }
 
@@ -355,7 +341,7 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
         [Route("admin/content/blocks/")]
-        public IActionResult Blocks(ListFilters request, string search, string sort, string type)
+        public IActionResult Blocks(ListFilters request)
         {
             string[] templateDirs = {
                     _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
@@ -467,9 +453,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while publishing content with Id {id}: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error publishing content with Id: {id}", ex);
             }
         }
         [Route("admin/content/{id}/archive")]
@@ -484,9 +468,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while archiving content with Id {id}: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error archiving content with Id: {id}", ex);
             }
         }
 
@@ -501,9 +483,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting content with Id {id}: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error deleting content with Id: {id}", ex);
             }
         }
 
@@ -517,9 +497,10 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while duplicating: {ex.Message}";
+                SaveMessage = $"Error duplicating content with Id: {id}";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                SaveMessage += $": {ex.Message}";
                 return RedirectToAction(nameof(Edit), new { id });
             }
         }
@@ -537,9 +518,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while setting a homepage: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error setting a homepage as content Id: {id}", ex);
             }
         }
 
@@ -678,9 +657,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing a content image: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error clearing a content image for content Id: {id}", ex);
             }
         }
 
@@ -697,9 +674,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing a content share image: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error clearing a content share image for content Id: {id}", ex);
             }
         }
 
@@ -716,9 +691,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while clearing a content meta object: {ex.Message}";
-                await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ContentController>($"Error clearing a content meta object for content Id: {id}", ex);
             }
         }
 
@@ -734,7 +707,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while : {ex.Message}";
+                SaveMessage = $"Error deleting all content.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
             }

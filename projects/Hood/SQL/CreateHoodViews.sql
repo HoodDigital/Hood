@@ -123,11 +123,11 @@ SELECT
 				WHEN 
 					'active'
 				THEN 
-					dbo.HoodUserSubscriptions.StripeId
+					dbo.HoodSubscriptions.StripeId
 				WHEN 
 					'trialing'
 				THEN 
-					dbo.HoodUserSubscriptions.StripeId
+					dbo.HoodSubscriptions.StripeId
 				ELSE 
 					NULL 
 				END,

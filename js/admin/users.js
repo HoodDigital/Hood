@@ -1,132 +1,77 @@
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 if (!$.hood) $.hood = {};
 $.hood.Users = {
   Init: function Init() {
-    $('body').on('click', '.delete-user', this.Delete);
-    $('body').on('click', '.create-user', this.Create.Init);
-    $('body').on('change', '#cuGeneratePassword', this.Create.GeneratePassword);
-    $('body').on('change', '.role-check', this.Edit.ToggleRole);
-    $('body').on('click', '.reset-password', this.Edit.ResetPassword);
+    $('body').on('click', '.user-delete', this.Delete);
+    $('body').on('click', '.user-reset-password', this.Edit.ResetPassword);
+    $('body').on('click', '.user-notes-add', this.Edit.Notes.Add);
+    $('body').on('click', '.user-notes-delete', this.Edit.Notes.Delete);
+    $('body').on('change', '#user-create-form #GeneratePassword', this.Create.GeneratePassword);
+    $('body').on('change', '.user-role-check', this.Edit.ToggleRole);
+  },
+  Loaded: function Loaded(data) {
+    $.hood.Loader(false);
+  },
+  Reload: function Reload(complete) {
+    $.hood.Inline.Reload($('#user-list'), complete);
   },
   Delete: function Delete(e) {
-    var _swal;
+    e.preventDefault();
+    $tag = $(this);
 
-    var $this = $(this);
-    swal((_swal = {
-      title: "Are you sure?",
-      text: "The user will be permanently removed and all associated files will be deleted from the system.\n\nThis process CANNOT be undone!\n\nNote: This process will also cancel any active subscriptions.",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Yes, go ahead.",
-      cancelButtonText: "No, cancel!"
-    }, _defineProperty(_swal, "showCancelButton", true), _defineProperty(_swal, "closeOnConfirm", false), _defineProperty(_swal, "showLoaderOnConfirm", true), _defineProperty(_swal, "closeOnCancel", false), _swal), function (isConfirm) {
+    deleteUserCallback = function deleteUserCallback(isConfirm) {
       if (isConfirm) {
-        // delete functionality
-        $.post('/admin/users/delete', {
-          id: $this.data('id')
-        }, function (data) {
-          if (data.Success) {
-            swal({
-              title: "Deleted!",
-              text: "The user has now been removed from the website.",
-              timer: 1300,
-              type: "success"
-            });
-            setTimeout(function () {
-              window.location = data.Url;
-            }, 500);
-            swal("Deleted", "", "success");
-          } else {
-            swal("Error", "There was a problem deleting the user:\n\n" + data.Errors, "error");
-          }
+        $.post($tag.attr('href'), function (data) {
+          $.hood.Helpers.ProcessResponse(data, $tag);
+          $.hood.Users.Reload();
         });
-      } else {
-        swal("Cancelled", "It's all good in the hood!", "error");
       }
-    });
+    };
+
+    $.hood.Alerts.Confirm("The user will be permanently removed and all associated files will be deleted from the system.", "Are you sure?", deleteUserCallback, 'error', '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong><br />This process will also cancel any active subscriptions.</span>');
   },
   Create: {
-    Init: function Init(e) {
-      // close open blade
-      $('button.create-user').removeClass('btn-primary').addClass('btn-default').html('<i class="fa fa-refresh fa-spin"></i>&nbsp;Loading...'); // load in the create user blade
-
-      $.get('/admin/users/create/', null, function (data) {
-        $('#right-sidebar').html(data); // slide open the blade
-
-        $('#right-sidebar').addClass('sidebar-open');
-        $('button.create-user').removeClass('btn-default').addClass('btn-primary').html('<i class="fa fa-user-plus"></i>&nbsp;Create new user');
-        $.hood.Users.Create.SetupCreateForm();
-        $.hood.Helpers.ResetSidebarScroll();
-      });
-    },
-    CancelCreate: function CancelCreate(e) {
-      // close open blade
-      $('#right-sidebar').removeClass('animate-all sidebar-open');
-      setTimeout(function () {
-        $('#right-sidebar').empty();
-      });
-    },
-    SetupCreateForm: function SetupCreateForm() {
-      $('#create-user-form').hoodValidator({
+    Loaded: function Loaded(e) {
+      $('#user-create-form').hoodValidator({
         validationRules: {
-          cuFirstName: {
+          FirstName: {
             required: true
           },
-          cuLastName: {
+          LastName: {
             required: true
           },
-          cuUserName: {
+          UserName: {
             required: true,
             email: true
           },
-          cuPassword: {
+          Password: {
             required: true
           }
         },
-        submitButtonTag: $('#create-user-submit'),
-        submitUrl: '/admin/users/add',
+        submitButtonTag: $('#user-create-submit'),
+        submitUrl: $('#user-create-form').attr('action'),
         submitFunction: function submitFunction(data) {
-          if (data.Success) {
-            swal({
-              title: "Created!",
-              text: "The user has now been created and can log in right away.",
-              timer: 1300,
-              type: "success"
-            });
-            setTimeout(function () {
-              window.location = data.Url;
-            }, 500);
-          } else {
-            swal("Error", "There was a problem creating the user:\n\n" + data.Errors, "error");
-          }
+          $.hood.Helpers.ProcessResponse(data, $tag);
         }
       });
     },
     GeneratePassword: function GeneratePassword() {
       if ($(this).is(':checked')) {
-        $('#cuPassword').val($.hood.Helpers.GenerateRandomString(0));
+        $('#user-create-form #Password').val($.hood.Helpers.GenerateRandomString(0));
+        $('#user-create-form #Password').attr('type', 'text');
       } else {
-        $('#cuPassword').val('');
+        $('#user-create-form #Password').val('');
+        $('#user-create-form #Password').attr('type', 'password');
       }
     }
   },
   Edit: {
-    ResetPassword: function ResetPassword() {
-      swal({
-        title: "Reset password",
-        text: "Please enter a new password for the user...",
-        type: "input",
-        showCancelButton: true,
-        closeOnCancel: true,
-        closeOnConfirm: false,
-        showLoaderOnConfirm: true,
-        animation: "slide-from-top",
-        inputPlaceholder: "New password..."
-      }, function (inputValue) {
+    ResetPassword: function ResetPassword(e) {
+      e.preventDefault();
+      $tag = $(this);
+
+      resetPasswordCallback = function resetPasswordCallback(inputValue) {
         if (inputValue === false) return false;
 
         if (inputValue === "") {
@@ -134,17 +79,54 @@ $.hood.Users = {
           return false;
         }
 
-        $.post('/admin/users/reset/', {
-          id: $('#edit-user-form').data('id'),
+        $.post($tag.attr('href'), {
           password: inputValue
         }, function (data) {
-          if (data.Success) {
-            swal("Success!", "The password has been reset.", "success");
-          } else {
-            swal("Oops!", "There was a problem resetting the password:\n\n" + data.Errors, "error");
-          }
+          $.hood.Helpers.ProcessResponse(data, $tag);
         });
-      });
+      };
+
+      $.hood.Alerts.Prompt("Please enter a new password for the user...", "Reset password", resetPasswordCallback);
+    },
+    Notes: {
+      Add: function Add(e) {
+        e.preventDefault();
+        $tag = $(this);
+
+        addNoteCallback = function addNoteCallback(inputValue) {
+          if (inputValue === false || inputValue === "") {
+            swal.showInputError("You enter anything!");
+            return false;
+          }
+
+          $.post($tag.attr('href'), {
+            note: inputValue
+          }, function (data) {
+            $.hood.Helpers.ProcessResponse(data, $tag);
+            $.hood.Inline.Reload('#user-notes');
+          });
+        };
+
+        $.hood.Alerts.Prompt("Enter and store a note about this user. These are internal, and are not shown to the user.", "Add a note", addNoteCallback, 'textarea');
+      },
+      Delete: function Delete(e) {
+        e.preventDefault();
+        $tag = $(this);
+
+        deleteUserNoteCallback = function deleteUserNoteCallback(isConfirm) {
+          if (isConfirm) {
+            // delete functionality
+            $.post($tag.attr('href'), function (data) {
+              $.hood.Helpers.ProcessResponse(data, $tag);
+              $.hood.Inline.Reload('#user-notes');
+            });
+          } else {
+            swal("Cancelled", "It's all good in the hood!", "error");
+          }
+        };
+
+        $.hood.Alerts.Confirm("Are you sure?", "The note will be removed permanently.", deleteUserNoteCallback);
+      }
     },
     ToggleRole: function ToggleRole() {
       if ($(this).is(':checked')) {
@@ -152,22 +134,14 @@ $.hood.Users = {
           id: $(this).data('id'),
           role: $(this).val()
         }, function (data) {
-          if (data.Success) {
-            $.hood.Alerts.Success("Added user to role.");
-          } else {
-            $.hood.Alerts.Error("Couldn't add the user to the role: " + data.Error);
-          }
+          $.hood.Helpers.ProcessResponse(data, $tag);
         });
       } else {
         $.post('/admin/users/removefromrole/', {
           id: $(this).data('id'),
           role: $(this).val()
         }, function (data) {
-          if (data.Success) {
-            $.hood.Alerts.Success("Removed user from role.");
-          } else {
-            $.hood.Alerts.Error("Couldn't remove the user from the role: " + data.Error);
-          }
+          $.hood.Helpers.ProcessResponse(data, $tag);
         });
       }
     }

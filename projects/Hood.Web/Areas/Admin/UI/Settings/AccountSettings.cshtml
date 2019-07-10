@@ -12,7 +12,7 @@
 <div class="card">
     <div class="card-header">
         <div class="row align-items-center">
-            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
                 <li class="nav-item">
                     <a class="nav-link active" id="registration-tab" data-toggle="tab" href="#registration" role="tab" aria-controls="registration" aria-selected="false">
                         Registration
@@ -35,6 +35,13 @@
                         <label asp-for="EnableRegistration" class="custom-control-label"></label>
                     </div>
                     <small asp-for="EnableRegistration"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="RequireEmailConfirmation" class="custom-control-input">
+                        <label asp-for="RequireEmailConfirmation" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="RequireEmailConfirmation"></small>
                 </div>
                 <hr />
                 <div class="form-group floating-label">

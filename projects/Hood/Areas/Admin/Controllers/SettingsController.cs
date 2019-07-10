@@ -81,7 +81,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -119,7 +119,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -156,7 +156,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -200,7 +200,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -322,7 +322,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -358,7 +358,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -393,7 +393,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -430,7 +430,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -469,7 +469,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
 
@@ -525,7 +525,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             return View(model);
@@ -565,7 +565,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
             var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });

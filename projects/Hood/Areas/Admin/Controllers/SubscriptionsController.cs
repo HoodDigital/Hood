@@ -57,7 +57,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "An error occurred while saving: " + ex.Message;
+                SaveMessage = "Errorsaving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
@@ -130,7 +130,7 @@ namespace Hood.Areas.Admin.Controllers
                     _userManager.GetUserId(User),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
-                return new Response(SaveMessage);
+                return new Response(ex);
             }
         }
 
@@ -151,7 +151,7 @@ namespace Hood.Areas.Admin.Controllers
                     Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
                 );
 #warning TODO: Handle response in JS.
-                return new Response(true);
+                return new Response(true, $"The subscription has been deleted.");
             }
             catch (Exception ex)
             {
@@ -163,7 +163,7 @@ namespace Hood.Areas.Admin.Controllers
                     _userManager.GetUserId(User),
                     Url.AbsoluteAction("Index", "Subscriptions")
                 );
-                return new Response(SaveMessage);
+                return new Response(ex);
             }
         }
 
@@ -216,8 +216,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (WebException wex)
             {
-                var httpResponse = wex.Response as HttpWebResponse;
-                if (httpResponse != null)
+                if (wex.Response is HttpWebResponse httpResponse)
                 {
                     ViewBag.Message = string.Format(
                         "<div class='alert alert-danger'><i class='fa fa-exclamation-triangle m-r-sm'></i>Remote server call to {0} resulted in a http error {1} {2}.</div>",

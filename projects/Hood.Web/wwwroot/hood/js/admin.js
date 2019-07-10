@@ -120,6 +120,10 @@ $.hood.Admin = {
     Load: function () {
         $.hood.Admin.Resize();
     },
+    Ready: function () {
+        $.hood.Admin.CheckAndLoadTabs('#page-tabs');
+        $.hood.Admin.Resize();
+    },
     Resize: function () {
         if ($(window).width() > 768) {
             $('.content-body').css({
@@ -400,8 +404,36 @@ $.hood.Admin = {
                 time: 2000
             });
         }
+    },
+    CheckAndLoadTabs: function (tag) {
+        $(tag).each(function () {
+            // build the mobile jobber
+            var button = $('<li class="nav-item d-inline d-lg-none"></li>');
+            var dropdown = $('<div class="dropdown-menu"></ul>');
+            var nav = $('<ul class="navbar-nav"></ul>');
+            $(this).find('> li').each(function () {
+                link = $(this).children('a:first-child');
+                var item = $('<li class="nav-item"><a href="' + link.attr('href') + '" data-toggle="tab" class="nav-link tab-switch">' + link.html() + '</a></li>');
+                nav.append(item);
+                $(this).addClass('d-none d-lg-inline');
+            });
+            button.append('<a class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-eye mr-2"></i><span>Choose View</span></button>');
+            dropdown.append(nav);
+            button.append(dropdown);
+            $(this).prepend(button);
+        });
+        $(tag + ' a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            localStorage.setItem('tab-' + $(tag).data('id'), $(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('tab-' + $(tag).data('id'));
+        if (activeTab) {
+            $(tag + ' a[href="' + activeTab + '"]').tab('show');
+        } else {
+            $(tag + ' a[data-toggle="tab"]').first().tab('show');
+        }
     }
 };
+$(document).ready($.hood.Admin.Ready);
 $(window).on('load', $.hood.Admin.Load);
 $(window).on('resize', $.hood.Admin.Resize);
 $.hood.Admin.Init();

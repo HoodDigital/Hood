@@ -87,15 +87,14 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Add(model);
                 await _db.SaveChangesAsync();
-#warning TODO: Handle response in JS.
+    #warning TODO: Handle response in JS.
                 return new Response(true, "Created successfully.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while creating an API key: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
-
+                var message = $"Error creating an API key";
+                await _logService.AddExceptionAsync<ApiController>(message, ex);
+                return new Response(ex, message);
             }
         }
 
@@ -117,9 +116,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while activating an API key: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                await _logService.AddExceptionAsync<ApiController>($"Error activating an API key", ex);
+                return new Response(ex);
             }
         }
 
@@ -141,9 +139,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deactivating an API key: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ApiController>($"Error deactivating an API key.", ex);
             }
         }
 
@@ -165,9 +161,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while deleting an API key: {ex.Message}";
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ApiController>($"Error deleting an API key.", ex);
             }
         }
 

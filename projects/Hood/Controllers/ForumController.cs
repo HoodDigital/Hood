@@ -444,7 +444,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while editing a {nameof(Topic)}.: {ex.Message}";
+                SaveMessage = $"Error editing a {nameof(Topic)}.";
                 if (topic != null)
                 {
                     await _logService.AddExceptionAsync<ForumController>(SaveMessage, topic, ex);
@@ -652,7 +652,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while reporting a {nameof(Post)} with Id: {postId}.";
+                SaveMessage = $"Errorreporting a {nameof(Post)} with Id: {postId}.";
                 await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
                 return RedirectToAction(nameof(ForumController.Index));
             }

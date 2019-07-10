@@ -83,8 +83,12 @@ namespace Hood.Extensions
 
 
         #endregion
-
-        public static string ToHtmlLineBreaks(this string str)
+        /// <summary>
+        /// Adds HTML style line breaks. <br /> in place of newlines.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToHtml(this string str)
         {
             return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br />").Replace("\r", "<br />").Replace("\n", "<br />");
         }
@@ -408,6 +412,7 @@ namespace Hood.Extensions
             var settings = Core.Engine.Settings.Basic;
             return text
                 .Replace("{Site.Title}", settings.FullTitle)
+                .Replace("{SITETITLE}", settings.FullTitle) // Backwards Compat Removed-v3.0.0
                 .Replace("{Site.CompanyName}", settings.CompanyName)
                 .Replace("{Site.Phone}", settings.Phone)
                 .Replace("{Site.Logo}", settings.Logo)

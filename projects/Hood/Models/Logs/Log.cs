@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
+
     public class Log : BaseEntity<long>
     {
         /// <summary>
@@ -20,14 +21,30 @@ namespace Hood.Models
 
         /// <summary>
         /// Detailed description, or Json of exception for Exception logs.
-        /// </summary>
+        /// </summary>)
+        /// 
+        public string Message
+        {
+            get
+            {
+                if (ErrorLogDetail != null)
+                {
+                    foreach (var entry in ErrorLogDetail.Exception)
+                    {
+                        if (entry.Key == "Message")
+                            return entry.Value;
+                    }
+                }
+                return null;
+            }
+        }
+
         public string Detail { get; set; }
 
         [NotMapped]
-        public Exception Exception
+        public ErrorLogDetail ErrorLogDetail
         {
-            get { try { return Detail.IsSet() ? JsonConvert.DeserializeObject<Exception>(Detail) : null; } catch (Exception) { return null; } }
-            set { try { Detail = JsonConvert.SerializeObject(value); } catch (Exception ex) { Detail = $"Could not serialize the exception: {ex.Message}"; } }
+            get { try { return Detail.IsSet() ? JsonConvert.DeserializeObject<ErrorLogDetail>(Detail) : null; } catch (Exception) { return null; } }
         }
 
         /// <summary>

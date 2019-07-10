@@ -38,7 +38,7 @@ namespace Hood.Services
         #endregion
 
         #region Stripe customer object
-        Task<Stripe.Customer> GetCustomerObjectAsync(string stripeId, bool allowNullObject);
+        Task<Stripe.Customer> GetCustomerObjectAsync(string stripeId);
         Task<List<Stripe.Customer>> GetMatchingCustomerObjectsAsync(string email);
         #endregion
 

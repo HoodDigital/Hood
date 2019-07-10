@@ -541,7 +541,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while : {ex.Message}";
+                SaveMessage = $"Error when user attemted to delete their account.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
             }

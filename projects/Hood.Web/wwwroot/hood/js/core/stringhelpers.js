@@ -1,4 +1,4 @@
-﻿String.prototype.contains = function (it) { return this.indexOf(it) != -1; };
+﻿String.prototype.contains = function (it) { return this.indexOf(it) !== -1; };
 String.prototype.pick = function (min, max) {
     var n, chars = '';
 
@@ -27,4 +27,13 @@ String.prototype.shuffle = function () {
     }
 
     return array.join('');
+};
+String.prototype.toSeoUrl = function () {
+    var output = this.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").toLowerCase();
+    /* remove first dash */
+    if (output.charAt(0) === '-') output = output.substring(1);
+    /* remove last dash */
+    var last = output.length - 1;
+    if (output.charAt(last) === '-') output = output.substring(0, last);
+    return output;
 };

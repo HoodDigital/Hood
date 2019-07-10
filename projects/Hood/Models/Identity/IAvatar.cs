@@ -1,6 +1,6 @@
 ﻿using Hood.Interfaces;
 
-namespace Hood.Models
+namespace Hood.Interfaces
 {
     public interface IAvatar
     {

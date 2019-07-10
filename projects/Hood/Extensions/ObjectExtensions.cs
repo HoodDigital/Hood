@@ -14,7 +14,14 @@ namespace Hood.Extensions
         /// <returns>String Json content</returns>
         public static string ToJson(this object element)
         {
-            return JsonConvert.SerializeObject(element);
+            try
+            {
+                return JsonConvert.SerializeObject(element);
+            }
+            catch (Exception ex)
+            {
+                return ex.ToJson();
+            }
         }
 
         /// <summary>

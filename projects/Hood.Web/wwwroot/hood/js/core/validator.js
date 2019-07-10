@@ -1,5 +1,5 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.FormValidator = function (element, options) {
     this.Options = $.extend({
         formTag: element,
@@ -9,12 +9,6 @@ $.hood.FormValidator = function (element, options) {
         submitButtonTag: null,
         submitUrl: null,
         submitFunction: null,
-        errorElement: 'div',
-        errorClass: 'text-danger help-block small',
-        invalidHandler: $.hood.Forms.ValidationInvalid,
-        highlight: $.hood.Forms.ValidationHighlight,
-        success: $.hood.Forms.ValidationSuccess,
-        errorPlacement: $.hood.Forms.ValidationErrorPlacement,
         serializationFunction: function () {
             rtn = $(this.formTag).serialize();
             return rtn;
@@ -23,8 +17,8 @@ $.hood.FormValidator = function (element, options) {
     this.LoadValidation = function () {
         if ($.hood.Helpers.IsNullOrUndefined(this.Options.formTag))
             return;
-        $(this.Options.formTag).find('input, select').keypress($.proxy(function (e) {
-            if (e.which == 13) {
+        $(this.Options.formTag).find('input, textarea, select').keypress($.proxy(function (e) {
+            if (e.which === 13) {
                 $.proxy(this.submitForm(), this);
                 e.preventDefault();
                 return false;
@@ -38,23 +32,6 @@ $.hood.FormValidator = function (element, options) {
             focusInvalid: false,
             rules: this.Options.validationRules,
             messages: this.Options.validationMessages,
-            invalidHandler: this.Options.invalidHandler,
-            errorPlacement: $.proxy(function (error, element) {
-                element.siblings().remove();
-                if (this.Options.placeBelow)
-                    error.insertAfter(element);
-                else
-                    error.insertBefore(element);
-            }, this),
-            errorElement: this.Options.errorElement,
-            highlight: function (element) {
-                $(element).parent().removeClass("has-success").addClass("has-error");
-                //$(element).siblings("label").addClass("hide");
-            },
-            success: function (element) {
-                $(element).parent().removeClass("has-error").addClass("has-success");
-                //$(element).siblings("label").removeClass("hide");
-            }
         });
         if ($.hood.Helpers.IsNullOrUndefined(this.Options.submitButtonTag))
             return;
@@ -71,12 +48,10 @@ $.hood.FormValidator = function (element, options) {
                 }
             });
             $.post(this.Options.submitUrl, this.Options.serializationFunction(),
-
                 $.proxy(function (data) {
                     $(this.Options.submitButtonTag).removeClass('btn-default').addClass('btn-primary').html(this.TempButtonContent);
                     this.Options.submitFunction(data);
                 }, this)
-
             );
 
         }
@@ -84,7 +59,7 @@ $.hood.FormValidator = function (element, options) {
     this.LoadValidation();
     if (this.Options.placeBelow)
         $(this.Options.formTag).addClass("validation-below");
-}
+};
 $.fn.hoodValidator = function (options) {
     return this.each(function () {
         var element = $(this);

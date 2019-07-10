@@ -5,6 +5,10 @@ $.hood.Inline = {
   Init: function Init() {
     $('.hood-inline:not(.refresh)').each($.hood.Inline.Load);
     $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
+    $('body').on('click', '.hood-modal', function (e) {
+      e.preventDefault();
+      $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'));
+    });
     $.hood.Inline.DataList.Init();
   },
   Refresh: function Refresh(tag) {
@@ -13,7 +17,7 @@ $.hood.Inline = {
   Load: function Load(e) {
     $.hood.Inline.Reload(this);
   },
-  Reload: function Reload(tag, complete) {
+  Reload: function Reload(tag) {
     $tag = $(tag);
     $tag.addClass('loading');
     var urlLoad = $tag.data('url');
@@ -21,7 +25,7 @@ $.hood.Inline = {
       $tag.html(data);
       $tag.removeClass('loading');
     }).done(function (data) {
-      $.hood.Inline.RunComplete(complete, data, $tag);
+      $.hood.Inline.RunComplete($tag.data('complete'), data);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   Modal: function Modal(url, complete) {
@@ -137,24 +141,16 @@ $.hood.Inline = {
   },
   RunComplete: function RunComplete(complete) {
     var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    var tag = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    func = $(tag).attr("data-complete");
 
-    if (data !== null) {
-      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "(data)");
-      }
+    if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
+      var func = eval(complete);
 
-      if (tag !== null && func) {
-        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "(data)");
-      }
-    } else {
-      if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-        if ($.hood.Helpers.IsFunction(complete)) complete();else eval(complete + "()");
-      }
-
-      if (tag !== null && func) {
-        if ($.hood.Helpers.IsFunction(complete)) eval($(tag).data('complete'));else eval($(tag).data('complete') + "()");
+      if (typeof func === 'function') {
+        if (data !== null) {
+          func(data);
+        } else {
+          func();
+        }
       }
     }
   }

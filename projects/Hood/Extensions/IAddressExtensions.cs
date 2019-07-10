@@ -38,6 +38,20 @@ namespace Hood.Extensions
                 address.Longitude = location.Longitude;
             }
         }
+        public static bool IsSet(this IAddress from)
+        {
+            if (from != null && (
+                !from.Number.IsSet()
+                || !from.Address1.IsSet()
+                || !from.Address2.IsSet()
+                || !from.City.IsSet()
+                || !from.County.IsSet()
+                || !from.Postcode.IsSet()
+                || !from.Country.IsSet()
+                ))
+                return true;
+            return false;
+        }
 
         public static string ToFormat(this IAddress from, AddressFormat format, bool showPostcode = true, bool showCountry = false)
         {

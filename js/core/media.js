@@ -12,6 +12,9 @@ $.hood.Media = {
   Loaded: function Loaded(data) {
     $.hood.Loader(false);
   },
+  BladeLoaded: function BladeLoaded(data) {
+    $.hood.Media.LoadMediaPlayers();
+  },
   Reload: function Reload(complete) {
     $.hood.Inline.Reload($('#media-list'), complete);
   },
@@ -250,6 +253,7 @@ $.hood.Media = {
           if (data.Success) {
             $.hood.Media.Reload();
             $('.modal-backdrop').remove();
+            $('.modal').modal('hide');
             $.hood.Alerts.Success("The file has now been removed from the website.");
           } else {
             $.hood.Alerts.Error("There was a problem deleting the file.");
@@ -345,7 +349,8 @@ $.hood.Media = {
     }
   },
   Players: {},
-  LoadMediaPlayers: function LoadMediaPlayers(tag) {
+  LoadMediaPlayers: function LoadMediaPlayers() {
+    var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '.hood-media';
     var videoOptions = {
       techOrder: ["azureHtml5JS", "flashSS", "html5FairPlayHLS", "silverlightSS", "html5"],
       nativeControlsForTouch: false,
@@ -354,14 +359,26 @@ $.hood.Media = {
       seeking: true
     };
     $(tag).each(function () {
-      player = $.hood.Media.Players[$(this).data('id')];
-      if (player) player.dispose();
-      $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
-      player = $.hood.Media.Players[$(this).data('id')];
-      player.src([{
-        src: $(this).data('file'),
-        type: $(this).data('type')
-      }]);
+      try {
+        player = $.hood.Media.Players[$(this).data('id')];
+
+        if (player) {
+          try {
+            player.dispose();
+          } catch (ex) {
+            console.log("There was a problem disposing the old media player: ".concat(ex));
+          }
+        }
+
+        $.hood.Media.Players[$(this).data('id')] = amp($(this).attr('id'), videoOptions);
+        player = $.hood.Media.Players[$(this).data('id')];
+        player.src([{
+          src: $(this).data('file'),
+          type: $(this).data('type')
+        }]);
+      } catch (ex) {
+        console.log("There was a problem playing the media file: ".concat(ex));
+      }
     });
   }
 };

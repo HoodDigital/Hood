@@ -34,5 +34,35 @@
                 border-bottom: 1px solid $gray-700;
             }
         }
+
+        .dropdown-menu {
+            color: #6c757d;
+            font-weight: 700;
+            min-width: 250px;
+            border-radius: 3px;
+            margin-top: 2px;
+
+            ul.navbar-nav {
+                margin: 0;
+
+                .nav-link {
+                    padding: .5rem 1.5rem;
+                    border: 0;
+                    color: $gray-700;
+                    border-bottom: 0;
+
+                    &.active {
+                        color: $gray-700;
+                        border-bottom: 0;
+                    }
+
+                    &:hover {
+                        color: $gray-900;
+                        background-color: $gray-100;
+                        border-bottom: 0;
+                    }
+                }
+            }
+        }
     }
 }

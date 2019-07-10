@@ -133,7 +133,7 @@ namespace Hood.Services
                                 case "invalid_request_error":
                                 case "rate_limit_error":
                                 case "validation_error":
-                                    throw new Exception("An error occurred while cancelling active subscriptions.");
+                                    throw new Exception("Errorcancelling active subscriptions.");
                                 default:
                                     break;
                             }
@@ -161,7 +161,7 @@ namespace Hood.Services
 
             if (model.Subscription.IsSet())
             {
-                query = query.Where(q => q.ActiveSubscriptionIds.Contains(model.Role));
+                query = query.Where(q => q.ActiveSubscriptionIds.Contains(model.Subscription));
             }
 
             if (!string.IsNullOrEmpty(model.Search))
@@ -398,36 +398,20 @@ namespace Hood.Services
         #endregion
 
         #region Stripe customer object
-        public async Task<Customer> GetCustomerObjectAsync(string stripeId, bool allowNullObject)
+        public async Task<Customer> GetCustomerObjectAsync(string stripeId)
         {
             // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
-            if (stripeId.IsSet())
-                try
-                {
-                    var customer = await _billing.Customers.FindByIdAsync(stripeId);
-                    if (customer.Deleted.HasValue && customer.Deleted.Value)
-                    {
-                        await ResetBillingInfoAsync();
-                        customer = null;
-                    }
-                    if (!allowNullObject)
-                        throw new Exception("There is no customer account associated with this user.");
-                    else
-                        await ResetBillingInfoAsync();
-                    return customer;
-                }
-                catch (StripeException)
-                {
-                    if (allowNullObject)
-                        return null;
-                    else
-                        throw new Exception("There is no customer account associated with this user.");
-                }
-            else
-                if (allowNullObject)
+            if (!stripeId.IsSet())
                 return null;
-            else
-                throw new Exception("There is no customer account associated with this user.");
+            try
+            {
+                var customer = await _billing.Customers.FindByIdAsync(stripeId);
+                return customer;
+            }
+            catch (StripeException)
+            {
+                return null;
+            }
         }
         public async Task<List<Customer>> GetMatchingCustomerObjectsAsync(string email)
         {
@@ -524,7 +508,9 @@ namespace Hood.Services
             Plan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
 
             // Check for customer or throw, but allow it to be null.
-            Customer customer = await GetCustomerObjectAsync(user.StripeId, true);
+            var customer = await GetCustomerObjectAsync(user.StripeId);
+            if (customer == null)
+                throw new Exception("There was a problem loading the customer object.");
 
             // The object for the new user subscription to be recieved from stripe.
             Stripe.Subscription newSubscription = null;
@@ -618,7 +604,9 @@ namespace Hood.Services
             UserSubscription userSub = GetUserSubscription(user, subscriptionId);
 
             // Check for customer or throw.
-            var customer = await GetCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId);
+            if (customer == null)
+                throw new Exception("There was a problem loading the customer object.");
 
             if (customer.DefaultSourceId.IsSet() || customer.Sources?.Count() > 0)
             {
@@ -642,7 +630,9 @@ namespace Hood.Services
             ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await GetCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId);
+            if (customer == null)
+                throw new Exception("There was a problem loading the customer object.");
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
@@ -658,7 +648,9 @@ namespace Hood.Services
             ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await GetCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId);
+            if (customer == null)
+                throw new Exception("There was a problem loading the customer object.");
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
@@ -674,7 +666,9 @@ namespace Hood.Services
             ApplicationUser user = await GetCurrentUserAsync();
 
             // Check for customer or throw.
-            var customer = await GetCustomerObjectAsync(user.StripeId, false);
+            var customer = await GetCustomerObjectAsync(user.StripeId);
+            if (customer == null)
+                throw new Exception("There was a problem loading the customer object.");
 
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);

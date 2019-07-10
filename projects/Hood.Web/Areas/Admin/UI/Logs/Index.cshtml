@@ -5,10 +5,10 @@
 }
 @if (Model.SaveMessage.IsSet())
 {
-    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
 @section buttons {
-    <a class="btn btn-danger warning-alert" asp-action="ClearLogs" data-title="Are you sure?" data-warning="This will clear all the logs from the database.">        
+    <a class="btn btn-danger warning-alert" asp-action="Clear" data-title="Are you sure?" data-warning="This will clear all the logs from the database.">        
         <i class="fa fa-trash mr-2"></i>
         Clear Logs
     </a>

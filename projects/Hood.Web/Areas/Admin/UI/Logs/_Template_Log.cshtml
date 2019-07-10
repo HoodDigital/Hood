@@ -1,7 +1,7 @@
 @model Log
 <div class="card p-2 mb-2 hover">
-    <div class="row row-center">
-        <div class="col-1">
+    <div class="row align-items-center">
+        <div class="col-md-1">
             @switch (Model.Type)
             {
                 case LogType.Success:
@@ -18,16 +18,30 @@
                     break;
             }
         </div>
-        <div class="col-auto">
-            <div>@Model.Time.ToDisplay()</div>
+        <div class="col-md-3">
+            <div><strong>@Model.Time.ToDisplay()</strong></div>
+            <small class="d-none d-lg-block text-muted">@Model.Source</small>
         </div>
-        <div class="col">
-            <div><strong>@Model.Title</strong></div>
-        </div>
-        <div class="col-auto text-right">
-            <div>
-                <span class="badge badge-default">@Model.Source</span>
-            </div>
+        <div class="col-md">
+            @switch (Model.Type)
+            {
+                case LogType.Success:
+                    <div><strong class="text-success">@Model.Title</strong></div>
+                    break;
+                case LogType.Error:
+                    <div><strong class="text-danger">@Model.Title</strong></div>
+                    break;
+                case LogType.Warning:
+                    <div><strong class="text-warning">@Model.Title</strong></div>
+                    break;
+                case LogType.Info:
+                    <div><strong class="text-info">@Model.Title</strong></div>
+                    break;
+                default:
+                    <div><strong class="">@Model.Title</strong></div>
+                    break;
+            }
+            <small class="d-block">@Model.Message</small>
         </div>
         <a data-toggle="modal" href="@string.Format("#log-{0}", Model.Id)" class="full-box-link"></a>
     </div>
@@ -40,7 +54,7 @@
                         <div class="modal-header bg-success text-white">
                             <h5 class="modal-title">
                                 Success
-                            </h5> 
+                            </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -50,7 +64,7 @@
                         <div class="modal-header bg-danger text-white">
                             <h5 class="modal-title">
                                 Error
-                            </h5> 
+                            </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -60,7 +74,7 @@
                         <div class="modal-header bg-warning text-white">
                             <h5 class="modal-title">
                                 Warning
-                            </h5> 
+                            </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -70,7 +84,7 @@
                         <div class="modal-header bg-info text-white">
                             <h5 class="modal-title">
                                 Info
-                            </h5> 
+                            </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -80,68 +94,92 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Message</label>
-                        <p class="h5">
+                        <p class="h5 font-weight-normal">
                             @Model.Title
                         </p>
+                        <p>@Model.Message</p>
                     </div>
                     @if (Model.Source.IsSet())
                     {
                         <div class="form-group">
                             <label>Source</label>
-                            <p class="h5">
+                            <p class="h5 font-weight-normal">
                                 @Model.Source
                             </p>
                         </div>
                     }
                     <div class="form-group">
                         <label>Date &amp; Time</label>
-                        <p class="h5">
+                        <p>
                             @Model.Time.ToDisplay()
                         </p>
                     </div>
-                    @if (Model.Detail.IsSet())
-                    {
-                        <div class="form-group">
-                            <label>Detail</label>
-                            <div class="code-viewer p-2 bg-gray text-white" style="font-family:monospace;">
-                                @Html.Raw(Model.Detail.ToHtmlLineBreaks().ToFormattedJson())
-                            </div>
-                        </div>
-                    }
-                    @if (Model.Exception != null)
-                    {
-                        <div class="form-group">
-                            <label>Detail</label>
-                            <div class="code-viewer p-2 bg-gray text-white" style="font-family:monospace;">
-                                @Html.Raw(Model.Detail.ToFormattedJson())
-                            </div>
-                        </div>
-                    }
                     @if (Model.User != null)
                     {
                         <div class="form-group">
                             <label>User</label>
-                            <div class="col-sm-6">
-                                <p class="form-control-static">
-                                    <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
-                                        @Model.User.ToFullName()
-                                    </a>
-                                </p>
-                            </div>
+                            <p>
+                                <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
+                                    @Model.User.ToFullName()
+                                </a>
+                            </p>
                         </div>
                     }
                     @if (Model.SourceUrl.IsSet())
                     {
                         <div class="form-group">
                             <label>Source Url</label>
-                            <div class="col-sm-6">
-                                <p class="form-control-static">
-                                    <a href="@Model.SourceUrl">
-                                        @Model.SourceUrl
-                                    </a>
-                                </p>
-                            </div>
+                            <p>
+                                <a href="@Model.SourceUrl">
+                                    @Model.SourceUrl
+                                </a>
+                            </p>
                         </div>
+                    }
+                    @if (Model.Detail.IsSet())
+                    {
+                        if (Model.ErrorLogDetail != null)
+                        {
+                            <h5>Exception</h5>
+                            <div class="code-viewer p-2 bg-gray auto text-white mb-3" style="font-family:monospace;">
+                                @foreach (var entry in Model.ErrorLogDetail.Exception)
+                                {
+                                    <p>
+                                        <strong>@entry.Key</strong><br />
+                                        @entry.Value
+                                    </p>
+                                }
+                            </div>
+                            @if (Model.ErrorLogDetail.InnerException != null)
+                            {
+                                <h5>Inner Exception</h5>
+                                <div class="code-viewer p-2 bg-gray auto text-white mb-3" style="font-family:monospace;">
+                                    @foreach (var entry in Model.ErrorLogDetail.InnerException)
+                                    {
+                                        <p>
+                                            <strong>@entry.Key</strong><br />
+                                            @entry.Value
+                                        </p>
+                                    }
+                                </div>
+                            }
+                            @if (Model.ErrorLogDetail.ObjectJson.IsSet())
+                            {
+                                <h5>Object Json</h5>
+                                <div class="code-viewer p-2 bg-gray auto text-white mb-3" style="font-family:monospace;">
+                                    @Html.Raw(Model.ErrorLogDetail.ObjectJson.ToHtml())
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label>Detail</label>
+                                <div class="code-viewer p-2 bg-gray text-white" style="font-family:monospace;">
+                                    @Html.Raw(Model.Detail.ToHtml())
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>

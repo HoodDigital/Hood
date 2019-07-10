@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
-    public class Person : IName, IAddress
+    public class Person : IName, IAddress, IPerson
     {
         [Display(Name = "First name")]
         public string FirstName { get; set; }
@@ -17,12 +17,15 @@ namespace Hood.Models
         public string Phone { get; set; }
         [Display(Name = "Job Title")]
         public string JobTitle { get; set; }
-        [Display(Name = "Job Title")]
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
+        [Display(Name = "Contact Name")]
         public string ContactName { get => this.ToFullName(); set { } }
         public string Number { get; set; }
+        [Display(Name = "Address 1")]
         public string Address1 { get; set; }
+        [Display(Name = "Address 2")]
         public string Address2 { get; set; }
         public string City { get; set; }
         public string County { get; set; }

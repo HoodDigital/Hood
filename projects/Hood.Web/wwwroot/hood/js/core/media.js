@@ -258,6 +258,7 @@ $.hood.Media = {
                     if (data.Success) {
                         $.hood.Media.Reload();
                         $('.modal-backdrop').remove();
+                        $('.modal').modal('hide');
                         $.hood.Alerts.Success("The file has now been removed from the website.");
                     } else {
                         $.hood.Alerts.Error("There was a problem deleting the file.");

@@ -2,79 +2,6 @@
 
 if (!$.hood) $.hood = {};
 $.hood.Helpers = {
-  InIframe: function InIframe() {
-    try {
-      return window.self !== window.top;
-    } catch (e) {
-      return true;
-    }
-  },
-  GetQueryStringParamByName: function GetQueryStringParamByName(name) {
-    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
-        results = regex.exec(location.search);
-    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-  },
-  InsertQueryStringParam: function InsertQueryStringParam(key, value) {
-    key = escape(key);
-    value = escape(value);
-    var kvp = document.location.search.substr(1).split('&');
-
-    if (kvp == '') {
-      document.location.search = '?' + key + '=' + value;
-    } else {
-      var i = kvp.length;
-      var x;
-
-      while (i--) {
-        x = kvp[i].split('=');
-
-        if (x[0] == key) {
-          x[1] = value;
-          kvp[i] = x.join('=');
-          break;
-        }
-      }
-
-      if (i < 0) {
-        kvp[kvp.length] = [key, value].join('=');
-      } //this will reload the page, it's likely better to store this until finished
-
-
-      document.location.search = kvp.join('&');
-    }
-  },
-  InsertQueryStringParamToUrl: function InsertQueryStringParamToUrl(url, key, value) {
-    key = escape(key);
-    value = escape(value);
-    var kvp = url.search.substr(1).split('&');
-
-    if (kvp == '') {
-      url.search = '?' + key + '=' + value;
-    } else {
-      var i = kvp.length;
-      var x;
-
-      while (i--) {
-        x = kvp[i].split('=');
-
-        if (x[0] == key) {
-          x[1] = value;
-          kvp[i] = x.join('=');
-          break;
-        }
-      }
-
-      if (i < 0) {
-        kvp[kvp.length] = [key, value].join('=');
-      } //this will reload the page, it's likely better to store this until finished
-
-
-      url.search = kvp.join('&');
-    }
-
-    return url;
-  },
   IsNullOrUndefined: function IsNullOrUndefined(a) {
     var rc = false;
 
@@ -100,7 +27,7 @@ $.hood.Helpers = {
 
     if (!isSupported) {
       el.setAttribute(eventName, 'return;');
-      isSupported = typeof el[eventName] == 'function';
+      isSupported = typeof el[eventName] === 'function';
     }
 
     el = null;
@@ -109,6 +36,22 @@ $.hood.Helpers = {
   IsFunction: function IsFunction(functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
   },
+  IsUrlExternal: function IsUrlExternal(url) {
+    var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
+    if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
+    if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + {
+      "http:": 80,
+      "https:": 443
+    }[location.protocol] + ")?$"), "") !== location.host) return true;
+    return false;
+  },
+  IsInIframe: function IsInIframe() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  },
   HtmlEncode: function HtmlEncode(value) {
     //create a in-memory div, set it's inner text(which jQuery automatically encodes)
     //then grab the encoded contents back out.  The div never exists on the page.
@@ -116,18 +59,6 @@ $.hood.Helpers = {
   },
   HtmlDecode: function HtmlDecode(value) {
     return $('<div/>').html(value).text();
-  },
-  SlimScrollTopBottom: function SlimScrollTopBottom(elem, scrollUp) {
-    if (scrollUp) {
-      $(elem).slimScroll({
-        scrollTo: '0px'
-      });
-    } else {
-      var scrollTo_val = $(elem).prop('scrollHeight') + 'px';
-      $(elem).slimScroll({
-        scrollTo: scrollTo_val
-      });
-    }
   },
   FormatCurrency: function FormatCurrency(n, currency) {
     return currency + " " + n.toFixed(2).replace(/./g, function (c, i, a) {
@@ -147,34 +78,97 @@ $.hood.Helpers = {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   },
-  IsUrlExternal: function IsUrlExternal(url) {
-    var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
-    if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
-    if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + {
-      "http:": 80,
-      "https:": 443
-    }[location.protocol] + ")?$"), "") !== location.host) return true;
-    return false;
+  ProcessResponse: function ProcessResponse(data) {
+    var $tag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    title = '';
+    if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");
+
+    if (data.Success) {
+      $.hood.Alerts.Success("".concat(title).concat(data.Message));
+
+      if ($tag && $tag.data('redirect')) {
+        setTimeout(function () {
+          window.location = $tag.data('redirect');
+        }, 1500);
+      }
+    } else {
+      $.hood.Alerts.Error("".concat(title).concat(data.Errors));
+    }
+  },
+  GetQueryStringParamByName: function GetQueryStringParamByName(name) {
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  },
+  InsertQueryStringParam: function InsertQueryStringParam(key, value) {
+    key = escape(key);
+    value = escape(value);
+    var kvp = document.location.search.substr(1).split('&');
+
+    if (kvp === '') {
+      document.location.search = '?' + key + '=' + value;
+    } else {
+      var i = kvp.length;
+      var x;
+
+      while (i--) {
+        x = kvp[i].split('=');
+
+        if (x[0] === key) {
+          x[1] = value;
+          kvp[i] = x.join('=');
+          break;
+        }
+      }
+
+      if (i < 0) {
+        kvp[kvp.length] = [key, value].join('=');
+      } //this will reload the page, it's likely better to store this until finished
+
+
+      document.location.search = kvp.join('&');
+    }
+  },
+  InsertQueryStringParamToUrl: function InsertQueryStringParamToUrl(url, key, value) {
+    key = escape(key);
+    value = escape(value);
+    var kvp = url.search.substr(1).split('&');
+
+    if (kvp === '') {
+      url.search = '?' + key + '=' + value;
+    } else {
+      var i = kvp.length;
+      var x;
+
+      while (i--) {
+        x = kvp[i].split('=');
+
+        if (x[0] === key) {
+          x[1] = value;
+          kvp[i] = x.join('=');
+          break;
+        }
+      }
+
+      if (i < 0) {
+        kvp[kvp.length] = [key, value].join('=');
+      } //this will reload the page, it's likely better to store this until finished
+
+
+      url.search = kvp.join('&');
+    }
+
+    return url;
   },
   UrlToLocationObject: function UrlToLocationObject(href) {
     var l = document.createElement("a");
     l.href = href;
     return l;
   },
-  SeoUrl: function SeoUrl(txt_src) {
-    var output = txt_src.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").toLowerCase();
-    /* remove first dash */
-
-    if (output.charAt(0) == '-') output = output.substring(1);
-    /* remove last dash */
-
-    var last = output.length - 1;
-    if (output.charAt(last) == '-') output = output.substring(0, last);
-    return output;
-  },
   FindAndRemoveFromArray: function FindAndRemoveFromArray(array, property, value) {
     $.each(array, function (index, result) {
-      if (result[property] == value) {
+      if (result[property] === value) {
         //Remove from array
         array.splice(index, 1);
       }
@@ -183,7 +177,7 @@ $.hood.Helpers = {
   FindAndReturnFromArray: function FindAndReturnFromArray(array, property, value) {
     var outputItem = null;
     $.each(array, function (index, result) {
-      if (result[property] == value) {
+      if (result[property] === value) {
         //return it
         outputItem = result;
       }
@@ -242,30 +236,6 @@ $.hood.Helpers = {
 
     return ret;
   },
-  SubmitPageToForm: function myFunction(action, method, input) {
-    'use strict';
-
-    var form;
-    form = $('<form />', {
-      action: action,
-      method: method,
-      style: 'display: none;'
-    });
-
-    if (typeof input !== 'undefined' && input !== null) {
-      for (var key in input) {
-        if (input.hasOwnProperty(key)) {
-          $('<input />', {
-            type: 'hidden',
-            name: key,
-            value: input[key]
-          }).appendTo(form);
-        }
-      }
-    }
-
-    form.appendTo('body').submit();
-  },
   GenerateRandomString: function GenerateRandomString(numSpecials) {
     specials = '!@#$&*';
     lowercase = 'abcdefghijklmnopqrstuvwxyz';
@@ -274,15 +244,5 @@ $.hood.Helpers = {
     all = lowercase + uppercase + numbers;
     password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
     return password;
-  },
-  ResetSidebarScroll: function ResetSidebarScroll() {
-    $('.sidebar-container').slimScroll({
-      height: '100%',
-      railOpacity: 0.4,
-      wheelStep: 10
-    });
-  },
-  InitMetisMenu: function InitMetisMenu(tag) {
-    $(tag).find('.metisMenu').metisMenu();
   }
 };

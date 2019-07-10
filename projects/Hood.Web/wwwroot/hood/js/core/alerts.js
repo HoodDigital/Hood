@@ -54,7 +54,10 @@ $.hood.Alerts = {
             footer: footer,
             showConfirmButton: showConfirmButton,
             timer: timer
-        }).then(callback);
+        }).then(function (result) {
+            if (!result.dismiss)
+                callback(result);
+        });
     },
     Confirm: function (msg, title, callback, type, footer, confirmButtonText, cancelButtonText) {
         swalWithBootstrapButtons.fire({
@@ -66,7 +69,26 @@ $.hood.Alerts = {
             confirmButtonText: confirmButtonText || 'Ok',
             cancelButtonText: cancelButtonText || 'Cancel'
         }).then(function (result) {
-            callback(result.value);
+            if (!result.dismiss)
+                callback(result.value);
+        });
+    },
+    Prompt: function (msg, title, callback, inputType, type, footer, confirmButtonText, cancelButtonText, inputAttributes) {
+        swalWithBootstrapButtons.fire({
+            input: inputType || 'text',
+            inputAttributes: inputAttributes || {
+                autocapitalize: 'off'
+            },
+            title: title || 'Enter a value',
+            html: msg || 'Fill in the field and press Ok to continue.',
+            type: type || 'info',
+            footer: footer,
+            showCancelButton: true,
+            confirmButtonText: confirmButtonText || 'Ok',
+            cancelButtonText: cancelButtonText || 'Cancel'
+        }).then(function (result) {
+            if (!result.dismiss)
+                callback(result.value);
         });
     }
 };

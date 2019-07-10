@@ -127,6 +127,11 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
+                user.LastLogOn = DateTime.Now;
+                user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
+                user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
+                await _userManager.UpdateAsync(user);
+
                 await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with 2fa.", userId: user.Id);
                 return RedirectToLocal(returnUrl);
             }
@@ -180,6 +185,11 @@ namespace Hood.Controllers
 
             if (result.Succeeded)
             {
+                user.LastLogOn = DateTime.Now;
+                user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
+                user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
+                await _userManager.UpdateAsync(user);
+
                 await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with a recovery code.", userId: user.Id);
                 return RedirectToLocal(returnUrl);
             }
@@ -235,24 +245,43 @@ namespace Hood.Controllers
             if (ModelState.IsValid && ModelState.IsNotSpam(model))
             {
 
-                var user = new ApplicationUser { UserName = model.Username.IsSet() ? model.Username : model.Email, Email = model.Email };
+                var user = new ApplicationUser {
+                    UserName = model.Username.IsSet() ? model.Username : model.Email,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    DisplayName = model.DisplayName,
+                    PhoneNumber = model.Phone,
+                    JobTitle = model.JobTitle,
+                    Anonymous = model.Anonymous,
+                    CreatedOn = DateTime.Now,
+                    LastLogOn = DateTime.Now,
+                    LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
+                    LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
+                };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-
-                    if (Engine.Settings.Account.EnableWelcome && Engine.Settings.Mail.IsSetup)
+                    if ((Engine.Settings.Account.EnableWelcome || Engine.Settings.Account.RequireEmailConfirmation) && Engine.Settings.Mail.IsSetup)
                     {
-                        var welcomeModel = new WelcomeEmailModel(user, callbackUrl)
-                        {
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+                        var welcomeModel = new WelcomeEmailModel(user, Engine.Settings.Account.RequireEmailConfirmation ? callbackUrl : null)
+                        {                           
                             SendToRecipient = true,
                             NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
                         };
                         await _mailService.ProcessAndSend(welcomeModel);
-                    }
 
-                    user.Active = true;
+                        return RedirectToAction(nameof(ConfirmRequired));
+                    }
+                    else
+                        user.Active = true;
+
+                    user.LastLogOn = DateTime.Now;
+                    user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
+                    user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
+
                     await _userManager.UpdateAsync(user);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -503,7 +532,7 @@ namespace Hood.Controllers
 
                 if (Engine.Settings.Account.EnableWelcome)
                 {
-                    var welcomeModel = new WelcomeEmailModel(user)
+                    var welcomeModel = new WelcomeEmailModel(user, Url.Action("Login", new { returnUrl = "/" }))
                     {
                         SendToRecipient = true,
                         NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
@@ -627,6 +656,12 @@ namespace Hood.Controllers
         }
 
         #endregion
+        [HttpGet]
+        [AllowAnonymous]
+        public virtual IActionResult ConfirmRequired()
+        {
+            return View();
+        }
 
         [HttpGet]
         [AllowAnonymous]

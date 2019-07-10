@@ -26,13 +26,11 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Engine.Settings.Set("Hood.Settings.Theme", name);
 #warning TODO: Handle response in JS.
-                return new Response(true);
+                return new Response(true, $"The theme, {name}, has been activated successfully.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while activating a theme: {ex.Message}";
-                await _logService.AddExceptionAsync<ThemesController>(SaveMessage, ex);
-                return new Response(SaveMessage);
+                return await ErrorResponseAsync<ThemesController>($"Error activating a theme.", ex);
             }
         }
 

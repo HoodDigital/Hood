@@ -1,68 +1,8 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Helpers = {
-    InIframe: function () {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    },
-    GetQueryStringParamByName: function (name) {
-        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
-            results = regex.exec(location.search);
-        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    },
-    InsertQueryStringParam: function (key, value) {
-        key = escape(key); value = escape(value);
-        var kvp = document.location.search.substr(1).split('&');
-        if (kvp == '') {
-            document.location.search = '?' + key + '=' + value;
-        }
-        else {
 
-            var i = kvp.length; var x; while (i--) {
-                x = kvp[i].split('=');
 
-                if (x[0] == key) {
-                    x[1] = value;
-                    kvp[i] = x.join('=');
-                    break;
-                }
-            }
-
-            if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
-
-            //this will reload the page, it's likely better to store this until finished
-            document.location.search = kvp.join('&');
-        }
-    },
-    InsertQueryStringParamToUrl: function (url, key, value) {
-        key = escape(key); value = escape(value);
-        var kvp = url.search.substr(1).split('&');
-        if (kvp == '') {
-            url.search = '?' + key + '=' + value;
-        }
-        else {
-
-            var i = kvp.length; var x; while (i--) {
-                x = kvp[i].split('=');
-
-                if (x[0] == key) {
-                    x[1] = value;
-                    kvp[i] = x.join('=');
-                    break;
-                }
-            }
-
-            if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
-
-            //this will reload the page, it's likely better to store this until finished
-            url.search = kvp.join('&');
-        }
-        return url;
-    },
     IsNullOrUndefined: function (a) {
         var rc = false;
         if (a === null || typeof (a) === "undefined" || a === "") {
@@ -83,7 +23,7 @@ $.hood.Helpers = {
         var isSupported = (eventName in el);
         if (!isSupported) {
             el.setAttribute(eventName, 'return;');
-            isSupported = typeof el[eventName] == 'function';
+            isSupported = typeof el[eventName] === 'function';
         }
         el = null;
         return isSupported;
@@ -91,6 +31,20 @@ $.hood.Helpers = {
     IsFunction: function (functionToCheck) {
         return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
     },
+    IsUrlExternal: function (url) {
+        var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
+        if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
+        if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + { "http:": 80, "https:": 443 }[location.protocol] + ")?$"), "") !== location.host) return true;
+        return false;
+    },
+    IsInIframe: function () {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    },
+
     HtmlEncode: function (value) {
         //create a in-memory div, set it's inner text(which jQuery automatically encodes)
         //then grab the encoded contents back out.  The div never exists on the page.
@@ -99,14 +53,7 @@ $.hood.Helpers = {
     HtmlDecode: function (value) {
         return $('<div/>').html(value).text();
     },
-    SlimScrollTopBottom: function (elem, scrollUp) {
-        if (scrollUp) {
-            $(elem).slimScroll({ scrollTo: '0px' });
-        } else {
-            var scrollTo_val = $(elem).prop('scrollHeight') + 'px';
-            $(elem).slimScroll({ scrollTo: scrollTo_val });
-        }
-    },
+
     FormatCurrency: function (n, currency) {
         return currency + " " + n.toFixed(2).replace(/./g, function (c, i, a) {
             return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
@@ -125,29 +72,87 @@ $.hood.Helpers = {
             return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
         });
     },
-    IsUrlExternal: function (url) {
-        var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
-        if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
-        if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + { "http:": 80, "https:": 443 }[location.protocol] + ")?$"), "") !== location.host) return true;
-        return false;
+
+    ProcessResponse: function (data, $tag = null) {
+        title = '';
+        if (data.Title) title = `<strong>${data.Title}</strong><br />`;
+        if (data.Success) {
+            $.hood.Alerts.Success(`${title}${data.Message}`);
+            if ($tag && $tag.data('redirect')) {
+                setTimeout(function () {
+                    window.location = $tag.data('redirect');
+                }, 1500);
+            }
+        } else {
+            $.hood.Alerts.Error(`${title}${data.Errors}`);
+        }
     },
+
+    GetQueryStringParamByName: function (name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)", 'i'),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    },
+    InsertQueryStringParam: function (key, value) {
+        key = escape(key); value = escape(value);
+        var kvp = document.location.search.substr(1).split('&');
+        if (kvp === '') {
+            document.location.search = '?' + key + '=' + value;
+        }
+        else {
+
+            var i = kvp.length; var x; while (i--) {
+                x = kvp[i].split('=');
+
+                if (x[0] === key) {
+                    x[1] = value;
+                    kvp[i] = x.join('=');
+                    break;
+                }
+            }
+
+            if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
+
+            //this will reload the page, it's likely better to store this until finished
+            document.location.search = kvp.join('&');
+        }
+    },
+    InsertQueryStringParamToUrl: function (url, key, value) {
+        key = escape(key); value = escape(value);
+        var kvp = url.search.substr(1).split('&');
+        if (kvp === '') {
+            url.search = '?' + key + '=' + value;
+        }
+        else {
+
+            var i = kvp.length; var x; while (i--) {
+                x = kvp[i].split('=');
+
+                if (x[0] === key) {
+                    x[1] = value;
+                    kvp[i] = x.join('=');
+                    break;
+                }
+            }
+
+            if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
+
+            //this will reload the page, it's likely better to store this until finished
+            url.search = kvp.join('&');
+        }
+        return url;
+    },
+
     UrlToLocationObject: function (href) {
         var l = document.createElement("a");
         l.href = href;
         return l;
     },
-    SeoUrl: function (txt_src) {
-        var output = txt_src.replace(/[^a-zA-Z0-9]/g, ' ').replace(/\s+/g, "-").toLowerCase();
-        /* remove first dash */
-        if (output.charAt(0) == '-') output = output.substring(1);
-        /* remove last dash */
-        var last = output.length - 1;
-        if (output.charAt(last) == '-') output = output.substring(0, last);
-        return output;
-    },
+
     FindAndRemoveFromArray: function (array, property, value) {
         $.each(array, function (index, result) {
-            if (result[property] == value) {
+            if (result[property] === value) {
                 //Remove from array
                 array.splice(index, 1);
             }
@@ -156,13 +161,14 @@ $.hood.Helpers = {
     FindAndReturnFromArray: function (array, property, value) {
         var outputItem = null;
         $.each(array, function (index, result) {
-            if (result[property] == value) {
+            if (result[property] === value) {
                 //return it
                 outputItem = result;
             }
         });
         return outputItem;
     },
+
     LeftPad: function (number, targetLength) {
         var output = number + '';
         while (output.length < targetLength) {
@@ -170,6 +176,7 @@ $.hood.Helpers = {
         }
         return output;
     },
+
     DateAdd: function (date, interval, units) {
         var ret = new Date(date); //don't change original date
         switch (interval.toLowerCase()) {
@@ -185,27 +192,7 @@ $.hood.Helpers = {
         }
         return ret;
     },
-    SubmitPageToForm: function myFunction(action, method, input) {
-        'use strict';
-        var form;
-        form = $('<form />', {
-            action: action,
-            method: method,
-            style: 'display: none;'
-        });
-        if (typeof input !== 'undefined' && input !== null) {
-            for (var key in input) {
-                if (input.hasOwnProperty(key)) {
-                    $('<input />', {
-                        type: 'hidden',
-                        name: key,
-                        value: input[key]
-                    }).appendTo(form);
-                }
-            }
-        }
-        form.appendTo('body').submit();
-    },
+
     GenerateRandomString: function (numSpecials) {
         specials = '!@#$&*';
         lowercase = 'abcdefghijklmnopqrstuvwxyz';
@@ -214,15 +201,5 @@ $.hood.Helpers = {
         all = lowercase + uppercase + numbers;
         password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
         return password;
-    },
-    ResetSidebarScroll: function () {
-        $('.sidebar-container').slimScroll({
-            height: '100%',
-            railOpacity: 0.4,
-            wheelStep: 10
-        });
-    },
-    InitMetisMenu: function (tag) {
-        $(tag).find('.metisMenu').metisMenu();
     }
 };

@@ -39,17 +39,18 @@ namespace Hood.Models
         public MailObject WriteToMailObject(MailObject message)
         {
             var _accountSettings = Engine.Settings.Account;
-            message.Subject = message.Subject.ReplaceUserVariables(User);
-            message.PreHeader = message.PreHeader.ReplaceUserVariables(User);
+            message.Subject = _accountSettings.VerifySubject.IsSet() ? _accountSettings.VerifySubject.ReplaceSiteVariables().ReplaceUserVariables(User) : "Verify your email";
+            message.PreHeader = _accountSettings.VerifyTitle.IsSet() ? _accountSettings.VerifyTitle.ReplaceSiteVariables().ReplaceUserVariables(User) : "You have been sent this in order to validate your email.";;
 
-            message.AddH1(_accountSettings.WelcomeTitle.ReplaceSiteVariables());
-            message.AddDiv(_accountSettings.WelcomeMessage);
+            message.AddH1(_accountSettings.VerifyTitle.ReplaceSiteVariables().ReplaceUserVariables(User));
+            message.AddDiv(_accountSettings.VerifyMessage.ReplaceSiteVariables().ReplaceUserVariables(User));
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
 
             if (ConfirmLink.IsSet())
             {
-                message.AddParagraph("You can log in and access your account by clicking the link below.");
-                message.AddCallToAction("Access your account", ConfirmLink);
+                message.AddParagraph("Please click the link below to confirm your email.");
+                message.AddCallToAction("Confirm your Email", ConfirmLink);
+                message.AddParagraph($"Or visit the following URL: {ConfirmLink}");
             }
             return message;
         }

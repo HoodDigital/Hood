@@ -76,7 +76,7 @@ namespace Hood.Controllers
             catch (Exception ex)
             {
                 model = await GetCreateModel(model.Category, returnUrl);
-                SaveMessage = $"An error occurred while : {ex.Message}";
+                SaveMessage = $"Error";
                 MessageType = Enums.AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
                 return View(model);
@@ -108,7 +108,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while upgrading a subscription: {ex.Message}";
+                SaveMessage = $"Error upgrading a subscription.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
 
@@ -133,7 +133,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while cancelling a subscription: {ex.Message}";
+                SaveMessage = $"Error cancelling a subscription.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
 
@@ -158,7 +158,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while cancelling a subscription: {ex.Message}";
+                SaveMessage = $"Error cancelling a subscription.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
 
@@ -183,7 +183,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = $"An error occurred while reactivating a subscription: {ex.Message}";
+                SaveMessage = $"Error reactivating a subscription.";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
 
@@ -216,7 +216,7 @@ namespace Hood.Controllers
                 Category = category,
                 Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Category = category, Addon = false })).List,
                 Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List,
-                Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId, true)
+                Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId)
             };
             ViewData["ReturnUrl"] = returnUrl;
             return model;

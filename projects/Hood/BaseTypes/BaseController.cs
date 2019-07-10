@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
@@ -88,9 +90,32 @@ namespace Hood.Controllers
             return base.View(viewName, model);
         }
 
-        public UserProfile Account
+        public async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
         {
-            get => User.AccountInfo();
+            if (!_env.IsProduction())
+            {
+                await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+            }
+            return new Response(true, successMessage, title);
         }
+        public async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
+        {
+            if (!_env.IsProduction())
+            {
+                await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+            }
+            return new Response(true, successMessage, title);
+        }
+        public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
+        {
+            await _logService.AddExceptionAsync<TSource>(errorMessage, ex, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+            return new Response(ex, errorMessage);
+        }
+        public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
+        {
+            await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+            return new Response(ex, errorMessage);
+        }
+
     }
 }

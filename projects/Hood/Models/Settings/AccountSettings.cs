@@ -25,6 +25,8 @@ namespace Hood.Models
 
         [Display(Name = "Send a Welcome Email", Description = "This will send a formatted welcome email to new account holders.")]
         public bool EnableWelcome { get; set; }
+        [Display(Name = "Require Email Confirmation", Description = "This will send confirmation email to new account holders, they will not be able to log in until their email is confirmed.")]
+        public bool RequireEmailConfirmation { get; set; }
 
         [Display(Name = "Welcome Email title")]
         public string WelcomeTitle { get; set; }
@@ -34,6 +36,15 @@ namespace Hood.Models
 
         [Display(Name = "Welcome Email message")]
         public string WelcomeMessage { get; set; }
+
+        [Display(Name = "Verify Email title")]
+        public string VerifyTitle { get; set; }
+
+        [Display(Name = "Verify Email subject")]
+        public string VerifySubject { get; set; }
+
+        [Display(Name = "Verify Email message")]
+        public string VerifyMessage { get; set; }
 
         [Display(Name = "Notify Administrators", Description = "This will copy in the NewAccountNotifications role on the above email.")]
         public bool NotifyNewAccount { get; set; }
