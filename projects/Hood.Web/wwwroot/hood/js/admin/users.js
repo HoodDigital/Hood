@@ -17,7 +17,8 @@ $.hood.Users = {
         $.hood.Loader(false);
     },
     Reload: function (complete) {
-        $.hood.Inline.Reload($('#user-list'), complete);
+        if ($('#user-list').doesExist())
+            $.hood.Inline.Reload($('#user-list'), complete);
     },
 
     Delete: function (e) {
@@ -29,6 +30,14 @@ $.hood.Users = {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data, $tag);
                     $.hood.Users.Reload();
+                    if (data.Success) {
+                        if ($tag && $tag.data('redirect')) {
+                            $.hood.Alerts.Success(`<strong>User deleted, redirecting...</strong><br />Just taking you back to the user list.`);
+                            setTimeout(function () {
+                                window.location = $tag.data('redirect');
+                            }, 1500);
+                        }
+                    }
                 });
             }
         };
@@ -64,7 +73,8 @@ $.hood.Users = {
                 submitUrl: $('#user-create-form').attr('action'),
                 submitFunction: function (data) {
                     $.hood.Helpers.ProcessResponse(data, $tag);
-                }
+                    $.hood.Users.Reload();
+               }
             });
         },
         GeneratePassword: function () {

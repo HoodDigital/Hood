@@ -197,6 +197,7 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
+                await _logService.AddLogAsync<UsersController>($"A new user account has been created in the admin area for {user.Email}", type: LogType.Success);
                 return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
@@ -215,9 +216,8 @@ namespace Hood.Areas.Admin.Controllers
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
                 await _account.DeleteUserAsync(user);
-#warning TODO: Handle response in JS.
+                await _logService.AddLogAsync<UsersController>($"A new user account has been deleted in the admin area for {user.Email}", type: LogType.Warning);
                 return new Response(true, "Deleted successfully.");
-
             }
             catch (Exception ex)
             {

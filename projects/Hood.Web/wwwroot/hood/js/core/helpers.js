@@ -73,16 +73,11 @@ $.hood.Helpers = {
         });
     },
 
-    ProcessResponse: function (data, $tag = null) {
+    ProcessResponse: function (data) {
         title = '';
         if (data.Title) title = `<strong>${data.Title}</strong><br />`;
         if (data.Success) {
             $.hood.Alerts.Success(`${title}${data.Message}`);
-            if ($tag && $tag.data('redirect')) {
-                setTimeout(function () {
-                    window.location = $tag.data('redirect');
-                }, 1500);
-            }
         } else {
             $.hood.Alerts.Error(`${title}${data.Errors}`);
         }
