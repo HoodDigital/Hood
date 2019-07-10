@@ -17,15 +17,17 @@ $.hood.Inline = {
     Load: function (e) {
         $.hood.Inline.Reload(this);
     },
-    Reload: function (tag) {
+    Reload: function (tag, complete) {
         $tag = $(tag);
         $tag.addClass('loading');
+        if (!complete)
+            complete = $tag.data('complete');
         var urlLoad = $tag.data('url');
         $.get(urlLoad, function (data) {
             $tag.html(data);
             $tag.removeClass('loading');
         })
-            .done(function (data) { $.hood.Inline.RunComplete($tag.data('complete'), data); })
+            .done(function () { $.hood.Inline.RunComplete(complete); })
             .fail($.hood.Inline.HandleError)
             .always($.hood.Inline.Finish);
     },
@@ -46,7 +48,7 @@ $.hood.Inline = {
                 $(document).off('focusin.modal');
             });
         })
-            .done(function (data) { $.hood.Inline.RunComplete(complete, data); })
+            .done(function () { $.hood.Inline.RunComplete(complete); })
             .fail($.hood.Inline.HandleError)
             .always($.hood.Inline.Finish);
     },
@@ -69,7 +71,7 @@ $.hood.Inline = {
             }
             $tag.removeClass('loading');
         })
-            .done(function (data) { $.hood.Inline.RunComplete(complete, data); })
+            .done(function () { $.hood.Inline.RunComplete(complete); })
             .fail($.hood.Inline.HandleError)
             .always($.hood.Inline.Finish);
     },
@@ -124,7 +126,7 @@ $.hood.Inline = {
                 window.history.pushState({ path: newurl }, '', newurl);
             }
             list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
-            $.hood.Inline.Reload(list, list.data('complete'));
+            $.hood.Inline.Reload(list);
         }
     },
     HandleError: function (xhr) {
@@ -140,15 +142,11 @@ $.hood.Inline = {
         // Function can be overridden, to add global functionality to end of inline loads.
         $.hood.Loader(false);
     },
-    RunComplete: function (complete, data = null) {
+    RunComplete: function (complete) {
         if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
             var func = eval(complete);
             if (typeof func === 'function') {
-                if (data !== null) {
-                    func(data);
-                } else {
-                    func();
-                }
+                func();
             }
         }
     }

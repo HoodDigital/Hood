@@ -5,6 +5,7 @@
 <div class="card-deck @(Model.Action.HasValue ? "card-deck-3" : "card-deck-5")">
     @foreach (var media in Model.List)
     {
+        var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });
         <div class="card text-center hover">
             @switch (Model.Action)
             {
@@ -15,7 +16,7 @@
                     <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-insert" data-tag="@Model.Tag" data-url="@media.Url" />
                     break;
                 case MediaWindowAction.Attach:
-                    <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-attach" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="@media.Id" />
+                    <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-attach" data-url="@attachUrl" />
                     break;
                 default:
                     <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
@@ -31,17 +32,17 @@
             {
                 case MediaWindowAction.Select:
                     <p>
-                        <a class="media-select btn btn-sm btn-outline-dark btn-default" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
+                        <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
                             <span>
                                 Small
                             </span>
                         </a>
-                        <a class="media-select btn btn-sm btn-outline-dark btn-default" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
+                        <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
                             <span>
                                 Medium
                             </span>
                         </a>
-                        <a class="media-select btn btn-sm btn-outline-dark btn-default" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
+                        <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
                             <span>
                                 Large
                             </span>
@@ -49,33 +50,20 @@
                     </p>
                     break;
                 case MediaWindowAction.Insert:
-                    <p>
-                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ SmallUrl }" href="javascript:void(0);">
-                            Small
-                        </a>
-                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ MediumUrl }" href="javascript:void(0);">
-                            Medium
-                        </a>
-                        <a class="media-insert action-button btn btn-xs btn-default" data-tag="@Model.Tag" data-url="${ LargeUrl }" href="javascript:void(0);">
-                            Large
-                        </a>
-                    </p>
+
                     break;
                 case MediaWindowAction.Attach:
                     <p class="no-margin">
-                        <a class="attach-media-select action-button btn btn-xs btn-success" data-id="@Model.Id" data-entity="@Model.Entity" data-field="@Model.Field" data-refresh="@Model.Refresh" data-tag="@Model.Tag" data-media="@media.Id" href="javascript:void(0);">
-                            <i class="fa fa-clone m-r-xs"></i>
-                            <span>
-                                Attach
-                            </span>
+                        <a class="media-attach btn btn-sm btn-outline-success" data-tag="@Model.Tag" data-url="@attachUrl">
+                            <i class="fa fa-link mr-2"></i>
+                            Attach
                         </a>
                     </p>
                     break;
                 default:
-                    <a data-toggle="modal" href="@string.Format("#media-object-{0}", media.Id)" class="full-box-link"></a>
+                    <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">@media.Filename</a>
                     break;
             }
-            <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">${ Filename }</a>
         </div>
     }
 </div>

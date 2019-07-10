@@ -17,15 +17,16 @@ $.hood.Inline = {
   Load: function Load(e) {
     $.hood.Inline.Reload(this);
   },
-  Reload: function Reload(tag) {
+  Reload: function Reload(tag, complete) {
     $tag = $(tag);
     $tag.addClass('loading');
+    if (!complete) complete = $tag.data('complete');
     var urlLoad = $tag.data('url');
     $.get(urlLoad, function (data) {
       $tag.html(data);
       $tag.removeClass('loading');
-    }).done(function (data) {
-      $.hood.Inline.RunComplete($tag.data('complete'), data);
+    }).done(function () {
+      $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   Modal: function Modal(url, complete) {
@@ -43,8 +44,8 @@ $.hood.Inline = {
       $(modalId).on('shown.bs.modal', function () {
         $(document).off('focusin.modal');
       });
-    }).done(function (data) {
-      $.hood.Inline.RunComplete(complete, data);
+    }).done(function () {
+      $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   Task: function Task(e) {
@@ -65,8 +66,8 @@ $.hood.Inline = {
       }
 
       $tag.removeClass('loading');
-    }).done(function (data) {
-      $.hood.Inline.RunComplete(complete, data);
+    }).done(function () {
+      $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   DataList: {
@@ -123,7 +124,7 @@ $.hood.Inline = {
       }
 
       list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
-      $.hood.Inline.Reload(list, list.data('complete'));
+      $.hood.Inline.Reload(list);
     }
   },
   HandleError: function HandleError(xhr) {
@@ -140,17 +141,11 @@ $.hood.Inline = {
     $.hood.Loader(false);
   },
   RunComplete: function RunComplete(complete) {
-    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
     if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
       var func = eval(complete);
 
       if (typeof func === 'function') {
-        if (data !== null) {
-          func(data);
-        } else {
-          func();
-        }
+        func();
       }
     }
   }

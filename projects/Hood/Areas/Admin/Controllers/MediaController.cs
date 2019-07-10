@@ -23,10 +23,6 @@ namespace Hood.Areas.Admin.Controllers
         {
         }
 
-        [Route("admin/media/")]
-        public async Task<IActionResult> Index(MediaListModel model) => await List(model, "Index");
-
-        [HttpGet]
         [Route("admin/media/list/")]
         public async Task<IActionResult> List(MediaListModel model, string viewName = "_List_Media")
         {
@@ -86,11 +82,12 @@ namespace Hood.Areas.Admin.Controllers
             return View(viewName, model);
         }
 
-        [HttpGet]
+        [Route("admin/media/")]
+        public async Task<IActionResult> Index(MediaListModel model) => await List(model, "Index");
+
         [Route("admin/media/action/")]
         public async Task<IActionResult> Action(MediaListModel model) => await List(model, "Action");
 
-        [HttpGet]
         [Route("admin/media/blade/")]
         public async Task<IActionResult> Blade(int id)
         {
@@ -98,7 +95,7 @@ namespace Hood.Areas.Admin.Controllers
             return View("_Blade_Media", media);
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("admin/media/delete/")]
         public async Task<Response> Delete(int id)
         {
@@ -116,7 +113,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [HttpGet]
+        #region Directories
         [Route("admin/media/getdirectories/")]
         public async Task<List<string>> GetDirectories()
         {
@@ -156,7 +153,7 @@ namespace Hood.Areas.Admin.Controllers
 
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("admin/media/directory/delete")]
         public async Task<Response> DeleteDirectory(string directory)
         {
@@ -181,8 +178,11 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        #endregion
+
+        #region Attaching To Entities 
         /// <summary>
-        /// This is the action which handles the chosen attachment from the CHOOSE -> ATTACH modal.
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the CHOOSE -> ATTACH modal.
         /// </summary>
         [HttpPost]
         [Route("admin/media/attach/")]
@@ -211,10 +211,10 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
-                        await _db.SaveChangesAsync();
                         cacheKey = typeof(Content).ToString() + ".Single." + contentId;
                         _cache.Remove(cacheKey);
-                        return new Response(true, media);
+
+                        break;
 
                     case "Forum":
 
@@ -232,8 +232,7 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
-                        await _db.SaveChangesAsync();
-                        return new Response(true, media);
+                        break;
 
                     case "ApplicationUser":
 
@@ -250,8 +249,8 @@ namespace Hood.Areas.Admin.Controllers
 
                         cacheKey = typeof(ApplicationUser).ToString() + ".Single." + model.Id;
                         _cache.Remove(cacheKey);
-                        await _db.SaveChangesAsync();
-                        return new Response(true, media);
+
+                        break;
 
                     case "PropertyListing":
 
@@ -268,10 +267,126 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
+                        cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
+                        _cache.Remove(cacheKey);
+
+                        break;
+
+                    case "ContentMeta":
+
+                        int idForMeta = int.Parse(model.Id);
+                        Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();
+                        MediaObject mi = await _db.Media.Where(m => m.Id == model.MediaId).FirstOrDefaultAsync();
+                        contentForMeta.UpdateMeta(model.Field, mi);
+
+                        cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
+                        _cache.Remove(cacheKey);
+
+                        break;
+
+                    default:
+                        throw new Exception("No field set to attach the media item to.");
+                }
+
+                await _db.SaveChangesAsync();
+                return new Response(true, media, $"The media has been set for attached successfully.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the CHOOSE -> ATTACH modal.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/media/clear/")]
+        public async Task<Response> Clear(MediaListModel model)
+        {
+            try
+            {
+                // load the media object.
+                string cacheKey;
+                switch (model.Entity)
+                {
+                    case "Content":
+
+                        // create the new media item for content =>
+                        int contentId = int.Parse(model.Id);
+                        Content content = await _db.Content.Where(p => p.Id == contentId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case "FeaturedImage":
+                                content.FeaturedImageJson = null;
+                                break;
+                            case "ShareImage":
+                                content.ShareImageJson = null;
+                                break;
+                        }
+
+                        await _db.SaveChangesAsync();
+                        cacheKey = typeof(Content).ToString() + ".Single." + contentId;
+                        _cache.Remove(cacheKey);
+                        return new Response(true, MediaObject.Blank);
+
+                    case "Forum":
+
+                        // create the new media item for content =>
+                        int forumId = int.Parse(model.Id);
+                        Forum forum = await _db.Forums.Where(p => p.Id == forumId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case "FeaturedImage":
+                                forum.FeaturedImage = null;
+                                break;
+                            case "ShareImage":
+                                forum.ShareImage = null;
+                                break;
+                        }
+
+                        await _db.SaveChangesAsync();
+                        return new Response(true, MediaObject.Blank);
+
+                    case "ApplicationUser":
+
+                        // create the new media item for content =>
+                        ApplicationUser user = await _db.Users.Where(p => p.Id == model.Id).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case "Avatar":
+                                user.AvatarJson = null;
+                                break;
+                        }
+
+
+                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + model.Id;
+                        _cache.Remove(cacheKey);
+                        await _db.SaveChangesAsync();
+                        return new Response(true, MediaObject.Blank);
+
+                    case "PropertyListing":
+
+                        int propertyId = int.Parse(model.Id);
+                        PropertyListing property = await _db.Properties.Where(p => p.Id == propertyId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case "FeaturedImage":
+                                property.FeaturedImageJson = null;
+                                break;
+                            case "InfoDownload":
+                                property.InfoDownloadJson = null;
+                                break;
+                        }
+
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
                         _cache.Remove(cacheKey);
-                        return new Response(true, media);
+                        return new Response(true, MediaObject.Blank);
 
                     case "ContentMeta":
 
@@ -283,10 +398,10 @@ namespace Hood.Areas.Admin.Controllers
                             throw new Exception("Could not update the database");
                         cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
                         _cache.Remove(cacheKey);
-                        return new Response(true, media);
+                        return new Response(true, MediaObject.Blank);
 
                     default:
-                        return new Response(false);
+                        return new Response(true, MediaObject.Blank);
                 }
 
             }
@@ -295,6 +410,7 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
             }
         }
+        #endregion
 
         #region Uploads 
 

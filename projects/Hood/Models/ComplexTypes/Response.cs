@@ -16,7 +16,8 @@ namespace Hood.Models
         public bool Success { get; set; }
         public string Url { get; set; }
         public Exception Exception { get; set; }
-        public IMediaObject Image { get; set; }
+        public IMediaObject Media { get; set; }
+        public string MediaJson { get { return Media.ToJson(); } }
 
         public Response(Array data, int count, string message = "", string title = "Succeeded!")
         {
@@ -48,7 +49,7 @@ namespace Hood.Models
             Message = message;
             Errors = message;
             Title = title.IsSet() ? title : success ? "Succeeded" : "Failed";
-            Image = media;
+            Media = media;
         }
 
         public Response(IEnumerable<IdentityError> errors, string message = "", string title = "An error occurred!")

@@ -23,47 +23,38 @@ $.hood.Media = {
         Init: function () {
             // ATTACH FUNCTION - ATTACHES THE IMAGE TO A SPECIFIC ENTITY ATTACHABLE FIELD
             $('body').on('click', '.hood-image-attach', $.hood.Media.Actions.Load.Attach);
+            $('body').on('click', '.hood-image-clear', $.hood.Media.Actions.Complete.Clear);
 
             // INSERT FUNCTION - INSERTS AN IMAGE TAG INTO THE CURRENTLY SELECTED EDITOR
             $('body').on('click', '.hood-image-insert', $.hood.Media.Actions.Load.Insert);
 
-            // SET FUNCTION - SETS THE VALUE OF THE TAGGED INPUT
+            // SELECT FUNCTION - INSERTS THE SELECTED URL INTO TEXTBOX ATTACHED TO SELECTOR
             $('body').on('click', '.hood-media-select', $.hood.Media.Actions.Load.Select);
-
-            // SWITCH FUNCTION - REPLACES IMAGES IN THE DESIGNER
-            $('body').on('click', '.hood-image-switch', $.hood.Media.Actions.Load.Switch);
         },
-        Switching: null,
+        Target: null,
+        Json: null,
         Current: {
             Attach: null
         },
         Load: {
             Attach: function (e) {
-                $.hood.Media.Actions.Attacher = {
-                    Id: $(this).data('id'),
-                    Entity: $(this).data('entity'),
-                    Field: $(this).data('field'),
-                    Type: $(this).data('type'),
-                    Refresh: $(this).data('refresh'),
-                    Tag: $(this).data('tag'),
-                    Title: $(this).attr('title'),
-                    JsonField: $(this).data('json')
-                };
-                $.hood.Modals.Open('/admin/media/attach/', $.hood.Media.Actions.Attacher, '.hood-image-attach', function () {
+                e.preventDefault();
+                $.hood.Media.Actions.Target = $($(this).data('tag'));
+                $.hood.Media.Actions.Json = $($(this).data('json'));
+                $.hood.Inline.Modal($(this).data('url'), function () {
                     $.hood.Media.Reload(function () {
-                        $('body').off('click');
-                        $('body').on('click', '.attach-media-select', $.hood.Media.Actions.Complete.Attach);
+                        $('body').off('click', '.media-attach');
+                        $('body').on('click', '.media-attach', $.hood.Media.Actions.Complete.Attach);
                     });
                     $.hood.Media.Upload.Init();
                 });
-
             },
             Insert: function (editor) {
                 editor.addButton('hoodimage', {
                     text: 'Insert image...',
                     icon: false,
                     onclick: function () {
-                        $.hood.Modals.Open('/admin/media/insert/', null, '.hood-image-attach', function () {
+                        $.hood.Inline.Modal($(this).data('url'), function () {
                             $.hood.Media.Reload(function () {
                                 $('body').off('click');
                                 $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
@@ -74,21 +65,11 @@ $.hood.Media = {
                 });
             },
             Select: function (e) {
-                $.hood.Media.Actions.Switching = $($(this).data('target'));
-                $.hood.Modals.Open($(this).data('url'), null, '.hood-image-select', function () {
+                $.hood.Media.Actions.Target = $($(this).data('target'));
+                $.hood.Inline.Modal($(this).data('url'), function () {
                     $.hood.Media.Reload(function () {
                         $('body').off('click', '.media-select');
                         $('body').on('click', '.media-select', $.hood.Media.Actions.Complete.Select);
-                    });
-                    $.hood.Media.Upload.Init();
-                });
-            },
-            Switch: function (e) {
-                $.hood.Media.Actions.Switching = $(this);
-                $.hood.Modals.Open($(this).data('url'), null, '.hood-image-switch', function () {
-                    $.hood.Media.Reload(function () {
-                        $('body').off('click');
-                        $('body').on('click', '.media-select', $.hood.Media.Actions.Complete.Switch);
                     });
                     $.hood.Media.Upload.Init();
                 });
@@ -96,45 +77,36 @@ $.hood.Media = {
         },
         Complete: {
             Attach: function (e) {
-                $(this).data('temp', $(this).html());
-                $(this).addClass('loading').append('<i class="fa fa-refresh fa-spin"></i>');
-                var $image = $('.' + $.hood.Media.Actions.Attacher.Tag);
-                params = {
-                    Id: $(this).data('id'),
-                    Entity: $(this).data('entity'),
-                    Field: $(this).data('field'),
-                    MediaId: $(this).data('media')
-                };
-                $.post('/admin/media/attach/', params, function (data) {
+                e.preventDefault();
+                $image = $.hood.Media.Actions.Target;
+                $json = $.hood.Media.Actions.Json;
+                $.post($(this).data('url'), function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
                     if (data.Success) {
-                        $.hood.Alerts.Success("Attached!");
-                        $image.addClass('loading');
+
                         icon = data.Media.Icon;
                         if (data.Media.GeneralFileType === "Image") {
                             icon = data.Media.MediumUrl;
                         }
-                        $image.css({
-                            'background-image': 'url(' + icon + ')'
-                        });
-                        $image.find('img').attr('src', icon);
-                        $image.removeClass('loading');
-                        if (!$.hood.Helpers.IsNullOrUndefined($.hood.Media.Actions.Attacher.JsonField)) {
-                            $jsonField = $('#' + $.hood.Media.Actions.Attacher.JsonField);
-                            $jsonField.val(data.Json);
+
+                        if (!$.hood.Helpers.IsNullOrUndefined($image)) {
+                            $image.css({
+                                'background-image': 'url(' + icon + ')'
+                            });
+                            $image.find('img').attr('src', icon);
+                            $image.removeClass('loading');
                         }
-                    } else {
-                        $.hood.Alerts.Error(data.Errors, "Error attaching.");
+
+                        if (!$.hood.Helpers.IsNullOrUndefined($json)) {
+                            $json.val(data.MediaJson);
+                        }
+
                     }
                 })
                     .done(function () {
+                        $('#media-select-modal').modal('hide');
                     })
-                    .fail(function (data) {
-                        $.hood.Alerts.Error(data.status + " - " + data.statusText, "Error communicating.");
-                    })
-                    .always($.proxy(function (data) {
-                        $(this).removeClass('loading').html($(this).data('temp'));
-                        $.hood.Modals.Close('#attach-media-modal');
-                    }, this));
+                    .fail($.hood.Inline.HandleError);
             },
             Insert: function (e) {
                 url = $(e.target).data('url');
@@ -144,7 +116,7 @@ $.hood.Media = {
             },
             Select: function (e) {
                 url = $(this).data('url');
-                tag = $.hood.Media.Actions.Switching;
+                tag = $.hood.Media.Actions.Target;
                 $(tag).each(function () {
                     if ($(this).is("input")) {
                         $(this).val(url);
@@ -159,15 +131,34 @@ $.hood.Media = {
                 $.hood.Alerts.Success("Image URL has been inserted.<br /><strong>Remember to press save!</strong>");
                 $('#media-select-modal').modal('hide');
             },
-            Switch: function (e) {
-                url = $(this).data('url');
-                $tag = $.hood.Media.Actions.Switching;
-                $tag.css({
-                    'background-image': 'url(' + url + ')'
-                });
-                $tag.find('img').attr('src', url);
-                $.hood.Modals.Close('#attach-media-modal');
-                $.hood.Alerts.Success("Attached!");
+            Clear: function (e) {
+                e.preventDefault();
+                $image = $($(this).data('tag'));
+                $json = $($(this).data('json'));
+                $.post($(this).data('url'), function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    if (data.Success) {
+
+                        icon = data.Media.Icon;
+                        if (data.Media.GeneralFileType === "Image") {
+                            icon = data.Media.MediumUrl;
+                        }
+
+                        if (!$.hood.Helpers.IsNullOrUndefined($image)) {
+                            $image.css({
+                                'background-image': 'url(' + icon + ')'
+                            });
+                            $image.find('img').attr('src', icon);
+                            $image.removeClass('loading');
+                        }
+
+                        if (!$.hood.Helpers.IsNullOrUndefined($json)) {
+                            $json.val(data.Json);
+                        }
+
+                    }
+                })
+                    .fail($.hood.Inline.HandleError);
             }
         },
         RefreshImage: function (tag, url, id) {
@@ -255,13 +246,11 @@ $.hood.Media = {
             if (confirmed) {
                 // delete functionality
                 $.post('/admin/media/delete', { id: $this.data('id') }, function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
                     if (data.Success) {
                         $.hood.Media.Reload();
                         $('.modal-backdrop').remove();
                         $('.modal').modal('hide');
-                        $.hood.Alerts.Success("The file has now been removed from the website.");
-                    } else {
-                        $.hood.Alerts.Error("There was a problem deleting the file.");
                     }
                 });
             } 
@@ -346,13 +335,9 @@ $.hood.Media = {
                     message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
                 deleteDirectoryCallback = function (confirmed) {
                     if (confirmed) {
-                        $.post('/admin/media/directory/delete', { directory: $('#Directory').val() }, function (data) {
-                            if (data.Success) {
-                                $.hood.Media.Reload();
-                                $.hood.Alerts.Success("The directory has now been removed from the website.");
-                            } else {
-                                $.hood.Alerts.Error("There was a problem deleting the directory.");
-                            }
+                        $.post($this.data('url'), { directory: $('#Directory').val() }, function (data) {
+                            $.hood.Helpers.ProcessResponse(data);
+                            $.hood.Media.Reload();
                         });
                     } 
                 };

@@ -20,6 +20,7 @@ namespace Hood.Models
         { }
 
         public new static IMediaObject Blank => MediaObjectBase.Blank;
+        public new static IMediaObject BlankAvatar => MediaObjectBase.BlankAvatar;
     }
 
     public abstract class MediaObjectBase : BaseEntity, IMediaObject
@@ -119,6 +120,34 @@ namespace Hood.Models
                 {
                     FileSize = 0,
                     Filename = "no-image.jpg",
+                    SmallUrl = noImage,
+                    MediumUrl = noImage,
+                    LargeUrl = noImage,
+                    ThumbUrl = noImage,
+                    Url = noImage,
+                    BlobReference = "N/A"
+                };
+                return ret;
+            }
+        }
+        public static IMediaObject BlankAvatar
+        {
+            get
+            {
+                string noImage;
+                try
+                {
+                    var mediaSettings = Engine.Settings.Media;
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-avatar.jpg";
+                }
+                catch
+                {
+                    noImage = "/hood/images/no-avatar.jpg";
+                }
+                MediaObject ret = new MediaObject
+                {
+                    FileSize = 0,
+                    Filename = "no-avatar.jpg",
                     SmallUrl = noImage,
                     MediumUrl = noImage,
                     LargeUrl = noImage,

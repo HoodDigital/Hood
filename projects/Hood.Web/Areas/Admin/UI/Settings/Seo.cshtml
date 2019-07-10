@@ -57,7 +57,7 @@
                     </ul>
                 </alert>
                 <hr class="mt-4 mb-4" />
-                <editor asp-image="SiteIconUrl"></editor>
+                <mediaSelect asp-for="SiteIconUrl"></mediaSelect>
                 <div class="form-group floating-label">
                     <label asp-for="GoogleAnalytics"></label>
                     <textarea asp-for="GoogleAnalytics" class="form-control" rows="4"></textarea>
@@ -246,8 +246,8 @@
                     <input asp-for="OgAuthor" class="form-control" />
                     <small asp-for="OgAuthor"></small>
                 </div>
-                <editor asp-image="OgImageUrl"></editor>
-                <editor asp-image="OgSecureImageUrl"></editor>
+                <mediaSelect asp-for="OgImageUrl"></mediaSelect>
+                <mediaSelect asp-for="OgSecureImageUrl"></mediaSelect>
                 <div class="form-group floating-label">
                     <label asp-for="OgLocale"></label>
                     <input asp-for="OgLocale" class="form-control" />
@@ -284,7 +284,7 @@
                     <input asp-for="TwitterCardCreator" class="form-control" />
                     <small asp-for="TwitterCardCreator"></small>
                 </div>
-                <editor asp-image="TwitterCardImageUrl"></editor>
+                <mediaSelect asp-for="TwitterCardImageUrl"></mediaSelect>
                 <div class="form-group floating-label">
                     <label asp-for="TwitterCardSite"></label>
                     <input asp-for="TwitterCardSite" class="form-control" />

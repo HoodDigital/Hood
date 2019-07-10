@@ -3,6 +3,7 @@ using Hood.BaseTypes;
 using Hood.Controllers;
 using Hood.Core;
 using Hood.Enums;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
@@ -46,20 +47,29 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 Engine.Settings.Set(model);
-                var location = _address.GeocodeAddress(model.Address);
-                if (location != null)
+                if (model.Address.IsSet())
                 {
-                    model.Address.Latitude = location.Coordinates.Latitude;
-                    model.Address.Longitude = location.Coordinates.Longitude;
-                    Engine.Settings.Set(model);
-                    SaveMessage = "Settings saved & address geocoded via Google API.";
-                    MessageType = AlertType.Success;
+                    var location = _address.GeocodeAddress(model.Address);
+                    if (location != null)
+                    {
+                        model.Address.Latitude = location.Coordinates.Latitude;
+                        model.Address.Longitude = location.Coordinates.Longitude;
+                        Engine.Settings.Set(model);
+                        SaveMessage = "Settings saved & address geocoded via Google API.";
+                        MessageType = AlertType.Success;
+                    }
+                    else
+                    {
+                        SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
+                        MessageType = AlertType.Warning;
+                    }
                 }
                 else
                 {
-                    SaveMessage = "Settings were saved, but because there was an error with the Google API, your address could not be located on the map. Check your Google API key in your Integration Settings, and ensure your API key has the Geocoding API enabled.";
+                    SaveMessage = "Settings were saved, but you did not set an address correctly, so the Google API could not locate your address on the map.";
                     MessageType = AlertType.Warning;
                 }
+
             }
             catch (GoogleGeocodingException ex)
             {

@@ -124,19 +124,20 @@
                         <small asp-for="MarketingEmails"></small>
                     </div>
                     <hr class="mt-4 mb-4" />
+                    <input type="hidden" asp-for="AvatarJson">
                     <div class="form-group row align-items-center">
                         <div class="col-auto">
-                            <fixedImage src="@Model.Avatar.SmallUrl" class="img-sm img-circle m-0 @Model.Id" id="user-edit-avatar" />
+                            <fixedImage src="@Model.Avatar.SmallUrl" class="img-sm img-circle m-0 Avatar" id="user-edit-avatar" />
                         </div>
                         <div class="col">
                             <h6>Avatar</h6>
                             <p class="m-0">
-                                <attacher dataid="@Model.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.Id" class="btn btn-sm btn-info">Choose profile image...</attacher>
-                                <a class="btn btn-sm btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Users" asp-area="Admin" asp-route-id="@Model.Id" data-complete="$.hood.Uploader.RefreshImage('.@Model.Id', '/admin/users/getavatar', '@Model.Id')"><i class="fa fa-trash"></i></a>
+                                <mediaAttach asp-for="Avatar" asp-entity="@nameof(ApplicationUser)" asp-id="@Model.Id" asp-filetype="Image" asp-json="AvatarJson">
+                                    Choose profile image...
+                                </mediaAttach>
                             </p>
                         </div>
                     </div>
-
                     <hr class="mt-4 mb-4" />
                     <div class="form-group floating-label">
                         <label asp-for="CompanyName"></label>
@@ -195,7 +196,13 @@
                             <div class="list-group-item list-group-item-action p-3 pt-2 pb-2">
                                 <div class="form-group m-0">
                                     <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input role-check" id="role-check-@role.Id" name="role-check-@role.Id" type="checkbox" data-id="@Model.Id" value="@role" @(Model.Roles.Any(r => r.Name == role.Name) ? "checked" : "") />
+                                        <input class="custom-control-input user-role-check" 
+                                               id="role-check-@role.Id" 
+                                               name="role-check-@role.Id" 
+                                               type="checkbox" 
+                                               data-url="@Url.Action("SetRole", new { id = Model.Id })" 
+                                               value="@role" 
+                                               @(Model.Roles.Any(r => r.Name == role.Name) ? "checked" : "") />
                                         <label class="custom-control-label d-block" for="role-check-@role.Id">
                                             @role.Name.CamelCaseToString()
                                         </label>

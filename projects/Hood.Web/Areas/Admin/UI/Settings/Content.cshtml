@@ -150,7 +150,7 @@
                                                 <input asp-for="Types[i].Icon" class="form-control" />
                                                 <small asp-for="Types[i].Icon"></small>
                                             </div>
-                                            <editor asp-image="Types[i].NoImage"></editor>
+                                            <mediaSelect asp-for="Types[i].NoImage"></mediaSelect>
                                             <div class="form-group">
                                                 <div class="custom-control custom-checkbox">
                                                     <input asp-for="Types[i].IsPublic" class="custom-control-input">

@@ -36,8 +36,6 @@ namespace Hood.ViewModels
         public string Field { get; set; }
         [FromQuery(Name = "type")]
         public string Type { get; set; }
-        [FromQuery(Name = "refresh")]
-        public string Refresh { get; set; }
         [FromQuery(Name = "tag")]
         public string Tag { get; set; }
         [FromQuery(Name = "media")]
@@ -60,8 +58,6 @@ namespace Hood.ViewModels
             query += Entity.IsSet() ? "&entity=" + Entity : "";
             query += Field.IsSet() ? "&field=" + Field : "";
             query += Type.IsSet() ? "&type=" + Type : "";
-            query += Tag.IsSet() ? "&tag=" + Tag : "";
-            query += Refresh.IsSet() ? "&refresh=" + Refresh : "";
             query += MediaId.HasValue ? "&media=" + MediaId : "";
 
             return query;

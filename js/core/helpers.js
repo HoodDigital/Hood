@@ -79,18 +79,11 @@ $.hood.Helpers = {
     });
   },
   ProcessResponse: function ProcessResponse(data) {
-    var $tag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     title = '';
     if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");
 
     if (data.Success) {
       $.hood.Alerts.Success("".concat(title).concat(data.Message));
-
-      if ($tag && $tag.data('redirect')) {
-        setTimeout(function () {
-          window.location = $tag.data('redirect');
-        }, 1500);
-      }
     } else {
       $.hood.Alerts.Error("".concat(title).concat(data.Errors));
     }

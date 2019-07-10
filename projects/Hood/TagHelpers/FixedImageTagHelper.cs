@@ -7,24 +7,19 @@ namespace Hood.TagHelpers
     [HtmlTargetElement("fixedImage")]
     public class FixedImageTagHelper : TagHelper
     {
-        private const string AltAttrName = "alt";
-        [HtmlAttributeName(AltAttrName)]
+        [HtmlAttributeName("alt")]
         public string Alt { get; set; }
 
-        private const string SrcAttrName = "src";
-        [HtmlAttributeName(SrcAttrName)]
+        [HtmlAttributeName("src")]
         public string Src { get; set; }
 
-        private const string DefaultAttrName = "default";
-        [HtmlAttributeName(DefaultAttrName)]
+        [HtmlAttributeName("default")]
         public bool UseDefault { get; set; } = true;
 
-        private const string FallbackAttrName = "fallback";
-        [HtmlAttributeName(FallbackAttrName)]
+        [HtmlAttributeName("fallback")]
         public string Fallback { get; set; }
 
-        private const string ColourAttrName = "color";
-        [HtmlAttributeName(ColourAttrName)]
+        [HtmlAttributeName("color")]
         public string Colour { get; set; }
 
         public FixedImageTagHelper()

@@ -10,7 +10,7 @@ using System;
 
 namespace Hood.TagHelpers
 {
-    [HtmlTargetElement("editor", Attributes = "asp-image")]
+    [HtmlTargetElement("mediaSelect")]
     public class MediaSelectTagHelper : TagHelper
     {
         public override int Order { get; } = int.MaxValue;
@@ -18,7 +18,7 @@ namespace Hood.TagHelpers
         /// <summary>
         /// The field which this editor is bound to.
         /// </summary>
-        [HtmlAttributeName("asp-image")]
+        [HtmlAttributeName("asp-for")]
         public ModelExpression For { get; set; }
         /// <summary>
         /// Default: form-control
@@ -92,7 +92,13 @@ namespace Hood.TagHelpers
                 output.Attributes.SetAttribute("class", $"{GroupClass}");
 
             var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
-            var attachUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new { area = "Admin", doAction = MediaWindowAction.Select.ToString(), tag = $".{fieldId}", fileType = FileType, restrict = true }); ;
+            var attachUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new {
+                area = "Admin",
+                doAction = MediaWindowAction.Select.ToString(),
+                tag = $".{fieldId}",
+                fileType = FileType,
+                restrict = true
+            }); ;
 
             output.Content.SetHtmlContent($@"
                 <div class='row no-gutter align-items-center'>

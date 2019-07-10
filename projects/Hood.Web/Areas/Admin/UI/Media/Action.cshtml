@@ -26,7 +26,7 @@
                         </div>
                         <div class="col-sm">
                             <partial name="_Media_Uploader" />
-                            <div id="media-list" class="hood-inline-list" data-url="@Url.Action("List", new { doAction = Model.Action.ToString(), tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field, refresh = Model.Refresh, media = Model.MediaId  })" data-complete="$.hood.Media.Loaded">
+                            <div id="media-list" class="hood-inline-list" data-url="@Url.Action("List", new { doAction = Model.Action.ToString(), tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field, media = Model.MediaId  })" data-complete="$.hood.Media.Loaded">
                                 <alert icon="fa fa-4x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading Media...</alert>
                             </div>
                         </div>

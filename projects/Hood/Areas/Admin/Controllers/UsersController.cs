@@ -278,49 +278,8 @@ namespace Hood.Areas.Admin.Controllers
         }
         #endregion
 
-        #region Avatars
-        [Route("admin/users/{id}/avatar/get/")]
-        [HttpGet]
-        public async Task<IMediaObject> GetAvatar(string id)
-        {
-            try
-            {
-                var user = await _account.GetUserByIdAsync(id);
-                if (user != null)
-                {
-                    if (user.Avatar == null)
-                        return MediaObject.Blank;
-                    return new MediaObject(user.Avatar);
-                }
-                else
-                    throw new Exception("No avatar found");
-            }
-            catch (Exception)
-            {
-                return MediaObject.Blank;
-            }
-        }
-        [Route("admin/users/{id}/avatar/clear/")]
-        [HttpGet]
-        public async Task<Response> ClearAvatar(string id)
-        {
-            try
-            {
-                var user = await _account.GetUserByIdAsync(id);
-                user.Avatar = null;
-                await _account.UpdateUserAsync(user);
-#warning TODO: Handle response in JS.
-                return new Response(true, "The image has been cleared!");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<UsersController>($"Error clearing a user's avatar via the admin panel.", ex);
-            }
-        }
-        #endregion
-
         #region Roles
-        [Route("admin/users/{id}/getroles/")]
+        [Route("admin/users/{id}/get-roles/")]
         [HttpGet]
         public async Task<JsonResult> GetRoles(string id)
         {
@@ -328,20 +287,28 @@ namespace Hood.Areas.Admin.Controllers
             IList<string> roles = await _userManager.GetRolesAsync(user);
             return Json(new { success = true, roles });
         }
-        [Route("admin/users/{id}/addtorole/")]
+        [Route("admin/users/{id}/set-role/")]
         [HttpPost]
-        public async Task<Response> AddToRole(string id, string role)
+        public async Task<Response> SetRole(string id, string role, bool add)
         {
             try
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
                 if (!await _roleManager.RoleExistsAsync(role))
                     await _roleManager.CreateAsync(new IdentityRole(role));
+                IdentityResult result;
 
-                IdentityResult result = await _userManager.AddToRoleAsync(user, role);
+                if (add)
+                    result = await _userManager.AddToRoleAsync(user, role);
+                else
+                    result = await _userManager.RemoveFromRoleAsync(user, role);
+
                 if (result.Succeeded)
                 {
-                    return new Response(true, $"The user has been added to the {role} role.");
+                    if (add)
+                        return await SuccessResponseAsync<UsersController>($"The user has been added the {role} role.");
+                    else
+                        return await SuccessResponseAsync<UsersController>($"The user has been removed from the {role} role.");
                 }
                 else
                 {
@@ -350,34 +317,15 @@ namespace Hood.Areas.Admin.Controllers
                     {
                         throw new Exception(error.Description);
                     }
-                    throw new Exception("The database could not be updated, please try later.");
+                    throw new Exception("The user manager could not save the role update to the database.");
                 }
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<UsersController>($"Error adding a user to a role via the admin panel.", ex);
-            }
-        }
-        [Route("admin/users/{id}/removefromrole/")]
-        [HttpPost]
-        public async Task<Response> RemoveFromRole(string id, string role)
-        {
-            try
-            {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
-                IdentityResult result = await _userManager.RemoveFromRoleAsync(user, role);
-                if (result.Succeeded)
-                {
-                    return new Response(true, $"The user has been removed from the {role} role.");
-                }
+                if (add)
+                    return await ErrorResponseAsync<UsersController>($"Error adding a user to a role via the admin panel.", ex);
                 else
-                {
-                    throw new Exception("The database could not be updated, please try later.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<UsersController>($"Error removing a user from a role via the admin panel.", ex);
+                    return await ErrorResponseAsync<UsersController>($"Error removing a user from a role via the admin panel.", ex);
             }
         }
         #endregion

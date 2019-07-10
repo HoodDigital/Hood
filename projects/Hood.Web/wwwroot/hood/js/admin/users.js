@@ -28,7 +28,7 @@ $.hood.Users = {
         deleteUserCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
-                    $.hood.Helpers.ProcessResponse(data, $tag);
+                    $.hood.Helpers.ProcessResponse(data);
                     $.hood.Users.Reload();
                     if (data.Success) {
                         if ($tag && $tag.data('redirect')) {
@@ -72,7 +72,7 @@ $.hood.Users = {
                 submitButtonTag: $('#user-create-submit'),
                 submitUrl: $('#user-create-form').attr('action'),
                 submitFunction: function (data) {
-                    $.hood.Helpers.ProcessResponse(data, $tag);
+                    $.hood.Helpers.ProcessResponse(data);
                     $.hood.Users.Reload();
                }
             });
@@ -98,7 +98,7 @@ $.hood.Users = {
                     swal.showInputError("You didn't supply a new password, we can't reset the password without it!"); return false
                 }
                 $.post($tag.attr('href'), { password: inputValue }, function (data) {
-                    $.hood.Helpers.ProcessResponse(data, $tag);
+                    $.hood.Helpers.ProcessResponse(data);
                 });
             };
 
@@ -120,7 +120,7 @@ $.hood.Users = {
                         return false;
                     }
                     $.post($tag.attr('href'), { note: inputValue }, function (data) {
-                        $.hood.Helpers.ProcessResponse(data, $tag);
+                        $.hood.Helpers.ProcessResponse(data);
                         $.hood.Inline.Reload('#user-notes');
                     });
                 };
@@ -141,7 +141,7 @@ $.hood.Users = {
                     if (isConfirm) {
                         // delete functionality
                         $.post($tag.attr('href'), function (data) {
-                            $.hood.Helpers.ProcessResponse(data, $tag);
+                            $.hood.Helpers.ProcessResponse(data);
                             $.hood.Inline.Reload('#user-notes');
                         });
                     } else {
@@ -159,12 +159,12 @@ $.hood.Users = {
         },
         ToggleRole: function () {
             if ($(this).is(':checked')) {
-                $.post('/admin/users/addtorole/', { id: $(this).data('id'), role: $(this).val() }, function (data) {
-                    $.hood.Helpers.ProcessResponse(data, $tag);
+                $.post($(this).data('url'), { role: $(this).val(), add: true }, function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
                 });
             } else {
-                $.post('/admin/users/removefromrole/', { id: $(this).data('id'), role: $(this).val() }, function (data) {
-                    $.hood.Helpers.ProcessResponse(data, $tag);
+                $.post($(this).data('url'), { role: $(this).val(), add: false }, function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
                 });
             }
         }

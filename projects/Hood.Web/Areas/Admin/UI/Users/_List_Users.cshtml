@@ -5,11 +5,11 @@
 <div class="">
     @foreach (var user in Model.List)
     {
-        <div class="card hover mb-3">
-            <div class="row no-gutters align-items-stretch">
-                <div class="col-2">
+        <div class="card hover overflow-hidden mb-3">
+            <div class="row no-gutters align-items-center">
+                <div class="col-auto">
                     <a asp-action="Edit" asp-route-id="@user.Id">
-                        <fixedImage src="@user.Avatar.ThumbUrl" class="img m-0 w-100 h-100" alt="@user.ToFullName()"></fixedImage>
+                        <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-4" alt="@user.ToFullName()"></fixedImage>
                     </a>
                 </div>
                 <div class="col">
