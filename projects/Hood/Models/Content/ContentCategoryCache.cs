@@ -1,8 +1,12 @@
 ﻿using Hood.Core;
 using Hood.Enums;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -44,7 +48,13 @@ namespace Hood.Caching
             return bySlug[contentType].Value[slug];
         }
 
-        public int Count { get { return byKey.Value.Count; } }
+        public int Count(string type)
+        {
+            if (type.IsSet())
+                return bySlug[type].Value.Count;
+            else
+                return byKey.Value.Count;
+        }
 
         public void ResetCache()
         {
@@ -201,23 +211,44 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<tr>";
-                    htmlOutput += "<td>";
+                    string carets = "";
                     for (int i = 0; i < startingLevel; i++)
                     {
-                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                        carets += "<i class='fa fa-caret-right mr-1'></i>";
                     }
-                    htmlOutput += string.Format("<a href=\"/admin/content/{0}/manage?category={1}\" class=\"content-category\">", contentType, category.Slug);
-                    htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
-                    htmlOutput += "</a>";
-                    htmlOutput += " <small>[" + category.Slug + "]</small>";
-                    htmlOutput += "</td>";
-                    htmlOutput += "<td class='text-right'>";
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-content-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-content-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
-                    htmlOutput += "</td>";
+
+                    var template = $@"
+
+    <div class='list-group-item list-group-item-action p-0'>
+        <div class='custom-control custom-checkbox d-flex'>
+            <input class='custom-control-input refresh-on-change'
+                   id='Category-{category.Slug}' name='categories'
+                   type='checkbox'
+                   value='{category.Slug}' />
+            <label class='custom-control-label col m-2 mt-1 mb-1' for='Category-{category.Slug}'>
+                {carets}{category.DisplayName} <span>({category.Count})</span>
+            </label>
+            <div class='col-auto p-2'>
+                <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}'>
+                    <i class='fa fa-edit'></i><span>
+                        Edit
+                    </span>
+                </a>
+                <a class='btn-link text-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
+                    <i class='fa fa-trash'></i>
+                    <span>
+                        Delete
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+";
+                    htmlOutput += "";
+                    htmlOutput += template;
                     htmlOutput += AdminContentCategoryTree(category.Children, contentType, startingLevel + 1);
-                    htmlOutput += "</tr>";
+
                 }
             }
 

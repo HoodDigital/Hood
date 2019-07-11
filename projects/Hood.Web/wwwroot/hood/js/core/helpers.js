@@ -2,7 +2,6 @@
     $.hood = {};
 $.hood.Helpers = {
 
-
     IsNullOrUndefined: function (a) {
         var rc = false;
         if (a === null || typeof (a) === "undefined" || a === "") {

@@ -2,13 +2,13 @@
     $.hood = {};
 $.hood.Property = {
     Init: function () {
-        $('body').on('click', '.delete-property', this.Delete);
-        $('body').on('click', '.archive-property', this.Archive);
-        $('body').on('click', '.publish-property', this.Publish);
-        $('body').on('click', '.create-property', this.Create.Init);
+        $('body').on('click', '.delete-property', $.hood.Property.Delete);
+        $('body').on('click', '.archive-property', $.hood.Property.Archive);
+        $('body').on('click', '.publish-property', $.hood.Property.Publish);
+        $('body').on('click', '.create-property', $.hood.Property.Create.Init);
 
         if ($('#edit-property').doesExist())
-            this.Edit.Init();
+            $.hood.Property.Edit.Init();
     },
     Delete: function (e) {
         var $this = $(this);
@@ -398,4 +398,5 @@ $.hood.Property = {
         }
     }
 };
-$.hood.Property.Init();
+$(document).ready($.hood.Property.Init);
+

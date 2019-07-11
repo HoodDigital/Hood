@@ -41,7 +41,7 @@
                         </div>
                         break;
                     case GenericFileType.Image:
-                        <fixedImage src="@Model.LargeUrl" class="img img-wide img-fluid rounded mx-auto d-block" alt="@Model.Filename" />
+                        <img src="@Model.LargeUrl" class="img img-wide img-full rounded mx-auto d-block mb-3" alt="@Model.Filename" />
                         <display asp-for="ThumbUrl"></display>
                         <display asp-for="SmallUrl"></display>
                         <display asp-for="MediumUrl"></display>

@@ -134,7 +134,7 @@ namespace Hood.Services
                         if (shouldRebuild)
                         {
                             _bundleFileProcessor.Process(configFilePath, new List<Bundle> { bundle });
-                            _ = _cache.Add(cacheKey, false, new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = new TimeSpan(2, 0, 0) });
+                            _cache.Add(cacheKey, false, new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = new TimeSpan(2, 0, 0) });
                         }
                     }
                     result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + outputFileName + ".min.js"));

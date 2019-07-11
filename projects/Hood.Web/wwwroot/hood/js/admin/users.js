@@ -2,15 +2,15 @@
     $.hood = {};
 $.hood.Users = {
     Init: function () {
-        $('body').on('click', '.user-delete', this.Delete);
+        $('body').on('click', '.user-delete', $.hood.Users.Delete);
 
-        $('body').on('click', '.user-reset-password', this.Edit.ResetPassword);
+        $('body').on('click', '.user-reset-password', $.hood.Users.Edit.ResetPassword);
 
-        $('body').on('click', '.user-notes-add', this.Edit.Notes.Add);
-        $('body').on('click', '.user-notes-delete', this.Edit.Notes.Delete);
+        $('body').on('click', '.user-notes-add', $.hood.Users.Edit.Notes.Add);
+        $('body').on('click', '.user-notes-delete', $.hood.Users.Edit.Notes.Delete);
 
-        $('body').on('change', '#user-create-form #GeneratePassword', this.Create.GeneratePassword);
-        $('body').on('change', '.user-role-check', this.Edit.ToggleRole);
+        $('body').on('change', '#user-create-form #GeneratePassword', $.hood.Users.Create.GeneratePassword);
+        $('body').on('change', '.user-role-check', $.hood.Users.Edit.ToggleRole);
     },
 
     Loaded: function (data) {
@@ -170,4 +170,4 @@ $.hood.Users = {
         }
     }
 };
-$.hood.Users.Init();
+$(document).ready($.hood.Users.Init);

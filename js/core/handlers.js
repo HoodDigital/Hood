@@ -14,7 +14,7 @@ $.hood.Handlers = {
     $('select[data-selected]').each($.hood.Handlers.SelectSetup); // date/time meta editor
 
     $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
-    this.Uploaders.Init();
+    $.hood.Handlers.Uploaders.Init();
   },
   SubmitOnChange: function SubmitOnChange(e) {
     $(this).parents('form').submit();
@@ -225,4 +225,4 @@ $.hood.Handlers = {
     }
   }
 };
-$.hood.Handlers.Init();
+$(document).ready($.hood.Handlers.Init);

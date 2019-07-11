@@ -114,8 +114,13 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #region Directories
-        [Route("admin/media/getdirectories/")]
-        public async Task<List<string>> GetDirectories()
+        [Route("admin/media/directories/list/")]
+        public async Task<IActionResult> Directories(MediaListModel model)
+        {
+            model.Directories = await GetDirectories();
+            return View("_List_Directories", model);
+        }
+        private async Task<List<string>> GetDirectories()
         {
             List<string> dirs = await _db.Media.Select(u => u.Directory).Distinct().OrderBy(s => s).ToListAsync();
             if (!dirs.Contains("Default"))
@@ -144,11 +149,11 @@ namespace Hood.Areas.Admin.Controllers
                 };
                 _db.Media.Add(newMedia);
                 await _db.SaveChangesAsync();
-                return new Models.Response(true);
+                return new Response(true, "The directory has been created and you can add files to it right away.");
             }
             catch (Exception ex)
             {
-                return new Models.Response(ex.Message);
+                return new Response(ex.Message);
             }
 
         }
@@ -159,9 +164,11 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                if (!directory.IsSet())
+                    throw new Exception("You have to select a directory to delete.");
+
                 var directoryList = _db.Media.AsQueryable();
-                if (directory.IsSet())
-                    directoryList = directoryList.Where(m => m.Directory == directory);
+                directoryList = directoryList.Where(m => m.Directory == directory);
 
                 foreach (var media in directoryList)
                 {
@@ -329,7 +336,7 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(Content).ToString() + ".Single." + contentId;
                         _cache.Remove(cacheKey);
-                        return new Response(true, MediaObject.Blank);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
                     case "Forum":
 
@@ -348,7 +355,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
                         await _db.SaveChangesAsync();
-                        return new Response(true, MediaObject.Blank);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
                     case "ApplicationUser":
 
@@ -366,7 +373,7 @@ namespace Hood.Areas.Admin.Controllers
                         cacheKey = typeof(ApplicationUser).ToString() + ".Single." + model.Id;
                         _cache.Remove(cacheKey);
                         await _db.SaveChangesAsync();
-                        return new Response(true, MediaObject.Blank);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
                     case "PropertyListing":
 
@@ -386,7 +393,7 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
                         _cache.Remove(cacheKey);
-                        return new Response(true, MediaObject.Blank);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
                     case "ContentMeta":
 
@@ -398,16 +405,16 @@ namespace Hood.Areas.Admin.Controllers
                             throw new Exception("Could not update the database");
                         cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
                         _cache.Remove(cacheKey);
-                        return new Response(true, MediaObject.Blank);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
                     default:
-                        return new Response(true, MediaObject.Blank);
+                        throw new Exception($"No entity supplied to remove from.");
                 }
 
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
+                return await ErrorResponseAsync<MediaController>($"Error removing a media file from an entity.", ex);
             }
         }
         #endregion
@@ -416,7 +423,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/media/upload/simple/")]
-        public async Task<IActionResult> UploadToDirectory(IEnumerable<IFormFile> files, string directory)
+        public async Task<Response> UploadToDirectory(IEnumerable<IFormFile> files, string directory)
         {
             try
             {
@@ -430,20 +437,20 @@ namespace Hood.Areas.Admin.Controllers
                         _db.Media.Add(mi);
                         _db.SaveChanges();
                     }
-                    return Json(new { Success = true });
+                    return new Response(true, MediaObject.Blank, "The files have been uploaded successfully.");
                 }
                 else
                     throw new Exception("No files supplied.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, ex.Message });
+                return await ErrorResponseAsync<MediaController>($"Error uploading files to the directory: {directory}", ex);
             }
         }
 
         [HttpPost]
         [Route("admin/media/upload/single/")]
-        public async Task<IActionResult> UploadSingle(IFormFile file, string directory)
+        public async Task<Response> UploadSingle(IFormFile file, string directory)
         {
             try
             {
@@ -454,7 +461,7 @@ namespace Hood.Areas.Admin.Controllers
                     MediaObject mi = await _media.ProcessUpload(file, new MediaObject() { Directory = directory });
                     _db.Media.Add(mi);
                     _db.SaveChanges();
-                    return Json(new { Success = false, Message = mi.LargeUrl });
+                    return new Response(true, MediaObject.Blank, "The file has been uploaded successfully.");
                 }
                 else
                     throw new Exception("No file supplied.");
@@ -462,10 +469,10 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, ex.Message });
+                return await ErrorResponseAsync<MediaController>($"Error uploading a single media file to the directory: {directory}", ex);
             }
         }
 
-        #endregion
-    }
+    #endregion
+}
 }

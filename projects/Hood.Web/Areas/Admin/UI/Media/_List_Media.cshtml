@@ -22,7 +22,8 @@
                     <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
                     break;
             }
-            <p class="m-0 font-weight-bold text-truncate">
+            <div class="card-body p-1">
+                            <p class="m-0 font-weight-bold text-truncate">
                 @media.Filename
             </p>
             <p>
@@ -64,6 +65,8 @@
                     <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">@media.Filename</a>
                     break;
             }
+
+            </div>
         </div>
     }
 </div>

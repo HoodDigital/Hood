@@ -33,4 +33,4 @@ $.hood.Forms = {
     }
   }
 };
-$.hood.Forms.Init();
+$(document).ready($.hood.Forms.Init);

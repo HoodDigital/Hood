@@ -2,7 +2,7 @@
     $.hood = {}
 $.hood.Themes = {
     Init: function () {
-        $('body').on('click', '.activate-theme', this.Activate);
+        $('body').on('click', '.activate-theme', $.hood.Themes.Activate);
     },
     Activate: function (e) {
         var $this = $(this);
@@ -35,4 +35,4 @@ $.hood.Themes = {
         });
     },
 }
-$.hood.Themes.Init();
+$(document).ready($.hood.Themes.Init);

@@ -106,6 +106,16 @@ namespace Hood.Core
                 return Services.Resolve<IThemesService>();
             }
         }
+        /// <summary>
+        /// Gets the current resolvable version of the IEventsService.
+        /// </summary>
+        public static IEventsService Events
+        {
+            get
+            {
+                return Services.Resolve<IEventsService>();
+            }
+        }
 
         public static string Version
         {

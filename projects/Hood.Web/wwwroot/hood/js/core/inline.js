@@ -2,6 +2,7 @@
     $.hood = {};
 
 $.hood.Inline = {
+    Tags: {},
     Init: function () {
         $('.hood-inline:not(.refresh)').each($.hood.Inline.Load);
         $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
@@ -17,16 +18,16 @@ $.hood.Inline = {
     Load: function (e) {
         $.hood.Inline.Reload(this);
     },
-    Reload: function (tag, complete) {
+    Reload: function (tag, complete) {        
         $tag = $(tag);
         $tag.addClass('loading');
         if (!complete)
             complete = $tag.data('complete');
         var urlLoad = $tag.data('url');
-        $.get(urlLoad, function (data) {
-            $tag.html(data);
-            $tag.removeClass('loading');
-        })
+        $.get(urlLoad, $.proxy(function (data) {
+            $(this).html(data);
+            $(this).removeClass('loading');
+        }, $tag))
             .done(function () { $.hood.Inline.RunComplete(complete); })
             .fail($.hood.Inline.HandleError)
             .always($.hood.Inline.Finish);
@@ -151,8 +152,7 @@ $.hood.Inline = {
         }
     }
 };
-$.hood.Inline.Init();
-
+$(document).ready($.hood.Inline.Init);
 // Backwards compatibility.
 $.hood.Modals = {
     Open: $.hood.Inline.Modal

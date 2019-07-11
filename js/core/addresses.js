@@ -136,4 +136,4 @@ $.hood.Addresses = {
     e.preventDefault();
   }
 };
-$.hood.Addresses.Init();
+$(document).ready($.hood.Addresses.Init);

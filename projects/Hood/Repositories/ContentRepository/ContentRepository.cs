@@ -67,10 +67,13 @@ namespace Hood.Services
                 content = content.Where(n => n.Author.UserName == model.AuthorName);
             }
 
-            // posts in category
+            if (model.Categories != null && model.Categories.Count > 0)
+            {
+                content = content.Where(c => c.Categories.Any(cc => model.Categories.Any(mc => cc.Category.Slug == mc)));
+            }
             if (!string.IsNullOrEmpty(model.Category))
             {
-                content = content.Where(n => n.Categories.Any(c => c.Category.Slug == model.Category));
+                content = content.Where(c => c.Categories.Any(cc => cc.Category.Slug == model.Category));
             }
 
             // search the collection
@@ -123,7 +126,7 @@ namespace Hood.Services
                         case "Date":
                             content = content.OrderBy(n => n.CreatedOn);
                             break;
-                        case "PublishDate":
+                        case "Publish":
                             content = content.OrderBy(n => n.PublishDate);
                             break;
                         case "Views":
@@ -136,7 +139,7 @@ namespace Hood.Services
                         case "DateDesc":
                             content = content.OrderByDescending(n => n.CreatedOn);
                             break;
-                        case "PublishDateDesc":
+                        case "PublishDesc":
                             content = content.OrderByDescending(n => n.PublishDate);
                             break;
                         case "ViewsDesc":
@@ -196,7 +199,7 @@ namespace Hood.Services
         {
             Content content = _db.Content.Where(p => p.Id == id).FirstOrDefault();
             _db.Entry(content).State = EntityState.Deleted;
-            await UpdateAsync(content);
+            await _db.SaveChangesAsync();
         }
         public async Task SetStatusAsync(int id, ContentStatus status)
         {

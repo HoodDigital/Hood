@@ -5,7 +5,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 if (!$.hood) $.hood = {};
 $.hood.Themes = {
   Init: function Init() {
-    $('body').on('click', '.activate-theme', this.Activate);
+    $('body').on('click', '.activate-theme', $.hood.Themes.Activate);
   },
   Activate: function Activate(e) {
     var _swal;
@@ -37,4 +37,4 @@ $.hood.Themes = {
     });
   }
 };
-$.hood.Themes.Init();
+$(document).ready($.hood.Themes.Init);

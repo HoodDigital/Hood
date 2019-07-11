@@ -3,9 +3,9 @@
 if (!$.hood) $.hood = {};
 $.hood.Subscriptions = {
   Init: function Init() {
-    $('body').on('click', '.delete-subscription', this.Delete);
-    $('body').on('click', '.create-subscription', this.Create.Init);
-    if ($('#edit-subscription').doesExist()) this.Edit.Init();
+    $('body').on('click', '.delete-subscription', $.hood.Subscriptions.Delete);
+    $('body').on('click', '.create-subscription', $.hood.Subscriptions.Create.Init);
+    if ($('#edit-subscription').doesExist()) $.hood.Subscriptions.Edit.Init();
   },
   Delete: function Delete(e) {
     var $this = $(this);
@@ -135,4 +135,4 @@ $.hood.Subscriptions = {
     }
   }
 };
-$.hood.Subscriptions.Init();
+$(document).ready($.hood.Subscriptions.Init);

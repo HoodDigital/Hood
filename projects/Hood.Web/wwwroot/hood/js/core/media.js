@@ -18,6 +18,9 @@ $.hood.Media = {
     Reload: function (complete) {
         $.hood.Inline.Reload($('#media-list'), complete);
     },
+    ReloadDirectories: function (complete) {
+        $.hood.Inline.Reload($('#media-directories-list'), complete);
+    },
 
     Actions: {
         Init: function () {
@@ -197,12 +200,8 @@ $.hood.Media = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-            myDropzone.on("success", function (file, response) {
-                if (response.Success === false) {
-                    $.hood.Alerts.Error("Uploads failed: " + response.Message);
-                } else {
-                    $.hood.Alerts.Success("Uploads completed successfully.");
-                }
+            myDropzone.on("success", function (file, data) {
+                $.hood.Helpers.ProcessResponse(data);
             });
 
             myDropzone.on("addedfile", function (file) {
@@ -235,7 +234,7 @@ $.hood.Media = {
             });
         },
         UploadUrl: function () {
-            return "/admin/media/upload/simple?directory=" + $('#Directory').val();
+            return $("#media-upload").data('url') + "?directory=" + $("input[type='radio'][name='dir']:checked").val();
         }
     },
 
@@ -310,39 +309,32 @@ $.hood.Media = {
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
-                if (result.value.Success) {
-                    $.hood.Media.Reload();
-                    Swal.fire({
-                        title: "Woohoo!",
-                        text: "Directory has been successfully added...",
-                        type: "success"
-                    });
-                } else {
-                    Swal.showValidationMessage(
-                        `There was a problem creating the new directory:\n\n${result.value.Errors}`
-                    );
-                }
+                $.hood.Helpers.ProcessResponse(result.value);
+                $.hood.Media.ReloadDirectories();
+                $.hood.Media.Reload();
                 $('body').off('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
             });
         },
         Delete: function (e) {
             var $this = $(this);
-            message = "The directory and all files will be permanently removed.\n\nWarning: Ensure these files are not attached to any posts, pages or features of the site, or it will appear as a broken image or file.";
-            if ($('#Directory').val() === "Default") {
-                $.hood.Alerts.Error("You have to select a directory to delete.", "Error!", true, '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> You cannot delete the "Default" directory.</span>', true, 5000);
-            } else {
-                if ($('#Directory').val() === "")
-                    message = "You have selected to delete All directories, this will remove ALL files and ALL directories from the site. Are you sure!?";
-                deleteDirectoryCallback = function (confirmed) {
-                    if (confirmed) {
-                        $.post($this.data('url'), { directory: $('#Directory').val() }, function (data) {
-                            $.hood.Helpers.ProcessResponse(data);
-                            $.hood.Media.Reload();
-                        });
-                    } 
-                };
-                $.hood.Alerts.Message("Cancelled, nothing to worry about.");
-            }
+
+            deleteDirectoryCallback = function (confirmed) {
+                if (confirmed) {
+                    $.post($this.data('url'), { directory: $('#Directory').val() }, function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Media.ReloadDirectories();
+                        $.hood.Media.Reload();
+                    });
+                }
+            };
+
+            $.hood.Alerts.Confirm(
+                "The directory and all files will be permanently removed.",
+                "Are you sure?",
+                deleteDirectoryCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle mr-2"></i><strong>This cannot be undone!</strong><br />Ensure these files are not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>',            );
+
         }
     },
 
@@ -379,4 +371,4 @@ $.hood.Media = {
         });
     }
 };
-$.hood.Media.Init();
+$(document).ready($.hood.Media.Init);

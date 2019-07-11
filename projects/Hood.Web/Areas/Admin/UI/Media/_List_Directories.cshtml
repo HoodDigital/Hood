@@ -1,0 +1,25 @@
+@model MediaListModel
+@{
+    Layout = null;
+}
+<div class="list-group list-group-flush">
+    <div class="list-group-item list-group-item-action p-0">
+        <div class="custom-control custom-checkbox d-flex">
+            <input class="custom-control-input refresh-on-change" id="Directory-all" name="dir" type="radio" value="" @(Model.Directory == "" || !Model.Directory.IsSet() ? "checked" : "") />
+            <label class="custom-control-label col m-2 mt-1 mb-1" for="Directory-all">
+                All Directories
+            </label>
+        </div>
+    </div>
+    @foreach (string s in Model.Directories)
+    {
+        <div class="list-group-item list-group-item-action p-0">
+            <div class="custom-control custom-checkbox d-flex">
+                <input class="custom-control-input refresh-on-change" id="Directory-@s" name="dir" type="radio" value="@s" @(Model.Directory == s ? "active" : "") />
+                <label class="custom-control-label col m-2 mt-1 mb-1" for="Directory-@s">
+                    @s
+                </label>
+            </div>
+        </div>
+    }
+</div>

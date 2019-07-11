@@ -2,11 +2,11 @@
     $.hood = {};
 $.hood.Subscriptions = {
     Init: function () {
-        $('body').on('click', '.delete-subscription', this.Delete);
-        $('body').on('click', '.create-subscription', this.Create.Init);
+        $('body').on('click', '.delete-subscription', $.hood.Subscriptions.Delete);
+        $('body').on('click', '.create-subscription', $.hood.Subscriptions.Create.Init);
 
         if ($('#edit-subscription').doesExist())
-            this.Edit.Init();
+            $.hood.Subscriptions.Edit.Init();
     },
     Delete: function (e) {
         var $this = $(this);
@@ -137,4 +137,4 @@ $.hood.Subscriptions = {
         }
     }
 };
-$.hood.Subscriptions.Init();
+$(document).ready($.hood.Subscriptions.Init);

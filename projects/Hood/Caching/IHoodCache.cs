@@ -9,7 +9,7 @@ namespace Hood.Caching
         IDictionary<string, DateTime> Entries { get; }
         bool TryGetValue<T>(string key, out T cacheItem);
 
-        string Add<T>(string key, T cacheItem, MemoryCacheEntryOptions options = null);
+        void Add<T>(string key, T cacheItem, MemoryCacheEntryOptions options = null);
 
         void ResetCache();
         void Remove(string key);

@@ -2,23 +2,23 @@
     $.hood = {};
 $.hood.Forum = {
     Init: function () {
-        $('body').on('click', '.delete-forum', this.Delete);
-        $('body').on('click', '.create-forum', this.Create.Init);
-        $('body').on('click', '.publish-forum', this.Publish);
-        $('body').on('click', '.archive-forum', this.Archive);
-        $('body').on('click', '.create-forum', this.Create.Init);
-        $('body').on('click', '.edit-forum-category', this.Categories.Edit);
-        $('body').on('click', '.save-forum-category', this.Categories.Save);
-        $('body').on('click', '.add-forum-category', this.Categories.Add);
-        $('body').on('click', '.delete-forum-category', this.Categories.Delete);
-        $('body').on('change', '.forum-category-check', this.Categories.ToggleCategory);
+        $('body').on('click', '.delete-forum', $.hood.Forum.Delete);
+        $('body').on('click', '.create-forum', $.hood.Forum.Create.Init);
+        $('body').on('click', '.publish-forum', $.hood.Forum.Publish);
+        $('body').on('click', '.archive-forum', $.hood.Forum.Archive);
+        $('body').on('click', '.create-forum', $.hood.Forum.Create.Init);
+        $('body').on('click', '.edit-forum-category', $.hood.Forum.Categories.Edit);
+        $('body').on('click', '.save-forum-category', $.hood.Forum.Categories.Save);
+        $('body').on('click', '.add-forum-category', $.hood.Forum.Categories.Add);
+        $('body').on('click', '.delete-forum-category', $.hood.Forum.Categories.Delete);
+        $('body').on('change', '.forum-category-check', $.hood.Forum.Categories.ToggleCategory);
 
         $('body').on('keyup', '#Slug', function () {
             $('.slug-display').html($(this).val());
         });
 
         if ($('#edit-forum').doesExist())
-            this.Edit.Init();
+            $.hood.Forum.Edit.Init();
     },
     Categories: {
         Edit: function (e) {
@@ -297,7 +297,4 @@ $.hood.Forum = {
         }
     }
 };
-$(window).on('load', function () {
-    $.hood.Forum.Init();
-});
-
+$(document).ready($.hood.Forum.Init);

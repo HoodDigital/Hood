@@ -25,11 +25,12 @@ namespace Hood.ViewModels
         public bool Featured { get; set; }
         [FromQuery(Name = "inline")]
         public bool Inline { get; set; }
+        [FromQuery(Name = "categories")]
+        public List<string> Categories { get; set; }
 
         // Sidebar Stuff
         public ContentType ContentType { get; set; }
         public PagedList<Content> Recent { get; set; }
-        public IEnumerable<ContentCategory> Categories { get; set; }
 
         // Single Stuff
         public Content Content { get; set; }
@@ -43,6 +44,11 @@ namespace Hood.ViewModels
         public override string GetPageUrl(int pageIndex)
         {
             var query = base.GetPageUrl(pageIndex);
+            if (Categories != null)
+                foreach (var cat in Categories)
+                {
+                    query += "&categories=" + cat;
+                }
             query += Category.IsSet() ? "&category=" + Category : "";
             query += Type.IsSet() ? "&type=" + Type : "";
             query += Filter.IsSet() ? "&filter=" + Filter : "";
@@ -50,11 +56,6 @@ namespace Hood.ViewModels
             query += Status.HasValue ? "&status=" + Status : "";
             query += Inline ? "&inline=" + Inline : "";
             return query;
-        }
-
-        public static implicit operator List<object>(ContentModel v)
-        {
-            throw new NotImplementedException();
         }
     }
 }
