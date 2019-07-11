@@ -7,8 +7,6 @@ $.hood.Content = {
         $('body').on('click', '.content-clone', $.hood.Content.Clone);
         $('body').on('click', '.content-set-status', $.hood.Content.SetStatus);
 
-        $('body').on('click', '.content-categories-save', $.hood.Content.Categories.Save);
-        $('body').on('click', '.content-categories-add', $.hood.Content.Categories.Add);
         $('body').on('click', '.content-categories-delete', $.hood.Content.Categories.Delete);
         $('body').on('change', '.content-categories-check', $.hood.Content.Categories.ToggleCategory);
 
@@ -224,20 +222,22 @@ $.hood.Content = {
     },
 
     Categories: {
-        Save: function (e) {
-            e.preventDefault();
-            $tag = $(this);
-            $.post($('#content-categories-edit-form').attr('action'), $('#content-categories-edit-form').serialize(), function (data) {
-                $.hood.Helpers.ProcessResponse(data);
-                $.hood.Content.Lists.Categories.Reload();
-            });
-        },
-        Add: function (e) {
-            e.preventDefault();
-            $tag = $(this);
-            $.post($('#content-categories-add-form').attr('action'), $('#content-categories-add-form').serialize(), function (data) {
-                $.hood.Helpers.ProcessResponse(data);
-                $.hood.Content.Lists.Categories.Reload();
+        Editor: function () {
+            $('#content-categories-edit-form').hoodValidator({
+                validationRules: {
+                    DisplayName: {
+                        required: true
+                    },
+                    Slug: {
+                        required: true
+                    }
+                },
+                submitButtonTag: $('#content-categories-edit-submit'),
+                submitUrl: $('#content-categories-edit-form').attr('action'),
+                submitFunction: function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    $.hood.Content.Lists.Categories.Reload();
+                }
             });
         },
         ToggleCategory: function () {

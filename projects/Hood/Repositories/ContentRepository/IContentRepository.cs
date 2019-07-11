@@ -13,8 +13,8 @@ namespace Hood.Services
         #region Content CRUD
         Task<ContentModel> GetContentAsync(ContentModel model);
         Task<Content> GetContentByIdAsync(int id, bool clearCache = false, bool track = true);
-        Task AddAsync(Content content);
-        Task UpdateAsync(Content content);
+        Task<Content> AddAsync(Content content);
+        Task<Content> UpdateAsync(Content content);
         Task DeleteAsync(int id);
         Task SetStatusAsync(int id, ContentStatus status);
         Task DeleteAllAsync(string type);

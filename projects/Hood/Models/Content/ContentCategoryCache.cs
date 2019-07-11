@@ -229,7 +229,7 @@ namespace Hood.Caching
                 {carets}{category.DisplayName} <span>({category.Count})</span>
             </label>
             <div class='col-auto p-2'>
-                <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}'>
+                <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
                     <i class='fa fa-edit'></i><span>
                         Edit
                     </span>

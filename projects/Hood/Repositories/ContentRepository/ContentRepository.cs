@@ -173,7 +173,7 @@ namespace Hood.Services
             }
             return content;
         }
-        public async Task AddAsync(Content content)
+        public async Task<Content> AddAsync(Content content)
         {
             // create the slug
             var generator = new KeyGenerator();
@@ -186,14 +186,16 @@ namespace Hood.Services
             content = await GetContentByIdAsync(content.Id);
             await RefreshMetasAsync(content);
             _eventService.TriggerContentChanged(this);
+            return content;
         }
-        public async Task UpdateAsync(Content content)
+        public async Task<Content> UpdateAsync(Content content)
         {
             string cacheKey = typeof(Content).ToString() + ".Single." + content.Id;
             _db.Update(content);
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
             _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+            return content;
         }
         public async Task DeleteAsync(int id)
         {

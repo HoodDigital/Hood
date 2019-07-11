@@ -168,7 +168,8 @@ namespace Hood.Areas.Admin.Controllers
             Content model = new Content()
             {
                 PublishDate = DateTime.Now,
-                Type = Engine.Settings.Content.GetContentType(type)
+                Type = Engine.Settings.Content.GetContentType(type),
+                Status = ContentStatus.Draft
             };
             return View("_Blade_Content", model);
         }
@@ -179,19 +180,18 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 model.AllowComments = true;
-                model.AuthorId = user.Id;
+                model.AuthorId = Engine.Account.Id;
                 model.Body = "";
-                model.CreatedBy = user.UserName;
+                model.CreatedBy = Engine.Account.UserName;
                 model.CreatedOn = DateTime.Now;
-                model.LastEditedBy = user.UserName;
+                model.LastEditedBy = Engine.Account.UserName;
                 model.LastEditedOn = DateTime.Now;
                 model.Public = true;
                 model.ShareCount = 0;
                 model.Views = 0;
-                await _content.AddAsync(model);
-                return new Response(true, "Published successfully.");
+                model = await _content.AddAsync(model);
+                return new Response(true, $"The content was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { id = model.Id })}'>Go to the new content</a>");
             }
             catch (Exception ex)
             {
@@ -278,7 +278,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/content/categories/add/")]
+        [Route("admin/content/categories/add/{type}/")]
         public async Task<Response> CreateCategory(ContentCategory category)
         {
             try
@@ -289,7 +289,6 @@ namespace Hood.Areas.Admin.Controllers
                 var categoryResult = await _content.AddCategoryAsync(category);
                 _contentCategoryCache.ResetCache();
 
-#warning TODO: Handle response in JS.
                 return new Response(true, "Added the category.");
             }
             catch (Exception ex)
@@ -307,7 +306,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/content/categories/save/")]
+        [Route("admin/content/categories/edit/{id}/")]
         public async Task<Response> EditCategory(ContentCategory model)
         {
             try
