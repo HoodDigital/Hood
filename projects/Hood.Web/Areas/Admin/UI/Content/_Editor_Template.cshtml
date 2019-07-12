@@ -1,4 +1,4 @@
-@model EditContentModel
+@model Content
 <h5>Choose the template</h5>
 <div class="ibox-content">
     <fieldset class="form-horizontal">
@@ -35,7 +35,7 @@
                 {
                     <hr />
                 }
-                await Html.RenderPartialAsync("_MetaEditor_Template", (object)cm);
+                await Html.RenderPartialAsync("_Editor_Metadata_Template", (object)cm);
                 previousName = cm.Name.Split('.')[cm.Name.Split('.').Length - 2].Replace("-", " ").ToTitleCase(); ;
             }
         </fieldset>

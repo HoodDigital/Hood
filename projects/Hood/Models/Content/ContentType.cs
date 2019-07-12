@@ -8,6 +8,39 @@ namespace Hood.Models
 {
     public class ContentType
     {
+        public static ContentType Null
+        {
+            get {
+                return new ContentType()
+                {
+                    BaseName = "Unknown",
+                    Slug = "unknown",
+                    Type = "unknown",
+                    Search = "unknown",
+                    Title = "Unknowns",
+                    Icon = "fa-newspaper",
+                    TypeName = "Unknown",
+                    Enabled = false,
+                    IsPublic = false,
+                    HasPage = false,
+                    TypeNamePlural = "Unknown",
+                    TitleName = "Title",
+                    ExcerptName = "Excerpt",
+                    MultiLineExcerpt = true,
+                    ShowDesigner = false,
+                    ShowEditor = true,
+                    ShowCategories = false,
+                    ShowBanner = true,
+                    ShowImage = true,
+                    Gallery = true,
+                    UrlFormatting = "news-title",
+                    Templates = false,
+                    TemplateFolder = "Templates",
+                    CustomFields = new List<CustomField>()
+                };
+            }
+        }
+        public bool IsUnknown { get { return Type == "unknown"; } }
         [Display(Name = "Base Name", Description = "The base name of this content type. Do not change this.")]
         public string BaseName { get; set; }
         [Display(Name= "Enabled", Description= "Enable this content type for use on the site.")]

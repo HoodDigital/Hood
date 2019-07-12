@@ -1,0 +1,35 @@
+@model Content
+@if (Model.Type.ShowImage)
+{
+    <input type="hidden" asp-for="FeaturedImageJson">
+    <div class="form-group row align-items-center">
+        <div class="col-auto">
+            <fixedImage src="@Model.FeaturedImage.SmallUrl" class="img-sm img-circle m-0 FeaturedImage" id="content-feature-image" />
+        </div>
+        <div class="col">
+            <h6>Featured Image</h6>
+            <p class="m-0">
+                <mediaAttach asp-for="FeaturedImage" asp-entity="@nameof(Content)" asp-id="@Model.Id" asp-filetype="Image" asp-json="FeaturedImageJson">
+                    Choose...                
+                </mediaAttach>
+            </p>
+        </div>
+    </div>
+}
+@if (Model.Type.ShowBanner)
+{
+    <input type="hidden" asp-for="ShareImageJson">
+    <div class="form-group row align-items-center">
+        <div class="col-auto">
+            <fixedImage src="@Model.ShareImage.SmallUrl" class="img-sm img-circle m-0 ShareImage" id="content-share-image" />
+        </div>
+        <div class="col">
+            <h6>Featured Image</h6>
+            <p class="m-0">
+                <mediaAttach asp-for="ShareImage" asp-entity="@nameof(Content)" asp-id="@Model.Id" asp-filetype="Image" asp-json="ShareImageJson">
+                    Choose...                
+                </mediaAttach>
+            </p>
+        </div>
+    </div>
+}

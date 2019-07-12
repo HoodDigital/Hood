@@ -193,7 +193,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/settings/content/")]
-        public async Task<IActionResult> ContentAsync(ContentSettings model)
+        public async Task<IActionResult> Content(ContentSettings model)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/content/reset/")]
-        public async Task<IActionResult> ResetContentAsync()
+        public async Task<IActionResult> ResetContent()
         {
             var model = new ContentSettings();
             Engine.Settings.Set(model);
@@ -227,7 +227,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/content/add-type/")]
-        public async Task<IActionResult> AddContentTypeAsync()
+        public async Task<IActionResult> AddContentType()
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;
@@ -281,7 +281,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/content/delete-type/")]
-        public async Task<IActionResult> DeleteContentTypeAsync(string type)
+        public async Task<IActionResult> DeleteContentType(string type)
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;

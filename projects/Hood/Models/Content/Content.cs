@@ -27,6 +27,7 @@ namespace Hood.Models
         public int? ParentId { get; set; }
 
         // Dates
+        [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
@@ -184,7 +185,6 @@ namespace Hood.Models
         public List<ContentCategoryJoin> Categories { get; set; }
         public List<ContentMeta> Metadata { get; set; }
         public List<ContentMedia> Media { get; set; }
-        public List<ContentTagJoin> Tags { get; set; }
 
         public string FeaturedImageJson { get; set; }
         [NotMapped]
@@ -202,41 +202,23 @@ namespace Hood.Models
             set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
 
-        [NotMapped]
-        public string TagString
-        {
-            get
-            {
-                if (Tags != null)
-                    return string.Join(",", Tags.Select(x => x.Tag?.Value).ToArray());
-                return "";
-            }
-        }
         public bool IsInCategory(int categoryId)
         {
             if (Categories == null)
                 return false;
             return Categories.Select(c => c.Category.Id).Contains(categoryId);
         }
-        public void AddTag(string value)
-        {
-            if (Tags == null)
-                Tags = new List<ContentTagJoin>();
-            if (!Tags.Select(c => c.Tag.Value).Contains(value))
-            {
-                Tags.Add(new ContentTagJoin() { ContentId = Id, TagId = value });
-            }
-        }
-        public void RemoveTag(string value)
-        {
-            if (Tags == null)
-                Tags = new List<ContentTagJoin>();
-            var tag = Tags.Where(c => c.Tag.Value == value).FirstOrDefault();
-            if (tag != null)
-            {
-                Tags.Remove(tag);
-            }
-        }
+
+        #region Edit View Model Stuff
+        [NotMapped]
+        public Dictionary<string, string> Templates { get; set; }
+        [NotMapped]
+        public List<Subscription> Subscriptions { get; set; }
+        [NotMapped]
+        public List<UserProfile> Authors { get; set; }
+        #endregion
+
+        #region Metadata
         public ContentMeta GetMeta(string name)
         {
             ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
@@ -284,13 +266,7 @@ namespace Hood.Models
             }
             return false;
         }
-        public Content Clean()
-        {
-            Author.Content = null;
-            Author.Properties = null;
-            Author.Addresses = null;
-            return this;
-        }
+        #endregion
     }
 }
 

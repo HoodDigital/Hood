@@ -47,10 +47,10 @@ namespace Hood.Services
                                                      .Include(p => p.Media)
                                                      .Include(p => p.Metadata)
                                                      .Include(p => p.Categories).ThenInclude(c => c.Category)
-                                                     .Include(p => p.Tags).ThenInclude(t => t.Tag).AsNoTracking();
+                                                     .AsNoTracking();
 
             // filter posts by type
-            if (!string.IsNullOrEmpty(model.Type))
+            if (model.Type.IsSet())
             {
                 content = content.Where(c => c.ContentType == model.Type);
             }
@@ -161,7 +161,6 @@ namespace Hood.Services
             if (!_cache.TryGetValue(cacheKey, out Content content) || clearCache)
             {
                 content = _db.Content.Include(p => p.Categories).ThenInclude(c => c.Category)
-                                    .Include(p => p.Tags).ThenInclude(t => t.Tag)
                                     .Include(p => p.Media)
                                     .Include(p => p.Metadata)
                                     .Include(p => p.Author)
@@ -178,7 +177,7 @@ namespace Hood.Services
             // create the slug
             var generator = new KeyGenerator();
             content.Slug = generator.UrlSlug();
-            while (!await CheckSlugAsync(content.Slug))
+            while (await SlugExists(content.Slug))
                 content.Slug = generator.UrlSlug();
 
             _db.Content.Add(content);
@@ -241,7 +240,6 @@ namespace Hood.Services
             var copyObject = await _db.Content
                                 .AsNoTracking()
                                 .Include(p => p.Categories).ThenInclude(c => c.Category)
-                                .Include(p => p.Tags).ThenInclude(t => t.Tag)
                                 .Include(p => p.Media)
                                 .Include(p => p.Metadata)
                                 .SingleOrDefaultAsync(c => c.Id == id);
@@ -250,11 +248,6 @@ namespace Hood.Services
             foreach (var c in copyObject.Categories)
             {
                 clone.Categories.Add(new ContentCategoryJoin() { ContentId = clone.Id, CategoryId = c.CategoryId });
-            }
-            clone.Tags = new List<ContentTagJoin>();
-            foreach (var c in copyObject.Tags)
-            {
-                clone.Tags.Add(new ContentTagJoin() { ContentId = clone.Id, TagId = c.TagId });
             }
             clone.Media = new List<ContentMedia>();
             foreach (var c in copyObject.Media)
@@ -331,33 +324,6 @@ namespace Hood.Services
                 _cache.Add(cacheKey, neighbours, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }
             return neighbours;
-        }
-        #endregion
-
-        #region Tags
-        public async Task<ContentTag> AddTagAsync(string value)
-        {
-            value = value.Trim().ToTitleCase();
-            var tag = _db.ContentTags.SingleOrDefault(t => t.Value == value);
-            if (tag == null)
-            {
-                tag = new ContentTag() { Value = value };
-                _db.ContentTags.Add(tag);
-                await _db.SaveChangesAsync();
-                _eventService.TriggerContentChanged(this);
-            }
-            return tag;
-        }
-        public async Task DeleteTagAsync(string value)
-        {
-            value = value.ToTitleCase();
-            var tag = _db.ContentTags.SingleOrDefault(t => t.Value == value);
-            if (tag != null)
-            {
-                _db.ContentTags.Remove(tag);
-                await _db.SaveChangesAsync();
-                _eventService.TriggerContentChanged(this);
-            }
         }
         #endregion
 
@@ -692,7 +658,7 @@ namespace Hood.Services
         #endregion
 
         #region Helpers
-        public async Task<bool> CheckSlugAsync(string slug, int? id = null)
+        public async Task<bool> SlugExists(string slug, int? id = null)
         {
             if (id.HasValue)
                 return await _db.Content.AnyAsync(c => c.Slug == slug && c.Id != id);

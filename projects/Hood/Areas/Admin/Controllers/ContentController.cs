@@ -29,10 +29,10 @@ namespace Hood.Areas.Admin.Controllers
         {
         }
 
-        [Route("admin/content/manage/{type}/")]
+        [Route("admin/content/manage/{type?}/")]
         public async Task<IActionResult> Index(ContentModel model) => await List(model, "Index");
 
-        [Route("admin/content/list/{type}/")]
+        [Route("admin/content/list/{type?}/")]
         public async Task<IActionResult> List(ContentModel model, string viewName = "_List_Content")
         {
             model = await _content.GetContentAsync(model);
@@ -47,75 +47,52 @@ namespace Hood.Areas.Admin.Controllers
             var content = await _content.GetContentByIdAsync(id, true);
             if (content == null)
                 return NotFound();
-            EditContentModel model = await GetEditorModel(content);
+            Content model = await GetEditorModel(content);
             return View(model);
         }
 
         [HttpPost()]
         [Route("admin/content/{id}/edit/")]
-        public async Task<ActionResult> Edit(EditContentModelSend post)
+        public async Task<ActionResult> Edit(Content model)
         {
-            var content = await _content.GetContentByIdAsync(post.Id, true);
             try
             {
-                post.PublishDate = post.PublishDate.AddHours(post.PublishHour);
-                post.PublishDate = post.PublishDate.AddMinutes(post.PublishMinute);
-                post.CopyProperties(content);
-                content.AuthorId = post.AuthorId;
-                content.Featured = post.Featured;
-                content.LastEditedBy = User.Identity.Name;
-                content.LastEditedOn = DateTime.Now;
+                model.LastEditedBy = User.Identity.Name;
+                model.LastEditedOn = DateTime.Now;
 
-                if (content.Slug.IsSet())
+                if (model.Slug.IsSet())
                 {
-                    if (!await _content.CheckSlugAsync(content.Slug, content.Id))
+                    if (await _content.SlugExists(model.Slug, model.Id))
                         throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
                 }
                 else
                 {
                     var generator = new KeyGenerator();
-                    content.Slug = generator.UrlSlug();
-                    while (!await _content.CheckSlugAsync(content.Slug))
-                        content.Slug = generator.UrlSlug();
+                    model.Slug = generator.UrlSlug();
+                    while (await _content.SlugExists(model.Slug))
+                        model.Slug = generator.UrlSlug();
                 }
 
-                List<string> tags = post.Tags?.Split(',').ToList();
-                if (tags == null)
-                    tags = new List<string>();
-                foreach (string tag in tags)
-                {
-                    // check if it exists in the db, if not add it. 
-                    var tagResult = await _content.AddTagAsync(tag);
-
-                    // add it to the model object.
-                    content.AddTag(tagResult.Value);
-                }
-                if (content.Tags != null)
-                {
-                    var extraneous = content.Tags.Where(p => !tags.Select(t => t.Trim().ToTitleCase()).Any(p2 => p2 == p.TagId)).Select(s => s.TagId).ToArray();
-                    for (int i = 0; i < extraneous.Count(); i++)
-                        content.RemoveTag(extraneous[i]);
-                }
                 var _contentSettings = Engine.Settings.Content;
-                var type = _contentSettings.GetContentType(content.ContentType);
+                var type = _contentSettings.GetContentType(model.ContentType);
                 // update  meta values
-                var oldTemplate = content.GetMeta("Settings.Template").GetStringValue();
+                var oldTemplate = model.GetMeta("Settings.Template").GetStringValue();
                 foreach (var val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
                         // bosh we have a meta
-                        if (content.HasMeta(val.Key.Replace("Meta:", "")))
+                        if (model.HasMeta(val.Key.Replace("Meta:", "")))
                         {
-                            content.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            model.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                         else
                         {
                             // Add it...
                             var metaDetails = type.GetMetaDetails(val.Key.Replace("Meta:", ""));
-                            content.AddMeta(new ContentMeta()
+                            model.AddMeta(new ContentMeta()
                             {
-                                ContentId = content.Id,
+                                ContentId = model.Id,
                                 Name = metaDetails.Name,
                                 Type = metaDetails.Type,
                                 BaseValue = JsonConvert.SerializeObject(val.Value)
@@ -124,19 +101,19 @@ namespace Hood.Areas.Admin.Controllers
                         }
                     }
                 }
-                var currentTemplate = content.GetMeta("Settings.Template").GetStringValue();
+                var currentTemplate = model.GetMeta("Settings.Template").GetStringValue();
                 // check if new template has been selected
                 if (oldTemplate.IsSet() && currentTemplate.IsSet())
                 {
                     // delete all template metas that do not exist in the new template, and add any that are missing
                     List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, type.TemplateFolder);
-                    _content.UpdateTemplateMetas(content, newMetas);
+                    _content.UpdateTemplateMetas(model, newMetas);
                 }
 
 
-                await _content.UpdateAsync(content);
+                await _content.UpdateAsync(model);
 
-                EditContentModel model = await GetEditorModel(content);
+                model = await GetEditorModel(model);
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
                 return View(model);
@@ -144,7 +121,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                EditContentModel model = await GetEditorModel(content);
+                model = await GetEditorModel(model);
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
@@ -512,45 +489,38 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Helpers
 
-        protected async Task<EditContentModel> GetEditorModel(Content content)
+        protected async Task<Content> GetEditorModel(Content model)
         {
-            EditContentModel model = new EditContentModel()
-            {
-                ContentType = Engine.Settings.Content.GetContentType(content.ContentType),
-                Content = content
-            };
-            var admins = await _userManager.GetUsersInRoleAsync("Admin");
-            var editors = await _userManager.GetUsersInRoleAsync("Editor");
-            model.Authors = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
+            model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
-            // Templates
-            if (model.ContentType.Templates)
-                model = GetTemplates(model, model.ContentType.TemplateFolder);
+#warning Replace this with a client side lookup.
+            var authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
+            model.Authors = authors.List;
 
-            // Special type features.
-            switch (model.ContentType.BaseName)
+            if (model.Type != null)
             {
-                case "Page":
-                    model = await GetPageEditorFeatures(model);
-                    break;
+                // Templates
+                if (model.Type.Templates)
+                    model = GetTemplates(model, model.Type.TemplateFolder);
+
+                // Special type features.
+                switch (model.Type.BaseName)
+                {
+                    case "Page":
+                        if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
+                        {
+                            // get subscriptions - if there are any.
+                            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+                            model.Subscriptions = subs.List;
+                        }
+                        break;
+                }
             }
 
             return model;
         }
 
-        protected async Task<EditContentModel> GetPageEditorFeatures(EditContentModel model)
-        {
-
-            if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
-            {
-                // get subscriptions - if there are any.
-                var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
-                model.Subscriptions = subs.List;
-            }
-            return model;
-        }
-
-        protected EditContentModel GetTemplates(EditContentModel model, string templateDirectory)
+        protected Content GetTemplates(Content model, string templateDirectory)
         {
             Dictionary<string, string> templates = new Dictionary<string, string>();
 

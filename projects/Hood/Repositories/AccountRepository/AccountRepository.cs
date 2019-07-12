@@ -159,6 +159,11 @@ namespace Hood.Services
                 query = query.Where(q => q.RoleIds.Contains(model.Role));
             }
 
+            if (model.RoleIds != null && model.RoleIds.Count > 0)
+            {
+                query = query.Where(q => model.RoleIds.Any(m => q.RoleIds.Contains(m)));
+            }
+
             if (model.Subscription.IsSet())
             {
                 query = query.Where(q => q.ActiveSubscriptionIds.Contains(model.Subscription));

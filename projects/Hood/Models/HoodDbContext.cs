@@ -41,7 +41,6 @@ namespace Hood.Models
         // Content
         public DbSet<Content> Content { get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
-        public DbSet<ContentTag> ContentTags { get; set; }
 
         // Forums
         public DbSet<Forum> Forums { get; set; }

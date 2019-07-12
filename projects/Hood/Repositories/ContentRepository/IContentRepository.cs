@@ -34,11 +34,6 @@ namespace Hood.Services
         Task<ContentNeighbours> GetNeighbourContentAsync(int id, string type, string category = null);
         #endregion
 
-        #region Tags
-        Task<ContentTag> AddTagAsync(string value);
-        Task DeleteTagAsync(string value);
-        #endregion
-
         #region Categories 
         Task<ContentCategory> GetCategoryByIdAsync(int categoryId);
         Task<IEnumerable<ContentCategory>> GetCategoriesAsync(int contentId);
@@ -65,7 +60,7 @@ namespace Hood.Services
         #endregion
 
         #region Helpers
-        Task<bool> CheckSlugAsync(string slug, int? id = null);
+        Task<bool> SlugExists(string slug, int? id = null);
         #endregion
 
         #region Statistics

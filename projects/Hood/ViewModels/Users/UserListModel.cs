@@ -12,6 +12,7 @@ namespace Hood.ViewModels
         public string Role { get; set; }
         [FromQuery(Name = "sub")]
         public string Subscription { get; set; }
+        public List<string> RoleIds { get; set; }
 
         public override string GetPageUrl(int pageIndex)
         {

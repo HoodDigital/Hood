@@ -15,7 +15,7 @@
                             @meta.Name.Replace("Custom.", "").ToSentenceCase().CamelCaseToString().Replace(".", " ")
                         </label>
                         <div class="col-sm-8">
-                            @{await Html.RenderPartialAsync("_MetaEditor_Default", meta); }
+                            @{await Html.RenderPartialAsync("_Editor_Metadata", meta); }
                         </div>
                     </div>
                 }

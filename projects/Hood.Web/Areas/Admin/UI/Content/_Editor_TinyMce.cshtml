@@ -1,7 +1,7 @@
-@model EditContentModel
+@model Content
 @{
     var _basics = Engine.Settings.Basic;
 }
 <h4>Content Body</h4>
 <p>This is the main content, and you can edit it with the following rich text editor:</p>
-<textarea id="Body" name="Body" class="@Engine.Settings.WysiwygEditorClass-content">@Model.Content.Body</textarea>
+<textarea asp-for="Body" class="tinymce-content"></textarea>

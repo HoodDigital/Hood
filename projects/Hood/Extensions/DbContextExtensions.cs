@@ -38,12 +38,7 @@ namespace Hood.Models
             builder.Entity<Content>().ToTable("HoodContent");
             builder.Entity<Content>().HasOne(c => c.Author).WithMany(up => up.Content).HasForeignKey(c => c.AuthorId);
 
-            // Content Tags
-            builder.Entity<ContentTag>().ToTable("HoodContentTags");
-            builder.Entity<ContentTagJoin>().ToTable("HoodContentTagJoins");
-            builder.Entity<ContentTagJoin>().HasKey(t => new { t.ContentId, t.TagId });
-            builder.Entity<ContentTagJoin>().HasOne(pt => pt.Tag).WithMany(p => p.Content).HasForeignKey(pt => pt.TagId);
-            builder.Entity<ContentTagJoin>().HasOne(pt => pt.Content).WithMany(t => t.Tags).HasForeignKey(pt => pt.ContentId);
+            // Content Media
             builder.Entity<ContentMedia>().ToTable("HoodContentMedia");
             builder.Entity<ContentMedia>().HasOne(up => up.Content).WithMany(t => t.Media).HasForeignKey(au => au.ContentId);
 

@@ -1,14 +1,13 @@
-@model EditContentModel
+@model Content
 
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
-    Hood.Infrastructure.OperationResult subResult = Engine.Settings.SubscriptionsEnabled();
-    bool subsEnabled = subResult.Succeeded;
+    bool subsEnabled = Engine.Settings.Billing.IsSubscriptionsEnabled;
 }
-<h5>@Model.Content.ContentType.ToTitleCase() Security Settings</h5>
+<h5>@Model.ContentType.ToTitleCase() Security Settings</h5>
 <div class="ibox-content">
     <fieldset class="form-horizontal">
-        @foreach (ContentMeta cm in Model.Content.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).OrderBy(cm => cm.Name))
+        @foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).OrderBy(cm => cm.Name))
         {
             if (cm.Name == "Settings.Security.Subscription")
             {
@@ -53,7 +52,7 @@
                         @cm.Name.Replace("Settings.Security.", "").CamelCaseToString():
                     </label>
                     <div class="col-sm-8">
-                        @{await Html.RenderPartialAsync("_MetaEditor_Default", (object)cm); }
+                        @{await Html.RenderPartialAsync("_Editor_Metadata", (object)cm); }
                     </div>
                 </div>
             }

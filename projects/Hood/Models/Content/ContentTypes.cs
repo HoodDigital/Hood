@@ -46,7 +46,7 @@ namespace Hood.Models
                         Type = "news",
                         Search = "news",
                         Title = "News Stories",
-                        Icon = "fa-newspaper-o",
+                        Icon = "fa-newspaper",
                         TypeName = "Story",
                         Enabled = true,
                         IsPublic = true,

@@ -1,4 +1,4 @@
-@model EditContentModel
+@model Content
 @{
     var typeFields = Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.ContentType.BaseName + "."));
 }
@@ -14,7 +14,7 @@
                         @cm.Name.Replace("Content." + Model.ContentType.BaseName + ".", "").CamelCaseToString().ToTitleCase():
                     </label>
                     <div class="col-sm-8">
-                        @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+                        @{await Html.RenderPartialAsync("_Editor_Metadata", cm); }
                     </div>
                 </div>
             }
@@ -40,7 +40,7 @@
                         @cm.Name.Replace("Custom.", "").ToSentenceCase():
                     </label>
                     <div class="col-sm-8">
-                        @{await Html.RenderPartialAsync("_MetaEditor_Default", cm); }
+                        @{await Html.RenderPartialAsync("_Editor_Metadata", cm); }
                     </div>
                 </div>
             }

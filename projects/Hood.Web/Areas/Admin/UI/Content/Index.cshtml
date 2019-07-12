@@ -1,8 +1,13 @@
 ﻿@model ContentModel
-@inject ContentCategoryCache _categories
 @{
-    var categories = _categories.TopLevel(Model.ContentType.Type);
-    ViewBag.Title = Model.ContentType.Title;
+    if (!Model.ContentType.IsUnknown)
+    {
+        ViewBag.Title = Model.ContentType.Title;
+    }
+    else
+    {
+        ViewBag.Title = "All Content";
+    }
 }
 @section buttons {
     @if (Model.ContentType.IsPublic)
@@ -19,10 +24,13 @@
             Delete All
         </a>
     }
-    <a class="btn btn-success hood-modal" asp-action="Create" asp-route-type="@Model.ContentType.Slug" data-complete="$.hood.Content.Create.Loaded">
-        <i class="fa fa-user-plus mr-2"></i>
-        Create New
-    </a>
+    @if (Model.ContentType.IsUnknown)
+    {
+        <a class="btn btn-success hood-modal" asp-action="Create" asp-route-type="@Model.ContentType.Slug" data-complete="$.hood.Content.Create">
+            <i class="fa fa-user-plus mr-2"></i>
+            Create New
+        </a>
+    }
 }
 @if (Model.SaveMessage.IsSet())
 {
@@ -33,9 +41,12 @@
         <div class="col-sm-3">
             <input type="hidden" asp-for="PageIndex" />
             <input type="hidden" asp-for="PageSize" />
-            <div id="content-categories-list" class="hood-inline-list" data-url="@Url.Action("Categories")" data-complete="$.hood.Content.Lists.Categories.Loaded">
-                <partial name="_List_Categories" />
-            </div>
+            @if (Model.ContentType.ShowCategories)
+            {
+                <div id="content-categories-list" class="hood-inline-list" data-url="@Url.Action("Categories")" data-complete="$.hood.Content.Lists.Categories.Loaded">
+                    <partial name="_List_Categories" />
+                </div>
+            }
             <div class="card mb-3">
                 <div class="card-header position-relative" id="content-search-panel-heading">
                     <p class="card-title m-0 font-weight-bold">
@@ -74,7 +85,7 @@
                         <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
                             <li class="nav-item">
                                 <a class="nav-link active" id="items-tab" data-toggle="tab" href="#items" role="tab" aria-controls="items" aria-selected="true">
-                                    @Model.ContentType.Title
+                                    @ViewBag.Title
                                 </a>
                             </li>
                         </ul>
@@ -83,8 +94,8 @@
                 <div class="card-body p-0">
                     <div class="tab-content">
                         <div id="items" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="items-tab">
-                            <div id="content-list" class="hood-inline-list query" data-url="@Url.Action("List")" data-complete="$.hood.Content.Lists.Content.Loaded">
-                                <alert icon="fa fa-4x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading Content...</alert>
+                            <div id="content-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Content.Lists.Content.Loaded">
+                                <partial name="_List_Content" />
                             </div>
                         </div>
                     </div>

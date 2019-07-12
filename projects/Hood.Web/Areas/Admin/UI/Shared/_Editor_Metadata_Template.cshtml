@@ -2,7 +2,7 @@
 @{
     string name = Model.Name.Split('.')[Model.Name.Split('.').Length - 2].Replace("-", " ").ToTitleCase();
     string type = Model.Name.Split('.')[Model.Name.Split('.').Length - 1];
-    var _mediaSettings = Engine.Settings.GetMediaSettings();
+    var _mediaSettings = Engine.Settings.Media;
 }
 <div class="form-group">
     <label for="@string.Format("Meta:{0}", Model.Name)" class="col-sm-3 control-label">

@@ -2,7 +2,6 @@
 @inject ContentCategoryCache _categories
 @{
     Layout = null;
-    var categories = _categories.TopLevel(Model.ContentType.Type);
 }
 @if (Model.List.Count > 0)
 {
@@ -25,6 +24,10 @@
                                 <a asp-action="Edit" asp-route-id="@content.Id">@content.Title</a>
                             </h5>
                             <p class="card-text mb-1">
+                                @if (Model.ContentType.IsUnknown)
+                                {
+                                        <span class="badge badge-info mr-2">@content.ContentType</span>
+                                }
                                 @content.Status.ToHtml()
                             </p>
                             <p class="card-text mb-1">
@@ -35,7 +38,7 @@
                             </p>
                             <p class="card-text mb-1">
                                 <small class="d-block">Created on <i class="fa fa-clock-o"></i> @content.CreatedOn.ToDisplay()</small>
-                                @if (Model.ContentType.HasPage)
+                                @if (Model.ContentType != null && Model.ContentType.HasPage)
                                 {
                                     <small class="d-block font-bold"><a href="@content.Url" target="_blank">@content.Url</a></small>
                                 }
@@ -58,18 +61,15 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" asp-action="Edit" asp-route-id="@content.Id">
-                                <i class="fa fa-edit mr-2"></i> 
+                                <i class="fa fa-edit mr-2"></i>
                                 Edit
                             </a>
-                            @if (!content.IsHomepage)
+                            @if (Model.ContentType != null && Model.ContentType.BaseName == "Page" && !content.IsHomepage)
                             {
-                                @if (Model.ContentType.BaseName == "Page")
-                                {
-                                    <a class="dropdown-item hood-inline-task" asp-action="Edit" asp-route-id="@content.Id" data-complete="$.hood.Content.Lists.Content.Reload">
-                                        <i class="fa fa-home mr-2"></i>
-                                        Set as Homepage
-                                    </a>
-                                }
+                                <a class="dropdown-item hood-inline-task" asp-action="Edit" asp-route-id="@content.Id" data-complete="$.hood.Content.Lists.Content.Reload">
+                                    <i class="fa fa-home mr-2"></i>
+                                    Set as Homepage
+                                </a>
                             }
                             @if (content.Status == ContentStatus.Published)
                             {
@@ -85,7 +85,7 @@
                                     Publish
                                 </a>
                             }
-                            @if (Model.ContentType.HasPage)
+                            @if (Model.ContentType != null && Model.ContentType.HasPage)
                             {
                                 <a class="dropdown-item" href="@content.Url" target="_blank">
                                     <i class="fa fa-search mr-2"></i>
@@ -107,7 +107,17 @@
 }
 else
 {
-    <alert type="Info" icon="fa-info" size="Epic" class="text-center">
-        There are no @Model.ContentType.TypeNamePlural.ToLower() yet, click "Create New" to add your first @Model.ContentType.TypeName.ToLower().
-    </alert>
+    if (Model.ContentType != null)
+    {
+        <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+            There are no @Model.ContentType.TypeNamePlural.ToLower() yet, click "Create New" to add your first @Model.ContentType.TypeName.ToLower().
+        </alert>
+    }
+    else
+    {
+        <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+            There is no content yet, go to a content type to add some.
+        </alert>
+
+    }
 }

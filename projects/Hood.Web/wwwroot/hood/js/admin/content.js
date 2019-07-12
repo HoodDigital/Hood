@@ -128,33 +128,31 @@ $.hood.Content = {
         );
     },
 
-    Create: {
-        Loaded: function (e) {
-            $('#content-create-form').find('.datepicker').datetimepicker({
-                locale: 'en-gb',
-                format: 'L'
-            });
-            $('#content-create-form').hoodValidator({
-                validationRules: {
-                    Title: {
-                        required: true
-                    },
-                    Except: {
-                        required: true
-                    },
-                    PublishDate: {
-                        required: true,
-                        ukdate: true
-                    }
+    Create: function () {
+        $('#content-create-form').find('.datepicker').datetimepicker({
+            locale: 'en-gb',
+            format: 'L'
+        });
+        $('#content-create-form').hoodValidator({
+            validationRules: {
+                Title: {
+                    required: true
                 },
-                submitButtonTag: $('#content-create-submit'),
-                submitUrl: $('#content-create-form').attr('action'),
-                submitFunction: function (data) {
-                    $.hood.Helpers.ProcessResponse(data);
-                    $.hood.Content.Lists.Content.Reload();
+                Except: {
+                    required: true
+                },
+                PublishDate: {
+                    required: true,
+                    ukdate: true
                 }
-            });
-        }
+            },
+            submitButtonTag: $('#content-create-submit'),
+            submitUrl: $('#content-create-form').attr('action'),
+            submitFunction: function (data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Content.Lists.Content.Reload();
+            }
+        });
     },
 
     Edit: {

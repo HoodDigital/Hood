@@ -15,7 +15,7 @@
                             <small>@media.Filename</small>
                         </p>
                         <p class="no-margin">
-                            @if (media.GeneralFileType == "Image")
+                            @if (media.GenericFileType == GenericFileType.Image)
                             {
                                 <a class="btn btn-xs btn-success" asp-action="SetFeatured" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id">Set as featured</a>
                             }

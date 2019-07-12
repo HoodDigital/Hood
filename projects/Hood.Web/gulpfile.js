@@ -1,4 +1,4 @@
-/// <binding AfterBuild='build' />
+/// <binding />
 // Useful gulp functions for the development of HoodCMS.
 // Note this is a demo project and should not be used for production HoodCMS projects.
 // In production, you should install the nuget and bower packages to your HoodCMS project.

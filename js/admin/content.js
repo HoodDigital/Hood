@@ -98,33 +98,31 @@ $.hood.Content = {
 
     $.hood.Alerts.Confirm("This will duplicate the content and everything inside it.", "Are you sure?", duplicateContentCallback, 'warning');
   },
-  Create: {
-    Loaded: function Loaded(e) {
-      $('#content-create-form').find('.datepicker').datetimepicker({
-        locale: 'en-gb',
-        format: 'L'
-      });
-      $('#content-create-form').hoodValidator({
-        validationRules: {
-          Title: {
-            required: true
-          },
-          Except: {
-            required: true
-          },
-          PublishDate: {
-            required: true,
-            ukdate: true
-          }
+  Create: function Create() {
+    $('#content-create-form').find('.datepicker').datetimepicker({
+      locale: 'en-gb',
+      format: 'L'
+    });
+    $('#content-create-form').hoodValidator({
+      validationRules: {
+        Title: {
+          required: true
         },
-        submitButtonTag: $('#content-create-submit'),
-        submitUrl: $('#content-create-form').attr('action'),
-        submitFunction: function submitFunction(data) {
-          $.hood.Helpers.ProcessResponse(data);
-          $.hood.Content.Lists.Content.Reload();
+        Except: {
+          required: true
+        },
+        PublishDate: {
+          required: true,
+          ukdate: true
         }
-      });
-    }
+      },
+      submitButtonTag: $('#content-create-submit'),
+      submitUrl: $('#content-create-form').attr('action'),
+      submitFunction: function submitFunction(data) {
+        $.hood.Helpers.ProcessResponse(data);
+        $.hood.Content.Lists.Content.Reload();
+      }
+    });
   },
   Edit: {
     Init: function Init() {
