@@ -6,7 +6,7 @@ namespace Hood.Services
 {
     public class SubscriptionPlanService : ISubscriptionPlanService
     {
-        private IStripeService _stripe;
+        private readonly IStripeService _stripe;
         public SubscriptionPlanService(IStripeService stripe)
         {
             _stripe = stripe;

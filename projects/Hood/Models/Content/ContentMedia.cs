@@ -2,7 +2,7 @@
 
 namespace Hood.Models
 {
-    public class ContentMedia : MediaObjectBase
+    public class ContentMedia : MediaBase
     {
         public ContentMedia() : base()
         { }
@@ -10,9 +10,14 @@ namespace Hood.Models
         public ContentMedia(IMediaObject mediaResult) : base(mediaResult)
         { }
 
+        public ContentMedia(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
+            : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
+        {
+        }
+
         public int ContentId { get; set; }
         public Content Content { get; set; }
 
-        public new static IMediaObject Blank => MediaObjectBase.Blank;
+        public new static IMediaObject Blank => MediaBase.Blank;
     }
 }

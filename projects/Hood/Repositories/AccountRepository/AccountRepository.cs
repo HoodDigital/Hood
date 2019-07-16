@@ -24,11 +24,13 @@ namespace Hood.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IBillingService _billing;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogService _logService;
 
         public AccountRepository(
             HoodDbContext db,
             IBillingService billing,
             IHttpContextAccessor context,
+            ILogService logService,
             IHoodCache cache,
             UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
@@ -39,6 +41,7 @@ namespace Hood.Services
             _userManager = userManager;
             _roleManager = roleManager;
             _billing = billing;
+            _logService = logService;
         }
 
         #region User Get/Update/Delete
@@ -92,60 +95,76 @@ namespace Hood.Services
             _db.Update(user);
             await _db.SaveChangesAsync();
         }
-        public async Task DeleteUserAsync(ApplicationUser user)
+        public async Task DeleteUserAsync(ApplicationUser user, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-            string container = typeof(ApplicationUser).Name;
-            var logins = await _userManager.GetLoginsAsync(user);
-            foreach (var li in logins)
+            if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetUserId() != user.Id)
             {
-                await _userManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
-            }
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                await _userManager.RemoveFromRoleAsync(user, role);
-            }
-            var claims = await _userManager.GetClaimsAsync(user);
-            foreach (var claim in claims)
-            {
-                await _userManager.RemoveClaimAsync(user, claim);
-            }
-
-            var userSubs = await GetUserByIdAsync(user.Id);
-            if (userSubs.Subscriptions != null)
-            {
-                if (userSubs.Subscriptions.Count > 0)
+                var logins = await _userManager.GetLoginsAsync(user);
+                foreach (var li in logins)
                 {
-                    foreach (var sub in userSubs.Subscriptions)
+                    await _userManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+                foreach (var role in roles)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role);
+                }
+
+                var claims = await _userManager.GetClaimsAsync(user);
+                foreach (var claim in claims)
+                {
+                    await _userManager.RemoveClaimAsync(user, claim);
+                }
+
+                var userSubs = await GetUserByIdAsync(user.Id);
+                if (userSubs.Subscriptions != null)
+                {
+                    if (userSubs.Subscriptions.Count > 0)
                     {
-                        try
+                        foreach (var sub in userSubs.Subscriptions)
                         {
-                            var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.CustomerId, sub.StripeId, false);
-                        }
-                        catch (Stripe.StripeException ex)
-                        {
-                            switch (ex.StripeError.ErrorType)
+                            try
                             {
-                                case "card_error":
-                                case "api_connection_error":
-                                case "api_error":
-                                case "authentication_error":
-                                case "invalid_request_error":
-                                case "rate_limit_error":
-                                case "validation_error":
-                                    throw new Exception("Errorcancelling active subscriptions.");
-                                default:
-                                    break;
+                                var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.CustomerId, sub.StripeId, false);
+                            }
+                            catch (Stripe.StripeException ex)
+                            {
+                                await _logService.AddExceptionAsync<AccountRepository>("Error cancelling a user subscription while deleting user.", ex);
                             }
                         }
+                        userSubs.Subscriptions.Clear();
+                        await UpdateUserAsync(userSubs);
                     }
-                    userSubs.Subscriptions.Clear();
-                    await UpdateUserAsync(userSubs);
                 }
+
+                await _db.SaveChangesAsync();
+                await _userManager.DeleteAsync(user);
             }
-            await _db.SaveChangesAsync();
-            await _userManager.DeleteAsync(user);
-            return;
+            else 
+                throw new Exception("You do not have permission to delete this user.");
+        }
+        public async Task<MediaDirectory> GetDirectoryAsync(string userId)
+        {
+            var directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.OwnerId == userId && md.Type == DirectoryType.User);
+            if (directory == null)
+            {
+                var userDirectory = _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.UserDirectorySlug && md.Type == DirectoryType.System);
+                var user = await GetUserByIdAsync(userId);
+                if (user == null)
+                    throw new Exception("No user found to add/get directory for.");
+                directory = new MediaDirectory()
+                {
+                    OwnerId = userId,
+                    Type = DirectoryType.User,
+                    ParentId = userDirectory.Id,
+                    DisplayName = user.UserName,
+                    Slug = user.Id
+                };
+                _db.Add(directory);
+                await _db.SaveChangesAsync();
+            }
+            return directory;
         }
         #endregion
 
@@ -161,12 +180,17 @@ namespace Hood.Services
 
             if (model.RoleIds != null && model.RoleIds.Count > 0)
             {
-                query = query.Where(q => model.RoleIds.Any(m => q.RoleIds.Contains(m)));
+                query = query.Where(q => q.RoleIds != null && model.RoleIds.Any(m => q.RoleIds.Contains(m)));
             }
 
             if (model.Subscription.IsSet())
             {
                 query = query.Where(q => q.ActiveSubscriptionIds.Contains(model.Subscription));
+            }
+
+            if (model.SubscriptionIds != null && model.SubscriptionIds.Count > 0)
+            {
+                query = query.Where(q => q.ActiveSubscriptionIds != null && model.SubscriptionIds.Any(m => q.ActiveSubscriptionIds.Contains(m)));
             }
 
             if (!string.IsNullOrEmpty(model.Search))

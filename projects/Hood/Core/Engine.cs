@@ -97,6 +97,16 @@ namespace Hood.Core
             }
         }
         /// <summary>
+        /// Gets the current resolvable version of the IMediaManager<MediaObject>.
+        /// </summary>
+        public static IMediaManager Media
+        {
+            get
+            {
+                return Services.Resolve<IMediaManager>();
+            }
+        }
+        /// <summary>
         /// Gets the current resolvable version of the IAccountRepository.
         /// </summary>
         public static IThemesService Themes

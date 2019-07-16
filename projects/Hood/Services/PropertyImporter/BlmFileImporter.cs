@@ -18,25 +18,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Hood.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
+using Hood.Interfaces;
 
 namespace Hood.Services
 {
     public class BlmFileImporter : IPropertyImporter
     {
-        private IFTPService _ftp;
-        private IConfiguration _config;
-        private IMediaManager<MediaObject> _media;
+        private readonly IFTPService _ftp;
+        private readonly IConfiguration _config;
+        private readonly IMediaManager _media;
         private PropertySettings _propertySettings;
-        private IHttpContextAccessor _context;
+        private readonly IHttpContextAccessor _context;
 
         public BlmFileImporter(
             IFTPService ftp,
             IHostingEnvironment env,
             IHttpContextAccessor context,
             IConfiguration config,
-            IMediaManager<MediaObject> media,
+            IMediaManager media,
             IAddressService address,
-            ILogService logService)
+            ILogService logService
+            )
         {
             _ftp = ftp;
             _config = config;
@@ -93,7 +95,7 @@ namespace Hood.Services
         private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
-        private ILogService _logService;
+        private readonly ILogService _logService;
 
         public bool RunUpdate(HttpContext context)
         {
@@ -489,11 +491,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        MediaObject mediaResult = null;
+                        IMediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = string.Format("property/{0}/", property.Id) });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, property.DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
@@ -540,11 +542,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        MediaObject mediaResult = null;
+                        IMediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, property.DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
@@ -609,7 +611,7 @@ namespace Hood.Services
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, property.DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {
@@ -670,7 +672,7 @@ namespace Hood.Services
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, new MediaObject() { Directory = "Property/Epc" });
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, property.DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {

@@ -31,7 +31,7 @@ namespace Hood.Services
         protected readonly IConfiguration _config;
         protected readonly IHostingEnvironment _env;
         protected readonly IHoodCache _cache;
-        protected readonly IMediaManager<MediaObject> _media;
+        protected readonly IMediaManager _media;
         protected readonly IAddressService _address;
         protected readonly IEventsService _eventService;
 

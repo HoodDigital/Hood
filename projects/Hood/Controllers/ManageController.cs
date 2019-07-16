@@ -1,5 +1,8 @@
-﻿using Hood.Enums;
+﻿using Hood.Caching;
+using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -124,7 +127,7 @@ namespace Hood.Controllers
 
             try
             {
-                MediaObject mediaResult = null;
+                IMediaObject mediaResult = null;
                 if (file != null)
                 {
                     // If the club already has an avatar, delete it from the system.
@@ -132,7 +135,8 @@ namespace Hood.Controllers
                     {
                         await _media.DeleteStoredMedia((MediaObject)user.Avatar);
                     }
-                    mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = string.Format("users/{0}/", userId) });
+                    var directory = await Engine.AccountManager.GetDirectoryAsync(User.GetUserId());
+                    mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));
                     user.Avatar = mediaResult;
                     await _account.UpdateUserAsync(user);
                 }
@@ -535,7 +539,7 @@ namespace Hood.Controllers
                     log.UserId = null;
                 }
                 _db.SaveChanges();
-                await _account.DeleteUserAsync(user);
+                await _account.DeleteUserAsync(user, User);
 
                 return RedirectToAction(nameof(Deleted));
             }

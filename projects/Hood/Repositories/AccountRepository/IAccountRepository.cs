@@ -15,8 +15,9 @@ namespace Hood.Services
         Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
         Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true);
         Task UpdateUserAsync(ApplicationUser user);
-        Task DeleteUserAsync(ApplicationUser user);
+        Task DeleteUserAsync(ApplicationUser user, System.Security.Claims.ClaimsPrincipal adminUser);
         Task<List<UserAccessCode>> GetAccessCodesAsync(string id);
+        Task<MediaDirectory> GetDirectoryAsync(string userId);
         #endregion
 
         #region Profiles

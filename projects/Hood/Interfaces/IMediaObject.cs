@@ -9,7 +9,6 @@ namespace Hood.Interfaces
         long FileSize { get; set; }
         string FileType { get; set; }
         string Filename { get; set; }
-        string Directory { get; set; }
         string BlobReference { get; set; }
         string Url { get; set; }
         DateTime CreatedOn { get; set; }
@@ -25,12 +24,7 @@ namespace Hood.Interfaces
 
         string Icon { get; }
         string FormattedSize { get; }
-
-        /// <summary>
-        /// /// Please use IMediaObject.GenericFileType instead.
-        /// </summary>
-        [Obsolete("Please use IMediaObject.GenericFileType instead.", true)]
-        string GeneralFileType { get; set; }
+        string Path { get; }
     }
 
 }

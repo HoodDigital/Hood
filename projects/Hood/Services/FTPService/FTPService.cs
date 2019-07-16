@@ -8,13 +8,13 @@ namespace Hood.Services
     public class FTPService : IFTPService
     {
 
-        private ReaderWriterLock Lock;
+        private readonly ReaderWriterLock Lock;
         private bool Running;
         private double Complete;
         private byte[] Buffer;
         private long TotalBytes;
         private long BytesTransferred;
-        private int BufferSize;
+        private readonly int BufferSize;
         private string StatusMessage;
         private bool Cancelled;
         private bool Success;

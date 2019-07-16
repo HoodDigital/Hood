@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Net;
 using Hood.Core;
 using Hood.Interfaces;
+using Hood.Caching;
 
 namespace Hood.Services
 {
@@ -18,13 +19,14 @@ namespace Hood.Services
     {
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
-
-        private IMediaManager<MediaObject> _media;
+        private readonly DirectoryManager _directoryCache;
+        private IMediaManager _media;
 
         private HoodDbContext Database { get; set; }
 
         public MediaRefreshService(
             IHostingEnvironment env,
+            DirectoryManager directoryCache,
             IConfiguration config)
         {
             _config = config;
@@ -38,7 +40,8 @@ namespace Hood.Services
             Succeeded = false;
             StatusMessage = "Not running...";
             _env = env;
-            _media = new MediaManager<MediaObject>(env);
+            _directoryCache = directoryCache;
+            _media = new MediaManager(env);
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(MediaRefreshService) + "\\";
         }
 
@@ -78,7 +81,7 @@ namespace Hood.Services
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 Database = new HoodDbContext(options.Options);
 
-                _media = new MediaManager<MediaObject>(_env);
+                _media = new MediaManager(_env);
 
                 Lock.ReleaseWriterLock();
 

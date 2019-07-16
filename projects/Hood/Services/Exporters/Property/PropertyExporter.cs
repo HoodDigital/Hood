@@ -19,11 +19,11 @@ namespace Hood.Services
     public class PropertyExporter : IPropertyExporter
     {
         // Services
-        private IFTPService _ftp;
-        private IConfiguration _config;
-        private IMediaManager<MediaObject> _media;
+        private readonly IFTPService _ftp;
+        private readonly IConfiguration _config;
+        private readonly IMediaManager _media;
         private PropertySettings _propertySettings;
-        private IEmailSender _email;
+        private readonly IEmailSender _email;
         private HoodDbContext _db { get; set; }
 
         // Members
@@ -34,7 +34,7 @@ namespace Hood.Services
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
 
-        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<MediaObject> media, IEmailSender email)
+        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager media, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;

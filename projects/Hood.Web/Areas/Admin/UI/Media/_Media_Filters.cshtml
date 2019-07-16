@@ -14,16 +14,11 @@
         </div>
     </div>
     <div class="card-body d-flex">
-        <div class="col-6">
-            <button class="create-directory btn btn-success btn-sm btn-block" type="button" title="Create directory">
-                <i class="fa fa-plus-circle"></i>
-            </button>
-        </div>
-        <div class="col-6">
-            <a class=" btn btn-sm btn-block btn-danger delete-directory text-white" data-url="@Url.Action("DeleteDirectory")" title="Delete selected directory">
-                <i class="fa fa-trash"></i>
-            </a>
-        </div>
+        <a class="btn btn-success btn-sm btn-block hood-modal"
+                asp-action="CreateDirectory" 
+                data-complete="$.hood.Media.Directories.Editor" title="Create directory">
+            <i class="fa fa-plus-circle mr-2"></i> Create Directory
+        </a>
     </div>
 </div>
 <div class="card mb-3">
@@ -40,11 +35,11 @@
         <input asp-for="Entity" type="hidden" />
         <input asp-for="Field" type="hidden" />
         <input asp-for="Id" type="hidden" />
-        <input asp-for="PageIndex" type="hidden" />
+        <input asp-for="PageIndex" type="hidden" value="@(Model.PageIndex == 0 ? 1 : Model.PageIndex)" />
         <input asp-for="PageSize" type="hidden" />
         <input asp-for="Tag" type="hidden" />
         <input asp-for="Type" type="hidden" />
-        <input asp-for="Directory" type="hidden" class="refresh-on-change" />
+        <input asp-for="DirectoryId" type="hidden" class="refresh-on-change" />
         <div class="form-group floating-label">
             <input asp-for="Search" class="form-control">
             <label asp-for="Search"></label>

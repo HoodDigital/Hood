@@ -58,6 +58,14 @@ namespace Hood.Models
         public bool Public { get; set; }
         public bool Featured { get; set; }
 
+        public string DirectoryPath
+        {
+            get
+            {
+                return $"{nameof(Content)}/{Id.ToString("D6")}-{Title.ToString()}";
+            }
+        }
+
         // MVVM Helpers
         [NotMapped]
         public string PublishDatePart
@@ -98,7 +106,7 @@ namespace Hood.Models
                 PublishDate = new DateTime(PublishDate.Year, PublishDate.Month, PublishDate.Day, PublishDate.Hour, value, PublishDate.Second);
             }
         }
-
+        
         // Formatted Members
         public string StatusString
         {

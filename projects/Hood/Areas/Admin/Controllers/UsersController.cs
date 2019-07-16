@@ -215,7 +215,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
-                await _account.DeleteUserAsync(user);
+                await _account.DeleteUserAsync(user, User);
                 await _logService.AddLogAsync<UsersController>($"A new user account has been deleted in the admin area for {user.Email}", type: LogType.Warning);
                 return new Response(true, "Deleted successfully.");
             }

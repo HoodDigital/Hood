@@ -8,8 +8,8 @@ namespace Hood.Services
 {
     public class InvoiceService : IInvoiceService
     {
-        private IStripeService _stripe;
-        private UserManager<ApplicationUser> _userManager;
+        private readonly IStripeService _stripe;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public InvoiceService(IStripeService stripe,
                                UserManager<ApplicationUser> userManager)

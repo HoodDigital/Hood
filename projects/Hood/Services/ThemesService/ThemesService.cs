@@ -9,7 +9,7 @@ namespace Hood.Services
 {
     public class ThemesService : IThemesService
     {
-        private Dictionary<string, IConfiguration> _configs;
+        private readonly Dictionary<string, IConfiguration> _configs;
         public static object scriptLock = new object();
 
         public ThemesService(IHostingEnvironment env)

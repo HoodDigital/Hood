@@ -1,5 +1,6 @@
 ﻿using Hood.Entities;
 using Hood.Infrastructure;
+using Hood.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Models
 {
@@ -26,6 +28,7 @@ namespace Hood.Models
         public DbSet<UserAccessCode> AccessCodes { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<MediaObject> Media { get; set; }
+        public DbSet<MediaDirectory> MediaDirectories { get; set; }
 
         // Api
         public DbSet<ApiKey> ApiKeys { get; set; }
@@ -128,6 +131,13 @@ namespace Hood.Models
                         }
                     }
                 }
+
+                var siteAdmin = Users.SingleOrDefault(u => u.UserName == "admin@hooddigital.com");
+
+                if (!MediaDirectories.Any(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System))
+                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Default", Slug = MediaManager.SiteDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
+                if (!MediaDirectories.Any(o => o.Slug == MediaManager.UserDirectorySlug && o.Type == DirectoryType.System))
+                    MediaDirectories.Add(new MediaDirectory { DisplayName = "User Media", Slug = MediaManager.UserDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
 
                 if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
                 {

@@ -285,7 +285,6 @@ namespace Hood.Services
             if (property.Media == null)
                 property.Media = new List<PropertyMedia>();
             property.Media.Add(media);
-            _db.Media.Add(new MediaObject(media));
             _db.Properties.Update(property);
             await _db.SaveChangesAsync();
             ClearPropertyCache(property.Id);
@@ -295,7 +294,6 @@ namespace Hood.Services
             if (property.FloorPlans == null)
                 property.FloorPlans = new List<PropertyFloorplan>();
             property.FloorPlans.Add(media);
-            _db.Media.Add(new MediaObject(media));
             _db.Properties.Update(property);
             await _db.SaveChangesAsync();
             ClearPropertyCache(property.Id);

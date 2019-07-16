@@ -2,7 +2,7 @@
 
 namespace Hood.Models
 {
-    public partial class PropertyMedia : PropertyMediaBase
+    public partial class PropertyMedia : MediaBase
     {
         public PropertyListing Property { get; internal set; }
         public int PropertyId { get; internal set; }
@@ -10,13 +10,18 @@ namespace Hood.Models
         public PropertyMedia()
             : base()
         { }
-
         public PropertyMedia(IMediaObject media)
             : base(media)
         { }
-        public new static IMediaObject Blank => MediaObjectBase.Blank;
+        public PropertyMedia(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
+        : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
+        {
+        }
+
+        public new static IMediaObject Blank => MediaBase.Blank;
     }
-    public partial class PropertyFloorplan : PropertyMediaBase
+
+    public partial class PropertyFloorplan : MediaBase
     {
         public PropertyListing Property { get; internal set; }
         public int PropertyId { get; internal set; }
@@ -28,19 +33,11 @@ namespace Hood.Models
         public PropertyFloorplan(IMediaObject media)
             : base(media)
         { }
-        public new static IMediaObject Blank => MediaObjectBase.Blank;
-    }
+        public PropertyFloorplan(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
+           : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
+        {
+        }
 
-    public partial class PropertyMediaBase : MediaObjectBase
-    {
-        public PropertyMediaBase()
-            : base()
-        { }
-
-        public PropertyMediaBase(IMediaObject media)
-            : base(media)
-        { }
-
-        public new static IMediaObject Blank => MediaObjectBase.Blank;
+        public new static IMediaObject Blank => MediaBase.Blank;
     }
 }

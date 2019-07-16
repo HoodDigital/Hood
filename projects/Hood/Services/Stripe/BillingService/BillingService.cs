@@ -2,12 +2,12 @@
 {
     public class BillingService : IBillingService
     {
-        private IStripeService _stripe;
-        private ISubscriptionPlanService _subscriptionPlans;
-        private ISubscriptionService _subscriptions;
-        private ICustomerService _customers;
-        private ICardService _cards;
-        private IInvoiceService _invoices;
+        private readonly IStripeService _stripe;
+        private readonly ISubscriptionPlanService _subscriptionPlans;
+        private readonly ISubscriptionService _subscriptions;
+        private readonly ICustomerService _customers;
+        private readonly ICardService _cards;
+        private readonly IInvoiceService _invoices;
 
         public BillingService(IStripeService stripe,
                               ISubscriptionService subscriptions,

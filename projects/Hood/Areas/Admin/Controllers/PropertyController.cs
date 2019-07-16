@@ -362,7 +362,7 @@ namespace Hood.Areas.Admin.Controllers
 
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = "Property" });
+                        mediaResult = await _media.ProcessUpload(file, property.DirectoryPath) as MediaObject;
                         await _property.AddMediaAsync(property, new PropertyMedia(mediaResult));
                     }
                 }
@@ -397,7 +397,7 @@ namespace Hood.Areas.Admin.Controllers
 
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = "Property" });
+                        mediaResult = await _media.ProcessUpload(file, property.DirectoryPath) as MediaObject;
                         await _property.AddFloorplanAsync(property, new PropertyFloorplan(mediaResult));
                     }
                 }

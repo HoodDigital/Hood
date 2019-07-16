@@ -8,9 +8,9 @@ namespace Hood.Services
 {
     public class CustomerService : ICustomerService
     {
-        private IStripeService _stripe;
-        private UserManager<ApplicationUser> _userManager;
-        private IHoodCache _cache;
+        private readonly IStripeService _stripe;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHoodCache _cache;
 
         public CustomerService(IStripeService stripe,
                                IHoodCache cache,

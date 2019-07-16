@@ -15,7 +15,7 @@ namespace Hood.Models
         public string Title { get; set; }
         public bool Success { get; set; }
         public string Url { get; set; }
-        public Exception Exception { get; set; }
+        public Dictionary<string, string> Exception { get; set; }
         public IMediaObject Media { get; set; }
         public string MediaJson { get { return Media.ToJson(); } }
 
@@ -82,7 +82,7 @@ namespace Hood.Models
             Errors = ex.Message;
             Message = message;
             Title = title;
-            Exception = ex;
+            Exception = ex.ToDictionary();
         }
     }
 }

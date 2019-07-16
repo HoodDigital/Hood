@@ -132,11 +132,12 @@ $.hood.Inline = {
     },
     HandleError: function (xhr) {
         if (xhr.status === 500) {
-            $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: There was an error processing the content, please contact an administrator if this continues.<br/>");
+            $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />There was an error processing the content, please contact an administrator if this continues.<br/>");
         } else if (xhr.status === 404) {
-            $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: The content could not be found.<br/>");
+            $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />The content could not be found.<br/>");
         } else if (xhr.status === 401) {
-            $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: You are not allowed to view this resource, are you logged in correctly?<br/>");
+            $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />You are not allowed to view this resource, are you logged in correctly?<br/>");
+            window.location = window.location;
         }
     },
     Finish: function (data) {

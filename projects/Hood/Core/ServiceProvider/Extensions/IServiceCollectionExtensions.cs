@@ -68,7 +68,8 @@ namespace Hood.Extensions
             services.AddSingleton<IContentExporter, ContentExporter>();
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
-            services.AddSingleton<IMediaManager<MediaObject>, MediaManager<MediaObject>>();
+            services.AddSingleton<IDirectoryManager, DirectoryManager>();
+            services.AddSingleton<IMediaManager, MediaManager>();
             services.AddSingleton<ILogService, LogService>();
             services.AddSingleton<IHoodCache, HoodCache>();
             services.AddSingleton<ContentCategoryCache>();

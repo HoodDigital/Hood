@@ -15,9 +15,9 @@ namespace Hood.Services
 {
     public class RazorViewRenderer : IRazorViewRenderer
     {
-        private IRazorViewEngine _viewEngine;
-        private ITempDataProvider _tempDataProvider;
-        private IServiceProvider _serviceProvider;
+        private readonly IRazorViewEngine _viewEngine;
+        private readonly ITempDataProvider _tempDataProvider;
+        private readonly IServiceProvider _serviceProvider;
 
         public RazorViewRenderer(
             IRazorViewEngine viewEngine,

@@ -2,24 +2,34 @@
 @{
     Layout = null;
 }
-<div>
+@if (Model.TotalCount > 0)
+{
     @foreach (var user in Model.List)
     {
-        <div class="card hover mb-3">
+        <div class="card hover mb-3 p-2">
             <div class="row no-gutters align-items-center">
                 <div class="col-auto">
                     <a asp-action="Edit" asp-route-id="@user.Id">
-                        <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-4" alt="@user.ToFullName()"></fixedImage>
+                        <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@user.ToFullName()"></fixedImage>
                     </a>
                 </div>
                 <div class="col">
-                    <div class="mb-2">
+                    <div class="mb-1">
                         <h5 class="card-title d-lg-inline">
                             <a asp-action="Edit" asp-route-id="@user.Id">@user.ToAdminName()</a>
                         </h5>
                         <small class="ml-2 text-muted d-lg-inline">Last logged in @user.LastLogOn.ToHumaneDate()</small>
-
                     </div>
+                    <p class="card-text mb-1">
+                        @foreach (var sub in user.Roles)
+                        {
+                            <small class="badge badge-light">@sub.Name.CamelCaseToString()</small>
+                        }
+                        @if (user.Roles.Count == 0)
+                        {
+                            <small class="badge badge-light">Not in any roles</small>
+                        }
+                    </p>
                     <p class="card-text mb-1">
                         <small class="d-block">
                             Username:
@@ -58,5 +68,11 @@
             </div>
         </div>
     }
-</div>
-<partial name="_Pagination" />
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        No users found.
+    </alert>
+}

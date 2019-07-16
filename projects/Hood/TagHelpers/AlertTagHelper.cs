@@ -41,19 +41,19 @@ namespace Hood.TagHelpers
                 {
                     case AlertSize.Small:
                     default:
-                        iconTemplate = Icon.IsSet() ? $"<div class='p-1'><i class='{Icon} {Size.ToIconSizeCssClass()}'></i></div>" : "";
-                        alertTemplate = $"{iconTemplate}<div class='p-1 flex-grow-1'>{alertTemplate}</div>";
+                        iconTemplate = Icon.IsSet() ? $"<div class='col-auto p-1'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-1'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='col p-1 flex-grow-1'>{alertTemplate}</div>";
                         alertClass = "d-flex flex-row align-items-center p-1";
                         break;
                     case AlertSize.Medium:
-                        iconTemplate = Icon.IsSet() ? $"<div class='p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
-                        alertTemplate = $"{iconTemplate}<div class='p-2'>{alertTemplate}</div>";
+                        iconTemplate = Icon.IsSet() ? $"<div class='col-auto p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='col p-2'>{alertTemplate}</div>";
                         alertClass = "d-flex flex-row align-items-center p-2";
                         break;
                     case AlertSize.Large:
-                        iconTemplate = Icon.IsSet() ? $"<div class='p-2'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-2'></i></div>" : "";
-                        alertTemplate = $"{iconTemplate}<div class='p-2'>{alertTemplate}</div>";
-                        alertClass = "d-flex flex-row align-items-center p-2";
+                        iconTemplate = Icon.IsSet() ? $"<div class='col-auto p-3'><i class='{Icon} {Size.ToIconSizeCssClass()} mr-3'></i></div>" : "";
+                        alertTemplate = $"{iconTemplate}<div class='col p-3'>{alertTemplate}</div>";
+                        alertClass = "d-flex flex-row align-items-center p-3";
                         break;
                     case AlertSize.Epic:
                         iconTemplate = Icon.IsSet() ? $"<div class='p-3'><i class='{Icon} {Size.ToIconSizeCssClass()}'></i></div>" : "";

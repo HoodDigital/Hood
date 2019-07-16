@@ -172,6 +172,16 @@ namespace Hood.Models
         public List<PropertyMedia> Media { get; set; }
         public List<PropertyFloorplan> FloorPlans { get; set; }
 
+        public string DisplayTitle
+        {
+            get
+            {
+                if (Title.IsSet())
+                    return Title;
+                return this.ToFormat(AddressFormat.Short);
+            }
+        }
+
         [NotMapped]
         public string Url
         {
@@ -328,6 +338,14 @@ namespace Hood.Models
                         else
                             return $"{Bedrooms} bedroom {PropertyType}. Unavailable.";
                 }
+            }
+        }
+
+        public string DirectoryPath
+        {
+            get
+            {
+                return $"{nameof(PropertyListing)}/{Id.ToString("D6")}-{DisplayTitle.ToString()}";
             }
         }
 

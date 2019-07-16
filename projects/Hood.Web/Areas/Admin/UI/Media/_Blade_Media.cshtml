@@ -56,7 +56,7 @@
                 <display asp-for="UniqueId"></display>
             </div>
             <div class="modal-footer">
-                <a href="javascript:void(0);" data-id="@Model.Id" class="btn btn-xs btn-danger delete-media">Delete</a>
+                <a href="javascript:void(0);" data-id="@Model.Id" class="btn btn-xs btn-danger media-delete">Delete</a>
                 @switch (Model.GenericFileType)
                 {
                     case GenericFileType.Image:

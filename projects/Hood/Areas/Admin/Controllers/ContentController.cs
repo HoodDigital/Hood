@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor,Manager")]
+    [Authorize(Roles = "Admin,Editor")]
     public class ContentController : BaseController
     {
         public ContentController()
@@ -437,7 +437,7 @@ namespace Hood.Areas.Admin.Controllers
 
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = content.ContentType.ToTitleCase() });
+                        mediaResult = await _media.ProcessUpload(file, content.DirectoryPath) as MediaObject;
                         await _content.AddImageAsync(content, new ContentMedia(mediaResult));
                     }
                 }

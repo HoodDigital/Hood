@@ -51,7 +51,7 @@ namespace Hood.Models
         [NotMapped]
         public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ForumMedia>(FeaturedImageJson) : ForumMedia.Blank; }
+            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank; }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
         }
 
@@ -59,7 +59,7 @@ namespace Hood.Models
         [NotMapped]
         public IMediaObject ShareImage
         {
-            get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ForumMedia>(ShareImageJson) : ForumMedia.Blank; }
+            get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(ShareImageJson) : MediaObject.Blank; }
             set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
     }

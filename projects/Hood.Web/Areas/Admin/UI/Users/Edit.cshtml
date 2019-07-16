@@ -10,12 +10,6 @@
         <i class="fa fa-ellipsis-h"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right">
-        @if (Model.Customer != null)
-        {
-            <a class="dropdown-item" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, Model.StripeId)">
-                <i class="fa fa-external-link-alt"></i><span>&nbsp;View on Stripe</span>
-            </a>
-        }
         <a class="dropdown-item user-reset-password" asp-action="ResetPassword" asp-route-id="@Model.Id"><i class="fa fa-lock"></i> Reset Password</a>
         <a class="dropdown-item" asp-action="Impersonate" asp-route-id="@Model.Id"><i class="fa fa-user-secret"></i> Impersonate User</a>
         <div class="dropdown-divider"></div>
@@ -196,12 +190,12 @@
                             <div class="list-group-item list-group-item-action p-3 pt-2 pb-2">
                                 <div class="form-group m-0">
                                     <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input user-role-check" 
-                                               id="role-check-@role.Id" 
-                                               name="role-check-@role.Id" 
-                                               type="checkbox" 
-                                               data-url="@Url.Action("SetRole", new { id = Model.Id })" 
-                                               value="@role" 
+                                        <input class="custom-control-input user-role-check"
+                                               id="role-check-@role.Id"
+                                               name="role-check-@role.Id"
+                                               type="checkbox"
+                                               data-url="@Url.Action("SetRole", new { id = Model.Id })"
+                                               value="@role"
                                                @(Model.Roles.Any(r => r.Name == role.Name) ? "checked" : "") />
                                         <label class="custom-control-label d-block" for="role-check-@role.Id">
                                             @role.Name.CamelCaseToString()
@@ -222,7 +216,9 @@
                             {
                                 if (Model.MatchedCustomerObjects == null || Model.MatchedCustomerObjects.Count() == 0)
                                 {
-                                    <alert type="Warning" size="Medium" icon="fa-exclamation-triangle" class="m-0">There is no Stripe customer account associated with this user account.</alert>
+                                    <alert type="Warning" size="Medium" icon="fa-exclamation-triangle" class="m-0">
+                                        There is no Stripe customer account associated with this user account.
+                                    </alert>
                                 }
                                 else
                                 {
@@ -245,7 +241,18 @@
                             }
                             else
                             {
-                                <alert type="Success" size="Medium" icon="fa-thumbs-up" class="m-0">The Stripe customer account (@Model.StripeId) is linked correctly to this account.</alert>
+                                <alert type="Success" size="Medium" icon="fa-thumbs-up" class="m-0">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            The Stripe customer account (@Model.StripeId) is linked correctly to this account.
+                                        </div>
+                                        <div class="col-auto text-right">
+                                            <a class="btn btn-success" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, Model.StripeId)">
+                                                <i class="fa fa-external-link-alt"></i><span>&nbsp;View on Stripe</span>
+                                            </a>
+                                        </div>
+                                    </div>                                
+                                </alert>
                             }
                         </div>
                         <div class="list-group-item">

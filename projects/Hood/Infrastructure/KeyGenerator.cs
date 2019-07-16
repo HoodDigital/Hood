@@ -544,8 +544,8 @@ namespace Hood.Infrastructure
         private char[] CurrentNumericCharacters;
         private char[] CurrentSpecialCharacters;
         private char[] CurrentGeneralCharacters; // All used characters
-        private RNGCryptoServiceProvider Random;
-        private List<string> ExistingStrings; // History
+        private readonly RNGCryptoServiceProvider Random;
+        private readonly List<string> ExistingStrings; // History
         #endregion
     }
 }

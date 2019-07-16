@@ -54,7 +54,7 @@ namespace Hood.Extensions
             }
             if (!output.IsSet())
             {
-                output = MediaObjectBase.NoImageUrl;
+                output = MediaBase.NoImageUrl;
             }
             return output;
         }
@@ -62,7 +62,6 @@ namespace Hood.Extensions
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(mediaObject);
         }
-
     }
 
 }

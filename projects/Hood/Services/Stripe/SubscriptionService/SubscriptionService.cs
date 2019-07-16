@@ -11,8 +11,8 @@ namespace Hood.Services
 {
     public class SubscriptionService : ISubscriptionService
     {
-        private IStripeService _stripe;
-        private UserManager<ApplicationUser> _userManager;
+        private readonly IStripeService _stripe;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public SubscriptionService(IStripeService stripe,
                                    UserManager<ApplicationUser> userManager)

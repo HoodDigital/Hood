@@ -24,7 +24,7 @@
             Delete All
         </a>
     }
-    @if (Model.ContentType.IsUnknown)
+    @if (!Model.ContentType.IsUnknown)
     {
         <a class="btn btn-success hood-modal" asp-action="Create" asp-route-type="@Model.ContentType.Slug" data-complete="$.hood.Content.Create">
             <i class="fa fa-user-plus mr-2"></i>
@@ -79,27 +79,8 @@
             </div>
         </div>
         <div class="col-sm">
-            <div class="card">
-                <div class="card-header">
-                    <div class="row align-items-center">
-                        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="items-tab" data-toggle="tab" href="#items" role="tab" aria-controls="items" aria-selected="true">
-                                    @ViewBag.Title
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="tab-content">
-                        <div id="items" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="items-tab">
-                            <div id="content-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Content.Lists.Content.Loaded">
-                                <partial name="_List_Content" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="content-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Content.Lists.Content.Loaded">
+                <partial name="_List_Content" />
             </div>
         </div>
     </div>

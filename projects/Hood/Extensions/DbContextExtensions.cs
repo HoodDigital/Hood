@@ -17,13 +17,19 @@ namespace Hood.Models
             builder.Entity<Log>().ToTable("HoodLogs");
             builder.Entity<ApiKey>().ToTable("HoodApiKeys");
             builder.Entity<ApiEvent>().ToTable("HoodApiEvents");
-            builder.Entity<MediaObject>().ToTable("HoodMedia");
             builder.Entity<Address>().ToTable("HoodAddresses");
             builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
             builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId);
+
+            // Media
+            builder.Entity<MediaObject>().ToTable("HoodMedia");
+            builder.Entity<MediaObject>().Property(b => b.Path).HasColumnName("Directory");
+            builder.Entity<MediaDirectory>().ToTable("HoodMediaDirectories");
+            builder.Entity<MediaDirectory>().HasOne(m => m.Parent).WithMany(m => m.Children).HasForeignKey(m => m.ParentId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
 
             // Subscriptions
             builder.Entity<Subscription>().ToTable("HoodSubscriptions");
@@ -40,7 +46,8 @@ namespace Hood.Models
 
             // Content Media
             builder.Entity<ContentMedia>().ToTable("HoodContentMedia");
-            builder.Entity<ContentMedia>().HasOne(up => up.Content).WithMany(t => t.Media).HasForeignKey(au => au.ContentId);
+            builder.Entity<ContentMedia>().HasOne(up => up.Content).WithMany(t => t.Media).HasForeignKey(au => au.ContentId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ContentMedia>().Property(b => b.Path).HasColumnName("Directory");
 
             // Categories
             builder.Entity<ContentCategory>().ToTable("HoodContentCategories");
@@ -66,7 +73,7 @@ namespace Hood.Models
             builder.Entity<ForumCategoryJoin>().HasKey(t => new { t.ForumId, t.CategoryId });
             builder.Entity<ForumCategoryJoin>().HasOne(pt => pt.Category).WithMany(p => p.Forum).HasForeignKey(pt => pt.CategoryId).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<ForumCategoryJoin>().HasOne(pt => pt.Forum).WithMany(t => t.Categories).HasForeignKey(pt => pt.ForumId).OnDelete(DeleteBehavior.Cascade);
-            
+
             // Forum Topics
             builder.Entity<Topic>().ToTable("HoodForumTopics");
             builder.Entity<Topic>().HasOne(c => c.Author).WithMany(up => up.Topics).HasForeignKey(c => c.AuthorId);
@@ -87,13 +94,15 @@ namespace Hood.Models
 
             builder.Entity<PropertyMeta>().ToTable("HoodPropertyMetadata");
             builder.Entity<PropertyMeta>().HasAlternateKey(ol => new { ol.PropertyId, ol.Name });
-            builder.Entity<PropertyMeta>().HasOne(c => c.Property).WithMany(cc => cc.Metadata).HasForeignKey(au => au.PropertyId);
+            builder.Entity<PropertyMeta>().HasOne(c => c.Property).WithMany(cc => cc.Metadata).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<PropertyMedia>().ToTable("HoodPropertyMedia");
-            builder.Entity<PropertyMedia>().HasOne(up => up.Property).WithMany(t => t.Media).HasForeignKey(au => au.PropertyId);
+            builder.Entity<PropertyMedia>().HasOne(up => up.Property).WithMany(t => t.Media).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<PropertyMedia>().Property(b => b.Path).HasColumnName("Directory");
 
             builder.Entity<PropertyFloorplan>().ToTable("HoodPropertyFloorplans");
-            builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId);
+            builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
 
             builder.Query<UserProfile>().ToView("HoodUserProfiles");
             builder.Query<UserProfile>().Property(b => b.RolesJson).HasColumnName("Roles");

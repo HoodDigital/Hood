@@ -44,7 +44,8 @@ namespace Hood.Controllers
         protected readonly IConfiguration _config;
         protected readonly IHostingEnvironment _env;
         protected readonly IHoodCache _cache;
-        protected readonly IMediaManager<MediaObject> _media;
+        protected readonly IDirectoryManager _directoryManager;
+        protected readonly IMediaManager _media;
         protected readonly IAddressService _address;
         protected readonly IEventsService _eventService;
 
@@ -74,7 +75,8 @@ namespace Hood.Controllers
             _cache = Engine.Services.Resolve<IHoodCache>();
             _address = Engine.Services.Resolve<IAddressService>();
             _eventService = Engine.Services.Resolve<IEventsService>();
-            _media = Engine.Services.Resolve<IMediaManager<MediaObject>>();
+            _directoryManager = Engine.Services.Resolve<IDirectoryManager>();
+            _media = Engine.Services.Resolve<IMediaManager>();
         }
 
         public ViewResult View(ISaveableModel model)

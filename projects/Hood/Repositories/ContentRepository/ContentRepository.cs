@@ -233,6 +233,8 @@ namespace Hood.Services
             clone.Id = 0;
             clone.Title += " - Copy";
             clone.Slug += "-copy";
+            clone.PublishDate = DateTime.Now;
+            clone.CreatedOn = DateTime.Now;
 
             _db.Content.Add(clone);
             await _db.SaveChangesAsync();
@@ -276,7 +278,6 @@ namespace Hood.Services
         {
             if (content.Media == null)
                 content.Media = new List<ContentMedia>();
-            _db.Media.Add(new MediaObject(media));
             content.Media.Add(media);
             await UpdateAsync(content);
         }
