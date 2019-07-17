@@ -3,9 +3,12 @@
 $.hood.Property = {
     Init: function () {
         $('body').on('click', '.property-delete', $.hood.Property.Delete);
+        $('body').on('click', '.property-delete-floor', $.hood.Property.DeleteFloorArea);
         $('body').on('click', '.property-set-status', $.hood.Property.SetStatus);
 
-        if ($('#edit-property').doesExist())
+        $('body').on('click', '.property-media-delete', $.hood.Property.Media.Delete);
+
+        if ($('#property-edit-form').doesExist())
             $.hood.Property.Edit.Init();
     },
 
@@ -24,8 +27,8 @@ $.hood.Property = {
                 $.hood.Loader(false);
             },
             Reload: function (complete) {
-                if ($('#property-media-list').doesExist())
-                    $.hood.Inline.Reload($('#property-media-list'), complete);
+                if ($('#property-gallery-list').doesExist())
+                    $.hood.Inline.Reload($('#property-gallery-list'), complete);
             }
         },
         Floorplans: {
@@ -33,8 +36,17 @@ $.hood.Property = {
                 $.hood.Loader(false);
             },
             Reload: function (complete) {
-                if ($('#property-floorplan-list').doesExist())
-                    $.hood.Inline.Reload($('#property-floorplan-list'), complete);
+                if ($('#property-floorplans-list').doesExist())
+                    $.hood.Inline.Reload($('#property-floorplans-list'), complete);
+            }
+        },
+        Floorareas: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#property-floors-list').doesExist())
+                    $.hood.Inline.Reload($('#property-floors-list'), complete);
             }
         }
     },
@@ -130,6 +142,60 @@ $.hood.Property = {
         $.hood.Google.Addresses.InitAutocomplete();
     },
 
+    CreateFloorArea: function () {
+        $('#property-floorArea-create-form').hoodValidator({
+            validationRules: {
+                Name: {
+                    required: true
+                },
+                Number: {
+                    required: true
+                },
+                SquareFeet: {
+                    required: true
+                },
+                SquareMetres: {
+                    required: true
+                }
+            },
+            submitButtonTag: $('#property-floorArea-create-submit'),
+            submitUrl: $('#property-floorArea-create-form').attr('action'),
+            submitFunction: function (data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Property.Lists.Floorareas.Reload();
+            }
+        });
+        $('body').on('change', '.recalc-floor', $.hood.Property.RecalcFloor);
+    },
+    RecalcFloor: function (e) {
+        if (this.id === "SquareMetres")
+            $('#property-floorArea-create-form #SquareFeet').val(Number($(this).val()) * 10.7639);
+        else {
+            $('#property-floorArea-create-form #SquareMetres').val(Number($(this).val()) / 10.7639);
+        }
+    },
+    DeleteFloorArea: function (e) {
+        e.preventDefault();
+        $tag = $(this);
+
+        deleteFloorAreaCallback = function (isConfirm) {
+            if (isConfirm) {
+                $.post($tag.attr('href'), function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    $.hood.Property.Lists.Floorareas.Reload();
+                });
+            }
+        };
+
+        $.hood.Alerts.Confirm(
+            "The floor will be permanently removed.",
+            "Are you sure?",
+            deleteFloorAreaCallback,
+            'error',
+            '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+        );
+    },
+
     Edit: {
         Init: function () {
             $('.datepicker').datetimepicker({
@@ -139,90 +205,20 @@ $.hood.Property = {
 
             $.hood.Property.Upload.InitImageUploader();
             $.hood.Property.Upload.InitFloorplanUploader();
-
-            $('body').on('click', '.add-floor', $.hood.Property.Edit.AddFloor);
-            $('body').on('click', '.delete-floor', $.hood.Property.Edit.DeleteFloor);
-            $('body').on('change', '.recalc-floor', $.hood.Property.Edit.RecalcFloor);
-        },
-
-        AddFloor: function () {
-            var number = $('#Floor-Number').val();
-            var floors = $.hood.Property.Edit.GetFloorsList();
-            exists = false;
-            $.each(floors, function (key, value) {
-                if (value.Number == number)
-                    exists = true;
-            });
-            if (exists) {
-                $.hood.Alerts.Error("Cannot insert two floors with the same number.");
-                return;
-            }
-            // Add the new item.
-            newFloor = {
-                Name: $('#Floor-Name').val(),
-                SquareFeet: $('#Floor-SquareFeet').val(),
-                SquareMetres: $('#Floor-SquareMetres').val(),
-                Number: $('#Floor-Number').val()
-            };
-            floors.push(newFloor);
-            $.hood.Property.Edit.ReRenderFloors(floors);
-            $('#Floors').val(JSON.stringify(floors));
-        },
-        DeleteFloor: function () {
-            var floors = $.hood.Property.Edit.GetFloorsList();
-            var number = $(this).data('number');
-            floors = $.grep(floors, function (e) {
-                return e.Number != number;
-            });
-            $.hood.Property.Edit.ReRenderFloors(floors);
-            $('#Floors').val(JSON.stringify(floors));
-        },
-        RecalcFloor: function (e) {
-            if (this.id == "Floor-SquareMetres")
-                $('#Floor-SquareFeet').val(Number($(this).val()) * 10.7639);
-            else {
-                $('#Floor-SquareMetres').val(Number($(this).val()) / 10.7639);
-            }
-        },
-        GetFloorsList: function () {
-            // Take the contents of the floors input. 
-            floorsInput = $('#Floors').val();
-            // if it is null, we need a new object.
-            if (floorsInput != null && floorsInput != '') {
-                var obj = JSON.parse(floorsInput);
-                // if not, we can deserialise to an array of FloorAreas
-                for (var x in obj) {
-                    if (obj[x].hasOwnProperty('Name')) {
-                        return obj
-                    }
-                }
-            }
-            // if not, we can deserialise to an array of FloorAreas
-            return new Array();
-        },
-        ReRenderFloors: function (arr) {
-            arr.sort(function (a, b) {
-                var keyA = Number(a.Number),
-                    keyB = Number(b.Number);
-                // Compare the 2
-                if (keyA < keyB) return -1;
-                if (keyA > keyB) return 1;
-                return 0;
-            });
-            newList = $('.floor-list').empty();
-            for (i = 0; i < arr.length; i++) {
-                newList.append("<div class='row m-b-xs'><div class='col-xs-4'><strong>" + arr[i].Name + "</strong> " + arr[i].Number + "</div><div class='col-xs-8'>" + $.numberWithCommas(Math.round(arr[i].SquareMetres)) + " m<sup>2</sup> [" + $.numberWithCommas(Math.round(arr[i].SquareFeet)) + " sq. ft.] <a class='delete-floor btn btn-xs bg-color-red txt-color-white' data-number='" + arr[i].Number + "'><i class='fa fa-trash-o'></i></a></div></div>");
-            }
         }
     },
 
     Upload: {
         InitImageUploader: function () {
+            if (!$('#property-gallery-add').doesExist())
+                return;
+
+            $('#property-gallery-total-progress').hide();
 
             Dropzone.autoDiscover = false;
 
-            var pgDropzone = new Dropzone("#property-gallery-upload", {
-                url: "/admin/property/upload/gallery?id=" + $("#property-gallery-upload").data('id'),
+            var myDropzone = new Dropzone("#property-gallery-upload", {
+                url: $('#property-gallery-upload').data('url'),
                 thumbnailWidth: 80,
                 thumbnailHeight: 80,
                 parallelUploads: 5,
@@ -235,41 +231,50 @@ $.hood.Property = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-            pgDropzone.on("success", function (file, response) {
-                if (response.Success == false) {
-                    $.hood.Alerts.Error("Uploads failed: " + response.Error);
-                } else {
-                    $.hood.Alerts.Success("Uploads completed successfully.");
-                }
+            myDropzone.on("success", function (file, data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Property.Lists.Media.Reload();
+            });
+
+            myDropzone.on("addedfile", function (file) {
+                $('#property-gallery-total-progress .progress-bar').css({ width: 0 + "%" });
+                $('#property-gallery-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
-            pgDropzone.on("totaluploadprogress", function (progress) {
-                document.querySelector("#gallery-total-progress .progress-bar").style.width = progress + "%";
+            myDropzone.on("totaluploadprogress", function (progress) {
+                $('#property-gallery-total-progress .progress-bar').css({ width: progress + "%" });
+                $('#property-gallery-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
-            pgDropzone.on("sending", function (file) {
+            myDropzone.on("sending", function (file) {
                 // Show the total progress bar when upload starts
-                document.querySelector("#gallery-total-progress").style.opacity = "1";
+                $('#property-gallery-total-progress').fadeIn();
+                $('#property-gallery-total-progress .progress-bar').css({ width: "0%" });
+                $('#property-gallery-total-progress .progress-bar .percentage').html("0%");
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            pgDropzone.on("complete", function (file) {
-                $.hood.Inline.Refresh('.gallery');
+            myDropzone.on("complete", function (file) {
+                $.hood.Property.Lists.Media.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            pgDropzone.on("queuecomplete", function (progress) {
-                document.querySelector("#gallery-total-progress").style.opacity = "0";
-                $.hood.Inline.Refresh('.gallery');
+            myDropzone.on("queuecomplete", function (progress) {
+                $('#property-gallery-total-progress').hide();
+                $.hood.Property.Lists.Media.Reload();
             });
         },
         InitFloorplanUploader: function () {
+            if (!$('#property-floorplans-add').doesExist())
+                return;
+
+            $('#property-floorplans-total-progress').hide();
 
             Dropzone.autoDiscover = false;
 
-            var fpDropzone = new Dropzone("#property-floorplans-upload", {
-                url: "/admin/property/upload/floorplan?id=" + $("#property-floorplans-upload").data('id'),
+            var myDropzone = new Dropzone("#property-floorplans-upload", {
+                url: $('#property-floorplans-upload').data('url'),
                 thumbnailWidth: 80,
                 thumbnailHeight: 80,
                 parallelUploads: 5,
@@ -282,37 +287,68 @@ $.hood.Property = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-            fpDropzone.on("success", function (file, response) {
-                if (response.Success == false) {
-                    $.hood.Alerts.Error("Uploads failed: " + response.Error);
-                } else {
-                    $.hood.Alerts.Success("Uploads completed successfully.");
-                }
+            myDropzone.on("success", function (file, data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Property.Lists.Floorplans.Reload();
+         });
+
+            myDropzone.on("addedfile", function (file) {
+                $('#property-floorplans-total-progress .progress-bar').css({ width: 0 + "%" });
+                $('#property-floorplans-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
-            fpDropzone.on("totaluploadprogress", function (progress) {
-                document.querySelector("#floorplans-total-progress .progress-bar").style.width = progress + "%";
+            myDropzone.on("totaluploadprogress", function (progress) {
+                $('#property-floorplans-total-progress .progress-bar').css({ width: progress + "%" });
+                $('#property-floorplans-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
-            fpDropzone.on("sending", function (file) {
+            myDropzone.on("sending", function (file) {
                 // Show the total progress bar when upload starts
-                document.querySelector("#floorplans-total-progress").style.opacity = "1";
+                $('#property-floorplans-total-progress').fadeIn();
+                $('#property-floorplans-total-progress .progress-bar').css({ width: "0%" });
+                $('#property-floorplans-total-progress .progress-bar .percentage').html("0%");
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            fpDropzone.on("complete", function (file) {
-                $.hood.Inline.Refresh('.gallery');
+            myDropzone.on("complete", function (file) {
+                $.hood.Property.Lists.Floorplans.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            fpDropzone.on("queuecomplete", function (progress) {
-                document.querySelector("#floorplans-total-progress").style.opacity = "0";
-                $.hood.Inline.Refresh('.floorplans');
-                $.hood.Alerts.Success("Uploads completed successfully.");
+            myDropzone.on("queuecomplete", function (progress) {
+                $('#property-floorplans-total-progress').hide();
+                $.hood.Property.Lists.Floorplans.Reload();
             });
         }
+    },
+
+    Media: {
+        Delete: function (e) {
+            e.preventDefault();
+            $tag = $(this);
+
+            deleteMediaCallback = function (isConfirm) {
+                if (isConfirm) {
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Property.Lists.Media.Reload();
+                        $.hood.Property.Lists.Floorplans.Reload();
+                    });
+                }
+            };
+
+            $.hood.Alerts.Confirm(
+                "The image/media will be permanently removed.",
+                "Are you sure?",
+                deleteMediaCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong><br /><span class="text-warning">If this is set as a featured image, this may cause issues, make sure to set another image as featured before deleting this one.</span></span>',
+            );
+
+        }
     }
+
 };
 $(document).ready($.hood.Property.Init);
 

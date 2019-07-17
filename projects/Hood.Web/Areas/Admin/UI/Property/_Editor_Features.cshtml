@@ -4,25 +4,42 @@
     PropertySettings _propertySettings = Engine.Settings.Property;
 }
 <div id="features" class="tab-pane">
-    <div class="panel-body">
-        @if (Model.Metadata != null)
+    <h5 class="mt-2 mb-0">Features</h5>
+    <p>Features will be listed in a simple bullet list on in the default templates.</p>
+    @if (Model.Metadata != null)
+    {
+        foreach (var meta in Model.Metadata.Where(m => !m.Name.Contains("FloorPlan") && m.Name.Contains("Feature")).OrderBy(m => m.Name))
         {
-            <fieldset class="form-horizontal">
-                @foreach (var meta in Model.Metadata.Where(m => !m.Name.Contains("FloorPlan") && m.Name.Contains("Feature")).OrderBy(m => m.Name))
-                {
+            <div class="row align-items-center">
+                <div class="col">
                     <partial name="_Editor_Metadata" model="meta" />
-                }
-            </fieldset>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-sm btn-danger warning-alert mb-3" asp-action="DeleteMeta" asp-route-id="@Model.Id" asp-route-metaId="@meta.Id">
+                        <i class="fa fa-trash-o"></i> Delete
+                    </a>
+                </div>
+            </div>
         }
-        @if (Model.Metadata != null)
+    }
+    <a class="btn btn-success" asp-area="Admin" asp-action="AddMeta" asp-route-id="@Model.Id" asp-route-name="Feature">Add feature slot</a>
+    <hr class="mt-4 mb-4" />
+    <h5 class="mt-2 mb-0">Custom Fields &amp; Imported Fields</h5>
+    <p>Custom Fields &amp; Imported Fields can be displayed in the default templates, some are used by property importers such as the BLM File Importer. </p>
+    @if (Model.Metadata != null)
+    {
+        foreach (var meta in Model.Metadata.Where(m => !m.Name.Contains("FloorPlan") && !m.Name.Contains("Feature")).OrderBy(m => m.Name))
         {
-            <fieldset class="form-horizontal">
-                @foreach (var meta in Model.Metadata.Where(m => !m.Name.Contains("FloorPlan") && !m.Name.Contains("Feature")).OrderBy(m => m.Name))
-                {
+            <div class="row align-items-center">
+                <div class="col">
                     <partial name="_Editor_Metadata" model="meta" />
-                }
-            </fieldset>
+                </div>
+                <div class="col-auto">
+                    <a class="btn btn-sm btn-danger warning-alert mb-3" asp-action="DeleteMeta" asp-route-id="@Model.Id" asp-route-metaId="@meta.Id">
+                        <i class="fa fa-trash-o"></i> Delete
+                    </a>
+                </div>
+            </div>
         }
-        <a class="btn btn-success" asp-area="Admin" asp-action="AddFeature" asp-controller="Property" asp-route-id="@Model.Id">Add feature slot</a>
-    </div>
+    }
 </div>

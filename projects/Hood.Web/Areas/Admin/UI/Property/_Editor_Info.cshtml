@@ -4,7 +4,9 @@
     var _integrationSettings = Engine.Settings.Integrations;
 }
 <div id="info" class="tab-pane active">
-    <div class="form-group floating-label">
+    <h5 class="mt-2 mb-0">Property Listing, Title and Description</h5>
+    <p>Set titles, descriptions and enter the main body of the property. You can adjust what editors you see here in the <a asp-action="Property" asp-controller="Settings">content settings</a> area.</p>
+   <div class="form-group floating-label">
         <label asp-for="Title"></label>
         <input asp-for="Title" type="text" class="form-control" />
         <small asp-for="Title"></small>
@@ -22,6 +24,8 @@
     <hr class="mt-4 mb-4" />
     <partial name="_Editor_Images" />
     <hr class="mt-4 mb-4" />
+    <h5 class="mt-2 mb-0">Property Address</h5>
+    <p>Addres and location information for this property listing.</p>
     @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
     {
         <div class="form-group floating-label">

@@ -1,9 +1,4 @@
 @model PropertyListing
-@inject IContentRepository _data
-
-@{
-    PropertySettings _propertySettings = Engine.Settings.Property;
-}
 <div id="floorplans" class="tab-pane">
     <h5 class="mt-2 mb-0">Floor plans</h5>
     <p>You can add images or PDFs to this, images will appear in a floor plan view in the template, or can be templated to appear however you want.</p>
@@ -15,7 +10,7 @@
         <span>Add files...</span>
     </a>
     <div id="property-floorplans-upload" class="media-upload text-center" data-url="@Url.Action("UploadFloorplan", new { id = Model.Id })"></div>
-    <div id="property-floorplans-total-progress" class="progress progress-striped active mb-3" style="height:2rem;display:none;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="property-floorplans-total-progress" class="progress progress-striped active mt-3" style="height:2rem;display:none;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="progress-bar bg-info progress-bar-striped progress-bar-animated" style="width:0%;"><span>Uploading: <strong class="percentage">0%</strong></span></div>
     </div>
 </div>

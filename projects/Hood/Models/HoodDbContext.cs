@@ -43,6 +43,7 @@ namespace Hood.Models
 
         // Content
         public DbSet<Content> Content { get; set; }
+        public DbSet<ContentMeta> ContentMetadata { get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
 
         // Forums
@@ -53,6 +54,7 @@ namespace Hood.Models
 
         // Property
         public DbSet<PropertyListing> Properties { get; set; }
+        public DbSet<PropertyMeta> PropertyMetadata { get; set; }
 
         // Logs
         public DbSet<Log> Logs { get; set; }

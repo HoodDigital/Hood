@@ -475,6 +475,7 @@ namespace Hood.Areas.Admin.Controllers
                 ContentMedia media = content.Media.Find(m => m.Id == mediaId);
                 if (media != null)
                 {
+                    await _media.DeleteStoredMedia(media);
                     _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
                 }
 
@@ -483,7 +484,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<ContentController>("Error removing media item", ex);
+                await _logService.AddExceptionAsync<ContentController>("Error removing media item.", ex);
                 return new Response(ex);
             }
         }
@@ -501,7 +502,7 @@ namespace Hood.Areas.Admin.Controllers
                     content.FeaturedImage = new MediaObject(media);
                     await _content.UpdateAsync(content);
                 }
-                return new Response(true, "The image has now been set as the featured image.");
+                return new Response(true, "The image has now been set as the featured image. You may need to reload the page to see the change.");
             } catch (Exception ex)
             {
                 await _logService.AddExceptionAsync<ContentController>("Error setting a featured image from the media list.", ex);

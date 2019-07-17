@@ -2,10 +2,10 @@
 @{
     Layout = null;
 }
-@if (Model.Media != null && Model.Media.Count > 0)
+@if (Model.FloorPlans != null && Model.FloorPlans.Count > 0)
 {
     <div class="card-deck card-deck-4">
-        @foreach (var media in Model.Media)
+        @foreach (var media in Model.FloorPlans)
         {
             <div class="card text-center hover">
                 <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
@@ -20,12 +20,11 @@
                     {
                         <a class="btn btn-sm btn-success hood-inline-task" asp-action="SetFeatured" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id">Set as featured</a>
                     }
-                    <a class="btn btn-sm btn-danger content-media-delete" asp-action="RemoveMedia" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id"><i class="fa fa-trash"></i></a>
+                    <a class="btn btn-sm btn-danger property-media-delete" asp-action="RemoveFloorplan" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id"><i class="fa fa-trash"></i></a>
                 </div>
             </div>
         }
     </div>
-    <partial name="_Pagination" />
 }
 else
 {

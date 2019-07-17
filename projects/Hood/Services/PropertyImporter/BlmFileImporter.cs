@@ -1120,29 +1120,29 @@ namespace Hood.Services
             {
 
                 bool includesWater = data["LET_BILL_INC_WATER"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Water", JsonConvert.SerializeObject(includesWater), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesWater", JsonConvert.SerializeObject(includesWater), "System.Boolean");
 
                 bool includesGas = data["LET_BILL_INC_GAS"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Gas", JsonConvert.SerializeObject(includesGas), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesGas", JsonConvert.SerializeObject(includesGas), "System.Boolean");
 
                 bool includesElectricity = data["LET_BILL_INC_ELECTRICITY"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Electricity", JsonConvert.SerializeObject(includesElectricity), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesElectricity", JsonConvert.SerializeObject(includesElectricity), "System.Boolean");
 
                 bool includesTvLicense = data["LET_BILL_INC_TV_LICENCE"] == "Y";
-                property = AddMeta(property, "Bill.Includes.TV.License", JsonConvert.SerializeObject(includesTvLicense), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesTVLicense", JsonConvert.SerializeObject(includesTvLicense), "System.Boolean");
 
                 bool includesTv = data["LET_BILL_INC_TV_SUBSCRIPTION"] == "Y";
-                property = AddMeta(property, "Bill.Includes.TV.Subscription", JsonConvert.SerializeObject(includesTv), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesTVSubscription", JsonConvert.SerializeObject(includesTv), "System.Boolean");
 
                 bool includesInternet = data["LET_BILL_INC_INTERNET"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Internet", JsonConvert.SerializeObject(includesInternet), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesInternet", JsonConvert.SerializeObject(includesInternet), "System.Boolean");
 
             }
             catch (Exception ex)
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                StatusMessage = "Could not get the letting data for the property, this could be a sale property.";
-                await _logService.AddExceptionAsync<BlmFileImporter>(StatusMessage, property, ex);
+                StatusMessage = "Could not get the bills inclusive data for the property.";
+                await _logService.AddExceptionAsync<BlmFileImporter>(StatusMessage, property, ex, LogType.Warning);
                 Warnings.Add(FormatLog(StatusMessage, property));
                 Lock.ReleaseWriterLock();
             }

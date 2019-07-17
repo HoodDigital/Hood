@@ -201,6 +201,7 @@ $.hood.Content = {
 
             myDropzone.on("success", function (file, data) {
                 $.hood.Helpers.ProcessResponse(data);
+                $.hood.Content.Lists.Media.Reload();
             });
 
             myDropzone.on("addedfile", function (file) {

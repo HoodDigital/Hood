@@ -66,8 +66,8 @@ namespace Hood.Models
         [NotMapped]
         public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank; }
-            set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
+            get => FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank;
+            set => FeaturedImageJson = JsonConvert.SerializeObject(value);
         }
 
         // Media
@@ -75,8 +75,8 @@ namespace Hood.Models
         [NotMapped]
         public IMediaObject InfoDownload
         {
-            get { return InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : MediaObject.Blank; }
-            set { InfoDownloadJson = JsonConvert.SerializeObject(value); }
+            get => InfoDownloadJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(InfoDownloadJson) : MediaObject.Blank;
+            set => InfoDownloadJson = JsonConvert.SerializeObject(value);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Hood.Models
         /// <summary>
         /// Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.
         /// </summary>
-        [Display(Name = "Lease\Listing Status", Description = "Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.")]
+        [Display(Name = "Lease/Listing Status", Description = "Availability flag for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.")]
         public string LeaseStatus { get; set; }
 
         /// <summary>
@@ -206,19 +206,16 @@ namespace Hood.Models
             get
             {
                 if (Title.IsSet())
+                {
                     return Title;
+                }
+
                 return this.ToFormat(AddressFormat.Short);
             }
         }
 
         [NotMapped]
-        public string Url
-        {
-            get
-            {
-                return string.Format("/property/{0}/{1}/{2}/{3}", Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.Split(' ').First().ToSeoUrl(), Title.ToSeoUrl());
-            }
-        }
+        public string Url => string.Format("/property/{0}/{1}/{2}/{3}", Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.Split(' ').First().ToSeoUrl(), Title.ToSeoUrl());
 
         [NotMapped]
         public string FormattedRent
@@ -228,7 +225,10 @@ namespace Hood.Models
                 PropertySettings propertySettings = Engine.Settings.Property;
                 decimal rent = 0;
                 if (Rent.HasValue)
+                {
                     rent = Rent.Value;
+                }
+
                 return propertySettings.ShowRentDecimals ? rent.ToString("C") : rent.ToString("C0");
             }
         }
@@ -241,7 +241,10 @@ namespace Hood.Models
                 PropertySettings propertySettings = Engine.Settings.Property;
                 decimal ap = 0;
                 if (AskingPrice.HasValue)
+                {
                     ap = AskingPrice.Value;
+                }
+
                 return propertySettings.ShowAskingPriceDecimals ? ap.ToString("C") : ap.ToString("C0");
             }
         }
@@ -254,7 +257,10 @@ namespace Hood.Models
                 PropertySettings propertySettings = Engine.Settings.Property;
                 decimal premium = 0;
                 if (Premium.HasValue)
+                {
                     premium = Premium.Value;
+                }
+
                 return propertySettings.ShowPremiumDecimals ? premium.ToString("C") : premium.ToString("C0");
             }
         }
@@ -267,7 +273,10 @@ namespace Hood.Models
                 PropertySettings propertySettings = Engine.Settings.Property;
                 decimal fees = 0;
                 if (Fees.HasValue)
+                {
                     fees = Fees.Value;
+                }
+
                 return propertySettings.ShowFeesDecimals ? fees.ToString("C") : fees.ToString("C0");
             }
         }
@@ -281,25 +290,25 @@ namespace Hood.Models
         [NotMapped]
         public List<FloorArea> FloorAreas
         {
-            get
-            {
-                try
-                {
-                    return JsonConvert.DeserializeObject<List<FloorArea>>(Floors);
-                }
-                catch (Exception)
-                {
-                    return new List<FloorArea>();
-                }
-            }
+            get => Floors.IsSet() ? JsonConvert.DeserializeObject<List<FloorArea>>(Floors) : new List<FloorArea>();
+            set => Floors = JsonConvert.SerializeObject(value);
         }
+
         [NotMapped]
         public decimal TotalFloorAreaMetres
         {
             get
             {
-                if (FloorAreas == null) return 0;
-                if (FloorAreas.Count == 0) return 0;
+                if (FloorAreas == null)
+                {
+                    return 0;
+                }
+
+                if (FloorAreas.Count == 0)
+                {
+                    return 0;
+                }
+
                 return FloorAreas.Select(f => f.SquareMetres).Sum();
             }
         }
@@ -308,8 +317,16 @@ namespace Hood.Models
         {
             get
             {
-                if (FloorAreas == null) return 0;
-                if (FloorAreas.Count == 0) return 0;
+                if (FloorAreas == null)
+                {
+                    return 0;
+                }
+
+                if (FloorAreas.Count == 0)
+                {
+                    return 0;
+                }
+
                 return FloorAreas.Select(f => f.SquareFeet).Sum();
             }
         }
@@ -328,13 +345,18 @@ namespace Hood.Models
         {
             get
             {
-                switch ((Enums.ContentStatus)Status)
+                switch (Status)
                 {
                     case ContentStatus.Published:
                         if (PublishDate > DateTime.Now)
+                        {
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                        }
                         else
+                        {
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
+                        }
+
                     case ContentStatus.Draft:
                     default:
                         return "Draft";
@@ -362,33 +384,36 @@ namespace Hood.Models
                         return $"{PropertyType} for sale at {FormattedAskingPrice}";
                     default:
                         if (LeaseStatus == "Available")
+                        {
                             return $"{Bedrooms} bedroom {PropertyType} available now for {FormattedRent}";
+                        }
                         else if (LeaseStatus == "Let Agreed")
+                        {
                             return $"{Bedrooms} bedroom {PropertyType}. Let Agreed.";
+                        }
                         else
+                        {
                             return $"{Bedrooms} bedroom {PropertyType}. Unavailable.";
+                        }
                 }
             }
         }
 
-        public string DirectoryPath
-        {
-            get
-            {
-                return $"{nameof(PropertyListing)}/{Id.ToString("D6")}-{DisplayTitle.ToString()}";
-            }
-        }
+        public string DirectoryPath => $"{nameof(PropertyListing)}/{Id.ToString("D6")}-{DisplayTitle.ToString()}";
 
         public PropertyMeta GetMeta(string name)
         {
             PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
             if (cm == null)
+            {
                 return new PropertyMeta()
                 {
                     BaseValue = null,
                     Name = name,
                     Type = null
                 };
+            }
+
             return cm;
         }
         public void UpdateMeta<T>(string name, T value)
@@ -400,6 +425,14 @@ namespace Hood.Models
                 {
                     cm.Set(value);
                 }
+            }
+        }
+        public void RemoveMeta(string name)
+        {
+            if (HasMeta(name))
+            {
+                PropertyMeta meta = GetMeta(name);
+                Metadata.Remove(meta);
             }
         }
         public void AddMeta(PropertyMeta value)
@@ -415,18 +448,26 @@ namespace Hood.Models
             {
                 PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
                 if (cm != null)
+                {
                     return true;
+                }
             }
             return false;
         }
         public bool BillIncludes(string type)
         {
-            var meta = Metadata.SingleOrDefault(m => m.Name == "Bill.Includes." + type);
+            PropertyMeta meta = Metadata.SingleOrDefault(m => m.Name == "Bill.Includes." + type);
             if (meta == null)
+            {
                 return false;
-            var value = meta.GetValue<bool>();
+            }
+
+            bool value = meta.GetValue<bool>();
             if (value)
+            {
                 return true;
+            }
+
             return false;
         }
 
