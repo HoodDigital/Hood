@@ -1,21 +1,23 @@
-﻿using Hood.Interfaces;
+﻿using Hood.Entities;
+using Hood.Interfaces;
 using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public partial class SubscriptionFeature : IMetadata
+    public partial class SubscriptionFeature : MetadataBase, IMetadata
     {
-        public int Id { get; set; }
-        public string BaseValue { get; set; }
-        public bool IsStored { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public SubscriptionFeature()
+        {
+        }
+
+        public SubscriptionFeature(string name, string value, string type = "System.String") : base(name, value, type)
+        {
+        }
 
         [JsonIgnore]
         public int SubscriptionId { get; set; }
         [JsonIgnore]
         public Subscription Subscription { get; set; }
-
     }
 
 }

@@ -19,14 +19,14 @@ namespace Hood.Services
     {
         private readonly IConfiguration _config;
         private readonly IHostingEnvironment _env;
-        private readonly DirectoryManager _directoryCache;
+        private readonly IDirectoryManager _directoryManager;
         private IMediaManager _media;
 
         private HoodDbContext Database { get; set; }
 
         public MediaRefreshService(
             IHostingEnvironment env,
-            DirectoryManager directoryCache,
+            IDirectoryManager directoryManager,
             IConfiguration config)
         {
             _config = config;
@@ -40,7 +40,7 @@ namespace Hood.Services
             Succeeded = false;
             StatusMessage = "Not running...";
             _env = env;
-            _directoryCache = directoryCache;
+            _directoryManager = directoryManager;
             _media = new MediaManager(env);
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(MediaRefreshService) + "\\";
         }

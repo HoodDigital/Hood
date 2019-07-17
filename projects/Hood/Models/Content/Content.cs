@@ -21,7 +21,10 @@ namespace Hood.Models
         [Required]
         public string Excerpt { get; set; }
         public string Body { get; set; }
+
+        [Display(Name = "URL Slug", Description = "Do not start your url slug with reserved words as they will not reach this page.<br />These include: <strong>account, about, store, admin, api, services.</strong>")]
         public string Slug { get; set; }
+        
 
         // Parent Content
         public int? ParentId { get; set; }
@@ -56,6 +59,8 @@ namespace Hood.Models
         // Settings
         public bool AllowComments { get; set; }
         public bool Public { get; set; }
+
+        [Display(Name = "Featured Content", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]
         public bool Featured { get; set; }
 
         public string DirectoryPath
@@ -175,9 +180,9 @@ namespace Hood.Models
         }
         public string GetImageStyle(string imageType = "Featured")
         {
-            string align = GetMetaValue(string.Format("Settings.Image.{0}.Align", imageType));
-            string fit = GetMetaValue(string.Format("Settings.Image.{0}.Fit", imageType));
-            string bg = GetMetaValue(string.Format("Settings.Image.{0}.Background", imageType));
+            string align = GetMetaValue<string>(string.Format("Settings.Image.{0}.Align", imageType));
+            string fit = GetMetaValue<string>(string.Format("Settings.Image.{0}.Fit", imageType));
+            string bg = GetMetaValue<string>(string.Format("Settings.Image.{0}.Background", imageType));
             return string.Format("{0}{1}{2}",
                 !string.IsNullOrEmpty(align) ? "background-position:" + align + ";" : "",
                 !string.IsNullOrEmpty(fit) ? "background-size:" + fit + ";" : "",
@@ -187,7 +192,9 @@ namespace Hood.Models
         [NotMapped]
         public IEnumerable<ContentCategory> AllowedCategories { get; set; }
         // Author 
+        [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public string AuthorId { get; set; }
+        [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public ApplicationUser Author { get; set; }
 
         public List<ContentCategoryJoin> Categories { get; set; }
@@ -239,12 +246,12 @@ namespace Hood.Models
                 };
             return cm;
         }
-        public string GetMetaValue(string name)
+        public T GetMetaValue<T>(string name)
         {
             ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
             if (cm != null)
-                return cm.GetStringValue();
-            return null;
+                return cm.GetValue<T>();
+            return default;
         }
         public void UpdateMeta<T>(string name, T value)
         {

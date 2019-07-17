@@ -1,49 +1,31 @@
 @model Content
 @{
-    var typeFields = Model.Content.Metadata.Where(c => c.Name.StartsWith("Content." + Model.ContentType.BaseName + "."));
+    var typeFields = Model.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + "."));
 }
+<h5 class="mt-2 mb-0">@Model.Type.TypeName Settings &amp; Custom Fields</h5>
+<p>You can create custom fields in the <a asp-action="Content" asp-controller="Settings">content settings</a> area.</p>
 @if (typeFields.Count() > 0)
 {
-    <h5>@Model.ContentType.TypeName Settings</h5>
-    <div class="ibox-content">
-        <fieldset class="form-horizontal">
-            @foreach (ContentMeta cm in typeFields.OrderBy(cm => cm.Name))
-            {
-                <div class="form-group">
-                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                        @cm.Name.Replace("Content." + Model.ContentType.BaseName + ".", "").CamelCaseToString().ToTitleCase():
-                    </label>
-                    <div class="col-sm-8">
-                        @{await Html.RenderPartialAsync("_Editor_Metadata", cm); }
-                    </div>
-                </div>
-            }
-        </fieldset>
-    </div>
+    @foreach (ContentMeta cm in typeFields.OrderBy(cm => cm.Name))
+    {
+        <partial name="_Editor_Metadata" model="cm" />
+    }
 }
 @{
-    var customFields = Model.Content.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.ContentType.BaseName + ".")) || c.Name.StartsWith("Custom."));
+    var customFields = Model.Metadata.Where(c => (c.Name.StartsWith("Content.") && !c.Name.StartsWith("Content." + Model.Type.BaseName + ".")) || c.Name.StartsWith("Custom."));
 }
 @if (customFields.Count() > 0 && typeFields.Count() > 0)
 {
-    <hr />
+    <hr class="mt-4 mb-4" />
 }
 @if (customFields.Count() > 0)
 {
-    <h5>Custom Fields</h5>
-    <div class="ibox-content">
-        <fieldset class="form-horizontal">
-            @foreach (ContentMeta cm in customFields.OrderBy(cm => cm.Name))
-            {
-                <div class="form-group">
-                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                        @cm.Name.Replace("Custom.", "").ToSentenceCase():
-                    </label>
-                    <div class="col-sm-8">
-                        @{await Html.RenderPartialAsync("_Editor_Metadata", cm); }
-                    </div>
-                </div>
-            }
-        </fieldset>
-    </div>
+    @foreach (ContentMeta cm in customFields.OrderBy(cm => cm.Name))
+    {
+            <partial name="_Editor_Metadata" model="cm" />
+    }
+}
+else
+{
+    <alert icon="fa fa-info" size="Medium">There are no custom fields added to this type yet. Go to <a asp-action="Content" asp-controller="Settings">content settings</a> to add some.</alert>
 }

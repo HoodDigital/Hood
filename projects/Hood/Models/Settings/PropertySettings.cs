@@ -133,12 +133,12 @@ namespace Hood.Models
             ShowList = true;
             DefaultPageSize = 24;
             RentMinimum = 0;
-            RentMaximum = 1000000;
+            RentMaximum = 10000;
             AskingPriceMinimum = 0;
             AskingPriceMaximum = 10000000;
             PremiumMinimum = 0;
             PremiumMaximum = 1000000;
-            RentIncrement = 10000;
+            RentIncrement = 100;
             AskingPriceIncrement = 50000;
             PremiumIncrement = 10000;
             Enabled = false;

@@ -3,7 +3,6 @@ using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
-using Hood.Interfaces;
 using Hood.IO;
 using Hood.Models;
 using Hood.ViewModels;
@@ -30,7 +29,10 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/manage/{type?}/")]
-        public async Task<IActionResult> Index(ContentModel model) => await List(model, "Index");
+        public async Task<IActionResult> Index(ContentModel model)
+        {
+            return await List(model, "Index");
+        }
 
         [Route("admin/content/list/{type?}/")]
         public async Task<IActionResult> List(ContentModel model, string viewName = "_List_Content")
@@ -44,10 +46,13 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<IActionResult> Edit(int id)
         {
-            var content = await _content.GetContentByIdAsync(id, true);
-            if (content == null)
+            Content model = await _content.GetContentByIdAsync(id, true);
+            if (model == null)
+            {
                 return NotFound();
-            Content model = await GetEditorModel(content);
+            }
+
+            model = await GetEditorModel(model);
             return View(model);
         }
 
@@ -57,27 +62,32 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+
                 model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.Now;
+                model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
                 if (model.Slug.IsSet())
                 {
                     if (await _content.SlugExists(model.Slug, model.Id))
+                    {
                         throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                    }
                 }
                 else
                 {
-                    var generator = new KeyGenerator();
+                    KeyGenerator generator = new KeyGenerator();
                     model.Slug = generator.UrlSlug();
                     while (await _content.SlugExists(model.Slug))
+                    {
                         model.Slug = generator.UrlSlug();
+                    }
                 }
 
-                var _contentSettings = Engine.Settings.Content;
-                var type = _contentSettings.GetContentType(model.ContentType);
+                await _content.UpdateAsync(model);
+
                 // update  meta values
-                var oldTemplate = model.GetMeta("Settings.Template").GetStringValue();
-                foreach (var val in Request.Form)
+                foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
@@ -89,7 +99,7 @@ namespace Hood.Areas.Admin.Controllers
                         else
                         {
                             // Add it...
-                            var metaDetails = type.GetMetaDetails(val.Key.Replace("Meta:", ""));
+                            CustomField metaDetails = model.Type.GetMetaDetails(val.Key.Replace("Meta:", ""));
                             model.AddMeta(new ContentMeta()
                             {
                                 ContentId = model.Id,
@@ -101,17 +111,11 @@ namespace Hood.Areas.Admin.Controllers
                         }
                     }
                 }
-                var currentTemplate = model.GetMeta("Settings.Template").GetStringValue();
-                // check if new template has been selected
-                if (oldTemplate.IsSet() && currentTemplate.IsSet())
-                {
-                    // delete all template metas that do not exist in the new template, and add any that are missing
-                    List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, type.TemplateFolder);
+                string currentTemplate = model.GetMeta("Settings.Template").GetStringValue();
+                // delete all template metas that do not exist in the new template, and add any that are missing
+                List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, model.Type.TemplateFolder);
+                if (newMetas != null)
                     _content.UpdateTemplateMetas(model, newMetas);
-                }
-
-
-                await _content.UpdateAsync(model);
 
                 model = await GetEditorModel(model);
                 SaveMessage = "Saved!";
@@ -125,17 +129,10 @@ namespace Hood.Areas.Admin.Controllers
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
-                return View(model);
             }
-        }
 
-        [Route("admin/content/{id}/gallery/")]
-        public async Task<IActionResult> EditorGallery(int id)
-        {
-            var model = await _content.GetContentByIdAsync(id);
             return View(model);
         }
-
         #endregion
 
         #region Create
@@ -182,7 +179,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/categories/")]
         public async Task<IActionResult> ContentCategories(int id)
         {
-            var content = await _content.GetContentByIdAsync(id);
+            Content content = await _content.GetContentByIdAsync(id);
             EditContentModel model = new EditContentModel()
             {
                 ContentType = Engine.Settings.Content.GetContentType(content.ContentType),
@@ -192,35 +189,27 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/content/{id}/categories/add/")]
-        public async Task<Response> AddCategoryToContent(int id, int categoryId)
+        [Route("admin/content/{id}/categories/toggle/")]
+        public async Task<Response> ToggleCategory(int id, int categoryId, bool add)
         {
             try
             {
-                await _content.AddCategoryToContentAsync(id, categoryId);
-                _contentCategoryCache.ResetCache();
-#warning TODO: Handle response in JS.
-                return new Response(true, "Added the category to the content.");
+                if (add)
+                {
+                    await _content.AddCategoryToContentAsync(id, categoryId);
+                    _contentCategoryCache.ResetCache();
+                    return new Response(true, "Added the category to the content.");
+                }
+                else
+                {
+                    await _content.RemoveCategoryFromContentAsync(id, categoryId);
+                    _contentCategoryCache.ResetCache();
+                    return new Response(true, "Removed the category from the content.");
+                }
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<ContentController>($"Error adding a content category.", ex);
-            }
-        }
-
-        [Route("admin/content/{id}/categories/remove/")]
-        public async Task<Response> RemoveCategoryAsync(int id, int categoryId)
-        {
-            try
-            {
-                await _content.RemoveCategoryFromContentAsync(id, categoryId);
-                _contentCategoryCache.ResetCache();
-#warning TODO: Handle response in JS.
-                return new Response(true, "Removed the category from the content.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<ContentController>($"Error removing a content category.", ex);
+                return await ErrorResponseAsync<ContentController>($"Error toggling a content category.", ex);
             }
         }
 
@@ -246,7 +235,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/add/{type}/")]
         public IActionResult CreateCategory(string type)
         {
-            var model = new ContentCategory()
+            ContentCategory model = new ContentCategory()
             {
                 ContentType = type,
                 Categories = _contentCategoryCache.TopLevel(type)
@@ -261,9 +250,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 if (!category.DisplayName.IsSet())
+                {
                     throw new Exception("You need to enter a category!");
+                }
 
-                var categoryResult = await _content.AddCategoryAsync(category);
+                ContentCategory categoryResult = await _content.AddCategoryAsync(category);
                 _contentCategoryCache.ResetCache();
 
                 return new Response(true, "Added the category.");
@@ -277,7 +268,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/categories/edit/{id}/")]
         public async Task<IActionResult> EditCategory(int id, string type)
         {
-            var model = await _content.GetCategoryByIdAsync(id);
+            ContentCategory model = await _content.GetCategoryByIdAsync(id);
             model.Categories = _contentCategoryCache.TopLevel(type);
             return View("_Blade_Category", model);
         }
@@ -291,11 +282,15 @@ namespace Hood.Areas.Admin.Controllers
                 if (model.ParentCategoryId.HasValue)
                 {
                     if (model.ParentCategoryId == model.Id)
+                    {
                         throw new Exception("You cannot set the parent to be the same category!");
+                    }
 
-                    var thisAndChildren = _contentCategoryCache.GetThisAndChildren(model.Id);
+                    IEnumerable<ContentCategory> thisAndChildren = _contentCategoryCache.GetThisAndChildren(model.Id);
                     if (thisAndChildren.Select(c => c.Id).ToList().Contains(model.ParentCategoryId.Value))
+                    {
                         throw new Exception("You cannot set the parent to be a child of this category!");
+                    }
                 }
 
                 await _content.UpdateCategoryAsync(model);
@@ -331,7 +326,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 await _content.SetStatusAsync(id, status);
-                var content = await _content.GetContentByIdAsync(id);
+                Content content = await _content.GetContentByIdAsync(id);
                 return new Response(true, "Content status has been updated successfully.");
             }
             catch (Exception ex)
@@ -383,7 +378,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var newContent = await _content.DuplicateContentAsync(id);
+                Content newContent = await _content.DuplicateContentAsync(id);
                 return RedirectToAction(nameof(Edit), new { newContent.Id });
             }
             catch (Exception ex)
@@ -397,13 +392,13 @@ namespace Hood.Areas.Admin.Controllers
         }
         #endregion
 
-        [Route("admin/content/sethomepage/{id}")]
+        [Route("admin/pages/set-home/{id}")]
         public async Task<Response> SetHomepage(int id)
         {
             try
             {
                 _cache.Remove(typeof(BasicSettings).ToString());
-                var model = Engine.Settings.Basic;
+                BasicSettings model = Engine.Settings.Basic;
                 model.Homepage = id;
                 Engine.Settings.Set(model);
                 return new Response(true, "The homepage has now been set.");
@@ -415,13 +410,28 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #region Gallery
+        [Route("admin/content/{id}/gallery")]
+        public async Task<IActionResult> Gallery(int id)
+        {
+            Content model = await _content.GetContentByIdAsync(id, true);
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            model = await GetEditorModel(model);
+            return View("_List_ContentMedia", model);
+        }
+
         [Route("admin/content/media/{id}/upload/gallery")]
         public async Task<IActionResult> UploadToGallery(List<IFormFile> files, int id)
         {
             // User must have an organisation.
             Content content = await _content.GetContentByIdAsync(id);
             if (content == null)
+            {
                 return NotFound();
+            }
 
             try
             {
@@ -429,11 +439,13 @@ namespace Hood.Areas.Admin.Controllers
                 if (files != null)
                 {
                     if (files.Count == 0)
+                    {
                         return Json(new
                         {
                             Success = false,
                             Error = "There are no files attached!"
                         });
+                    }
 
                     foreach (IFormFile file in files)
                     {
@@ -453,37 +465,48 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("admin/content/media/{id}/remove/{mediaId}")]
-        public async Task<IActionResult> RemoveMedia(int id, int mediaId)
+        public async Task<Response> RemoveMedia(int id, int mediaId)
         {
             try
             {
                 Content content = await _content.GetContentByIdAsync(id, true);
                 ContentMedia media = content.Media.Find(m => m.Id == mediaId);
                 if (media != null)
-                    content.Media.Remove(media);
+                {
+                    _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                }
+
                 await _content.UpdateAsync(content);
+                return new Response(true, "The image has now been removed.");
             }
             catch (Exception ex)
             {
                 await _logService.AddExceptionAsync<ContentController>("Error removing media item", ex);
+                return new Response(ex);
             }
-            return RedirectToAction(nameof(Edit), new { id });
         }
 
         [HttpGet]
         [Route("admin/content/media/{id}/setfeatured/{mediaId}")]
-        public async Task<IActionResult> SetFeaturedAsync(int id, int mediaId)
+        public async Task<Response> SetFeatured(int id, int mediaId)
         {
-            Content content = await _content.GetContentByIdAsync(id, true);
-            ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
-            if (media != null)
+            try
             {
-                content.FeaturedImage = new MediaObject(media);
-                await _content.UpdateAsync(content);
+                Content content = await _content.GetContentByIdAsync(id, true);
+                ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
+                if (media != null)
+                {
+                    content.FeaturedImage = new MediaObject(media);
+                    await _content.UpdateAsync(content);
+                }
+                return new Response(true, "The image has now been set as the featured image.");
+            } catch (Exception ex)
+            {
+                await _logService.AddExceptionAsync<ContentController>("Error setting a featured image from the media list.", ex);
+                return new Response(ex);
             }
-            return RedirectToAction(nameof(Edit), new { id });
         }
         #endregion
 
@@ -494,14 +517,16 @@ namespace Hood.Areas.Admin.Controllers
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
 #warning Replace this with a client side lookup.
-            var authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
+            UserListModel authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
             model.Authors = authors.List;
 
             if (model.Type != null)
             {
                 // Templates
                 if (model.Type.Templates)
+                {
                     model = GetTemplates(model, model.Type.TemplateFolder);
+                }
 
                 // Special type features.
                 switch (model.Type.BaseName)
@@ -510,7 +535,7 @@ namespace Hood.Areas.Admin.Controllers
                         if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
                         {
                             // get subscriptions - if there are any.
-                            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+                            SubscriptionSearchModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
                             model.Subscriptions = subs.List;
                         }
                         break;
@@ -525,19 +550,22 @@ namespace Hood.Areas.Admin.Controllers
             Dictionary<string, string> templates = new Dictionary<string, string>();
 
             // Add the base templates:
-            var files = EmbeddedFiles.GetFiles("~/UI/" + templateDirectory + "/");
-            foreach (var temp in files)
+            string[] files = EmbeddedFiles.GetFiles("~/UI/" + templateDirectory + "/");
+            foreach (string temp in files)
             {
                 if (temp.EndsWith(".cshtml"))
                 {
-                    var key = Path.GetFileNameWithoutExtension(temp);
-                    var value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
+                    string key = Path.GetFileNameWithoutExtension(temp);
+                    string value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
                     if (!templates.ContainsKey(key))
+                    {
                         templates.Add(key, value);
+                    }
                 }
             }
 
             string[] templateDirs = {
+                _env.ContentRootPath + "\\UI\\" + templateDirectory + "\\",
                 _env.ContentRootPath + "\\Views\\" + templateDirectory + "\\",
                 _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + templateDirectory + "\\"
             };
@@ -547,14 +575,16 @@ namespace Hood.Areas.Admin.Controllers
                 try
                 {
                     files = Directory.GetFiles(str);
-                    foreach (var temp in files)
+                    foreach (string temp in files)
                     {
                         if (temp.EndsWith(".cshtml"))
                         {
-                            var key = Path.GetFileNameWithoutExtension(temp);
-                            var value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
+                            string key = Path.GetFileNameWithoutExtension(temp);
+                            string value = key.TrimStart('_').Replace("_", " ").ToTitleCase();
                             if (!templates.ContainsKey(key))
+                            {
                                 templates.Add(key, value);
+                            }
                         }
                     }
                 }
@@ -575,7 +605,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var content = await _content.GetContentByIdAsync(post.Id, true);
+                Content content = await _content.GetContentByIdAsync(post.Id, true);
                 content.Body = post.Body;
                 content.Body = Regex.Replace(content.Body, @"contenteditable=""true""", "", RegexOptions.IgnoreCase);
                 content.Body = Regex.Replace(content.Body, @"id=""mce_[^;]+""", "", RegexOptions.IgnoreCase);
@@ -604,15 +634,17 @@ namespace Hood.Areas.Admin.Controllers
             foreach (string str in templateDirs)
             {
                 if (Directory.Exists(str))
+                {
                     foreach (string temp in Directory.GetFiles(str).Where(s => s.Contains(".cshtml")))
                     {
                         string name = temp.Replace(str, "").Replace(".cshtml", "").ToSentenceCase().ToTitleCase();
                         try
                         {
-                            var jsonFile = temp.Replace(".cshtml", ".json");
+                            string jsonFile = temp.Replace(".cshtml", ".json");
                             string json = System.IO.File.ReadAllText(jsonFile);
                             ContentBlockSettings settings = JsonConvert.DeserializeObject<ContentBlockSettings>(json);
                             if (!templates.Select(t => t.Name).Contains(name))
+                            {
                                 templates.Add(new BlockContent()
                                 {
                                     Name = settings.Name,
@@ -620,18 +652,22 @@ namespace Hood.Areas.Admin.Controllers
                                     Variables = settings.Variables,
                                     Url = temp.Replace(str, "")
                                 });
+                            }
                         }
                         catch
                         {
                             if (!templates.Select(t => t.Name).Contains(name))
+                            {
                                 templates.Add(new BlockContent()
                                 {
                                     Name = name,
                                     Description = "No description added...",
                                     Url = temp.Replace(str, "")
                                 });
+                            }
                         }
                     }
+                }
             }
 
             // Add the base templates:
@@ -640,10 +676,11 @@ namespace Hood.Areas.Admin.Controllers
                 string name = temp.Replace(".cshtml", "").ToSentenceCase().ToTitleCase();
                 try
                 {
-                    var jsonFile = temp.Replace(".cshtml", ".json");
+                    string jsonFile = temp.Replace(".cshtml", ".json");
                     string json = EmbeddedFiles.ReadAllText("~/Views/Blocks/" + jsonFile);
                     ContentBlockSettings settings = JsonConvert.DeserializeObject<ContentBlockSettings>(json);
                     if (!templates.Select(t => t.Name).Contains(name))
+                    {
                         templates.Add(new BlockContent()
                         {
                             Name = settings.Name,
@@ -651,16 +688,19 @@ namespace Hood.Areas.Admin.Controllers
                             Variables = settings.Variables,
                             Url = temp
                         });
+                    }
                 }
                 catch
                 {
                     if (!templates.Select(t => t.Name).Contains(name))
+                    {
                         templates.Add(new BlockContent()
                         {
                             Name = name,
                             Description = "No description added...",
                             Url = temp
                         });
+                    }
                 }
             }
 
@@ -684,10 +724,15 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     string view = templateDirs[i] + url;
                     if (System.IO.File.Exists(view))
+                    {
                         return View(templateVirtualDirs[i] + url);
+                    }
+
                     view = templateVirtualDirs[i] + url;
                     if (EmbeddedFiles.GetFiles(view).Count() == 1)
+                    {
                         return View(templateVirtualDirs[i] + url);
+                    }
                 }
                 catch { }
             }

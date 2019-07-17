@@ -29,7 +29,10 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/manage/")]
-        public async Task<IActionResult> Index(PropertyListModel model)
+        public async Task<IActionResult> Index(PropertyListModel model) => await List(model, "Index");
+
+        [Route("admin/property/list/")]
+        public async Task<IActionResult> List(PropertyListModel model, string viewName)
         {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
@@ -45,24 +48,10 @@ namespace Hood.Areas.Admin.Controllers
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
 
-            return View(model);
+            return View(viewName.IsSet() ? viewName : "_List_Property", model);
         }
 
-        [Route("admin/property/gallery/{id}/")]
-        public async Task<IActionResult> EditorGalleryAsync(int id)
-        {
-            var model = await _property.GetPropertyByIdAsync(id, true);
-            return View(model);
-        }
-
-        [Route("admin/property/floorplans/{id}/")]
-        public async Task<IActionResult> EditorFloorplans(int id)
-        {
-            var model = await _property.GetPropertyByIdAsync(id, true);
-            return View(model);
-        }
-
-
+        #region Edit
         [Route("admin/property/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -94,29 +83,27 @@ namespace Hood.Areas.Admin.Controllers
 
                 await _property.UpdateAsync(model);
 
-                var property = await _property.GetPropertyByIdAsync(model.Id, true);
                 var type = Engine.Settings.Property.GetPlanningFromType(model.Planning);
-
-                if (property.HasMeta("PlanningDescription"))
-                    property.UpdateMeta("PlanningDescription", type);
+                if (model.HasMeta("PlanningDescription"))
+                    model.UpdateMeta("PlanningDescription", type);
                 else
                 {
-                    if (property.Metadata == null)
-                        property.Metadata = new List<PropertyMeta>();
-                    property.AddMeta(new PropertyMeta("PlanningDescription", type));
+                    if (model.Metadata == null)
+                        model.Metadata = new List<PropertyMeta>();
+                    model.AddMeta(new PropertyMeta("PlanningDescription", type));
                 }
 
                 foreach (var val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
-                        if (property.HasMeta(val.Key.Replace("Meta:", "")))
+                        if (model.HasMeta(val.Key.Replace("Meta:", "")))
                         {
-                            property.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            model.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                         else
                         {
-                            property.AddMeta(new PropertyMeta()
+                            model.AddMeta(new PropertyMeta()
                             {
                                 PropertyId = property.Id,
                                 Name = val.Key.Replace("Meta:", ""),
@@ -141,47 +128,102 @@ namespace Hood.Areas.Admin.Controllers
         }
         private async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
+#warning Replace this with client side user lookup.
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var editors = await _userManager.GetUsersInRoleAsync("Editor");
             listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
             return listing;
         }
 
+        #endregion
+
+        #region Create
         [Route("admin/property/create/")]
         public IActionResult Create()
         {
-            return View();
+            PropertyListing model = new PropertyListing()
+            {
+                AgentId = User.GetUserId()
+            };
+            return View("_Blade_Property", model);
         }
-
-        [Route("admin/property/addfeature/{id}/")]
-        public async Task<IActionResult> AddFeature(int id)
+        [HttpPost]
+        [Route("admin/property/create/")]
+        public async Task<Response> Create(PropertyListing model)
         {
             try
-            {
-                var property = await _property.GetPropertyByIdAsync(id, true);
-            int? count = property.Metadata?.Where(m => m.Name.Contains("Feature")).Count();
-            if (!count.HasValue)
-                count = 0;
+            {                
+                model.AgentId = Engine.Account.Id;
+                model.CreatedBy = Engine.Account.UserName;
+                model.CreatedOn = DateTime.Now;
+                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedOn = DateTime.Now;
+                model.Confidential = false;
+                model.Featured = false;
+                model.AskingPrice = 0;
+                model.Fees = 0;
+                model.Rent = 0;
+                model.Premium = 0;
+                model.AskingPriceDisplay = "{0}";
+                model.FeesDisplay = "{0}";
+                model.RentDisplay = "{0}";
+                model.PremiumDisplay = "{0}";
+                model.ShareCount = 0;
+                model.Views = 0;
 
-            property.AddMeta(new PropertyMeta()
-            {
-                PropertyId = property.Id,
-                Name = "Feature" + (count + 1).ToString(),
-                Type = "System.String",
-                BaseValue = JsonConvert.SerializeObject("")
-            });
-            await _property.UpdateAsync(property);
+                var leaseStatuses = _propertySettings.GetLeaseStatuses();
+                if (leaseStatuses.Count > 0)
+                    model.LeaseStatus = leaseStatuses.FirstOrDefault();
+                else
+                    model.LeaseStatus = "Available";
+
+                var planningTypes = _propertySettings.GetPlanningTypes();
+                if (planningTypes.Count > 0)
+                    model.Planning = planningTypes.FirstOrDefault().Key;
+                else
+                    model.Planning = "VAR";
+
+                var listingTypes = _propertySettings.GetListingTypes();
+                if (listingTypes.Count > 0)
+                    model.ListingType = listingTypes.FirstOrDefault();
+                else
+                    model.ListingType = "Not Specified";
+
+                // Geocode
+                var address = _address.GeocodeAddress(model);
+                if (address != null)
+                {
+                    model.SetLocation(address.Coordinates);
+                }
+
+                await _property.AddAsync(model);
+                if (model.Metadata == null)
+                    model.Metadata = new List<PropertyMeta>();
+                model.UpdateMeta("PlanningDescription", Engine.Settings.Property.GetPlanningTypes().FirstOrDefault().Value);
+
+                for (int i = 0; i < 11; i++)
+                {
+                    model.AddMeta(new PropertyMeta()
+                    {
+                        PropertyId = model.Id,
+                        Name = "Feature" + i.ToString(),
+                        Type = "System.String",
+                        BaseValue = JsonConvert.SerializeObject("")
+                    });
+                }
+
+                await _property.UpdateAsync(model);
+                return new Response(true, "Created successfully."); ;
             }
             catch (Exception ex)
             {
-                SaveMessage = $"Error adding a property feature.";
-                MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+                return await ErrorResponseAsync<PropertyController>($"Error creating a new property.", ex);
             }
-
-            return RedirectToAction(nameof(Edit), new { id });
         }
 
+        #endregion
+
+        #region Delete
         [Authorize(Roles = "SuperUser,Admin")]
         [Route("admin/property/delete/all/")]
         public async Task<IActionResult> DeleteAll()
@@ -201,106 +243,14 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
-        [Route("admin/property/add/")]
-        public async Task<Response> Add(CreatePropertyModel model)
-        {
-            try
-            {
-                ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-
-                PropertyListing property = new PropertyListing
-                {
-                    AgentId = user.Id,
-                    CreatedBy = user.UserName,
-                    CreatedOn = DateTime.Now,
-                    Number = model.cpNumber,
-                    Address1 = model.cpAddress1,
-                    Address2 = model.cpAddress2,
-                    City = model.cpCity,
-                    County = model.cpCounty,
-                    Country = model.cpCountry,
-                    Postcode = model.cpPostcode,
-                    LastEditedBy = user.UserName,
-                    LastEditedOn = DateTime.Now,
-                    Confidential = false,
-                    Featured = false,
-                    AskingPrice = 0,
-                    Fees = 0,
-                    Rent = 0,
-                    Premium = 0,
-                    AskingPriceDisplay = "{0}",
-                    FeesDisplay = "{0}",
-                    RentDisplay = "{0}",
-                    PremiumDisplay = "{0}",
-                    PublishDate = new DateTime(model.cpPublishDate.Year, model.cpPublishDate.Month, model.cpPublishDate.Day, model.cpPublishHour, model.cpPublishMinute, 0),
-                    Status = model.cpStatus,
-                    Title = model.cpTitle,
-                    ShareCount = 0,
-                    Views = 0,
-                    Latitude = model.cpLatitude,
-                    Longitude = model.cpLongitude
-                };
-
-                var leaseStatuses = _propertySettings.GetLeaseStatuses();
-                if (leaseStatuses.Count > 0)
-                    property.LeaseStatus = leaseStatuses.FirstOrDefault();
-                else
-                    property.LeaseStatus = "Available";
-
-                var planningTypes = _propertySettings.GetPlanningTypes();
-                if (planningTypes.Count > 0)
-                    property.Planning = planningTypes.FirstOrDefault().Key;
-                else
-                    property.Planning = "VAR";
-
-                var listingTypes = _propertySettings.GetListingTypes();
-                if (listingTypes.Count > 0)
-                    property.ListingType = listingTypes.FirstOrDefault();
-                else
-                    property.ListingType = "Not Specified";
-
-                // Geocode
-                var address = _address.GeocodeAddress(property);
-                if (address != null)
-                {
-                    property.SetLocation(address.Coordinates);
-                }
-
-                await _property.AddAsync(property);
-                if (property.Metadata == null)
-                    property.Metadata = new List<PropertyMeta>();
-                property.UpdateMeta("PlanningDescription", Engine.Settings.Property.GetPlanningTypes().FirstOrDefault().Value);
-
-                for (int i = 0; i < 11; i++)
-                {
-                    property.AddMeta(new PropertyMeta()
-                    {
-                        PropertyId = property.Id,
-                        Name = "Feature" + i.ToString(),
-                        Type = "System.String",
-                        BaseValue = JsonConvert.SerializeObject("")
-                    });
-                }
-
-                await _property.UpdateAsync(property);
-#warning TODO: Handle response in JS.
-                return new Response(true, "Created successfully."); ;
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error creating a new property.", ex);
-            }
-        }
-
-        [Route("admin/property/delete")]
+        [Route("admin/property/delete/{id}")]
         [HttpPost()]
-        public async Task<Response> DeleteAsync(int id)
+        public async Task<Response> Delete(int id)
         {
             try
             {
                 await _property.DeleteAsync(id);
-                var response = new Response(true, "Deleted!");
+                var response = new Response(true, "The property has been successfully deleted.");
                 return response;
             }
             catch (Exception ex)
@@ -308,42 +258,31 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<PropertyController>($"Error deleting a property.", ex);
             }
         }
+        #endregion
 
-        [Route("admin/property/publish")]
+        [Route("admin/property/set-status/{id}")]
         [HttpPost()]
-        public async Task<Response> Publish(int id)
+        public async Task<Response> SetStatus(int id, ContentStatus status)
         {
             try
             {
-                await _property.SetStatusAsync(id, ContentStatus.Published);
-                return new Response(true, "Published successfully.");
+                await _property.SetStatusAsync(id, status);
+                return new Response(true, "Property status has been updated successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<PropertyController>($"Error publishing a property.", ex);
+                return await ErrorResponseAsync<ContentController>($"Error publishing/archiving property with Id: {id}", ex);
             }
         }
 
-        [Route("admin/property/archive")]
-        [HttpPost()]
-        public async Task<Response> Archive(int id)
+        #region Gallery
+        [Route("admin/property/gallery/{id}/")]
+        public async Task<IActionResult> Gallery(int id)
         {
-            try
-            {
-                await _property.SetStatusAsync(id, ContentStatus.Archived);
-                return new Response(true, "Archived successfully.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error archiving a property.", ex);
-            }
+            var model = await _property.GetPropertyByIdAsync(id, true);
+            return View(model);
         }
 
-        /// <summary>
-        /// This adds images to the club gallery.
-        /// </summary>
-        /// <param name="clubSlug">The SEO slug for the club</param>
-        /// <returns></returns>
         [Authorize]
         [Route("admin/property/upload/gallery")]
         public async Task<Response> UploadToGallery(List<IFormFile> files, int id)
@@ -371,82 +310,6 @@ namespace Hood.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 return await ErrorResponseAsync<PropertyController>($"Error uploading media to the gallery.", ex);
-            }
-        }
-
-        /// <summary>
-        /// This adds images to the club gallery.
-        /// </summary>
-        /// <param name="clubSlug">The SEO slug for the club</param>
-        /// <returns></returns>
-        [Authorize]
-        [Route("admin/property/upload/floorplan")]
-        public async Task<Response> UploadFloorplan(List<IFormFile> files, int id)
-        {
-            try
-            {
-                PropertyListing property = await _property.GetPropertyByIdAsync(id);
-                if (property == null)
-                    throw new Exception("Property not found!");
-
-                MediaObject mediaResult = null;
-                if (files != null)
-                {
-                    if (files.Count == 0)
-                        throw new Exception("There are no files attached!");
-
-                    foreach (IFormFile file in files)
-                    {
-                        mediaResult = await _media.ProcessUpload(file, property.DirectoryPath) as MediaObject;
-                        await _property.AddFloorplanAsync(property, new PropertyFloorplan(mediaResult));
-                    }
-                }
-                return new Response(true, mediaResult);
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error uploading a floorplan.", ex);
-            }
-        }
-
-        [HttpGet]
-        [Route("admin/property/getmedia/")]
-        public async Task<IMediaObject> GetMediaAsync(int id, string type)
-        {
-            try
-            {
-                PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
-                if (property != null)
-                    switch (type)
-                    {
-                        case "FeaturedImage":
-                            return property.FeaturedImage;
-                        case "InfoDownload":
-                            return property.InfoDownload;
-                        default:
-                            return MediaObject.Blank;
-                    }
-                else
-                    throw new Exception("No media found.");
-            }
-            catch (Exception)
-            {
-                return MediaObject.Blank;
-            }
-        }
-
-        [HttpGet]
-        [Route("admin/property/clearfield/")]
-        public async Task<Response> ClearFieldAsync(int id, string field)
-        {
-            try
-            {
-                await _property.ClearFieldAsync(id, field);
-                return new Response(true, "The field has been cleared!");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error clearing the field.", ex);
             }
         }
 
@@ -490,6 +353,45 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        #endregion
+
+        #region Floorplans
+        [Route("admin/property/floorplans/{id}/")]
+        public async Task<IActionResult> FloorPlans(int id)
+        {
+            var model = await _property.GetPropertyByIdAsync(id, true);
+            return View(model);
+        }
+
+        [Authorize]
+        [Route("admin/property/upload/floorplan")]
+        public async Task<Response> UploadFloorplan(List<IFormFile> files, int id)
+        {
+            try
+            {
+                PropertyListing property = await _property.GetPropertyByIdAsync(id);
+                if (property == null)
+                    throw new Exception("Property not found!");
+
+                MediaObject mediaResult = null;
+                if (files != null)
+                {
+                    if (files.Count == 0)
+                        throw new Exception("There are no files attached!");
+
+                    foreach (IFormFile file in files)
+                    {
+                        mediaResult = await _media.ProcessUpload(file, property.DirectoryPath) as MediaObject;
+                        await _property.AddFloorplanAsync(property, new PropertyFloorplan(mediaResult));
+                    }
+                }
+                return new Response(true, mediaResult);
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<PropertyController>($"Error uploading a floorplan.", ex);
+            }
+        }
         [HttpGet]
         [Route("admin/property/floorplan/remove/{id}/{mediaId}")]
         public async Task<Response> RemoveFloorplan(int id, int mediaId)
@@ -504,7 +406,7 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<PropertyController>($"Error removing floorplan.", ex);
             }
         }
-
+        #endregion
 
     }
 }

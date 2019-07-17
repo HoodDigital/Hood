@@ -15,7 +15,7 @@ $.hood.Inline = {
     Refresh: function (tag) {
         $(tag || '.hood-inline').each($.hood.Inline.Load);
     },
-    Load: function (e) {
+    Load: function () {
         $.hood.Inline.Reload(this);
     },
     Reload: function (tag, complete) {        
@@ -55,20 +55,17 @@ $.hood.Inline = {
     },
     Task: function (e) {
         e.preventDefault();
-
         $tag = $(e.currentTarget);
         $tag.addClass('loading');
-
+        complete = $tag.data('complete');
         $.get($tag.attr('href'), function (data) {
+            $.hood.Helpers.ProcessResponse(data);
             if (data.Success) {
-                $.hood.Alerts.Success(data.Message);
-            } else {
-                $.hood.Alerts.Error(data.Errors, data.Message);
-            }
-            if (data.Url) {
-                setTimeout(function () {
-                    window.location = data.Url;
-                }, 500);
+                if ($tag && $tag.data('redirect')) {
+                    setTimeout(function () {
+                        window.location = $tag.data('redirect');
+                    }, 1500);
+                }
             }
             $tag.removeClass('loading');
         })

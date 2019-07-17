@@ -5,120 +5,124 @@
     PropertySettings _propertySettings = Engine.Settings.Property;
 }
 <div id="price" class="tab-pane">
-    <div class="panel-body">
-        <fieldset class="form-horizontal">
-            @if (_propertySettings.ShowAskingPrice)
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Asking Price:</label>
-                    <div class="col-sm-2">
-                        <input asp-for="AskingPrice" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
-                    </div>
-                    <div class="col-sm-6">
-                        <select class="form-control" asp-for="AskingPriceDisplay">
-                            @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PriceDisplays, "\r\n|\r|\n"))
-                            {
-                                <option value="@s">@string.Format(s, "£X")</option>
-                            }
-                        </select>
-                    </div>
+    @if (_propertySettings.ShowAskingPrice)
+    {
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group floating-label">
+                    <label asp-for="AskingPrice"></label>
+                    <input asp-for="AskingPrice" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <small asp-for="AskingPrice"></small>
                 </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Asking Price:</label>
-                    <div class="col-sm-3">
-                        <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Asking Prices are not enabled.</span>
-                    </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group floating-label">
+                    <label asp-for="AskingPriceDisplay"></label>
+                    <select class="form-control" asp-for="AskingPriceDisplay">
+                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PriceDisplays, "\r\n|\r|\n"))
+                        {
+                            <option value="@s">@string.Format(s, "£X")</option>
+                        }
+                    </select>
+                    <small asp-for="AskingPriceDisplay"></small>
                 </div>
-                    <input asp-for="AskingPrice" type="hidden" />
-                    <input asp-for="AskingPriceDisplay" type="hidden" />
-            }
-            @if (_propertySettings.ShowRent)
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Rent:</label>
-                    <div class="col-sm-2">
-                        <input asp-for="Rent" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
-                    </div>
-                    <div class="col-sm-6">
-                        <select class="form-control" asp-for="RentDisplay" data-selected="@Model.RentDisplay">
-                            @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.RentDisplays, "\r\n|\r|\n"))
-                            {
-                                <option value="@s">@string.Format(s, "£X")</option>
-                            }
-                        </select>
-                    </div>
+            </div>
+        </div>
+    }
+    @if (_propertySettings.ShowRent)
+    {
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group floating-label">
+                    <label asp-for="Rent"></label>
+                    <input asp-for="Rent" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <small asp-for="Rent"></small>
                 </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Rent:</label>
-                    <div class="col-sm-2">
-                        <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Rents are not enabled.</span>
-                    </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group floating-label">
+                    <label asp-for="RentDisplay"></label>
+                    <select class="form-control" asp-for="RentDisplay" data-selected="@Model.RentDisplay">
+                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.RentDisplays, "\r\n|\r|\n"))
+                        {
+                            <option value="@s">@string.Format(s, "£X")</option>
+                        }
+                    </select>
+                    <small asp-for="RentDisplay"></small>
                 </div>
-                    <input asp-for="Rent" type="hidden" />
-                    <input asp-for="RentDisplay" type="hidden" />
-            }
-            @if (_propertySettings.ShowPremium)
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Premium:</label>
-                    <div class="col-sm-2">
-                        <input asp-for="Premium" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
-                    </div>
-                    <div class="col-sm-6">
-                        <select class="form-control" asp-for="PremiumDisplay">
-                            @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PriceDisplays, "\r\n|\r|\n"))
-                            {
-                                <option value="@s">@string.Format(s, "£X")</option>
-                            }
-                        </select>
-                    </div>
+            </div>
+        </div>
+    }
+    @if (_propertySettings.ShowPremium)
+    {
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group floating-label">
+                    <label asp-for="Premium"></label>
+                    <input asp-for="Premium" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <small asp-for="Premium"></small>
                 </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Premiums:</label>
-                    <div class="col-sm-2">
-                        <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Premiums are not enabled.</span>
-                    </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group floating-label">
+                    <label asp-for="PremiumDisplay"></label>
+                    <select class="form-control" asp-for="PremiumDisplay">
+                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PriceDisplays, "\r\n|\r|\n"))
+                        {
+                            <option value="@s">@string.Format(s, "£X")</option>
+                        }
+                    </select>
+                    <small asp-for="PremiumDisplay"></small>
                 </div>
-                    <input asp-for="Premium" type="hidden" />
-                    <input asp-for="PremiumDisplay" type="hidden" />
-            }
-            @if (_propertySettings.ShowFees)
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Fees:</label>
-                    <div class="col-sm-2">
-                        <input asp-for="Fees" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
-                    </div>
-                    <div class="col-sm-6">
-                        <select class="form-control" asp-for="FeesDisplay">
-                            @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.FeesDisplay, "\r\n|\r|\n"))
-                            {
-                                <option value="@s">@string.Format(s, "£X")</option>
-                            }
-                        </select>
-                    </div>
+            </div>
+        </div>
+    }
+    @if (_propertySettings.ShowFees)
+    {
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group floating-label">
+                    <label asp-for="Fees"></label>
+                    <input asp-for="Fees" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <small asp-for="Fees"></small>
                 </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <label class="col-sm-3 control-label">Fees:</label>
-                    <div class="col-sm-2">
-                        <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Fees are not enabled.</span>
-                    </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group floating-label">
+                    <label asp-for="FeesDisplay"></label>
+                    <select class="form-control" asp-for="FeesDisplay">
+                        @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.FeesDisplay, "\r\n|\r|\n"))
+                        {
+                            <option value="@s">@string.Format(s, "£X")</option>
+                        }
+                    </select>
+                    <small asp-for="FeesDisplay"></small>
                 </div>
-                    <input asp-for="Fees" type="hidden" />
-                    <input asp-for="FeesDisplay" type="hidden" />
-            }
-        </fieldset>
-    </div>
+            </div>
+        </div>
+    }
+    @if (!_propertySettings.ShowAskingPrice)
+    {
+        <alert icon="fa fa-info">Asking Prices are not enabled. You can enable them in <a asp-action="Property" asp-controller="Settings">property settings</a>.</alert>
+        <input asp-for="AskingPrice" type="hidden" />
+        <input asp-for="AskingPriceDisplay" type="hidden" />
+    }
+    @if (!_propertySettings.ShowRent)
+    {
+        <alert icon="fa fa-info">Rents are not enabled. You can enable them in <a asp-action="Property" asp-controller="Settings">property settings</a>.</alert>
+        <input asp-for="Rent" type="hidden" />
+        <input asp-for="RentDisplay" type="hidden" />
+    }
+    @if (!_propertySettings.ShowPremium)
+    {
+        <alert icon="fa fa-info">Premiums are not enabled. You can enable them in <a asp-action="Property" asp-controller="Settings">property settings</a>.</alert>
+        <input asp-for="Premium" type="hidden" />
+        <input asp-for="PremiumDisplay" type="hidden" />
+    }
+    @if (!_propertySettings.ShowFees)
+    {
+        <alert icon="fa fa-info">Fees are not enabled. You can enable them in <a asp-action="Property" asp-controller="Settings">property settings</a>.</alert>
+        <input asp-for="Fees" type="hidden" />
+        <input asp-for="FeesDisplay" type="hidden" />
+    }
 </div>

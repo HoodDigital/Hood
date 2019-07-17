@@ -7,6 +7,8 @@ $.hood.Content = {
         $('body').on('click', '.content-clone', $.hood.Content.Clone);
         $('body').on('click', '.content-set-status', $.hood.Content.SetStatus);
 
+        $('body').on('click', '.content-media-delete', $.hood.Content.Media.Delete);
+
         $('body').on('click', '.content-categories-delete', $.hood.Content.Categories.Delete);
         $('body').on('change', '.content-categories-check', $.hood.Content.Categories.ToggleCategory);
 
@@ -23,7 +25,6 @@ $.hood.Content = {
         if ($('#content-meta-form').doesExist())
             $.hood.Content.Meta.Init();
 
-        $.hood.Inline.Reload('#content-meta-fields');
     },
 
     Lists: {
@@ -52,6 +53,15 @@ $.hood.Content = {
             Reload: function (complete) {
                 if ($('#content-meta-list').doesExist())
                     $.hood.Inline.Reload($('#content-meta-list'), complete);
+            }
+        },
+        Media: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#content-media-list').doesExist())
+                    $.hood.Inline.Reload($('#content-media-list'), complete);
             }
         }
     },
@@ -157,21 +167,26 @@ $.hood.Content = {
 
     Edit: {
         Init: function () {
-            // Load the url thing if on page editor.
-            $(tag).find('.datepicker').datetimepicker({
+            $('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
+            });
+            $('.datetimepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'LT'
             });
             $.hood.Content.Edit.InitImageUploader();
         },
         InitImageUploader: function () {
-            if (!$("#content-gallery-upload").doesExist())
+            if (!$('#content-gallery-add').doesExist())
                 return;
+
+            $('#content-gallery-total-progress').hide();
 
             Dropzone.autoDiscover = false;
 
-            var pgDropzone = new Dropzone("#content-gallery-upload", {
-                url: $("#content-gallery-upload").data('url'),
+            var myDropzone = new Dropzone("#content-gallery-upload", {
+                url: $('#content-gallery-upload').data('url'),
                 thumbnailWidth: 80,
                 thumbnailHeight: 80,
                 parallelUploads: 5,
@@ -184,37 +199,37 @@ $.hood.Content = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-
-            pgDropzone.on("success", function (file, response) {
-                if (response.Success === false) {
-                    $.hood.Alerts.Error("Uploads failed: " + response.Error);
-                } else {
-                    $.hood.Alerts.Success("Uploads completed successfully.");
-                }
+            myDropzone.on("success", function (file, data) {
+                $.hood.Helpers.ProcessResponse(data);
             });
 
-            pgDropzone.on("addedfile", function (file) {
+            myDropzone.on("addedfile", function (file) {
+                $('#content-gallery-total-progress .progress-bar').css({ width: 0 + "%" });
+                $('#content-gallery-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
-            pgDropzone.on("totaluploadprogress", function (progress) {
-                document.querySelector("#gallery-total-progress .progress-bar").style.width = progress + "%";
+            myDropzone.on("totaluploadprogress", function (progress) {
+                $('#content-gallery-total-progress .progress-bar').css({ width: progress + "%" });
+                $('#content-gallery-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
-            pgDropzone.on("sending", function (file) {
+            myDropzone.on("sending", function (file) {
                 // Show the total progress bar when upload starts
-                document.querySelector("#gallery-total-progress").style.opacity = "1";
+                $('#content-gallery-total-progress').fadeIn();
+                $('#content-gallery-total-progress .progress-bar').css({ width: "0%" });
+                $('#content-gallery-total-progress .progress-bar .percentage').html("0%");
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            pgDropzone.on("complete", function (file) {
-                $.hood.Inline.Refresh('.gallery');
+            myDropzone.on("complete", function (file) {
+                $.hood.Content.Lists.Media.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            pgDropzone.on("queuecomplete", function (progress) {
-                document.querySelector("#gallery-total-progress").style.opacity = "0";
-                $.hood.Inline.Refresh('.gallery');
+            myDropzone.on("queuecomplete", function (progress) {
+                $('#content-gallery-total-progress').hide();
+                $.hood.Content.Lists.Media.Reload();
             });
         }
     },
@@ -239,7 +254,7 @@ $.hood.Content = {
             });
         },
         ToggleCategory: function () {
-            $.post($(this).data('url'), { categoryId: $(this).val(), contentId: $(this).data('id'), add: $(this).is(':checked') }, function (data) {
+            $.post($(this).data('url'), { categoryId: $(this).val(), add: $(this).is(':checked') }, function (data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Content.Lists.Categories.Reload();
             });
@@ -287,7 +302,7 @@ $.hood.Content = {
                 }
             });
         },
-        Delete: function () {
+        Delete: function (e) {
             e.preventDefault();
             $tag = $(this);
 
@@ -306,6 +321,32 @@ $.hood.Content = {
                 deleteCategoryCallback,
                 'error',
                 '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+            );
+
+        }
+    },
+
+    // Media
+    Media: {
+        Delete: function (e) {
+            e.preventDefault();
+            $tag = $(this);
+
+            deleteMediaCallback = function (isConfirm) {
+                if (isConfirm) {
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Content.Lists.Media.Reload();
+                    });
+                }
+            };
+
+            $.hood.Alerts.Confirm(
+                "The image/media will be permanently removed.",
+                "Are you sure?",
+                deleteMediaCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong><br /><span class="text-warning">If this is set as a featured image, this may cause issues, make sure to set another image as featured before deleting this one.</span></span>',
             );
 
         }

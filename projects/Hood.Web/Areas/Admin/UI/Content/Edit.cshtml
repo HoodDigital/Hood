@@ -1,16 +1,21 @@
 @model Content
-@inject ContentCategoryCache _categories
 @{
     ViewBag.Title = "Edit " + Model.Type.TypeName + ": " + Model.Title;
 }
 @section buttons {
-    <a class="btn btn-danger delete-content" data-id="@Model.Id" data-type="@Model.Type.Type"><i class="fa fa-trash mr-2"></i>Delete</a>
-    @if (Model.Type.HasPage)
-    {
-        <a class="btn btn-info" href="@Model.Url" target="_blank"><i class="fa fa-search mr-2"></i>Preview</a>
-    }
-    <a class="btn btn-default" asp-action="Duplicate" asp-route-id="@Model.Id"><i class="fa fa-copy mr-2"></i>Duplicate</a>
-    <a href="javascript:document.getElementById('edit-content').submit()" class="btn btn-success"><i class="fa fa-save mr-2"></i>Save</a>
+    <a href="javascript:document.getElementById('content-edit-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (Model.Type.HasPage)
+        {
+            <a class="dropdown-item" href="@Model.Url" target="_blank"><i class="fa fa-search"></i>Preview</a>
+        }
+        <a class="dropdown-item" asp-action="Duplicate" asp-route-id="@Model.Id"><i class="fa fa-copy"></i>Duplicate</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete User</a>
+    </div>
 }
 @section breadcrumbs {
     <nav aria-label="breadcrumb">
@@ -30,160 +35,33 @@
 }
 @if (Model.SaveMessage.IsSet())
 {
-    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="editor">
-        <form method="post" id="edit-content" data-id="@Model.Id" data-type="@Model.ContentType">
-            <input type="hidden" asp-for="Id" value="@Model.Id" />
-            <input type="hidden" asp-for="Views" value="@Model.Views" />
+        <form method="post" id="content-edit-form" data-id="@Model.Id" data-type="@Model.ContentType">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Views" />
+            <input type="hidden" asp-for="ContentType" />
             <div class="row">
                 <div class="col-md-8">
-                    <div class="tabs-container m-b-lg">
-                        <ul class="nav nav-tabs">
-                            <partial name="_Partial_Tabs" />
-                        </ul>
-                        <div class="tab-content">
-                            <partial name="_Partial_TabContent" />
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row align-items-center">
+                                <partial name="_Partial_Tabs" />
+                            </div>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="tab-content">
+                                <partial name="_Partial_TabContent" />
+                            </div>
                         </div>
                     </div>
-                    @if (Model.Type.ShowEditor)
-                    {
-                        <partial name="_Editor_TinyMce" />
-                    }
                 </div>
                 <div class="col-md-4">
-                    <div class="panel-body">
-                        <h4 class="font-bold text-center">
-                            <span>@Model.Title</span>
-                        </h4>
-                        <p class="text-center">
-                            <small>@Html.Raw(Model.StatusString)</small>
-                        </p>
-                        <p>
-                            <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save mr-2"></i> Save @Model.Type.TypeName</button>
-                        </p>
-                    </div>
-                    @if (Model.ContentType == "page")
-                    {
-                        <div class="panel-body small">
-                            <h4 class="">Slug &amp; Url</h4>
-                            <div class="form-group no-margin">
-                                <label for="Slug" class="control-label">Slug</label>
-                                <div>
-                                    <input asp-for="Slug" class="form-control restrict-to-page-slug" value="@Model.Slug" />
-                                </div>
-                                @if (Model.IsHomepage)
-                                {
-                                    <div class="font-xs url-preview">
-                                        URL Preview:
-                                        <br />
-                                        <a class="font-sm" href="@Url.AbsoluteUrl()" target="_blank"><strong>@Url.AbsoluteUrl()</strong></a>
-                                        <br />
-                                        Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="font-xs url-preview">
-                                        URL Preview:
-                                        <br />
-                                        <a class="font-sm" href="@Url.AbsoluteUrl(Model.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Slug</span></strong></a>
-                                        <br />
-                                        Do not use reserved words as they will not reach this page. These include:<br /><strong>about, team, testimonials, news, shop, admin, api, services.</strong>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        if (Model.Type.UrlFormatting == "news")
-                        {
-                            <div class="panel-body small">
-                                <h4 class="">Slug &amp; Url</h4>
-                                <div class="form-group no-margin">
-                                    <label for="Slug" class="control-label">Slug</label>
-                                    <div>
-                                        <input asp-for="Slug" class="form-control restrict-to-page-slug" value="@Model.Slug" />
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            <input asp-for="Slug" type="hidden" value="@Model.Slug" />
-                        }
-                    }
-                    @if (Model.Type.ShowImage || Model.Type.ShowBanner)
-                    {
-                        <div class="panel-body small">
-                            <h4 class="">Images</h4>
-                            <partial name="_Editor_Images" />
-                        </div>
-                    }
-                    @if (Model.Type.ShowCategories)
-                    {
-                        <div class="panel-body small">
-                            <h4>Categories</h4>
-                            <div class="category-list">
-                                @{
-                                    _categories.ResetCache();
-                                }
-                                @if (_categories.Count(Model.Type.Type) > 0)
-                                {
-                                    @_categories.AddToCategoryTree(_categories.TopLevel(Model.Type.Type), Model, Model.Type.Slug)
-                                }
-                                else
-                                {
-                                    <p>No categories added yet. To add a category, go back to the @Model.Type.TypeName list and select @Model.Type.TypeName Categories.</p>
-                                }
-                            </div>
-                        </div>
-                    }
-                    <div class="panel-body small">
-                        <h4>
-                            Settings
-                        </h4>
-                        @if (Model.Type.BaseName == "News" || Model.Type.BaseName == "Event")
-                        {
-                            <div class="form-group">
-                                <label for="Meta:Settings.SubType" class="control-label">Post type</label>
-                                <select name="Meta:Settings.SubType" id="Meta:Settings.SubType" type="text" class="form-control" data-selected="@Model.GetMetaValue("Settings.SubType")">
-                                    <option value="">Standard Post</option>
-                                    <option value="Video">Video Post</option>
-                                    <option value="Slides">Slide Show Post</option>
-                                </select>
-                                <p><small>With a video post you must supply a video embed code for the video. For sliders, you must add more than one image to the gallery.</small></p>
-                            </div>
-                        }
-                        <div class="form-group">
-                            <label class="control-label">Author/Owner</label>
-                            <div>
-                                <select class="form-control" asp-for="AuthorId">
-                                    @foreach (var author in Model.Authors)
-                                    {
-                                        <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-label">Publish Status</label>
-                            <div>
-                                <select class="form-control" asp-for="Status">
-                                    <option value="1">Draft</option>
-                                    <option value="2">Published</option>
-                                    <option value="3">Archived</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PublishDate" class="control-label"></label>
-                            <input class="datepicker form-control" asp-for="PublishDate" value="@Model.PublishDate.ToShortDateString()">
-                        </div>
-                    </div>
+                    <partial name="_Editor_Sidebar" />
                 </div>
+            </div>
         </form>
     </div>
 </div>

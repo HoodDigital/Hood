@@ -1,22 +1,15 @@
 @model Content
-<h5>Attached Images</h5>
-<div class="hood-inline refresh gallery media-list m-b-md" data-url="@Url.Action("EditorGallery")">
-    @{ await Html.RenderPartialAsync("EditorGallery", Model); }
+<h5 class="mt-2 mb-0">Media Gallery</h5>
+<p>You can add images or media to this, images will appear in a gallery view in the template, or can be templated to appear however you want.</p>
+<div id="content-media-list" class="hood-inline refresh m-b-md" data-url="@Url.Action("Gallery", new { id = Model.Id })">
+    <partial name="_List_ContentMedia" />
 </div>
-<div id="gallery-actions" class="row">
-    <div class="col-xs-12">
-        <span class="btn btn-success" id="content-gallery-add">
-            <i class="glyphicon glyphicon-plus"></i>
-            <span>Add files...</span>
-        </span>
-    </div>
-    <div class="col-xs-12">
-        <div class="fileupload-process m-t-sm">
-            <div id="gallery-total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="opacity: 0;">
-                <div class="progress-bar progress-bar-dark" style="width:0%;" data-dz-uploadprogress=""></div>
-            </div>
-        </div>
-    </div>
+<a class="btn btn-success text-white" id="content-gallery-add">
+    <i class="fa fa-plus-circle mr-2"></i>
+    <span>Add files...</span>
+</a>
+<div id="content-gallery-upload" class="media-upload text-center" data-url="@Url.Action("UploadToGallery", new { id = Model.Id })"></div>
+<div id="content-gallery-total-progress" class="progress progress-striped active mb-3" style="height:2rem;display:none;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="progress-bar bg-info progress-bar-striped progress-bar-animated" style="width:0%;"><span>Uploading: <strong class="percentage">0%</strong></span></div>
 </div>
-<div id="content-gallery-upload" class="media-upload text-center" data-id="@Model.Id">
-</div>
+

@@ -1,61 +1,60 @@
 @model Content
-
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
     bool subsEnabled = Engine.Settings.Billing.IsSubscriptionsEnabled;
 }
-<h5>@Model.ContentType.ToTitleCase() Security Settings</h5>
-<div class="ibox-content">
-    <fieldset class="form-horizontal">
-        @foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).OrderBy(cm => cm.Name))
+<h5 class="mt-2 mb-0">Access &amp; Security</h5>
+<p>You can prevent access to this area by non-logged in users, or restrict to administrators only.</p>
+@foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).OrderBy(cm => cm.Name))
+{
+    if (cm.Name == "Settings.Security.Subscription")
+    {
+        <hr class="mt-4 mb-4" />
+        <h5 class="mt-2 mb-0">Subscriptions</h5>
+        <p class="m-t-xs">Select subscriptions that can access this page. <em>If you select none, then the page is open to all users.</em></p>
+        @if (subsEnabled && Model.Subscriptions.Count() > 0)
         {
-            if (cm.Name == "Settings.Security.Subscription")
+            string fieldId = $"Meta-{cm.Name.ToSeoUrl()}";
+            string fieldName = $"Meta:{cm.Name}";
+
+            List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(cm.GetStringValue());
+            <input class="form-control checkbox-values"
+                   type="hidden"
+                   id="@fieldId"
+                   name="@fieldName"
+                   value="@cm.GetStringValue()" />
+            @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
             {
                 <div class="form-group">
-                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                        Subscription:
-                    </label>
-                    <div class="col-sm-8">
-                        @if (subsEnabled && Model.Subscriptions.Count() > 0)
+                    <div class="custom-control custom-checkbox">
+                        @if (subs == null || !subs.Contains(sub.StripeId))
                         {
-                            List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(cm.GetStringValue());
-                            <p class="m-t-xs">Select subscriptions that can access this page. <em>If you select none, then the page is open to all users.</em></p>
-                            <input class="form-control checkbox-values" type="hidden" id="@string.Format("Meta-{0}", cm.Name)" name="@string.Format("Meta:{0}", cm.Name)" value="@cm.GetStringValue()" />
-                            @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
-                            {
-                                <div class="checkbox">
-                                    @if (subs == null || !subs.Contains(sub.StripeId))
-                                    {
-                                        <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="@string.Format("Meta-{0}", cm.Name)" id="plan-@sub.StripeId.ToSeoUrl()" />
-                                    }
-                                    else
-                                    {
-                                        <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="@string.Format("Meta-{0}", cm.Name)" id="plan-@sub.StripeId.ToSeoUrl()" checked />
-                                    }
-                                    <label for="plan-@sub.StripeId.ToSeoUrl()">
-                                        @sub.Name
-                                    </label>
-                                </div>
-                            }
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   value="@string.Format("{0}", sub.StripeId)"
+                                   data-input="@fieldId"
+                                   id="@fieldId-@sub.StripeId.ToSeoUrl()" />
                         }
                         else
                         {
-                            <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   value="@string.Format("{0}", sub.StripeId)"
+                                   data-input="@fieldId"
+                                   id="@fieldId-@sub.StripeId.ToSeoUrl()" checked />
                         }
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="form-group">
-                    <label for="@string.Format("Meta:{0}", cm.Name)" class="col-sm-3 control-label">
-                        @cm.Name.Replace("Settings.Security.", "").CamelCaseToString():
-                    </label>
-                    <div class="col-sm-8">
-                        @{await Html.RenderPartialAsync("_Editor_Metadata", (object)cm); }
+                        <label for="@fieldId-@sub.StripeId.ToSeoUrl()" class="custom-control-label d-block">@sub.Name</label>
                     </div>
                 </div>
             }
         }
-    </fieldset>
-</div>
+        else
+        {
+            <span class="text-warning form-control-message"><i class="fa fa-exclamation-triangle mr-2"></i>Subscriptions are not enabled.</span>
+        }
+    }
+    else
+    {
+        <partial name="_Editor_Metadata" model="cm" />
+    }
+}

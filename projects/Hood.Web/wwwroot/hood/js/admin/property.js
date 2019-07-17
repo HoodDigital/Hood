@@ -2,203 +2,149 @@
     $.hood = {};
 $.hood.Property = {
     Init: function () {
-        $('body').on('click', '.delete-property', $.hood.Property.Delete);
-        $('body').on('click', '.archive-property', $.hood.Property.Archive);
-        $('body').on('click', '.publish-property', $.hood.Property.Publish);
-        $('body').on('click', '.create-property', $.hood.Property.Create.Init);
+        $('body').on('click', '.property-delete', $.hood.Property.Delete);
+        $('body').on('click', '.property-set-status', $.hood.Property.SetStatus);
 
         if ($('#edit-property').doesExist())
             $.hood.Property.Edit.Init();
     },
+
+    Lists: {
+        Property: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#property-list').doesExist())
+                    $.hood.Inline.Reload($('#property-list'), complete);
+            }
+        },
+        Media: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#property-media-list').doesExist())
+                    $.hood.Inline.Reload($('#property-media-list'), complete);
+            }
+        },
+        Floorplans: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#property-floorplan-list').doesExist())
+                    $.hood.Inline.Reload($('#property-floorplan-list'), complete);
+            }
+        }
+    },
+
     Delete: function (e) {
-        var $this = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "The property will be permanently removed.",
-            type: "warning",
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/property/delete', { id: $this.data('id') }, function (data) {
-                        if (data.Success) {
-                            if (!$('#manage-property-list').doesExist())
-                                window.location = data.Url;
-                            $.hood.Property.Manage.Refresh();
-                            $.hood.Blades.Close();
-                            swal({
-                                title: "Deleted!",
-                                text: "The property has now been removed from the website.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem deleting the property: " + data.Errors,
-                                timer: 1300,
-                                type: "error"
-                            });
+        e.preventDefault();
+        $tag = $(this);
+
+        deletePropertyCallback = function (isConfirm) {
+            if (isConfirm) {
+                $.post($tag.attr('href'), function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    $.hood.Property.Lists.Property.Reload();
+                    if (data.Success) {
+                        if ($tag && $tag.data('redirect')) {
+                            $.hood.Alerts.Success(`<strong>Property deleted, redirecting...</strong><br />Just taking you back to the property list.`);
+                            setTimeout(function () {
+                                window.location = $tag.data('redirect');
+                            }, 1500);
                         }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
+                    }
+                });
+            }
+        };
+
+        $.hood.Alerts.Confirm(
+            "The property will be permanently removed.",
+            "Are you sure?",
+            deletePropertyCallback,
+            'error',
+            '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+        );
     },
-    Publish: function (e) {
-        var $this = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "The property will be visible on the website.",
-            type: "warning",
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/property/publish', { id: $this.data('id') }, function (data) {
-                        if (data.Success) {
-                            if (!$('#manage-property-list').doesExist())
-                                window.location = data.Url;
-                            $.hood.Property.Manage.Refresh();
-                            $.hood.Blades.Close();
-                            swal({
-                                title: "Published!",
-                                text: "The property has now been published.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem publishing the property: " + data.Errors,
-                                timer: 1300,
-                                type: "error"
-                            });
-                        }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
+
+    SetStatus: function (e) {
+        e.preventDefault();
+        $tag = $(this);
+
+        publishPropertyCallback = function (isConfirm) {
+            if (isConfirm) {
+                $.post($tag.attr('href'), $tag.data('status'), function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    $.hood.Property.Lists.Property.Reload();
+                });
+            }
+        };
+
+        $.hood.Alerts.Confirm(
+            "The item will be immediately visible on the website.",
+            "Are you sure?",
+            publishPropertyCallback,
+            'warning'
+        );
     },
-    Archive: function (e) {
-        var $this = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "The property will be hidden from the website.",
-            type: "warning",
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/property/archive', { id: $this.data('id') }, function (data) {
-                        if (data.Success) {
-                            if (!$('#manage-property-list').doesExist())
-                                window.location = data.Url;
-                            $.hood.Property.Manage.Refresh();
-                            $.hood.Blades.Close();
-                            swal({
-                                title: "Archived!",
-                                text: "The property has now been archived.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem archiving the property: " + data.Errors,
-                                timer: 1300,
-                                type: "error"
-                            });
-                        }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
+
+    Create: function () {
+        $('#property-create-form').find('.datepicker').datetimepicker({
+            locale: 'en-gb',
+            format: 'L'
+        });
+        $('#property-create-form').hoodValidator({
+            validationRules: {
+                Title: {
+                    required: true
+                },
+                Address1: {
+                    required: true
+                },
+                City: {
+                    required: true
+                },
+                County: {
+                    required: true
+                },
+                Country: {
+                    required: true
+                },
+                Postcode: {
+                    required: true
+                },
+                PublishDate: {
+                    required: true,
+                    ukdate: true
                 }
-            });
+            },
+            submitButtonTag: $('#property-create-submit'),
+            submitUrl: $('#property-create-form').attr('action'),
+            submitFunction: function (data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Property.Lists.Property.Reload();
+            }
+        });
+        $.hood.Google.Addresses.InitAutocomplete();
     },
-    Create: {
-        Init: function (e) {
-            e.preventDefault();
-            $.hood.Blades.OpenWithLoader('button.create-property', '/admin/property/create/', $.hood.Property.Create.SetupCreateForm);
-        },
-        SetupCreateForm: function () {
-            $('#create-property-form').find('.datepicker').datetimepicker({
+
+    Edit: {
+        Init: function () {
+            $('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
             });
-            $('#create-property-form').hoodValidator({
-                validationRules: {
-                    cpTitle: {
-                        required: true
-                    },
-                    cpAddress1: {
-                        required: true
-                    },
-                    cpCity: {
-                        required: true
-                    },
-                    cpCounty: {
-                        required: true
-                    },
-                    cpCountry: {
-                        required: true
-                    },
-                    cpPostcode: {
-                        required: true
-                    },
-                    cpPublishDate: {
-                        required: true,
-                        ukdate: true
-                    }
-                },
-                submitButtonTag: $('#create-property-submit'),
-                submitUrl: '/admin/property/add',
-                submitFunction: function (data) {
-                    if (data.Success) {
-                        swal("Created!", "The property has now been created!", "success");
-                        setTimeout(function () {
-                            window.location = data.Url;
-                        }, 500);
-                    } else {
-                        swal("Error", "There was a problem creating the content:\n\n" + data.Errors, "error");
-                    }
-                }
-            });
-            $.hood.Google.Addresses.InitAutocomplete();
-        }
-    },
-    Edit: {
-        Init: function () {
-            this.LoadEditors('#edit-property');
+
             $.hood.Property.Upload.InitImageUploader();
             $.hood.Property.Upload.InitFloorplanUploader();
-            $('body').on('click', '.add-floor', this.AddFloor);
-            $('body').on('click', '.delete-floor', this.DeleteFloor);
-            $('body').on('change', '.recalc-floor', this.RecalcFloor);
+
+            $('body').on('click', '.add-floor', $.hood.Property.Edit.AddFloor);
+            $('body').on('click', '.delete-floor', $.hood.Property.Edit.DeleteFloor);
+            $('body').on('change', '.recalc-floor', $.hood.Property.Edit.RecalcFloor);
         },
+
         AddFloor: function () {
             var number = $('#Floor-Number').val();
             var floors = $.hood.Property.Edit.GetFloorsList();
@@ -267,39 +213,9 @@ $.hood.Property = {
             for (i = 0; i < arr.length; i++) {
                 newList.append("<div class='row m-b-xs'><div class='col-xs-4'><strong>" + arr[i].Name + "</strong> " + arr[i].Number + "</div><div class='col-xs-8'>" + $.numberWithCommas(Math.round(arr[i].SquareMetres)) + " m<sup>2</sup> [" + $.numberWithCommas(Math.round(arr[i].SquareFeet)) + " sq. ft.] <a class='delete-floor btn btn-xs bg-color-red txt-color-white' data-number='" + arr[i].Number + "'><i class='fa fa-trash-o'></i></a></div></div>");
             }
-        },
-        Blade: function () {
-            this.LoadEditors('#property-blade');
-            $('#property-blade select').each($.hood.Handlers.SelectSetup);
-            $('#property-blade-form').hoodValidator({
-                validationRules: {
-                    Title: {
-                        required: true
-                    },
-                    Excerpt: {
-                        required: true
-                    }
-                },
-                submitButtonTag: $('#save-blade'),
-                submitUrl: '/admin/property/save/' + $('#property-blade-form').data('id'),
-                submitFunction: function (data) {
-                    if (data.Succeeded) {
-                        $('#manage-property-list').data('hoodDataList').Refresh();
-                        $.hood.Alerts.Success("Updated.");
-                    } else {
-                        $.hood.Alerts.Error("There was an error saving.");
-                    }
-                }
-            });
-        },
-        LoadEditors: function (tag) {
-            // Load the url thing if on page editor.
-            $(tag).find('.datepicker').datetimepicker({
-                locale: 'en-gb',
-                format: 'L'
-            });
         }
     },
+
     Upload: {
         InitImageUploader: function () {
 

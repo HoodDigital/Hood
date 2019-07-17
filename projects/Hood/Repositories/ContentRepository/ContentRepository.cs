@@ -616,6 +616,8 @@ namespace Hood.Services
             if (!System.IO.File.Exists(templatePath))
                 templatePath = _env.ContentRootPath + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))
+                templatePath = _env.ContentRootPath + "\\UI\\" + folder + "\\" + templateName + ".cshtml";
+            if (!System.IO.File.Exists(templatePath))
             {
                 templatePath = null;
             }

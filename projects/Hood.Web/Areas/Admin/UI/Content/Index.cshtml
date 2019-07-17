@@ -10,20 +10,6 @@
     }
 }
 @section buttons {
-    @if (Model.ContentType.IsPublic)
-    {
-        <a class="btn btn-info" href="@string.Format("/{0}/", Model.ContentType.Slug)" target="_blank">
-            <i class="fa fa-desktop mr-2"></i>
-            Preview
-        </a>
-    }
-    @if (User.IsAdminOrBetter())
-    {
-        <a class="btn btn-danger create-content warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.ContentType.TypeNamePlural.ToLower() from the site!">
-            <i class="fa fa-trash mr-2"></i>
-            Delete All
-        </a>
-    }
     @if (!Model.ContentType.IsUnknown)
     {
         <a class="btn btn-success hood-modal" asp-action="Create" asp-route-type="@Model.ContentType.Slug" data-complete="$.hood.Content.Create">
@@ -31,6 +17,26 @@
             Create New
         </a>
     }
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (Model.ContentType.IsPublic)
+        {
+            <a class="dropdown-item" href="@string.Format("/{0}/", Model.ContentType.Slug)" target="_blank">
+                <i class="fa fa-desktop"></i>
+                Preview
+            </a>
+        }
+        <div class="dropdown-divider"></div>
+        @if (User.IsAdminOrBetter())
+        {
+            <a class="dropdown-item warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.ContentType.TypeNamePlural.ToLower() from the site!">
+                <i class="fa fa-trash"></i>
+                Delete All
+            </a>
+        }
+    </div>
 }
 @if (Model.SaveMessage.IsSet())
 {
@@ -38,50 +44,13 @@
 }
 <form class="inline" data-target="#content-list">
     <div class="row">
-        <div class="col-sm-3">
-            <input type="hidden" asp-for="PageIndex" />
-            <input type="hidden" asp-for="PageSize" />
-            @if (Model.ContentType.ShowCategories)
-            {
-                <div id="content-categories-list" class="hood-inline-list" data-url="@Url.Action("Categories")" data-complete="$.hood.Content.Lists.Categories.Loaded">
-                    <partial name="_List_Categories" />
-                </div>
-            }
-            <div class="card mb-3">
-                <div class="card-header position-relative" id="content-search-panel-heading">
-                    <p class="card-title m-0 font-weight-bold">
-                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#content-search-panel" href="#content-search-panel" aria-expanded="true" aria-controls="content-search-panel">
-                            Search Filters
-                            <i class="fe fe-arrow-up mt-1"></i>
-                        </a>
-                    </p>
-                </div>
-                <div class="card-body collapse show" aria-labelledby="content-search-panel-heading" id="content-search-panel">
-                    <div class="form-group floating-label">
-                        <label asp-for="Order"></label>
-                        <select class="form-control refresh-on-change" asp-for="Order">
-                            <option value="PublishDesc">Recently Published</option>
-                            <option value="Publish">Published Date (Oldest-Newest)</option>
-                            <option value="DateDesc">Newest First</option>
-                            <option value="Date">Oldest First</option>
-                            <option value="Title">By Title (A-Z)</option>
-                            <option value="TitleDesc">By Title (Z-A)</option>
-                        </select>
-                        <small asp-for="Order"></small>
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="Search"></label>
-                        <input asp-for="Search" type="text" placeholder="Search" class="form-control">
-                        <small asp-for="Search"></small>
-                    </div>
-                    <button type="submit" class="btn btn-success btn-block"> Search</button>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm">
+        <div class="col-lg-8 mb-3">
             <div id="content-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Content.Lists.Content.Loaded">
                 <partial name="_List_Content" />
             </div>
+        </div>
+        <div class="col-lg-4">
+                 <partial name="_Filters" />
         </div>
     </div>
 </form>

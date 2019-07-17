@@ -128,19 +128,19 @@ namespace Hood.Controllers
             {
                 // if admin only, and not logged in as admin hide.
                 if (model.Content.GetMeta("Settings.Security.AdminOnly") != null)
-                    if (!User.IsAdminOrBetter() && model.Content.GetMeta("Settings.Security.AdminOnly").Get<bool>() == true)
+                    if (!User.IsAdminOrBetter() && model.Content.GetMetaValue<bool>("Settings.Security.AdminOnly") == true)
                         return NotFound();
 
                 // if not public, and not logged in hide.
                 if (model.Content.GetMeta("Settings.Security.Public") != null)
-                    if (!User.Identity.IsAuthenticated && model.Content.GetMeta("Settings.Security.Public").Get<bool>() == false)
+                    if (!User.Identity.IsAuthenticated && model.Content.GetMetaValue<bool>("Settings.Security.Public") == false)
                         return NotFound();
 
                 if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
                 {
-                    if (model.Content.GetMeta("Settings.Security.Subscription").IsStored)
+                    if (model.Content.GetMeta("Settings.Security.Subscription") != null)
                     {
-                        List<string> subs = JsonConvert.DeserializeObject<List<string>>(model.Content.GetMeta("Settings.Security.Subscription").Get<string>());
+                        List<string> subs = JsonConvert.DeserializeObject<List<string>>(model.Content.GetMetaValue<string>("Settings.Security.Subscription"));
                         if (subs != null)
                             if (subs.Count > 0)
                             {

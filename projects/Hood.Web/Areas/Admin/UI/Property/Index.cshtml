@@ -1,48 +1,41 @@
 @model PropertyListModel
 @{
-    ViewBag.Title = "Manage Properties";
+    ViewBag.Title = "Property Listings";
     PropertySettings _propertySettings = Engine.Settings.Property;
 }
-@section scripts {
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlnzmbeo7JEMMxHUrZOJz6zWnHbQBmGng&libraries=places"></script>
-}
 @section buttons {
-    @if (_propertySettings.ShowList)
-    {
-        <a class="btn btn-sm btn-info" href="/@_propertySettings.Slug" target="_blank"><i class="fa fa-desktop m-r-sm"></i>Preview</a>
-    }
-    @if (User.IsAdminOrBetter())
-    {
-        <a class="btn btn-sm btn-danger warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!"><i class="fa fa-trash m-r-sm"></i>Delete All</a>
-    }
-    <button class="btn btn-sm btn-success create-property"><i class="fa fa-plus-circle m-r-sm"></i>Create New</button>
+    <a class="btn btn-success hood-modal" asp-action="Create" data-complete="$.hood.Property.Create">
+        <i class="fa fa-user-plus mr-2"></i>
+        Create New
+    </a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (_propertySettings.ShowList)
+        {
+            <a class="dropdown-item" href="/@_propertySettings.Slug" target="_blank"><i class="fa fa-desktop"></i>Preview</a>
+        }
+        <div class="dropdown-divider"></div>
+        @if (User.IsAdminOrBetter())
+        {
+            <a class="dropdown-item warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!"><i class="fa fa-trash"></i>Delete All</a>
+        }
+    </div>
 }
 @if (Model.SaveMessage.IsSet())
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
 }
-<div class="row">
-    <div class="col-sm-12 col-lg-9">
-        <div class="panel-body">
-            @if (Model.List.Count > 0)
-            {
-                @foreach (var property in Model.List)
-                {
-                    await Html.RenderPartialAsync("_ListTemplate", property);
-                }
-                <div class="text-center m-t-md">
-                    @{ await Html.RenderPartialAsync("_Pagination"); }
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-info">
-                    <p class="text-center m-t-xs m-b-lg">There are no properties yet, click "Create New" to add your first property.</p>
-                </div>
-            }
-       </div>
+<form class="inline" data-target="#property-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="property-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Property.Lists.Property.Loaded">
+                <partial name="_List_Property" />
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <partial name="_Filters" />
+        </div>
     </div>
-    <div class="col-sm-4 col-lg-3">
-        @{ await Html.RenderPartialAsync("_PropertySearch"); }
-    </div>
-</div>
+</form>

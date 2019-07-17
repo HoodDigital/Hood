@@ -87,7 +87,7 @@ namespace Hood.Models
         public bool ShowCategories { get; set; }
         [Display(Name = "Show Image", Description = "Enable the featured image field.")]
         public bool ShowImage { get; set; }
-        [Display(Name = "Show Banner", Description = "Enable the share image field, for Twitter/Facebook social media sharer images.")]
+        [Display(Name = "Show Share", Description = "Enable the share image field, for Twitter/Facebook social media sharer images.")]
         public bool ShowBanner { get; set; }
         [Display(Name = "Enable Templates", Description = "Enable templates for this type, you can select a template to use for the view of the type.")]
         public bool Templates { get; set; }

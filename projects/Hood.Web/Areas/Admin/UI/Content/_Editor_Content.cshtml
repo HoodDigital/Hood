@@ -1,0 +1,29 @@
+@model Content
+<h5 class="mt-2 mb-0">Content, Title and Description</h5>
+<p>Set titles, descriptions and enter the main body of the content. You can adjust what editors you see here in the <a asp-action="Content" asp-controller="Settings">content settings</a> area.</p>
+<div class="form-group floating-label">
+    <label asp-for="Title">@Model.Type.TitleName:</label>
+    <input asp-for="Title" value="@Model.Title" type="text" class="form-control" />
+    <small asp-for="Title"></small>
+</div>
+<div class="form-group floating-label">
+    <label asp-for="Excerpt">@Model.Type.ExcerptName:</label>
+    @if (Model.Type.MultiLineExcerpt)
+    {
+        <textarea asp-for="Excerpt" class="form-control @(Model.Type.RichTextExcerpt ? "tinymce-simple" : "")">@Model.Excerpt</textarea>
+    }
+    else
+    {
+        <input asp-for="Excerpt" value="@Model.Excerpt" type="text" class="form-control" />
+    }
+    <small asp-for="Title"></small>
+</div>
+<hr class="mt-4 mb-4" />
+<div class="form-group m-0">
+    @if (Model.Type.ShowEditor)
+    {
+        <label asp-for="Body" class="sr-only"></label>
+        <textarea asp-for="Body" class="tinymce-full"></textarea>
+        <small asp-for="Body"></small>
+    }
+</div>

@@ -2,102 +2,98 @@
 @{
     PropertySettings _propertySettings = Engine.Settings.Property;
 }
-<div class="panel-body">
-    <h4 class="font-bold text-center">
-        <span>@Model.Title</span>
-    </h4>
-    <p class="text-center">
-        <small>@Html.Raw(Model.StatusString)</small>
-    </p>
-    <p>
-        <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save m-r-xs"></i> Save Property</button>
-    </p>
-</div>
-<div class="panel-body small">
-    <h4>
-        Images
-    </h4>
-    <div class="form-horizontal">
-        <div class="form-group no-margin">
-            <label class="col-sm-4 control-label pt-15">Share Image</label>
-            <div class="col-sm-8">
-                <input type="hidden" asp-for="FeaturedImageJson" />
-                <fixedImage src="@Model.FeaturedImage.SmallUrl" class="img-xs img-circle m-r-sm property-feature-@Model.Id" id="property-blade-avatar" />
-                <attacher dataid="@Model.Id" entity="PropertyListing" field="FeaturedImage" type="image" refresh="/admin/property/getmedia?type=FeaturedImage" tag="property-feature-@Model.Id" data-json="FeaturedImageJson" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
-                <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearField" asp-controller="Property" asp-area="Admin" asp-route-id="@Model.Id" data-complete="$.hood.Uploader.RefreshImage('.property-feature-@Model.Id', '/admin/property/getmedia?type=FeaturedImage', @Model.Id)"><i class="fa fa-trash"></i></a>
-            </div>
-        </div>
+<div class="card mb-3">
+    <div class="card-header position-relative" id="content-access-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#content-access-panel" href="#content-access-panel" aria-expanded="true" aria-controls="content-access-panel">
+                URL &amp; Status
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
     </div>
-</div>
-<div class="panel-body small">
-    <h4>
-        Agent / Publish Settings
-    </h4>
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label class="control-label">Agent</label>
-                <div>
-                    <select class="form-control" data-selected="@Model.AgentId" id="AgentId" name="AgentId">
-                        @foreach (ApplicationUser author in Model.AvailableAgents)
-                                {
-                                <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
-                                }
-                    </select>
-                </div>
-            </div>
+    <div class="card-body collapse show" aria-labelledby="content-access-panel-heading" id="content-access-panel">
+        <div class="form-group floating-label">
+            <label asp-for="Status">Publish Status</label>
+            <select class="form-control" asp-for="Status">
+                <option value="1">Draft</option>
+                <option value="2">Published</option>
+                <option value="3">Archived</option>
+            </select>
+            <small asp-for="Status"></small>
         </div>
-        <div class="col-xs-12">
-            <div class="form-group">
-                <label class="control-label">Publish Status</label>
-                <div>
-                    <select class="form-control" data-selected="@Model.Status" id="Status" name="Status">
-                        <option value="1">Draft</option>
-                        <option value="2">Published</option>
-                        <option value="3">Archived</option>
-                    </select>
-                </div>
-            </div>
+        <div class="form-group floating-label">
+            <label asp-for="PublishDate"></label>
+            <input class="datepicker form-control" asp-for="PublishDate" type="text" value="@Model.PublishDate.ToShortDateString()">
+            <small asp-for="Status"></small>
         </div>
-        <div class="col-xs-12">
-            <div class="row">
-                <div class="col-xs-6">
-                    <div class="form-group">
-                        <label class="control-label">Publish Date</label>
-                        <div class="">
-                            <input class="datepicker form-control" id="PublishDate" name="PublishDate" value="@Model.PublishDate.ToShortDateString()">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-6">
-                    <div class="form-group">
-                        <label class="control-label">Time</label>
-                        <div>
-                            <select class="form-control half" id="PublishHour" name="PublishHour" data-selected="@Model.PublishDate.Hour">
-                                @for (int i = 0; i < 24; i++)
-                                        {
-                                        <option value="@i">@i.ToString("00")</option>
-                                        }
-                            </select>
-                            <select class="form-control half" id="PublishMinute" name="PublishMinute" data-selected="@Model.PublishDate.Minute">
-                                @for (int i = 0; i < 60; i++)
-                                        {
-                                        <option value="@i">@i.ToString("00")</option>
-                                        }
-                            </select>
-                        </div>
-                    </div>
-                </div>
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="Featured" class="custom-control-input">
+                <label asp-for="Featured" class="custom-control-label"></label>
             </div>
+            <small asp-for="Featured"></small>
         </div>
-        <div class="col-xs-12">
-            <div class="form-group no-margin">
-                <label for="Views" class="control-label">View Count</label>
-                <div>
-                    <input id="Views" name="Views" value="@Model.Views" class="form-control" />
-                    <input id="Views" name="Views" value="@Model.ShareCount" class="form-control" type="hidden" />
-                </div>
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="Confidential" class="custom-control-input">
+                <label asp-for="Confidential" class="custom-control-label"></label>
             </div>
+            <small asp-for="Confidential"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="PropertyType"></label>
+            <select class="form-control" asp-for="PropertyType">
+                @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PropertyType, "\r\n|\r|\n"))
+                {
+                    <option value="@s.ToSeoUrl()">@s</option>
+                }
+            </select>
+            <small asp-for="PropertyType"></small>
+        </div>
+        <hr class="mt-4 mb-4" />
+        @if (_propertySettings.ShowBedrooms)
+        {
+            <div class="form-group floating-label">
+                <label asp-for="Bedrooms"></label>
+                <select class="form-control" asp-for="Bedrooms">
+                    <option value="">N/A</option>
+                    <option value="0">Studio</option>
+                    @for (int i = 1; i < 15; i++)
+                    {
+                        <option value="@i">@i.ToString("0")</option>
+                    }
+                </select>
+              <small asp-for="Bedrooms"></small>
+          </div>
+        }
+        else
+        {
+            <input asp-for="Bedrooms" type="hidden">
+        }
+        <div class="form-group floating-label">
+            <label asp-for="Planning"></label>
+            <select class="form-control" asp-for="Planning" asp-items="_propertySettings.GetPlanningTypes().Select(p => new SelectListItem() { Value = p.Key, Text = p.Value })"></select>
+            <small asp-for="Planning"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="ListingType"></label>
+            <select class="form-control" asp-for="ListingType" asp-items="_propertySettings.GetListingTypes().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+            <small asp-for="ListingType"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="LeaseStatus"></label>
+            <select class="form-control" asp-for="LeaseStatus" asp-items="_propertySettings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+            <small asp-for="LeaseStatus"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="AgentId"></label>
+            <select class="form-control" asp-for="AgentId">
+                @foreach (var author in Model.AvailableAgents)
+                {
+                    <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
+                }
+            </select>
+            <small asp-for="AgentId"></small>
         </div>
     </div>
 </div>

@@ -1,40 +1,38 @@
 @model PropertyListing
 @{
     ViewBag.Title = "Edit " + Model.Title;
-    PropertySettings _propertySettings = Engine.Settings.Property;
 }
 @section buttons {
-    <a class="btn btn-sm btn-danger delete-property" data-id="@Model.Id"><i class="fa fa-trash m-r-xs"></i>Delete</a>
-    <a class="btn btn-sm btn-info" href="@Model.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
-    <a href="javascript:document.getElementById('edit-property').submit()" class="btn btn-success btn-sm"><i class="fa fa-save m-r-sm"></i>Save</a>
+    <a href="javascript:document.getElementById('property-edit-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item " href="@Model.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete Property</a>
+    </div>
 }
 @section breadcrumbs {
-    <ol class="breadcrumb">
-        <li>
-            <a href="/admin">Home</a>
-        </li>
-        <li>
-            <a asp-action="Index" asp-controller="Property" asp-route-area="Admin">
-                <i class="fa fa-building m-r-xs"></i>
-                Properties
-            </a>
-        </li>
-        <li class="active">
-            <strong>@ViewBag.Title</strong>
-        </li>
-    </ol>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="/admin">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a asp-action="Index" asp-controller="Property" asp-route-area="Admin"><i class="fa fa-building mr-1"></i>All Properties</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+        </ol>
+    </nav>
 }
-<form method="post" id="edit-property" data-id="@Model.Id">
+<form method="post" id="property-edit-form" data-id="@Model.Id">
     @if (Model.SaveMessage.IsSet())
     {
-        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
     }
     <div class="row">
         <div class="col-md-8">
-            @{ await Html.RenderPartialAsync("_Editor_Property"); }
+            <partial name="_Editor_Tabs" />
         </div>
         <div class="col-md-4">
-            @{ await Html.RenderPartialAsync("_Editor_Sidebar"); }
+            <partial name="_Editor_Sidebar" />
         </div>
     </div>
 </form>

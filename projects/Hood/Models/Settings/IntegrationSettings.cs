@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using Hood.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -35,6 +36,28 @@ namespace Hood.Models
         public bool EnableGoogleMaps { get; set; }
         [Display(Name = "Google API Key")]
         public string GoogleMapsApiKey { get; set; }
+
+        public bool IsGoogleMapsEnabled
+        {
+            get
+            {
+                return GoogleMapsApiKey.IsSet() && EnableGoogleMaps;
+            }
+        }
+        public bool IsGoogleGeocodingEnabled
+        {
+            get
+            {
+                return GoogleMapsApiKey.IsSet() && EnableGoogleGeocoding;
+            }
+        }
+        public bool IsGoogleRecaptchaEnabled
+        {
+            get
+            {
+                return GoogleRecaptchaSiteKey.IsSet() && GoogleRecaptchaSecretKey.IsSet() && EnableGoogleRecaptcha;
+            }
+        }
 
         // Google Analytics
         [Display(Name = "Google Analytics Code")]

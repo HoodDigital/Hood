@@ -39,7 +39,11 @@
                     <div class="form-group">
                         <label>Create as</label>
                         <div class="">
-                            <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<ContentStatus>()"></select>
+                            <select asp-for="Status" class="form-control">
+                                <option value="1">Draft</option>
+                                <option value="2">Published</option>
+                                <option value="3">Archived</option>
+                            </select>
                         </div>
                     </div>
                 </div>

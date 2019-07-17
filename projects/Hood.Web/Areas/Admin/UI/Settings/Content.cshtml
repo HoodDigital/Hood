@@ -309,7 +309,7 @@
                                                     <input asp-for="Types[i].CustomFieldsJson" type="hidden" id="custom-fields-@i" value="@Model.Types[i].CustomFieldsJson" />
                                                     <div class="form-group floating-label">
                                                         <label>Name</label>
-                                                        <input id="custom-field-name-@i" type="text" class="form-control restrict-to-meta-slug" data-prefix="@string.Format("Content.{0}.", Model.Types[i].Type.ToTitleCase())" placeholder="Name" />
+                                                        <input id="custom-field-name-@i" type="text" class="form-control restrict-to-meta-slug" data-prefix="@string.Format("Custom.{0}.", Model.Types[i].Type.ToTitleCase())" placeholder="Name" />
                                                     </div>
                                                     <div class="form-group floating-label">
                                                         <label>Type</label>
