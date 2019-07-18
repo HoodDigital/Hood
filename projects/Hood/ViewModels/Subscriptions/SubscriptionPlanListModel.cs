@@ -3,22 +3,24 @@ using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
-    public class SubscriptionSearchModel : PagedList<Subscription>, IPageableModel
+    public class SubscriptionPlanListModel : PagedList<SubscriptionPlan>, IPageableModel
     {
-        [FromQuery(Name = "category")]
-        public string Category { get; set; }
+        [Display(Name = "Group", Description = "Show only subscriptions from the selected group.")]
+        [FromQuery(Name = "group")]
+        public int? GroupId { get; set; }
         [FromQuery(Name = "addon")]
         public bool Addon { get; set; }
+
+        public List<SubscriptionGroup> SubscriptionGroups { get; set; }
 
         public override string GetPageUrl(int pageIndex)
         {
             var query = base.GetPageUrl(pageIndex);
-            query += Category.IsSet() ? "&category=" + Category : "";
-            query += Search.IsSet() ? "&search=" + Search : "";
-            query += Order.IsSet() ? "&order=" + Order : "";
+            query += GroupId.HasValue ? "&group=" + GroupId.Value : "";
             query += Addon ? "&addon=true" : "";
             return query;
         }

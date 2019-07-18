@@ -56,16 +56,6 @@ namespace Hood.Models
         public Customer Customer { get; set; }
         [NotMapped]
         public List<Customer> MatchedCustomerObjects { get; set; }
-        public string ToAdminName()
-        {
-            if (this.ToFullName().IsSet())
-                return this.ToFullName();
-            if (UserName.IsSet())
-                return UserName;
-            if (Email.IsSet())
-                return Email;
-            else return "";
-        }
         #endregion
 
         #region Prevent Mapping Sensitive Fields

@@ -32,29 +32,29 @@ namespace Hood.Controllers
         {
             SubscriptionModel model = new SubscriptionModel()
             {
-                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = false })).List,
-                Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List
+                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, Addon = false })).List,
+                Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, Addon = true })).List
             };
             return View(model);
         }
 
         [HttpGet]
         [SubscriptionRequired(Roles: "SuperUser")]
-        public async Task<IActionResult> Change(string category)
+        public async Task<IActionResult> Change(int? groupId)
         {
             SubscriptionModel model = new SubscriptionModel()
             {
-                Category = category,
-                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Category = category, Addon = false })).List,
-                Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List
+                GroupId = groupId,
+                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, GroupId = groupId, Addon = false })).List,
+                Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, Addon = true })).List
             };
             return View(model);
         }
 
         [HttpGet]
-        public async Task<IActionResult> New(string category, string returnUrl = null)
+        public async Task<IActionResult> New(int? groupId, string returnUrl = null)
         {
-            SubscriptionModel model = await GetCreateModel(category, returnUrl);
+            SubscriptionModel model = await GetCreateModel(groupId, returnUrl);
             return View(model);
         }
 
@@ -75,7 +75,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                model = await GetCreateModel(model.Category, returnUrl);
+                model = await GetCreateModel(model.GroupId, returnUrl);
                 SaveMessage = $"Error";
                 MessageType = Enums.AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
@@ -84,9 +84,9 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Addon(string category, string required, string returnUrl = null)
+        public async Task<IActionResult> Addon(int? groupId, string returnUrl = null)
         {
-            SubscriptionModel model = await GetCreateModel(category, returnUrl);
+            SubscriptionModel model = await GetCreateModel(groupId, returnUrl);
             return View(model);
         }
 
@@ -209,13 +209,13 @@ namespace Hood.Controllers
             }
         }
 
-        private async Task<SubscriptionModel> GetCreateModel(string category, string returnUrl)
+        private async Task<SubscriptionModel> GetCreateModel(int? groupId, string returnUrl)
         {
             SubscriptionModel model = new SubscriptionModel()
             {
-                Category = category,
-                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Category = category, Addon = false })).List,
-                Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue, Addon = true })).List,
+                GroupId = groupId,
+                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, GroupId = groupId, Addon = false })).List,
+                Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, Addon = true })).List,
                 Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId)
             };
             ViewData["ReturnUrl"] = returnUrl;

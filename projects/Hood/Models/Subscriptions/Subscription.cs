@@ -7,76 +7,72 @@ using Hood.Extensions;
 using Hood.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
+using Stripe;
 
 namespace Hood.Models
 {
-    public partial class Subscription :  BaseEntity, ISaveableModel
+    public class ConnectedStripePlan : Stripe.Plan
     {
-        [Display(Name = "Code",
-                Description = "Used as a unique id for the subscription. Cannot be changed once set.")]
+        public ConnectedStripePlan(Plan sp)
+        {
+            sp.CopyProperties(this);
+        }
+
+        [NotMapped]
+        public SubscriptionPlan SubscriptionPlan { get; set; }
+        public int? SubscriptionPlanId { get; set; }
+    }
+
+    public class SubscriptionPlan : SubscriptionBase
+    {
+        public int TotalCount { get; set; }
+        public int ActiveCount { get; set; }
+        public int TrialCount { get; set; }
+        public int InactiveCount { get; set; }
+    }
+
+    public sealed class Subscription : SubscriptionBase
+    {
+        [NotMapped]
+        public Plan StripePlan { get; set; }
+    }
+
+    public abstract class SubscriptionBase : BaseEntity, ISaveableModel
+    {
+        [Display(Name = "Code", Description = "Used as a unique id for the subscription. Cannot be changed once set.")]
         public string StripeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 
-        [Display(Name = "Subscription Category",
-            Description = "A user can only subscribe to one of each category. Think of categories as products, with different subscription levels.")]
-        public string Category { get; set; }
-        [Display(Name = "Public",
-               Description = "Display this as a public subscription (User can up/downgrade to it)")]
+        [Display(Name = "Subscription Colour", Description = "Used when colouring the subscriptions when displayed in the subscription tables in choose subscription or new subscription pages.")]
+        public string Colour { get; set; }
+        [Display(Name = "Published", Description = "Display this subscription. Users will be able to subscribe from choose subscription or new subscription pages.")]
         public bool Public { get; set; }
 
-        [Display(Name = "Level",
-                 Description = "This is the level of the subscription, higher numbers indicate a higher access level, subscriptions are ordered by level.")]
+        [Display(Name = "Level", Description = "This is the level of the subscription, higher numbers indicate a higher access level, subscriptions are ordered by level.")]
         public int Level { get; set; }
 
-        [Display(Name = "Add On",
-               Description = "Addons are excluded from the level based subscriptions, and can be bolted onto accounts in addition to regular subscriptions.")]
+        [Display(Name = "Add On", Description = "Addons are excluded from the level based subscriptions, and can be bolted onto accounts in addition to regular subscriptions.")]
         public bool Addon { get; set; }
         public int NumberAllowed { get; set; }
 
         // Stripe Fields
-        [Display(Name = "Price",
-            Description = "The price in your chosen currency for the subscription, per interval. Cannot be changed once set.")]
+        [Display(Name = "Price", Description = "The price in your chosen currency for the subscription, per interval. Cannot be changed once set.")]
         public int Amount { get; set; }
         public DateTime Created { get; set; }
         public string Currency { get; set; }
-        [Display(Name = "Charge Interval",
-             Description = "The time period in which the subscription cycle is measured.")]
+        [Display(Name = "Charge Interval", Description = "The time period in which the subscription cycle is measured.")]
         public string Interval { get; set; }
-        [Display(Name = "Interval Count",
-                Description = "How many intervals between charges.")]
+        [Display(Name = "Interval Count", Description = "How many intervals between charges.")]
         public int IntervalCount { get; set; }
         public bool LiveMode { get; set; }
         public string StatementDescriptor { get; set; }
-        [Display(Name = "Trial Period (Days)",
-               Description = "If entered, a trial will be active before charging for the set number of days.")]
+        [Display(Name = "Trial Period (Days)", Description = "If entered, a trial will be active before charging for the set number of days.")]
         public int? TrialPeriodDays { get; set; }
 
         [JsonIgnore]
         public List<UserSubscription> Users { get; set; }
 
-        [NotMapped]
-        public int SubscriberCount
-        {
-            get
-            {
-                if (Users == null)
-                    return 0;
-                else
-                    return Users.Count;
-            }
-        }
-        [NotMapped]
-        public int ActiveSubscribers
-        {
-            get
-            {
-                if (Users == null)
-                    return 0;
-                else
-                    return Users.Where(u => u.Status == "active" || u.Status == "trialing").Count();
-            }
-        }
         [NotMapped]
         public string Price
         {
@@ -95,43 +91,34 @@ namespace Hood.Models
         }
 
         // Featured Images
-        public string FeaturedImageUrl { get; set; }
+        /// <summary>
+        /// Restricted field, used for JSON FeaturedImage.
+        /// </summary>
+        public string FeaturedImageJson { get; set; }
+        [NotMapped]
+        public IMediaObject FeaturedImage
+        {
+            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : MediaBase.Blank; }
+            set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
+        }
 
         // Creator/Editor
         public string CreatedBy { get; set; }
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
 
-        public IList<SubscriptionFeature> Features { get; set; }
+        public int? SubscriptionGroupId { get; set; }
+        public SubscriptionGroup SubscriptionGroup { get; set; }
 
-        public SubscriptionFeature GetFeature(string name)
+        /// <summary>
+        /// Restricted field, used for JSON features.
+        /// </summary>
+        public string FeaturesJson { get; set; }
+        [NotMapped]
+        public List<SubscriptionFeature> Features
         {
-            SubscriptionFeature cm = Features.FirstOrDefault(p => p.Name == name);
-            if (cm == null)
-                return new SubscriptionFeature()
-                {
-                    BaseValue = null,
-                    Name = name,
-                    Type = null
-                };
-            return cm;
-        }
-
-        public void UpdateFeature<T>(string name, T value)
-        {
-            SubscriptionFeature cm = Features.FirstOrDefault(p => p.Name == name);
-            if (cm != null)
-            {
-                cm.Set(value);
-            }
-        }
-
-        public bool HasMeta(string name)
-        {
-            SubscriptionFeature cm = Features.FirstOrDefault(p => p.Name == name);
-            if (cm == null)
-                return false;
-            return true;
+            get => FeaturesJson.IsSet() ? JsonConvert.DeserializeObject<List<SubscriptionFeature>>(FeaturesJson) : new List<SubscriptionFeature>();
+            set => FeaturesJson = JsonConvert.SerializeObject(value);
         }
     }
 }

@@ -2,138 +2,193 @@
     $.hood = {};
 $.hood.Subscriptions = {
     Init: function () {
-        $('body').on('click', '.delete-subscription', $.hood.Subscriptions.Delete);
-        $('body').on('click', '.create-subscription', $.hood.Subscriptions.Create.Init);
+        $('body').on('click', '.subscriptions-plans-delete', $.hood.Subscriptions.Plans.Delete);
+        if ($('#subscriptions-plans-edit-form').doesExist())
+            $.hood.Subscriptions.Plans.Edit();
 
-        if ($('#edit-subscription').doesExist())
-            $.hood.Subscriptions.Edit.Init();
+        $('body').on('click', '.subscriptions-groups-delete', $.hood.Subscriptions.Groups.Delete);
+        if ($('#subscriptions-groups-edit-form').doesExist())
+            $.hood.Subscriptions.Groups.Edit();
+
+        if ($('#subscriptions-stripe-edit-form').doesExist())
+            $.hood.Subscriptions.Stripe.Edit();
     },
-    Delete: function (e) {
-        var $this = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "The subscription will be permanently removed.",
-            type: "warning",
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            showCancelButton: true,
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
+
+    Lists: {
+        Plans: {
+            Loaded: function () {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#subscriptions-plans-list').doesExist())
+                    $.hood.Inline.Reload($('#subscriptions-plans-list'), complete);
+            }
         },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/subscriptions/delete', { id: $this.data('id') }, function (data) {
-                        if (data.Success) {
-                            if (!$('#manage-subscription-list').doesExist())
-                                window.location = '/admin/subscriptions/';
-                            $.hood.Subscriptions.Manage.Refresh();
-                            $.hood.Blades.Close();
-                            swal({
-                                title: "Deleted!",
-                                text: "The subscription has now been removed from the website.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem deleting the subscription: " + data.Errors,
-                                timer: 1300,
-                                type: "error"
-                            });
-                        }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
-    },
-    Create: {
-        Init: function (e) {
-            e.preventDefault();
-            $.hood.Blades.OpenWithLoader('button.create-subscription', '/admin/subscriptions/create/', $.hood.Subscriptions.Create.SetupCreateForm);
+        Stripe: {
+            Loaded: function () {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#subscriptions-stripe-list').doesExist())
+                    $.hood.Inline.Reload($('#subscriptions-stripe-list'), complete);
+            }
         },
-        SetupCreateForm: function () {
-            $('#create-subscription-form').find('.datepicker').datetimepicker({
-                locale: 'en-gb',
-                format: 'L'
-            });
-            $('#create-subscription-form').hoodValidator({
-                validationRules: {
-                    Title: {
-                        required: true
-                    },
-                    Description: {
-                        required: true
-                    },
-                    Amount: {
-                        required: true
-                    },
-                    Currency: {
-                        required: true
-                    },
-                    Interval: {
-                        required: true
-                    },
-                    IntervalCount: {
-                        required: true
-                    },
-                    Name: {
-                        required: true
-                    }
-                },
-                submitButtonTag: $('#create-subscription-submit'),
-                submitUrl: '/admin/subscriptions/add',
-                submitFunction: function (data) {
-                    if (data.Success) {
-                        swal("Created!", "The subscription has now been created!", "success");
-                        if (data.Url)
-                            window.location = data.Url;
-                    } else {
-                        swal("Error", "There was a problem creating the subscription:\n\n" + data.Errors, "error");
-                    }
-                }
-            });
+        Groups: {
+            Loaded: function () {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#subscriptions-groups-list').doesExist())
+                    $.hood.Inline.Reload($('#subscriptions-groups-list'), complete);
+            }
+        },
+        Subscribers: {
+            Loaded: function () {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#subscriptions-subscribers-list').doesExist())
+                    $.hood.Inline.Reload($('#subscriptions-subscribers-list'), complete);
+            }
         }
     },
-    Edit: {
-        Init: function () {
-            this.LoadEditors('#edit-subscription');
-            $.hood.Editor.Init('.edit-subscription-editor');
-        },
-        Blade: function () {
-            this.LoadEditors('#subscription-blade');
-            $('#subscription-blade select').each($.hood.Handlers.SelectSetup);
-            $('#subscription-blade-form').hoodValidator({
-                validationRules: {
-                    Title: {
-                        required: true
-                    },
-                    Excerpt: {
-                        required: true
-                    }
-                },
-                submitButtonTag: $('#save-blade'),
-                submitUrl: '/admin/subscriptions/save/' + $('#subscription-blade-form').data('id'),
-                submitFunction: function (data) {
-                    if (data.Succeeded) {
-                        $('#manage-subscription-list').data('hoodDataList').Refresh();
-                        $.hood.Alerts.Success("Updated.");
-                    } else {
-                        $.hood.Alerts.Error("There was an error saving.");
-                    }
+
+    Plans: {
+        Delete: function (e) {
+            e.preventDefault();
+            $tag = $(this);
+
+            deletePlanCallback = function (isConfirm) {
+                if (isConfirm) {
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Subscriptions.Lists.Plans.Reload();
+                        if (data.Success) {
+                            if ($tag && $tag.data('redirect')) {
+                                $.hood.Alerts.Success(`<strong>Plan deleted, redirecting...</strong><br />Just taking you back to the subscription plan list.`);
+                                setTimeout(function () {
+                                    window.location = $tag.data('redirect');
+                                }, 1500);
+                            }
+                        }
+                    });
                 }
-            });
+            };
+
+            $.hood.Alerts.Confirm(
+                "The plan will be permanently removed.",
+                "Are you sure?",
+                deleteContentCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+            );
         },
-        LoadEditors: function (tag) {
-            // Load the url thing if on page editor.
-            $(tag).find('.datepicker').datetimepicker({
-                locale: 'en-gb',
-                format: 'L'
-            });
+        Create: {
+            Init: function () {
+                $('#subscriptions-plans-create-form').find('.datepicker').datetimepicker({
+                    locale: 'en-gb',
+                    format: 'L'
+                });
+                $('#subscriptions-plans-create-form').hoodValidator({
+                    validationRules: {
+                        Title: {
+                            required: true
+                        },
+                        Description: {
+                            required: true
+                        },
+                        Amount: {
+                            required: true
+                        },
+                        Currency: {
+                            required: true
+                        },
+                        Interval: {
+                            required: true
+                        },
+                        IntervalCount: {
+                            required: true
+                        },
+                        Name: {
+                            required: true
+                        }
+                    },
+                    submitButtonTag: $('#subscriptions-plans-create-submit'),
+                    submitUrl: $('#subscriptions-plans-create-form').attr('action'),
+                    submitFunction: function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Subscriptions.Lists.Plans.Reload();
+                    }
+                });
+            }
+        },
+        Edit: function () {
+        }
+    },
+
+    Groups: {
+        Delete: function (e) {
+            e.preventDefault();
+            $tag = $(this);
+
+            deleteGroupCallback = function (isConfirm) {
+                if (isConfirm) {
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Subscriptions.Lists.Groups.Reload();
+                        if (data.Success) {
+                            if ($tag && $tag.data('redirect')) {
+                                $.hood.Alerts.Success(`<strong>Group deleted, redirecting...</strong><br />Just taking you back to the subscription group list.`);
+                                setTimeout(function () {
+                                    window.location = $tag.data('redirect');
+                                }, 1500);
+                            }
+                        }
+                    });
+                }
+            };
+
+            $.hood.Alerts.Confirm(
+                "The group will be permanently removed.",
+                "Are you sure?",
+                deleteContentCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+            );
+        },
+        Create: {
+            Init: function () {
+                $('#subscriptions-groups-create-form').find('.datepicker').datetimepicker({
+                    locale: 'en-gb',
+                    format: 'L'
+                });
+                $('#subscriptions-groups-create-form').hoodValidator({
+                    validationRules: {
+                        DisplayName: {
+                            required: true
+                        },
+                        Slug: {
+                            required: true
+                        },
+                        Body: {
+                            required: true
+                        }
+                    },
+                    submitButtonTag: $('#subscriptions-groups-create-submit'),
+                    submitUrl: $('#subscriptions-groups-create-form').attr('action'),
+                    submitFunction: function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Subscriptions.Lists.Groups.Reload();
+                    }
+                });
+            }
+        },
+        Edit: function () {
+        }
+    },
+
+    Stripe: {
+        Edit: function () {
         }
     }
 };

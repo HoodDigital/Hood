@@ -29,7 +29,6 @@ namespace Hood.Services
         // Members
         private ReaderWriterLock Lock { get; set; }
         private PropertyExporterReport Status { get; set; }
-        private AccountInfo Account { get; set; }
         private string _tempFolder { get; set; }
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }

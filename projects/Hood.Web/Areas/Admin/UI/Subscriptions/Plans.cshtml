@@ -1,36 +1,43 @@
-@model StripePlanListModel
+@model SubscriptionPlanListModel
 @{
-    ViewBag.Title = "Stripe Subscriptions";
+    ViewBag.Title = "Subscription Plans";
 }
 @section buttons {
+    <a class="btn btn-success hood-modal" asp-action="Create" data-complete="$.hood.Property.Create">
+        <i class="fa fa-user-plus mr-2"></i>
+        Create New
+    </a>
     <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fa fa-ellipsis-h"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" asp-action="Stripe">
+            <i class="fa fa-cc-stripe"></i>Connected Stripe Subscriptions
+        </a>
     </div>
 }
 @if (Model.SaveMessage.IsSet())
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
 }
-<form class="inline" data-target="#subscriptions-stripe-list">
+<form class="inline" data-target="#subscriptions-plans-list">
     <div class="row">
         <div class="col-lg-8 mb-3">
-            <div id="subscriptions-stripe-list" class="hood-inline-list refresh query" data-url="@Url.Action("StripeList")" data-complete="$.hood.Subscriptions.Lists.Stripe.Loaded">
-                <partial name="_List_Stripe" />
+            <div id="subscriptions-plans-list" class="hood-inline-list refresh query" data-url="@Url.Action("PlansList")" data-complete="$.hood.Subscriptions.Lists.Plans.Loaded">
+                <partial name="_List_Plans" />
             </div>
         </div>
         <div class="col-lg-4">
             <div class="card mb-3">
-                <div class="card-header position-relative" id="subscription-stripe-filters-panel-heading">
+                <div class="card-header position-relative" id="subscription-plans-filters-panel-heading">
                     <p class="card-title m-0 font-weight-bold">
-                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#subscription-stripe-filters-panel" href="#subscription-stripe-filters-panel" aria-expanded="true" aria-controls="subscription-stripe-filters-panel">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#subscription-plans-filters-panel" href="#subscription-plans-filters-panel" aria-expanded="true" aria-controls="subscription-plans-filters-panel">
                             Search Filters
                             <i class="fe fe-arrow-up mt-1"></i>
                         </a>
                     </p>
                 </div>
-                <div class="card-body collapse show" aria-labelledby="subscription-stripe-filters-panel-heading" id="subscription-stripe-filters-panel">
+                <div class="card-body collapse show" aria-labelledby="subscription-plans-filters-panel-heading" id="subscription-plans-filters-panel">
                      <div class="form-group floating-label">
                         <label asp-for="GroupId"></label>
                         <select class="form-control refresh-on-change" asp-for="GroupId">

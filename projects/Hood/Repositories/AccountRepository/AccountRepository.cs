@@ -266,7 +266,6 @@ namespace Hood.Services
         #region Roles
         public async Task<IList<IdentityRole>> GetAllRolesAsync()
         {
-#warning TODO: Cache this method.
             return await _db.Roles.ToListAsync();
         }
         #endregion
@@ -306,17 +305,60 @@ namespace Hood.Services
         #endregion
 
         #region Subscriptions
-        public async Task<SubscriptionSearchModel> GetSubscriptionPlansAsync(SubscriptionSearchModel model = null)
+        public async Task<SubscriptionGroupListModel> GetSubscriptionGroupsAsync(SubscriptionGroupListModel model = null)
         {
-            IQueryable<Models.Subscription> query = _db.Subscriptions.Include(s => s.Features);
+            IQueryable<SubscriptionGroup> query = _db.SubscriptionGroups.Include(g => g.Subscriptions).AsQueryable();
 
             if (model == null)
-                model = new SubscriptionSearchModel();
+                model = new SubscriptionGroupListModel();
 
             // search the collection
             if (!string.IsNullOrEmpty(model.Search))
             {
 
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                query = query.Where(n => searchTerms.Any(s => n.DisplayName != null && n.DisplayName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.Body != null && n.Body.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.FeaturesJson != null && n.FeaturesJson.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+            }
+
+
+            // sort the collection and then output it.
+            if (!string.IsNullOrEmpty(model.Order))
+            {
+                switch (model.Order)
+                {
+                    case "Title":
+                        query = query.OrderBy(n => n.DisplayName);
+                        break;
+
+                    case "TitleDesc":
+                        query = query.OrderByDescending(n => n.DisplayName);
+                        break;
+
+                    default:
+                        query = query.OrderBy(n => n.DisplayName).ThenBy(n => n.Id);
+                        break;
+                }
+            }
+
+            await model.ReloadAsync(query);
+
+            return model;
+        }
+        public async Task<SubscriptionPlanListModel> GetSubscriptionPlansAsync(SubscriptionPlanListModel model = null)
+        {
+            IQueryable<SubscriptionPlan> query = _db.SubscriptionPlans.Include(s => s.SubscriptionGroup);
+
+            if (model == null)
+                model = new SubscriptionPlanListModel() { PageSize = int.MaxValue };
+
+            if (model.GroupId.HasValue)
+                query = query.Where(u => u.SubscriptionGroupId == model.GroupId);
+
+            // search the collection
+            if (!string.IsNullOrEmpty(model.Search))
+            {
                 string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 query = query.Where(n => searchTerms.Any(s => n.Name != null && n.Name.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
                                       || searchTerms.Any(s => n.Description != null && n.Description.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
@@ -330,24 +372,36 @@ namespace Hood.Services
             {
                 switch (model.Order)
                 {
-                    case "Title":
+                    case "Name":
                         query = query.OrderBy(n => n.Name);
                         break;
-                    case "Date":
+                    case "Created":
                         query = query.OrderBy(n => n.Created);
                         break;
-                    case "Price":
+                    case "Amount":
                         query = query.OrderBy(n => n.Amount);
                         break;
+                    case "ActiveCount":
+                        query = query.OrderBy(n => n.ActiveCount);
+                        break;
+                    case "TrialCount":
+                        query = query.OrderBy(n => n.TrialCount);
+                        break;
 
-                    case "TitleDesc":
+                    case "NameDesc":
                         query = query.OrderByDescending(n => n.Name);
                         break;
-                    case "DateDesc":
+                    case "CreatedDesc":
                         query = query.OrderByDescending(n => n.Created);
                         break;
-                    case "PriceDesc":
+                    case "AmountDesc":
                         query = query.OrderByDescending(n => n.Amount);
+                        break;
+                    case "ActiveCountDesc":
+                        query = query.OrderByDescending(n => n.ActiveCount);
+                        break;
+                    case "TrialCountDesc":
+                        query = query.OrderByDescending(n => n.TrialCount);
                         break;
 
                     default:
@@ -360,11 +414,87 @@ namespace Hood.Services
 
             return model;
         }
+        public async Task<StripePlanListModel> GetStripeSubscriptionsAsync(StripePlanListModel model = null)
+        {
+            var localPlans = (await GetSubscriptionPlansAsync()).List;
+            var stripePlans = (await _billing.SubscriptionPlans.GetAllAsync());
+
+            var connectedPlans = new List<ConnectedStripePlan>();
+
+            stripePlans.ForEach(sp =>
+            {
+                ConnectedStripePlan csp = new ConnectedStripePlan(sp);
+                var link = localPlans.SingleOrDefault(lp => lp.StripeId == sp.Id);
+                if (link != null)
+                {
+                    csp.SubscriptionPlan = link;
+                    csp.SubscriptionPlanId = link.Id;
+                }
+                connectedPlans.Add(csp);
+            });
+
+            if (model.Linked)
+                connectedPlans = connectedPlans.Where(sp => sp.SubscriptionPlan != null).ToList();
+
+            if (model.Search.IsSet())
+            {
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                connectedPlans = connectedPlans.Where(n => searchTerms.Any(s => n.Nickname != null && n.Nickname.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.Id != null && n.Id.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)).ToList();
+            }
+
+
+            if (model.Order.IsSet())
+            {
+                switch (model.Order)
+                {
+                    case "Name":
+                        connectedPlans = connectedPlans.OrderBy(n => n.SubscriptionPlan?.Name).ToList();
+                        break;
+                    case "Created":
+                        connectedPlans = connectedPlans.OrderBy(n => n.SubscriptionPlan?.Created).ToList();
+                        break;
+                    case "Amount":
+                        connectedPlans = connectedPlans.OrderBy(n => n.SubscriptionPlan?.Amount).ToList();
+                        break;
+                    case "ActiveCount":
+                        connectedPlans = connectedPlans.OrderBy(n => n.SubscriptionPlan?.ActiveCount).ToList();
+                        break;
+                    case "TrialCount":
+                        connectedPlans = connectedPlans.OrderBy(n => n.SubscriptionPlan?.TrialCount).ToList();
+                        break;
+
+                    case "NameDesc":
+                        connectedPlans = connectedPlans.OrderByDescending(n => n.SubscriptionPlan?.Name).ToList();
+                        break;
+                    case "CreatedDesc":
+                        connectedPlans = connectedPlans.OrderByDescending(n => n.SubscriptionPlan?.Created).ToList();
+                        break;
+                    case "AmountDesc":
+                        connectedPlans = connectedPlans.OrderByDescending(n => n.SubscriptionPlan?.Amount).ToList();
+                        break;
+                    case "ActiveCountDesc":
+                        connectedPlans = connectedPlans.OrderByDescending(n => n.SubscriptionPlan?.ActiveCount).ToList();
+                        break;
+                    case "TrialCountDesc":
+                        connectedPlans = connectedPlans.OrderByDescending(n => n.SubscriptionPlan?.TrialCount).ToList();
+                        break;
+
+                    default:
+                        connectedPlans = connectedPlans.OrderBy(n => n.Id).ToList();
+                        break;
+                }
+            }
+
+            model.Reload(connectedPlans, model.PageIndex, model.PageSize);
+
+            return model;
+        }
         public async Task<Models.Subscription> GetSubscriptionPlanByIdAsync(int id)
         {
             Models.Subscription subscription = await _db.Subscriptions
                                     .Include(s => s.Users)
-                                    .Include(s => s.Features)
+                                    .Include(s => s.SubscriptionGroup)
                                     .FirstOrDefaultAsync(c => c.Id == id);
             return subscription;
         }
@@ -372,7 +502,7 @@ namespace Hood.Services
         {
             Models.Subscription subscription = await _db.Subscriptions
                                 .Include(s => s.Users)
-                                .Include(s => s.Features)
+                                .Include(s => s.SubscriptionGroup)
                                 .FirstOrDefaultAsync(c => c.StripeId == stripeId);
 
             return subscription;
@@ -469,23 +599,29 @@ namespace Hood.Services
         #region User Subscriptions
         public async Task<UserSubscriptionListModel> GetUserSubscriptionsAsync(UserSubscriptionListModel model)
         {
-            IQueryable<ApplicationUser> users = _db.Users
-                .Include(u => u.Subscriptions).ThenInclude(u => u.Subscription);
+            IQueryable<UserSubscription> users = _db.UserSubscriptions.Include(us => us.User).Include(us => us.Subscription);
+
+            if (model.SubscriptionPlanId.HasValue)
+                users = users.Where(u => u.SubscriptionId == model.SubscriptionPlanId);
 
             if (model.Subscription.IsSet())
-                users = users.Where(u => u.Subscriptions.Any(s => s.Subscription.StripeId == model.Subscription && (s.Status == "trialing" || s.Status == "active")));
-            else
-                users = users.Where(u => u.Subscriptions.Any(s => s.Status == "trialing" || s.Status == "active"));
+                users = users.Where(u => u.StripeId == model.Subscription);
+
+            if (model.Linked)
+                users = users.Where(u => u.User != null);
+
+            if (model.Status.IsSet())
+                users = users.Where(u => u.Status == model.Status);
 
             // search the collection
             if (!string.IsNullOrEmpty(model.Search))
             {
 
                 string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                users = users.Where(n => searchTerms.Any(s => n.FirstName != null && n.FirstName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.LastName != null && n.LastName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.StripeId != null && n.StripeId.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Email != null && n.Email.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+                users = users.Where(n => searchTerms.Any(s => n.User.FirstName != null && n.User.FirstName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.User.LastName != null && n.User.LastName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.User.StripeId != null && n.User.StripeId.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.User.Email != null && n.User.Email.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
             }
 
 
@@ -494,31 +630,37 @@ namespace Hood.Services
             {
                 switch (model.Order)
                 {
+                    case "NextPeriodDate":
+                        users = users.OrderBy(n => n.CurrentPeriodEnd);
+                        break;
                     case "UserName":
-                        users = users.OrderBy(n => n.UserName);
+                        users = users.OrderBy(n => n.User.UserName);
                         break;
                     case "Email":
-                        users = users.OrderBy(n => n.Email);
+                        users = users.OrderBy(n => n.User.Email);
                         break;
                     case "LastName":
-                        users = users.OrderBy(n => n.LastName);
+                        users = users.OrderBy(n => n.User.LastName);
                         break;
                     case "LastLogOn":
-                        users = users.OrderByDescending(n => n.LastLogOn);
+                        users = users.OrderByDescending(n => n.User.LastLogOn);
                         break;
 
+                    case "NextPeriodDateDesc":
+                        users = users.OrderByDescending(n => n.CurrentPeriodEnd);
+                        break;
                     case "UserNameDesc":
-                        users = users.OrderByDescending(n => n.UserName);
+                        users = users.OrderByDescending(n => n.User.UserName);
                         break;
                     case "EmailDesc":
-                        users = users.OrderByDescending(n => n.Email);
+                        users = users.OrderByDescending(n => n.User.Email);
                         break;
                     case "LastNameDesc":
-                        users = users.OrderByDescending(n => n.LastName);
+                        users = users.OrderByDescending(n => n.User.LastName);
                         break;
 
                     default:
-                        users = users.OrderByDescending(n => n.CreatedOn).ThenBy(n => n.Id);
+                        users = users.OrderByDescending(n => n.User.CreatedOn).ThenBy(n => n.Id);
                         break;
                 }
             }

@@ -41,56 +41,6 @@ namespace Hood.Models
         }
         #endregion
         
-        #region Subscription Helpers
-        public bool HasActiveSubscription(string category = null)
-        {
-            var subs = Subscriptions;
-            if (category.IsSet())
-                subs = subs.Where(s => s.Subscription.Category == category).ToList();
-            foreach (var sub in subs)
-                if (sub.IsActive)
-                    return true;
-            return false;
-        }
-        public UserSubscription GetActiveSubscription(string category = null)
-        {
-            var subs = Subscriptions;
-            if (category.IsSet())
-                subs = subs.Where(s => s.Subscription.Category == category).ToList();
-            foreach (var sub in subs)
-                if (sub.IsActive)
-                    return sub;
-            return null;
-        }
-        public bool IsSubscribed(int subscriptionId, bool requireActiveOrTrial = true)
-        {
-            foreach (var sub in Subscriptions)
-            {
-                if (sub.SubscriptionId == subscriptionId)
-                {
-                    if (requireActiveOrTrial && sub.IsActive)
-                        return true;
-                    if (!requireActiveOrTrial)
-                        return true;
-                }
-            }
-            return false;
-        }
-        public UserSubscription GetSubscription(int subscriptionId, bool requireActiveOrTrial = true)
-        {
-            foreach (var sub in Subscriptions)
-            {
-                if (sub.SubscriptionId == subscriptionId)
-                {
-                    if (requireActiveOrTrial && sub.IsActive)
-                        return sub;
-                    if (!requireActiveOrTrial)
-                        return sub;
-                }
-            }
-            return null;
-        }
-        #endregion
     }
 
 

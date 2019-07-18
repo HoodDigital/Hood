@@ -74,8 +74,10 @@ namespace Hood.Models
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
-        public IList<Subscription> Subscriptions { get; set; }
+        public IList<SubscriptionPlan> Subscriptions { get; set; }
+        [NotMapped]
         [JsonIgnore]
         public IList<IdentityRole> Roles { get; set; }
     }

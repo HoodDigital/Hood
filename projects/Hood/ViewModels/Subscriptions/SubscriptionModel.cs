@@ -19,10 +19,10 @@ namespace Hood.ViewModels
         public string returnUrl { get; set; }
 
         [Display(Name = "Current Category")]
-        public string Category { get; set; }
+        public int? GroupId { get; set; }
 
-        public List<Models.Subscription> Plans { get; set; }
-        public List<Models.Subscription> Addons { get; set; }
+        public List<Models.SubscriptionPlan> Plans { get; set; }
+        public List<Models.SubscriptionPlan> Addons { get; set; }
         public Stripe.Subscription CurrentSubscription { get; set; }
         public Stripe.Customer Customer { get; set; }
         public IEnumerable<Stripe.Card> Cards { get; set; }

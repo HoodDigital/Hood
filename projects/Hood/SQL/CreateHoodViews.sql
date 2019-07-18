@@ -1,11 +1,9 @@
 /* Subscriptions View */
 
-IF EXISTS(select * FROM sys.views where name = 'HoodSubscription') DROP VIEW HoodSubscription
-GO
-IF EXISTS(select * FROM sys.views where name = 'HoodSubscriptionsView') DROP VIEW HoodSubscriptionsView
+IF EXISTS(select * FROM sys.views where name = 'HoodSubscriptionPlans') DROP VIEW HoodSubscriptionPlans
 GO
 
-CREATE VIEW HoodSubscriptionsView AS
+CREATE VIEW HoodSubscriptionPlans AS
 SELECT        
 	dbo.HoodSubscriptions.Id, 
 	dbo.HoodSubscriptions.Addon, 
@@ -15,7 +13,6 @@ SELECT
 	dbo.HoodSubscriptions.CreatedBy, 
 	dbo.HoodSubscriptions.Currency,
 	dbo.HoodSubscriptions.Description, 
-	dbo.HoodSubscriptions.FeaturedImageUrl, 
 	dbo.HoodSubscriptions.Interval, 
 	dbo.HoodSubscriptions.IntervalCount, 
 	dbo.HoodSubscriptions.LastEditedBy, 
@@ -28,8 +25,9 @@ SELECT
 	dbo.HoodSubscriptions.StatementDescriptor, 
 	dbo.HoodSubscriptions.StripeId, 
 	dbo.HoodSubscriptions.TrialPeriodDays, 
-	dbo.HoodSubscriptions.ForumId, 
-	dbo.HoodSubscriptions.TopicId, 
+	dbo.HoodSubscriptions.SubscriptionGroupId, 
+	dbo.HoodSubscriptions.FeaturedImageJson, 
+	dbo.HoodSubscriptions.FeaturesJson, 
 	COUNT(dbo.HoodUserSubscriptions.UserSubscriptionId) AS TotalCount,
 	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'active' THEN 1 ELSE NULL END) AS ActiveCount, 
 	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'trialing' THEN 1 ELSE NULL END) AS TrialCount, 
@@ -39,9 +37,10 @@ FROM
 	dbo.HoodSubscriptions ON dbo.HoodUserSubscriptions.SubscriptionId = dbo.HoodSubscriptions.Id
 GROUP BY 
 	dbo.HoodSubscriptions.Id, dbo.HoodSubscriptions.Amount, dbo.HoodSubscriptions.Colour, dbo.HoodSubscriptions.Created, dbo.HoodSubscriptions.CreatedBy, dbo.HoodSubscriptions.Currency, 
-    dbo.HoodSubscriptions.Description, dbo.HoodSubscriptions.Interval, dbo.HoodSubscriptions.FeaturedImageUrl, dbo.HoodSubscriptions.IntervalCount, dbo.HoodSubscriptions.LastEditedBy, 
+    dbo.HoodSubscriptions.Description, dbo.HoodSubscriptions.Interval, dbo.HoodSubscriptions.IntervalCount, dbo.HoodSubscriptions.LastEditedBy, 
     dbo.HoodSubscriptions.LastEditedOn, dbo.HoodSubscriptions.[Level], dbo.HoodSubscriptions.Name, dbo.HoodSubscriptions.NumberAllowed, dbo.HoodSubscriptions.StatementDescriptor, dbo.HoodSubscriptions.StripeId, 
-    dbo.HoodSubscriptions.TrialPeriodDays, dbo.HoodSubscriptions.ForumId, dbo.HoodSubscriptions.TopicId, dbo.HoodSubscriptions.Addon, dbo.HoodSubscriptions.LiveMode, dbo.HoodSubscriptions.[Public]
+    dbo.HoodSubscriptions.TrialPeriodDays, dbo.HoodSubscriptions.SubscriptionGroupId, dbo.HoodSubscriptions.FeaturedImageJson, dbo.HoodSubscriptions.FeaturesJson, dbo.HoodSubscriptions.Addon, 
+	dbo.HoodSubscriptions.LiveMode, dbo.HoodSubscriptions.[Public]
 GO
 
 /* UserSubscriptions - Used by HoodUserProfiles View */

@@ -32,10 +32,10 @@ namespace Hood.Models
             builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
 
             // Subscriptions
+            builder.Entity<SubscriptionGroup>().ToTable("HoodSubscriptionGroups");
             builder.Entity<Subscription>().ToTable("HoodSubscriptions");
             builder.Entity<SubscriptionFeature>().ToTable("HoodSubscriptionFeatures");
             builder.Entity<UserSubscription>().ToTable("HoodUserSubscriptions");
-            builder.Entity<Subscription>().Property("Category").HasColumnName("Colour");
             builder.Entity<UserSubscription>().Property("Id").HasColumnName("UserSubscriptionId");
             builder.Entity<UserSubscription>().HasOne(pt => pt.User).WithMany(p => p.Subscriptions).HasForeignKey(pt => pt.UserId);
             builder.Entity<UserSubscription>().HasOne(pt => pt.Subscription).WithMany(t => t.Users).HasForeignKey(pt => pt.SubscriptionId);
@@ -107,6 +107,9 @@ namespace Hood.Models
             builder.Query<UserProfile>().ToView("HoodUserProfiles");
             builder.Query<UserProfile>().Property(b => b.RolesJson).HasColumnName("Roles");
             builder.Query<UserProfile>().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
+
+            builder.Query<SubscriptionPlan>().ToView("HoodSubscriptionPlans");
+
         }
 
         public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction

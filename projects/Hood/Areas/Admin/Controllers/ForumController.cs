@@ -92,7 +92,7 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Authors = await GetAuthorsAsync();
 
-            SubscriptionSearchModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            SubscriptionPlanListModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
             model.Subscriptions = subs.List;
 
             model.Roles = await _account.GetAllRolesAsync();
@@ -155,7 +155,7 @@ namespace Hood.Areas.Admin.Controllers
                 await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
             }
 
-            SubscriptionSearchModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            SubscriptionPlanListModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
             model.Subscriptions = subs.List;
 
             model.Roles = await _account.GetAllRolesAsync();

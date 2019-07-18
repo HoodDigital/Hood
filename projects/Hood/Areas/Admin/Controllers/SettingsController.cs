@@ -557,7 +557,7 @@ namespace Hood.Areas.Admin.Controllers
             if (model == null)
                 model = new ForumSettings();
 
-            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
             model.Subscriptions = subs.List;
 
             model.Roles = await _account.GetAllRolesAsync();
@@ -578,7 +578,7 @@ namespace Hood.Areas.Admin.Controllers
                 SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
-            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
             model.Subscriptions = subs.List;
 
             model.Roles = await _account.GetAllRolesAsync();

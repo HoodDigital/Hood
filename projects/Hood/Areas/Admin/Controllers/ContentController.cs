@@ -536,7 +536,7 @@ namespace Hood.Areas.Admin.Controllers
                         if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
                         {
                             // get subscriptions - if there are any.
-                            SubscriptionSearchModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionSearchModel() { PageSize = int.MaxValue });
+                            SubscriptionPlanListModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
                             model.Subscriptions = subs.List;
                         }
                         break;

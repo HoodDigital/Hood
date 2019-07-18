@@ -35,6 +35,7 @@ namespace Hood.Models
         public DbSet<ApiEvent> ApiEvents { get; set; }
 
         // Content
+        public DbSet<SubscriptionGroup> SubscriptionGroups { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
 
@@ -61,6 +62,7 @@ namespace Hood.Models
 
         // Views
         public DbQuery<UserProfile> UserProfiles { get; set; }
+        public DbQuery<SubscriptionPlan> SubscriptionPlans { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

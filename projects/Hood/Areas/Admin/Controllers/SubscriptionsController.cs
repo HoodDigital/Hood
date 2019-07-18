@@ -24,24 +24,59 @@ namespace Hood.Areas.Admin.Controllers
         {
         }
 
+        #region Lists
         [Route("admin/subscriptions/")]
-        public async Task<IActionResult> Index(SubscriptionSearchModel model)
+        public async Task<IActionResult> Plans(SubscriptionPlanListModel model) => await PlansList(model, "Plans");
+
+        [Route("admin/subscriptions/subscribers/")]
+        public async Task<IActionResult> Subscribers(UserSubscriptionListModel model) => await SubscribersList(model, "Subscribers");
+
+        [Route("admin/subscriptions/groups/")]
+        public async Task<IActionResult> Groups(SubscriptionGroupListModel model) => await GroupsList(model, "Groups");
+        [Route("admin/subscriptions/stripe/")]
+        public async Task<IActionResult> Stripe(StripePlanListModel model) => await StripeList(model, "Stripe");
+
+
+        [Route("admin/subscriptions/list/")]
+        public async Task<IActionResult> PlansList(SubscriptionPlanListModel model, string viewName)
         {
             model = await _account.GetSubscriptionPlansAsync(model);
-            return View(model);
+            return View(viewName.IsSet() ? viewName : "_List_Plans", model);
         }
 
-        [Route("admin/subscribers/")]
-        public async Task<IActionResult> Subscribers(UserSubscriptionListModel model)
+        [Route("admin/subscriptions/subscribers/list/")]
+        public async Task<IActionResult> SubscribersList(UserSubscriptionListModel model, string viewName)
         {
             model = await _account.GetUserSubscriptionsAsync(model);
-            return View(model);
+            return View(viewName.IsSet() ? viewName : "_List_Subscribers", model);
         }
 
+        [Route("admin/subscriptions/groups/list/")]
+        public async Task<IActionResult> GroupsList(SubscriptionGroupListModel model, string viewName)
+        {
+            model = await _account.GetSubscriptionGroupsAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Groups", model);
+        }
+
+        [Route("admin/subscriptions/stripe/list/")]
+        public async Task<IActionResult> StripeList(StripePlanListModel model, string viewName)
+        {
+            model = await _account.GetStripeSubscriptionsAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Stripe", model);
+        }
+        #endregion
+
+
+        #region Edit Subscription (Plan)
         [Route("admin/subscriptions/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
             var model = await _account.GetSubscriptionPlanByIdAsync(id);
+            if (model == null)
+                return NotFound();
+
+            model.StripePlan = await _billing.SubscriptionPlans.FindByIdAsync(model.StripeId);
+
             return View(model);
         }
 
@@ -67,18 +102,23 @@ namespace Hood.Areas.Admin.Controllers
                    Url.AbsoluteAction("Index", "Subscriptions")
                );
             }
+
+            model.StripePlan = await _billing.SubscriptionPlans.FindByIdAsync(model.StripeId);
+
             return View(model);
         }
+        #endregion
 
+        #region Create Subscription (Plan)
         [Route("admin/subscriptions/create/")]
         public IActionResult Create()
         {
-            return View();
+            return View("_Blade_Subcription", new Subscription());
         }
 
         [HttpPost]
         [Route("admin/subscriptions/add")]
-        public async Task<Response> Add(CreateSubscriptionModel model)
+        public async Task<Response> Create(CreateSubscriptionModel model)
         {
             Subscription subscription = new Subscription();
             try
@@ -133,7 +173,9 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex);
             }
         }
+        #endregion
 
+        #region Delete Subscription (Plan)
         [Route("admin/subscriptions/delete")]
         [HttpPost()]
         public async Task<Response> Delete(int id)
@@ -166,14 +208,114 @@ namespace Hood.Areas.Admin.Controllers
                 return new Response(ex);
             }
         }
+        #endregion
 
-        [Route("admin/subscriptions/stripe/")]
-        public async Task<IActionResult> Stripe()
+
+
+        #region Edit Subscription (Group)
+        [Route("admin/subscriptions/groups/edit/{id}/")]
+        public async Task<IActionResult> EditGroup(int id)
         {
-            var model = await _billing.SubscriptionPlans.GetAllAsync();
+            var model = await _account.GetSubscriptionPlanByIdAsync(id);
             return View(model);
         }
 
+        [HttpPost()]
+        [Route("admin/subscriptions/groups/edit/{id}/")]
+        public async Task<ActionResult> EditGroup(Subscription model)
+        {
+            try
+            {
+                await _account.UpdateSubscriptionAsync(model);
+                SaveMessage = "Subscription saved.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Errorsaving: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                   string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
+                   ex,
+                   LogType.Error,
+                   _userManager.GetUserId(User),
+                   Url.AbsoluteAction("Index", "Subscriptions")
+               );
+            }
+            return View(model);
+        }
+        #endregion
+
+        #region Create Subscription (Group)
+        [Route("admin/subscriptions/groups/create/")]
+        public IActionResult CreateGroup()
+        {
+            return View("_Blade_Subcription", new SubscriptionGroup());
+        }
+
+        [HttpPost]
+        [Route("admin/subscriptions/groups/create/")]
+        public async Task<Response> CreateGroup(SubscriptionGroup model)
+        {
+            Subscription subscription = new Subscription();
+            try
+            {
+#warning TODO: Handle response in JS.
+                return new Response(true, "Created new subscription group successfully.");
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name);
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                    SaveMessage,
+                    ex,
+                    LogType.Error,
+                    _userManager.GetUserId(User),
+                    Url.AbsoluteAction("Index", "Subscriptions")
+                );
+                return new Response(ex);
+            }
+        }
+        #endregion
+
+        #region Delete Subscription (Group)
+        [Route("admin/subscriptions/groups/delete")]
+        [HttpPost()]
+        public async Task<Response> DeleteGroup(int id)
+        {
+            try
+            {
+                var subscription = await _account.GetSubscriptionPlanByIdAsync(id);
+                await _account.DeleteSubscriptionPlanAsync(id);
+                SaveMessage = string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name);
+                await _logService.AddLogAsync<SubscriptionsController>(
+                    SaveMessage,
+                    JsonConvert.SerializeObject(subscription),
+                    LogType.Success,
+                    _userManager.GetUserId(User),
+                    Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
+                );
+#warning TODO: Handle response in JS.
+                return new Response(true, $"The subscription has been deleted.");
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = string.Format("Error deleting subscription with id: {0}", id);
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                    SaveMessage,
+                    ex,
+                    LogType.Error,
+                    _userManager.GetUserId(User),
+                    Url.AbsoluteAction("Index", "Subscriptions")
+                );
+                return new Response(ex);
+            }
+        }
+        #endregion
+
+
+
+        #region Webhooks
         [Route("admin/subscriptions/stripe/test/webhook")]
         public IActionResult Webhook()
         {
@@ -240,7 +382,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             return View(model);
         }
-
+        #endregion
     }
 }
 

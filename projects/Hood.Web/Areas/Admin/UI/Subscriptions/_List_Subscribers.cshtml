@@ -1,0 +1,86 @@
+@model UserSubscriptionListModel
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var subscription in Model.List)
+    {
+        var user = subscription.User;
+        <div class="card hover mb-3 p-3 @(user != null ? "border-success" : "border-danger")">
+            <div class="row no-gutters align-items-center">
+                <div class="col">
+                    <div class="mb-1">
+                        <h5 class="card-title d-lg-inline">
+                            @if (user != null)
+                            {
+                                <a asp-action="Edit" asp-route-id="@subscription.Id">
+                                    @user.ToAdminName()
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="Edit" asp-route-id="@subscription.Id" class=" text-muted">
+                                    Unlinked Subscription
+                                </a>
+                            }
+                        </h5>
+                        <p class="ml-2 text-muted d-lg-inline"><span class="badge badge-info">@subscription.Subscription.Name</span></p>
+                    </div>
+                    <small class="d-block">
+                        Status:
+                        <strong class="badge badge-success">@subscription.Status</strong>
+                    </small>
+                    <small class="d-block">
+                        Next Period:
+                        <strong class="badge badge-success">@subscription.CurrentPeriodEnd</strong>
+                    </small>
+                    @if (user != null)
+                    {
+                        <p class="card-text mb-1">
+                            <small class="d-block">
+                                Username:
+                                <strong>@user.UserName</strong>
+                            </small>
+                            <small class="d-block">
+                                Email:
+                                <strong>@user.Email</strong>
+                                @if (!user.EmailConfirmed)
+                                {<i class="fa fa-exclamation-triangle text-danger" title="Email not confirmed."></i>}
+                            </small>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-danger mt-2 mb-0"><i class="fa fa-exclamation-triangle mr-2"></i>This subscription is not linked to a current user.</p>
+                    }
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="EditSubscription" asp-route-id="@subscription.Id">
+                            <i class="fa fa-edit"></i>
+                            Edit Subscription
+                        </a>
+                        @if (user != null)
+                        {
+                            <a class="dropdown-item" asp-action="Edit" asp-controller="Users" asp-route-id="@user.Id">
+                                <i class="fa fa-edit"></i>
+                                Edit User
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        There are no subscription plans yet, click "Create New" to add your first subscription plan.
+    </alert>
+}

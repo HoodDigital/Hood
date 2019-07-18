@@ -349,6 +349,36 @@ namespace Hood.Areas.Admin.Controllers
 
                         break;
 
+                    case nameof(Subscription):
+
+                        // create the new media item for content =>
+                        int subId = int.Parse(model.Id);
+                        Subscription subscription = await _db.Subscriptions.Where(p => p.Id == subId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(Subscription.FeaturedImage):
+                                subscription.FeaturedImage = media;
+                                break;
+                        }
+
+                        break;
+
+                    case nameof(SubscriptionGroup):
+
+                        // create the new media item for content =>
+                        int subgId = int.Parse(model.Id);
+                        SubscriptionGroup subscriptionGroup = await _db.SubscriptionGroups.Where(p => p.Id == subgId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(SubscriptionGroup.FeaturedImage):
+                                subscriptionGroup.FeaturedImage = media;
+                                break;
+                        }
+
+                        break;
+
                     case "ContentMeta":
 
                         int idForMeta = int.Parse(model.Id);
@@ -387,7 +417,7 @@ namespace Hood.Areas.Admin.Controllers
                 string cacheKey;
                 switch (model.Entity)
                 {
-                    case "Content":
+                    case nameof(Models.Content):
 
                         // create the new media item for content =>
                         int contentId = int.Parse(model.Id);
@@ -395,10 +425,10 @@ namespace Hood.Areas.Admin.Controllers
 
                         switch (model.Field)
                         {
-                            case "FeaturedImage":
+                            case nameof(Models.Content.FeaturedImage):
                                 content.FeaturedImageJson = null;
                                 break;
-                            case "ShareImage":
+                            case nameof(Models.Content.ShareImage):
                                 content.ShareImageJson = null;
                                 break;
                         }
@@ -408,7 +438,7 @@ namespace Hood.Areas.Admin.Controllers
                         _cache.Remove(cacheKey);
                         return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
-                    case "Forum":
+                    case nameof(Forum):
 
                         // create the new media item for content =>
                         int forumId = int.Parse(model.Id);
@@ -416,10 +446,10 @@ namespace Hood.Areas.Admin.Controllers
 
                         switch (model.Field)
                         {
-                            case "FeaturedImage":
+                            case nameof(Forum.FeaturedImage):
                                 forum.FeaturedImage = null;
                                 break;
-                            case "ShareImage":
+                            case nameof(Forum.ShareImage):
                                 forum.ShareImage = null;
                                 break;
                         }
@@ -427,14 +457,14 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
-                    case "ApplicationUser":
+                    case nameof(ApplicationUser):
 
                         // create the new media item for content =>
                         ApplicationUser user = await _db.Users.Where(p => p.Id == model.Id).FirstOrDefaultAsync();
 
                         switch (model.Field)
                         {
-                            case "Avatar":
+                            case nameof(ApplicationUser.Avatar):
                                 user.AvatarJson = null;
                                 break;
                         }
@@ -445,17 +475,17 @@ namespace Hood.Areas.Admin.Controllers
                         await _db.SaveChangesAsync();
                         return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
-                    case "PropertyListing":
+                    case nameof(PropertyListing):
 
                         int propertyId = int.Parse(model.Id);
                         PropertyListing property = await _db.Properties.Where(p => p.Id == propertyId).FirstOrDefaultAsync();
 
                         switch (model.Field)
                         {
-                            case "FeaturedImage":
+                            case nameof(PropertyListing.FeaturedImage):
                                 property.FeaturedImageJson = null;
                                 break;
-                            case "InfoDownload":
+                            case nameof(PropertyListing.InfoDownload):
                                 property.InfoDownloadJson = null;
                                 break;
                         }
@@ -465,7 +495,37 @@ namespace Hood.Areas.Admin.Controllers
                         _cache.Remove(cacheKey);
                         return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
-                    case "ContentMeta":
+                    case nameof(Subscription):
+
+                        // create the new media item for content =>
+                        int subId = int.Parse(model.Id);
+                        Subscription subscription = await _db.Subscriptions.Where(p => p.Id == subId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(Subscription.FeaturedImage):
+                                subscription.FeaturedImage = null;
+                                break;
+                        }
+
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(SubscriptionGroup):
+
+                        // create the new media item for content =>
+                        int subgId = int.Parse(model.Id);
+                        SubscriptionGroup subscriptionGroup = await _db.SubscriptionGroups.Where(p => p.Id == subgId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(SubscriptionGroup.FeaturedImage):
+                                subscriptionGroup.FeaturedImage = null;
+                                break;
+                        }
+
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(ContentMeta):
 
                         int idForMeta = int.Parse(model.Id);
                         Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();

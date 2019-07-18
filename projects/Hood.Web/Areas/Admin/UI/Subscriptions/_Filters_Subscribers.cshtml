@@ -1,0 +1,73 @@
+@model UserSubscriptionListModel
+@{
+    Layout = null;
+}
+<div class="card mb-3">
+    <div class="card-header position-relative" id="subscription-subscribers-filters-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#subscription-subscribers-filters-panel" href="#subscription-subscribers-filters-panel" aria-expanded="true" aria-controls="subscription-subscribers-filters-panel">
+                Search Filters
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="subscription-subscribers-filters-panel-heading" id="subscription-subscribers-filters-panel">
+        <div class="form-group floating-label">
+            <label asp-for="SubscriptionPlanId"></label>
+            <select class="form-control refresh-on-change" asp-for="SubscriptionPlanId">
+                <option value="">Show All</option>
+                @{
+                    var plans = await Engine.AccountManager.GetSubscriptionPlansAsync();
+                }
+                @foreach (var plan in plans.List)
+                {
+                    <option value="@plan.Id">@plan.Name</option>
+                }
+            </select>
+            <small asp-for="SubscriptionPlanId"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="Order"></label>
+            <select class="form-control refresh-on-change" asp-for="Order">
+                <option value="NextPeriodDateDesc">Next Period Date</option>
+                <option value="NextPeriodDate">Next Period Date (Decsending)</option>
+                <option value="UserName">Username (A-Z)</option>
+                <option value="UserNameDesc">Username (Z-A)</option>
+                <option value="Email">Email (A-Z)</option>
+                <option value="EmailDesc">Email (Z-A)</option>
+                <option value="LastName">Last Name (A-Z)</option>
+                <option value="LastNameDesc">Last Name (Z-A)</option>
+            </select>
+            <small asp-for="Order"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="Status"></label>
+            <select class="form-control refresh-on-change" asp-for="Status">
+                <option value="">Show All</option>
+                <option value="active">Active</option>
+                <option value="trialing">Trial</option>
+                <option value="canceled">Canceled</option>
+                <option value="incomplete">Incomplete</option>
+                <option value="incomplete_expired">Incomplete Expired</option>
+                <option value="past_due">Past Due</option>
+                <option value="unpaid">Unpaid</option>
+            </select>
+            <small asp-for="Status"></small>
+        </div>
+        <div class="form-group">
+            <label asp-for="Search"></label>
+            <input asp-for="Search" class="form-control">
+            <small asp-for="Search"></small>
+        </div>
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="Linked" class="custom-control-input refresh-on-change">
+                <label asp-for="Linked" class="custom-control-label"></label>
+            </div>
+            <small asp-for="Linked"></small>
+        </div>
+    </div>
+    <div class="card-footer">
+        <button type="submit" class="btn btn-success btn-block"> Search!</button>
+    </div>
+</div>

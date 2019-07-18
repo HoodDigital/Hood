@@ -1,0 +1,52 @@
+@model SubscriptionGroupListModel
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var group in Model.List)
+    {
+        <div class="card hover mb-3 p-2">
+            <div class="row no-gutters align-items-center">
+                <div class="col-auto">
+                    <a asp-action="" asp-route-id="">
+                        <fixedImage src="" class="img img-circle img-sm m-2 mr-4" alt=""></fixedImage>
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="mb-1">
+                        <h5 class="card-title d-lg-inline">
+                            <a asp-action="Edit" asp-route-id="@group.Id">
+                                @group.DisplayName
+                            </a>
+                        </h5>
+                    </div>
+                    <p class="text-muted m-0">@group.Subscriptions.Count Subscription Plans</p>
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="EditGroup" asp-route-id="@group.Id">
+                            <i class="fa fa-edit"></i>
+                            Edit Item
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item subscriptions-groups-delete" asp-action="DeleteGroup" asp-route-id="@group.Id">
+                            <i class="fa fa-trash-alt"></i>
+                            Delete Item
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        There are no subscription groups yet, click "Create New" to add your first subscription group.
+    </alert>
+}

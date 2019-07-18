@@ -228,7 +228,7 @@ namespace Hood.Models
         [NotMapped]
         public Dictionary<string, string> Templates { get; set; }
         [NotMapped]
-        public List<Subscription> Subscriptions { get; set; }
+        public List<SubscriptionPlan> Subscriptions { get; set; }
         [NotMapped]
         public List<UserProfile> Authors { get; set; }
         #endregion

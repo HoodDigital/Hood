@@ -45,6 +45,16 @@ namespace Hood.Models
         [ProtectedPersonalData]
         [Display(Name = "Display name")]
         public virtual string DisplayName { get; set; }
+        public virtual string ToAdminName()
+        {
+            if (this.ToFullName().IsSet())
+                return this.ToFullName();
+            if (UserName.IsSet())
+                return UserName;
+            if (Email.IsSet())
+                return Email;
+            else return "";
+        }
         #endregion
 
         #region Addresses 

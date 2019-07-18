@@ -66,14 +66,14 @@
         </div>
     </div>
 </div>
-<div class="row collapse" id="content-types">
+<div class="collapse" id="content-types">
     @{
-        var types = Engine.Settings.Content.Types;
+        var types = Engine.Settings.Content.AllowedTypes;
     }
+        <div class="card-deck">
     @foreach (var t in types)
     {
-        <div class="col-sm-6 col-lg-3">
-            <div class="card mb-2">
+            <div class="card mb-3">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto text-black-50">
@@ -85,10 +85,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <a class="full-box-link" href="/admin/content/@t.Type/manage">Show subscriptions...</a>
-        </div>
+             <a class="full-box-link" href="/admin/content/manage/@t.Type">Show subscriptions...</a>
+           </div>
     }
+        </div>
 </div>
 <div class="card">
     <div class="card-header p-3">

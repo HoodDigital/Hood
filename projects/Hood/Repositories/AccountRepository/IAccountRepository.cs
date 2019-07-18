@@ -44,7 +44,9 @@ namespace Hood.Services
         #endregion
 
         #region Subscription Plans
-        Task<SubscriptionSearchModel> GetSubscriptionPlansAsync(SubscriptionSearchModel model = null);
+        Task<SubscriptionGroupListModel> GetSubscriptionGroupsAsync(SubscriptionGroupListModel model = null);
+        Task<SubscriptionPlanListModel> GetSubscriptionPlansAsync(SubscriptionPlanListModel model = null);
+        Task<StripePlanListModel> GetStripeSubscriptionsAsync(StripePlanListModel model);
         Task<Subscription> GetSubscriptionPlanByIdAsync(int id);
         Task<Subscription> GetSubscriptionPlanByStripeIdAsync(string stripeId);
         Task<Subscription> AddSubscriptionPlanAsync(Models.Subscription subscription);
