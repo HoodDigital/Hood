@@ -90,8 +90,8 @@
             <div class="collapse" id="sidebar-subscriptions">
                 <ul class="nav">
                     <li class="nav-item">
-                        <a class="nav-link" asp-action="Groups" asp-controller="Subscriptions" asp-route-area="Admin">
-                            <i class="fa fa-layer-group"></i>Groups
+                        <a class="nav-link" asp-action="Subscribers" asp-controller="Subscriptions" asp-route-area="Admin">
+                            <i class="fa fa-user-plus"></i>Subscribers
                         </a>
                     </li>
                     <li class="nav-item">
@@ -100,18 +100,10 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-action="Subscribers" asp-controller="Subscriptions" asp-route-area="Admin">
-                            <i class="fa fa-user-plus"></i>Subscribers
+                        <a class="nav-link" asp-action="Products" asp-controller="Subscriptions" asp-route-area="Admin">
+                            <i class="fa fa-layer-group"></i>Product Groups
                         </a>
                     </li>
-                    @if (User.IsSuperUser())
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-action="Webhook" asp-controller="Subscriptions">
-                                <i class="fa fa-download"></i>Test Webhooks
-                            </a>
-                        </li>
-                    }
                 </ul>
             </div>
         </li>

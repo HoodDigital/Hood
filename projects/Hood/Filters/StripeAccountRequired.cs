@@ -24,14 +24,14 @@ namespace Hood.Filters
 
         private class StripeAccountRequiredAttributeImpl : IActionFilter
         {
-            private readonly IBillingService _billing;
+            private readonly IStripeService _stripe;
             private readonly UserManager<ApplicationUser> _userManager;
 
             public StripeAccountRequiredAttributeImpl(
-                IBillingService billing,
+                IStripeService stripe,
                 UserManager<ApplicationUser> userManager)
             {
-                _billing = billing;
+                _stripe = stripe;
                 _userManager = userManager;
             }
 
@@ -47,7 +47,7 @@ namespace Hood.Filters
                         return;
                     }
 
-                    var customer = _billing.Customers.FindByIdAsync(user.StripeId).Result;
+                    var customer = _stripe.GetCustomerByIdAsync(user.StripeId).Result;
 
                     if (customer == null)
                     {

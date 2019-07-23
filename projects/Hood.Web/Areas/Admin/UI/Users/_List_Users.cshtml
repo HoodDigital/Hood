@@ -1,6 +1,7 @@
 @model UserListModel
 @{
     Layout = null;
+    var stripeUrl = string.Format("https://dashboard.stripe.com{0}", Engine.Settings.Billing.EnableStripeTestMode ? "/test" : "");
 }
 @if (Model.TotalCount > 0)
 {
@@ -17,6 +18,10 @@
                     <div class="mb-1">
                         <h5 class="card-title d-lg-inline">
                             <a asp-action="Edit" asp-route-id="@user.Id">@user.ToAdminName()</a>
+                        @if (user.StripeId.IsSet())
+                        {
+                            <a class="ml-2 text-info" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, user.StripeId)"><i class="mt-2 fab fa-cc-stripe"></i></a>
+                        }
                         </h5>
                         <small class="ml-2 text-muted d-lg-inline">Last logged in @user.LastLogOn.ToHumaneDate()</small>
                     </div>

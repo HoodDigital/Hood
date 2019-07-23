@@ -22,7 +22,9 @@ namespace Hood.Models
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
-            builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId);
+            builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<ApiKey>().HasOne(up => up.User).WithMany(add => add.ApiKeys).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<ApiEvent>().HasOne(up => up.ApiKey).WithMany(add => add.Events).HasForeignKey(au => au.ApiKeyId).OnDelete(DeleteBehavior.Cascade);
 
             // Media
             builder.Entity<MediaObject>().ToTable("HoodMedia");
@@ -32,7 +34,7 @@ namespace Hood.Models
             builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
 
             // Subscriptions
-            builder.Entity<SubscriptionGroup>().ToTable("HoodSubscriptionGroups");
+            builder.Entity<SubscriptionProduct>().ToTable("HoodSubscriptionGroups");
             builder.Entity<Subscription>().ToTable("HoodSubscriptions");
             builder.Entity<SubscriptionFeature>().ToTable("HoodSubscriptionFeatures");
             builder.Entity<UserSubscription>().ToTable("HoodUserSubscriptions");

@@ -6,6 +6,7 @@ using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +46,7 @@ namespace Hood.Controllers
             SubscriptionModel model = new SubscriptionModel()
             {
                 GroupId = groupId,
-                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, GroupId = groupId, Addon = false })).List,
+                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, ProductId = groupId, Addon = false })).List,
                 Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, Addon = true })).List
             };
             return View(model);
@@ -198,14 +199,19 @@ namespace Hood.Controllers
         public async Task<StatusCodeResult> WebHooks()
         {
             var json = new StreamReader(Request.Body).ReadToEnd();
+            
             try
             {
-                await _webHooks.ProcessEventAsync(json);
+                if (!Engine.Settings.Billing.StripeWebhookSecret.IsSet())
+                    throw new Exception("Cannot process a signed webhook without a Stripe Webhook Secret. Set one in the Billing Settings to fix this.");
+
+                var stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], Engine.Settings.Billing.StripeWebhookSecret);
+                await _webHooks.ProcessEventAsync(stripeEvent);
                 return new StatusCodeResult(200);
             }
             catch (Exception)
             {
-                return new StatusCodeResult(202);
+               return BadRequest();
             }
         }
 
@@ -214,7 +220,7 @@ namespace Hood.Controllers
             SubscriptionModel model = new SubscriptionModel()
             {
                 GroupId = groupId,
-                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, GroupId = groupId, Addon = false })).List,
+                Plans = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, ProductId = groupId, Addon = false })).List,
                 Addons = (await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue, Addon = true })).List,
                 Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId)
             };

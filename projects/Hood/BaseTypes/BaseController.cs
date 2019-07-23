@@ -39,7 +39,7 @@ namespace Hood.Controllers
         protected readonly IEmailSender _emailSender;
         protected readonly IMailService _mailService;
         protected readonly ISmsSender _smsSender;
-        protected readonly IBillingService _billing;
+        protected readonly IStripeService _stripe;
         protected readonly ILogService _logService;
         protected readonly IConfiguration _config;
         protected readonly IHostingEnvironment _env;
@@ -68,7 +68,7 @@ namespace Hood.Controllers
             _emailSender = Engine.Services.Resolve<IEmailSender>();
             _mailService = Engine.Services.Resolve<IMailService>();
             _smsSender = Engine.Services.Resolve<ISmsSender>();
-            _billing = Engine.Services.Resolve<IBillingService>();
+            _stripe = Engine.Services.Resolve<IStripeService>();
             _logService = Engine.Services.Resolve<ILogService>();
             _config = Engine.Services.Resolve<IConfiguration>();
             _env = Engine.Services.Resolve<IHostingEnvironment>();

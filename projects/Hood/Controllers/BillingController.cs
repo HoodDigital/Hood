@@ -31,10 +31,10 @@ namespace Hood.Controllers
                 model.Customer = await _account.GetCustomerObjectAsync(Engine.Account.StripeId);
                 if (model.Customer != null)
                 {
-                    model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);
+                    model.Invoices = await _stripe.GetAllInvoicesAsync(model.Customer.Id, null);
                     try
                     {
-                        model.NextInvoice = await _billing.Invoices.GetUpcoming(model.Customer.Id);
+                        model.NextInvoice = await _stripe.GetUpcomingInvoicesAsync(model.Customer.Id);
                     }
                     catch (StripeException)
                     {
@@ -74,10 +74,10 @@ namespace Hood.Controllers
 
                 // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
                 if (user.StripeId.IsSet())
-                    model.Customer = await _billing.Customers.FindByIdAsync(user.StripeId);
+                    model.Customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
 
                 // if not, then the user must have supplied a token
-                Stripe.Token stripeToken = _billing.Stripe.TokenService.Get(model.StripeToken);
+                Stripe.Token stripeToken = await _stripe.TokenService.GetAsync(model.StripeToken);
                 if (stripeToken == null)
                     throw new Exception("The provided card token was not valid.");
 
@@ -85,14 +85,14 @@ namespace Hood.Controllers
                 if (model.Customer == null)
                 {
                     // if it does not, create it, add the card and subscribe the plan.
-                    model.Customer = await _billing.Customers.CreateCustomer(user, model.StripeToken);
+                    model.Customer = await _stripe.CreateCustomerAsync(user, model.StripeToken);
                     user.StripeId = model.Customer.Id;
                     IdentityResult result = await _userManager.UpdateAsync(user);
                 }
                 else
                 {
                     // finally, add the user to the subscription, using the new card as the charge source.
-                    await _billing.Cards.CreateCard(model.Customer.Id, model.StripeToken);
+                    await _stripe.CreateCardAsync(model.Customer.Id, model.StripeToken);
                 }
 
                 SaveMessage = $"The card has been added successfully.";
@@ -114,7 +114,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _billing.Customers.SetDefaultCard(Engine.Account.StripeId, uid);
+                await _stripe.SetDefaultCardAsync(Engine.Account.StripeId, uid);
                 SaveMessage = $"Default card set.";
                 MessageType = Enums.AlertType.Success;
             }
@@ -132,7 +132,7 @@ namespace Hood.Controllers
         {
             try
             {
-                await _billing.Cards.DeleteCard(Engine.Account.StripeId, uid);
+                await _stripe.DeleteCardAsync(Engine.Account.StripeId, uid);
                 SaveMessage = $"Card deleted.";
                 MessageType = Enums.AlertType.Success;
             }

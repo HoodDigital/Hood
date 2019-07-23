@@ -407,6 +407,18 @@ namespace Hood.Extensions
             return x.Link(x);
         }
 
+        public static string ToFirstName(this string fullName)
+        {
+            List<string> names = fullName.Split(' ').ToList();
+            return names.First();
+        }
+        public static string ToLastName(this string fullName)
+        {
+            List<string> names = fullName.Split(' ').ToList();
+            names.RemoveAt(0);
+            return string.Join(" ", names.ToArray());
+        }
+
         public static string ReplaceSiteVariables(this string text)
         {
             var settings = Core.Engine.Settings.Basic;

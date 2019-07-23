@@ -214,9 +214,11 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
-                await _account.DeleteUserAsync(user, User);
-                await _logService.AddLogAsync<UsersController>($"A new user account has been deleted in the admin area for {user.Email}", type: LogType.Warning);
+                var user = await _account.GetUserProfileByIdAsync(id);
+                if (user == null)
+                    throw new Exception($"The user Id {id} could not be found, therefore could not be deleted.");
+                await _account.DeleteUserAsync(id, User);
+                await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) has been deleted via the admin area by {User.Identity.Name}", type: LogType.Warning);
                 return new Response(true, "Deleted successfully.");
             }
             catch (Exception ex)

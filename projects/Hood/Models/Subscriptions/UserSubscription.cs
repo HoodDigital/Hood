@@ -1,4 +1,5 @@
 ﻿using Hood.Entities;
+using Microsoft.AspNetCore.Html;
 using System;
 
 namespace Hood.Models
@@ -18,6 +19,31 @@ namespace Hood.Models
         public long Quantity { get; set; }
         public DateTime? Start { get; set; }
         public string Status { get; set; }
+        public IHtmlContent StatusBadge
+        {
+            get
+            {
+                switch (Status)
+                {
+                    case Stripe.SubscriptionStatuses.Active:
+                        return new HtmlString("<span class='badge badge-success'><i class='fa fa-check-circle mr-2'></i>Active</span>");
+                    case Stripe.SubscriptionStatuses.Trialing:
+                        return new HtmlString("<span class='badge badge-warning'><i class='fa fa-info mr-2'></i>Trialing</span>");
+                    case Stripe.SubscriptionStatuses.Canceled:
+                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Canceled</span>");
+                    case Stripe.SubscriptionStatuses.PastDue:
+                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>PastDue</span>");
+                    case Stripe.SubscriptionStatuses.Incomplete:
+                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Incomplete</span>");
+                    case Stripe.SubscriptionStatuses.IncompleteExpired:
+                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Incomplete Expired</span>");
+                    case Stripe.SubscriptionStatuses.Unpaid:
+                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Unpaid</span>");
+                }
+                return new HtmlString($"<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>{Status}</span>");
+            }
+        }
+
         public decimal? TaxPercent { get; set; }
         public DateTime? TrialEnd { get; set; }
         public DateTime? TrialStart { get; set; }

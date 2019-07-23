@@ -13,16 +13,19 @@ namespace Hood.ViewModels
         public UserSubscriptionListModel()
         {
             Linked = true;
+            Status = "currently-active";
         }
 
         public UserSubscriptionListModel(IQueryable<UserSubscription> source, int pageIndex, int pageSize) : base(source, pageIndex, pageSize)
         {
             Linked = true;
+            Status = "currently-active";
         }
 
         public UserSubscriptionListModel(IList<UserSubscription> source, int pageIndex, int pageSize) : base(source, pageIndex, pageSize)
         {
             Linked = true;
+            Status = "currently-active";
         }
 
         [FromQuery(Name = "subscription")]

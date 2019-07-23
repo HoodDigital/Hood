@@ -116,6 +116,19 @@ namespace Hood.Extensions
             return html.Raw(ret);
         }
 
+        public static Stripe.Address ToStripeAddress(this IAddress address)
+        {
+            return new Stripe.Address()
+            {
+                Line1 = address.Address1,
+                Line2 = address.Address2,
+                Country = address.Country,
+                City = address.City,
+                PostalCode = address.Postcode,
+                State = address.County
+            };
+        }
+
     }
 }
 

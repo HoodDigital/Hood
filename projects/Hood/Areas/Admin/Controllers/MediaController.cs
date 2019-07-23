@@ -364,15 +364,15 @@ namespace Hood.Areas.Admin.Controllers
 
                         break;
 
-                    case nameof(SubscriptionGroup):
+                    case nameof(SubscriptionProduct):
 
                         // create the new media item for content =>
                         int subgId = int.Parse(model.Id);
-                        SubscriptionGroup subscriptionGroup = await _db.SubscriptionGroups.Where(p => p.Id == subgId).FirstOrDefaultAsync();
+                        SubscriptionProduct subscriptionGroup = await _db.SubscriptionProducts.Where(p => p.Id == subgId).FirstOrDefaultAsync();
 
                         switch (model.Field)
                         {
-                            case nameof(SubscriptionGroup.FeaturedImage):
+                            case nameof(SubscriptionProduct.FeaturedImage):
                                 subscriptionGroup.FeaturedImage = media;
                                 break;
                         }
@@ -510,15 +510,15 @@ namespace Hood.Areas.Admin.Controllers
 
                         return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
-                    case nameof(SubscriptionGroup):
+                    case nameof(SubscriptionProduct):
 
                         // create the new media item for content =>
                         int subgId = int.Parse(model.Id);
-                        SubscriptionGroup subscriptionGroup = await _db.SubscriptionGroups.Where(p => p.Id == subgId).FirstOrDefaultAsync();
+                        SubscriptionProduct subscriptionGroup = await _db.SubscriptionProducts.Where(p => p.Id == subgId).FirstOrDefaultAsync();
 
                         switch (model.Field)
                         {
-                            case nameof(SubscriptionGroup.FeaturedImage):
+                            case nameof(SubscriptionProduct.FeaturedImage):
                                 subscriptionGroup.FeaturedImage = null;
                                 break;
                         }

@@ -156,6 +156,14 @@ namespace Hood.Services
         public MediaSettings Media => Get<MediaSettings>();
         public MailSettings Mail => Get<MailSettings>();
         public ForumSettings Forum => Get<ForumSettings>();
+        public UserProfile SiteOwner
+        {
+            get
+            {
+                var userId = Get("Hood.Settings.SiteOwner");
+                return _db.UserProfiles.SingleOrDefault(u => u.Id == userId);
+            }
+        } 
 
         #endregion
 
@@ -242,8 +250,8 @@ namespace Hood.Services
 
         [Obsolete(null, true)]
         public string WysiwygEditorClass => throw new NotImplementedException();
-     
-   [Obsolete("Please use Httpcontext.ProcessCaptchaOrThrowAsync() instead.", true)]
+
+        [Obsolete("Please use Httpcontext.ProcessCaptchaOrThrowAsync() instead.", true)]
         public Task ProcessCaptchaOrThrowAsync(HttpRequest request)
         {
             throw new NotImplementedException();

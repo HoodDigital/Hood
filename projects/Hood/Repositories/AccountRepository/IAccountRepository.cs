@@ -14,8 +14,9 @@ namespace Hood.Services
         Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true);
         Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
         Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true);
+        Task<UserProfile> GetUserProfileByIdAsync(string id);
         Task UpdateUserAsync(ApplicationUser user);
-        Task DeleteUserAsync(ApplicationUser user, System.Security.Claims.ClaimsPrincipal adminUser);
+        Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser);
         Task<List<UserAccessCode>> GetAccessCodesAsync(string id);
         Task<MediaDirectory> GetDirectoryAsync(string userId);
         #endregion
@@ -43,32 +44,44 @@ namespace Hood.Services
         Task<List<Stripe.Customer>> GetMatchingCustomerObjectsAsync(string email);
         #endregion
 
+        #region Subscription Products
+        Task<SubscriptionProductListModel> GetSubscriptionProductsAsync(SubscriptionProductListModel model = null);
+        Task<StripeProductListModel> GetStripeProductsAsync(StripeProductListModel model);
+        Task<SubscriptionProduct> GetSubscriptionProductByIdAsync(int id);
+        Task<SubscriptionProduct> CreateSubscriptionProductAsync(string name, string stripeId);
+        Task<SubscriptionProduct> UpdateSubscriptionProductAsync(SubscriptionProduct model);
+        Task DeleteSubscriptionProductAsync(int id);
+        Task<SubscriptionProduct> SyncSubscriptionProductAsync(int? id, string stripeId);
+        #endregion
+
         #region Subscription Plans
-        Task<SubscriptionGroupListModel> GetSubscriptionGroupsAsync(SubscriptionGroupListModel model = null);
         Task<SubscriptionPlanListModel> GetSubscriptionPlansAsync(SubscriptionPlanListModel model = null);
-        Task<StripePlanListModel> GetStripeSubscriptionsAsync(StripePlanListModel model);
+        Task<StripePlanListModel> GetStripeSubscriptionPlansAsync(StripePlanListModel model);
         Task<Subscription> GetSubscriptionPlanByIdAsync(int id);
         Task<Subscription> GetSubscriptionPlanByStripeIdAsync(string stripeId);
-        Task<Subscription> AddSubscriptionPlanAsync(Models.Subscription subscription);
-        Task UpdateSubscriptionAsync(Subscription model);
+        Task<Subscription> CreateSubscriptionPlanAsync(Models.Subscription subscription);
+        Task<Subscription> UpdateSubscriptionPlanAsync(Subscription model);
         Task DeleteSubscriptionPlanAsync(int id);
+        Task<Models.Subscription> SyncSubscriptionPlanAsync(int? id, string stripeId);
         #endregion
 
         #region User Subscriptions
         Task<UserSubscriptionListModel> GetUserSubscriptionsAsync(UserSubscriptionListModel model);
+        Task<UserSubscription> GetUserSubscriptionByIdAsync(int id);
+        Task<UserSubscription> GetUserSubscriptionByStripeIdAsync(string stripeId);
         Task<UserSubscription> CreateUserSubscriptionAsync(int planId, string stripeToken, string cardId);
         Task<UserSubscription> UpdateUserSubscriptionAsync(UserSubscription userSubscription);
         Task<UserSubscription> UpgradeUserSubscriptionAsync(int subscriptionId, int planId);
         Task<UserSubscription> CancelUserSubscriptionAsync(int subscriptionId);
         Task<UserSubscription> ReactivateUserSubscriptionAsync(int subscriptionId);
         Task<UserSubscription> RemoveUserSubscriptionAsync(int subscriptionId);
+        Task<UserSubscription> SyncUserSubscriptionAsync(int id);
         #endregion
 
         #region WebHooks
         Task ConfirmSubscriptionObjectAsync(Stripe.Subscription created, DateTime? eventTime);
         Task UpdateSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime);
         Task RemoveUserSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime);
-        Task<UserSubscription> GetUserSubscriptionByStripeIdAsync(string id);
 
         #endregion
 

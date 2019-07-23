@@ -11,6 +11,18 @@ using Stripe;
 
 namespace Hood.Models
 {
+    public class ConnectedStripeProduct : Stripe.Product
+    {
+        public ConnectedStripeProduct(Product sp)
+        {
+            sp.CopyProperties(this);
+        }
+
+        [NotMapped]
+        public SubscriptionProduct SubscriptionProduct { get; set; }
+        public int? SubscriptionProductId { get; set; }
+    }
+
     public class ConnectedStripePlan : Stripe.Plan
     {
         public ConnectedStripePlan(Plan sp)
@@ -23,7 +35,7 @@ namespace Hood.Models
         public int? SubscriptionPlanId { get; set; }
     }
 
-    public class SubscriptionPlan : SubscriptionBase
+    public class SubscriptionPlan : SubscriptionPlanBase
     {
         public int TotalCount { get; set; }
         public int ActiveCount { get; set; }
@@ -31,13 +43,13 @@ namespace Hood.Models
         public int InactiveCount { get; set; }
     }
 
-    public sealed class Subscription : SubscriptionBase
+    public sealed class Subscription : SubscriptionPlanBase
     {
         [NotMapped]
         public Plan StripePlan { get; set; }
     }
 
-    public abstract class SubscriptionBase : BaseEntity, ISaveableModel
+    public abstract class SubscriptionPlanBase : BaseEntity, ISaveableModel
     {
         [Display(Name = "Code", Description = "Used as a unique id for the subscription. Cannot be changed once set.")]
         public string StripeId { get; set; }
@@ -60,8 +72,9 @@ namespace Hood.Models
         [Display(Name = "Price", Description = "The price in your chosen currency for the subscription, per interval. Cannot be changed once set.")]
         public int Amount { get; set; }
         public DateTime Created { get; set; }
+        [Display(Name = "Currency", Description = "Choose the currency to use.")]
         public string Currency { get; set; }
-        [Display(Name = "Charge Interval", Description = "The time period in which the subscription cycle is measured.")]
+        [Display(Name = "Charge Interval", Description = "How often to charge the subscriber.")]
         public string Interval { get; set; }
         [Display(Name = "Interval Count", Description = "How many intervals between charges.")]
         public int IntervalCount { get; set; }
@@ -69,6 +82,10 @@ namespace Hood.Models
         public string StatementDescriptor { get; set; }
         [Display(Name = "Trial Period (Days)", Description = "If entered, a trial will be active before charging for the set number of days.")]
         public int? TrialPeriodDays { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Price", Description = "Price, charged every interval.")]
+        public decimal CreatePrice { get; set; }
 
         [JsonIgnore]
         public List<UserSubscription> Users { get; set; }
@@ -107,8 +124,9 @@ namespace Hood.Models
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
 
-        public int? SubscriptionGroupId { get; set; }
-        public SubscriptionGroup SubscriptionGroup { get; set; }
+        [Display(Name="Subscription Product", Description = "Choose a product group for this plan, if you leave it unset, a product group will be generated.")]
+        public int? SubscriptionProductId { get; set; }
+        public SubscriptionProduct SubscriptionProduct { get; set; }
 
         /// <summary>
         /// Restricted field, used for JSON features.

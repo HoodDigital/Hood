@@ -32,6 +32,7 @@ namespace Hood.Services
         MediaSettings Media { get; }
         PropertySettings Property { get; }
         SeoSettings Seo { get; }
+        UserProfile SiteOwner { get; }
         #endregion
 
         #region Other Settings/Properties

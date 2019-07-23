@@ -23,7 +23,7 @@
                    id="@fieldId"
                    name="@fieldName"
                    value="@cm.GetStringValue()" />
-            @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
+            @foreach (var sub in Model.Subscriptions.OrderBy(p => p.Amount))
             {
                 <div class="form-group">
                     <div class="custom-control custom-checkbox">

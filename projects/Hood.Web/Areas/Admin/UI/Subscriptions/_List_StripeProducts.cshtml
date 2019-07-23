@@ -1,0 +1,90 @@
+@model StripeProductListModel
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var stripeProduct in Model.List)
+    {
+        var product = stripeProduct.SubscriptionProduct;
+
+        <div class="card hover mb-3 p-3">
+            <div class="row no-gutters align-items-center">
+                @if (product != null)
+                {
+                    <div class="col-auto">
+                        <a asp-action="ManageStripesubscription" asp-route-id="@stripeProduct.Id">
+                            <fixedImage src="@product.FeaturedImage.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@product.DisplayName"></fixedImage>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-auto">
+                        <a asp-action="ManageStripesubscription" asp-route-id="@stripeProduct.Id">
+                            <fixedImage src="" class="img img-circle img-sm m-2 mr-4" alt="@stripeProduct.Name"></fixedImage>
+                        </a>
+                    </div>
+                }
+                <div class="col">
+                    <div class="mb-1">
+                        <h5 class="card-title d-lg-inline">
+                            <a asp-action="ManageStripesubscription" asp-route-id="@stripeProduct.Id">
+                                @if (product != null)
+                                {
+                                    <span><i class="fa fa-link mr-2"></i>@product.DisplayName</span>
+                                }
+                                else
+                                {
+                                    if (!stripeProduct.Name.IsSet())
+                                    {
+                                        <span><i class="fa fa-unlink mr-2"></i>Unnamed Subscription Plan</span>
+                                    }
+                                    else
+                                    {
+                                        <span><i class="fa fa-unlink mr-2"></i>@stripeProduct.Name</span>
+                                    }
+                                }
+                            </a>
+                        </h5>
+                        <small class="ml-2 badge badge-dark d-lg-inline">@stripeProduct.Id</small>
+                    </div>
+                    @if (product != null)
+                    {
+                        <p class="card-text mb-0">
+                            <small class="ml-1 badge badge-dark">@product.Subscriptions.Count Subscriptions</small>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-danger mt-2 mb-0">
+                            <i class="fa fa-exclamation-triangle mr-2"></i>This product group is not linked to a subscription product on this site, click Sync to connect it.
+                        </p>
+                    }
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="SyncProduct" asp-route-id="@stripeProduct.SubscriptionProductId" asp-route-stripeId="@stripeProduct.Id">
+                            <i class="fa fa-sync-alt"></i>
+                            Sync with Stripe
+                        </a>
+                        <a class="dropdown-item" href="@($"https://dashboard.stripe.com/products/{stripeProduct.Id}")" target="_blank">
+                            <i class="fa fa-edit"></i>
+                            Manage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        No results found.
+    </alert>
+}

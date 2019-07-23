@@ -73,6 +73,8 @@ namespace Hood.Models
         public string StripeTestKey { get; set; }
         [Display(Name = "Stripe Test Public Key")]
         public string StripeTestPublicKey { get; set; }
+        [Display(Name = "Stripe Webhook Secret")]
+        public string StripeWebhookSecret { get; set; }
 
         internal IActionResult GetNewSubscriptionUrl(HttpContext context)
         {

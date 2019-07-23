@@ -531,16 +531,10 @@ namespace Hood.Controllers
 
                 await _signInManager.SignOutAsync();
 
-                await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.", userId: user.Id);
 
-                var userLogs = _db.Logs.Where(l => l.UserId == user.Id);
-                foreach (var log in userLogs)
-                {
-                    log.UserId = null;
-                }
-                _db.SaveChanges();
-                await _account.DeleteUserAsync(user, User);
+                await _account.DeleteUserAsync(user.Id, User);
 
+                await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.");
                 return RedirectToAction(nameof(Deleted));
             }
             catch (Exception ex)

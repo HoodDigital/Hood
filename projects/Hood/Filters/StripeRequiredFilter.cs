@@ -17,13 +17,9 @@ namespace Hood.Filters
 
         private class StripeRequiredAttributeImpl : IActionFilter
         {
-            private readonly ILogger _logger;
-            private readonly IBillingService _billing;
 
-            public StripeRequiredAttributeImpl(ILoggerFactory loggerFactory, IBillingService billing)
+            public StripeRequiredAttributeImpl()
             {
-                _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
-                _billing = billing;
             }
 
             public void OnActionExecuting(ActionExecutingContext context)

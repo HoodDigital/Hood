@@ -140,16 +140,19 @@
                     {
                         if (Model.ErrorLogDetail != null)
                         {
-                            <h5>Exception</h5>
-                            <div class="code-viewer p-2 bg-gray auto text-white mb-3" style="font-family:monospace;">
-                                @foreach (var entry in Model.ErrorLogDetail.Exception)
-                                {
-                                    <p>
-                                        <strong>@entry.Key</strong><br />
-                                        @entry.Value
-                                    </p>
-                                }
-                            </div>
+                            @if (Model.ErrorLogDetail.Exception != null)
+                            {
+                                <h5>Exception</h5>
+                                <div class="code-viewer p-2 bg-gray auto text-white mb-3" style="font-family:monospace;">
+                                    @foreach (var entry in Model.ErrorLogDetail.Exception)
+                                    {
+                                        <p>
+                                            <strong>@entry.Key</strong><br />
+                                            @entry.Value
+                                        </p>
+                                    }
+                                </div>
+                            }
                             @if (Model.ErrorLogDetail.InnerException != null)
                             {
                                 <h5>Inner Exception</h5>

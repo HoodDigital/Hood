@@ -17,7 +17,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active" aria-current="page"><a href="/admin">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Users" asp-route-area="Admin"><i class="fa fa-users"></i> Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Plans"><i class="fa fa-award mr-2"></i>Subscription Plans</a></li>
             <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
         </ol>
     </nav>
@@ -40,11 +40,16 @@
             <div class="tab-content">
                 <div id="plan" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="plan-tab">
                     <form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="edit-user-form" data-id="@Model.Id">
-
+                        @if (!Model.LiveMode)
+                        {
+                            <alert type="Warning" icon="fa fa-info" size="Medium">
+                                <p class="m-0">This was created in Test mode.</p>
+                            </alert>
+                        }
                         @if (Model.StripePlan != null)
                         {
                             <alert type="Info" icon="fa fa-info" size="Medium">
-                                <a class="float-right" href="@($"https://dashboard.stripe.com/plans/{Model.StripePlan.Id}")">View on Stripe<i class="ml-2 fa fa-external-link-alt"></i></a>
+                                <a class="float-right" href="@($"https://dashboard.stripe.com/plans/{Model.StripePlan.Id}")" target="_blank">View on Stripe<i class="ml-2 fa fa-external-link-alt"></i></a>
                                 <p class="m-0">This is linked to stripe, with stripe Id: <strong>@Model.StripePlan.Id</strong></p>
                             </alert>
                         }
@@ -64,8 +69,10 @@
                             }
                         }
                         <alert type="Dark" icon="fa fa-info" size="Medium">
-                            <p class="m-0">The plan costs: <strong>@Model.FullPrice</strong><br />
-                            <em>Prices cannot be changed once the plan has been created. To change your pricing, you need to create a new plan, then add the </em></p>
+                            <p class="m-0">
+                                The plan costs: <strong>@Model.FullPrice</strong><br />
+                                <em>Prices cannot be changed once the plan has been created. To change your pricing, you need to create a new plan, then move your subscribers to it.</em>
+                            </p>
                         </alert>
 
                         <input asp-for="Id" type="hidden" />
@@ -100,18 +107,18 @@
                         </div>
                         <hr class="mt-4 mb-4" />
                         <div class="form-group floating-label">
-                            <label asp-for="SubscriptionGroupId"></label>
-                            <select asp-for="SubscriptionGroupId" class="form-control">
+                            <label asp-for="SubscriptionProductId"></label>
+                            <select asp-for="SubscriptionProductId" class="form-control">
                                 <option value="">No Group</option>
                                 @{
-                                    var groups = await Engine.AccountManager.GetSubscriptionGroupsAsync();
+                                    var products = await Engine.AccountManager.GetSubscriptionProductsAsync();
                                 }
-                                @foreach (var group in groups.List)
+                                @foreach (var product in products.List)
                                 {
-                                    <option value="@group.Id">@group.DisplayName</option>
+                                    <option value="@product.Id">@product.DisplayName</option>
                                 }
                             </select>
-                            <small asp-for="SubscriptionGroupId"></small>
+                            <small asp-for="SubscriptionProductId"></small>
                         </div>
                         <div class="form-group floating-label">
                             <label asp-for="Level"></label>

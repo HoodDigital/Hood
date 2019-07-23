@@ -78,12 +78,6 @@ namespace Hood.Extensions
 
             // Register transients.
             services.AddTransient<IStripeService, StripeService>();
-            services.AddTransient<ISubscriptionPlanService, SubscriptionPlanService>();
-            services.AddTransient<ISubscriptionService, SubscriptionService>();
-            services.AddTransient<ICardService, CardService>();
-            services.AddTransient<ICustomerService, CustomerService>();
-            services.AddTransient<IInvoiceService, InvoiceService>();
-            services.AddTransient<IBillingService, BillingService>();
 
             // Register scoped.
             services.AddScoped<ISettingsRepository, SettingsRepository>();

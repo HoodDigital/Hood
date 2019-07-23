@@ -89,7 +89,11 @@
                         <i class="fa fa-ellipsis-v"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" asp-action="ManageStripesubscription" asp-route-id="@stripePlan.Id">
+                        <a class="dropdown-item" asp-action="SyncPlan" asp-route-stripeId="@stripePlan.Id" asp-route-id="@stripePlan.SubscriptionPlanId">
+                            <i class="fa fa-sync-alt"></i>
+                            Sync with Stripe
+                        </a>
+                        <a class="dropdown-item" href="@($"https://dashboard.stripe.com/plans/{stripePlan.Id}")" target="_blank">
                             <i class="fa fa-edit"></i>
                             Manage
                         </a>

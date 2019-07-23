@@ -27,7 +27,7 @@ namespace Hood.Models
         {
             get
             {
-                if (ErrorLogDetail != null)
+                if (ErrorLogDetail != null && ErrorLogDetail.Exception != null)
                 {
                     foreach (var entry in ErrorLogDetail.Exception)
                     {

@@ -1,4 +1,6 @@
 ﻿using Hood.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Hood.Interfaces
 {
@@ -9,6 +11,15 @@ namespace Hood.Interfaces
         string DisplayName { get; set; }
         string FirstName { get; set; }
         string LastName { get; set; }
+    }
+
+    public class Name
+    {
+        public bool Anonymous { get; set; }
+        public string FullName { get; set; }
+        public string DisplayName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 
     public static class INameExtensions

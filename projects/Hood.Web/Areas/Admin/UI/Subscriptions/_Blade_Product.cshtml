@@ -1,0 +1,42 @@
+@model SubscriptionProduct
+@inject IContentRepository _data
+@{
+    Layout = null;
+}
+<div class="modal fade modal-right media-blade" id="susbcriptions-products-create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <form id="susbcriptions-products-create-form" action="@Url.Action("CreateProduct")" asp-antiforgery="true" autocomplete="off" class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <div>
+                    <h5 class="modal-title">
+                        Add a subscription product group
+                    </h5>
+                    <p class="m-0 text-info">
+                        <i class="fa fa-plus-circle mr-2"></i>Create a new subscription product group to contain your subscriptions
+                    </p>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group floating-label">
+                    <input asp-for="DisplayName" class="form-control" />
+                    <label asp-for="DisplayName" class="control-label"></label>
+                    <small asp-for="DisplayName"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="Public" class="custom-control-input">
+                        <label asp-for="Public" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="Public"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="susbcriptions-products-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

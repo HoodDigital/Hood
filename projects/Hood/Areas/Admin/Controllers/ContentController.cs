@@ -9,6 +9,7 @@ using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -46,13 +47,10 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<IActionResult> Edit(int id)
         {
-            Content model = await _content.GetContentByIdAsync(id, true);
+            var model = await GetEditorModel(new Content() { Id = id });
             if (model == null)
-            {
                 return NotFound();
-            }
 
-            model = await GetEditorModel(model);
             return View(model);
         }
 
@@ -62,10 +60,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-
                 model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.Now;
-                model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
+
+                model = await GetEditorModel(model);
 
                 if (model.Slug.IsSet())
                 {
@@ -84,7 +82,9 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
+                // Save and reload to deal with metas.
                 await _content.UpdateAsync(model);
+                model = await GetEditorModel(model);
 
                 // update  meta values
                 foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
@@ -107,7 +107,6 @@ namespace Hood.Areas.Admin.Controllers
                                 Type = metaDetails.Type,
                                 BaseValue = JsonConvert.SerializeObject(val.Value)
                             });
-
                         }
                     }
                 }
@@ -117,7 +116,8 @@ namespace Hood.Areas.Admin.Controllers
                 if (newMetas != null)
                     _content.UpdateTemplateMetas(model, newMetas);
 
-                model = await GetEditorModel(model);
+                await _content.UpdateAsync(model);
+
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
                 return View(model);
@@ -125,7 +125,6 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                model = await GetEditorModel(model);
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
@@ -515,6 +514,8 @@ namespace Hood.Areas.Admin.Controllers
 
         protected async Task<Content> GetEditorModel(Content model)
         {
+            model = await _content.GetContentByIdAsync(model.Id, true, false);
+
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
 #warning Replace this with a client side lookup.

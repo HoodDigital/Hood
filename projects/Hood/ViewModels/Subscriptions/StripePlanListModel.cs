@@ -6,6 +6,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
+    public class StripeProductListModel : PagedList<ConnectedStripeProduct>, IPageableModel
+    {
+        [FromQuery(Name = "linked")]
+        [Display(Name = "Show only linked subscriptions", Description = "Show only the subscriptions that are connected to active accounts, when accounts are deleted, records of the subscriptions are retained.")]
+        public bool Linked { get; set; }
+
+        public override string GetPageUrl(int pageIndex)
+        {
+            var query = base.GetPageUrl(pageIndex);
+            query += Linked ? "&linked=true" : "";
+            return query;
+        }
+    }
+
     public class StripePlanListModel : PagedList<ConnectedStripePlan>, IPageableModel
     {
         [Display(Name = "Group", Description = "Show only subscriptions from the selected group.")]
@@ -16,7 +30,7 @@ namespace Hood.ViewModels
         [Display(Name = "Show only linked subscriptions", Description = "Show only the subscriptions that are connected to active accounts, when accounts are deleted, records of the subscriptions are retained.")]
         public bool Linked { get; set; }
 
-        public List<SubscriptionGroup> SubscriptionGroups { get; set; }
+        public List<SubscriptionProduct> SubscriptionGroups { get; set; }
 
         public override string GetPageUrl(int pageIndex)
         {

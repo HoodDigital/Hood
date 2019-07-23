@@ -228,7 +228,7 @@
                                         {
                                             <p class="m-0">
                                                 <span class="font-weight-bold">Customer Id: @match.Id</span>
-                                                <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, match.Id)">
+                                                <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, match.Id)">
                                                     <i class="fa fa-external-link-alt mr-2"></i>Stripe
                                                 </a>
                                                 <a class="btn btn-sm btn-success" asp-action="LinkToStripe" asp-route-id="@Model.Id" asp-route-customerId="@match.Id">

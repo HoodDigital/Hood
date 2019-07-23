@@ -35,7 +35,7 @@ namespace Hood.Models
         public DbSet<ApiEvent> ApiEvents { get; set; }
 
         // Content
-        public DbSet<SubscriptionGroup> SubscriptionGroups { get; set; }
+        public DbSet<SubscriptionProduct> SubscriptionProducts { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
 
@@ -146,6 +146,10 @@ namespace Hood.Models
                 if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
                 {
                     Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
+                }
+                if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
+                {
+                    Options.Add(new Option { Id = "Hood.Settings.SiteOwner", Value = siteAdmin.Id });
                 }
 
                 if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))
