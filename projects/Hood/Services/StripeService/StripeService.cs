@@ -4,6 +4,7 @@ using Hood.Models;
 using Stripe;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hood.Services
@@ -42,7 +43,6 @@ namespace Hood.Services
         {
             return await ProductService.ListAsync(options);
         }
-
         public async Task<Product> GetProductByIdAsync(string subscriptionId, ProductGetOptions options = null)
         {
             try
@@ -52,22 +52,23 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<Product> CreateProductAsync(string name, string type = "service", bool active = true)
         {
             ProductCreateOptions product = new ProductCreateOptions()
             {
                 Active = active,
-                Name = name, 
+                Name = name,
                 Type = type
             };
             return await ProductService.CreateAsync(product);
         }
-
         public async Task<Product> UpdateProductAsync(string productId, ProductUpdateOptions options)
         {
             try
@@ -77,11 +78,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<Product> DeleteProductAsync(string productId)
         {
             try
@@ -91,7 +94,10 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
@@ -102,7 +108,6 @@ namespace Hood.Services
         {
             return await PlanService.ListAsync(options);
         }
-
         public async Task<Plan> GetPlanByIdAsync(string subscriptionId, PlanGetOptions options = null)
         {
             try
@@ -112,11 +117,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<Plan> CreatePlanAsync(string name, int amount, string currency = "gbp", string interval = "month", int intervalCount = 1, int? trialPeriodDays = 30, string productId = null, bool active = true)
         {
             AnyOf<string, PlanProductCreateOptions> product = productId.IsSet() ?
@@ -137,7 +144,6 @@ namespace Hood.Services
 
             return await PlanService.CreateAsync(myPlan);
         }
-
         public async Task<Plan> UpdatePlanAsync(string planId, PlanUpdateOptions options)
         {
             try
@@ -147,11 +153,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<Plan> DeletePlanAsync(string planId)
         {
             try
@@ -161,11 +169,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<Plan> MovePlanToProductAsync(string planId, string productId)
         {
             PlanUpdateOptions updateOptions = new PlanUpdateOptions()
@@ -189,12 +199,10 @@ namespace Hood.Services
             };
             return await CustomerService.CreateAsync(customer);
         }
-
         public async Task<Customer> UpdateCustomerAsync(string customerId, CustomerUpdateOptions options)
         {
             return await CustomerService.UpdateAsync(customerId, options);
         }
-
         public async Task<Customer> DeleteCustomerAsync(string customerId)
         {
             try
@@ -204,11 +212,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<Customer> GetCustomerByIdAsync(string customerId)
         {
             try
@@ -218,42 +228,77 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<List<Customer>> GetCustomersByEmailAsync(string email)
         {
-            var customers = await CustomerService.ListAsync(new CustomerListOptions() { Email = email });
+            StripeList<Customer> customers = await CustomerService.ListAsync(new CustomerListOptions() { Email = email });
             return customers != null ? customers.Data : new List<Customer>();
         }
-
         public async Task<Customer> SetDefaultCardAsync(string customerId, string cardId)
         {
-            CustomerUpdateOptions updateOptions = new CustomerUpdateOptions()
+            try
             {
-                DefaultSource = cardId
-            };
-            return await CustomerService.UpdateAsync(customerId, updateOptions);
+                CustomerUpdateOptions updateOptions = new CustomerUpdateOptions()
+                {
+                    DefaultSource = cardId
+                };
+                return await CustomerService.UpdateAsync(customerId, updateOptions);
+            }
+            catch (StripeException stripeEx)
+            {
+                if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                throw stripeEx;
+            }
         }
         #endregion
 
         #region Payment Methods
         public async Task<Card> CreateCardAsync(string customerId, string token)
         {
-            CardCreateOptions card = new Stripe.CardCreateOptions()
+            try
             {
-                Source = token
-            };
-            return await CardService.CreateAsync(customerId, card);
-        }
+                CardCreateOptions card = new Stripe.CardCreateOptions()
+                {
+                    Source = token
+                };
+                return await CardService.CreateAsync(customerId, card);
+            }
+            catch (StripeException stripeEx)
+            {
+                if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
 
+                throw stripeEx;
+            }
+        }
         public async Task<Card> DeleteCardAsync(string customerId, string cardId)
         {
-            return await CardService.DeleteAsync(customerId, cardId);
-        }
+            try
+            {
+                return await CardService.DeleteAsync(customerId, cardId);
+            }
+            catch (StripeException stripeEx)
+            {
+                if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
 
+                throw stripeEx;
+            }
+        }
         public async Task<Stripe.Card> GetCardByIdAsync(string customerId, string cardId)
         {
             try
@@ -263,11 +308,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<IEnumerable<Stripe.Card>> GetAllCardsAsync(string customerId)
         {
             return await CardService.ListAsync(customerId);
@@ -284,11 +331,13 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
         public async Task<IEnumerable<Invoice>> GetAllInvoicesAsync(string customerId, string startAfterId, int? pageSize = null)
         {
             InvoiceListOptions options = new InvoiceListOptions()
@@ -299,8 +348,7 @@ namespace Hood.Services
             };
             return await InvoiceService.ListAsync(options);
         }
-
-        public async Task<Invoice> GetUpcomingInvoicesAsync(string customerId)
+        public async Task<Invoice> GetUpcomingInvoiceAsync(string customerId)
         {
             UpcomingInvoiceOptions options = new UpcomingInvoiceOptions()
             {
@@ -320,7 +368,6 @@ namespace Hood.Services
             };
             return await SubscriptionService.ListAsync(options);
         }
-
         public async Task<Stripe.Subscription> GetSusbcriptionByIdAsync(string subscriptionId)
         {
             try
@@ -330,76 +377,99 @@ namespace Hood.Services
             catch (StripeException stripeEx)
             {
                 if (stripeEx.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+                {
                     return null;
+                }
+
                 throw stripeEx;
             }
         }
-
-        public async Task<Stripe.Subscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null)
+        public async Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, DateTime? trialEnd = null)
         {
-            SubscriptionCreateOptions options = new SubscriptionCreateOptions()
-            {
-                TrialEnd = trialEnd,
-                CustomerId = customerId,
-                Items = new List<SubscriptionItemOption>()
-                {
-                    new SubscriptionItemOption()
-                    {
+            List<SubscriptionItemOption> items = new List<SubscriptionItemOption> {
+                    new SubscriptionItemOption {
                         PlanId = planId,
-                        Quantity = 1
+                        Quantity = quantity
                     }
-                }
+                };
+            SubscriptionCreateOptions options = new SubscriptionCreateOptions
+            {
+                CustomerId = customerId,
+                Items = items,
+                TrialEnd = trialEnd
             };
+            options.AddExpand("latest_invoice.payment_intent");
             return await SubscriptionService.CreateAsync(options);
         }
-
-        public async Task<Stripe.Subscription> UpdateSubscriptionAsync(string subscriptionId, Plan plan)
-        {
-            Stripe.Subscription currentSubscription = await SubscriptionService.GetAsync(subscriptionId);
-            SubscriptionUpdateOptions updateOptions = new SubscriptionUpdateOptions()
-            {
-                Items = new List<SubscriptionItemUpdateOption>()
-                {
-                    new SubscriptionItemUpdateOption()
-                    {
-                        Id = subscriptionId
-                    }
-                }
-            };
-            if (currentSubscription.Status == "trialing" && plan.TrialPeriodDays > 0)
-            {
-                // if the current trialEnd is before the new subscription's trial WOULD end
-                DateTime newTrialEnd = DateTime.Now.AddDays(plan.TrialPeriodDays.Value);
-                if (newTrialEnd < currentSubscription.TrialEnd)
-                {
-                    updateOptions.TrialEnd = newTrialEnd;
-                }
-                else
-                {
-                    updateOptions.TrialEnd = currentSubscription.TrialEnd;
-                }
-            }
-            else
-            {
-                updateOptions.TrialEnd = DateTime.Now;
-            }
-            currentSubscription = await SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
-            return currentSubscription;
-        }
-
-        public async Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true)
+        public async Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false)
         {
             if (!cancelAtPeriodEnd)
             {
-                return await SubscriptionService.CancelAsync(subscriptionId, new SubscriptionCancelOptions() { });
+                return await SubscriptionService.CancelAsync(subscriptionId, new SubscriptionCancelOptions()
+                {
+                    InvoiceNow = invoiceNow,
+                    Prorate = prorate
+                });
             }
 
-            await SubscriptionService.UpdateAsync(subscriptionId, new SubscriptionUpdateOptions
+            return await SubscriptionService.UpdateAsync(subscriptionId, new SubscriptionUpdateOptions
+            {
+                CancelAtPeriodEnd = true,
+            });
+        }
+        public async Task<Stripe.Subscription> ReactivateSubscriptionAsync(string subscriptionId)
+        {
+            Stripe.Subscription subscription = await GetSusbcriptionByIdAsync(subscriptionId);
+            if (subscription == null)
+            {
+                throw new Exception("Could not load Stripe subscription object to update.");
+            }
+
+            List<SubscriptionItemUpdateOption> items = new List<SubscriptionItemUpdateOption>();
+            subscription.Items.ForEach(i => items.Add(new SubscriptionItemUpdateOption
+            {
+                Id = i.Id,
+                PlanId = i.Plan.Id
+            }));
+            SubscriptionUpdateOptions options = new SubscriptionUpdateOptions
             {
                 CancelAtPeriodEnd = false,
-            });
-            return await SubscriptionService.CancelAsync(subscriptionId, new SubscriptionCancelOptions() { });
+                Items = items,
+            };
+            return await SubscriptionService.UpdateAsync(subscriptionId, options);
+        }
+        public async Task<Stripe.Subscription> SwitchSubscriptionPlanAsync(string subscriptionId, string newPlanId)
+        {
+            Stripe.Subscription subscription = await GetSusbcriptionByIdAsync(subscriptionId);
+            if (subscription == null)
+            {
+                throw new Exception("Could not load Stripe subscription object to update.");
+            }
 
+            Plan newPlan = await GetPlanByIdAsync(newPlanId);
+            if (newPlan == null)
+            {
+                throw new Exception("There was a problem loading the subscription plan.");
+            }
+
+            SubscriptionItem oldPlanItem = subscription.Items.Data.FirstOrDefault(s => s.Plan.ProductId == newPlan.ProductId);
+            if (oldPlanItem == null)
+            {
+                throw new Exception("Could not find a plan from the same product to switch from in the given subscription");
+            }
+
+            List<SubscriptionItemUpdateOption> items = new List<SubscriptionItemUpdateOption>();
+            items.Add(new SubscriptionItemUpdateOption()
+            {
+                Id = oldPlanItem.Id,
+                PlanId = newPlan.Id
+            });
+            SubscriptionUpdateOptions options = new SubscriptionUpdateOptions
+            {
+                CancelAtPeriodEnd = false,
+                Items = items,
+            };
+            return await SubscriptionService.UpdateAsync(subscriptionId, options);
         }
         #endregion
     }

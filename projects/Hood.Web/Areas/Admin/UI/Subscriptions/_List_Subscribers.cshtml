@@ -70,6 +70,10 @@
                             <i class="fa fa-external-link-alt"></i>
                             View on Stripe
                         </a>
+                        <a class="dropdown-item" asp-action="SyncSubscription" asp-route-id="@subscription.Id">
+                            <i class="fab fa-stripe-s"></i>
+                            Sync with Stripe
+                        </a>
                         @if (user != null)
                         {
                             <a class="dropdown-item" asp-action="Edit" asp-controller="Users" asp-route-id="@user.Id">
@@ -78,9 +82,9 @@
                             </a>
                         }
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" asp-action="SyncSubscription" asp-route-id="@subscription.Id">
-                            <i class="fab fa-stripe-s"></i>
-                            Sync with Stripe
+                        <a class="dropdown-item subscriptions-subs-delete" asp-action="DeleteSubscription" asp-route-id="@subscription.Id">
+                            <i class="fa fa-trash-alt"></i>
+                            Delete Item
                         </a>
                     </div>
                 </div>

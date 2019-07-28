@@ -6,12 +6,14 @@
 var gulp = require('gulp'),
     babel = require('gulp-babel'),
     sass = require('gulp-sass'),
+    less = require('gulp-less'),
     rimraf = require('gulp-rimraf'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
     cssnano = require('gulp-cssnano'),
     rename = require('gulp-rename'),
     imagemin = require('gulp-imagemin'),
+    path = require('path'),
     sourcemaps = require('gulp-sourcemaps'),
     lib = './wwwroot/lib/',
     hood = {
@@ -209,39 +211,43 @@ gulp.task('js:package:admin', function () {
 gulp.task('package', gulp.series('js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
 gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images'), gulp.parallel('scss:copy', 'cssnano', 'package')));
 
-// Site workload, for the local site to compile files for use.
-
-gulp.task('site:js', function () {
-    l = uglify({});
-    l.on('error', function (e) {
-        console.log(e);
-        l.end();
-    });
-    return gulp
-        .src('./wwwroot/js/site.js')
-        .pipe(l)
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest(jsFolder));
-});
-
-gulp.task('site:js:package', function () {
-    l = uglify({});
-    l.on('error', function (e) {
-        console.log(e);
-        l.end();
-    });
+// Site workload, to compile theme less/scss and JS.
+gulp.task('themes:scss', function () {
     return gulp.src([
-        '/wwwroot/js/includes/google.js',
-        '/wwwroot/js/site.min.js'
+        './wwwroot/themes/**/scss/styles.scss'
     ])
-        .pipe(concat('site.packaged.js'))
-        .pipe(l)
-        .pipe(gulp.dest(jsFolder))
-        .pipe(stripJs())
-        .pipe(gulp.dest(jsFolder));
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
+        .pipe(sourcemaps.write())
+        .pipe(rename(function (filePath) {
+            let parentFolder = path.dirname(filePath.dirname);
+            filePath.dirname = path.join(parentFolder, 'css');
+        }))
+        .pipe(gulp.dest('./wwwroot/themes/'));
+});
+gulp.task('themes:less', function () {
+    lss = less({ relativeUrls: true });
+    lss.on('error', function (e) {
+        console.log(e);
+        lss.end();
+    });
+
+    return gulp.src([
+        './wwwroot/themes/**/less/styles.less'
+    ])
+        .pipe(sourcemaps.init())
+        .pipe(lss)
+        .pipe(sourcemaps.write())
+        .pipe(rename(function (filePath) {
+            let parentFolder = path.dirname(filePath.dirname);
+            filePath.dirname = path.join(parentFolder, 'css');
+        }))
+        .pipe(gulp.dest('./wwwroot/themes/'));
 });
 
-gulp.task('publish', gulp.series('clean', 'build', 'site:js', 'site:js:package'));
+gulp.task('themes', gulp.parallel('themes:scss', 'themes:less'));
+
+gulp.task('publish', gulp.series('clean', 'build', 'themes'));
 
 gulp.task('watch', function () {
     gulp.watch(hood.scss, gulp.series('scss'));

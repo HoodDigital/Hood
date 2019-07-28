@@ -30,6 +30,7 @@ namespace Hood.ViewModels
 
         [FromQuery(Name = "subscription")]
         public string Subscription { get; set; }
+        public string UserId { get; set; }
         [FromQuery(Name = "plan")]
         [Display(Name = "Subscription Plan", Description = "Show only the subscriptions to the selected plan.")]
         public int? SubscriptionPlanId { get; set; }

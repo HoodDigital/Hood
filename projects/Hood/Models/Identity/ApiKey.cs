@@ -50,7 +50,7 @@ namespace Hood.Models
             get
             {
                 var privateKey = Key;
-                privateKey += Engine.Settings.Get("Hood.Api.SystemPrivateKey");
+                privateKey += Engine.Settings["Hood.Api.SystemPrivateKey"];
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
 
                 var _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
@@ -71,7 +71,7 @@ namespace Hood.Models
 
             if (access == AccessLevel.Public)
             {
-                privateKey += Engine.Settings.Get("Hood.Api.SystemPrivateKey");
+                privateKey += Engine.Settings["Hood.Api.SystemPrivateKey"];
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));

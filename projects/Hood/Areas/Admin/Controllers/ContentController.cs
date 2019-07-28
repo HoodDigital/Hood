@@ -30,10 +30,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/manage/{type?}/")]
-        public async Task<IActionResult> Index(ContentModel model)
-        {
-            return await List(model, "Index");
-        }
+        public async Task<IActionResult> Index(ContentModel model) => await List(model, "Index");
 
         [Route("admin/content/list/{type?}/")]
         public async Task<IActionResult> List(ContentModel model, string viewName = "_List_Content")

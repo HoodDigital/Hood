@@ -43,8 +43,8 @@ namespace Hood.Models
             Title = "Enquiry on it's way!";
             Message = "<p>Thank you for contacting us! Your enquiry has been successfully sent, and we are currently digesting it.</p><p>We will be in touch once we have had a read.<p><p>Thanks!</p>";
             AdminNoficationSubject = "A new enquiry from {{Site.Title}}.";
-            AdminNoficationTitle = "Enquiry recieved";
-            AdminNoficationMessage = "<p>A new enquiry has been recieved from the <strong>{{Site.Title}}</strong> website.</p><p>Your website team.</p>";
+            AdminNoficationTitle = "Enquiry received";
+            AdminNoficationMessage = "<p>A new enquiry has been received from the <strong>{{Site.Title}}</strong> website.</p><p>Your website team.</p>";
         }
     }
 }

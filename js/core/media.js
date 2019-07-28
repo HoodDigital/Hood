@@ -3,9 +3,8 @@
 if (!$.hood) $.hood = {};
 $.hood.Media = {
   Init: function Init() {
-    $('body').on('click', '.delete-media', $.hood.Media.Delete);
-    $('body').on('click', '.delete-directory', $.hood.Media.Directories.Delete);
-    $('body').on('click', '.create-directory', $.hood.Media.Directories.Create);
+    $('body').on('click', '.media-delete', $.hood.Media.Delete);
+    $('body').on('click', '.media-directories-delete', $.hood.Media.Directories.Delete);
     $.hood.Media.Upload.Init();
     $.hood.Media.Actions.Init();
   },
@@ -228,7 +227,7 @@ $.hood.Media = {
       });
     },
     UploadUrl: function UploadUrl() {
-      return $("#media-upload").data('url') + "?directory=" + $("input[type='radio'][name='dir']:checked").val();
+      return $("#media-upload").data('url') + "?directoryId=" + $("input[type='radio'][name='dir']:checked").val();
     }
   },
   Delete: function Delete(e) {
@@ -264,51 +263,32 @@ $.hood.Media = {
     }
   },
   Directories: {
-    Create: function Create() {
-      $('body').on('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
-      Swal.fire({
-        title: "Create directory",
-        text: "Please enter a name for your new directory:",
-        input: 'text',
-        inputAttributes: {
-          placeholder: "Directory name...",
-          autocapitalize: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Add Directory',
-        showLoaderOnConfirm: true,
-        preConfirm: function preConfirm(directory) {
-          if (directory === false) return false;
-
-          if (directory === "") {
-            Swal.showValidationMessage("You didn't supply a directory name, we can't create one without it!");
-            return false;
+    Editor: function Editor() {
+      $('#content-directories-edit-form').hoodValidator({
+        validationRules: {
+          DisplayName: {
+            required: true
+          },
+          Slug: {
+            required: true
           }
-
-          return fetch("/admin/media/directory/add?directory=".concat(directory)).then(function (response) {
-            return response.json();
-          })["catch"](function (error) {
-            Swal.showValidationMessage("Request failed: ".concat(error));
-          });
         },
-        allowOutsideClick: function allowOutsideClick() {
-          return !Swal.isLoading();
+        submitButtonTag: $('#content-directories-edit-submit'),
+        submitUrl: $('#content-directories-edit-form').attr('action'),
+        submitFunction: function submitFunction(data) {
+          $.hood.Helpers.ProcessResponse(data);
+          $.hood.Media.ReloadDirectories();
+          $.hood.Media.Reload();
         }
-      }).then(function (result) {
-        $.hood.Helpers.ProcessResponse(result.value);
-        $.hood.Media.ReloadDirectories();
-        $.hood.Media.Reload();
-        $('body').off('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
       });
     },
     Delete: function Delete(e) {
+      e.preventDefault();
       var $this = $(this);
 
       deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
         if (confirmed) {
-          $.post($this.data('url'), {
-            directory: $('#Directory').val()
-          }, function (data) {
+          $.post($this.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
             $.hood.Media.ReloadDirectories();
             $.hood.Media.Reload();

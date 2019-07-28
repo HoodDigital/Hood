@@ -1,8 +1,4 @@
 @inject IThemesService _themes
-@{
-    IntegrationSettings _plugins = Engine.Settings.Integrations;
-}
-
 @Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
 @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
 
@@ -18,50 +14,8 @@
 @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
 @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
-<environment names="Development,Staging,ErrorTesting">
-    @if (_themes.CurrentTheme == "default")
-    {
-        <script src="~/js/site.js" asp-append-version="true"></script>
-    }
-    else
-    {
-        <script src="@string.Format("~/themes/{0}/js/site.js", _themes.CurrentTheme)" asp-append-version="true"></script>
-    }
-    <script async defer src="~/hood/js/app.js" asp-append-version="true"></script>
-</environment>
-<environment names="Production,PreProduction">
-    <script async defer src="@string.Format("https://hood.azureedge.net/cdn/{0}/js/app.packaged.js", Engine.Version)" 
-            asp-append-version="true"
-            asp-fallback-test="$.hood.App"
-            asp-fallback-src="~/hood/js/app.packaged.js"></script>
-    @if (_themes.CurrentTheme == "default")
-    {
-        <script src="~/js/site.packaged.js" asp-append-version="true"></script>
-    }
-    else
-    {
-        <script src="@string.Format("~/themes/{0}/js/site.packaged.js", _themes.CurrentTheme)" asp-append-version="true"></script>
-    }
-</environment>
-@if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
-{
-    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
-}
-@if (_plugins.GoogleRecaptchaSiteKey.IsSet() && _plugins.EnableGoogleRecaptcha)
-{
-    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
-    <script type="text/javascript" charset="utf-8">
-        var onloadCallback = function() {
-            var recaptchas = document.querySelectorAll('div[class=recaptcha]');
-            for( i = 0; i < recaptchas.length; i++) {
-                var widgetId = grecaptcha.render( recaptchas[i].id, {
-                'sitekey' : '@_plugins.GoogleRecaptchaSiteKey',
-                });
-                $('#' + recaptchas[i].id).data('recaptchaid', widgetId);
-            }
-        }
-    </script>
-}
+<partial name="_Scripts_Hood" />
+<partial name="_Scripts_Google" />
 
 @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
 @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)

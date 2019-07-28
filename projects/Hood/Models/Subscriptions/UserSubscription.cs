@@ -70,6 +70,7 @@ namespace Hood.Models
     {
         public static UserSubscription UpdateFromStripe(this UserSubscription userSubscription, Stripe.Subscription stripeSubscription)
         {
+            userSubscription.Created = stripeSubscription.Created;
             userSubscription.CancelAtPeriodEnd = stripeSubscription.CancelAtPeriodEnd;
             userSubscription.CanceledAt = stripeSubscription.CanceledAt;
             userSubscription.CurrentPeriodEnd = stripeSubscription.CurrentPeriodEnd;

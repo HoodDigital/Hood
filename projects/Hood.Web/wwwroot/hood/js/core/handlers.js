@@ -9,20 +9,42 @@ $.hood.Handlers = {
         $('body').on('click', '.click-select:not(.show-selected)[data-target][data-value]', $.hood.Handlers.ClickSelectClean);
         $('body').on('click', '.slide-link', $.hood.Handlers.SlideToAnchor);
 
+        $('body').on('click', '.scroll-target, .scroll-to-target', $.hood.Handlers.ScrollToTarget);
+        $('body').on('click', '.scroll-top, .scroll-to-top', $.hood.Handlers.ScrollToTop);
+
         $('body').on('change', 'input[type=checkbox][data-input]', $.hood.Handlers.CheckboxChange);
         $('body').on('change', '.submit-on-change', $.hood.Handlers.SubmitOnChange);
 
         $('select[data-selected]').each($.hood.Handlers.SelectSetup);
-        // date/time meta editor
+
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
         $.hood.Handlers.Uploaders.Init();
     },
+    ScrollToTop: function(e) {
+        if (e) e.preventDefault();
+        $('html, body').animate({ scrollTop: 0 }, 800);
+        return false;
+    },
+    ScrollToTarget: function(e) {
+        if (e) e.preventDefault();
+        var url = $(this).attr('href').split('#')[0];
+        if (url !== window.location.pathname && url !== "") {
+            return;
+        }
+        var target = this.hash;
+        var $target = $(target);
+        $('html, body').stop().animate({
+            'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
+        }, 900, 'swing');
+    },
     SubmitOnChange: function (e) {
+        if (e) e.preventDefault();
         $(this).parents('form').submit();
     },
     DateChange: function (e) {
-        // update the date element attached to the field's attach
+        if (e) e.preventDefault();
+       // update the date element attached to the field's attach
         $field = $(this).parents('.hood-date').find('.date-output');
         date = $field.parents('.hood-date').find('.date-value').val();
         pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
@@ -38,6 +60,7 @@ $.hood.Handlers = {
         $field.attr("value", date + " " + hour + ":" + minute + ":00");
     },
     CheckboxChange: function (e) {
+        if (e) e.preventDefault();
         // when i change - create an array, with any other checked of the same data-input checkboxes. and add to the data-input referenced tag.
         var items = new Array();
         $('input[data-input="' + $(this).data('input') + '"]').each(function () {

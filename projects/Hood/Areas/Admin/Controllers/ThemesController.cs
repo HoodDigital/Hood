@@ -17,14 +17,21 @@ namespace Hood.Areas.Admin.Controllers
         {
         }
 
+        [Route("admin/theme/")]
+        public IActionResult Index() => List("Index");
+        [Route("admin/theme/list/")]
+        public IActionResult List(string viewName = "_List_Themes")
+        {
+            return View(viewName);
+        }
+
         [HttpPost()]
         [Route("admin/themes/activate/")]
         public async Task<Response> Activate(string name)
         {
             try
             {
-                Engine.Settings.Set("Hood.Settings.Theme", name);
-#warning TODO: Handle response in JS.
+                Engine.Settings.Set(name, "Hood.Settings.Theme");
                 return new Response(true, $"The theme, {name}, has been activated successfully.");
             }
             catch (Exception ex)

@@ -3,16 +3,14 @@
     Layout = "_BasicLayout";
 
     ViewData["SubTitle"] = ViewData["Title"];
-    ViewData["PageTitle"] = (ViewData["Title"] as string) + (_basicSettings.SiteTitle.IsSet() ? " - " + _basicSettings.SiteTitle : "");
+    ViewData["PageTitle"] = (ViewData["Title"] as string) + (Engine.Settings.Basic.FullTitle.IsSet() ? " - " + Engine.Settings.Basic.FullTitle : "");
     ViewData["Title"] = "Manage your account";
-
-    var _account = Context.GetAccountInfo();
 }
 <div class="container m-b-lg">
     <div class="row">
         <div class="col-md-3">
             <div class="text-center m-b-lg">
-                <fixedImage src="@_account.User.Avatar?.SmallUrl" class="img img-sm @string.Format("avatar-{0}", _account.User.Id)"></fixedImage>
+                <fixedImage src="@Engine.Account.Avatar?.SmallUrl" class="img img-sm"></fixedImage>
             </div>
             @await Html.PartialAsync("_ManageNav")
         </div>
@@ -21,7 +19,3 @@
         </div>
     </div>
 </div>
-@section Scripts {
-    @RenderSection("Scripts", required: false)
-}
-

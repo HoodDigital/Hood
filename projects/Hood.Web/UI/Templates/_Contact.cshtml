@@ -1,8 +1,6 @@
 @{
     BasicSettings _basicSettings  = Engine.Settings.Basic;
-    SeoSettings _seoSettings = Engine.Settings.Seo;
     IntegrationSettings _plugins = Engine.Settings.Integrations;
-    ContactSettings _contact = Engine.Settings.GetContactSettings();
     Layout = "_Layout";
     Content currentContent = ViewData["Content"] as Content;
 }
@@ -11,9 +9,6 @@
 }
 @section includes {
     @RenderSection("includes", required: false)
-}
-@section scripts {
-    @RenderSection("scripts", required: false)
 }
 @section metas {
     @RenderSection("metas", required: false)
@@ -38,7 +33,7 @@
         </div>
     </div>
 </div>
-@if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet())
+@if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet() && _basicSettings.Address.IsGeoLocated())
 {
     <div class="google-map" data-lat="@_basicSettings.Address?.Latitude" data-long="@_basicSettings.Address?.Longitude" data-marker="@Engine.Settings.Basic.FullTitle" data-zoom="12"></div>
 }

@@ -31,7 +31,7 @@ namespace Hood.Services
 
             // Now add Themed regular front end views.
             if (theme.IsSet())
-                temp.AddRange(GetLocations("/Themes/Views/" + theme));
+                temp.AddRange(GetLocations("/Themes/" + theme + "/Views"));
 
             // Add Local Area front end views.
             temp.AddRange(GetLocations("/Views"));

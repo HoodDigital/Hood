@@ -75,6 +75,14 @@
                             <i class="fa fa-edit"></i>
                             Manage
                         </a>
+                        @if (product != null)
+                        {
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item subscriptions-products-delete" asp-action="Delete" asp-route-id="@stripeProduct.SubscriptionProductId" data-redirect="@Url.Action("Index")">
+                                <i class="fa fa-trash-alt"></i>
+                                Delete Product
+                            </a>
+                        }
                     </div>
                 </div>
             </div>

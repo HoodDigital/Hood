@@ -1,0 +1,33 @@
+@inject IThemesService _themesService
+@{
+    Layout = null;
+}
+<div class="card-deck card-deck-4">
+    @foreach (Theme theme in _themesService.Themes)
+    {
+        <div class="card hover @(theme.IsActive ? "active border-success" : "border-dark")">
+            <figure class="card-img-top img img-wide" style="background-image:url(@theme.PreviewImage)">
+                <img src="@theme.PreviewImage" alt="@theme.FullName" />
+            </figure>
+            <div class="card-body">
+                <h5 class="card-title">@theme.FullName <small>@theme.Name</small></h5>
+                @if (theme.Description.IsSet())
+                {
+                    <p class="card-text">@theme.Description</p>
+                }
+                <p class="card-text">by <strong>@theme.Author</strong></p>
+            </div>
+            <div class="card-footer">
+                @if (!theme.IsActive)
+                {
+                    <a class="btn-primary btn btn-block text-white activate-theme" asp-action="Activate" asp-route-name="@theme.Name">Activate Theme</a>
+                }
+                else
+                {
+                    <button class="btn btn-success btn-disabled btn-block" disabled data-name="@theme.Name">Currently Active</button>
+                }
+
+            </div>
+        </div>
+    }
+</div>

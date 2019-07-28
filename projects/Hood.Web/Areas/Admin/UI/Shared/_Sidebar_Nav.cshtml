@@ -21,7 +21,7 @@
                         var sideTypes = Engine.Settings.Content.AllowedTypes;
                         if (Engine.Settings.Property.Enabled)
                         {
-                            sideTypes.Add(new ContentType() { Type = "property", TypeNamePlural = "Properties" });
+                            sideTypes.Add(new ContentType() { Type = "property", TypeNamePlural = "Properties", Icon= "fa-building" });
                         }
                         sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
                         foreach (ContentType ct in sideTypes)
@@ -40,14 +40,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="Content" asp-route-type="@ct.Type" asp-route-area="Admin">
                                         <i class="fa @ct.Icon"></i>
-                                        @if (!string.IsNullOrEmpty(Engine.Settings[ct.Type + "-page-title"]))
-                                        {
-                                            @Engine.Settings[ct.Type + "-page-title"]
-                                        }
-                                        else
-                                        {
-                                            @ct.TypeNamePlural
-                                        }
+                                              @ct.TypeNamePlural
                                     </a>
                                 </li>
                             }
@@ -156,7 +149,7 @@
         @if (User.IsAdminOrBetter() && Engine.Settings.Basic.EnableThemes)
         {
             <li class="nav-item">
-                <a class="nav-link" asp-action="Theme" asp-controller="Home" asp-route-area="Admin">
+                <a class="nav-link" asp-action="Index" asp-controller="Themes" asp-route-area="Admin">
                     <i class="fa fa-paint-brush"></i>Theme
                 </a>
             </li>

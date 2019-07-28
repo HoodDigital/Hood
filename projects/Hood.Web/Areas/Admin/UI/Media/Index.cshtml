@@ -2,12 +2,10 @@
 @{
     ViewBag.Title = "Website Media";
 }
-@section scripts {
-    <script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js"></script>
-}
 @section buttons {
     <partial name="_Media_Actions" />
 }
+<script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js" asp-location="BeforeScripts"></script>
 <form class="inline" data-target="#media-list">
     <div class="row">
         <div class="col-sm-3">

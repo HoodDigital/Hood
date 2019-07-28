@@ -2,24 +2,6 @@
 @import url('../../lib/chart/chart.min.css');
 @import "../../lib/bootstrap/scss/bootstrap";
 
-$feathericon-font-path: "../../lib/feather/build/fonts/";
-@import "../../lib/feather/build/scss/feathericon";
-
-
-$fa-font-path: "../../lib/fontawesome/webfonts";
-@import "../../lib/fontawesome/scss/fontawesome";
-@import "../../lib/fontawesome/scss/brands";
-@import "../../lib/fontawesome/scss/regular";
-@import "../../lib/fontawesome/scss/solid";
-
-// SweetAlert 2
-$swal2-success: $success !default;
-$swal2-error: $danger !default;
-$swal2-warning: $warning !default;
-$swal2-info: $info !default;
-$swal2-question: $info !default;
-@import "../../lib/sweetalert/src/sweetalert2";
-
 @import "core/all";
 
 @import "admin/nav-tabs";

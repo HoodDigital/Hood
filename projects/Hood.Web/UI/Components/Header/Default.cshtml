@@ -1,27 +1,23 @@
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
-    AccountInfo _account = Context.GetAccountInfo();
 }
 <header class="header" id="header">
     <div class="wrap" id="header-wrap">
         <div class="contact-slim">
-            <a class="logo" href="/" title="@_basicSettings.SiteTitle">
-                <img src="@_basicSettings.SiteLogoLight" />
+            <a class="logo" href="/" title="@_basicSettings.FullTitle">
+                <img src="@_basicSettings.LogoLight" />
             </a>
         </div>
         <div class="top-bar">
             <div class="container">
                 <div class="contact">
-                    <span class="email">
-                        <i class="fa fa-microsoft m-r-sm"></i><em>@_basicSettings.Description</em>
-                    </span>
                     <span class="phone">
                         <i class="fa fa-phone m-r-sm"></i>@_basicSettings.Phone
                     </span>
                 </div>
                 <div class="brand">
-                    <a class="logo" href="/" title="@_basicSettings.SiteTitle">
-                        <img src="@_basicSettings.SiteLogo" />
+                    <a class="logo" href="/" title="@_basicSettings.FullTitle">
+                        <img src="@_basicSettings.Logo" />
                     </a>
                 </div>
             </div>

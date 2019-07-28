@@ -38,7 +38,7 @@ $.hood.Users = {
       }
     };
 
-    $.hood.Alerts.Confirm("The user will be permanently removed and all associated files will be deleted from the system.", "Are you sure?", deleteUserCallback, 'error', '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong><br />This process will also cancel any active subscriptions.</span>');
+    $.hood.Alerts.Confirm("The user will be permanently removed, any site content will be reassigned to the ownership of the site owner, any user content (Forum Topics & Posts) will be deleted from the system and all associated media files.", "Are you sure?", deleteUserCallback, 'error', '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong><br />This process will also cancel any active subscriptions.</span>');
   },
   Create: {
     Loaded: function Loaded(e) {

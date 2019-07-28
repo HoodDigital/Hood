@@ -1,7 +1,7 @@
 @model SubscriptionModel
 @inject IAccountRepository _subs
 @{
-    BillingSettings settings = Engine.Settings.GetBillingSettings();
+    BillingSettings settings = Engine.Settings.Billing;
     ViewBag.Title = "Choose your package";
     ViewBag.SubTitle = "To take advantage of one of our paid packages, you will need to add a payment method. You can try our paid packages for free, as our monthly packages come with 30 days free, and of course you can cancel at any time!";
     Layout = "_BasicLayout";
@@ -70,9 +70,7 @@
         }
     </div>
 </section>
-@section scripts {
-    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-    <script type="text/javascript">
+<script type="text/javascript" asp-location="footer">
         Stripe.setPublishableKey('@(settings.EnableStripeTestMode ? settings.StripeTestPublicKey : settings.StripeLivePublicKey)');
         $(function () {
             var $form = $('#payment-form');
@@ -140,5 +138,4 @@
                 })
             }
         };
-    </script>
-}
+</script>

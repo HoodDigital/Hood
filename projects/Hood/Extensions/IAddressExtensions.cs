@@ -47,6 +47,14 @@ namespace Hood.Extensions
                 return true;
             return false;
         }
+        public static bool IsGeoLocated(this IAddress from)
+        {
+            if (from != null
+                && from.Latitude != 0
+                && from.Longitude != 0)
+                return true;
+            return false;
+        }
 
         public static string ToFormat(this IAddress from, AddressFormat format, bool showPostcode = true, bool showCountry = false)
         {

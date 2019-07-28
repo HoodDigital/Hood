@@ -1,6 +1,6 @@
 @model ContactFormModel
 @{
-    ContactSettings _contactSettings = Engine.Settings.GetContactSettings();
+    ContactSettings _contactSettings = Engine.Settings.Contact;
     IntegrationSettings _integrationSettings = Engine.Settings.Integrations;
 }
 <form method="post"

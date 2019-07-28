@@ -1,9 +1,4 @@
 @model Forum
-@{
-    BasicSettings _basicSettings = Engine.Settings.Basic;
-    Hood.Infrastructure.OperationResult subResult = Engine.Settings.SubscriptionsEnabled();
-    bool subsEnabled = subResult.Succeeded;
-}
 <div id="settings" class="tab-pane">
     <div class="panel-body">
         <fieldset class="form-horizontal">
@@ -59,24 +54,18 @@
                     <label asp-for="ViewingRequiresLogin"></label>
                 </div>
             </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <input asp-for="ViewingRequiresSubscription" class="styled">
-                    <label asp-for="ViewingRequiresSubscription"></label>
-                </div>
-            </div>
             <div class="well well-sm">
                 <div class="form-group no-margin">
                     <label asp-for="ViewingSubscriptions" class="col-sm-3 control-label">
                         Viewer Subscriptions:
                     </label>
                     <div class="col-sm-8">
-                        @if (subsEnabled && Model.Subscriptions.Count() > 0)
+                        @if (Engine.Settings.Billing.IsSubscriptionsEnabled && Model.Subscriptions.Count() > 0)
                         {
                             List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingSubscriptions.IsSet() ? Model.ViewingSubscriptions : "[]");
                             <p class="m-t-xs">Select subscriptions that can view this forum. <em>If you select none, then then any subscription can (if subscriptions are required).</em></p>
                             <input class="form-control checkbox-values" type="hidden" asp-for="ViewingSubscriptions" />
-                            @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                            @foreach (SubscriptionPlan sub in Model.Subscriptions.OrderBy(p => p.Amount))
                             {
                                 <div class="checkbox">
                                     @if (subs == null || !subs.Contains(sub.StripeId))
@@ -107,7 +96,7 @@
                         Viewer Roles:
                     </label>
                     <div class="col-sm-8">
-                        @if (subsEnabled && Model.Roles.Count() > 0)
+                        @if (Model.Roles.Count() > 0)
                         {
                             List<string> roles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingRoles.IsSet() ? Model.ViewingRoles : "[]");
                             <p class="m-t-xs">Select roles that can ALWAYS view this forum. <em>These roles will not require a subscription to access the forums, even if a specific forum requires it.</em></p>

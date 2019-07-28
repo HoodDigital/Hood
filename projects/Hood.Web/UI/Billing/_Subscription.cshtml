@@ -1,47 +1,21 @@
 @model UserSubscription
 <div class="panel panel-default no-margin accordion-section">
     <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-us-{0}", Model.Id)">
-        <span class="pull-right">
-            @switch (Model.Status)
-            {
-                case "trialing":
-                    if (Model.CancelAtPeriodEnd)
-                    {
-                        <span class="label label-danger">@Model.Status [Cancelling]</span>
-                    }
-                    else
-                    {
-                        <span class="label label-warning">@Model.Status</span>
-                    }
-                    break;
-                case "active":
-                    if (Model.CancelAtPeriodEnd)
-                    {
-                        <span class="label label-danger">@Model.Status [Cancelling]</span>
-                    }
-                    else
-                    {
-                        <span class="label label-success">@Model.Status</span>
-                    }
-                    break;
-                case "past_due":
-                    if (Model.CancelAtPeriodEnd)
-                    {
-                        <span class="label label-danger">@Model.Status [Cancelling]</span>
-                    }
-                    else
-                    {
-                        <span class="label label-warning">@Model.Status</span>
-                    }
-                    break;
-                case "canceled":
+        <a data-toggle="collapse" href="@string.Format("#collapse-subscription-{0}", Model.Id)">
+            <span class="pull-right">
+                @if (Model.CancelAtPeriodEnd)
+                {
+                    <span class="label label-danger">@Model.StatusBadge [Cancelling]</span>
+                }
+                else
+                {
                     <span class="label label-warning">@Model.Status</span>
-                    break;
-            }            
-        </span>
-        Subscription - @Model.Subscription.Name
+                }
+            </span>
+            Subscription - @Model.Subscription.Name
+        </a>
     </div>
-    <div id="@string.Format("#collapse-us-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-us-{0}", Model.Id)">
+    <div id="@string.Format("collapse-subscription-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-us-{0}", Model.Id)">
         <div class="panel-body">
             <dl class="dl-horizontal">
                 @if (Model.CancelAtPeriodEnd)

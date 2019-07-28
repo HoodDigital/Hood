@@ -16,17 +16,6 @@ namespace Hood.Services
         {
             _configs = new Dictionary<string, IConfiguration>();
 
-            IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
-            {
-                ["Name"] = "default",
-                ["FullName"] = "Default",
-                ["BaseColour"] = "#C33610",
-                ["Author"] = "Hood - Digital Architects.",
-                ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
-                ["Public"] = "true"
-            };
-            _configs.Add("default", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
-
             string[] themeDirs = { };
             if (System.IO.Directory.Exists(env.ContentRootPath + "\\Themes\\"))
                 themeDirs = themeDirs.Concat(System.IO.Directory.GetDirectories(env.ContentRootPath + "\\Themes\\")).ToArray();
@@ -42,6 +31,20 @@ namespace Hood.Services
                 }
             }
 
+            if (!_configs.ContainsKey("default"))
+            {
+                IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
+                {
+                    ["Name"] = "default",
+                    ["FullName"] = "Default",
+                    ["BaseColour"] = "#C33610",
+                    ["Author"] = "Hood Digital",
+                    ["Description"] = "Default theme.",
+                    ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
+                    ["Public"] = "true"
+                };
+                _configs.Add("default", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+            }
         }
 
         public string CurrentTheme
@@ -51,7 +54,7 @@ namespace Hood.Services
                 string loadTheme = Engine.Settings["Hood.Settings.Theme"];
                 if (string.IsNullOrEmpty(loadTheme))
                 {
-                    Engine.Settings.Set("Hood.Settings.Theme", "default");
+                    Engine.Settings.Set("default", "Hood.Settings.Theme");
                 }
                 return Engine.Settings["Hood.Settings.Theme"];
             }

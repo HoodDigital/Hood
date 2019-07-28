@@ -12,12 +12,9 @@ namespace Hood.Services
     {
 
         #region Get/Set/Delete
-        string Get(string key);
-        T Get<T>();
-        void Set(string key, string value);
-        void Set<T>(T value);
-        void Remove<T>();
-        void Remove(string key);
+        T Get<T>(string key = null);
+        void Set<T>(T value, string key = null);
+        void Remove<T>(string key = null);
         #endregion
 
         #region Site Settings

@@ -38,7 +38,7 @@ namespace Hood.Infrastructure
                 {
                     string[] tokenised = fullUrl.ToLower().Split('/');
                     var type = Engine.Settings.Content.GetContentType(tokenised[0]);
-                    if (type != null)
+                    if (type != null && !type.IsUnknown)
                     {
                         // if a type is matched, we must use the Hood routes, content CMS routes cannot be overridden.
                         if (tokenised.Length > 1)
@@ -97,9 +97,9 @@ namespace Hood.Infrastructure
                         }
                     }
                     var pages = _content.GetPages();
-                    if (pages.Select(p => p.Url).Contains(fullUrl))
+                    if (pages.Select(p => p.Url.ToLower().Trim('/')).Contains(fullUrl))
                     {
-                        var pg = pages.Where(p => p.Url == fullUrl).FirstOrDefault();
+                        var pg = pages.Where(p => p.Url.ToLower().Trim('/') == fullUrl).FirstOrDefault();
                         if (!values.ContainsKey("id"))
                             values.Add("id", pg.Id);
                         return true;

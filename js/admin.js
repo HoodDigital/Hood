@@ -27,7 +27,7 @@ $.hood.Admin = {
     });
     $('[data-plugin="counter"]').counterUp({
       delay: 10,
-      time: 3000
+      time: 800
     });
     $.hood.Admin.Editors.Init();
     $.hood.Admin.Stats.Init();
@@ -337,7 +337,7 @@ $.hood.Admin = {
 
       $('[data-plugin="counterup"]').counterUp({
         delay: 10,
-        time: 2000
+        time: 800
       });
     }
   },

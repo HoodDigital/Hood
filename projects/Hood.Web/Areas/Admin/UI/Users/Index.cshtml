@@ -2,9 +2,6 @@
 @{
     ViewBag.Title = "Website Users";
 }
-@section scripts {
-    <script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js"></script>
-}
 @section buttons {
     @if (Engine.Settings.Integrations.EnableMailchimp && Engine.Settings.Integrations.MailchimpApiKey.IsSet() && Engine.Settings.Integrations.MailchimpUserListId.IsSet())
     {
@@ -15,7 +12,8 @@
         </a>
     }
     <a class="btn btn-success hood-modal" asp-action="Create" data-complete="$.hood.Users.Create.Loaded"><i class="fa fa-user-plus mr-2"></i>Create New User</a>
-}
+}    
+<script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js" asp-location="BeforeScripts"></script>
 <form class="inline" data-target="#user-list">
     <div class="row">
         <div class="col-sm-3">

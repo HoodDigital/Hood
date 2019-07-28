@@ -58,9 +58,9 @@
         </ul>
     </div>
     <div class="col-sm-3 text-right">
-        <fixedImage src="@User.AccountInfo().Avatar.SmallUrl" class="img-xs sidebar-avatar @string.Format("avatar-{0}", User.AccountInfo().Id)" />
+        <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs sidebar-avatar" />
         <p class="m-t-xs">
-            Logged in as <strong class="font-bold">@User.AccountInfo().ToDisplayName()</strong><br />
+            Logged in as <strong class="font-bold">@Engine.Account.ToDisplayName()</strong><br />
             <a href="javascript:document.getElementById('logoutForm').submit()">
                 Log out
             </a>

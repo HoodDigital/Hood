@@ -98,7 +98,7 @@ namespace Hood.Controllers
         {
             try
             {
-                var sub = await _account.UpgradeUserSubscriptionAsync(id, plan);
+                var sub = await _account.SwitchUserSubscriptionAsync(id, plan);
 
                 SaveMessage = $"Subscription upgraded by user {User.Identity.Name}";
                 MessageType = AlertType.Success;
@@ -148,7 +148,7 @@ namespace Hood.Controllers
         {
             try
             {
-                var sub = await _account.RemoveUserSubscriptionAsync(id);
+                var sub = await _account.CancelUserSubscriptionAsync(id, false);
 
                 SaveMessage = $"Subscription removed by user {User.Identity.Name}";
                 MessageType = AlertType.Success;

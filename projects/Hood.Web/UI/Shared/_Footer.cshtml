@@ -1,6 +1,5 @@
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
-    AccountInfo _account = Context.GetAccountInfo();
 }
 <footer>
     <nav>
@@ -20,7 +19,7 @@
                             <ul>
                                 @{
                                     var _propertySettings = Engine.Settings.Property;
-                                    var sideTypes = Engine.Settings.Content.GetAllowedTypes();
+                                    var sideTypes = Engine.Settings.Content.AllowedTypes;
                                     if (_propertySettings.Enabled)
                                     {
                                         sideTypes.Add(new ContentType() { Type = "property", Title = _propertySettings.Title, TypeNamePlural = _propertySettings.Plural, Slug = _propertySettings.Slug, IsPublic = true });
@@ -40,8 +39,8 @@
                 </div>
                 <div class="col-md-5 text-right">
                     <p class="logo m-b-md">
-                        <a href="/" title="@_basicSettings.SiteTitle">
-                            <img src="@_basicSettings.SiteLogoLight" />
+                        <a href="/" title="@_basicSettings.FullTitle">
+                            <img src="@_basicSettings.LogoLight" />
                         </a>
                     </p>
                     <p>Designed and built by <a href="https://hooddigital.com/">Hood Digital</a></p>

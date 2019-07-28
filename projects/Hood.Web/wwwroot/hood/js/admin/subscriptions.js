@@ -2,6 +2,8 @@
     $.hood = {};
 $.hood.Subscriptions = {
     Init: function () {
+        $('body').on('click', '.subscriptions-subs-delete', $.hood.Subscriptions.Subscriptions.Delete);
+
         $('body').on('click', '.subscriptions-plans-delete', $.hood.Subscriptions.Plans.Delete);
         if ($('#subscriptions-plans-edit-form').doesExist())
             $.hood.Subscriptions.Plans.Edit();
@@ -59,6 +61,38 @@ $.hood.Subscriptions = {
                 if ($('#subscriptions-subscribers-list').doesExist())
                     $.hood.Inline.Reload($('#subscriptions-subscribers-list'), complete);
             }
+        }
+    },
+
+    Subscriptions: {
+        Delete: function (e) {
+            e.preventDefault();
+            $tag = $(this);
+
+            deleteSubscriptionCallback = function (isConfirm) {
+                if (isConfirm) {
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Subscriptions.Lists.Subscribers.Reload();
+                        if (data.Success) {
+                            if ($tag && $tag.data('redirect')) {
+                                $.hood.Alerts.Success(`<strong>Subscription deleted, redirecting...</strong><br />Just taking you back to the subscription list.`);
+                                setTimeout(function () {
+                                    window.location = $tag.data('redirect');
+                                }, 1500);
+                            }
+                        }
+                    });
+                }
+            };
+
+            $.hood.Alerts.Confirm(
+                "The subscription will be removed from the site, however record of the subscription will remain in your Stripe account.",
+                "Are you sure?",
+                deleteSubscriptionCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+            );
         }
     },
 
@@ -172,13 +206,6 @@ $.hood.Subscriptions = {
                     $.hood.Subscriptions.Lists.Products.Reload();
                 }
             });
-        },
-        Edit: function () {
-        }
-    },
-
-    Stripe: {
-        Edit: function () {
         }
     }
 };

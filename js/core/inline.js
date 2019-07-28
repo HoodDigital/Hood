@@ -15,7 +15,7 @@ $.hood.Inline = {
   Refresh: function Refresh(tag) {
     $(tag || '.hood-inline').each($.hood.Inline.Load);
   },
-  Load: function Load(e) {
+  Load: function Load() {
     $.hood.Inline.Reload(this);
   },
   Reload: function Reload(tag, complete) {
@@ -53,17 +53,16 @@ $.hood.Inline = {
     e.preventDefault();
     $tag = $(e.currentTarget);
     $tag.addClass('loading');
+    complete = $tag.data('complete');
     $.get($tag.attr('href'), function (data) {
-      if (data.Success) {
-        $.hood.Alerts.Success(data.Message);
-      } else {
-        $.hood.Alerts.Error(data.Errors, data.Message);
-      }
+      $.hood.Helpers.ProcessResponse(data);
 
-      if (data.Url) {
-        setTimeout(function () {
-          window.location = data.Url;
-        }, 500);
+      if (data.Success) {
+        if ($tag && $tag.data('redirect')) {
+          setTimeout(function () {
+            window.location = $tag.data('redirect');
+          }, 1500);
+        }
       }
 
       $tag.removeClass('loading');
@@ -130,11 +129,12 @@ $.hood.Inline = {
   },
   HandleError: function HandleError(xhr) {
     if (xhr.status === 500) {
-      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: There was an error processing the content, please contact an administrator if this continues.<br/>");
+      $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />There was an error processing the content, please contact an administrator if this continues.<br/>");
     } else if (xhr.status === 404) {
-      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: The content could not be found.<br/>");
+      $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />The content could not be found.<br/>");
     } else if (xhr.status === 401) {
-      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: You are not allowed to view this resource, are you logged in correctly?<br/>");
+      $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />You are not allowed to view this resource, are you logged in correctly?<br/>");
+      window.location = window.location;
     }
   },
   Finish: function Finish(data) {

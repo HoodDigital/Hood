@@ -21,43 +21,36 @@
 
 <environment names="Development,Staging,ErrorTesting">
 
-    <script src="~/hood/js/core/production.js"></script>
-    <script src="~/hood/js/core/globals.js"></script>
+    <script src="~/hood/js/core/production.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/globals.js" asp-append-version="true"></script>
 
-    <script src="~/hood/js/core/handlers.js"></script>
-    <script src="~/hood/js/core/helpers.js"></script>
-    <script src="~/hood/js/core/stringhelpers.js"></script>
-    <script src="~/hood/js/core/validator.js"></script>
+    <script src="~/hood/js/core/handlers.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/helpers.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/stringhelpers.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/validator.js" asp-append-version="true"></script>
 
-    <script src="~/hood/js/core/addresses.js"></script>
-    <script src="~/hood/js/core/alerts.js"></script>
-    <script src="~/hood/js/core/forms.js"></script>
-    <script src="~/hood/js/core/inline.js"></script>
-    <script src="~/hood/js/core/media.js"></script>
+    <script src="~/hood/js/core/addresses.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/alerts.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/forms.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/inline.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/media.js" asp-append-version="true"></script>
 
-    <script src="~/hood/js/admin/content.js"></script>
-    <script src="~/hood/js/admin/forums.js"></script>
-    <script src="~/hood/js/admin/logs.js"></script>
-    <script src="~/hood/js/admin/property.js"></script>
-    <script src="~/hood/js/admin/subscriptions.js"></script>
-    <script src="~/hood/js/admin/themes.js"></script>
-    <script src="~/hood/js/admin/users.js"></script>
+    <script src="~/hood/js/admin/content.js" asp-append-version="true"></script>
+    <script src="~/hood/js/admin/forums.js" asp-append-version="true"></script>
+    <script src="~/hood/js/admin/logs.js" asp-append-version="true"></script>
+    <script src="~/hood/js/admin/property.js" asp-append-version="true"></script>
+    <script src="~/hood/js/admin/subscriptions.js" asp-append-version="true"></script>
+    <script src="~/hood/js/admin/themes.js" asp-append-version="true"></script>
+    <script src="~/hood/js/admin/users.js" asp-append-version="true"></script>
 
-    <script src="~/hood/js/app/google.js"></script>
-
-    <script src="~/hood/js/admin.js"></script>
+    <script src="~/hood/js/admin.js" asp-append-version="true"></script>
 
 </environment>
 <environment names="Production,PreProduction">
-    <script async defer src="@string.Format("https://hood.azureedge.net/cdn/{0}/js/admin.packaged.js", Engine.Version)" 
-            asp-append-version="true"
-            asp-fallback-test="$.hood.Admin"
-            asp-fallback-src="~/hood/js/admin.packaged.js"></script>
+    <script src="~/hood/js/admin.packaged.js" asp-append-version="true"></script>
 </environment>
-@if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
-{
-    <script async defer src="@string.Format("//maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
-}
+
+<partial name="_Scripts_Google" />
 
 @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
 @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)

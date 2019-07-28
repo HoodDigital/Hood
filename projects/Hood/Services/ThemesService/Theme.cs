@@ -13,6 +13,7 @@ namespace Hood.Services
         public string Name { get => _config["Name"].ToString(); }
         public string FullName { get => _config["FullName"].ToString(); }
         public string Author { get => _config["Author"].ToString(); }
+        public string Description { get => _config["Description"].ToString(); }
         public string PreviewImage { get => _config["PreviewImage"].ToString(); }
         public bool IsActive
         {

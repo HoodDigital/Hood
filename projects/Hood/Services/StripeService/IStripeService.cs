@@ -74,19 +74,16 @@ namespace Hood.Services
 
         Task<IEnumerable<Invoice>> GetAllInvoicesAsync(string customerId, string startAfterId, int? pageSize = null);
 
-        Task<Invoice> GetUpcomingInvoicesAsync(string customerId);
+        Task<Invoice> GetUpcomingInvoiceAsync(string customerId);
         #endregion
 
         #region Subscriptions 
         Task<IEnumerable<Stripe.Subscription>> GetSusbcriptionsByCustomerIdAsync(string customerId);
-
         Task<Stripe.Subscription> GetSusbcriptionByIdAsync(string subscriptionId);
-
-        Task<Stripe.Subscription> SubscribeUserAsync(string customerId, string planId, DateTime? trialEnd = null);
-
-        Task<Stripe.Subscription> UpdateSubscriptionAsync(string subscriptionId, Plan plan);
-
-        Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true);
+        Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, DateTime? trialEnd = null);
+        Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false);
+        Task<Stripe.Subscription> ReactivateSubscriptionAsync(string subscriptionId);
+        Task<Stripe.Subscription> SwitchSubscriptionPlanAsync(string subscriptionId, string newPlanId);
         #endregion
     }
 }

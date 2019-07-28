@@ -1,6 +1,7 @@
 ﻿using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Hood.Services
 
         #region Addresses
         Task DeleteAddressAsync(int id);
-        Task<Address> GetAddressByIdAsync(int id);
+        Task<Models.Address> GetAddressByIdAsync(int id);
         Task UpdateAddressAsync(Models.Address address);
         Task SetBillingAddressAsync(string userId, int id);
         Task SetDeliveryAddressAsync(string userId, int id);
@@ -50,18 +51,18 @@ namespace Hood.Services
         Task<SubscriptionProduct> GetSubscriptionProductByIdAsync(int id);
         Task<SubscriptionProduct> CreateSubscriptionProductAsync(string name, string stripeId);
         Task<SubscriptionProduct> UpdateSubscriptionProductAsync(SubscriptionProduct model);
-        Task DeleteSubscriptionProductAsync(int id);
+        Task<SubscriptionProduct> DeleteSubscriptionProductAsync(int id);
         Task<SubscriptionProduct> SyncSubscriptionProductAsync(int? id, string stripeId);
         #endregion
 
         #region Subscription Plans
         Task<SubscriptionPlanListModel> GetSubscriptionPlansAsync(SubscriptionPlanListModel model = null);
         Task<StripePlanListModel> GetStripeSubscriptionPlansAsync(StripePlanListModel model);
-        Task<Subscription> GetSubscriptionPlanByIdAsync(int id);
-        Task<Subscription> GetSubscriptionPlanByStripeIdAsync(string stripeId);
-        Task<Subscription> CreateSubscriptionPlanAsync(Models.Subscription subscription);
-        Task<Subscription> UpdateSubscriptionPlanAsync(Subscription model);
-        Task DeleteSubscriptionPlanAsync(int id);
+        Task<Models.Subscription> GetSubscriptionPlanByIdAsync(int id);
+        Task<Models.Subscription> GetSubscriptionPlanByStripeIdAsync(string stripeId);
+        Task<Models.Subscription> CreateSubscriptionPlanAsync(Models.Subscription subscription);
+        Task<Models.Subscription> UpdateSubscriptionPlanAsync(Models.Subscription model);
+        Task<Models.Subscription> DeleteSubscriptionPlanAsync(int id);
         Task<Models.Subscription> SyncSubscriptionPlanAsync(int? id, string stripeId);
         #endregion
 
@@ -70,19 +71,11 @@ namespace Hood.Services
         Task<UserSubscription> GetUserSubscriptionByIdAsync(int id);
         Task<UserSubscription> GetUserSubscriptionByStripeIdAsync(string stripeId);
         Task<UserSubscription> CreateUserSubscriptionAsync(int planId, string stripeToken, string cardId);
-        Task<UserSubscription> UpdateUserSubscriptionAsync(UserSubscription userSubscription);
-        Task<UserSubscription> UpgradeUserSubscriptionAsync(int subscriptionId, int planId);
-        Task<UserSubscription> CancelUserSubscriptionAsync(int subscriptionId);
+        Task<UserSubscription> DeleteUserSubscriptionAsync(int id);
+        Task<UserSubscription> CancelUserSubscriptionAsync(int subscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false);
         Task<UserSubscription> ReactivateUserSubscriptionAsync(int subscriptionId);
-        Task<UserSubscription> RemoveUserSubscriptionAsync(int subscriptionId);
-        Task<UserSubscription> SyncUserSubscriptionAsync(int id);
-        #endregion
-
-        #region WebHooks
-        Task ConfirmSubscriptionObjectAsync(Stripe.Subscription created, DateTime? eventTime);
-        Task UpdateSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime);
-        Task RemoveUserSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime);
-
+        Task<UserSubscription> SyncUserSubscriptionAsync(int? id, string stripeId);
+        Task<UserSubscription> SwitchUserSubscriptionAsync(int subscriptionId, int newPlanId);
         #endregion
 
         #region Statistics
@@ -93,6 +86,7 @@ namespace Hood.Services
         #region Obsolete
         [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
         AccountInfo LoadAccountInfo(string userId);
+        Task<ApplicationUser> CreateLocalUserForCustomerObject(Customer customer);
         #endregion
     }
 }

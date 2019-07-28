@@ -20,3 +20,9 @@ package-lock.json
 /wwwroot/css
 /wwwroot/js/**/*.min.js
 /wwwroot/js/**/*.packaged.js
+
+# Ignore Theme Libraries & Compiled Client Files
+/wwwroot/themes/**/css
+/wwwroot/themes/**/*.min.js
+/wwwroot/themes/**/*.packaged.js
+/wwwroot/themes/**/lib

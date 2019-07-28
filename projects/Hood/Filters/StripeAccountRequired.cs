@@ -37,7 +37,7 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                if (Core.Engine.Settings.Billing.CheckBillingOrThrow())
+                if (Core.Engine.Settings.Billing.CheckStripeOrThrow())
                 {
                     var user = _userManager.GetUserAsync(context.HttpContext.User).Result;
 

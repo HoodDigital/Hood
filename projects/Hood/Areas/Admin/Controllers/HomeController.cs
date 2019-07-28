@@ -39,13 +39,6 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        [Route("admin/theme/")]
-        [Authorize(Roles = "SuperUser,Admin")]
-        public IActionResult Theme()
-        {
-            return View();
-        }
-
         [Route("admin/stats/")]
         public async Task<IActionResult> StatsAsync()
         {

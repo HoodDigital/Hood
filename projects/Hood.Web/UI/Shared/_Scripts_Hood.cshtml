@@ -1,0 +1,20 @@
+<environment names="Development,Staging,ErrorTesting">
+    <script src="~/hood/js/core/production.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/globals.js" asp-append-version="true"></script>
+
+    <script src="~/hood/js/core/handlers.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/helpers.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/stringhelpers.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/validator.js" asp-append-version="true"></script>
+
+    <script src="~/hood/js/core/addresses.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/alerts.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/forms.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/inline.js" asp-append-version="true"></script>
+    <script src="~/hood/js/core/media.js" asp-append-version="true"></script>
+
+    <script src="~/hood/js/app.js" asp-append-version="true"></script>
+</environment>
+<environment names="Production,PreProduction">
+    <script src="~/hood/js/app.packaged.js" asp-append-version="true"></script>
+</environment>

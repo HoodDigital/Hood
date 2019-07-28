@@ -19,7 +19,7 @@ namespace Hood.Services
     {
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
-        private IHoodCache _cache { get; set; }
+        private readonly IHoodCache _cache;
 
         public SettingsRepository(
             HoodDbContext db,
@@ -31,25 +31,15 @@ namespace Hood.Services
             _cache = cache;
         }
 
-
-        #region Get/Set/Delete
-        public string this[string key]
-        {
-            get
-            {
-                return Get(key);
-            }
-            set
-            {
-                Set(key, value);
-            }
-        }
-        public string Get(string key)
+        #region Private Accessors 
+        private string Get(string key)
         {
             try
             {
                 if (_cache.TryGetValue(key, out Option option))
+                {
                     return option.Value;
+                }
                 else
                 {
                     option = _db.Options.AsNoTracking().Where(o => o.Id == key).FirstOrDefault();
@@ -70,7 +60,7 @@ namespace Hood.Services
                 return null;
             }
         }
-        public void Set(string key, string value)
+        private void Set(string key, string value)
         {
             try
             {
@@ -103,9 +93,31 @@ namespace Hood.Services
                 }
             }
         }
-        public T Get<T>()
+        private void Remove(string key)
         {
-            string key = typeof(T).ToString();
+            _cache.Remove(key);
+            Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
+            if (option != null)
+            {
+                _db.Entry(option).State = EntityState.Deleted;
+                _db.SaveChanges();
+            }
+        }
+        #endregion
+
+        #region Get/Set/Delete
+        public string this[string key]
+        {
+            get => Get<string>(key);
+            set => Set<string>(value, key);
+        }
+        public T Get<T>(string key = null)
+        {
+            if (!key.IsSet())
+            {
+                key = typeof(T).ToString();
+            }
+
             try
             {
                 return JsonConvert.DeserializeObject<T>(Get(key));
@@ -113,12 +125,16 @@ namespace Hood.Services
             catch
             {
                 _cache.Remove(key);
-                return default(T);
+                return default;
             }
         }
-        public void Set<T>(T value)
+        public void Set<T>(T value, string key = null)
         {
-            string key = typeof(T).ToString();
+            if (!key.IsSet())
+            {
+                key = typeof(T).ToString();
+            }
+
             try
             {
                 Set(key, JsonConvert.SerializeObject(value));
@@ -128,18 +144,15 @@ namespace Hood.Services
                 throw new Exception($"There was an error serializing option with key: {key}", ex);
             }
         }
-        public void Remove<T>()
+        public void Remove<T>(string key = null)
         {
-            Remove(typeof(T).ToString());
-        }
-        public void Remove(string key)
-        {
-            _cache.Remove(key);
-            Option option = _db.Options.Where(o => o.Id == key).FirstOrDefault();
-            if (option != null)
+            if (!key.IsSet())
             {
-                _db.Entry(option).State = EntityState.Deleted;
-                _db.SaveChanges();
+                Remove(typeof(T).ToString());
+            }
+            else
+            {
+                Remove(key);
             }
         }
         #endregion
@@ -160,28 +173,32 @@ namespace Hood.Services
         {
             get
             {
-                var userId = Get("Hood.Settings.SiteOwner");
+                string userId = Get("Hood.Settings.SiteOwner");
                 return _db.UserProfiles.SingleOrDefault(u => u.Id == userId);
             }
-        } 
+        }
 
         #endregion
 
-        public string ConnectionString { get { return _config.GetConnectionString("DefaultConnection"); } }
+        public string ConnectionString => _config.GetConnectionString("DefaultConnection");
         public List<string> LockoutAccessCodes
         {
             get
             {
-                var tokens = Basic.LockoutModeTokens;
+                string tokens = Basic.LockoutModeTokens;
                 if (tokens == null)
+                {
                     return new List<string>();
+                }
 
-                var allowedCodes = tokens.Split(Environment.NewLine.ToCharArray()).ToList();
+                List<string> allowedCodes = tokens.Split(Environment.NewLine.ToCharArray()).ToList();
                 allowedCodes.RemoveAll(str => string.IsNullOrEmpty(str));
 
                 string overrideCode = _config["LockoutMode:OverrideToken"];
                 if (overrideCode.IsSet())
+                {
                     allowedCodes.Add(overrideCode);
+                }
 
                 return allowedCodes;
             }
@@ -189,64 +206,124 @@ namespace Hood.Services
 
         #region Obsoletes
         [Obsolete("Please use Engine.Settings.Basics instead.", true)]
-        public BasicSettings GetBasicSettings(bool noCache = false) => throw new NotImplementedException();
+        public BasicSettings GetBasicSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.IntegrationSettings instead.", true)]
-        public IntegrationSettings GetIntegrationSettings(bool noCache = false) => throw new NotImplementedException();
+        public IntegrationSettings GetIntegrationSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.ContactSettings instead.", true)]
-        public ContactSettings GetContactSettings(bool noCache = false) => throw new NotImplementedException();
+        public ContactSettings GetContactSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.SeoSettings instead.", true)]
-        public SeoSettings GetSeo(bool noCache = false) => throw new NotImplementedException();
+        public SeoSettings GetSeo(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.ContentSettings instead.", true)]
-        public ContentSettings GetContentSettings(bool noCache = false) => throw new NotImplementedException();
+        public ContentSettings GetContentSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.PropertySettings instead.", true)]
-        public PropertySettings GetPropertySettings(bool noCache = false) => throw new NotImplementedException();
+        public PropertySettings GetPropertySettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.BillingSettings instead.", true)]
-        public BillingSettings GetBillingSettings(bool noCache = false) => throw new NotImplementedException();
+        public BillingSettings GetBillingSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.AccountSettings instead.", true)]
-        public AccountSettings GetAccountSettings(bool noCache = false) => throw new NotImplementedException();
+        public AccountSettings GetAccountSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Media instead.", true)]
-        public MediaSettings GetMediaSettings(bool noCache = false) => throw new NotImplementedException();
+        public MediaSettings GetMediaSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Mail instead.", true)]
-        public MailSettings GetMailSettings(bool noCache = false) => throw new NotImplementedException();
+        public MailSettings GetMailSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Forum instead.", true)]
-        public ForumSettings GetForumSettings(bool noCache = false) => throw new NotImplementedException();
+        public ForumSettings GetForumSettings(bool noCache = false)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Billing.CheckStripeOrThrow() instead.", true)]
-        public OperationResult StripeEnabled() => throw new NotImplementedException();
+        public OperationResult StripeEnabled()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Billing.CheckPaypalOrThrow() instead.", true)]
-        public OperationResult PayPalEnabled() => throw new NotImplementedException();
+        public OperationResult PayPalEnabled()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Billing.CheckSubscriptionsOrThrow() instead.", true)]
-        public OperationResult SubscriptionsEnabled() => throw new NotImplementedException();
+        public OperationResult SubscriptionsEnabled()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete(null, true)]
-        public OperationResult PropertyEnabled() => throw new NotImplementedException();
+        public OperationResult PropertyEnabled()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Billing.CheckCartOrThrow() instead.", true)]
-        public OperationResult CartEnabled() => throw new NotImplementedException();
+        public OperationResult CartEnabled()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Billing.CheckBillingOrThrow() instead.", true)]
-        public OperationResult BillingEnabled() => throw new NotImplementedException();
+        public OperationResult BillingEnabled()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Settings.Basics.SiteTitle instead.", true)]
-        public string GetSiteTitle() => throw new NotImplementedException();
+        public string GetSiteTitle()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use String.ReplaceSiteVariables() instead.", true)]
-        public string ReplacePlaceholders(string text) => throw new NotImplementedException();
+        public string ReplacePlaceholders(string text)
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete("Please use Engine.Version instead.", true)]
-        public string GetVersion() => throw new NotImplementedException();
+        public string GetVersion()
+        {
+            throw new NotImplementedException();
+        }
 
         [Obsolete(null, true)]
         public string WysiwygEditorClass => throw new NotImplementedException();

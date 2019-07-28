@@ -110,6 +110,25 @@ namespace Hood.Services
                 return null;
             }
         }
+        public async Task<ApplicationUser> CreateLocalUserForCustomerObject(Customer customer)
+        {
+            // a user with this email address does not exist on the site, let's create one so they can access their account.
+            var newUser = new ApplicationUser
+            {
+                UserName = customer.Email,
+                Email = customer.Email,
+                FirstName = customer.Name.ToFirstName(),
+                LastName = customer.Name.ToLastName(),
+                PhoneNumber = customer.Phone,
+                Anonymous = false,
+                CreatedOn = DateTime.Now,
+                StripeId = customer.Id
+            };
+            var result = await _userManager.CreateAsync(newUser);
+            if (result.Succeeded)
+                return newUser;
+            return null;
+        }
         public async Task UpdateUserAsync(ApplicationUser user)
         {
             _db.Update(user);
@@ -117,12 +136,14 @@ namespace Hood.Services
         }
         public async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-            var siteOwner = Engine.Settings.SiteOwner;
+            UserProfile siteOwner = Engine.Settings.SiteOwner;
 
             if (userId == siteOwner.Id)
+            {
                 throw new Exception("You cannot delete the site owner, you must assign a new site owner (from the site owner account) before you can delete this account.");
+            }
 
-            var user = await _db.Users
+            ApplicationUser user = await _db.Users
                 .Include(u => u.Content)
                 .Include(u => u.Properties)
                 .Include(u => u.Forums)
@@ -161,7 +182,7 @@ namespace Hood.Services
                 user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
                 user.Forums.ForEach(f => f.AuthorId = siteOwner.Id);
 
-                var userSubs = await GetUserProfileByIdAsync(user.Id);
+                UserProfile userSubs = await GetUserProfileByIdAsync(user.Id);
                 if (userSubs.ActiveSubscriptions != null)
                 {
                     if (userSubs.ActiveSubscriptions.Count > 0)
@@ -171,7 +192,9 @@ namespace Hood.Services
                 }
 
                 if (userSubs.StripeId.IsSet())
+                {
                     await _stripe.DeleteCustomerAsync(userSubs.StripeId);
+                }
 
                 await _db.SaveChangesAsync();
                 await _userManager.DeleteAsync(user);
@@ -478,14 +501,14 @@ namespace Hood.Services
         }
         public async Task<SubscriptionProduct> CreateSubscriptionProductAsync(string name, string stripeId)
         {
-            var subscriptionProduct = new SubscriptionProduct()
+            SubscriptionProduct subscriptionProduct = new SubscriptionProduct()
             {
                 DisplayName = name,
                 Slug = name.ToSeoUrl(),
                 StripeId = stripeId,
-                CreatedBy = Engine.Account.Id,
+                CreatedBy = Engine.Account == null ? "Stripe" : Engine.Account.Id,
                 Created = DateTime.Now,
-                LastEditedBy = Engine.Account.UserName,
+                LastEditedBy = Engine.Account == null ? "Stripe" : Engine.Account.UserName,
                 LastEditedOn = DateTime.Now
             };
             if (subscriptionProduct.StripeId.IsSet())
@@ -524,22 +547,27 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return subscriptionProduct;
         }
-        public async Task DeleteSubscriptionProductAsync(int id)
+        public async Task<SubscriptionProduct> DeleteSubscriptionProductAsync(int id)
         {
-            SubscriptionProduct subscriptionProduct = _db.SubscriptionProducts
-                .Include(s => s.Subscriptions)
-                .Where(p => p.Id == id)
-                .FirstOrDefault();
+            SubscriptionProduct subscriptionProduct = await GetSubscriptionProductByIdAsync(id);
+            if (subscriptionProduct == null)
+            {
+                throw new Exception("Could not find the product group.");
+            }
 
             if (subscriptionProduct.Subscriptions != null && subscriptionProduct.Subscriptions.Count() > 0)
+            {
                 throw new Exception("You cannot remove a subscription product group which contains plans. Move them to a new product group or delete them before you remove the product group.");
+            }
 
-            var stripePlan = await _stripe.GetProductByIdAsync(subscriptionProduct.StripeId);
+            Product stripePlan = await _stripe.GetProductByIdAsync(subscriptionProduct.StripeId);
             if (stripePlan != null)
             {
-                var subcount = await _stripe.PlanService.ListAsync(new PlanListOptions() { Limit = 1, ProductId = subscriptionProduct.StripeId });
+                StripeList<Plan> subcount = await _stripe.PlanService.ListAsync(new PlanListOptions() { Limit = 1, ProductId = subscriptionProduct.StripeId });
                 if (subcount != null && subcount.Count() > 0)
+                {
                     throw new Exception("You cannot remove a subscription product group which contains plans (on Stripe). Move them to a new product group or delete them before you remove the product group.");
+                }
 
                 await _stripe.DeleteProductAsync(subscriptionProduct.StripeId);
             }
@@ -547,7 +575,8 @@ namespace Hood.Services
             _db.SaveChanges();
             _db.Entry(subscriptionProduct).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
-            return;
+
+            return subscriptionProduct;
         }
         public async Task<SubscriptionProduct> SyncSubscriptionProductAsync(int? id, string stripeId)
         {
@@ -563,7 +592,9 @@ namespace Hood.Services
                 stripeProduct = await _stripe.GetProductByIdAsync(stripeId);
 
                 if (product == null)
+                {
                     product = await GetSubscriptionProductByStripeIdAsync(stripeId);
+                }
             }
 
             if (product == null && stripeProduct == null)
@@ -585,7 +616,7 @@ namespace Hood.Services
                 // Update from stripe.         
                 product.DisplayName = stripeProduct.Name;
                 product.StripeId = stripeProduct.Id;
-                product.LastEditedBy = Engine.Account.UserName;
+                product.LastEditedBy = Engine.Account == null ? "Stripe" : Engine.Account.UserName;
                 product.LastEditedOn = DateTime.Now;
                 await UpdateSubscriptionProductAsync(product);
             }
@@ -594,14 +625,14 @@ namespace Hood.Services
             product = await GetSubscriptionProductByIdAsync(id.Value);
             if (product.Subscriptions.Count > 0)
             {
-                foreach (var s in product.Subscriptions)
+                foreach (Models.Subscription s in product.Subscriptions)
                 {
                     await SyncSubscriptionPlanAsync(s.Id, s.StripeId);
                 }
             }
 
-            var plans = await _stripe.GetAllPlansAsync(new PlanListOptions() { ProductId = product.StripeId });
-            foreach (var p in plans)
+            IEnumerable<Plan> plans = await _stripe.GetAllPlansAsync(new PlanListOptions() { ProductId = product.StripeId });
+            foreach (Plan p in plans)
             {
                 await SyncSubscriptionPlanAsync(null, p.Id);
             }
@@ -798,19 +829,28 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             return subscription;
         }
-        public async Task DeleteSubscriptionPlanAsync(int id)
+        public async Task<Models.Subscription> DeleteSubscriptionPlanAsync(int id)
         {
             Models.Subscription subscription = _db.Subscriptions.Where(p => p.Id == id).FirstOrDefault();
+            if (subscription == null)
+            {
+                throw new Exception("Could not find the subscription plan.");
+            }
 
-            var stripePlan = await _stripe.GetPlanByIdAsync(subscription.StripeId);
+            Plan stripePlan = await _stripe.GetPlanByIdAsync(subscription.StripeId);
             if (stripePlan != null)
             {
-                var subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, PlanId = subscription.StripeId, Status = SubscriptionStatuses.Active });
+                StripeList<Stripe.Subscription> subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, PlanId = subscription.StripeId, Status = SubscriptionStatuses.Active });
                 if (subcount != null && subcount.Count() > 0)
+                {
                     throw new Exception("You cannot remove a subscription with active subscribers. Move them to a new subscription on Stripe or cancel them before you remove the plan.");
+                }
+
                 subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, PlanId = subscription.StripeId, Status = SubscriptionStatuses.Trialing });
                 if (subcount != null && subcount.Count() > 0)
+                {
                     throw new Exception("You cannot remove a subscription with trial subscribers. Move them to a new subscription on Stripe or cancel them before you remove the plan.");
+                }
 
                 await _stripe.DeletePlanAsync(subscription.StripeId);
             }
@@ -818,7 +858,8 @@ namespace Hood.Services
             _db.SaveChanges();
             _db.Entry(subscription).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
-            return;
+
+            return subscription;
         }
         public async Task<Models.Subscription> SyncSubscriptionPlanAsync(int? id, string stripeId)
         {
@@ -848,9 +889,9 @@ namespace Hood.Services
                     {
                         Name = stripePlan.Nickname,
                         StripeId = stripePlan.Id,
-                        CreatedBy = Engine.Account.Id,
+                        CreatedBy = Engine.Account == null ? "Stripe" : Engine.Account.UserName,
                         Created = DateTime.Now,
-                        LastEditedBy = Engine.Account.UserName,
+                        LastEditedBy = Engine.Account == null ? "Stripe" : Engine.Account.UserName,
                         LastEditedOn = DateTime.Now,
                         Addon = false,
                         Public = stripePlan.Active,
@@ -916,14 +957,20 @@ namespace Hood.Services
             if (product != null)
             {
                 if (product.StripeId == null)
+                {
                     await _stripe.CreateProductAsync(product.DisplayName);
+                }
 
                 Product stripeProduct = await _stripe.GetProductByIdAsync(product.StripeId);
                 if (stripeProduct == null)
+                {
                     await _stripe.CreateProductAsync(product.DisplayName);
+                }
 
                 if (stripeProduct != null)
+                {
                     product.StripeId = stripeProduct.Id;
+                }
 
                 subscriptionPlan.SubscriptionProductId = product.Id;
             }
@@ -962,7 +1009,7 @@ namespace Hood.Services
             // Update from stripe.      
             subscriptionPlan.Name = stripePlan.Nickname;
             subscriptionPlan.StripeId = stripePlan.Id;
-            subscriptionPlan.LastEditedBy = Engine.Account.UserName;
+            subscriptionPlan.LastEditedBy = Engine.Account == null ? "Stripe" : Engine.Account.UserName;
             subscriptionPlan.LastEditedOn = DateTime.Now;
             subscriptionPlan.Addon = false;
             subscriptionPlan.Public = stripePlan.Active;
@@ -1051,6 +1098,11 @@ namespace Hood.Services
                 .Include(us => us.User)
                 .Include(us => us.Subscription).ThenInclude(s => s.SubscriptionProduct);
 
+            if (model.UserId.IsSet())
+            {
+                users = users.Where(u => u.UserId == model.UserId);
+            }
+
             if (model.SubscriptionPlanId.HasValue)
             {
                 users = users.Where(u => u.SubscriptionId == model.SubscriptionPlanId);
@@ -1069,9 +1121,13 @@ namespace Hood.Services
             if (model.Status.IsSet())
             {
                 if (model.Status == "currently-active")
+                {
                     users = users.Where(u => u.Status == "active" || u.Status == "trialing");
+                }
                 else
+                {
                     users = users.Where(u => u.Status == model.Status);
+                }
             }
 
             // search the collection
@@ -1160,7 +1216,7 @@ namespace Hood.Services
                 throw new Exception("There was a problem loading the customer object.");
             }
 
-            // The object for the new user subscription to be recieved from stripe.
+            // The object for the new user subscription to be received from stripe.
             Stripe.Subscription newSubscription = null;
 
             // if the user has provided a cardId to use, then let's try and use that!
@@ -1184,7 +1240,7 @@ namespace Hood.Services
                 else
                 {
                     // finally, add the user to the NEW subscription.
-                    newSubscription = await _stripe.SubscribeUserAsync(customer.Id, subscription.StripeId);
+                    newSubscription = await _stripe.AddCustomerToPlan(customer.Id, subscription.StripeId);
                 }
             }
             else
@@ -1203,7 +1259,7 @@ namespace Hood.Services
                     customer = await _stripe.CreateCustomerAsync(user, stripeToken);
                     user.StripeId = customer.Id;
                     await UpdateUserAsync(user);
-                    newSubscription = await _stripe.SubscribeUserAsync(user.StripeId, plan.Id);
+                    newSubscription = await _stripe.AddCustomerToPlan(user.StripeId, plan.Id);
                 }
                 else
                 {
@@ -1222,7 +1278,7 @@ namespace Hood.Services
                         // set the card as the default for the user, then subscribe the user.
                         await _stripe.SetDefaultCardAsync(customer.Id, source.Id);
 
-                        newSubscription = await _stripe.SubscribeUserAsync(customer.Id, plan.Id);
+                        newSubscription = await _stripe.AddCustomerToPlan(customer.Id, plan.Id);
                     }
                 }
             }
@@ -1243,22 +1299,61 @@ namespace Hood.Services
             _db.SaveChanges();
             return newUserSub;
         }
-        public async Task<UserSubscription> UpdateUserSubscriptionAsync(UserSubscription newUserSub)
+        public async Task<UserSubscription> DeleteUserSubscriptionAsync(int id)
         {
-            _db.Entry(newUserSub).State = EntityState.Modified;
-            await _db.SaveChangesAsync();
-            return newUserSub;
-        }
-        public async Task<UserSubscription> UpgradeUserSubscriptionAsync(int subscriptionId, int planId)
-        {
-            // Load user object and clear cache.
-            ApplicationUser user = await GetCurrentUserAsync();
+            UserSubscription subscription = await GetUserSubscriptionByIdAsync(id);
 
-            Models.Subscription subscription = await GetSubscriptionPlanByIdAsync(planId);
-            UserSubscription userSub = GetUserSubscription(user, subscriptionId);
+            if (subscription == null)
+            {
+                throw new Exception("Could not find the subscription.");
+            }
+
+            if (subscription.Status == Stripe.SubscriptionStatuses.Active || subscription.Status == SubscriptionStatuses.Trialing)
+            {
+                var stripeUrl = string.Format("https://dashboard.stripe.com{0}/subscriptions/{1}", Engine.Settings.Billing.EnableStripeTestMode ? "/test" : "", subscription.StripeId);
+                throw new Exception($"You cannot delete an active or trialing subscription, you will need to cancel it first.<br /><a class='font-weight-bold' target='_blank' href='{stripeUrl}'>Modify the subscription on Stripe</a>");
+            }
+
+            subscription = await GetUserSubscriptionByIdAsync(id);
+            _db.Entry(subscription).State = EntityState.Deleted;
+            await _db.SaveChangesAsync();
+
+            return subscription;
+        }
+        public async Task<UserSubscription> CancelUserSubscriptionAsync(int userSubscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false)
+        {
+            // Check for subscription or throw.
+            UserSubscription userSub = await GetUserSubscriptionByIdAsync(userSubscriptionId);
+            if (userSub == null)
+            {
+                throw new Exception("There was a problem loading the subscription object.");
+            }
+
+            Stripe.Subscription sub = await _stripe.CancelSubscriptionAsync(userSub.StripeId, cancelAtPeriodEnd, invoiceNow, prorate);
+            userSub = userSub.UpdateFromStripe(sub);
+            await _db.SaveChangesAsync();
+            return userSub;
+        }
+        public async Task<UserSubscription> ReactivateUserSubscriptionAsync(int userSubscriptionId)
+        {
+            // Check for subscription or throw.
+            UserSubscription userSub = await GetUserSubscriptionByIdAsync(userSubscriptionId);
+            if (userSub == null)
+            {
+                throw new Exception("There was a problem loading the subscription object.");
+            }
+
+            Stripe.Subscription sub = await _stripe.ReactivateSubscriptionAsync(userSub.StripeId);
+            userSub = userSub.UpdateFromStripe(sub);
+            await _db.SaveChangesAsync();
+            return userSub;
+        }
+        public async Task<UserSubscription> SwitchUserSubscriptionAsync(int subscriptionId, int newPlanId)
+        {
+            UserSubscription userSub = await GetUserSubscriptionByIdAsync(subscriptionId);
 
             // Check for customer or throw.
-            Customer customer = await GetCustomerObjectAsync(user.StripeId);
+            Customer customer = await GetCustomerObjectAsync(userSub.StripeId);
             if (customer == null)
             {
                 throw new Exception("There was a problem loading the customer object.");
@@ -1268,224 +1363,106 @@ namespace Hood.Services
             {
                 // there is a payment source - continue                  
                 // Load the plan from stripe, then add to the user's subscription.
-                Plan plan = await _stripe.GetPlanByIdAsync(subscription.StripeId);
-                if (customer == null)
+                var newPlan = await GetSubscriptionPlanByIdAsync(newPlanId);
+                if (newPlan == null)
                 {
-                    throw new Exception("There was a problem loading the subscription plan object.");
+                    throw new Exception("There was a problem loading the subscription plan.");
                 }
 
-                Stripe.Subscription sub = await _stripe.UpdateSubscriptionAsync(userSub.StripeId, plan);
+                Stripe.Subscription sub = await _stripe.SwitchSubscriptionPlanAsync(userSub.StripeId, newPlan.StripeId);
                 userSub = userSub.UpdateFromStripe(sub);
-                userSub.Subscription = subscription;
-                userSub.SubscriptionId = subscription.Id;
-                await UpdateUserAsync(user);
+                userSub.SubscriptionId = newPlan.Id;
+                await _db.SaveChangesAsync();
+                return userSub;
             }
             else
             {
                 throw new Exception("There is no currently active payment source on the account, please add one before upgrading.");
             }
-
-            return userSub;
         }
-        public async Task<UserSubscription> CancelUserSubscriptionAsync(int userSubscriptionId)
+        public async Task<UserSubscription> SyncUserSubscriptionAsync(int? id, string stripeId)
         {
-            // Load user object and clear cache.
-            ApplicationUser user = await GetCurrentUserAsync();
-
-            // Check for customer or throw.
-            Customer customer = await GetCustomerObjectAsync(user.StripeId);
-            if (customer == null)
+            UserSubscription userSubscription = null;
+            if (id.HasValue)
             {
-                throw new Exception("There was a problem loading the customer object.");
+                userSubscription = await GetUserSubscriptionByIdAsync(id.Value);
             }
 
-            // Check for subscription or throw.
-            UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
-
-            Stripe.Subscription sub = await _stripe.CancelSubscriptionAsync(userSub.StripeId, true);
-            userSub = userSub.UpdateFromStripe(sub);
-            await UpdateUserAsync(user);
-            return userSub;
-        }
-        public async Task<UserSubscription> RemoveUserSubscriptionAsync(int userSubscriptionId)
-        {
-            // Load user object and clear cache.
-            ApplicationUser user = await GetCurrentUserAsync();
-
-            // Check for customer or throw.
-            Customer customer = await GetCustomerObjectAsync(user.StripeId);
-            if (customer == null)
+            Stripe.Subscription stripeSub = null;
+            if (stripeId.IsSet())
             {
-                throw new Exception("There was a problem loading the customer object.");
+                stripeSub = await _stripe.GetSusbcriptionByIdAsync(stripeId);
+            }
+            else if (userSubscription != null && userSubscription.StripeId.IsSet())
+            {
+                stripeSub = await _stripe.GetSusbcriptionByIdAsync(userSubscription.StripeId);
             }
 
-            // Check for subscription or throw.
-            UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
-
-            Stripe.Subscription sub = await _stripe.CancelSubscriptionAsync(userSub.StripeId, false);
-            userSub = userSub.UpdateFromStripe(sub);
-            await UpdateUserAsync(user);
-            return userSub;
-        }
-        public async Task<UserSubscription> ReactivateUserSubscriptionAsync(int userSubscriptionId)
-        {
-            // Load user object and clear cache.
-            ApplicationUser user = await GetCurrentUserAsync();
-
-            // Check for customer or throw.
-            Customer customer = await GetCustomerObjectAsync(user.StripeId);
-            if (customer == null)
+            if (userSubscription == null && stripeSub == null)
             {
-                throw new Exception("There was a problem loading the customer object.");
+                throw new Exception("Could not sync, neither a local or a stripe object could be loaded.");
             }
 
-            // Check for subscription or throw.
-            UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
-
-            Stripe.Subscription sub = await _stripe.GetSusbcriptionByIdAsync(userSub.StripeId);
-
-            sub = await _stripe.UpdateSubscriptionAsync(sub.Id, sub.Plan);
-            userSub = userSub.UpdateFromStripe(sub);
-            await UpdateUserAsync(user);
-            return userSub;
-        }
-        public async Task<UserSubscription> SyncUserSubscriptionAsync(int id)
-        {
-            var userSubscription = await GetUserSubscriptionByIdAsync(id);
-            if (!userSubscription.StripeId.IsSet())
-                throw new Exception("Could not sync with stripe, no stripe Id set for the user subscription.");
-
-            var stripeSub = await _stripe.GetSusbcriptionByIdAsync(userSubscription.StripeId);
-            if (stripeSub == null)
-                throw new Exception("Could not sync with stripe, failed to load a stripe subscription object. If it has been deleted without syncing to the local subscription, you can remove this from the site.");
-
-            // check the plan is correc'
-            var stripePlan = await GetSubscriptionPlanByStripeIdAsync(stripeSub.Plan.Id);
-            if (userSubscription.SubscriptionId == stripePlan.Id)
+            if (userSubscription == null && stripeSub != null)
             {
-                // Plan wasnt loaded correctly from the sub, try and load it from the stripe id.
-                userSubscription.SubscriptionId = stripePlan.Id;
-            }
-            userSubscription = userSubscription.UpdateFromStripe(stripeSub);
+                // try to get the local from the stripe sub's returned Id.
+                userSubscription = await GetUserSubscriptionByStripeIdAsync(stripeSub.Id);
+                if (userSubscription == null)
+                {
+                    // if the sub is active/trialing, and doesn't exist locally it needs to be created.
+                    if (stripeSub.Status == SubscriptionStatuses.Active || stripeSub.Status == SubscriptionStatuses.Trialing)
+                    {
+                        // find an associated user.
+                        var user = await GetUserByStripeIdAsync(stripeSub.CustomerId);
+                        if (user == null)
+                        {
+                            var customer = await _stripe.GetCustomerByIdAsync(stripeSub.CustomerId);
+                            user = await CreateLocalUserForCustomerObject(customer);
+                            if (user == null)
+                            {
+                                throw new AlertedException($"Stripe customer could not be linked to a local account, and the create user function failed.");
+                            }
+                        }
+                        var subscriptionPlan = await SyncSubscriptionPlanAsync(null, stripeSub.Plan.Id);
 
+                        userSubscription = new UserSubscription();
+                        userSubscription.UpdateFromStripe(stripeSub);
+                        userSubscription.StripeId = stripeSub.Id;
+                        userSubscription.CustomerId = stripeSub.CustomerId;
+                        userSubscription.UserId = user.Id;
+                        userSubscription.SubscriptionId = subscriptionPlan.Id;
+                        _db.UserSubscriptions.Add(userSubscription);
+                    }
+                }
+                else
+                {
+                    userSubscription = await UpdateSubscriptionFromStripe(userSubscription, stripeSub);
+                }
+            }
+            else if (userSubscription != null && stripeSub == null)
+            {
+                // the subscription doesnt exist on stripe. Let's remove the local version.
+                userSubscription = await DeleteUserSubscriptionAsync(userSubscription.Id);
+            }
+            else
+            {
+                userSubscription = await UpdateSubscriptionFromStripe(userSubscription, stripeSub);
+            }
             await _db.SaveChangesAsync();
+
             return userSubscription;
         }
-        #endregion
 
-        #region UserSubscription Helpers
-        private UserSubscription GetUserSubscription(ApplicationUser user, int userSubscriptionId)
+        private async Task<UserSubscription> UpdateSubscriptionFromStripe(UserSubscription userSubscription, Stripe.Subscription stripeSub)
         {
-            UserSubscription subscription = user.Subscriptions.Where(us => us.Id == userSubscriptionId).FirstOrDefault();
-            if (subscription == null)
-            {
-                throw new Exception("Could not load the subscription for the user.");
-            }
-
-            return subscription;
-        }
-        private UserSubscription GetUserSubscriptionByStripeId(ApplicationUser user, string stripeId)
-        {
-            UserSubscription subscription = user.Subscriptions.Where(us => us.StripeId == stripeId).FirstOrDefault();
-            if (subscription == null)
-            {
-                throw new Exception("Could not load the subscription for the user.");
-            }
-
-            return subscription;
-        }
-        #endregion
-
-        #region WebHooks
-        public async Task ConfirmSubscriptionObjectAsync(Stripe.Subscription created, DateTime? eventTime)
-        {
-            ApplicationUser user = await GetUserByStripeIdAsync(created.CustomerId);
-            if (user == null)
-            {
-                throw new Exception($"Could not locate user from Stripe id: {created.CustomerId}");
-            }
-
-            UserSubscription userSub = GetUserSubscriptionByStripeId(user, created.Id);
-            if (userSub == null)
-            {
-                throw new Exception($"Could not locate user's subscription from Stripe id: {created.Id}");
-            }
-
-            // Check the timestamp of the event, with the last update of the object
-            // If this was updated last before the event, therefore the event is valid and should be applied.
-            if (eventTime.HasValue && userSub.LastUpdated > eventTime)
-            {
-                return;
-            }
-
-            userSub = userSub.UpdateFromStripe(created);
-            userSub.Confirmed = true;
-            userSub.LastUpdated = DateTime.Now;
-            await _db.SaveChangesAsync();
-        }
-        public async Task UpdateSubscriptionObjectAsync(Stripe.Subscription updated, DateTime? eventTime)
-        {
-            ApplicationUser user = await GetUserByStripeIdAsync(updated.CustomerId);
-            if (user == null)
-            {
-                throw new Exception($"Could not locate user from Stripe id: {updated.CustomerId}");
-            }
-
-            UserSubscription userSub = GetUserSubscriptionByStripeId(user, updated.Id);
-            if (userSub == null)
-            {
-                throw new Exception($"Could not locate user's subscription from Stripe id: {updated.Id}");
-            }
-
-            Models.Subscription plan = await GetSubscriptionPlanByStripeIdAsync(updated.Plan.Id);
-            if (plan == null)
-            {
-                throw new Exception($"Could not locate subscription plan object from Stripe id: {updated.Plan.Id}");
-            }
-
-            if (userSub.SubscriptionId != plan.Id)
-            {
-                userSub.SubscriptionId = plan.Id;
-            }
-
-            // Check the timestamp of the event, with the last update of the object
-            // If this was updated last before the event, therefore the event is valid and should be applied.
-
-            if (eventTime.HasValue && userSub.LastUpdated > eventTime)
-            {
-                return;
-            }
-
-            userSub = userSub.UpdateFromStripe(updated);
-            userSub.LastUpdated = DateTime.Now;
-            await _db.SaveChangesAsync();
-        }
-        public async Task RemoveUserSubscriptionObjectAsync(Stripe.Subscription deleted, DateTime? eventTime)
-        {
-            ApplicationUser user = await GetUserByStripeIdAsync(deleted.CustomerId);
-            if (user == null)
-            {
-                throw new Exception($"Could not locate user from Stripe id: {deleted.CustomerId}");
-            }
-
-            UserSubscription userSub = GetUserSubscriptionByStripeId(user, deleted.Id);
-            if (userSub == null)
-            {
-                throw new Exception($"Could not locate user's subscription from Stripe id: {deleted.Id}");
-            }
-
-            // Check the timestamp of the event, with the last update of the object
-            // If this was updated last before the event, therefore the event is valid and should be applied.
-            if (eventTime.HasValue && userSub.LastUpdated > eventTime)
-            {
-                return;
-            }
-
-            userSub = userSub.UpdateFromStripe(deleted);
-            userSub.Deleted = true;
-            userSub.DeletedAt = DateTime.Now;
-            userSub.LastUpdated = DateTime.Now;
-            await _db.SaveChangesAsync();
+            if (stripeSub.Plan == null)
+                throw new AlertedException($"Could not load a Stripe plan from the subscription update for Id {userSubscription.StripeId}. It may have multiple items attached to it, this is not supported by this system currently. Remove multiple items to re-sync this subscription correctly.");
+            var subscriptionPlan = await SyncSubscriptionPlanAsync(null, stripeSub.Plan.Id);
+            if (stripeSub.Plan == null)
+                throw new AlertedException($"Could not load a Stripe plan from the subscription update for Id {userSubscription.StripeId}.");
+            userSubscription.SubscriptionId = subscriptionPlan.Id;
+            userSubscription = userSubscription.UpdateFromStripe(stripeSub);
+            return userSubscription;
         }
         #endregion
 

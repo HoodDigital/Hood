@@ -1,5 +1,4 @@
 ﻿using Hood.Core;
-using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Models;
@@ -34,13 +33,15 @@ namespace Hood.Controllers
                     model.Invoices = await _stripe.GetAllInvoicesAsync(model.Customer.Id, null);
                     try
                     {
-                        model.NextInvoice = await _stripe.GetUpcomingInvoicesAsync(model.Customer.Id);
+                        model.NextInvoice = await _stripe.GetUpcomingInvoiceAsync(model.Customer.Id);
                     }
                     catch (StripeException)
                     {
                         model.NextInvoice = null;
                     }
                 }
+                var subs = await _account.GetUserSubscriptionsAsync(new UserSubscriptionListModel() { UserId = Engine.Account.Id, PageSize = int.MaxValue });
+                model.Subscriptions = subs.List;
             }
             catch (Exception ex)
             {
@@ -50,23 +51,22 @@ namespace Hood.Controllers
             }
             return View(model);
         }
-        
-        internal async Task<IActionResult> NoCustomerAccount()
+
+        internal IActionResult NoCustomerAccount()
         {
             SaveMessage = $"Your customer account object was not found, so we have created one for you.";
             MessageType = Enums.AlertType.Info;
-            return await Index();
+            return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> AddCard()
+        public IActionResult AddCard()
         {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCard(SubscriptionModel model, string returnUrl = null)
+        public async Task<IActionResult> AddCard(SubscriptionModel model)
         {
             try
             {
@@ -74,12 +74,16 @@ namespace Hood.Controllers
 
                 // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
                 if (user.StripeId.IsSet())
+                {
                     model.Customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
+                }
 
                 // if not, then the user must have supplied a token
                 Stripe.Token stripeToken = await _stripe.TokenService.GetAsync(model.StripeToken);
                 if (stripeToken == null)
+                {
                     throw new Exception("The provided card token was not valid.");
+                }
 
                 // Check if the customer object exists.
                 if (model.Customer == null)
