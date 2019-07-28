@@ -16,6 +16,11 @@
 <script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js" asp-location="BeforeScripts"></script>
 <form class="inline" data-target="#user-list">
     <div class="row">
+        <div class="col-sm">
+            <div id="user-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Users.Loaded">
+                <partial name="_List_Users" />
+            </div>
+        </div>
         <div class="col-sm-3">
             <div class="card mb-3">
                 <div class="card-header position-relative" id="users-roles-panel-heading">
@@ -102,11 +107,6 @@
                     </div>
                     <button type="submit" class="btn btn-success btn-block"> Search</button>
                 </div>
-            </div>
-        </div>
-        <div class="col-sm">
-            <div id="user-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Users.Loaded">
-                <partial name="_List_Users" />
             </div>
         </div>
     </div>

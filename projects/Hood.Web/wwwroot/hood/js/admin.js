@@ -28,10 +28,11 @@ $.hood.Admin = {
             wheelStep: 10
         });
 
-        $('[data-plugin="counter"]').counterUp({
-            delay: 10,
-            time: 800
-        });
+        if ($('[data-plugin="counter"]') && $.counterUp) 
+            $('[data-plugin="counter"]').counterUp({
+                delay: 10,
+                time: 800
+            });
 
         $.hood.Admin.Editors.Init();
         $.hood.Admin.Stats.Init();
@@ -133,8 +134,8 @@ $.hood.Admin = {
     },
     Stats: {
         Init: function () {
-            $.hood.Admin.Stats.SetupCharts();
             if ($('#admin-stats-chart').exists()) {
+                $.hood.Admin.Stats.SetupCharts();
                 $.get('/admin/stats/', function (data) {
                     $.hood.Admin.Stats.LoadStats(data);
                     $.hood.Admin.Stats.DoCharts(data);

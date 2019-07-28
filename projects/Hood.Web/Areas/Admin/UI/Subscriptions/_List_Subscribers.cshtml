@@ -10,16 +10,32 @@
         var user = subscription.User;
         <div class="card hover mb-3 p-3 @(user != null ? "border-success" : "border-danger")">
             <div class="row no-gutters align-items-center">
+                @if (user != null)
+                {
+                    <div class="col-auto">
+                        <a asp-action="Edit" asp-controller="Users" asp-route-id="@user.Id">
+                            <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@user.ToFullName()"></fixedImage>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-auto">
+                        <a target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)">
+                            <fixedImage src="" class="img img-circle img-sm m-2 mr-4" alt="No User Found"></fixedImage>
+                        </a>
+                    </div>
+                }
                 <div class="col">
                     <div class="mb-1">
                         <h5 class="card-title d-lg-inline">
                             @if (user != null)
                             {
-                                <a  target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)">@user.ToAdminName()</a>
+                                <a target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)">@user.ToAdminName()</a>
                             }
                             else
                             {
-                                <a  target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)" class=" text-muted">Unlinked Subscription</a>
+                                <a target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)" class=" text-muted">Unlinked Subscription</a>
                             }
                         </h5>
                         @if (subscription.Subscription != null)
