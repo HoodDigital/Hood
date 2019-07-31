@@ -8,6 +8,7 @@ using Hood.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using Stripe;
+using Hood.Core;
 
 namespace Hood.Models
 {
@@ -95,7 +96,20 @@ namespace Hood.Models
         {
             get
             {
-                return ((double)Amount / 100).ToString("C");
+                var billing = Engine.Settings.Billing;
+                if (billing != null)
+                {
+                    switch (billing.StripeCurrency)
+                    {
+                        case "gbp":
+                            return $"£{Amount.ToCurrencyString()}";
+                        case "usd":
+                            return $"${Amount.ToCurrencyString()}";
+                        case "eur":
+                            return $"€{Amount.ToCurrencyString()}";
+                    }
+                }
+                return Amount.ToCurrencyString();
             }
         }
         [NotMapped]
@@ -103,7 +117,7 @@ namespace Hood.Models
         {
             get
             {
-                return ((double)Amount / 100).ToString("C") + " every " + IntervalCount + " " + Interval + "(s)";
+                return $"{Price} every {IntervalCount} {Interval} (s)";
             }
         }
 
@@ -125,7 +139,7 @@ namespace Hood.Models
         public string LastEditedBy { get; set; }
 
         [Display(Name="Subscription Product", Description = "Choose a product group for this plan, if you leave it unset, a product group will be generated.")]
-        public int? SubscriptionProductId { get; set; }
+        public int SubscriptionProductId { get; set; }
         public SubscriptionProduct SubscriptionProduct { get; set; }
 
         /// <summary>

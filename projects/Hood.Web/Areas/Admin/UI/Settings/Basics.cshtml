@@ -70,7 +70,7 @@
                     <label asp-for="Homepage"></label>
                     <select asp-for="Homepage" class="form-control">
                         <option value="">Default Homepage</option>
-                        @foreach (var content in _content.GetPages())
+                        @foreach (var content in await _content.GetPages())
                         {
                             <option value="@content.Id">@content.Title</option>
                         }
@@ -212,7 +212,7 @@
                     <label asp-for="LockoutModeHoldingPage"></label>
                     <select asp-for="LockoutModeHoldingPage" class="form-control">
                         <option value="">Default Holding Page</option>
-                        @foreach (var content in _content.GetPages())
+                        @foreach (var content in await _content.GetPages())
                         {
                             <option value="@content.Id">@content.Title</option>
                         }

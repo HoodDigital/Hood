@@ -96,7 +96,7 @@ namespace Hood.Infrastructure
                             return true;
                         }
                     }
-                    var pages = _content.GetPages();
+                    var pages = _content.GetPages().Result;
                     if (pages.Select(p => p.Url.ToLower().Trim('/')).Contains(fullUrl))
                     {
                         var pg = pages.Where(p => p.Url.ToLower().Trim('/') == fullUrl).FirstOrDefault();

@@ -41,7 +41,7 @@ namespace Hood.Services
         #endregion
 
         #region Stripe customer object
-        Task<Stripe.Customer> GetCustomerObjectAsync(string stripeId);
+        Task<Stripe.Customer> GetOrCreateStripeCustomerForUser(string userId);
         Task<List<Stripe.Customer>> GetMatchingCustomerObjectsAsync(string email);
         #endregion
 
@@ -70,7 +70,7 @@ namespace Hood.Services
         Task<UserSubscriptionListModel> GetUserSubscriptionsAsync(UserSubscriptionListModel model);
         Task<UserSubscription> GetUserSubscriptionByIdAsync(int id);
         Task<UserSubscription> GetUserSubscriptionByStripeIdAsync(string stripeId);
-        Task<UserSubscription> CreateUserSubscriptionAsync(int planId, string stripeToken, string cardId);
+        Task<UserSubscription> CreateUserSubscription(int planId, string userId, Stripe.Subscription newSubscription);
         Task<UserSubscription> DeleteUserSubscriptionAsync(int id);
         Task<UserSubscription> CancelUserSubscriptionAsync(int subscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false);
         Task<UserSubscription> ReactivateUserSubscriptionAsync(int subscriptionId);

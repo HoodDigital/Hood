@@ -47,7 +47,7 @@ namespace Hood.Services
 
         #region Sitemap
         // Sitemap
-        List<Content> GetPages(string category = null);
+        Task<List<Content>> GetPages(string category = null);
         Task<string> GetSitemapDocumentAsync(IUrlHelper urlHelper);
 
         #endregion

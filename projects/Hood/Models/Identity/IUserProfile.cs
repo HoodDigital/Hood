@@ -7,12 +7,36 @@ namespace Hood.Models
     /// <summary>
     /// IUserProfile is used for setting the user's profile and passing data to views, while excluding sensetive data from the IdentityUser classes.
     /// </summary>
-    public interface IUserProfile : IName, IJsonMetadata, IAvatar, ISaveableModel
+    public interface IUserProfile : IName, IJsonMetadata, IAvatar, ISaveableModel, ILoginInformation
     {
         string Id { get; set; }
 
-        #region Identity
+        #region Socials 
+        string WebsiteUrl { get; set; }
+        string Twitter { get; set; }
+        string TwitterHandle { get; set; }
+        string Facebook { get; set; }
+        string Instagram { get; set; }
+        string LinkedIn { get; set; }
+        #endregion
 
+        #region Extra Profile Fields
+        string ForumSignature { get; set; }
+        string CompanyName { get; set; }
+        string Bio { get; set; }
+        string JobTitle { get; set; }
+        #endregion
+
+        #region Notes 
+        List<UserNote> Notes { get; set; }
+        void AddUserNote(UserNote note);
+        string ToAdminName();
+        #endregion
+    }
+
+    public interface ILoginInformation
+    {
+        #region Identity
         /// <summary>
         /// Gets or sets the user name for this user.
         /// </summary>
@@ -48,25 +72,6 @@ namespace Hood.Models
         string Longitude { get; set; }
         #endregion
 
-        #region Socials 
-        string WebsiteUrl { get; set; }
-        string Twitter { get; set; }
-        string TwitterHandle { get; set; }
-        string Facebook { get; set; }
-        string Instagram { get; set; }
-        string LinkedIn { get; set; }
-        #endregion
 
-        #region Extra Profile Fields
-        string ForumSignature { get; set; }
-        string CompanyName { get; set; }
-        string Bio { get; set; }
-        string JobTitle { get; set; }
-        #endregion
-
-        #region Notes 
-        List<UserNote> Notes { get; set; }
-        void AddUserNote(UserNote note);
-        #endregion
     }
 }

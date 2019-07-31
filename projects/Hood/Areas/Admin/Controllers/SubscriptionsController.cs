@@ -150,6 +150,7 @@ namespace Hood.Areas.Admin.Controllers
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
                 BillingSettings billingSettings = Engine.Settings.Billing;
 
+                model.Currency = billingSettings.StripeCurrency;
                 model.CreatedBy = user.UserName;
                 model.Created = DateTime.Now;
                 model.LastEditedBy = user.UserName;

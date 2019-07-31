@@ -60,8 +60,6 @@ namespace Hood.Areas.Admin.Controllers
                 model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.Now;
 
-                model = await GetEditorModel(model);
-
                 if (model.Slug.IsSet())
                 {
                     if (await _content.SlugExists(model.Slug, model.Id))

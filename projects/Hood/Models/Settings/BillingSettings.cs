@@ -57,12 +57,6 @@ namespace Hood.Models
         public bool EnableSubscriptions { get; set; }
         [Display(Name = "Stripe Test Mode", Description = "Transactions processed will use the test service and process using your Test Api keys.")]
         public bool EnableStripeTestMode { get; set; }
-        [Display(Name = "Subscription Upgrade Page", Description = "Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/change ] - <strong>Default: /subscriptions/change</strong>")]
-        public string SubscriptionUpgradePage { get; set; }
-        [Display(Name = "Subscription Create Page", Description = "Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/get ] - <strong>Default: /subscriptions/get</strong>")]
-        public string SubscriptionCreatePage { get; set; }
-        [Display(Name = "Subscription Addon Page", Description = "Use this area to change the location of the upgrade subscriptions page. Use a relative url such as [ /subscriptions/addon ] - <strong>Default: /subscriptions/addon</strong>")]
-        public string SubscriptionAddonPage { get; set; }
         [Display(Name = "Webhook Logs")]
         public string SubscriptionWebhookLogs { get; set; }
         [Display(Name = "Stripe Live Key")]
@@ -75,37 +69,9 @@ namespace Hood.Models
         public string StripeTestPublicKey { get; set; }
         [Display(Name = "Stripe Webhook Secret")]
         public string StripeWebhookSecret { get; set; }
+        [Display(Name = "Stripe Currency", Description = "You can choose a single currency for your site's subscriptions and billing.")]
+        public string StripeCurrency { get; set; }
 
-        internal IActionResult GetNewSubscriptionUrl(HttpContext context)
-        {
-            var result = new RedirectToActionResult("New", "Subscriptions", new { returnUrl = context.Request.Path.ToUriComponent() });
-            if (SubscriptionCreatePage.IsSet())
-            {
-                UriBuilder baseUri = new UriBuilder(context.GetSiteUrl() + SubscriptionCreatePage.TrimStart('/'));
-                string queryToAppend = string.Format("returnUrl={0}", context.Request.Path.ToUriComponent());
-                if (baseUri.Query != null && baseUri.Query.Length > 1)
-                    baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
-                else
-                    baseUri.Query = queryToAppend;
-                return new RedirectResult(baseUri.ToString());
-            }
-            return result;
-        }
-        internal IActionResult GetChangeSubscriptionUrl(HttpContext context)
-        {
-            var changeResult = new RedirectToActionResult("Change", "Subscriptions", new { returnUrl = context.Request.Path.ToUriComponent() });
-            if (SubscriptionUpgradePage.IsSet())
-            {
-                UriBuilder baseUri = new UriBuilder(context.GetSiteUrl() + SubscriptionUpgradePage.TrimStart('/'));
-                string queryToAppend = string.Format("returnUrl={0}", context.Request.Path.ToUriComponent());
-                if (baseUri.Query != null && baseUri.Query.Length > 1)
-                    baseUri.Query = baseUri.Query.Substring(1) + "&" + queryToAppend;
-                else
-                    baseUri.Query = queryToAppend;
-                return new RedirectResult(baseUri.ToString());
-            }
-            return changeResult;
-        }
         public bool IsCartEnabled
         {
             get

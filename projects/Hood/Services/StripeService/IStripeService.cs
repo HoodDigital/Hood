@@ -13,6 +13,9 @@ namespace Hood.Services
         PlanService PlanService { get; }
         CustomerService CustomerService { get; }
         CardService CardService { get; }
+        SetupIntentService SetupIntentService { get; }
+        PaymentIntentService PaymentIntentService { get; }
+        PaymentMethodService PaymentMethodService { get; }
         InvoiceService InvoiceService { get; }
         SubscriptionService SubscriptionService { get; }
         RefundService RefundService { get; }
@@ -46,27 +49,18 @@ namespace Hood.Services
         #endregion
 
         #region Customers
-        Task<Customer> CreateCustomerAsync(ApplicationUser user, string token, string planId = null);
-
+        Task<Customer> CreateCustomerAsync(IUserProfile user);
         Task<Customer> UpdateCustomerAsync(string customerId, CustomerUpdateOptions options);
-
         Task<Customer> DeleteCustomerAsync(string customerId);
-
         Task<Customer> GetCustomerByIdAsync(string customerId);
-
         Task<List<Customer>> GetCustomersByEmailAsync(string email);
-
-        Task<Customer> SetDefaultCardAsync(string customerId, string cardId);
         #endregion
 
         #region Payment Methods
-        Task<Card> CreateCardAsync(string customerId, string token);
-
-        Task<Card> DeleteCardAsync(string customerId, string cardId);
-
-        Task<Stripe.Card> GetCardByIdAsync(string customerId, string cardId);
-
-        Task<IEnumerable<Stripe.Card>> GetAllCardsAsync(string customerId);
+        Task<Customer> SetDefaultPaymentMethodAsync(string customerId, string paymentMethodId);
+        Task<PaymentMethod> DeletePaymentMethodAsync(string customerId, string paymentMethodId);
+        Task<PaymentMethod> GetPaymentMethodByIdAsync(string paymentMethodId);
+        Task<List<PaymentMethod>> GetAllPaymentMethodsAsync(string customerId, string type);
         #endregion
 
         #region Invoices 
@@ -78,9 +72,9 @@ namespace Hood.Services
         #endregion
 
         #region Subscriptions 
-        Task<IEnumerable<Stripe.Subscription>> GetSusbcriptionsByCustomerIdAsync(string customerId);
+        Task<IEnumerable<Stripe.Subscription>> GetSusbcriptionsByCustomerIdAsync(string customerId, string planId = null);
         Task<Stripe.Subscription> GetSusbcriptionByIdAsync(string subscriptionId);
-        Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, DateTime? trialEnd = null);
+        Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, DateTime? trialEnd = null, string paymentMethodId = null);
         Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false);
         Task<Stripe.Subscription> ReactivateSubscriptionAsync(string subscriptionId);
         Task<Stripe.Subscription> SwitchSubscriptionPlanAsync(string subscriptionId, string newPlanId);

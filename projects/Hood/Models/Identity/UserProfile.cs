@@ -42,11 +42,6 @@ namespace Hood.Models
             get { return !RolesJson.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(RolesJson); }
             set { RolesJson = JsonConvert.SerializeObject(value); }
         }
-
-        internal ApplicationUser AsUser()
-        {
-            return (ApplicationUser)(IUserProfile)this;
-        }
         #endregion
 
         #region View Model Stuff

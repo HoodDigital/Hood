@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Folder Include="UI\Components\Header\" />
+  </ItemGroup>
+  
 </Project>

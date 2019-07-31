@@ -138,6 +138,7 @@ gulp.task('js:package:app', function () {
     return gulp.src([
 
         hood.js + 'app/cart.js',
+        hood.js + 'app/stripe.js',
         hood.js + 'app.js'
 
     ], { base: '.' })

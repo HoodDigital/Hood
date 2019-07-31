@@ -83,7 +83,12 @@ namespace Hood.Core
             get
             {
                 var _contextAccessor = Services.Resolve<IHttpContextAccessor>();
-                return _contextAccessor.HttpContext.User.AccountInfo();
+                if (_contextAccessor == null || 
+                    _contextAccessor.HttpContext == null || 
+                    _contextAccessor.HttpContext.User ==null || 
+                    !_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                    return null;
+                return _contextAccessor.HttpContext.User.GetUserProfile();
             }
         }
         /// <summary>

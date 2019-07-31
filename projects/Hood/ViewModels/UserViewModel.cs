@@ -25,7 +25,7 @@ namespace Hood.ViewModels
 
         public string StatusMessage { get; set; }
 
-        public UserProfileBase Profile { get; set; }
+        public UserProfile Profile { get; set; }
 
         public IMediaObject Avatar { get; set; }
 

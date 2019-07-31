@@ -93,15 +93,22 @@ SELECT
 					CONCAT
 					(
 						'{', 
+							'Id:', '', dbo.HoodUserSubscriptions.UserSubscriptionId, ',', 
+							'PlanId:', '"', dbo.HoodSubscriptions.Id, '",', 
 							'StripeSubscriptionId:', '"', dbo.HoodUserSubscriptions.StripeId, '",', 
 							'StripeId:', '"', dbo.HoodSubscriptions.StripeId, '",', 
+							'SubscriptionProductId:', '"', dbo.HoodSubscriptions.SubscriptionProductId, '",', 
 							'Status:', '"', dbo.HoodUserSubscriptions.Status, '",',
 							'Name:', '"', dbo.HoodSubscriptions.Name, '",',
 							'Category:', '"', dbo.HoodSubscriptions.Colour, '",',
 							'Public:', '', dbo.HoodSubscriptions.[Public], ',',
 							'Level:', '', dbo.HoodSubscriptions.Level, ',',
 							'Addon:', '', dbo.HoodSubscriptions.Addon, ',',
+							'Amount:', '', dbo.HoodSubscriptions.Amount, ',',
+							'Interval:', '"', dbo.HoodSubscriptions.Interval, '",',
+							'IntervalCount:', '', dbo.HoodSubscriptions.IntervalCount, ',',
 							'CurrentPeriodEnd:', '"', dbo.HoodUserSubscriptions.CurrentPeriodEnd, '",',
+							'CancelAtPeriodEnd:', '', dbo.HoodUserSubscriptions.CancelAtPeriodEnd, ',',
 						'}'
 					)
 				ELSE 

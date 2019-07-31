@@ -37,13 +37,14 @@ namespace Hood.Filters
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
+#warning Test for graceful error here.
                 if (Core.Engine.Settings.Billing.CheckStripeOrThrow())
                 {
                     var user = _userManager.GetUserAsync(context.HttpContext.User).Result;
 
                     if (!user.StripeId.IsSet())
                     {
-                        context.Result = new RedirectToActionResult(nameof(BillingController.NoCustomerAccount), "Billing", null);
+                        context.Result = new RedirectToActionResult(nameof(BillingController.Index), "Billing", null);
                         return;
                     }
 
@@ -51,7 +52,7 @@ namespace Hood.Filters
 
                     if (customer == null)
                     {
-                        context.Result = new RedirectToActionResult(nameof(BillingController.NoCustomerAccount), "Billing", null);
+                        context.Result = new RedirectToActionResult(nameof(BillingController.Index), "Billing", null);
                         return;
                     }
                 }

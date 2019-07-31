@@ -1,4 +1,5 @@
-﻿using Hood.Caching;
+﻿using Hood.BaseTypes;
+using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -30,7 +31,6 @@ namespace Hood.Controllers
             _urlEncoder = urlEncoder;
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -48,13 +48,9 @@ namespace Hood.Controllers
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
-                Profile = user.Profile as UserProfileBase,
+                Profile = User.GetUserProfile(),
                 Roles = await _userManager.GetRolesAsync(user)
             };
-
-            model.SaveMessage = SaveMessage;
-            model.MessageType = MessageType;
-
             return View(model);
         }
 
@@ -62,20 +58,21 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(UserViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            var user = await _userManager.GetUserAsync(User);
             try
             {
 
-                var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
                     throw new Exception($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
 
-                model.Roles = await _userManager.GetRolesAsync(user);
+
+                if (!ModelState.IsValid)
+                {
+                    model.Roles = await _userManager.GetRolesAsync(user);
+                    return View(model);
+                }
 
                 var email = user.Email;
                 if (model.Email != email)
@@ -98,35 +95,36 @@ namespace Hood.Controllers
                     }
                 }
 
-                user.Profile = model.Profile;
-                await _account.UpdateUserAsync(user);
+                model.Profile.Id = user.Id;
+                model.Profile.Notes = user.Notes;
+                await _account.UpdateProfileAsync(model.Profile);
 
                 SaveMessage = "Your profile has been updated.";
                 MessageType = AlertType.Success;
-                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
                     throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
                 SaveMessage = "Something went wrong: " + ex.Message;
                 MessageType = AlertType.Danger;
-                return RedirectToAction(nameof(Index));
             }
+
+            return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
+        public async Task<Response> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
-            var user = await _account.GetUserByIdAsync(userId);
-            if (user == null)
-                return NotFound();
 
             try
             {
+                var user = await _account.GetUserByIdAsync(userId);
+                if (user == null)
+                    throw new Exception("Could not locate the user to add an avatar to.");
+
                 IMediaObject mediaResult = null;
                 if (file != null)
                 {
@@ -140,11 +138,11 @@ namespace Hood.Controllers
                     user.Avatar = mediaResult;
                     await _account.UpdateUserAsync(user);
                 }
-                return Json(new { Success = true, Image = mediaResult });
+                return new Response(true, mediaResult, $"The media has been set for attached successfully.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                return await ErrorResponseAsync<ManageController>($"There was an error setting the avatar.", ex);
             }
         }
 
@@ -511,8 +509,7 @@ namespace Hood.Controllers
         [HttpGet]
         public IActionResult Delete()
         {
-            var model = new Hood.BaseTypes.SaveableModel();
-            return View(nameof(Delete), model);
+            return View(nameof(Delete), new SaveableModel());
         }
 
         [HttpPost]
@@ -525,23 +522,18 @@ namespace Hood.Controllers
                 if (user == null)
                     throw new Exception("User not found.");
 
-                // Delete functionality.
-                if (User.IsAdminOrBetter())
-                    throw new Exception("You are not an admin, so cannot delete users.");
+                await _account.DeleteUserAsync(user.Id, User);
 
                 await _signInManager.SignOutAsync();
-
-
-                await _account.DeleteUserAsync(user.Id, User);
 
                 await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.");
                 return RedirectToAction(nameof(Deleted));
             }
             catch (Exception ex)
             {
-                SaveMessage = $"Error when user attemted to delete their account.";
+                SaveMessage = $"Error deleting your account: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
+                await _logService.AddExceptionAsync<ApiController>($"Error when user attemted to delete their account.", ex);
             }
             return RedirectToAction(nameof(Delete));
         }

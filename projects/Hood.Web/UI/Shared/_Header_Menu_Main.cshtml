@@ -69,6 +69,10 @@
                     </div>
                 </div>
             </li>
+            @if (Engine.Settings.Billing.IsSubscriptionsEnabled)
+            {
+                <li><a asp-action="Select" asp-controller="Subscriptions">Pricing</a></li>
+            }
         </ul>
         <ul class="nav navbar-nav login">
             @if (User.Identity.IsAuthenticated)

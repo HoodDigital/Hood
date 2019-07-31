@@ -167,12 +167,12 @@ $.hood.Handlers = {
       });
       avatarDropzone.on("success", function (file, response) {
         if (response.Success) {
-          if (response.Image) {
-            $(jsontag).val(JSON.stringify(response.Image));
+          if (response.Media) {
+            $(jsontag).val(JSON.stringify(response.Media));
             $($(tag).data('preview')).css({
-              'background-image': 'url(' + response.Image.SmallUrl + ')'
+              'background-image': 'url(' + response.Media.SmallUrl + ')'
             });
-            $($(tag).data('preview')).find('img').attr('src', response.Image.SmallUrl);
+            $($(tag).data('preview')).find('img').attr('src', response.Media.SmallUrl);
           }
 
           $.hood.Alerts.Success("New image added!");

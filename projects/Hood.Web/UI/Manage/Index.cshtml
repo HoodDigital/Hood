@@ -168,7 +168,7 @@
             <div role="tabpanel" class="tab-pane" id="avatar">
                 <div class="row row-center-xs m-t-md m-b-lg">
                     <div class="col-xs-4">
-                        <fixedImage src="@Model.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId)"></fixedImage>
+                        <fixedImage src="@Model.Profile.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId)"></fixedImage>
                     </div>
                     <div class="col-xs-8">
                         <h4 class="media-heading">Change your profile image</h4>

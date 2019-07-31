@@ -1,11 +1,11 @@
-@model UserSubscription
+@model UserSubscriptionInfo
 <div class="well current-subscription m-t-lg">
-    <h4>Your current subscription: <strong>@Model.Subscription.Name</strong></h4>
+    <h4>Your current subscription: <strong>@Model.Name</strong></h4>
     <p>
         @if (!Model.CancelAtPeriodEnd)
         {
             <span class="text-success">Next Charge:</span>
-            <span class="text-success">@Model.Subscription.Price on @Model.CurrentPeriodEnd.Value.ToShortDateString()</span>
+            <span class="text-success">@Model.Amount.ToCurrencyFormat() on @Model.CurrentPeriodEnd.Value.ToShortDateString()</span>
         }
         else
         {
@@ -15,7 +15,7 @@
     <p>
         @if (!Context.Request.Path.ToString().Contains("account/subscriptions/change"))
         {
-            <a class="btn btn-sm btn-primary" asp-action="Change" asp-route-category="@Model.Subscription.Category">Change Package</a>
+            <a class="btn btn-sm btn-primary" asp-action="Select" asp-route-product="@Model.SubscriptionProductId">Change Package</a>
         }
         @if (Model != null)
         {

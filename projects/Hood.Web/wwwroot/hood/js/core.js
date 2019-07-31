@@ -642,18 +642,42 @@ $.hood.Handlers = {
     $('body').on('click', '.click-select.show-selected[data-target][data-value]', $.hood.Handlers.ClickSelect);
     $('body').on('click', '.click-select:not(.show-selected)[data-target][data-value]', $.hood.Handlers.ClickSelectClean);
     $('body').on('click', '.slide-link', $.hood.Handlers.SlideToAnchor);
+    $('body').on('click', '.scroll-target, .scroll-to-target', $.hood.Handlers.ScrollToTarget);
+    $('body').on('click', '.scroll-top, .scroll-to-top', $.hood.Handlers.ScrollToTop);
     $('body').on('change', 'input[type=checkbox][data-input]', $.hood.Handlers.CheckboxChange);
     $('body').on('change', '.submit-on-change', $.hood.Handlers.SubmitOnChange);
-    $('select[data-selected]').each($.hood.Handlers.SelectSetup); // date/time meta editor
-
+    $('select[data-selected]').each($.hood.Handlers.SelectSetup);
     $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
     $.hood.Handlers.Uploaders.Init();
   },
+  ScrollToTop: function ScrollToTop(e) {
+    if (e) e.preventDefault();
+    $('html, body').animate({
+      scrollTop: 0
+    }, 800);
+    return false;
+  },
+  ScrollToTarget: function ScrollToTarget(e) {
+    if (e) e.preventDefault();
+    var url = $(this).attr('href').split('#')[0];
+
+    if (url !== window.location.pathname && url !== "") {
+      return;
+    }
+
+    var target = this.hash;
+    var $target = $(target);
+    $('html, body').stop().animate({
+      'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
+    }, 900, 'swing');
+  },
   SubmitOnChange: function SubmitOnChange(e) {
+    if (e) e.preventDefault();
     $(this).parents('form').submit();
   },
   DateChange: function DateChange(e) {
-    // update the date element attached to the field's attach
+    if (e) e.preventDefault(); // update the date element attached to the field's attach
+
     $field = $(this).parents('.hood-date').find('.date-output');
     date = $field.parents('.hood-date').find('.date-value').val();
     pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
@@ -666,7 +690,8 @@ $.hood.Handlers = {
     $field.attr("value", date + " " + hour + ":" + minute + ":00");
   },
   CheckboxChange: function CheckboxChange(e) {
-    // when i change - create an array, with any other checked of the same data-input checkboxes. and add to the data-input referenced tag.
+    if (e) e.preventDefault(); // when i change - create an array, with any other checked of the same data-input checkboxes. and add to the data-input referenced tag.
+
     var items = new Array();
     $('input[data-input="' + $(this).data('input') + '"]').each(function () {
       if ($(this).is(":checked")) items.push($(this).val());
@@ -775,12 +800,12 @@ $.hood.Handlers = {
       });
       avatarDropzone.on("success", function (file, response) {
         if (response.Success) {
-          if (response.Image) {
-            $(jsontag).val(JSON.stringify(response.Image));
+          if (response.Media) {
+            $(jsontag).val(JSON.stringify(response.Media));
             $($(tag).data('preview')).css({
-              'background-image': 'url(' + response.Image.SmallUrl + ')'
+              'background-image': 'url(' + response.Media.SmallUrl + ')'
             });
-            $($(tag).data('preview')).find('img').attr('src', response.Image.SmallUrl);
+            $($(tag).data('preview')).find('img').attr('src', response.Media.SmallUrl);
           }
 
           $.hood.Alerts.Success("New image added!");
@@ -1242,7 +1267,7 @@ $.hood.Inline = {
   Refresh: function Refresh(tag) {
     $(tag || '.hood-inline').each($.hood.Inline.Load);
   },
-  Load: function Load(e) {
+  Load: function Load() {
     $.hood.Inline.Reload(this);
   },
   Reload: function Reload(tag, complete) {
@@ -1257,7 +1282,14 @@ $.hood.Inline = {
       $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
+  CurrentModal: null,
   Modal: function Modal(url, complete) {
+    var closePrevious = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    if (closePrevious && $.hood.Inline.CurrentModal) {
+      $.hood.Inline.CurrentModal.modal('hide');
+    }
+
     $.get(url, function (data) {
       modalId = '#' + $(data).attr('id');
       $(data).addClass('hood-inline-modal');
@@ -1267,6 +1299,7 @@ $.hood.Inline = {
       }
 
       $('body').append(data);
+      $.hood.Inline.CurrentModal = $(modalId);
       $(modalId).modal(); // Workaround for sweetalert popups.
 
       $(modalId).on('shown.bs.modal', function () {
@@ -1276,21 +1309,25 @@ $.hood.Inline = {
       $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
+  CloseModal: function CloseModal() {
+    if ($.hood.Inline.CurrentModal) {
+      $.hood.Inline.CurrentModal.modal('hide');
+    }
+  },
   Task: function Task(e) {
     e.preventDefault();
     $tag = $(e.currentTarget);
     $tag.addClass('loading');
+    complete = $tag.data('complete');
     $.get($tag.attr('href'), function (data) {
-      if (data.Success) {
-        $.hood.Alerts.Success(data.Message);
-      } else {
-        $.hood.Alerts.Error(data.Errors, data.Message);
-      }
+      $.hood.Helpers.ProcessResponse(data);
 
-      if (data.Url) {
-        setTimeout(function () {
-          window.location = data.Url;
-        }, 500);
+      if (data.Success) {
+        if ($tag && $tag.data('redirect')) {
+          setTimeout(function () {
+            window.location = $tag.data('redirect');
+          }, 1500);
+        }
       }
 
       $tag.removeClass('loading');
@@ -1357,11 +1394,12 @@ $.hood.Inline = {
   },
   HandleError: function HandleError(xhr) {
     if (xhr.status === 500) {
-      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: There was an error processing the content, please contact an administrator if this continues.<br/>");
+      $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />There was an error processing the content, please contact an administrator if this continues.<br/>");
     } else if (xhr.status === 404) {
-      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: The content could not be found.<br/>");
+      $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />The content could not be found.<br/>");
     } else if (xhr.status === 401) {
-      $.hood.Alerts.Error("<strong>" + xhr.status + "</strong>: You are not allowed to view this resource, are you logged in correctly?<br/>");
+      $.hood.Alerts.Error("<strong>Error " + xhr.status + "</strong><br />You are not allowed to view this resource, are you logged in correctly?<br/>");
+      window.location = window.location;
     }
   },
   Finish: function Finish(data) {
@@ -1386,9 +1424,8 @@ $.hood.Modals = {
 if (!$.hood) $.hood = {};
 $.hood.Media = {
   Init: function Init() {
-    $('body').on('click', '.delete-media', $.hood.Media.Delete);
-    $('body').on('click', '.delete-directory', $.hood.Media.Directories.Delete);
-    $('body').on('click', '.create-directory', $.hood.Media.Directories.Create);
+    $('body').on('click', '.media-delete', $.hood.Media.Delete);
+    $('body').on('click', '.media-directories-delete', $.hood.Media.Directories.Delete);
     $.hood.Media.Upload.Init();
     $.hood.Media.Actions.Init();
   },
@@ -1611,7 +1648,7 @@ $.hood.Media = {
       });
     },
     UploadUrl: function UploadUrl() {
-      return $("#media-upload").data('url') + "?directory=" + $("input[type='radio'][name='dir']:checked").val();
+      return $("#media-upload").data('url') + "?directoryId=" + $("input[type='radio'][name='dir']:checked").val();
     }
   },
   Delete: function Delete(e) {
@@ -1647,51 +1684,32 @@ $.hood.Media = {
     }
   },
   Directories: {
-    Create: function Create() {
-      $('body').on('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
-      Swal.fire({
-        title: "Create directory",
-        text: "Please enter a name for your new directory:",
-        input: 'text',
-        inputAttributes: {
-          placeholder: "Directory name...",
-          autocapitalize: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Add Directory',
-        showLoaderOnConfirm: true,
-        preConfirm: function preConfirm(directory) {
-          if (directory === false) return false;
-
-          if (directory === "") {
-            Swal.showValidationMessage("You didn't supply a directory name, we can't create one without it!");
-            return false;
+    Editor: function Editor() {
+      $('#content-directories-edit-form').hoodValidator({
+        validationRules: {
+          DisplayName: {
+            required: true
+          },
+          Slug: {
+            required: true
           }
-
-          return fetch("/admin/media/directory/add?directory=".concat(directory)).then(function (response) {
-            return response.json();
-          })["catch"](function (error) {
-            Swal.showValidationMessage("Request failed: ".concat(error));
-          });
         },
-        allowOutsideClick: function allowOutsideClick() {
-          return !Swal.isLoading();
+        submitButtonTag: $('#content-directories-edit-submit'),
+        submitUrl: $('#content-directories-edit-form').attr('action'),
+        submitFunction: function submitFunction(data) {
+          $.hood.Helpers.ProcessResponse(data);
+          $.hood.Media.ReloadDirectories();
+          $.hood.Media.Reload();
         }
-      }).then(function (result) {
-        $.hood.Helpers.ProcessResponse(result.value);
-        $.hood.Media.ReloadDirectories();
-        $.hood.Media.Reload();
-        $('body').off('keyup', '.sweet-alert input', $.hood.Media.RestrictDir);
       });
     },
     Delete: function Delete(e) {
+      e.preventDefault();
       var $this = $(this);
 
       deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
         if (confirmed) {
-          $.post($this.data('url'), {
-            directory: $('#Directory').val()
-          }, function (data) {
+          $.post($this.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
             $.hood.Media.ReloadDirectories();
             $.hood.Media.Reload();

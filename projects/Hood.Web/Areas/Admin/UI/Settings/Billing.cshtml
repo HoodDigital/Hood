@@ -82,6 +82,15 @@
                             <small asp-for="StripeWebhookSecret"></small>
                         </div>
                         <div class="form-group floating-label">
+                            <select asp-for="StripeCurrency" class="form-control">
+                                <option value="gbp">Pound Sterling (GBP)</option>
+                                <option value="usd">United States Dollar (USD)</option>
+                                <option value="eur">Euro (EUR)</option>
+                            </select>
+                            <label asp-for="StripeCurrency" class="control-label"></label>
+                            <small asp-for="StripeCurrency"></small>
+                        </div>
+                        <div class="form-group floating-label">
                             <label asp-for="SubscriptionWebhookLogs"></label>
                             <select asp-for="SubscriptionWebhookLogs" class="form-control">
                                 <option value="email">Send via email</option>

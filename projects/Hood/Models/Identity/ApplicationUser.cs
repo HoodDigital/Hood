@@ -28,18 +28,6 @@ namespace Hood.Models
         [JsonIgnore]
         public List<Post> DeletedPosts { get; set; }
         #endregion
-
-        #region Profile Get/Set 
-        /// <summary>
-        /// A Get/Set to allow the loading from or saving to a IUserProfile.
-        /// </summary>
-        [NotMapped]
-        public IUserProfile Profile
-        {
-            get { return this as IUserProfile; }
-            set { value.CopyProperties(this); }
-        }
-        #endregion
         
     }
 

@@ -9,7 +9,7 @@ namespace Hood.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static UserProfile AccountInfo(this ClaimsPrincipal principal)
+        public static UserProfile GetUserProfile(this ClaimsPrincipal principal)
         {
             if (!principal.Identity.IsAuthenticated)
                 return null;
@@ -17,55 +17,79 @@ namespace Hood.Extensions
             principal.GetUserId();
             var contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
 
-            var view = contextAccessor.HttpContext.Items[nameof(UserProfile)] as UserProfile;
-            if (view == null)
+            var profile = contextAccessor.HttpContext.Items[nameof(UserProfile)] as UserProfile;
+            if (profile == null)
             {
                 var context = Engine.Services.Resolve<HoodDbContext>();
-                view = context.UserProfiles.SingleOrDefault(us => us.Id == principal.GetUserId());
-                if (view != null)
-                    contextAccessor.HttpContext.Items[nameof(UserProfile)] = view;
+                profile = context.UserProfiles.SingleOrDefault(us => us.Id == principal.GetUserId());
+                if (profile != null)
+                    contextAccessor.HttpContext.Items[nameof(UserProfile)] = profile;
             }
 
-            return view;
+            return profile;
         }
 
-        public static bool IsSubscribed(this ClaimsPrincipal principal, string id)
+        public static bool IsSubscribed(this ClaimsPrincipal principal, string stripeId)
         {
-            var view = AccountInfo(principal);
+            var profile = GetUserProfile(principal);
 
-            if (view == null)
+            if (profile == null)
                 return false;
 
-            if (view.Subscriptions == null)
+            if (profile.Subscriptions == null)
                 return false;
 
-            return view.Subscriptions.Any(a => a.StripeId == id && (a.Status == "active" || a.Status == "trialing"));
+            return profile.ActiveSubscriptions.Any(a => a.StripeId == stripeId);
+        }
+        public static bool IsSubscribed(this ClaimsPrincipal principal, int planId)
+        {
+            var profile = GetUserProfile(principal);
+
+            if (profile == null)
+                return false;
+
+            if (profile.Subscriptions == null)
+                return false;
+
+            return profile.ActiveSubscriptions.Any(a => a.PlanId == planId);
         }
 
         public static bool HasActiveSubscription(this ClaimsPrincipal principal)
         {
-            var view = AccountInfo(principal);
+            var profile = GetUserProfile(principal);
 
-            if (view == null)
+            if (profile == null)
                 return false;
 
-            if (view.Subscriptions == null)
+            if (profile.Subscriptions == null)
                 return false;
 
-            return view.Subscriptions.Any(a => !a.Addon && (a.Status == "active" || a.Status == "trialing"));
+            return profile.ActiveSubscriptions.Any();
         }
 
-        public static bool IsSubscribedToCategory(this ClaimsPrincipal principal, string category)
+        public static bool IsSubscribedToProduct(this ClaimsPrincipal principal, int productId)
         {
-            var view = AccountInfo(principal);
+            var profile = GetUserProfile(principal);
 
-            if (view == null)
+            if (profile == null)
                 return false;
 
-            if (view.Subscriptions == null)
+            if (profile.Subscriptions == null)
                 return false;
 
-            return view.Subscriptions.Any(a => a.Category.Contains(category) && (a.Status == "active" || a.Status == "trialing"));
+            return profile.ActiveSubscriptions.Any(a => a.SubscriptionProductId == productId);
+        }
+        public static UserSubscriptionInfo GetActiveSubscription(this ClaimsPrincipal principal, int productId)
+        {
+            var profile = GetUserProfile(principal);
+
+            if (profile == null)
+                return null;
+
+            if (profile.Subscriptions == null)
+                return null;
+
+            return profile.ActiveSubscriptions.FirstOrDefault(a => a.SubscriptionProductId == productId);
         }
 
         // https://stackoverflow.com/a/35577673/809357

@@ -150,6 +150,7 @@ namespace Hood.Services
                 .Include(u => u.Topics)
                 .Include(u => u.Posts)
                 .Include(u => u.Posts)
+                .Include(u => u.Subscriptions)
                 .SingleOrDefaultAsync(u => u.Id == userId);
 
 
@@ -182,18 +183,23 @@ namespace Hood.Services
                 user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
                 user.Forums.ForEach(f => f.AuthorId = siteOwner.Id);
 
-                UserProfile userSubs = await GetUserProfileByIdAsync(user.Id);
-                if (userSubs.ActiveSubscriptions != null)
+                UserProfile userProfile = await GetUserProfileByIdAsync(user.Id);
+                if (userProfile.ActiveSubscriptions != null)
                 {
-                    if (userSubs.ActiveSubscriptions.Count > 0)
+                    if (userProfile.ActiveSubscriptions.Count > 0)
                     {
-                        throw new Exception("You cannot delete a user with active subscriptions, cancel them or delete them before deleting the user.");
+                        if (adminUser.GetUserId() != user.Id)
+                            throw new Exception("You cannot delete a user with active subscriptions, cancel them or delete them before deleting the user.");
+                        else
+                            throw new Exception("You have active subscriptions, cancel or delete them before deleting your account.");
                     }
                 }
 
-                if (userSubs.StripeId.IsSet())
+                user.Subscriptions.ForEach(p => _db.Entry(p).State = EntityState.Deleted);
+
+                if (userProfile.StripeId.IsSet())
                 {
-                    await _stripe.DeleteCustomerAsync(userSubs.StripeId);
+                    await _stripe.DeleteCustomerAsync(userProfile.StripeId);
                 }
 
                 await _db.SaveChangesAsync();
@@ -209,7 +215,7 @@ namespace Hood.Services
             MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.OwnerId == userId && md.Type == DirectoryType.User);
             if (directory == null)
             {
-                Task<MediaDirectory> userDirectory = _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.UserDirectorySlug && md.Type == DirectoryType.System);
+                MediaDirectory userDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.UserDirectorySlug && md.Type == DirectoryType.System);
                 ApplicationUser user = await GetUserByIdAsync(userId);
                 if (user == null)
                 {
@@ -319,11 +325,6 @@ namespace Hood.Services
                 property.SetValue(userToUpdate, property.GetValue(user));
             }
 
-            foreach (PropertyInfo property in typeof(IAvatar).GetProperties())
-            {
-                property.SetValue(userToUpdate, property.GetValue(user));
-            }
-
             foreach (PropertyInfo property in typeof(IJsonMetadata).GetProperties())
             {
                 property.SetValue(userToUpdate, property.GetValue(user));
@@ -384,7 +385,9 @@ namespace Hood.Services
         #region Subscription Products
         public async Task<SubscriptionProductListModel> GetSubscriptionProductsAsync(SubscriptionProductListModel model = null)
         {
-            IQueryable<SubscriptionProduct> query = _db.SubscriptionProducts.Include(g => g.Subscriptions).AsQueryable();
+            IQueryable<SubscriptionProduct> query = _db.SubscriptionProducts
+                .Include(g => g.Subscriptions)
+                .AsQueryable();
 
             if (model == null)
             {
@@ -885,6 +888,11 @@ namespace Hood.Services
                 subscriptionPlan = await GetSubscriptionPlanByStripeIdAsync(stripePlan.Id);
                 if (subscriptionPlan == null)
                 {
+                    SubscriptionProduct product = await _db.SubscriptionProducts.SingleOrDefaultAsync(c => c.StripeId == stripePlan.ProductId);
+                    if (product == null)
+                    {
+                        product = await CreateSubscriptionProductAsync(stripePlan.Nickname, stripePlan.ProductId);
+                    }
                     subscriptionPlan = new Models.Subscription()
                     {
                         Name = stripePlan.Nickname,
@@ -900,6 +908,7 @@ namespace Hood.Services
                         Interval = stripePlan.Interval,
                         IntervalCount = (int)stripePlan.IntervalCount,
                         NumberAllowed = 1,
+                        SubscriptionProductId = product.Id
                     };
                     if (stripePlan.TrialPeriodDays.HasValue)
                     {
@@ -930,11 +939,7 @@ namespace Hood.Services
 
         private async Task<SubscriptionProduct> SyncProductForSubscriptionPlanAsync(Models.Subscription subscriptionPlan)
         {
-            SubscriptionProduct product = null;
-            if (subscriptionPlan.SubscriptionProductId.HasValue)
-            {
-                product = await _db.SubscriptionProducts.SingleOrDefaultAsync(c => c.Id == subscriptionPlan.SubscriptionProductId.Value);
-            }
+            SubscriptionProduct product = await _db.SubscriptionProducts.SingleOrDefaultAsync(c => c.Id == subscriptionPlan.SubscriptionProductId);
             if (subscriptionPlan.StripeId.IsSet())
             {
                 Plan stripePlan = await _stripe.GetPlanByIdAsync(subscriptionPlan.StripeId);
@@ -1051,23 +1056,21 @@ namespace Hood.Services
         #endregion
 
         #region Stripe customer object
-        public async Task<Customer> GetCustomerObjectAsync(string stripeId)
+        public async Task<Customer> GetOrCreateStripeCustomerForUser(string userId)
         {
+            var user = await GetUserByIdAsync(userId);
             // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
-            if (!stripeId.IsSet())
+            Customer customer;
+            if (user.StripeId.IsSet())
             {
-                return null;
+                customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
+                if (customer != null)
+                    return customer;
             }
-
-            try
-            {
-                Customer customer = await _stripe.GetCustomerByIdAsync(stripeId);
-                return customer;
-            }
-            catch (StripeException)
-            {
-                return null;
-            }
+            customer = await _stripe.CreateCustomerAsync(user);
+            user.StripeId = customer.Id;
+            await UpdateUserAsync(user);
+            return customer;
         }
         public async Task<List<Customer>> GetMatchingCustomerObjectsAsync(string email)
         {
@@ -1198,103 +1201,16 @@ namespace Hood.Services
                 .Include(s => s.Subscription)
                 .SingleOrDefaultAsync(c => c.StripeId == stripeId);
         }
-        public async Task<UserSubscription> CreateUserSubscriptionAsync(int planId, string stripeToken, string cardId)
+        public async Task<UserSubscription> CreateUserSubscription(int planId, string userId, Stripe.Subscription newSubscription)
         {
             // Load user object and clear cache.
-            ApplicationUser user = await GetCurrentUserAsync();
-
-            // Load the subscription plan.
-            Models.Subscription subscription = await GetSubscriptionPlanByIdAsync(planId);
-
-            // Get the stripe subscription plan object.
-            Plan plan = await _stripe.GetPlanByIdAsync(subscription.StripeId);
-
-            // Check for customer or throw, but allow it to be null.
-            Customer customer = await GetCustomerObjectAsync(user.StripeId);
-            if (customer == null)
-            {
-                throw new Exception("There was a problem loading the customer object.");
-            }
-
-            // The object for the new user subscription to be received from stripe.
-            Stripe.Subscription newSubscription = null;
-
-            // if the user has provided a cardId to use, then let's try and use that!
-            if (cardId.IsSet())
-            {
-                if (customer == null)
-                {
-                    throw new Exception("There is no customer account associated with this user.");
-                }
-
-                // set the card as the default for the user, then subscribe the user.
-                await _stripe.SetDefaultCardAsync(customer.Id, cardId);
-
-                // check if the user is already on a subscription, if so, update that.
-                Stripe.Subscription sub = (await _stripe.GetSusbcriptionsByCustomerIdAsync(user.StripeId)).FirstOrDefault(s => s.Plan.Id == plan.Id && s.Status != "canceled");
-                if (sub != null)
-                {
-                    // there is an existing subscription, which is not cancelleed and matches the plan. BAIL OUT!                   
-                    throw new Exception("There is already a matching active subscription to this plan.");
-                }
-                else
-                {
-                    // finally, add the user to the NEW subscription.
-                    newSubscription = await _stripe.AddCustomerToPlan(customer.Id, subscription.StripeId);
-                }
-            }
-            else
-            {
-                // if not, then the user must have supplied a token
-                Stripe.Token stripeTokenObj = await _stripe.TokenService.GetAsync(stripeToken);
-                if (stripeTokenObj == null)
-                {
-                    throw new Exception("The payment method token was invalid.");
-                }
-
-                // Check if the customer object exists.
-                if (customer == null)
-                {
-                    // if it does not, create it, add the card and subscribe the plan.
-                    customer = await _stripe.CreateCustomerAsync(user, stripeToken);
-                    user.StripeId = customer.Id;
-                    await UpdateUserAsync(user);
-                    newSubscription = await _stripe.AddCustomerToPlan(user.StripeId, plan.Id);
-                }
-                else
-                {
-                    // check if the user is already on a subscription, if so, update that.
-                    Stripe.Subscription sub = (await _stripe.GetSusbcriptionsByCustomerIdAsync(user.StripeId)).FirstOrDefault(s => s.Plan.Id == plan.Id && s.Status != "canceled");
-                    if (sub != null)
-                    {
-                        // there is an existing subscription, which is not cancelleed and matches the plan. BAIL OUT!                   
-                        throw new Exception("There is already a matching active subscription to this plan.");
-                    }
-                    else
-                    {
-                        // finally, add the user to the NEW subscription, using the new card as the charge source.
-                        Card source = await _stripe.CreateCardAsync(customer.Id, stripeToken);
-
-                        // set the card as the default for the user, then subscribe the user.
-                        await _stripe.SetDefaultCardAsync(customer.Id, source.Id);
-
-                        newSubscription = await _stripe.AddCustomerToPlan(customer.Id, plan.Id);
-                    }
-                }
-            }
-
-            // We got this far, let's add the detail to the local DB.
-            if (newSubscription == null)
-            {
-                throw new Exception("The new subscription was not created correctly, please try again.");
-            }
-
+            ApplicationUser user = await GetUserByIdAsync(userId);
             UserSubscription newUserSub = new UserSubscription();
             newUserSub = newUserSub.UpdateFromStripe(newSubscription);
             newUserSub.StripeId = newSubscription.Id;
             newUserSub.CustomerId = user.StripeId;
             newUserSub.UserId = user.Id;
-            newUserSub.SubscriptionId = subscription.Id;
+            newUserSub.SubscriptionId = planId;
             await _db.UserSubscriptions.AddAsync(newUserSub);
             _db.SaveChanges();
             return newUserSub;
@@ -1353,7 +1269,7 @@ namespace Hood.Services
             UserSubscription userSub = await GetUserSubscriptionByIdAsync(subscriptionId);
 
             // Check for customer or throw.
-            Customer customer = await GetCustomerObjectAsync(userSub.StripeId);
+            Customer customer = await GetOrCreateStripeCustomerForUser(userSub.StripeId);
             if (customer == null)
             {
                 throw new Exception("There was a problem loading the customer object.");
@@ -1452,7 +1368,6 @@ namespace Hood.Services
 
             return userSubscription;
         }
-
         private async Task<UserSubscription> UpdateSubscriptionFromStripe(UserSubscription userSubscription, Stripe.Subscription stripeSub)
         {
             if (stripeSub.Plan == null)

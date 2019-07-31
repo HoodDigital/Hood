@@ -1,6 +1,7 @@
 ﻿using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using Hood.ViewModels;
+using System.Threading.Tasks;
 
 namespace Hood.ViewComponents
 {
@@ -14,11 +15,11 @@ namespace Hood.ViewComponents
             _content = content;
         }
 
-        public IViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
             HeaderModel model = new HeaderModel()
             {
-                Pages = _content.GetPages()
+                Pages = await _content.GetPages()
             };
             return View(model);
         }

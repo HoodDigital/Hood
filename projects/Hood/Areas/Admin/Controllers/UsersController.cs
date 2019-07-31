@@ -76,6 +76,7 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
+                model.Notes = user.Notes;
                 await _account.UpdateProfileAsync(model);
 
                 SaveMessage = "Saved!";
@@ -97,10 +98,10 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 var user = await _account.GetUserByIdAsync(id);
-                var customer = await _account.GetCustomerObjectAsync(user.StripeId);
+                var customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
                 if (customer == null)
                 {
-                    customer = await _account.GetCustomerObjectAsync(customerId);
+                    customer = await _stripe.GetCustomerByIdAsync(customerId);
                     if (customer == null)
                         throw new Exception("The customer object does could not be validated.");
                     if (customer.Email.ToLower() != user.Email.ToLower())
@@ -111,6 +112,8 @@ namespace Hood.Areas.Admin.Controllers
                     SaveMessage = "Account has been successfully linked with the Stripe customer account.";
                     MessageType = AlertType.Success;
                 }
+                else
+                    throw new Exception("The user is already linked to stripe.");
             }
             catch (Exception ex)
             {
@@ -124,7 +127,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             model.AllRoles = await _account.GetAllRolesAsync();
             model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
-            model.Customer = await _account.GetCustomerObjectAsync(model.StripeId);
+            model.Customer = await _stripe.GetCustomerByIdAsync(model.StripeId);
             if (model.Customer == null)
                 model.MatchedCustomerObjects = await _account.GetMatchingCustomerObjectsAsync(model.Email);
         }

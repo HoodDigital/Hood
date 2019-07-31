@@ -30,7 +30,14 @@ $.hood.Inline = {
       $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
+  CurrentModal: null,
   Modal: function Modal(url, complete) {
+    var closePrevious = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    if (closePrevious && $.hood.Inline.CurrentModal) {
+      $.hood.Inline.CurrentModal.modal('hide');
+    }
+
     $.get(url, function (data) {
       modalId = '#' + $(data).attr('id');
       $(data).addClass('hood-inline-modal');
@@ -40,6 +47,7 @@ $.hood.Inline = {
       }
 
       $('body').append(data);
+      $.hood.Inline.CurrentModal = $(modalId);
       $(modalId).modal(); // Workaround for sweetalert popups.
 
       $(modalId).on('shown.bs.modal', function () {
@@ -48,6 +56,11 @@ $.hood.Inline = {
     }).done(function () {
       $.hood.Inline.RunComplete(complete);
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
+  },
+  CloseModal: function CloseModal() {
+    if ($.hood.Inline.CurrentModal) {
+      $.hood.Inline.CurrentModal.modal('hide');
+    }
   },
   Task: function Task(e) {
     e.preventDefault();

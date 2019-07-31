@@ -1,9 +1,7 @@
-@model SubscriptionModel
+@model ChangeSubscriptionModel
 @{
-    ViewBag.Title = "Manage your subscription";
-    ViewBag.SubTitle = "Pay for more features and expand your profiles!";
-    AccountInfo _account = Context.GetAccountInfo();
-    var planCategories = Model.Plans.Where(p => p.Category.IsSet()).Select(p => p.Category).Distinct();
+    ViewBag.Title = "Change your subscription";
+    ViewBag.SubTitle = "Confirm your new package and go!";
 }
 <section class="page-section">
     @if (Model.SaveMessage.IsSet())
@@ -25,59 +23,65 @@
         </div>
     }
 
-    @if (planCategories.Count() == 0)
-    {
-        if (Model.Plans.Count == 0)
-        {
-            @Html.BootstrapAlert("There are no subscription plans added to the site yet.", AlertType.Warning);
+    <div class="row">
+        @{ 
+            var currentSub = Model.CurrentSubscription.Subscription;
         }
-        else
-        {
-            if (Model.User.HasActiveSubscription(Model.Category))
-            {
-                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(Model.Category));
-            }
-            else
-            {
-                <div class="current-subscription well">
-                    <h4>You are not currently on a paid package, you have the free package.</h4>
-                    <p>
-                        You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
-                    </p>
-                    <p>
-                        <a class="btn btn-sm btn-primary" asp-action="Change">Get a package!</a>
-                        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
-                    </p>
+        <div class="col-xs-12 col-sm-6">
+            <div class="thumbnail price">
+                <div class="panel-heading  text-center bg-info">
+                    <p><strong>Change from this:</strong></p>
+                    <h3>@currentSub.Name</h3>
+                    <p>@currentSub.FullPrice</p>
+                    @if (currentSub.TrialPeriodDays > 0)
+                    {
+                        <p>@currentSub.TrialPeriodDays days free trial</p>
+                    }
+                    else
+                    {
+                        <p>No trial period.</p>
+                    }
                 </div>
-            }
-            await Html.RenderPartialAsync("_Subscriptions_Table");
-        }
-    }
-    else
-    {
-        foreach (string category in planCategories)
-        {
-            <h1>@category.ToTitleCase() Packages</h1>
-            if (Model.User.HasActiveSubscription(category))
-            {
-                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", Model.User.GetActiveSubscription(category));
-            }
-            else
-            {
-                <div class="current-subscription well">
-                    <h4>You are not currently on a paid package, you have the free package.</h4>
-                    <p>
-                        You do not currently have an active paid package, but you can access your previous subscriptions and invoices here:
-                    </p>
-                    <p>
-                        <a class="btn btn-sm btn-primary" asp-action="Change" asp-route-category="@category">Get a package!</a>
-                        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
-                    </p>
+                <div class="p-lg text-center">
+                    @currentSub.Description
                 </div>
-            }
-            var ptModel = Model;
-            ptModel.Category = category;
-            await Html.RenderPartialAsync("_Subscriptions_Table", ptModel);
-        }
-    }
+                <div class="panel-footer text-center">
+                    <span class="price">@currentSub.Price</span>
+                    <span>per @currentSub.Interval</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="thumbnail price">
+                <div class="panel-heading  text-center bg-info">
+                    <p><strong>To this:</strong></p>
+                    <h3>@Model.Plan.Name</h3>
+                    <p>@Model.Plan.FullPrice</p>
+                    @if (Model.Plan.TrialPeriodDays > 0)
+                    {
+                        <p>@Model.Plan.TrialPeriodDays days free trial</p>
+                    }
+                    else
+                    {
+                        <p>No trial period.</p>
+                    }
+                </div>
+                <div class="p-lg text-center">
+                    @Model.Plan.Description
+                </div>
+                <div class="panel-footer text-center">
+                    <span class="price">@Model.Plan.Price</span>
+                    <span>per @Model.Plan.Interval</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="SubscriptionId" />
+        <input type="hidden" asp-for="PlanId" />
+        <button class="btn btn-success" type="submit">Confirm &amp; Change Subscription</button>
+    </form>
+
 </section>

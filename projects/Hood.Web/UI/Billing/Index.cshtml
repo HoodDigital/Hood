@@ -59,37 +59,21 @@
         {
             <div class="alert alert-info">
                 <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You do not have any active subscriptions.</p>
-                <p><a asp-action="New" asp-controller="Subscriptions" class="btn btn-xs btn-success"><i class="fa fa-user-plus m-r-xs"></i>Upgrade</a></p>
+                <p><a asp-action="Select" asp-controller="Subscriptions" class="btn btn-xs btn-success"><i class="fa fa-user-plus m-r-xs"></i>Get a package</a></p>
             </div>
         }
         <div class="panel panel-default">
             <div class="panel-heading">
-                <a asp-action="AddCard" asp-controller="Billing" class="btn btn-xs btn-success pull-right"><i class="fa fa-credit-card m-r-xs"></i>Add Card</a>
+                <a class="btn btn-xs btn-success pull-right pull-right hood-modal" asp-action="AddCard" data-complete="$.hood.Stripe.PaymentMethods.Add">
+                    <i class="fa fa-cc-visa mr-2"></i>
+                    Add card
+                </a>
                 Your Cards
             </div>
             <div class="panel-body">
-                @if (Model.Customer != null && Model.Customer.Sources != null && Model.Customer.Sources.Data.Count != 0)
-                {
-                    <div class="accordion">
-                    @foreach (var itm in Model.Customer.Sources.Data)
-                    {
-                        switch (itm.Object)
-                        {
-                            case Stripe.SourceType.Card:
-                                var card = itm as Stripe.Card;
-                                card.Customer = Model.Customer;
-                                await Html.RenderPartialAsync("_Card", card);
-                                break;
-                        }
-                    }
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-danger">
-                        <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You do not have any saved cards.</p>
-                    </div>
-                }
+                <div id="payment-method-list" class="hood-inline" data-url="@Url.Action("PaymentMethods")">
+                    <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading payment methods...</alert>
+                </div>
             </div>
         </div>
     </div>

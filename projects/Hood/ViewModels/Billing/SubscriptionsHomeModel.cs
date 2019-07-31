@@ -12,4 +12,9 @@ namespace Hood.ViewModels
         public Stripe.Invoice NextInvoice { get; set; }
         public List<UserSubscription> Subscriptions { get; set; }
     }
+    public partial class PaymentMethodsModel : SaveableModel
+    {
+        public List<Stripe.PaymentMethod> PaymentMethods { get; set; }
+        public Stripe.Customer Customer { get; set; }
+    }
 }

@@ -430,12 +430,12 @@ namespace Hood.Services
 
         #region Sitemap
         // Sitemap
-        public List<Content> GetPages(string category = null)
+        public async Task<List<Content>> GetPages(string category = null)
         {
             string cacheKey = typeof(Content).ToString() + ".Pages";
             if (!_cache.TryGetValue(cacheKey, out List<Content> pages))
             {
-                var content = GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category }).Result;
+                var content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
                 pages = content.List;
                 _cache.Add(cacheKey, pages, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }

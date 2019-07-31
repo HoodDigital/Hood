@@ -1,40 +1,30 @@
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 if (!$.hood) $.hood = {};
 $.hood.Themes = {
   Init: function Init() {
     $('body').on('click', '.activate-theme', $.hood.Themes.Activate);
   },
+  Loaded: function Loaded(data) {
+    $.hood.Loader(false);
+  },
+  Reload: function Reload(complete) {
+    if ($('#themes-list').doesExist()) $.hood.Inline.Reload($('#themes-list'), complete);
+  },
   Activate: function Activate(e) {
-    var _swal;
+    e.preventDefault();
+    $tag = $(this);
 
-    var $this = $(this);
-    swal((_swal = {
-      title: "Are you sure?",
-      text: "The site will change themes, and the selected theme will be live right away.",
-      type: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Yes, go ahead.",
-      cancelButtonText: "No, cancel!"
-    }, _defineProperty(_swal, "showCancelButton", true), _defineProperty(_swal, "closeOnConfirm", false), _defineProperty(_swal, "showLoaderOnConfirm", true), _defineProperty(_swal, "closeOnCancel", false), _swal), function (isConfirm) {
+    activateThemeCallback = function activateThemeCallback(isConfirm) {
       if (isConfirm) {
-        // delete functionality
-        $.post('/admin/themes/activate', {
-          name: $this.data('name')
-        }, function (data) {
-          if (data.Success) {
-            window.location = '/admin/theme';
-          } else {
-            swal("Error", "There was a problem activating the theme:\n\n" + data.Errors, "error");
-          }
+        $.post($tag.attr('href'), function (data) {
+          $.hood.Helpers.ProcessResponse(data);
+          $.hood.Themes.Reload();
         });
-      } else {
-        swal("Cancelled", "It's all good in the hood!", "error");
       }
-    });
+    };
+
+    $.hood.Alerts.Confirm("The site will change themes, and the selected theme will be live right away.", "Are you sure?", activateThemeCallback, 'error', '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process will take effect immediately!</strong></span>');
   }
 };
 $(document).ready($.hood.Themes.Init);
