@@ -75,7 +75,6 @@ namespace Hood.Services
         #endregion
 
         #region LinqToTwitter
-        [Obsolete("No longer supported, should be loaded in theme if required. Will be removed in next version.", true)]
         Task<List<LinqToTwitter.Status>> GetTweets(string name, int count = 6);
         #endregion
     }
