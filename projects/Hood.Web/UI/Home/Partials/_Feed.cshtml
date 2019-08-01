@@ -3,7 +3,7 @@
     <div class="col-sm-8">
         @if (Model.List.Count == 0)
         {
-            await Html.RenderPartialAsync("_NoResults");
+            <partial name="_NoResults" />
         }
         else
         {
@@ -11,14 +11,13 @@
             {
                 <div class="col-md-12">
                     <div class="content-feed-item @content.ContentType">
-                        @{ await Html.RenderPartialAsync("_FeaturedMedia", content); }
+                        <partial name="_FeaturedMedia" model="content" />
                         <h3><a href="@content.Url">@content.Title</a></h3>
                         <p>
                             <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">@content.Author.ToDisplayName()</a></span>
                             <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
                         </p>
                         <p>@content.Excerpt</p>
-                        <p class="text-muted"><em>@content.TagString</em></p>
                         <hr />
                         <span class="pull-right"><a href="@content.Url">Read More<i class="fa fa-long-arrow-right m-l-xs"></i></a></span>
                         @if (Model.ContentType.ShowCategories)
@@ -42,10 +41,10 @@
                     </div>
                 </div>
             }
-            await Html.RenderPartialAsync("_Pagination");
+            <partial name="_Pagination" />
         }
     </div>
     <div class="col-sm-4">
-        @{ await Html.RenderPartialAsync("_Sidebar"); }
+        <partial name="_Sidebar" />
     </div>
 </div>

@@ -54,4 +54,4 @@
     <meta name="twitter:description" content="@Model.ContentType.Description" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
-@{ await Html.RenderPartialAsync(Feed); }
+<partial name="@Feed" />

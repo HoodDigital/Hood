@@ -8,23 +8,23 @@
     <div class="col-sm-9">
         @if (Model.List.Count == 0)
         {
-        await Html.RenderPartialAsync("_Forums_NoResults");
+            <partial name="_Forums_NoResults" />
         }
         else
         {
-        @foreach (var forum in Model.List)
-        {
-        await Html.RenderPartialAsync("_Template_Forum", forum);
-        }
-        @if (Model.TotalPages > 1)
-        {
-        <div class="text-center">
-            @{ await Html.RenderPartialAsync("_Pagination");}
-        </div>
-        }
+            @foreach (var forum in Model.List)
+            {
+                <partial name="_Template_Forum" />
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <div class="text-center">
+                    <partial name="_Pagination" />
+                </div>
+            }
         }
     </div>
     <div class="col-sm-3">
-        @{ await Html.RenderPartialAsync("_Forums_Sidebar"); }
+        <partial name="_Forums_Sidebar" />
     </div>
 </div>

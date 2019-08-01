@@ -9,12 +9,12 @@
         switch (Model.ContentType.BaseName)
         {
             case "News":
-                await Html.RenderPartialAsync("_NewsCard", content);
+                <partial name="_NewsCard" />
                 break;
             case "Portfolio":
-                await Html.RenderPartialAsync("_PortfolioCard", content);
+                <partial name="_PortfolioCard" />
                 break;
         }
     }
-    await Html.RenderPartialAsync("_LoadMoreBlock");
+    <partial name="_LoadMoreBlock" />
 }

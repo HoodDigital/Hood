@@ -10,7 +10,7 @@
         switch (itm.Type)
         {
             case Stripe.SourceType.Card:
-                await Html.RenderPartialAsync("_Card", itm);
+                <partial name="_Card" model="itm" />
                 break;
         }
     }

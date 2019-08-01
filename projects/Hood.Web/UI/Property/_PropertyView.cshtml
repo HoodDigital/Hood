@@ -160,9 +160,9 @@
         <div class="portfolio-carousel owl-carousel owl-theme">
             <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
                 @foreach (var similar in Model.Similar)
-            {
-                await Html.RenderPartialAsync("_PropertyCard", similar);
-            }
+                {
+                    <partial name="_PropertyView" model="similar" />
+                }
             </div>
         </div>
     </div>

@@ -1,18 +1,9 @@
-@{ 
-    Layout = "_Layout";
+@{
+    ViewData["Title"] = $"Events Layout";
+    ViewData["SubTitle"] = "This is the Events Layout - it can be overwritten in your theme directory by copying <code>/Views/Layouts/_EventsLayout.cshtml</code> to match in your themes directory <code>/Themes/{YOURTHEME}/Views/Layouts/_EventsLayout.cshtml</code>";
+
+    Layout = "_BasicLayout";
 }
-@section styles {
-    @RenderSection("styles", required: false)
-}
-@section metas {
-    @RenderSection("metas", required: false)
-}
-<div class="jumbotron">
-    <div class="container">
-        <h1>Events Layout</h1>
-        <p>This is the Events Layout - it can be overwritten in your theme directory by copying <code>/Views/Layouts/_EventsLayout.cshtml</code> to match in your themes directory <code>/Themes/{YOURTHEME}/Views/Layouts/_EventsLayout.cshtml</code></p>
-    </div>
-</div>
 <section class="container">
     @RenderBody()
 </section>

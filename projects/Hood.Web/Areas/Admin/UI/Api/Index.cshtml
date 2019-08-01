@@ -110,7 +110,7 @@
                         </div>
                     }
                     <div class="text-center">
-                        @{ await Html.RenderPartialAsync("_Pagination"); }
+                        <partial name="_Pagination" model="Model" />
                     </div>
                 }
                 else

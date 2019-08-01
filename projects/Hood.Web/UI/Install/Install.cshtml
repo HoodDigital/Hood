@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>CMS Setup Incomplete</title>
-    @{ await Html.RenderPartialAsync("_LoginStyles"); }
+    <partial name="_Styles_Login" />
 </head>
 <body class="install">
     <div class="container">
@@ -49,6 +49,6 @@
             <p class="text-center"><small><a href="http://hooddigital.com/">HoodCMS v@Engine.Version by Hood Digital</a></small></p>
         </div>
     </div>
-    @{ await Html.RenderPartialAsync("_LoginScripts"); }
+    <partial name="_Scripts_Login" />
 </body>
 </html>

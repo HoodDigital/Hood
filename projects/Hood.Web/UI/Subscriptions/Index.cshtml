@@ -1,16 +1,18 @@
 @model SubscriptionProductsModel
 @{
     ViewBag.Title = "Manage Subscriptions";
+    ViewBag.SubTitle = "Use this area to provide information to your customers about their subscriptions, what packages they are on, how to cancel and upgrade/downgrade.";
+
     Layout = "_BasicLayout";
 }
 <div class="container">
     @if (Model.SaveMessage.IsSet())
     {
-        <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
+        <alert type="@Model.MessageType">@Model.SaveMessage</alert>
     }
     @if (Model.Products.Count() == 0)
     {
-        <alert type="Warning" size="Medium" icon="fa-exclamation-triangle">There are no subscription products added to the site yet.</alert>
+        <alert type="Warning">There are no subscription products added to the site yet.</alert>
     }
     else
     {
@@ -23,7 +25,7 @@
             </h3>
             if (User.IsSubscribedToProduct(product.Id))
             {
-                await Html.RenderPartialAsync("_Subscriptions_CurrentInfo", User.GetActiveSubscription(product.Id));
+                <partial name="_Subscriptions_CurrentInfo" model="User.GetActiveSubscription(product.Id)" />
             }
             else
             {

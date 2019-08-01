@@ -1,11 +1,11 @@
 @model Content
 <div class="featured-media">
-    @switch (Model.GetMetaValue("Settings.SubType"))
+    @switch (Model.GetMetaValue<string>("Settings.SubType"))
     {
         case "Video":
-            @if (Model.GetMetaValue("Content.News.Video").IsSet())
+            @if (Model.GetMetaValue<string>("Content.News.Video").IsSet())
             {
-                @Html.Raw(Model.GetMetaValue("Content.News.Video"));
+                @Html.Raw(Model.GetMetaValue<string>("Content.News.Video"));
             }
             break;
         case "Slides":

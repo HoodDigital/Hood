@@ -11,7 +11,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Your next payment</div>
                 <div class="panel-body">
-                    @{ await Html.RenderPartialAsync("_Invoice", Model.NextInvoice); }
+                    <partial name="_Invoice" model="Model.NextInvoice" />
                 </div>
             </div>
         }
@@ -29,7 +29,7 @@
                     <div class="accordion">
                         @foreach (Stripe.Invoice invoice in Model.Invoices)
                         {
-                            await Html.RenderPartialAsync("_Invoice", invoice);
+                            <partial name="_Invoice" model="invoice" />
                         }
                     </div>
                 </div>
@@ -48,9 +48,9 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Your Subscriptions</div>
                 <div class="panel-body">
-                    @foreach (var itm in Model.Subscriptions)
+                    @foreach (var subscription in Model.Subscriptions)
                     {
-                        await Html.RenderPartialAsync("_Subscription", itm);
+                        <partial name="_Subscription" model="subscription" />
                     }
                 </div>
             </div>

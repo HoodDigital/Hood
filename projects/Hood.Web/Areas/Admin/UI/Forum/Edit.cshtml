@@ -60,8 +60,8 @@
                             <li><a data-toggle="tab" href="#posting" aria-expanded="true"> Posting Settings</a></li>
                         </ul>
                         <div class="tab-content">
-                            @{await Html.RenderPartialAsync("_Editor_Info"); }
-                            @{await Html.RenderPartialAsync("_Editor_Settings"); }
+                            <partial name="_Editor_Info" model="Model" />
+                            <partial name="_Editor_Settings" model="Model" />
                         </div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                     </div>
                     <div class="panel-body small">
                         <h4 class="">Images</h4>
-                        @{ await Html.RenderPartialAsync("_Field_Images"); }
+                        <partial name="_Field_Images" />
                     </div>
                     <div class="panel-body small">
                         <h4>Categories</h4>

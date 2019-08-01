@@ -1,6 +1,7 @@
 @model UserViewModel
 @{
     ViewData["Title"] = "Update your profile";
+    ViewData["SubTitle"] = "This is the user profile page, update your profile and add images, social media links and a Bio. These can be used in templates around the site.";
     ViewData.AddActivePage(ManageNavPages.Index);
 }
 @if (Model.SaveMessage.IsSet())

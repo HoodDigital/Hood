@@ -6,7 +6,7 @@
 
     var cmTitle = Model.Property.GetMeta("SEO.Meta.Title");
     var cmDesc = Model.Property.GetMeta("SEO.Meta.Description");
-    string metaTitle = Model.Property.Title + " - " + _basicSettings.SiteTitle;
+    string metaTitle = Model.Property.Title + " - " + _basicSettings.FullTitle;
     string metaDesc = Model.Property.ShortDescription;
     if (!cmTitle.GetStringValue().IsNullOrEmpty())
     {
@@ -30,7 +30,7 @@
 @section metas {
     <meta name="description" content="@Model.Property.ShortDescription" />
     <meta property="og:author" content="@Model.Property.Agent.ToDisplayName()" />
-    <meta property="og:title" content="@Model.Property.Title - @_basicSettings.SiteTitle" />
+    <meta property="og:title" content="@Model.Property.Title - @_basicSettings.FullTitle" />
     @if (Model.Property.FeaturedImage.DownloadUrl.IsSet())
     {
         <meta property="og:image" content="@Model.Property.FeaturedImage.LargeUrl" />
@@ -44,7 +44,7 @@
         <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
     }
     <meta property="og:description" content="@Model.Property.ShortDescription" />
-    <meta name="twitter:title" content="@Model.Property.Title - @_basicSettings.SiteTitle" />
+    <meta name="twitter:title" content="@Model.Property.Title - @_basicSettings.FullTitle" />
     <meta name="twitter:description" content="@Model.Property.ShortDescription" />
 }
-@{ await Html.RenderPartialAsync("_PropertyView"); }
+<partial name="_PropertyView" />

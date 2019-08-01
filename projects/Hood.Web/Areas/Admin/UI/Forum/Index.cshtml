@@ -104,7 +104,7 @@
                                         {
                                             <span class="tag-item bg-color-green txt-color-white">Published</span>
                                         }
-                                        else 
+                                        else
                                         {
                                             <span class="tag-item bg-color-purple txt-color-white">Archived</span>
                                         }
@@ -151,7 +151,8 @@
                                     <a class="btn-default btn btn-sm action-button" asp-action="Edit" asp-route-id="@forum.Id">
                                         <i class="fa fa-edit m-r-xs"></i>
                                         <span>
-                                        Edit</span>
+                                            Edit
+                                        </span>
                                     </a>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -181,7 +182,7 @@
                         </div>
                     }
                     <div class="text-center">
-                        @{ await Html.RenderPartialAsync("_Pagination"); }
+                        <partial name="_Pagination" />
                     </div>
                 }
                 else

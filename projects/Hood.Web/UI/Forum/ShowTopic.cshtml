@@ -112,25 +112,25 @@
         </div>
         @if (Model.List.Count == 0)
         {
-            await Html.RenderPartialAsync("_Posts_NoResults");
+            <partial name="_Posts_NoResults" />
         }
         else
         {
             @foreach (var post in Model.List)
             {
-                await Html.RenderPartialAsync("_Template_Post", post);
+                <partial name="_Template_Post" model="Model.Recent" />
             }
             @if (Model.TotalPages > 1)
             {
                 <div class="text-center">
-                    @{ await Html.RenderPartialAsync("_Pagination");}
+                    <partial name="_Pagination" />
                 </div>
             }
         }
         <hr />
-        @{ await Html.RenderPartialAsync("_Forms_Post"); }
+        <partial name="_Forms_Post" />
     </div>
     <div class="col-sm-3">
-        @{ await Html.RenderPartialAsync("_Posts_Sidebar"); }
+        <partial name="_Posts_Sidebar" />
     </div>
 </div>

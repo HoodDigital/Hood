@@ -1,10 +1,8 @@
 @{
-    BasicSettings _basicSettings = Engine.Settings.Basic;
-    Layout = "_BasicLayout";
+    ViewData["Title"] = $"Account: {ViewBag.Title}";
+    ViewData["SubTitle"] = ViewData["SubTitle"];
 
-    ViewData["SubTitle"] = ViewData["Title"];
-    ViewData["PageTitle"] = (ViewData["Title"] as string) + (Engine.Settings.Basic.FullTitle.IsSet() ? " - " + Engine.Settings.Basic.FullTitle : "");
-    ViewData["Title"] = "Manage your account";
+    Layout = "_BasicLayout";
 }
 <div class="container m-b-lg">
     @RenderSection("alerts", false)

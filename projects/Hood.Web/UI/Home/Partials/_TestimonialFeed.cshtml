@@ -2,7 +2,7 @@
 
 @if (Model.List.Count == 0)
 {
-    await Html.RenderPartialAsync("_NoResults");
+    <partial name="_NoResults" />
 }
 else
 {
@@ -13,10 +13,10 @@ else
                 <div class="testimonial">
                     <blockquote>@content.Excerpt</blockquote>
                     <p class="testimonial-author">@content.Title</p>
-                    <p class="testimonial-company">@content.GetMetaValue("CompanyName")</p>
+                    <p class="testimonial-company">@(content.GetMetaValue<string>("CompanyName"))</p>
                 </div>
             </div>
         }
     </div>
-    await Html.RenderPartialAsync("_Pagination");
+     <partial name="_Pagination" />
 }

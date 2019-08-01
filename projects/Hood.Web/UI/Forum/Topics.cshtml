@@ -49,25 +49,25 @@
     <div class="col-sm-9">
         @if (Model.List.Count == 0)
         {
-            await Html.RenderPartialAsync("_Topics_NoResults");
+            <partial name="_Topics_NoResults" />
         }
         else
         {
             @foreach (var topic in Model.List)
             {
-                await Html.RenderPartialAsync("_Template_Topic", topic);
+                <partial name="_Template_Topic" model="topic" />
             }
             @if (Model.TotalPages > 1)
             {
                 <div class="text-center">
-                    @{ await Html.RenderPartialAsync("_Pagination");}
+                    <partial name="_Pagination" />
                 </div>
             }
         }
         <hr />
-        @{ await Html.RenderPartialAsync("_Forms_Topic"); }
+        <partial name="_Forms_Topic" />
     </div>
     <div class="col-sm-3">
-        @{ await Html.RenderPartialAsync("_Topics_Sidebar"); }
+        <partial name="_Topics_Sidebar" />
     </div>
 </div>

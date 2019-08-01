@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    @{ await Html.RenderPartialAsync("_BaseMetas"); }
+    <partial name="_Metas_Base" />
     <title>@ViewData["Title"]</title>
     @RenderSection("metas", required: false)
-    @{ await Html.RenderPartialAsync("_LoginStyles"); }
+    <partial name="_Styles_Login" />
     @RenderSection("styles", required: false)
 </head>
 <body class="@ViewData["BodyClass"]">
@@ -20,7 +20,7 @@
             <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
         </footer>
     </div>
-    @{ await Html.RenderPartialAsync("_LoginScripts"); }
+    <partial name="_Scripts_Login" />
     @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -94,39 +94,46 @@
 }
 @if (template.IsSet())
 {
-    await Html.RenderPartialAsync("_EditableContent");
+    if (Model.Content.Body.IsSet())
+    {
+        <partial name="_EditableContent" />
+    }
+    else
+    {
+        <alert type="Info">Nothing to see here just yet.</alert>
+    }
 }
 else
 {
     switch (Model.ContentType.BaseName)
     {
         case "Event":
-            await Html.RenderPartialAsync("_EventView");
+            <partial name="_EventView" />
             break;
         case "Faq":
-            await Html.RenderPartialAsync("_FaqView");
+            <partial name="_FaqView" />
             break;
         case "Job":
-            await Html.RenderPartialAsync("_JobView");
+            <partial name="_JobView" />
             break;
         case "Portfolio":
-            await Html.RenderPartialAsync("_PortfolioView");
+            <partial name="_PortfolioView" />
             break;
         case "Product":
-            await Html.RenderPartialAsync("_ProductView");
+            <partial name="_ProductView" />
             break;
         case "Team":
-            await Html.RenderPartialAsync("_TeamView");
+            <partial name="_TeamView" />
             break;
         case "Testimonial":
-            await Html.RenderPartialAsync("_TestimonialView");
+            <partial name="_TestimonialView" />
             break;
         case "Page":
-            await Html.RenderPartialAsync("_EditableContent");
+            <partial name="_EditableContent" />
             break;
         case "News":
         default:
-            await Html.RenderPartialAsync("_NewsView");
+            <partial name="_NewsView" />
             break;
     }
 }

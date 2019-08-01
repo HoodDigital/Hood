@@ -6,7 +6,7 @@
 }
 <div class="header">
     <h2>Sign In</h2>
-    @{ await Html.RenderPartialAsync("_LoginSocials"); }
+    <partial name="_LoginSocials" />
     <p>Don't Have Account?<br />Click <a asp-action="Register">create an account</a> to create one.</p>
 </div>
 <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-signin" role="form">

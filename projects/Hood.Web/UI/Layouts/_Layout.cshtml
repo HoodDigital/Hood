@@ -12,7 +12,7 @@
 <html lang="en-gb" xml:lang="en">
 <head>
 
-    <partial name="_BaseMetas" />
+    <partial name="_Metas_Base" />
     <title>@ViewData["Title"]</title>
 
     @if (!IsSectionDefined("metas"))
@@ -48,7 +48,7 @@
 
     @if (Engine.Settings.Basic.EnablePreload)
     {
-        await Html.RenderPartialAsync("_PreLoader");
+        <partial name="_PreLoader" />
     }
 
     @RenderSection("beforecontent", required: false)

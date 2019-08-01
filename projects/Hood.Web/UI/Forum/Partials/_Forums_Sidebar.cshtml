@@ -1,4 +1,4 @@
 @model ForumModel
-@{ await Html.RenderPartialAsync("_Forums_Search"); }
-@{ await Html.RenderPartialAsync("_Forums_Recent", Model.Recent); }
-@{ await Html.RenderPartialAsync("_Forums_Categories"); }
+<partial name="_Forums_Search" />
+<partial name="_Forums_Recent" model="Model.Recent" />
+<partial name="_Forums_Categories" />

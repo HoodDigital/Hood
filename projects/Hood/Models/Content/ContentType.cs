@@ -77,6 +77,8 @@ namespace Hood.Models
         public bool ShowPreview { get; set; }
         [Display(Name = "Show Editor", Description = "Enable a rich text editor on the content body, otherwise no editor will show.")]
         public bool ShowEditor { get; set; }
+        [Display(Name = "Hide Author", Description = "Hide the author's name, details and avatar from the display page and feeds.")]
+        public bool HideAuthor { get; set; }
         [Display(Name = "Show Designer", Description = "Enables the inline designer (BETA). This allows the editing of content while viewing it.")]
         public bool ShowDesigner { get; set; }
         [Display(Name = "MultiLine Excerpt?", Description = "Set whether or not the excerpt field allows multi-line text.")]
