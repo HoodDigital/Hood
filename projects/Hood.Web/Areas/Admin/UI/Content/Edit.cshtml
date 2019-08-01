@@ -11,10 +11,10 @@
         @if (Model.Type.HasPage)
         {
             <a class="dropdown-item" href="@Model.Url" target="_blank"><i class="fa fa-search"></i>Preview</a>
+            <div class="dropdown-divider"></div>
         }
         <a class="dropdown-item" asp-action="Duplicate" asp-route-id="@Model.Id"><i class="fa fa-copy"></i>Duplicate</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete User</a>
+        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete</a>
     </div>
 }
 @section breadcrumbs {

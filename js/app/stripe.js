@@ -121,7 +121,7 @@ $.hood.Stripe = {
         }
       };
 
-      $.hood.Alerts.Confirm("The card will be used for all transactions from this point onwards.", "Are you sure?", setDefaultCardCallback, 'warning');
+      $.hood.Alerts.Confirm("The card will be used for all transactions from this point onwards.", "Are you sure?", setDefaultCardCallback, 'warning', '<span class="text-info"><i class="fa fa-exclamation-triangle"></i> <strong>You can change this at any time.</strong></span>');
     },
     Delete: function Delete(e) {
       e.preventDefault();

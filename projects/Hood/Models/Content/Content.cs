@@ -58,6 +58,18 @@ namespace Hood.Models
 
         // Settings
         public bool AllowComments { get; set; }
+        public bool ShowAuthor
+        {
+            get
+            {
+                if (Type == null || Type.HideAuthor || Author == null || Author.Anonymous)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
         public bool Public { get; set; }
 
         [Display(Name = "Featured Content", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]

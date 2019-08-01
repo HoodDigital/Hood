@@ -4,7 +4,7 @@
         <div class="blog-post mb-30">
             <h2>@Model.Content.Title</h2>
             <hr />
-            @if (Model.Content.Author != null)
+            @if (Model.Content.ShowAuthor)
             {
                 <p>
                     <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), Model.Content.Author.UserName)">@Model.Content.Author.ToDisplayName()</a></span>
