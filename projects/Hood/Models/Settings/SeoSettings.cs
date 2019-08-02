@@ -30,11 +30,11 @@ namespace Hood.Models
         public bool HasSocials => Twitter.IsSet() || Facebook.IsSet() || LinkedIn.IsSet() || GitHub.IsSet() || Instagram.IsSet() || Pinterest.IsSet();
 
         // basic
-        [Display(Name = "Google Analytics Code")]
+        [Display(Name = "Analytics Code (End of Body)", Description = "Rendered at the bottom of <code>&lt;/body&gt;</code> tag.")]
         public string GoogleAnalytics { get; set; }
-        [Display(Name = "Header Scripts", Description = "Rendered before closing <code>&lt;/head&gt;</code> tag.")]
+        [Display(Name = "Header Scripts", Description = "Rendered as close to top of <code>&lt;/head&gt;</code> tag as possible.")]
         public string HeadTags { get; set; }
-        [Display(Name = "Body Scripts", Description = "Rendered before closing <code>&lt;/body&gt;</code> tag.")]
+        [Display(Name = "Body Scripts", Description = "Rendered at the top of <code>&lt;/body&gt;</code> tag.")]
         public string BodyTags { get; set; }
         [Display(Name = "Facebook Application ID")]
         public string FacebookAppId { get; set; }

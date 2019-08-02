@@ -14,7 +14,7 @@
         <div class="col-sm">
             <partial name="_Media_Uploader" />
             <div id="media-list" class="hood-inline-list query" data-url="@Url.Action("List")" data-complete="$.hood.Media.Loaded">
-                <alert icon="fa fa-4x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading Media...</alert>
+                <partial name="_List_Media" />
             </div>
         </div>
     </div>

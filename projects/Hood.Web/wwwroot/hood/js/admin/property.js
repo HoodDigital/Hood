@@ -3,6 +3,7 @@
 $.hood.Property = {
     Init: function () {
         $('body').on('click', '.property-delete', $.hood.Property.Delete);
+        $('body').on('click', '.property-delete-all', $.hood.Property.DeleteAll);
         $('body').on('click', '.property-delete-floor', $.hood.Property.DeleteFloorArea);
         $('body').on('click', '.property-set-status', $.hood.Property.SetStatus);
 
@@ -79,6 +80,50 @@ $.hood.Property = {
             'error',
             '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
         );
+    },
+
+    DeleteAll: function (e) {
+        e.preventDefault();
+        $tag = $(this);
+
+        Swal.fire({
+            title: "Are you sure?",
+            html: "ALL of the properties will be permanently removed. Type 'DELETE' to continue.",
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            footer: '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This can take a few minutes to complete and CANNOT be undone.</strong></span>',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            showLoaderOnConfirm: true,
+            preConfirm: (login) => {
+                if (login.toLowerCase() === "delete") {
+                    var url = $tag.attr('href');
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Property.Lists.Property.Reload();
+                        if (data.Success) {
+                            if ($tag && $tag.data('redirect')) {
+                                $.hood.Alerts.Success(`<strong>Properties deleted, redirecting...</strong><br />Just taking you back to the property list.`);
+                                setTimeout(function () {
+                                    window.location = $tag.data('redirect');
+                                }, 1500);
+                            }
+                        }
+                        swal.close();
+                    })
+                        .fail($.hood.Inline.HandleError)
+                        .always($.hood.Inline.Finish);
+                } else {
+                    Swal.showValidationMessage(
+                        `You did not type DELETE.`
+                    );
+                    return false;
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        });
     },
 
     SetStatus: function (e) {

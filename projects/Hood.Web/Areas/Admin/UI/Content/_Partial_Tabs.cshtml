@@ -5,11 +5,14 @@
             Content
         </a>
     </li>
+    @if (Model.Type.ShowImage || Model.Type.ShowBanner)
+    {
         <li class="nav-item">
             <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">
                 Images
             </a>
         </li>
+    }
     @if (Model.Type.Templates)
     {
         <li class="nav-item">
@@ -18,8 +21,10 @@
             </a>
         </li>
     }
-    @if (Model.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + ".")).Count() > 0 ||
-   Model.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
+    @if (
+            Model.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + ".")).Count() > 0 ||
+            Model.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0
+        )
     {
         <li class="nav-item">
             <a class="nav-link" id="type-tab" data-toggle="tab" href="#type" role="tab" aria-controls="type" aria-selected="false">
@@ -42,9 +47,6 @@
                 SEO
             </a>
         </li>
-    }
-    @if (Model.Metadata.Where(c => c.Name.StartsWith("Settings.Image.")).Count() > 0)
-    {
     }
     @if (Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
     {

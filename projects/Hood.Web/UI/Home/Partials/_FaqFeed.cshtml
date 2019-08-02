@@ -19,7 +19,7 @@ else
                 </div>
                 <div id="@string.Format("faq-accordion-{0}", content.Id)" class="panel-collapse collapse" role="tabpanel" aria-labelledby="@string.Format("faq-heading-{0}", content.Id)">
                     <div class="panel-body">
-                        @content.Excerpt
+                        @Html.Raw(content.Excerpt)
                     </div>
                 </div>
             </div>

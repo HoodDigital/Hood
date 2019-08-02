@@ -26,6 +26,7 @@ namespace Hood.Services
     {
         private readonly IFTPService _ftp;
         private readonly IConfiguration _config;
+        private readonly IDirectoryManager _directoryManager;
         private readonly IMediaManager _media;
         private PropertySettings _propertySettings;
         private readonly IHttpContextAccessor _context;
@@ -37,11 +38,13 @@ namespace Hood.Services
             IConfiguration config,
             IMediaManager media,
             IAddressService address,
-            ILogService logService
+            ILogService logService, 
+            IDirectoryManager directoryManager
             )
         {
             _ftp = ftp;
             _config = config;
+            _directoryManager = directoryManager;
             Lock = new ReaderWriterLock();
             Total = 0;
             Tasks = 0;
@@ -62,6 +65,7 @@ namespace Hood.Services
             StatusMessage = "Not running...";
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(BlmFileImporter) + "\\";
             _propertySettings = Engine.Settings.Property;
+
             LocalFolder = env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
             _media = media;
             _context = context;
@@ -96,6 +100,7 @@ namespace Hood.Services
         private bool _killFlag;
         private readonly IAddressService _address;
         private readonly ILogService _logService;
+        private string DirectoryPath { get; set; }
 
         public bool RunUpdate(HttpContext context)
         {
@@ -138,6 +143,11 @@ namespace Hood.Services
                     if (User == null)
                         throw new Exception("Could not load the PropertyImporter user account.");
                 }
+
+                MediaDirectory propertyDirectory = _db.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+                if (propertyDirectory == null)
+                    throw new Exception("Could not load the Property directory.");
+                DirectoryPath = _directoryManager.GetPath(propertyDirectory.Id);
 
                 Lock.ReleaseWriterLock();
 
@@ -495,7 +505,7 @@ namespace Hood.Services
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, property.DirectoryPath);
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
@@ -546,7 +556,7 @@ namespace Hood.Services
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, property.DirectoryPath);
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
@@ -611,7 +621,7 @@ namespace Hood.Services
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, property.DirectoryPath) as MediaObject;
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {
@@ -672,7 +682,7 @@ namespace Hood.Services
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, property.DirectoryPath) as MediaObject;
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {

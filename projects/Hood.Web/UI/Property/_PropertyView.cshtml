@@ -1,26 +1,31 @@
 @model ShowPropertyModel
-
 @{
     PropertySettings _propertySettings = Engine.Settings.Property;
 }
-<div class="jumbotron">
-    <div class="container">
-        <h1>@Model.Property.Title</h1>
-        <h2>@Model.Property.ListingType</h2>
-        <p class="lead">@Html.Raw(Model.Property.ShortDescription)</p>
-        <p>
-            @if (Model.Property.InfoDownload != null)
-            {
-                <a class="btn btn-default" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
-            }
-            <a class="btn btn-default" href="@string.Format("/contact?subject={0}#contact-form", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
-        </p>
+<section class="hero">
+    <fixedImage src="@Model.Property.FeaturedImage.LargeUrl" class="background-image hood-image"></fixedImage>
+    <div class="intro">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7 col-md-offset-1">
+                    <h1>@Model.Property.Title<br /><small>@Model.Property.ListingType</small></h1>
+                    <p class="lead">@Html.Raw(Model.Property.ShortDescription)</p>
+                    <p>
+                        @if (Model.Property.InfoDownloadJson.IsSet())
+                        {
+                            <a class="btn btn-default" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
+                        }
+                        <a class="btn btn-default" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<div class="container ptb-60">
+</section>
+<div class="container m-t-lg">
     <div class="row">
         <div class="col-sm-4">
-            <a href="@Model.Property.FeaturedImage.LargeUrl" class="colorbox"><img src="@Model.Property.FeaturedImage.MediumUrl" class="img-full content-feature-@Model.Property.Id m-b-xs" /></a>
+            <a href="@Model.Property.FeaturedImage.LargeUrl" class="colorbox"><img src="@Model.Property.FeaturedImage.MediumUrl" class="img img-full content-feature-@Model.Property.Id m-b-xs" /></a>
             <div class="gallery">
                 @foreach (var media in Model.Property.Media)
                 {
@@ -31,8 +36,8 @@
                 <p>
                     @Html.Raw(Model.Property.ToFormat(AddressFormat.MultiLine))
                 </p>
-                <a class="btn btn-block m-t-lg btn-default" href="@string.Format("/contact?subject={0}#contact-form", Model.Property.ToFormat(AddressFormat.SingleLine))">Make an Enquiry</a>
-                @if (Model.Property.InfoDownload != null)
+                <a class="btn btn-block m-t-lg btn-default" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+                @if (Model.Property.InfoDownloadJson.IsSet())
                 {
                     <a class="btn btn-block btn-default m-t-lg" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
                 }
@@ -108,11 +113,11 @@
             <blockquote>
                 <h5 class="no-margin">@_propertySettings.GetPlanningFromType(Model.Property.Planning)</h5>
                 <p class="m-t-sm">
-                    @if (Model.Property.InfoDownload != null)
+                    @if (Model.Property.InfoDownloadJson.IsSet())
                     {
                         <a class="btn btn-default" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
                     }
-                    <a class="btn btn-default" href="@string.Format("/contact?subject={0}#contact-form", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+                    <a class="btn  btn-default" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
                 </p>
             </blockquote>
             <h5>Description</h5>
@@ -155,16 +160,16 @@
     </div>
     @if (Model.Similar != null && Model.Similar.Count > 0)
     {
-    <div class="row">
-        <h4>Some of our other properties</h4>
-        <div class="portfolio-carousel owl-carousel owl-theme">
-            <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
-                @foreach (var similar in Model.Similar)
-                {
-                    <partial name="_PropertyView" model="similar" />
-                }
+        <div class="row">
+            <h4>Some of our other properties</h4>
+            <div class="portfolio-carousel owl-carousel owl-theme">
+                <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
+                    @foreach (var similar in Model.Similar)
+                    {
+                        <partial name="_PropertyView" model="similar" />
+                    }
+                </div>
             </div>
         </div>
-    </div>
     }
 </div>

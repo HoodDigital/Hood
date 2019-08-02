@@ -5,7 +5,7 @@
 
     var cmTitle = Model.Content.GetMeta("SEO.Meta.Title");
     var cmDesc = Model.Content.GetMeta("SEO.Meta.Description");
-    string metaTitle = Model.Content.Title + " - " + _basicSettings.SiteTitle;
+    string metaTitle = Model.Content.Title + " - " + _basicSettings.FullTitle;
     string metaDesc = Model.Content.Excerpt;
     if (!cmTitle.GetStringValue().IsNullOrEmpty())
     {
@@ -15,7 +15,7 @@
     {
         metaDesc = cmDesc.GetStringValue();
     }
-    ViewBag.Title = metaTitle;
+    ViewBag.Title = Model.Content.Title;
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
     if (Model.ContentType.ShowDesigner)
     {

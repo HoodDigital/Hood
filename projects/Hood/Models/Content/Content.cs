@@ -75,14 +75,6 @@ namespace Hood.Models
         [Display(Name = "Featured Content", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]
         public bool Featured { get; set; }
 
-        public string DirectoryPath
-        {
-            get
-            {
-                return $"{nameof(Content)}/{Id.ToString("D6")}-{Title.ToString()}";
-            }
-        }
-
         // MVVM Helpers
         [NotMapped]
         public string PublishDatePart

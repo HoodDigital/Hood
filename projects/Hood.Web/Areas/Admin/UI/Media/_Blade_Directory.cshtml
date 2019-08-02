@@ -11,7 +11,7 @@
                     <h5 class="modal-title">
                         Create a directory
                     </h5>
-                    <p class="m-0 text-primary">
+                    <p class="m-0 text-muted">
                         <i class="fa fa-file mr-2"></i> Add a new directory to store media files.
                     </p>
                 </div>
@@ -27,7 +27,6 @@
                 </div>
                 <div class="form-group floating-label">
                     <select asp-for="ParentId" class="form-control">
-                        <option>No Parent</option>
                         @_directoryManager.SelectOptions(Model.TopLevelDirectories, Model.ParentId)
                     </select>
                     <label asp-for="ParentId" class="control-label"></label>

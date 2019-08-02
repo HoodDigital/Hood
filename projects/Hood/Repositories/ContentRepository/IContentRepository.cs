@@ -18,6 +18,7 @@ namespace Hood.Services
         Task DeleteAsync(int id);
         Task SetStatusAsync(int id, ContentStatus status);
         Task DeleteAllAsync(string type);
+        Task<MediaDirectory> GetDirectoryAsync();
         #endregion
 
         #region Duplicate

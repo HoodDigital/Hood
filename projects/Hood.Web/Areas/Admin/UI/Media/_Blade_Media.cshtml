@@ -10,7 +10,7 @@
                     <h5 class="modal-title">
                         @Model.GenericFileType.ToString() File
                     </h5>
-                    <p class="m-0 text-primary">
+                    <p class="m-0 text-muted">
                         <i class="fa fa-file mr-2"></i> @Model.Filename
                     </p>
                 </div>
@@ -50,7 +50,7 @@
                 }
                 <display asp-for="DownloadUrlHttps"></display>
                 <display asp-for="FormattedSize"></display>
-                <display asp-for="Directory"></display>
+                <display asp-for="Directory.DisplayName"></display>
                 <display asp-for="BlobReference"></display>
                 <display asp-for="CreatedOn"></display>
                 <display asp-for="UniqueId"></display>

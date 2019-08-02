@@ -6,18 +6,22 @@
     <input asp-for="Title" value="@Model.Title" type="text" class="form-control" />
     <small asp-for="Title"></small>
 </div>
-<div class="form-group floating-label">
-    <label asp-for="Excerpt">@Model.Type.ExcerptName:</label>
-    @if (Model.Type.MultiLineExcerpt)
-    {
+@if (Model.Type.MultiLineExcerpt)
+{
+    <div class="form-group">
+        <label asp-for="Excerpt">@Model.Type.ExcerptName:</label>
         <textarea asp-for="Excerpt" class="form-control @(Model.Type.RichTextExcerpt ? "tinymce-simple" : "")">@Model.Excerpt</textarea>
-    }
-    else
-    {
+        <small asp-for="Title"></small>
+    </div>
+}
+else
+{
+    <div class="form-group floating-label">
+        <label asp-for="Excerpt">@Model.Type.ExcerptName:</label>
         <input asp-for="Excerpt" value="@Model.Excerpt" type="text" class="form-control" />
-    }
-    <small asp-for="Title"></small>
-</div>
+        <small asp-for="Title"></small>
+    </div>
+}
 <hr class="mt-4 mb-4" />
 <div class="form-group m-0">
     @if (Model.Type.ShowEditor)

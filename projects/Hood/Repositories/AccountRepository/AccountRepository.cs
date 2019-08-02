@@ -210,13 +210,13 @@ namespace Hood.Services
                 throw new Exception("You do not have permission to delete this user.");
             }
         }
-        public async Task<MediaDirectory> GetDirectoryAsync(string userId)
+        public async Task<MediaDirectory> GetDirectoryAsync(string id)
         {
-            MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.OwnerId == userId && md.Type == DirectoryType.User);
+            MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.OwnerId == id && md.Type == DirectoryType.User);
             if (directory == null)
             {
                 MediaDirectory userDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.UserDirectorySlug && md.Type == DirectoryType.System);
-                ApplicationUser user = await GetUserByIdAsync(userId);
+                ApplicationUser user = await GetUserByIdAsync(id);
                 if (user == null)
                 {
                     throw new Exception("No user found to add/get directory for.");
@@ -224,7 +224,7 @@ namespace Hood.Services
 
                 directory = new MediaDirectory()
                 {
-                    OwnerId = userId,
+                    OwnerId = id,
                     Type = DirectoryType.User,
                     ParentId = userDirectory.Id,
                     DisplayName = user.UserName,

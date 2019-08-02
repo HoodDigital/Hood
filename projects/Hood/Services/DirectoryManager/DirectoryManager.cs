@@ -26,7 +26,6 @@ namespace Hood.Services
         {
             return _directoriesById.Value.Count;
         }
-
         public void ResetCache()
         {
             DbContextOptionsBuilder<HoodDbContext> options = new DbContextOptionsBuilder<HoodDbContext>();
@@ -51,7 +50,7 @@ namespace Hood.Services
             _topLevel = new Lazy<MediaDirectory[]>(() => _directoriesById.Value.Values.Where(c => c.ParentId == null).ToArray());
             _siteDirectory = new Lazy<MediaDirectory>(() => _directoriesById.Value.Values.SingleOrDefault(c => c.Slug == MediaManager.SiteDirectorySlug && c.Type == DirectoryType.System));
         }
-        public MediaDirectory FromKey(int id)
+        public MediaDirectory GetDirectoryById(int id)
         {
             if (!_directoriesById.Value.ContainsKey(id))
             {
@@ -80,7 +79,7 @@ namespace Hood.Services
         public IEnumerable<MediaDirectory> GetHierarchy(int id)
         {
             List<MediaDirectory> result = new List<MediaDirectory>();
-            MediaDirectory directory = FromKey(id);
+            MediaDirectory directory = GetDirectoryById(id);
             while (directory != null)
             {
                 result.Insert(0, directory);
@@ -99,7 +98,7 @@ namespace Hood.Services
 
         public MediaDirectory GetTopLevelDirectory(int id)
         {
-            MediaDirectory result = FromKey(id);
+            MediaDirectory result = GetDirectoryById(id);
             while (result.Parent != null)
             {
                 result = result.Parent;
@@ -117,6 +116,17 @@ namespace Hood.Services
             return "/";
         }
 
+        public IHtmlContent GetBreadcrumb(int id)
+        {
+            List<string> links = new List<string>();
+            foreach (var directory in GetHierarchy(id))
+            {
+                links.Add($"<a href=\"/admin/media?dir={directory.Id}\">{directory.DisplayName}</a>");
+            }
+            var htmlOutput = string.Join(" <i class=\"fa fa-caret-right ml-2 mr-2\"></i> ", links.ToArray());
+            HtmlString builder = new HtmlString(htmlOutput);
+            return builder;
+        }
         // Html
         public IHtmlContent SelectOptions(IEnumerable<MediaDirectory> startLevel, int? selectedValue, int startingLevel = 0)
         {
@@ -126,7 +136,7 @@ namespace Hood.Services
                 foreach (int key in startLevel.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
-                    MediaDirectory directory = FromKey(key);
+                    MediaDirectory directory = GetDirectoryById(key);
 
                     htmlOutput += "<option value=\"" + directory.Id + "\"" + (selectedValue == directory.Id ? " selected" : "") + ">";
                     for (int i = 0; i < startingLevel; i++)
@@ -142,7 +152,6 @@ namespace Hood.Services
             HtmlString builder = new HtmlString(htmlOutput);
             return builder;
         }
-
         public IHtmlContent AdminDirectoryTree(IEnumerable<MediaDirectory> startLevel, int? selectedValue, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
@@ -152,7 +161,7 @@ namespace Hood.Services
                 foreach (int key in startLevel.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
-                    MediaDirectory directory = FromKey(key);
+                    MediaDirectory directory = GetDirectoryById(key);
 
                     string carets = "";
                     for (int i = 0; i < startingLevel; i++)
@@ -204,7 +213,7 @@ namespace Hood.Services
                 foreach (int key in startLevel.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
-                    MediaDirectory directory = FromKey(key);
+                    MediaDirectory directory = GetDirectoryById(key);
 
                     string carets = "";
                     for (int i = 0; i < startingLevel; i++)

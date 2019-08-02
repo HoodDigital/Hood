@@ -1,4 +1,5 @@
 ﻿using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -40,7 +41,20 @@ namespace Hood.Areas.Admin.Controllers
 
             if (model.DirectoryId.HasValue)
             {
-                media = media.Where(n => n.DirectoryId == model.DirectoryId);
+                var directory = _directoryManager.GetDirectoryById(model.DirectoryId.Value);
+                if (directory != null)
+                {
+                    var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
+                    media = media.Where(n => tree.Any(t => t.Id == n.DirectoryId));
+                }
+            }
+            else
+            {
+                var directory = await _db.MediaDirectories.SingleOrDefaultAsync(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
+                directory = _directoryManager.GetDirectoryById(directory.Id);
+                var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
+                media = media.Where(n => tree.Any(t => t.Id == n.DirectoryId));
+                model.DirectoryId = directory.Id;
             }
 
             if (model.UserId.IsSet())
@@ -101,7 +115,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/media/blade/")]
         public async Task<IActionResult> Blade(int id)
         {
-            MediaObject media = await _db.Media.SingleOrDefaultAsync(u => u.Id == id);
+            MediaObject media = await _db.Media.Include(m => m.Directory).SingleOrDefaultAsync(u => u.Id == id);
             return View("_Blade_Media", media);
         }
 

@@ -19,6 +19,7 @@ namespace Hood.Services
         Task SetStatusAsync(int id, ContentStatus status);
         Task DeleteAsync(int id);
         Task DeleteAllAsync();
+        Task<MediaDirectory> GetDirectoryAsync();
         #endregion
 
         #region Direct Field Editing

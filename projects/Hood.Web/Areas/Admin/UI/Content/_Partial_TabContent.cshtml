@@ -4,11 +4,14 @@
         <partial name="_Editor_Content" />
     </div>
 </div>
-<div id="image" class="tab-pane" role="tabpanel" aria-labelledby="image-tab">
-    <div class="panel-body">
-        <partial name="_Editor_Images" />
+@if (Model.Type.ShowImage || Model.Type.ShowBanner)
+{
+    <div id="image" class="tab-pane" role="tabpanel" aria-labelledby="image-tab">
+        <div class="panel-body">
+            <partial name="_Editor_Images" />
+        </div>
     </div>
-</div>
+}
 @if (Model.Type.Templates)
 {
     <div id="template" class="tab-pane" role="tabpanel" aria-labelledby="template-tab">

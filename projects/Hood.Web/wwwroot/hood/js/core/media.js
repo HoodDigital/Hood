@@ -259,7 +259,7 @@ $.hood.Media = {
             "Are you sure?",
             deleteMediaCallback,
             type = 'warning',
-            footer = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>',
+            footer = '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>',
             confirmButtonText = 'Ok',
             cancelButtonText = 'Cancel'
         );

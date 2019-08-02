@@ -137,6 +137,20 @@ gulp.task('js:package:app', function () {
     });
     return gulp.src([
 
+        hood.js + 'core/production.js',
+        hood.js + 'core/globals.js',
+
+        hood.js + 'core/helpers.js',
+        hood.js + 'core/handlers.js',
+        hood.js + 'core/stringhelpers.js',
+        hood.js + 'core/validator.js',
+
+        hood.js + 'core/addresses.js',
+        hood.js + 'core/alerts.js',
+        hood.js + 'core/forms.js',
+        hood.js + 'core/inline.js',
+        hood.js + 'core/media.js',
+
         hood.js + 'app/cart.js',
         hood.js + 'app/stripe.js',
         hood.js + 'app.js'
@@ -245,10 +259,21 @@ gulp.task('themes:less', function () {
         }))
         .pipe(gulp.dest('./wwwroot/themes/'));
 });
+gulp.task('themes:cssnano', function () {
+    return gulp.src(['./wwwroot/themes/**/css/styles.css'])
+        .pipe(gulp.dest(output.css))
+        .pipe(cssnano({
+            discardComments: {
+                removeAll: true
+            }
+        }))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest('./wwwroot/themes/'));
+});
 
 gulp.task('themes', gulp.parallel('themes:scss', 'themes:less'));
 
-gulp.task('publish', gulp.series('clean', 'build', 'themes'));
+gulp.task('publish', gulp.series('clean', 'build', 'themes', 'themes:cssnano'));
 
 gulp.task('watch', function () {
     gulp.watch(hood.scss, gulp.series('scss'));

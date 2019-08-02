@@ -260,22 +260,19 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Delete
         [Authorize(Roles = "SuperUser,Admin")]
+        [HttpPost()]
         [Route("admin/property/delete/all/")]
-        public async Task<IActionResult> DeleteAll()
+        public async Task<Response> DeleteAll()
         {
             try
             {
                 await _property.DeleteAllAsync();
-                SaveMessage = $"All the properties have been deleted.";
-                MessageType = AlertType.Success;
+                return new Response(true, "The properties have been successfully deleted.");
             }
             catch (Exception ex)
             {
-                SaveMessage = $"Error deleting all properties.";
-                MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<PropertyController>(SaveMessage, ex);
+                return await ErrorResponseAsync<PropertyController>($"Error deleting all properties.", ex);
             }
-            return RedirectToAction(nameof(Index));
         }
 
         [Route("admin/property/delete/{id}")]
@@ -285,8 +282,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 await _property.DeleteAsync(id);
-                Response response = new Response(true, "The property has been successfully deleted.");
-                return response;
+                return new Response(true, "The property has been successfully deleted.");
             }
             catch (Exception ex)
             {
@@ -338,10 +334,14 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("There are no files attached!");
                     }
 
+                    var directory = await _property.GetDirectoryAsync();
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, property.DirectoryPath) as MediaObject;
+                        mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
                         await _property.AddMediaAsync(property, new PropertyMedia(mediaResult));
+                        mediaResult.DirectoryId = directory.Id;
+                        _db.Media.Add(mediaResult);
+                        await _db.SaveChangesAsync();
                     }
                 }
                 return new Response(true, mediaResult, "The image/media file has been attached successfully.");
@@ -383,8 +383,13 @@ namespace Hood.Areas.Admin.Controllers
                 PropertyMedia media = model.Media.Find(m => m.Id == mediaId);
                 if (media != null)
                 {
+                    var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == media.UniqueId);
+                    if (mediaItem != null)
+                    {
+                        _db.Entry(mediaItem).State = EntityState.Deleted;
+                    }
                     await _media.DeleteStoredMedia(media);
-                    _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                    _db.Entry(media).State = EntityState.Deleted;
                 }
                 await _property.UpdateAsync(model);
                 return new Response(true, $"The media has been removed.");
@@ -425,10 +430,14 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("There are no files attached!");
                     }
 
+                    var directory = await _property.GetDirectoryAsync();
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, property.DirectoryPath) as MediaObject;
+                        mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
                         await _property.AddFloorplanAsync(property, new PropertyFloorplan(mediaResult));
+                        mediaResult.DirectoryId = directory.Id;
+                        _db.Media.Add(mediaResult);
+                        await _db.SaveChangesAsync();
                     }
                 }
                 return new Response(true, mediaResult, "The floorplan file has been attached successfully.");
@@ -448,6 +457,11 @@ namespace Hood.Areas.Admin.Controllers
                 PropertyFloorplan media = model.FloorPlans.Find(m => m.Id == mediaId);
                 if (media != null)
                 {
+                    var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == media.UniqueId);
+                    if (mediaItem != null)
+                    {
+                        _db.Entry(mediaItem).State = EntityState.Deleted;
+                    }
                     await _media.DeleteStoredMedia(media);
                     _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
                 }
@@ -461,7 +475,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         #endregion
 
-        #region Floorplans
+        #region Floor Areas
         [Route("admin/property/floorareas/{id}/")]
         public async Task<IActionResult> FloorAreas(int id)
         {

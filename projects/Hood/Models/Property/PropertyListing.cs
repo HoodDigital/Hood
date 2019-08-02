@@ -399,8 +399,6 @@ namespace Hood.Models
             }
         }
 
-        public string DirectoryPath => $"{nameof(PropertyListing)}/{Id.ToString("D6")}-{DisplayTitle.ToString()}";
-
         public PropertyMeta GetMeta(string name)
         {
             PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);

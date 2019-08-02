@@ -386,5 +386,7 @@ namespace Hood.Services
 
         public const string UserDirectorySlug = "users";
         public const string SiteDirectorySlug = "site";
+        public const string ContentDirectorySlug = "content";
+        public const string PropertyDirectorySlug = "property";
     }
 }

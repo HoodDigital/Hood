@@ -12,8 +12,16 @@
         &.modal-lg {
             max-width: 100%;
 
-            @media (min-width:768px) {
+            @media (min-width:996px) {
                 max-width: 50%;
+            }
+        }
+
+        &.modal-xl {
+            max-width: 100%;
+
+            @media (min-width:996px) {
+                max-width: 85%;
             }
         }
 

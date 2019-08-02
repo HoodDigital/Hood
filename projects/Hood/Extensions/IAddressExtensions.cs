@@ -1,9 +1,9 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Html;
-using Geocoding;
+﻿using Geocoding;
 using Hood.Enums;
 using Hood.Interfaces;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace Hood.Extensions
 {
@@ -25,7 +25,7 @@ namespace Hood.Extensions
         public static TAddress CloneTo<TAddress>(this IAddress from)
             where TAddress : IAddress, new()
         {
-            var to = new TAddress();
+            TAddress to = new TAddress();
             from.CopyTo(to);
             return to;
         }
@@ -41,10 +41,13 @@ namespace Hood.Extensions
         public static bool IsSet(this IAddress from)
         {
             if (from != null
-                && !from.Address1.IsSet()
-                && !from.Postcode.IsSet()
-                && !from.Country.IsSet())
+                && from.Address1.IsSet()
+                && from.Postcode.IsSet()
+                && from.Country.IsSet())
+            {
                 return true;
+            }
+
             return false;
         }
         public static bool IsGeoLocated(this IAddress from)
@@ -52,7 +55,10 @@ namespace Hood.Extensions
             if (from != null
                 && from.Latitude != 0
                 && from.Longitude != 0)
+            {
                 return true;
+            }
+
             return false;
         }
 
@@ -60,7 +66,10 @@ namespace Hood.Extensions
         {
             string ret = "";
             if (from == null || !from.Address1.IsSet())
+            {
                 return ret;
+            }
+
             switch (format)
             {
                 case AddressFormat.Short:
@@ -96,7 +105,10 @@ namespace Hood.Extensions
         {
             string ret = "";
             if (address == null || !address.Address1.IsSet())
+            {
                 return html.Raw(ret);
+            }
+
             switch (format)
             {
                 case AddressFormat.Short:

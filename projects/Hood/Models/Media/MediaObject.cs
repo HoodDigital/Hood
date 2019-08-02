@@ -16,8 +16,9 @@ namespace Hood.Models
         {
         }
 
-        public MediaObject(IMediaObject mediaResult) : base(mediaResult)
+        public MediaObject(IMediaObject mediaResult, int? directoryId = null) : base(mediaResult)
         {
+            DirectoryId = directoryId;
         }
 
         public MediaObject(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null) 

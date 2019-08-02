@@ -250,7 +250,7 @@ $.hood.Media = {
       }
     };
 
-    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, type = 'warning', footer = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
+    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, type = 'warning', footer = '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
   },
   RestrictDir: function RestrictDir() {
     var pattern = /[^0-9A-Za-z- ]*/g; // default pattern

@@ -301,7 +301,7 @@ namespace Hood.Services
                         Subject = "Thank you for your payment..."
                     };
                     message.AddH1("Thank you!");
-                    message.AddParagraph("Your payment has been received. You will recieve a payment reciept from our payment providers, Stripe.");
+                    message.AddParagraph("Your payment has been received. You will receive a payment receipt from our payment providers, Stripe.");
                     message.Template = MailSettings.DangerTemplate;
                     await _emailSender.SendEmailAsync(message);
                 }

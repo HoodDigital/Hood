@@ -19,7 +19,7 @@
         <div class="dropdown-divider"></div>
         @if (User.IsAdminOrBetter())
         {
-            <a class="dropdown-item warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL properties from the site!"><i class="fa fa-trash"></i>Delete All</a>
+            <a class="dropdown-item property-delete-all" asp-action="DeleteAll"><i class="fa fa-trash"></i>Delete All</a>
         }
     </div>
 }

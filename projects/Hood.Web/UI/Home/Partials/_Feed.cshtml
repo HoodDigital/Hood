@@ -13,10 +13,19 @@
                     <div class="content-feed-item @content.ContentType">
                         <partial name="_FeaturedMedia" model="content" />
                         <h3><a href="@content.Url">@content.Title</a></h3>
-                        <p>
-                            <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">@content.Author.ToDisplayName()</a></span>
-                            <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
-                        </p>
+                        @if (content.ShowAuthor)
+                        {
+                            <p>
+                                <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), content.Author.UserName)">content.Author.ToDisplayName()</a></span>
+                                <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
+                            </p>
+                        } 
+                        else
+                        {
+                            <p>
+                                <span><i class="fa fa-clock-o"></i> @content.PublishDate.ToLongDateString() at @content.PublishDate.ToShortTimeString()</span>
+                            </p>
+                        }
                         <p>@content.Excerpt</p>
                         <hr />
                         <span class="pull-right"><a href="@content.Url">Read More<i class="fa fa-long-arrow-right m-l-xs"></i></a></span>

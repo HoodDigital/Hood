@@ -7,7 +7,7 @@ namespace Hood.Models
 {
     public partial class MediaDirectory :  BaseEntity
     {
-        [Display(Name = "Title / Name", Description = "Display name for your directory.")]
+        [Display(Name = "Directory Name", Description = "Display name for your directory.")]
         public string DisplayName { get; set; }
         [Display(Name = "Url Slug", Description = "Will be used in the url for the directory.")]
         public string Slug { get; set; }

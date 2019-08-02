@@ -11,9 +11,10 @@
 <!DOCTYPE html>
 <html lang="en-gb" xml:lang="en">
 <head>
-
     <partial name="_Metas_Base" />
     <title>@ViewData["Title"]</title>
+
+    @Html.Raw(_seoSettings.HeadTags)
 
     @if (!IsSectionDefined("metas"))
     {
@@ -37,10 +38,9 @@
     @Html.RenderScripts(Url, ResourceLocation.AfterCss)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
-    @Html.Raw(_seoSettings.HeadTags)
-
 </head>
 <body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
+    @Html.Raw(_seoSettings.BodyTags)
 
     @RenderSection("afterbody", required: false)
 
@@ -78,7 +78,5 @@
 
     @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seoSettings.GoogleAnalytics)
-    @Html.Raw(_seoSettings.BodyTags)
-
 </body>
 </html>

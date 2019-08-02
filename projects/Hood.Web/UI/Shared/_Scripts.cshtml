@@ -17,5 +17,12 @@
 <partial name="_Scripts_Hood" />
 <partial name="_Scripts_Google" />
 
+<environment names="Development,Staging">
+    <script src="@string.Format("~/themes/{0}/js/theme.js", _themes.CurrentTheme)" asp-append-version="true"></script>
+</environment>
+<environment names="Production">
+    <script src="@string.Format("~/themes/{0}/js/theme.min.js", _themes.CurrentTheme)" asp-append-version="true"></script>
+</environment>
+
 @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
 @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)

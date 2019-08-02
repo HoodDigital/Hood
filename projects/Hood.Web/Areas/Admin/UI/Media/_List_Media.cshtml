@@ -1,10 +1,19 @@
 @model MediaListModel
+@inject IDirectoryManager _directoryManager
 @{
     Layout = null;
 }
+@if (Model.DirectoryId.HasValue)
+{
+    <div class="card mb-3 d-none d-md-block">
+        <div class="card-body p-2">
+            <i class="fa fa-folder-open mr-2 text-warning"></i> @_directoryManager.GetBreadcrumb(Model.DirectoryId.Value)
+        </div>
+    </div>
+}
 @if (Model.TotalCount > 0)
 {
-    <div class="card-deck @(Model.Action.HasValue ? "card-deck-3" : "card-deck-5")">
+    <div class="card-deck card-deck-5">
         @foreach (var media in Model.List)
         {
             var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });

@@ -219,6 +219,15 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
         }
+        public async Task<MediaDirectory> GetDirectoryAsync()
+        {
+            MediaDirectory contentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.ContentDirectorySlug && md.Type == DirectoryType.System);
+            if (contentDirectory == null)
+            {
+                throw new Exception("Site folder is not available.");
+            }
+            return contentDirectory;
+        }
         #endregion
 
         #region Duplicate

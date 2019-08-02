@@ -418,44 +418,40 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/media/{id}/upload/gallery")]
-        public async Task<IActionResult> UploadToGallery(List<IFormFile> files, int id)
+        public async Task<Response> UploadToGallery(List<IFormFile> files, int id)
         {
-            // User must have an organisation.
-            Content content = await _content.GetContentByIdAsync(id);
-            if (content == null)
-            {
-                return NotFound();
-            }
 
             try
             {
+                Content content = await _content.GetContentByIdAsync(id);
+                if (content == null)
+                {
+                    throw new Exception("Content not found!");
+                }
+
                 MediaObject mediaResult = null;
                 if (files != null)
                 {
                     if (files.Count == 0)
                     {
-                        return Json(new
-                        {
-                            Success = false,
-                            Error = "There are no files attached!"
-                        });
+                        throw new Exception("There are no files attached!");
                     }
 
+                    var directory = await _content.GetDirectoryAsync();
                     foreach (IFormFile file in files)
                     {
-                        mediaResult = await _media.ProcessUpload(file, content.DirectoryPath) as MediaObject;
+                        mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
                         await _content.AddImageAsync(content, new ContentMedia(mediaResult));
+                        mediaResult.DirectoryId = directory.Id;
+                        _db.Media.Add(mediaResult);
+                        await _db.SaveChangesAsync();
                     }
                 }
-                return Json(new { Success = true, Image = mediaResult });
+                return new Response(true, mediaResult, "The image/media file has been attached successfully.");
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    Success = false,
-                    Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message
-                });
+                return await ErrorResponseAsync<PropertyController>($"Error uploading media to the gallery.", ex);
             }
         }
 
@@ -469,8 +465,13 @@ namespace Hood.Areas.Admin.Controllers
                 ContentMedia media = content.Media.Find(m => m.Id == mediaId);
                 if (media != null)
                 {
+                    var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == media.UniqueId);
+                    if (mediaItem != null)
+                    {
+                        _db.Entry(mediaItem).State = EntityState.Deleted;
+                    }
                     await _media.DeleteStoredMedia(media);
-                    _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                    _db.Entry(media).State = EntityState.Deleted;
                 }
 
                 await _content.UpdateAsync(content);

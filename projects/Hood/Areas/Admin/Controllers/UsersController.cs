@@ -1,5 +1,5 @@
-﻿using Hood.Core;
-using Hood.Controllers;
+﻿using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
@@ -29,7 +29,10 @@ namespace Hood.Areas.Admin.Controllers
         { }
 
         [Route("admin/users/")]
-        public async Task<IActionResult> Index(UserListModel model) => await List(model, "Index");
+        public async Task<IActionResult> Index(UserListModel model)
+        {
+            return await List(model, "Index");
+        }
 
         [HttpGet]
         [Route("admin/users/list/")]
@@ -52,23 +55,23 @@ namespace Hood.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(UserProfile model)
         {
-            var user = await _account.GetUserByIdAsync(model.Id);
+            ApplicationUser user = await _account.GetUserByIdAsync(model.Id);
             try
             {
-                var email = user.Email;
+                string email = user.Email;
                 if (model.Email != email)
                 {
-                    var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+                    IdentityResult setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
                     if (!setEmailResult.Succeeded)
                     {
                         throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
                     }
                 }
 
-                var phoneNumber = user.PhoneNumber;
+                string phoneNumber = user.PhoneNumber;
                 if (model.PhoneNumber != phoneNumber)
                 {
-                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                    IdentityResult setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
                     if (!setPhoneResult.Succeeded)
                     {
                         model.Email = phoneNumber;
@@ -97,15 +100,20 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = await _account.GetUserByIdAsync(id);
-                var customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
+                Stripe.Customer customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
                 if (customer == null)
                 {
                     customer = await _stripe.GetCustomerByIdAsync(customerId);
                     if (customer == null)
+                    {
                         throw new Exception("The customer object does could not be validated.");
+                    }
+
                     if (customer.Email.ToLower() != user.Email.ToLower())
+                    {
                         throw new Exception("The email for the customer object does not match the user's email.");
+                    }
 
                     user.StripeId = customerId;
                     await _account.UpdateUserAsync(user);
@@ -113,7 +121,9 @@ namespace Hood.Areas.Admin.Controllers
                     MessageType = AlertType.Success;
                 }
                 else
+                {
                     throw new Exception("The user is already linked to stripe.");
+                }
             }
             catch (Exception ex)
             {
@@ -127,9 +137,15 @@ namespace Hood.Areas.Admin.Controllers
         {
             model.AllRoles = await _account.GetAllRolesAsync();
             model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
-            model.Customer = await _stripe.GetCustomerByIdAsync(model.StripeId);
+            if (model.StripeId.IsSet())
+            {
+                model.Customer = await _stripe.GetCustomerByIdAsync(model.StripeId);
+            }
+
             if (model.Customer == null)
+            {
                 model.MatchedCustomerObjects = await _account.GetMatchingCustomerObjectsAsync(model.Email);
+            }
         }
         #endregion
 
@@ -146,7 +162,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = new ApplicationUser
+                ApplicationUser user = new ApplicationUser
                 {
                     UserName = model.Username,
                     Email = model.Email,
@@ -167,7 +183,7 @@ namespace Hood.Areas.Admin.Controllers
                     CreatedOn = DateTime.Now,
                     Note = $"User created via admin panel by {User.Identity.Name}."
                 });
-                var result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
                 {
                     return new Response(result.Errors);
@@ -195,7 +211,7 @@ namespace Hood.Areas.Admin.Controllers
                     catch (Exception)
                     {
                         // roll back!
-                        var deleteUser = await _userManager.FindByEmailAsync(model.Username);
+                        ApplicationUser deleteUser = await _userManager.FindByEmailAsync(model.Username);
                         await _userManager.DeleteAsync(deleteUser);
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
@@ -217,9 +233,12 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = await _account.GetUserProfileByIdAsync(id);
+                UserProfile user = await _account.GetUserProfileByIdAsync(id);
                 if (user == null)
+                {
                     throw new Exception($"The user Id {id} could not be found, therefore could not be deleted.");
+                }
+
                 await _account.DeleteUserAsync(id, User);
                 await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) has been deleted via the admin area by {User.Identity.Name}", type: LogType.Warning);
                 return new Response(true, "Deleted successfully.");
@@ -245,7 +264,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = await _account.GetUserByIdAsync(id);
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
                 user.AddUserNote(new UserNote()
                 {
                     Id = Guid.NewGuid(),
@@ -267,11 +286,14 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var user = await _account.GetUserByIdAsync(id);
-                var notes = user.Notes;
-                var note = notes.SingleOrDefault(n => n.Id == noteId);
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
+                List<UserNote> notes = user.Notes;
+                UserNote note = notes.SingleOrDefault(n => n.Id == noteId);
                 if (note != null && notes.Contains(note))
+                {
                     notes.Remove(note);
+                }
+
                 user.Notes = notes;
                 await _account.UpdateUserAsync(user);
                 return new Response(true, "The note has been deleted.");
@@ -300,20 +322,31 @@ namespace Hood.Areas.Admin.Controllers
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
                 if (!await _roleManager.RoleExistsAsync(role))
+                {
                     await _roleManager.CreateAsync(new IdentityRole(role));
+                }
+
                 IdentityResult result;
 
                 if (add)
+                {
                     result = await _userManager.AddToRoleAsync(user, role);
+                }
                 else
+                {
                     result = await _userManager.RemoveFromRoleAsync(user, role);
+                }
 
                 if (result.Succeeded)
                 {
                     if (add)
+                    {
                         return await SuccessResponseAsync<UsersController>($"The user has been added the {role} role.");
+                    }
                     else
+                    {
                         return await SuccessResponseAsync<UsersController>($"The user has been removed from the {role} role.");
+                    }
                 }
                 else
                 {
@@ -328,9 +361,13 @@ namespace Hood.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 if (add)
+                {
                     return await ErrorResponseAsync<UsersController>($"Error adding a user to a role via the admin panel.", ex);
+                }
                 else
+                {
                     return await ErrorResponseAsync<UsersController>($"Error removing a user from a role via the admin panel.", ex);
+                }
             }
         }
         #endregion
@@ -341,9 +378,12 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 if (!id.IsSet())
+                {
                     throw new Exception("Cannot impersonate a user with no Id!");
-                var impersonatedUser = await _userManager.FindByIdAsync(id);
-                var userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
+                }
+
+                ApplicationUser impersonatedUser = await _userManager.FindByIdAsync(id);
+                ClaimsPrincipal userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
 
                 userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetUserId()));
                 userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
@@ -369,14 +409,18 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 if (!User.Identity.IsAuthenticated)
+                {
                     throw new Exception("You are not logged in.");
+                }
 
                 if (!User.IsImpersonating())
+                {
                     throw new Exception("You are not impersonating.");
+                }
 
-                var originalUserId = User.FindFirst("OriginalUserId").Value;
+                string originalUserId = User.FindFirst("OriginalUserId").Value;
 
-                var originalUser = await _userManager.FindByIdAsync(originalUserId);
+                ApplicationUser originalUser = await _userManager.FindByIdAsync(originalUserId);
 
                 await _signInManager.SignOutAsync();
 
@@ -402,8 +446,8 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, token, password);
+                string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                IdentityResult result = await _userManager.ResetPasswordAsync(user, token, password);
                 if (result.Succeeded)
                 {
                     await _logService.AddLogAsync<UsersController>($"The password has been reset by an admin for user with Id: {id}", type: LogType.Success);
@@ -412,7 +456,7 @@ namespace Hood.Areas.Admin.Controllers
                 else
                 {
                     string error = "";
-                    foreach (var err in result.Errors)
+                    foreach (IdentityError err in result.Errors)
                     {
                         error += err.Description + Environment.NewLine;
                     }
@@ -430,18 +474,18 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/sync/mailchimp/")]
         public async Task<IActionResult> SyncToMailchimp()
         {
-            var stats = new MailchimpSyncStats();
+            MailchimpSyncStats stats = new MailchimpSyncStats();
 
-            var integrations = Engine.Settings.Integrations;
-            var mailchimpManager = new MailChimpManager(integrations.MailchimpApiKey);
+            IntegrationSettings integrations = Engine.Settings.Integrations;
+            MailChimpManager mailchimpManager = new MailChimpManager(integrations.MailchimpApiKey);
 
             // delete users
             stats.MailchimpTotal = await mailchimpManager.Members.GetTotalItems(integrations.MailchimpUserListId, MailChimp.Net.Models.Status.Undefined).ConfigureAwait(false);
-            var members = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
+            IEnumerable<MailChimp.Net.Models.Member> members = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
             {
                 Status = MailChimp.Net.Models.Status.Undefined
             }).ConfigureAwait(false);
-            foreach (var member in members)
+            foreach (MailChimp.Net.Models.Member member in members)
             {
                 if (!_db.Users.Any(u => u.Email == member.EmailAddress))
                 {
@@ -452,14 +496,14 @@ namespace Hood.Areas.Admin.Controllers
 
             // Add users
             stats.SiteTotal = _db.Users.Where(u => u.Email != null).Count();
-            foreach (var user in _db.Users)
+            foreach (ApplicationUser user in _db.Users)
             {
                 if (user.Email.IsSet())
                 {
-                    var exists = await mailchimpManager.Members.ExistsAsync(integrations.MailchimpUserListId, user.Email, falseIfUnsubscribed: false);
+                    bool exists = await mailchimpManager.Members.ExistsAsync(integrations.MailchimpUserListId, user.Email, falseIfUnsubscribed: false);
                     if (!exists)
                     {
-                        var member = new MailChimp.Net.Models.Member()
+                        MailChimp.Net.Models.Member member = new MailChimp.Net.Models.Member()
                         {
                             EmailAddress = user.Email,
                             Status = MailChimp.Net.Models.Status.Subscribed,
@@ -472,7 +516,7 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             // show currently [unsubscribed] users
-            var unsubscribed = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
+            IEnumerable<MailChimp.Net.Models.Member> unsubscribed = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
             {
                 Status = MailChimp.Net.Models.Status.Unsubscribed
             }).ConfigureAwait(false);

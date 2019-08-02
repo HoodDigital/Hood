@@ -19,7 +19,7 @@
     ViewBag.Title = metaTitle;
     ViewData["EditUrl"] = Url.Action("Edit", "Property", new { area = "Admin", id = Model.Property.Id });
 
-    Layout = "_Blank";
+    Layout = "_Layout";
 
     string url = Context.GetSiteUrl(true, true);
     if (_seoSettings.CanonicalUrl.IsSet())

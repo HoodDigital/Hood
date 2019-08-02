@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Text;
@@ -131,12 +132,17 @@ namespace Hood.Controllers
                     // If the club already has an avatar, delete it from the system.
                     if (user.Avatar != null)
                     {
+                        var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == user.Avatar.UniqueId);
+                        if (mediaItem != null)
+                            _db.Entry(mediaItem).State = EntityState.Deleted;
                         await _media.DeleteStoredMedia((MediaObject)user.Avatar);
                     }
                     var directory = await Engine.AccountManager.GetDirectoryAsync(User.GetUserId());
-                    mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));
+                    mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));                    
                     user.Avatar = mediaResult;
                     await _account.UpdateUserAsync(user);
+                    _db.Media.Add(new MediaObject(mediaResult, directory.Id));
+                    await _db.SaveChangesAsync();
                 }
                 return new Response(true, mediaResult, $"The media has been set for attached successfully.");
             }

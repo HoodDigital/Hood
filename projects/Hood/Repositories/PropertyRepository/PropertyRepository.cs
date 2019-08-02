@@ -18,15 +18,18 @@ namespace Hood.Services
         private readonly HoodDbContext _db;
         private readonly IConfiguration _config;
         private readonly IHoodCache _cache;
+        private readonly IMediaManager _media;
 
         public PropertyRepository(
             HoodDbContext db,
             IHoodCache cache,
-            IConfiguration config)
+            IConfiguration config,
+            IMediaManager media)
         {
             _db = db;
             _config = config;
             _cache = cache;
+            _media = media;
         }
 
         #region Property CRUD
@@ -253,19 +256,77 @@ namespace Hood.Services
         }
         public async Task DeleteAsync(int id)
         {
-            PropertyListing property = _db.Properties.Include(p => p.Media).Where(p => p.Id == id).FirstOrDefault();
+            PropertyListing property = await _db.Properties
+                .Include(p => p.Metadata)
+                .Include(p => p.Media)
+                .Include(p => p.FloorPlans)
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+            property.Media.ForEach(async m =>
+            {
+                try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                _db.Entry(m).State = EntityState.Deleted;
+
+            });
+            property.FloorPlans.ForEach(async m =>
+            {
+                try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                _db.Entry(m).State = EntityState.Deleted;
+
+            });
+            property.Metadata.ForEach(m =>
+            {
+                _db.Entry(m).State = EntityState.Deleted;
+            });
+            await _db.SaveChangesAsync();
+
             _db.Entry(property).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
             ClearPropertyCache(id);
         }
         public async Task DeleteAllAsync()
         {
-            _db.Properties.ForEach(p =>
+            var all = _db.Properties
+                .Include(p => p.Metadata)
+                .Include(p => p.Media)
+                .Include(p => p.FloorPlans);
+
+            all.ForEach(p =>
+            {
+                p.Media.ForEach(async m =>
+                {
+                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                    _db.Entry(m).State = EntityState.Deleted;
+
+                });
+                p.FloorPlans.ForEach(async m =>
+                {
+                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                    _db.Entry(m).State = EntityState.Deleted;
+
+                });
+                p.Metadata.ForEach(m =>
+                {
+                    _db.Entry(m).State = EntityState.Deleted;
+                });
+            });
+            await _db.SaveChangesAsync();
+            all.ForEach(p =>
             {
                 _db.Entry(p).State = EntityState.Deleted;
             });
             await _db.SaveChangesAsync();
             ClearPropertyCache();
+        }
+        public async Task<MediaDirectory> GetDirectoryAsync()
+        {
+            MediaDirectory contentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+            if (contentDirectory == null)
+            {
+                throw new Exception("Site folder is not available.");
+            }
+            return contentDirectory;
         }
         #endregion
 

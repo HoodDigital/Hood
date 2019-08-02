@@ -19,7 +19,7 @@ namespace Hood.Services
         Task UpdateUserAsync(ApplicationUser user);
         Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser);
         Task<List<UserAccessCode>> GetAccessCodesAsync(string id);
-        Task<MediaDirectory> GetDirectoryAsync(string userId);
+        Task<MediaDirectory> GetDirectoryAsync(string id);
         #endregion
 
         #region Profiles
