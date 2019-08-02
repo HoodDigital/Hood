@@ -1,0 +1,23 @@
+@{
+    IntegrationSettings _plugins = Engine.Settings.Integrations;
+}
+<script src="~/hood/js/app/google.js" asp-append-version="true"></script>
+@if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
+{
+    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
+}
+@if (_plugins.GoogleRecaptchaSiteKey.IsSet() && _plugins.EnableGoogleRecaptcha)
+{
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+    <script type="text/javascript" charset="utf-8">
+        var onloadCallback = function() {
+            var recaptchas = document.querySelectorAll('div[class=recaptcha]');
+            for( i = 0; i < recaptchas.length; i++) {
+                var widgetId = grecaptcha.render( recaptchas[i].id, {
+                'sitekey' : '@_plugins.GoogleRecaptchaSiteKey',
+                });
+                $('#' + recaptchas[i].id).data('recaptchaid', widgetId);
+            }
+        }
+    </script>
+}

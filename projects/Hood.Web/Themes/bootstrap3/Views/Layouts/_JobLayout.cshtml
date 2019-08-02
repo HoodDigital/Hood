@@ -1,0 +1,18 @@
+@{ 
+    Layout = "_Layout";
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<div class="jumbotron">
+    <div class="container">
+        <h1>FAQ Layout</h1>
+        <p>This is the FAQ Layout - it can be overwritten in your theme directory by copying <code>/Views/Layouts/_FAQLayout.cshtml</code> to match in your themes directory <code>/Themes/{YOURTHEME}/Views/Layouts/_FAQLayout.cshtml</code></p>
+    </div>
+</div>
+<section class="container">
+    @RenderBody()
+</section>

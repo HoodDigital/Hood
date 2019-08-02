@@ -1,0 +1,73 @@
+@model TopicModel
+@{
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+
+    ViewData["Title"] = Model.Forum.Title;
+    ViewData["SubTitle"] = Model.Forum.Description;
+    ViewData["EditUrl"] = Url.Action("Edit", "Forum", new { area = "Admin", id = Model.Forum.Id });
+    ViewData["Forum"] = Model.Forum;
+    Layout = "_ForumLayout";
+
+    string url = Context.GetSiteUrl(true, true);
+    if (_seoSettings.CanonicalUrl.IsSet())
+    {
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+    }
+}
+@section metas {
+    <meta name="description" content="@Model.Forum.Description" />
+    <meta property="og:author" content="@Model.Forum.Author.ToDisplayName()" />
+    <meta property="og:title" content="@Model.Forum.Title" />
+    @if (Model.Forum.ShareImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@Model.Forum.ShareImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@Model.Forum.ShareImage.LargeUrl" />
+        <meta name="twitter:image" content="@Model.Forum.ShareImage.LargeUrl" />
+    }
+    else if (Model.Forum.FeaturedImage.DownloadUrl.IsSet())
+    {
+        <meta property="og:image" content="@Model.Forum.FeaturedImage.LargeUrl" />
+        <meta property="og:image:secure_url" content="@Model.Forum.FeaturedImage.LargeUrl" />
+        <meta name="twitter:image" content="@Model.Forum.FeaturedImage.LargeUrl" />
+    }
+    else
+    {
+        <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+        <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+        <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+    }
+    <meta property="og:description" content="@Model.Forum.Description" />
+    <meta name="twitter:title" content="@Model.Forum.Title" />
+    <meta name="twitter:description" content="@Model.Forum.Description" />
+}
+@if (Model.SaveMessage.IsSet())
+{
+    @Html.ContainedBootstrapAlert(Model.SaveMessage, Model.MessageType, true, "no-margin");
+}
+<div class="row">
+    <div class="col-sm-9">
+        @if (Model.List.Count == 0)
+        {
+            <partial name="_Topics_NoResults" />
+        }
+        else
+        {
+            @foreach (var topic in Model.List)
+            {
+                <partial name="_Template_Topic" model="topic" />
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <div class="text-center">
+                    <partial name="_Pagination" />
+                </div>
+            }
+        }
+        <hr />
+        <partial name="_Forms_Topic" />
+    </div>
+    <div class="col-sm-3">
+        <partial name="_Topics_Sidebar" />
+    </div>
+</div>

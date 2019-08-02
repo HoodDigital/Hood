@@ -1,0 +1,30 @@
+@model ForumModel
+@{
+    ViewData["Title"] = "Our Forums";
+    ViewData["SubTitle"] = "Browse and engage with our interactive forums.";
+    Layout = "_ForumLayout";
+}
+<div class="row">
+    <div class="col-sm-9">
+        @if (Model.List.Count == 0)
+        {
+            <partial name="_Forums_NoResults" />
+        }
+        else
+        {
+            @foreach (var forum in Model.List)
+            {
+                <partial name="_Template_Forum" />
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <div class="text-center">
+                    <partial name="_Pagination" />
+                </div>
+            }
+        }
+    </div>
+    <div class="col-sm-3">
+        <partial name="_Forums_Sidebar" />
+    </div>
+</div>

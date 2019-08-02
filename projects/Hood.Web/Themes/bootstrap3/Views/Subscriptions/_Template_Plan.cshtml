@@ -1,0 +1,23 @@
+@model Subscription
+<div class="col-xs-12 col-sm-6 col-lg-4">
+    <div class="thumbnail price">
+        <div class="panel-heading  text-center bg-info">
+            <h3>@Model.Name</h3>
+            <p>@Model.FullPrice</p>
+            @if (Model.TrialPeriodDays > 0)
+            {
+                <p>@Model.TrialPeriodDays days free trial</p>
+            }
+            else
+            {
+                <p>No trial period.</p>
+            }
+        </div>
+        <div class="p-lg text-center">
+            @Model.Description
+        </div>
+        <div class="panel-footer text-center">
+            <partial name="_Button_Subscribe" model="Model" />
+        </div>
+    </div>
+</div>

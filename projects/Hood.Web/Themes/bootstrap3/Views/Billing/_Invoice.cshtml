@@ -1,0 +1,70 @@
+@model Stripe.Invoice
+<div class="panel panel-default no-margin accordion-section">
+    <div class="panel-heading accordion-title">
+        <a data-toggle="collapse" href="@string.Format("#collapse-invoice-{0}", Model.Id)">
+            <span class="pull-right">
+                @if (Model.Paid)
+                {
+                    <span class="label label-success">PAID</span>
+                }
+                else
+                {
+                    <span class="label label-warning">UNPAID</span>
+                }
+            </span>
+            Invoice
+            <span>@Model.PeriodEnd.ToDisplay()</span>
+        </a>
+    </div>
+    <div id="@string.Format("collapse-invoice-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-{0}", Model.Id)">
+        <div class="panel-body">
+            <p>@Model.Description</p>
+            @if (Model.Lines != null && Model.Lines.Data.Count() != 0)
+            {
+                <table class="table">
+                    <tr>
+                        <th style="width:80%">Description / Period</th>
+                        <th style="width:20%">Amount</th>
+                    </tr>
+                    @foreach (var item in Model.Lines.Data)
+                    {
+                        <tr>
+                            <td><strong>@item.Description</strong><br />@item.Period.Start.Value.ToShortDateString() - @item.Period.End.Value.ToShortDateString()</td>
+                            <td>@item.Amount.ToCurrencyString()</td>
+                        </tr>
+                    }
+                    @if (Model.Tax.HasValue)
+                    {
+                       <tr>
+                            <td class="text-right">Tax:</td>
+                            <td><strong>@Model.Tax.Value.ToCurrencyString()</strong></td>
+                        </tr>
+                    }
+                    <tr>
+                        <td class="text-right">Total:</td>
+                        <td><strong>@Model.Total.ToCurrencyString()</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-right">Amount Paid:</td>
+                        <td><strong>@Model.AmountPaid.ToCurrencyString()</strong></td>
+                    </tr>
+            @if (Model.AmountRemaining > 0)
+            {
+                    <tr>
+                        <td class="text-right">Amount Remaining:</td>
+                        <td><strong>@Model.AmountRemaining.ToCurrencyString()</strong></td>
+                    </tr>
+            }
+                </table>
+            }
+            @if (Model.AmountRemaining > 0)
+            {
+                <alert icon="fa fa-exlamation-circle">You will be billed @Model.AmountDue.ToCurrencyString() on @Model.PeriodEnd.ToDisplay()</alert>
+            }
+            @if (Model.Total < 0)
+            {
+                <alert icon="fa fa-exlamation-circle">The total amount (@Model.Total.ToCurrencyString()) will be credited to your next invoice.</alert>
+            }
+        </div>
+    </div>
+</div>

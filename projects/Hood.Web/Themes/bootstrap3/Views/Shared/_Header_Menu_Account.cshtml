@@ -1,0 +1,69 @@
+@inject IContentRepository _content
+@model HeaderModel
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<div class="row">
+    <div class="col-sm-4">
+        <h3>Account menu</h3>
+        <p>This is the account menu, manage your account, change your password or access premium areas of the site.</p>
+    </div>
+    <div class="col-sm-3 col-sm-offset-1 links">
+        <ul>
+            @if (User.IsEditorOrBetter())
+            {
+                <li>
+                    <a asp-action="Index" asp-controller="Home" asp-area="Admin">
+                        <i class="fa fa-dashboard m-r-xs"></i>Website Dashboard
+                    </a>
+                </li>
+            }
+            <li>
+                <a asp-action="Index" asp-controller="Manage">
+                    <i class="fa fa-cogs m-r-xs"></i>Manage Account
+                </a>
+            </li>
+            <li>
+                <a asp-action="Index" asp-controller="Billing">
+                    <i class="fa fa-money m-r-xs"></i>Manage Billing
+                </a>
+            </li>
+            @if (User.IsAdminOrBetter() || User.IsInRole("Api"))
+            {
+                <li>
+                    <a asp-action="Index" asp-controller="Api">
+                        <i class="fa fa-key m-r-xs"></i>Api Keys
+                    </a>
+                </li>
+            }
+            @if (Engine.Settings.Billing.IsSubscriptionsEnabled)
+            {
+                <li>
+                    <a asp-action="Index" asp-controller="Subscriptions">
+                        <i class="fa fa-credit-card m-r-xs"></i>Manage Subscription
+                    </a>
+                </li>
+            }
+            <li>
+                <a asp-action="ChangePassword" asp-controller="Manage">
+                    <i class="fa fa-lock m-r-xs"></i>Change Password
+                </a>
+            </li>
+            <li>
+                <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm" class="navbar-right"></form>
+                <a href="javascript:document.getElementById('logoutForm').submit()">
+                    <i class="fa fa-sign-out m-r-xs"></i>Log out
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-sm-3 text-right">
+        <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs sidebar-avatar" />
+        <p class="m-t-xs">
+            Logged in as <strong class="font-bold">@Engine.Account.ToDisplayName()</strong><br />
+            <a href="javascript:document.getElementById('logoutForm').submit()">
+                Log out
+            </a>
+        </p>
+    </div>
+</div>

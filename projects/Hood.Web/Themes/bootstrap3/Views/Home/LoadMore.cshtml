@@ -1,0 +1,20 @@
+@model ContentModel
+@{
+    Layout = null;
+}
+@if (Model.List.Count() > 0)
+{
+    foreach (Content content in Model.List)
+    {
+        switch (Model.ContentType.BaseName)
+        {
+            case "News":
+                <partial name="_NewsCard" />
+                break;
+            case "Portfolio":
+                <partial name="_PortfolioCard" />
+                break;
+        }
+    }
+    <partial name="_LoadMoreBlock" />
+}

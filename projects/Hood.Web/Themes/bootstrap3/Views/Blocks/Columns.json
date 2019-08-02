@@ -1,0 +1,139 @@
+{
+    "Description": "A basic grid layout for columned content, up to 3 rows, and 1, 2, 3, 4 or 6 column layout.",
+    "IconUrl": "/hood/images/no-image.jpg",
+    "Name": "Content Columns",
+  "Variables": [
+    {
+      "Name": "CSS Class",
+      "VariableName": "class",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Grey",
+          "Value": "bg-color-light-grey"
+        },
+        {
+          "Key": "White",
+          "Value": "bg-color-white"
+        }
+      ],
+      "Value": "bg-color-white"
+    },
+    {
+      "Name": "Alignment",
+      "VariableName": "align",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Left",
+          "Value": "text-left"
+        },
+        {
+          "Key": "Center",
+          "Value": "text-center"
+        },
+        {
+          "Key": "Right",
+          "Value": "text-right"
+        }
+      ],
+      "Value": "text-align:left;"
+    },
+    {
+      "Name": "Buttons",
+      "VariableName": "buttons",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Show buttons",
+          "Value": "true"
+        },
+        {
+          "Key": "No buttons",
+          "Value": "false"
+        }
+      ],
+      "Value": "true"
+    },
+    {
+      "Name": "Icons",
+      "VariableName": "icons",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Show icons",
+          "Value": "true"
+        },
+        {
+          "Key": "No icons",
+          "Value": "false"
+        }
+      ],
+      "Value": "true"
+    },
+    {
+      "Name": "Rows",
+      "VariableName": "rows",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "1",
+          "Value": "1"
+        },
+        {
+          "Key": "2",
+          "Value": "2"
+        },
+        {
+          "Key": "3",
+          "Value": "3"
+        }
+      ],
+      "Value": "1"
+    },
+    {
+      "Name": "Columns",
+      "VariableName": "cols",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "1",
+          "Value": "1"
+        },
+        {
+          "Key": "2",
+          "Value": "2"
+        },
+        {
+          "Key": "3",
+          "Value": "3"
+        },
+        {
+          "Key": "4",
+          "Value": "4"
+        },
+        {
+          "Key": "6",
+          "Value": "6"
+        }
+      ],
+      "Value": "1"
+    },
+    {
+      "Name": "Full width",
+      "VariableName": "fullwidth",
+      "Type": "select",
+      "Values": [
+        {
+          "Key": "Full width",
+          "Value": "true"
+        },
+        {
+          "Key": "Contained",
+          "Value": "false"
+        }
+      ],
+      "Value": "true"
+    }
+  ]
+}

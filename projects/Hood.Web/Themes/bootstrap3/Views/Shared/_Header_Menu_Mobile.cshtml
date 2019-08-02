@@ -1,0 +1,65 @@
+@inject IContentRepository _content
+@model HeaderModel
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<nav class="mobile">
+    <div class="logo">
+        <img src="~/hood/images/hood-cms-white.svg" />
+    </div>
+    <h4><a href="/">Home</a></h4>
+    <ul>
+        <li><a asp-action="Index" asp-controller="Forum">Forums</a></li>
+        <li><a asp-action="Index" asp-controller="Subscriptions">Member's Area</a></li>
+        @{
+            var _propertySettings = Engine.Settings.Property;
+            var sideTypes = Engine.Settings.Content.AllowedTypes;
+            if (_propertySettings.Enabled)
+            {
+                sideTypes.Add(new ContentType() { Type = "property", Title = _propertySettings.Title, TypeNamePlural = _propertySettings.Plural, Slug = _propertySettings.Slug, IsPublic = true });
+            }
+            sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
+        }
+        @foreach (ContentType ct in sideTypes)
+        {
+            if (ct.IsPublic)
+            {
+                <li><a href="@string.Format("/{0}/", ct.Slug)">@ct.Title</a></li>
+            }
+        }
+    </ul>
+    <h4><a asp-action="Index" asp-controller="Manage">Account</a></h4>
+    <ul>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @if (User.IsEditorOrBetter())
+            {
+                <li>
+                    <a asp-action="Index" asp-controller="Home" asp-area="Admin">
+                        <i class="fa fa-dashboard m-r-xs"></i>Website Dashboard
+                    </a>
+                </li>
+            }
+            <li>
+                <a asp-action="ChangePassword" asp-controller="Manage">
+                    <i class="fa fa-lock m-r-xs"></i>Change Password
+                </a>
+            </li>
+            <li>
+                <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutFormMobile" class="navbar-right"></form>
+                <a href="javascript:document.getElementById('logoutFormMobile').submit()">
+                    <i class="fa fa-sign-out m-r-xs"></i>Log out
+                </a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a asp-action="Login" asp-controller="Account" asp-route-returnurl="@Context.Request.Path">Login</a>
+            </li>
+            <li>
+                <a asp-action="Register" asp-controller="Account" asp-route-returnurl="@Context.Request.Path" class="signup">Create account</a>
+            </li>
+        }
+    </ul>
+</nav>

@@ -1,0 +1,80 @@
+@model BillingHomeModel
+@{
+    ViewBag.Title = "Billing";
+    ViewBag.SubTitle = "This is the billing area, where customers can see their previous invoices, update their subcsriptions and credit card information.";
+}
+<alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+<div class="row">
+    <div class="col-md-7">
+        @if (Model.NextInvoice != null)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading">Your next payment</div>
+                <div class="panel-body">
+                    <partial name="_Invoice" model="Model.NextInvoice" />
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success">
+                <p><i class="fa fa-info-circle m-r-xs"></i>You have no upcoming payments...</p>
+            </div>
+        }
+        @if (Model.Invoices != null && Model.Invoices.Count() != 0)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading">Your previous invoices</div>
+                <div class="panel-body">
+                    <div class="accordion">
+                        @foreach (Stripe.Invoice invoice in Model.Invoices)
+                        {
+                            <partial name="_Invoice" model="invoice" />
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success">
+                <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You have no invoices to show...</p>
+            </div>
+        }
+    </div>
+    <div class="col-md-5">
+        @if (Model.Subscriptions?.Count > 0)
+        {
+            <div class="panel panel-default">
+                <div class="panel-heading">Your Subscriptions</div>
+                <div class="panel-body">
+                    @foreach (var subscription in Model.Subscriptions)
+                    {
+                        <partial name="_Subscription" model="subscription" />
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <p><i class="fa fa-exclamation-triangle m-r-xs"></i>You do not have any active subscriptions.</p>
+                <p><a asp-action="Select" asp-controller="Subscriptions" class="btn btn-xs btn-success"><i class="fa fa-user-plus m-r-xs"></i>Get a package</a></p>
+            </div>
+        }
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <a class="btn btn-xs btn-success pull-right pull-right hood-modal" asp-action="AddCard" data-complete="$.hood.Stripe.PaymentMethods.Add">
+                    <i class="fa fa-cc-visa mr-2"></i>
+                    Add card
+                </a>
+                Your Cards
+            </div>
+            <div class="panel-body">
+                <div id="payment-method-list" class="hood-inline" data-url="@Url.Action("PaymentMethods")">
+                    <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading payment methods...</alert>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

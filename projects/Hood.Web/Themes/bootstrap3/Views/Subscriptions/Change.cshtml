@@ -1,0 +1,87 @@
+@model ChangeSubscriptionModel
+@{
+    ViewBag.Title = "Change your subscription";
+    ViewBag.SubTitle = "Confirm your new package and go!";
+}
+<section class="page-section">
+    @if (Model.SaveMessage.IsSet())
+    {
+        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+    }
+    @if (Model.Customer?.Sources?.Data?.Count == 0)
+    {
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <div class="alert alert-warning">
+                    <p><i class="fa fa-info-circle fa-4x m-r-xs"></i><br />You do not currently have an active payment source, such as a credit card, to continue your subscription after the current period you must add one to your account now.</p>
+                    <p>
+                        <a asp-action="AddCard" asp-controller="Billing" class="btn btn-lg btn-success"><i class="fa fa-credit-card m-r-xs"></i>Add Card</a>
+                        <a asp-action="Index" asp-controller="Billing" class="btn btn-lg btn-default"><i class="fa fa-credit-card m-r-xs"></i>Manage Cards</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        @{ 
+            var currentSub = Model.CurrentSubscription.Subscription;
+        }
+        <div class="col-xs-12 col-sm-6">
+            <div class="thumbnail price">
+                <div class="panel-heading  text-center bg-info">
+                    <p><strong>Change from this:</strong></p>
+                    <h3>@currentSub.Name</h3>
+                    <p>@currentSub.FullPrice</p>
+                    @if (currentSub.TrialPeriodDays > 0)
+                    {
+                        <p>@currentSub.TrialPeriodDays days free trial</p>
+                    }
+                    else
+                    {
+                        <p>No trial period.</p>
+                    }
+                </div>
+                <div class="p-lg text-center">
+                    @currentSub.Description
+                </div>
+                <div class="panel-footer text-center">
+                    <span class="price">@currentSub.Price</span>
+                    <span>per @currentSub.Interval</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="thumbnail price">
+                <div class="panel-heading  text-center bg-info">
+                    <p><strong>To this:</strong></p>
+                    <h3>@Model.Plan.Name</h3>
+                    <p>@Model.Plan.FullPrice</p>
+                    @if (Model.Plan.TrialPeriodDays > 0)
+                    {
+                        <p>@Model.Plan.TrialPeriodDays days free trial</p>
+                    }
+                    else
+                    {
+                        <p>No trial period.</p>
+                    }
+                </div>
+                <div class="p-lg text-center">
+                    @Model.Plan.Description
+                </div>
+                <div class="panel-footer text-center">
+                    <span class="price">@Model.Plan.Price</span>
+                    <span>per @Model.Plan.Interval</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="SubscriptionId" />
+        <input type="hidden" asp-for="PlanId" />
+        <button class="btn btn-success" type="submit">Confirm &amp; Change Subscription</button>
+    </form>
+
+</section>

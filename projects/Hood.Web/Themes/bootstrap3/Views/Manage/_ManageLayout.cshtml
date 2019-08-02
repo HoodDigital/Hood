@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = $"Account: {ViewBag.Title}";
+    ViewData["SubTitle"] = ViewData["SubTitle"];
+
+    Layout = "_BasicLayout";
+}
+<div class="container m-b-lg">
+    @RenderSection("alerts", false)
+    <div class="row">
+        <div class="col-md-3">
+            <div class="text-center m-b-lg">
+                <fixedImage src="@Engine.Account.Avatar?.SmallUrl" class="img img-sm"></fixedImage>
+            </div>
+            @await Html.PartialAsync("_ManageNav")
+        </div>
+        <div class="col-md-9">
+            @RenderBody()
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+@{ 
+    Layout = "_Layout";
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<section class="hero">
+    <fixedImage src="/hood/images/bg/4.jpg" class="background-image hood-image"></fixedImage>
+    <div class="intro">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7 col-md-offset-1">
+                    <h1>@ViewData["Title"]</h1>
+                    <p>@Html.Raw(ViewData["SubTitle"])</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="container">
+    @RenderBody()
+</section>

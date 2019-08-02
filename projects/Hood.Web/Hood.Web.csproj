@@ -26,4 +26,10 @@
     <Folder Include="UI\Components\Header\" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Content Update="Themes\bootstrap3\Views\Shared\_Scripts_Bootstrap.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  
 </Project>
