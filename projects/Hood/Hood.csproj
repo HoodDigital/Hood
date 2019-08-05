@@ -53,6 +53,7 @@
     <EmbeddedResource Include="Areas\**\*.json" />
     <EmbeddedResource Include="UI\**\*.cshtml" />
     <EmbeddedResource Include="UI\**\*.json" />
+    <EmbeddedResource Include="SQL\**\*.sql" />
   </ItemGroup>
 
   <ItemGroup>

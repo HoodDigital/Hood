@@ -4,6 +4,7 @@ using Hood.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,34 +75,6 @@ namespace Hood.Controllers
         {
             string xml = await _content.GetSitemapDocumentAsync(Url);
             return Content(xml, "text/xml", Encoding.UTF8);
-        }
-
-        [Route("error/")]
-        public IActionResult Error()
-        {
-            var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
-            var error = feature?.Error;
-            return View("~/Views/Shared/Error.cshtml", error);
-        }
-
-        [Route("error/{code}")]
-        public IActionResult ErrorCode(int code)
-        {
-            var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
-            var error = feature?.Error;
-
-            switch (code)
-            {
-                case 404:
-                    ViewData["Title"] = $"{code} - Not Found";
-                    ViewData["Message"] = "Unfortunately, we can't locate what you are looking for...";
-                    break;
-                default:
-                    ViewData["Title"] = $"{code}";
-                    ViewData["Message"] = error.Message;
-                    break;
-            }
-            return View();
         }
 
         [Route("enter-access-code")]

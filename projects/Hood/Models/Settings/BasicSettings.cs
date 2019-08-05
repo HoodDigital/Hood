@@ -11,7 +11,7 @@ namespace Hood.Models
         public BasicSettings()
         {
             Title = "New Website";
-            Logo = "/hood/images/hood-cms-dark.svg";
+            Logo = "/hood/images/hood-cms.svg";
             LogoLight = "/hood/images/hood-cms-white.svg";
             Owner = new Person();
             Address = new SiteAddress();

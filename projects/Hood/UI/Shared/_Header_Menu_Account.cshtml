@@ -57,13 +57,15 @@
             </li>
         </ul>
     </div>
-    <div class="col-sm-3 text-right">
-        <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs sidebar-avatar" />
-        <p class="m-t-xs">
-            Logged in as <strong class="font-bold">@Engine.Account.ToDisplayName()</strong><br />
-            <a href="javascript:document.getElementById('logoutForm').submit()">
-                Log out
-            </a>
-        </p>
-    </div>
+    @if  (Engine.Account != null) { 
+        <div class="col-sm-3 text-right">
+            <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs sidebar-avatar" />
+            <p class="m-t-xs">
+                Logged in as <strong class="font-bold">@Engine.Account.ToDisplayName()</strong><br />
+                <a href="javascript:document.getElementById('logoutForm').submit()">
+                    Log out
+                </a>
+            </p>
+        </div>
+    }
 </div>

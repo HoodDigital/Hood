@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Hood.ViewModels;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -18,11 +19,12 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/theme/")]
-        public IActionResult Index() => List("Index");
+        public IActionResult Index(ThemeListView model) => List(model, "Index");
         [Route("admin/theme/list/")]
-        public IActionResult List(string viewName = "_List_Themes")
+        public IActionResult List(ThemeListView model, string viewName = "_List_Themes")
         {
-            return View(viewName);
+            model.Reload(_themeService.Themes);
+            return View(viewName, model);
         }
 
         [HttpPost()]

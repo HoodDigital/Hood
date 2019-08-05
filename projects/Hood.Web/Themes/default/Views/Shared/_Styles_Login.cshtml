@@ -1,6 +1,6 @@
-<environment names="Development,Staging,ErrorTesting">
+<environment include="Development">
     <link rel="stylesheet" href="~/hood/css/login.css" asp-append-version="true" />
 </environment>
-<environment names="Production,PreProduction">
+<environment exclude="Development">
     <link rel="stylesheet" href="~/hood/css/login.min.css" asp-append-version="true" />
 </environment>

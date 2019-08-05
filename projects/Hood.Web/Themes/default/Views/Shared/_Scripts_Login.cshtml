@@ -1,10 +1,10 @@
 <partial name="_Scripts_JQuery" />
 <partial name="_Scripts_Bootstrap" />
 <partial name="_Scripts_Validation" />
-<environment names="Development">
+<environment include="Development">
     <script src="~/lib/jquery-mask/jquery.mask.min.js"></script>
     <script src="~/hood/js/login.js" asp-append-version="true"></script>
 </environment>
-<environment names="Production,Staging">
+<environment exclude="Development">
     <script src="~/hood/js/login.packaged.js" asp-append-version="true"></script>
 </environment>

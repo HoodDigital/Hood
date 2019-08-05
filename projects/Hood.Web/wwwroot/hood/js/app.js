@@ -43,6 +43,14 @@ $.hood.App = {
         if ($.hood.App.Options.RichTextEditors)
             $.hood.App.RichTextEditors();
     },
+    Ready: function () {
+        $.hood.App.Init();
+        $.hood.App.Resize();
+    },
+    Load: function () {
+    },
+    Resize: function () {
+    },
     Header: {
         Init: function () {
             if ($.hood.App.Options.Header.Sticky) {
@@ -208,6 +216,8 @@ $.hood.App = {
         });
     }
 };
-$.hood.App.Init();
+
+// Initialise
+$(function () { $.hood.App.Ready(); });
 $(window).on('load', $.hood.App.Load);
 $(window).on('resize', $.hood.App.Resize);

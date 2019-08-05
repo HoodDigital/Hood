@@ -21,7 +21,14 @@ namespace Hood.Extensions
             if (profile == null)
             {
                 var context = Engine.Services.Resolve<HoodDbContext>();
-                profile = context.UserProfiles.SingleOrDefault(us => us.Id == principal.GetUserId());
+                try
+                {
+                    profile = context.UserProfiles.SingleOrDefault(us => us.Id == principal.GetUserId());
+                }
+                catch (Exception ex)
+                {
+
+                }
                 if (profile != null)
                     contextAccessor.HttpContext.Items[nameof(UserProfile)] = profile;
             }

@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Hood.Models
 {
@@ -69,7 +68,7 @@ namespace Hood.Models
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.ConfigureForHood();
         }
-        
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -78,11 +77,11 @@ namespace Hood.Models
 
         public bool AllMigrationsApplied()
         {
-            var applied = this.GetService<IHistoryRepository>()
+            System.Collections.Generic.IEnumerable<string> applied = this.GetService<IHistoryRepository>()
                 .GetAppliedMigrations()
                 .Select(m => m.MigrationId);
 
-            var total = this.GetService<IMigrationsAssembly>()
+            System.Collections.Generic.IEnumerable<string> total = this.GetService<IMigrationsAssembly>()
                 .Migrations
                 .Select(m => m.Key);
 
@@ -93,7 +92,7 @@ namespace Hood.Models
         {
             if (AllMigrationsApplied())
             {
-                foreach (var role in Models.Roles.All)
+                foreach (string role in Models.Roles.All)
                 {
                     if (!roleManager.RoleExistsAsync(role).Result)
                     {
@@ -102,7 +101,7 @@ namespace Hood.Models
                 }
                 if (!Users.Any(u => u.UserName == "admin@hooddigital.com"))
                 {
-                    var userToInsert = new ApplicationUser
+                    ApplicationUser userToInsert = new ApplicationUser
                     {
                         CompanyName = "Hood",
                         CreatedOn = DateTime.Now,
@@ -122,10 +121,10 @@ namespace Hood.Models
                     IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
                     if (ir.Succeeded)
                     {
-                        var user = userManager.FindByEmailAsync(userToInsert.UserName).Result;
+                        ApplicationUser user = userManager.FindByEmailAsync(userToInsert.UserName).Result;
                         if (userManager.SupportsUserRole)
                         {
-                            foreach (var role in Models.Roles.All)
+                            foreach (string role in Models.Roles.All)
                             {
                                 if (!userManager.IsInRoleAsync(user, role.ToUpper()).Result)
                                 {
@@ -138,22 +137,34 @@ namespace Hood.Models
 
                 var siteAdmin = Users.SingleOrDefault(u => u.UserName == "admin@hooddigital.com");
 
-                if (!MediaDirectories.Any(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System))
-                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Default", Slug = MediaManager.SiteDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
-                if (!MediaDirectories.Any(o => o.Slug == MediaManager.UserDirectorySlug && o.Type == DirectoryType.System))
-                    MediaDirectories.Add(new MediaDirectory { DisplayName = "User Media", Slug = MediaManager.UserDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
-
-                if (!MediaDirectories.Any(o => o.Slug == MediaManager.ContentDirectorySlug && o.Type == DirectoryType.System))
-                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Content", Slug = MediaManager.ContentDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
-                if (!MediaDirectories.Any(o => o.Slug == MediaManager.PropertyDirectorySlug && o.Type == DirectoryType.System))
-                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Property", Slug = MediaManager.PropertyDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
-                if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
-                {
-                    Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
-                }
                 if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
                 {
                     Options.Add(new Option { Id = "Hood.Settings.SiteOwner", Value = siteAdmin.Id });
+                }
+
+                if (!MediaDirectories.Any(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System))
+                {
+                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Default", Slug = MediaManager.SiteDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
+                }
+
+                if (!MediaDirectories.Any(o => o.Slug == MediaManager.UserDirectorySlug && o.Type == DirectoryType.System))
+                {
+                    MediaDirectories.Add(new MediaDirectory { DisplayName = "User Media", Slug = MediaManager.UserDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
+                }
+
+                if (!MediaDirectories.Any(o => o.Slug == MediaManager.ContentDirectorySlug && o.Type == DirectoryType.System))
+                {
+                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Content", Slug = MediaManager.ContentDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
+                }
+
+                if (!MediaDirectories.Any(o => o.Slug == MediaManager.PropertyDirectorySlug && o.Type == DirectoryType.System))
+                {
+                    MediaDirectories.Add(new MediaDirectory { DisplayName = "Property", Slug = MediaManager.PropertyDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
+                }
+
+                if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
+                {
+                    Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
                 }
 
                 if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))
@@ -161,12 +172,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Account"))
                     {
-                        var option = Options.Find("Hood.Settings.Account");
+                        Option option = Options.Find("Hood.Settings.Account");
                         AccountSettings setting = JsonConvert.DeserializeObject<AccountSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(AccountSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(AccountSettings).ToString(), Value = JsonConvert.SerializeObject(new AccountSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(BasicSettings).ToString()))
@@ -174,12 +187,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Basic"))
                     {
-                        var option = Options.Find("Hood.Settings.Basic");
+                        Option option = Options.Find("Hood.Settings.Basic");
                         BasicSettings setting = JsonConvert.DeserializeObject<BasicSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(BasicSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(BasicSettings).ToString(), Value = JsonConvert.SerializeObject(new BasicSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(BillingSettings).ToString()))
@@ -187,12 +202,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Billing"))
                     {
-                        var option = Options.Find("Hood.Settings.Billing");
+                        Option option = Options.Find("Hood.Settings.Billing");
                         BillingSettings setting = JsonConvert.DeserializeObject<BillingSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(BillingSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(BillingSettings).ToString(), Value = JsonConvert.SerializeObject(new BillingSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(ContactSettings).ToString()))
@@ -200,12 +217,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Contact"))
                     {
-                        var option = Options.Find("Hood.Settings.Contact");
+                        Option option = Options.Find("Hood.Settings.Contact");
                         ContactSettings setting = JsonConvert.DeserializeObject<ContactSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(ContactSettings).ToString(), Value = JsonConvert.SerializeObject(new ContactSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(ContentSettings).ToString()))
@@ -213,12 +232,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Content"))
                     {
-                        var option = Options.Find("Hood.Settings.Content");
+                        Option option = Options.Find("Hood.Settings.Content");
                         ContentSettings setting = JsonConvert.DeserializeObject<ContentSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(ContentSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(ContentSettings).ToString(), Value = JsonConvert.SerializeObject(new ContentSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(ForumSettings).ToString()))
@@ -226,12 +247,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Forum"))
                     {
-                        var option = Options.Find("Hood.Settings.Seo");
+                        Option option = Options.Find("Hood.Settings.Seo");
                         ForumSettings setting = JsonConvert.DeserializeObject<ForumSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(ForumSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(ForumSettings).ToString(), Value = JsonConvert.SerializeObject(new ForumSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(IntegrationSettings).ToString()))
@@ -239,12 +262,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Integrations"))
                     {
-                        var option = Options.Find("Hood.Settings.Integrations");
+                        Option option = Options.Find("Hood.Settings.Integrations");
                         IntegrationSettings setting = JsonConvert.DeserializeObject<IntegrationSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(IntegrationSettings).ToString(), Value = JsonConvert.SerializeObject(new IntegrationSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(MailSettings).ToString()))
@@ -252,12 +277,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Mail"))
                     {
-                        var option = Options.Find("Hood.Settings.Mail");
+                        Option option = Options.Find("Hood.Settings.Mail");
                         MailSettings setting = JsonConvert.DeserializeObject<MailSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(MailSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(MailSettings).ToString(), Value = JsonConvert.SerializeObject(new MailSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(MediaSettings).ToString()))
@@ -265,12 +292,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Media"))
                     {
-                        var option = Options.Find("Hood.Settings.Media");
+                        Option option = Options.Find("Hood.Settings.Media");
                         MediaSettings setting = JsonConvert.DeserializeObject<MediaSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(MediaSettings).ToString(), Value = JsonConvert.SerializeObject(new MediaSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(PropertySettings).ToString()))
@@ -278,12 +307,14 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Property"))
                     {
-                        var option = Options.Find("Hood.Settings.Property");
+                        Option option = Options.Find("Hood.Settings.Property");
                         PropertySettings setting = JsonConvert.DeserializeObject<PropertySettings>(option.Value);
                         Options.Add(new Option { Id = typeof(PropertySettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(PropertySettings).ToString(), Value = JsonConvert.SerializeObject(new PropertySettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == typeof(SeoSettings).ToString()))
@@ -291,18 +322,20 @@ namespace Hood.Models
                     // No new settings exist, attempt to copy from deprecated settings, or set new.
                     if (Options.Any(o => o.Id == "Hood.Settings.Seo"))
                     {
-                        var option = Options.Find("Hood.Settings.Seo");
+                        Option option = Options.Find("Hood.Settings.Seo");
                         SeoSettings setting = JsonConvert.DeserializeObject<SeoSettings>(option.Value);
                         Options.Add(new Option { Id = typeof(SeoSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
                     }
                     else
+                    {
                         Options.Add(new Option { Id = typeof(SeoSettings).ToString(), Value = JsonConvert.SerializeObject(new SeoSettings()) });
+                    }
                 }
 
                 if (!Options.Any(o => o.Id == "Hood.Api.SystemPrivateKey"))
                 {
-                    var generator = new KeyGenerator(true, true, true, false);
-                    var key = generator.Generate(24);
+                    KeyGenerator generator = new KeyGenerator(true, true, true, false);
+                    string key = generator.Generate(24);
                     Options.Add(new Option { Id = "Hood.Api.SystemPrivateKey", Value = JsonConvert.SerializeObject(key) });
                 }
 

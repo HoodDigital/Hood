@@ -1,9 +1,9 @@
 @inject IThemesService _themes
 <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" />
-<environment names="Development,Staging,ErrorTesting">
+<environment include="Development">
     <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
 </environment>
-<environment names="Production,PreProduction">
+<environment exclude="Development">
     <link rel="stylesheet" href="~/css/preload.min.css" asp-append-version="true" />
 </environment>
 <!--[if lte IE 9]>

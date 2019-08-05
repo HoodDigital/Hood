@@ -1,11 +1,11 @@
-@inject IThemesService _themesService
+@model ThemeListView
 @{
     Layout = null;
 }
 <div class="card-deck card-deck-4">
-    @foreach (Theme theme in _themesService.Themes)
+    @foreach (Theme theme in Model.List)
     {
-        <div class="card hover @(theme.IsActive ? "active border-success" : "border-dark")">
+        <div class="card hover @(theme.IsActive ? "active border-success" : "border-dark") mb-3">
             <figure class="card-img-top img img-wide" style="background-image:url(@theme.PreviewImage)">
                 <img src="@theme.PreviewImage" alt="@theme.FullName" />
             </figure>
@@ -31,3 +31,4 @@
         </div>
     }
 </div>
+<partial name="_Pagination" />

@@ -117,6 +117,12 @@ namespace System.Collections.Generic
             return this;
         }
 
+        public IPagedList<T> Reload(IEnumerable<T> source)
+        {
+            Reload(source, PageIndex, PageSize);
+            return this;
+        }
+
         public IPagedList<T> Reload(IEnumerable<T> source, int pageIndex, int pageSize)
         {
             var total = source.Count();

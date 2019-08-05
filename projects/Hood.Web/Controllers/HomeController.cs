@@ -12,10 +12,5 @@ namespace Hood.Web.Controllers
         {}
 
         public override async Task<IActionResult> Index() => await base.Index();
-
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }

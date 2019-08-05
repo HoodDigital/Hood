@@ -1,4 +1,4 @@
-/// <binding />
+/// <binding BeforeBuild='views' />
 // Useful gulp functions for the development of HoodCMS.
 // Note this is a demo project and should not be used for production HoodCMS projects.
 // In production, you should install the nuget and bower packages to your HoodCMS project.
@@ -26,7 +26,8 @@ var gulp = require('gulp'),
         js: './../../js/',
         css: './../../css/',
         scss: './../../scss/',
-        images: './../../images/'
+        images: './../../images/',
+        sql: './../../sql/'
     };
 
 // Cleans all dist/src/images output folders, as well as the hood folders.
@@ -68,11 +69,28 @@ gulp.task('cssnano', function () {
         .pipe(gulp.dest(output.css));
 });
 
+// Copies working views from default theme to be embedded in main assembly.
+gulp.task('views:clean', function (cb) {
+    return gulp.src('./../Hood/UI/**/*.*', { read: false, allowEmpty: true })
+        .pipe(rimraf({ force: true }));
+});
+gulp.task('views:copy', function () {
+    return gulp.src('./Themes/default/Views/**/*.*')
+        .pipe(gulp.dest('./../Hood/UI/'));
+});
+gulp.task('views', gulp.series('views:clean', 'views:copy'));
+
 // Copies any image files from the images directories to the distribution images directory.
 gulp.task('images', function () {
     return gulp.src(hood.images + '**/*.+(png|jpg|gif|svg)')
         .pipe(imagemin())
         .pipe(gulp.dest(output.images));
+});
+
+// Copies any sql files from the images directories to the distribution sql directory.
+gulp.task('sql', function () {
+    return gulp.src('./../Hood/SQL/**/*.+(sql)')
+        .pipe(gulp.dest(output.sql));
 });
 
 // Minifies javascript and copies the output to the output directories.
@@ -175,7 +193,6 @@ gulp.task('js:package:login', function () {
     return gulp.src([
 
         lib + 'jquery-mask/jquery.mask.js',
-        hood.js + 'core.js',
 
         hood.js + 'login.js'
 
@@ -224,7 +241,7 @@ gulp.task('js:package:admin', function () {
 });
 
 gulp.task('package', gulp.series('js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
-gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images'), gulp.parallel('scss:copy', 'cssnano', 'package')));
+gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images', 'sql'), gulp.parallel('scss:copy', 'cssnano', 'package')));
 
 // Site workload, to compile theme less/scss and JS.
 gulp.task('themes:scss', function () {
@@ -261,7 +278,6 @@ gulp.task('themes:less', function () {
 });
 gulp.task('themes:cssnano', function () {
     return gulp.src(['./wwwroot/themes/**/css/styles.css'])
-        .pipe(gulp.dest(output.css))
         .pipe(cssnano({
             discardComments: {
                 removeAll: true

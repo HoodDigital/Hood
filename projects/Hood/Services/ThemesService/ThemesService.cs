@@ -9,23 +9,29 @@ namespace Hood.Services
 {
     public class ThemesService : IThemesService
     {
-        private readonly Dictionary<string, IConfiguration> _configs;
+        private Dictionary<string, IConfiguration> _configs;
+        private readonly IHostingEnvironment _env;
         public static object scriptLock = new object();
 
         public ThemesService(IHostingEnvironment env)
         {
-            _configs = new Dictionary<string, IConfiguration>();
+            _env = env;
+            Reload();
+        }
 
+        public void Reload()
+        {
+            _configs = new Dictionary<string, IConfiguration>();
             string[] themeDirs = { };
-            if (System.IO.Directory.Exists(env.ContentRootPath + "\\Themes\\"))
-                themeDirs = themeDirs.Concat(System.IO.Directory.GetDirectories(env.ContentRootPath + "\\Themes\\")).ToArray();
+            if (System.IO.Directory.Exists(_env.ContentRootPath + "\\Themes\\"))
+                themeDirs = themeDirs.Concat(System.IO.Directory.GetDirectories(_env.ContentRootPath + "\\Themes\\")).ToArray();
 
             foreach (string theme in themeDirs)
             {
                 if (System.IO.File.Exists(theme + "/config.json"))
                 {
                     var name = theme.Remove(0, theme.LastIndexOf('\\') + 1).ToLower();
-                    var builder = new ConfigurationBuilder().SetBasePath(env.ContentRootPath + "\\themes\\" + name).AddJsonFile("config.json");
+                    var builder = new ConfigurationBuilder().SetBasePath(_env.ContentRootPath + "\\themes\\" + name).AddJsonFile("config.json");
                     var configBuilt = builder.Build();
                     _configs.Add(name, configBuilt);
                 }
@@ -90,7 +96,6 @@ namespace Hood.Services
         {
             try
             {
-
                 if (Themes.Any(t => t.Name == themeName))
                 {
                     Engine.Settings["Hood.Settings.Theme"] = themeName;
@@ -108,6 +113,7 @@ namespace Hood.Services
         {
             get
             {
+                Reload();
                 return _configs.Select(c => new Theme(c.Value)).ToList();
             }
         }

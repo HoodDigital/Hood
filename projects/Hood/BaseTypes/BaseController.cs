@@ -47,6 +47,7 @@ namespace Hood.Controllers
         protected readonly IDirectoryManager _directoryManager;
         protected readonly IMediaManager _media;
         protected readonly IAddressService _address;
+        protected readonly IThemesService _themeService;
         protected readonly IEventsService _eventService;
 
         [TempData]
@@ -76,6 +77,7 @@ namespace Hood.Controllers
             _address = Engine.Services.Resolve<IAddressService>();
             _eventService = Engine.Services.Resolve<IEventsService>();
             _directoryManager = Engine.Services.Resolve<IDirectoryManager>();
+            _themeService = Engine.Services.Resolve<IThemesService>();
             _media = Engine.Services.Resolve<IMediaManager>();
         }
 

@@ -16,18 +16,15 @@ namespace Hood.Services
     public class PropertyRepository : IPropertyRepository
     {
         private readonly HoodDbContext _db;
-        private readonly IConfiguration _config;
         private readonly IHoodCache _cache;
         private readonly IMediaManager _media;
 
         public PropertyRepository(
             HoodDbContext db,
             IHoodCache cache,
-            IConfiguration config,
             IMediaManager media)
         {
             _db = db;
-            _config = config;
             _cache = cache;
             _media = media;
         }

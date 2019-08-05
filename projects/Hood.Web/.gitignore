@@ -26,3 +26,6 @@ package-lock.json
 /wwwroot/themes/**/*.min.js
 /wwwroot/themes/**/*.packaged.js
 /wwwroot/themes/**/lib
+
+# Ignore Local appsettings.Development.json
+appsettings.Development.json

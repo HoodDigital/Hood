@@ -1,7 +1,7 @@
 @inject IThemesService _themes
-<environment names="Development,Staging,ErrorTesting">
+<environment include="Development">
     <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/styles.css", _themes.CurrentTheme)" asp-append-version="true" />
 </environment>
-<environment names="Production,PreProduction">
+<environment exclude="Development">
     <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/styles.min.css", _themes.CurrentTheme)" asp-append-version="true" />
 </environment>

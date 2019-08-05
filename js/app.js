@@ -31,6 +31,12 @@ $.hood.App = {
     if ($.hood.App.Options.LoadSharers) $.hood.App.Sharers();
     if ($.hood.App.Options.RichTextEditors) $.hood.App.RichTextEditors();
   },
+  Ready: function Ready() {
+    $.hood.App.Init();
+    $.hood.App.Resize();
+  },
+  Load: function Load() {},
+  Resize: function Resize() {},
   Header: {
     Init: function Init() {
       if ($.hood.App.Options.Header.Sticky) {
@@ -206,7 +212,10 @@ $.hood.App = {
       content_css: '/css/site.css'
     });
   }
-};
-$.hood.App.Init();
+}; // Initialise
+
+$(function () {
+  $.hood.App.Ready();
+});
 $(window).on('load', $.hood.App.Load);
 $(window).on('resize', $.hood.App.Resize);

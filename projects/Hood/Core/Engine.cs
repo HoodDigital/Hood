@@ -3,6 +3,10 @@ using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Hood.Core
@@ -82,13 +86,20 @@ namespace Hood.Core
         {
             get
             {
-                var _contextAccessor = Services.Resolve<IHttpContextAccessor>();
-                if (_contextAccessor == null || 
-                    _contextAccessor.HttpContext == null || 
-                    _contextAccessor.HttpContext.User ==null || 
-                    !_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                try
+                {
+                    var _contextAccessor = Services.Resolve<IHttpContextAccessor>();
+                    if (_contextAccessor == null ||
+                        _contextAccessor.HttpContext == null ||
+                        _contextAccessor.HttpContext.User == null ||
+                        !_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                        return null;
+                    return _contextAccessor.HttpContext.User.GetUserProfile();
+                }
+                catch (SqlException)
+                {
                     return null;
-                return _contextAccessor.HttpContext.User.GetUserProfile();
+                }
             }
         }
         /// <summary>
@@ -131,7 +142,6 @@ namespace Hood.Core
                 return Services.Resolve<IEventsService>();
             }
         }
-
         public static string Version
         {
             get

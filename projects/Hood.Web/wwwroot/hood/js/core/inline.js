@@ -19,7 +19,7 @@ $.hood.Inline = {
         $.hood.Inline.Reload(this);
     },
     Reload: function (tag, complete) {        
-        $tag = $(tag);
+        var $tag = $(tag);
         $tag.addClass('loading');
         if (!complete)
             complete = $tag.data('complete');

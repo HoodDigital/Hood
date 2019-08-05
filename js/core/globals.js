@@ -272,29 +272,19 @@ if (!$.mobile.Android) {
 // Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
 
 
-preventAutoComplete = true; // modifier to allow or disallow autocomplete
+$('body').on('change', '.prevent-autocomplete', function (e) {
+  // Change event is fired as autocomplete occurred at the input field 
+  trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
 
-trackInputs = {
-  password: "0",
-  username: "0"
-}; //Password and username fields ids as object's property, and "0" as its their values
-
-if (preventAutoComplete) {
-  $('body').on('change', '.prevent-autocomplete', function (e) {
-    // Change event is fired as autocomplete occurred at the input field 
-    trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
-
-    if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
-      //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
-      $(this).val(''); // empty the field
-    }
-  });
-  $('body').on('keyup', '.prevent-autocomplete', function (e) {
-    trackId = $(this).attr('id');
-    trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
-  });
-} // Custom Event polyfill
-
+  if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
+    //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
+    $(this).val(''); // empty the field
+  }
+});
+$('body').on('keyup', '.prevent-autocomplete', function (e) {
+  trackId = $(this).attr('id');
+  trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
+}); // Custom Event polyfill
 
 (function () {
   if (typeof window.CustomEvent === "function") return false;

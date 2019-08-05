@@ -1,5 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Interfaces;
+using Hood.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -53,16 +54,28 @@ namespace Hood.Extensions
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
-            if (env.IsEnvironment("Development") || env.IsEnvironment("Staging"))
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
             }
             else
             {
-                app.UseExceptionHandler("/error");
-                app.UseStatusCodePagesWithReExecute("/error/{0}");
+                app.UseExceptionHandler("/error/500");
             }
+
+            app.Use(async (ctx, next) =>
+            {
+                await next();
+
+                if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
+                {
+                    string originalPath = ctx.Request.Path.Value;
+                    ctx.Items["originalPath"] = originalPath;
+                    ctx.Request.Path = "/error/404";
+                    await next();
+                }
+            });
 
             if (config.ForceHttps())
             {
@@ -105,7 +118,14 @@ namespace Hood.Extensions
         }
         public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app, IConfiguration config)
         {
-            if (!config.IsDatabaseConfigured())
+            try
+            {
+                if (!config.IsDatabaseConfigured())
+                    throw new Exception();
+                var context = Engine.Services.Resolve<HoodDbContext>();
+                var profile = context.UserProfiles.FirstOrDefault();
+            }
+            catch (Exception)
             {
                 app.UseMvc(routes =>
                 {
@@ -115,52 +135,51 @@ namespace Hood.Extensions
                         defaults: new { controller = "Install", action = "Install" }
                     );
                 });
+                return app;
             }
-            else
+
+            app.UseMvc(routes =>
             {
-                app.UseMvc(routes =>
-                {
-                    // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
-                    routes.MapRoute(
-                        name: "Content",
-                        template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
-                        defaults: new { controller = "Home", action = "Show" }
-                    );
-                    routes.MapRoute(
-                         name: "Manage",
-                         template: "account/manage/{action=Index}/{id?}",
-                         defaults: new { controller = "Manage" }
-                    );
-                    routes.MapRoute(
-                         name: "Billing",
-                         template: "account/billing/{action=Index}/{id?}",
-                         defaults: new { controller = "Billing" }
-                    );
-                    routes.MapRoute(
-                         name: "Addresses",
-                         template: "account/addresses/{action=Index}/{id?}",
-                         defaults: new { controller = "Address" }
-                    );
-                    routes.MapRoute(
-                         name: "Api",
-                         template: "account/api/{action=Index}/{id?}",
-                         defaults: new { controller = "Api" }
-                    );
-                    routes.MapRoute(
-                         name: "Subscriptions",
-                         template: "account/subscriptions/{action=Index}/{id?}",
-                         defaults: new { controller = "Subscriptions" }
-                    );
-                    routes.MapRoute(
-                        name: "Areas",
-                        template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
-                    );
-                    routes.MapRoute(
-                        name: "Default",
-                        template: "{controller=Home}/{action=Index}/{id?}"
-                    );
-                });
-            }
+                // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
+                routes.MapRoute(
+                    name: "Content",
+                    template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
+                    defaults: new { controller = "Home", action = "Show" }
+                );
+                routes.MapRoute(
+                     name: "Manage",
+                     template: "account/manage/{action=Index}/{id?}",
+                     defaults: new { controller = "Manage" }
+                );
+                routes.MapRoute(
+                     name: "Billing",
+                     template: "account/billing/{action=Index}/{id?}",
+                     defaults: new { controller = "Billing" }
+                );
+                routes.MapRoute(
+                     name: "Addresses",
+                     template: "account/addresses/{action=Index}/{id?}",
+                     defaults: new { controller = "Address" }
+                );
+                routes.MapRoute(
+                     name: "Api",
+                     template: "account/api/{action=Index}/{id?}",
+                     defaults: new { controller = "Api" }
+                );
+                routes.MapRoute(
+                     name: "Subscriptions",
+                     template: "account/subscriptions/{action=Index}/{id?}",
+                     defaults: new { controller = "Subscriptions" }
+                );
+                routes.MapRoute(
+                    name: "Areas",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                );
+                routes.MapRoute(
+                    name: "Default",
+                    template: "{controller=Home}/{action=Index}/{id?}"
+                );
+            });
             return app;
         }
     }

@@ -53,7 +53,6 @@ namespace Hood.Extensions
             services.ConfigureRoutes();
 
             services.AddApplicationInsightsTelemetry(config);
-
             return services;
         }
 
