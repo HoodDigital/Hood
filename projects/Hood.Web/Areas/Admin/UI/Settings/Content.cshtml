@@ -1,0 +1,408 @@
+@model ContentSettings
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Content Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+    {
+        <a asp-action="ResetContent" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+    <a href="javascript:document.getElementById('settings-form').submit()" class="btn btn-success">
+        <i class="fa fa-save"></i> Save
+    </a>
+}
+<form method="post" id="settings-form">
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+    <div class="row">
+        <div class="col-12 col-lg-4 col-xl-3">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="content-type-filter-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#content-type-filter-panel" href="#content-type-filter-panel" aria-expanded="true" aria-controls="content-type-filter-panel">
+                            Choose a Type to Edit
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body collapse show" aria-labelledby="content-type-filter-panel-heading" id="content-type-filter-panel">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                @for (int i = 0; i < Model.Types.Count(); i++)
+                {
+                    <a class="nav-link d-flex justify-content-between align-items-center" href="@string.Format("#collapse_{0}", i.ToString())" aria-controls="@string.Format("collapse_{0}", i.ToString())" role="tab" data-toggle="pill" aria-selected="false">
+                        @Model.Types[i].Title
+                        @if (Model.Types[i].Enabled)
+                        {
+                            <span class="badge badge-success badge-pill">Enabled</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-dark badge-pill">Disabled</span>
+                        }
+                    </a>
+                }
+                <div class="mt-3">
+                    <a asp-action="AddContentType" class="nav-link btn btn-outline-success d-flex justify-content-between align-items-center" data-warning="This will add a blank content type to the site (cannot if you already have one with the type name 'blank'. Are you sure?">
+                        Add New Blank Type
+                        <i class="fa fa-plus-circle"></i>
+                    </a>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8 col-xl-9">
+            <div class="container ml-md-0 p-0">
+                <div class="tab-content">
+                    @for (int i = 0; i < Model.Types.Count(); i++)
+                    {
+                        <div role="tabpanel" class="tab-pane" id="@string.Format("collapse_{0}", i.ToString())">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" id="@string.Format("fields-tab-{0}", i.ToString())" data-toggle="tab" href="@string.Format("#type-{0}", i.ToString())" role="tab" aria-controls="@string.Format("fields-{0}", i.ToString())" aria-selected="false">
+                                                    Type Settings
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="@string.Format("fields-tab-{0}", i.ToString())" data-toggle="tab" href="@string.Format("#editor-{0}", i.ToString())" role="tab" aria-controls="@string.Format("fields-{0}", i.ToString())" aria-selected="false">
+                                                    Editor Settings
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="@string.Format("fields-tab-{0}", i.ToString())" data-toggle="tab" href="@string.Format("#meta-{0}", i.ToString())" role="tab" aria-controls="@string.Format("fields-{0}", i.ToString())" aria-selected="false">
+                                                    Default Meta Titles
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="@string.Format("fields-tab-{0}", i.ToString())" data-toggle="tab" href="@string.Format("#fields-{0}", i.ToString())" role="tab" aria-controls="@string.Format("fields-{0}", i.ToString())" aria-selected="false">
+                                                    Custom Fields
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="tab-content">
+                                        <div id="@string.Format("type-{0}", i.ToString())" class="tab-pane active" role="tabpanel" aria-labelledby="@string.Format("fields-tab-{0}", i.ToString())">
+                                            <input type="hidden" asp-for="Types[i].Search" />
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].Enabled" class="custom-control-input">
+                                                    <label asp-for="Types[i].Enabled" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].Enabled"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].BaseName"></label>
+                                                @if (Model.Types[i].BaseName == "Page")
+                                                {
+                                                    <input asp-for="Types[i].BaseName" class="form-control" type="hidden">
+                                                    <input asp-for="Types[i].BaseName" class="form-control" disabled>
+                                                }
+                                                else
+                                                {
+                                                    <select asp-for="Types[i].BaseName" class="form-control">
+                                                        <option value="Default">Basic Content (Default)</option>
+                                                        @foreach (var t in ContentTypes.All)
+                                                        {
+                                                            <option value="@t.BaseName">@t.BaseName</option>
+                                                        }
+                                                    </select>
+                                                }
+                                                <small asp-for="Types[i].BaseName"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].Slug"></label>
+                                                @if (Model.Types[i].BaseName == "Page")
+                                                {
+                                                    <input asp-for="Types[i].Slug" class="form-control" type="hidden">
+                                                    <input asp-for="Types[i].Slug" class="form-control" disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" />
+                                                }
+                                                <small asp-for="Types[i].Slug"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].Title"></label>
+                                                <input asp-for="Types[i].Title" class="form-control" />
+                                                <small asp-for="Types[i].Title"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].TypeName"></label>
+                                                <input asp-for="Types[i].TypeName" class="form-control" />
+                                                <small asp-for="Types[i].TypeName"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].TypeNamePlural"></label>
+                                                <input asp-for="Types[i].TypeNamePlural" class="form-control" />
+                                                <small asp-for="Types[i].TypeNamePlural"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].Type"></label>
+                                                @if (Model.Types[i].BaseName == "Page")
+                                                {
+                                                    <input asp-for="Types[i].Type" class="form-control" type="hidden">
+                                                    <input asp-for="Types[i].Type" class="form-control" disabled>
+                                                }
+                                                else
+                                                {
+                                                    <input asp-for="Types[i].Type" class="form-control restrict-to-slug" />
+                                                }
+                                                <small asp-for="Types[i].Type"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].Icon"></label>
+                                                <input asp-for="Types[i].Icon" class="form-control" />
+                                                <small asp-for="Types[i].Icon"></small>
+                                            </div>
+                                            <mediaSelect asp-for="Types[i].NoImage"></mediaSelect>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].IsPublic" class="custom-control-input">
+                                                    <label asp-for="Types[i].IsPublic" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].IsPublic"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].HasPage" class="custom-control-input">
+                                                    <label asp-for="Types[i].HasPage" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].HasPage"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].HideAuthor" class="custom-control-input">
+                                                    <label asp-for="Types[i].HideAuthor" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].HideAuthor"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].CachedByType" class="custom-control-input">
+                                                    <label asp-for="Types[i].CachedByType" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].CachedByType"></small>
+                                            </div>
+                                            <div class="card mt-4 border-danger">
+                                                <div class="card-body">
+                                                    <h4 class="text-danger mb-2">Delete this type?</h4>
+                                                    <p class="text-danger mb-2">This will delete this content type, you will no longer be able to access or manage this type, however anything saved to the database will remain. You should clear all the content before deleting this if you wish to.</p>
+                                                    <p class="mb-0">
+                                                        <a asp-action="DeleteContentType" asp-route-type="@Model.Types[i].Type" class="btn btn-danger warning-alert" data-warning="This will delete this content type, you will no longer be able to access or manage this type, however anything saved to the database will remain. You should clear all the content before deleting this if you wish to. Are you sure you wish to continue!?">
+                                                            <i class="fa fa-trash-o"></i> Delete this Content Type
+                                                        </a>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="@string.Format("editor-{0}", i.ToString())" class="tab-pane" role="tabpanel" aria-labelledby="@string.Format("editor-tab-{0}", i.ToString())">
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].TitleName"></label>
+                                                <input asp-for="Types[i].TitleName" class="form-control" />
+                                                <small asp-for="Types[i].TitleName"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].ExcerptName"></label>
+                                                <input asp-for="Types[i].ExcerptName" class="form-control" />
+                                                <small asp-for="Types[i].ExcerptName"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].MultiLineExcerpt" class="custom-control-input">
+                                                    <label asp-for="Types[i].MultiLineExcerpt" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].MultiLineExcerpt"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].RichTextExcerpt" class="custom-control-input">
+                                                    <label asp-for="Types[i].RichTextExcerpt" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].RichTextExcerpt"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].UrlFormatting"></label>
+                                                <select asp-for="Types[i].UrlFormatting" class="form-control">
+                                                    <option value="">Default</option>
+                                                    <option value="news">Id Value with Slug</option>
+                                                    <option value="news-title">Id Value with Title</option>
+                                                </select>
+                                                <small asp-for="Types[i].UrlFormatting"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].Templates" class="custom-control-input">
+                                                    <label asp-for="Types[i].Templates" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].Templates"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].TemplateFolder"></label>
+                                                <select asp-for="Types[i].TemplateFolder" class="form-control">
+                                                    <option value="Templates">General Templates</option>
+                                                    <option value="SliderTemplates">Slider Templates</option>
+                                                </select>
+                                                <small asp-for="Types[i].TemplateFolder"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].ShowImage" class="custom-control-input">
+                                                    <label asp-for="Types[i].ShowImage" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].ShowImage"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].ShowBanner" class="custom-control-input">
+                                                    <label asp-for="Types[i].ShowBanner" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].ShowBanner"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].Gallery" class="custom-control-input">
+                                                    <label asp-for="Types[i].Gallery" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].Gallery"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].ShowCategories" class="custom-control-input">
+                                                    <label asp-for="Types[i].ShowCategories" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].ShowCategories"></small>
+                                            </div>
+                                            <hr />
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].ShowDesigner" class="custom-control-input">
+                                                    <label asp-for="Types[i].ShowDesigner" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].ShowDesigner"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].ShowPreview" class="custom-control-input">
+                                                    <label asp-for="Types[i].ShowPreview" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].ShowPreview"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Types[i].ShowEditor" class="custom-control-input">
+                                                    <label asp-for="Types[i].ShowEditor" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Types[i].ShowEditor"></small>
+                                            </div>
+                                        </div>
+                                        <div id="@string.Format("meta-{0}", i.ToString())" class="tab-pane" role="tabpanel" aria-labelledby="@string.Format("meta-tab-{0}", i.ToString())">
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].MetaTitle"></label>
+                                                <input asp-for="Types[i].MetaTitle" class="form-control" />
+                                                <small asp-for="Types[i].MetaTitle"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Types[i].Description"></label>
+                                                <input asp-for="Types[i].Description" class="form-control" />
+                                                <small asp-for="Types[i].Description"></small>
+                                            </div>
+                                        </div>
+                                        <div id="@string.Format("fields-{0}", i.ToString())" class="tab-pane" role="tabpanel" aria-labelledby="@string.Format("fields-tab-{0}", i.ToString())">
+                                            <div class="card border-info mb-4">
+                                                <div class="card-header">
+                                                    <h6 class="card-title text-info m-0">Add a new custom field</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <input asp-for="Types[i].CustomFieldsJson" type="hidden" id="custom-fields-@i" value="@Model.Types[i].CustomFieldsJson" />
+                                                    <div class="form-group floating-label">
+                                                        <label>Name</label>
+                                                        <input id="custom-field-name-@i" type="text" class="form-control restrict-to-meta-slug" data-prefix="@string.Format("Custom.{0}.", Model.Types[i].Type.ToTitleCase())" placeholder="Name" />
+                                                    </div>
+                                                    <div class="form-group floating-label">
+                                                        <label>Type</label>
+                                                        <select id="custom-field-type-@i" type="text" class="form-control">
+                                                            <option value="System.String">Single Line Text</option>
+                                                            <option value="Hood.MultiLineString">Multi-Line Text</option>
+                                                            <option value="Hood.WYSIWYG">Multi-Line Text (WYSIWYG)</option>
+                                                            <option value="Hood.ImageUrl">Image (Url)</option>
+                                                            <option value="System.DateTime">Date/Time</option>
+                                                            <option value="System.Int32">Integer</option>
+                                                            <option value="System.Double">Decimal Number</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group floating-label">
+                                                        <label>Default Value</label>
+                                                        <input id="custom-field-default-@i" type="text" class="form-control" placeholder="Default Value" />
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-right">
+                                                    <a class="btn btn-success text-white add-custom-field" data-id="@i">Add Field</a>
+                                                </div>
+                                            </div>
+                                            @if (Model.Types[i].CustomFields?.Count > 0)
+                                            {
+                                                <table class="table">
+                                                    <thead class="thead-dark">
+                                                        <tr>
+                                                            <td colspan="2"><strong>Existing Fields</strong></td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="field-list-@i">
+                                                        @foreach (var customField in Model.Types[i].CustomFields)
+                                                        {
+                                                            <tr>
+                                                                <td class="col align-center"><strong>@customField.Name</strong> @customField.Type</td>
+                                                                <td class="col-auto text-right align-center">
+                                                                    @if (!customField.System)
+                                                                    {
+                                                                        <a class="delete-custom-field btn btn-sm btn-danger" data-name="@customField.Name" data-id="@i" href="javascript:void(0);">
+                                                                            <i class="fa fa-trash-o"></i> Delete
+                                                                        </a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="badge badge-default">System Field</span>
+                                                                    }
+                                                                </td>
+
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-info text-center">
+                                                    <p class="m-2"><i class="fa fa-info-circle fa-2x"></i></p>
+                                                    <p class="h5 m-0">No fields have been added yet.</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div role="tabpanel" class="tab-pane active" id="#types-home">
+                        <div class="alert alert-info text-center">
+                            <p class="m-2"><i class="fa fa-info-circle fa-2x"></i></p>
+                            <p class="h5 m-0">Choose a content type to edit.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

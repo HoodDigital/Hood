@@ -8,7 +8,6 @@ $.hood.Import.Property = {
         if ($('#import-property-start').doesExist()) {
             $.hood.Import.Property.Update();
             $('#import-property-start').click(function () {
-                //$(this).addLoader();
                 $.ajax({
                     url: $('#import-property-start').data('url'),
                     type: "POST",
@@ -17,14 +16,10 @@ $.hood.Import.Property = {
                     },
                     success: function (result) {
                         $.hood.Import.Property.Update();
-                    },
-                    complete: function () {
-                        //$(this).removeLoader();
                     }
                 });
             });
             $('#import-property-cancel').click(function () {
-                //$(this).addLoader();
                 $.ajax({
                     url: $('#import-property-cancel').data('url'),
                     type: "POST",
@@ -33,9 +28,6 @@ $.hood.Import.Property = {
                     },
                     success: function (result) {
                         $.hood.Import.Property.Update();
-                    },
-                    complete: function () {
-                        //$(this).removeLoader();
                     }
                 });
             });
@@ -97,16 +89,18 @@ $.hood.Import.Property = {
         HideInfo: function () {
             $('#import-property-start').removeAttr('disabled');
             $('#import-property-cancel').attr('disabled', 'disabled');
-            $('#import-property-progress').hide();
+            $('#import-property-progress').removeClass('d-block');
+            $('#import-property-progress').addClass('d-none');
         },
         ShowInfo: function () {
             $('#import-property-cancel').removeAttr('disabled');
             $('#import-property-start').attr('disabled', 'disabled');
-            $('#import-property-progress').show();
+            $('#import-property-progress').addClass('d-block');
+            $('#import-property-progress').removeClass('d-none');
         },
         ShowError: function (string) {
             $('#import-property-error-message').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
         }
     }
 };
-$(document).ready($.hood.Import.Reporter.Init);
+$(document).ready($.hood.Import.Property.Init);

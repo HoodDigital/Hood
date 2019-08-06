@@ -8,7 +8,6 @@ $.hood.Import.Property = {
     if ($('#import-property-start').doesExist()) {
       $.hood.Import.Property.Update();
       $('#import-property-start').click(function () {
-        //$(this).addLoader();
         $.ajax({
           url: $('#import-property-start').data('url'),
           type: "POST",
@@ -17,13 +16,10 @@ $.hood.Import.Property = {
           },
           success: function success(result) {
             $.hood.Import.Property.Update();
-          },
-          complete: function complete() {//$(this).removeLoader();
           }
         });
       });
       $('#import-property-cancel').click(function () {
-        //$(this).addLoader();
         $.ajax({
           url: $('#import-property-cancel').data('url'),
           type: "POST",
@@ -32,8 +28,6 @@ $.hood.Import.Property = {
           },
           success: function success(result) {
             $.hood.Import.Property.Update();
-          },
-          complete: function complete() {//$(this).removeLoader();
           }
         });
       });
@@ -102,16 +96,18 @@ $.hood.Import.Property = {
     HideInfo: function HideInfo() {
       $('#import-property-start').removeAttr('disabled');
       $('#import-property-cancel').attr('disabled', 'disabled');
-      $('#import-property-progress').hide();
+      $('#import-property-progress').removeClass('d-block');
+      $('#import-property-progress').addClass('d-none');
     },
     ShowInfo: function ShowInfo() {
       $('#import-property-cancel').removeAttr('disabled');
       $('#import-property-start').attr('disabled', 'disabled');
-      $('#import-property-progress').show();
+      $('#import-property-progress').addClass('d-block');
+      $('#import-property-progress').removeClass('d-none');
     },
     ShowError: function ShowError(string) {
       $('#import-property-error-message').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
     }
   }
 };
-$(document).ready($.hood.Import.Reporter.Init);
+$(document).ready($.hood.Import.Property.Init);

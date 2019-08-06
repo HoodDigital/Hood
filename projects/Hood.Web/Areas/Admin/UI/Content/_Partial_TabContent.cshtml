@@ -1,0 +1,55 @@
+@model Content
+<div id="content" class="tab-pane active" role="tabpanel" aria-labelledby="content-tab">
+    <div class="panel-body">
+        <partial name="_Editor_Content" />
+    </div>
+</div>
+@if (Model.Type.ShowImage || Model.Type.ShowBanner)
+{
+    <div id="image" class="tab-pane" role="tabpanel" aria-labelledby="image-tab">
+        <div class="panel-body">
+            <partial name="_Editor_Images" />
+        </div>
+    </div>
+}
+@if (Model.Type.Templates)
+{
+    <div id="template" class="tab-pane" role="tabpanel" aria-labelledby="template-tab">
+        <div class="panel-body">
+            <partial name="_Editor_Template" />
+        </div>
+    </div>
+}
+@if (Model.Metadata.Where(c => c.Name.StartsWith("Content." + Model.Type.BaseName + ".")).Count() > 0 ||
+  Model.Metadata.Where(c => c.Name.StartsWith("Custom.")).Count() > 0)
+{
+    <div id="type" class="tab-pane" role="tabpanel" aria-labelledby="type-tab">
+        <div class="panel-body">
+            <partial name="_Editor_Type" />
+        </div>
+    </div>
+}
+@if (Model.Type.Gallery)
+{
+    <div id="gallery" class="tab-pane" role="tabpanel" aria-labelledby="gallery-tab">
+        <div class="panel-body">
+            <partial name="_Editor_Media" />
+        </div>
+    </div>
+}
+@if (Model.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
+{
+    <div id="seo" class="tab-pane" role="tabpanel" aria-labelledby="seo-tab">
+        <div class="panel-body">
+            <partial name="_Editor_SEO" />
+        </div>
+    </div>
+}
+@if (Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
+{
+    <div id="security" class="tab-pane" role="tabpanel" aria-labelledby="security-tab">
+        <div class="panel-body">
+            <partial name="_Editor_Security" />
+        </div>
+    </div>
+}

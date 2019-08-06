@@ -24,7 +24,7 @@ namespace Hood.Controllers
         {
             ErrorModel model = GetErrorInformation();
 
-            await _logService.AddExceptionAsync<ErrorController>($"Page not found: {model.OriginalUrl}", model.Error);
+            await _logService.AddExceptionAsync<ErrorController>($"500 - Application Error: {model.OriginalUrl}", model.Error);
 
             _telemetryClient.TrackException(model.Error);
             _telemetryClient.TrackEvent("Error.ServerError", new Dictionary<string, string>
@@ -48,7 +48,7 @@ namespace Hood.Controllers
                 model.OriginalUrl = HttpContext.Items["originalPath"] as string;
             }
 
-            await _logService.AddLogAsync<ErrorController>($"Page not found: {model.OriginalUrl}", type: LogType.Error404);
+            await _logService.AddLogAsync<ErrorController>($"404 - Page not found: {model.OriginalUrl}", type: LogType.Error404);
 
             _telemetryClient.TrackEvent("Error.PageNotFound", new Dictionary<string, string>
             {

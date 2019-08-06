@@ -1,0 +1,113 @@
+@model UserListModel
+@{
+    ViewBag.Title = "Website Users";
+}
+@section buttons {
+    @if (Engine.Settings.Integrations.EnableMailchimp && Engine.Settings.Integrations.MailchimpApiKey.IsSet() && Engine.Settings.Integrations.MailchimpUserListId.IsSet())
+    {
+        <a class="btn btn-warning btn-sm warning-alert"
+           asp-action="SyncToMailchimp"
+           data-warning="Are you sure? This will sync ALL site users with the assigned Mailchimp list. Any extraneous users will be REMOVED from the mailchimp list.">
+            <i class="fa fa-refresh  mr-2"></i>Sync List to Mailchimp
+        </a>
+    }
+    <a class="btn btn-success hood-modal" asp-action="Create" data-complete="$.hood.Users.Create.Loaded"><i class="fa fa-user-plus mr-2"></i>Create New User</a>
+}    
+<script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js" asp-location="BeforeScripts"></script>
+<form class="inline" data-target="#user-list">
+    <div class="row">
+        <div class="col-sm">
+            <div id="user-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Users.Loaded">
+                <partial name="_List_Users" />
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="users-roles-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#users-roles-panel" href="#users-roles-panel" aria-expanded="false" aria-controls="users-roles-panel">
+                            Roles
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body p-0 collapse" aria-labelledby="users-roles-panel-heading" id="users-roles-panel">
+                    <div class="list-group list-group-flush">
+                        @foreach (var role in await Engine.AccountManager.GetAllRolesAsync())
+                        {
+                            <div class="list-group-item list-group-item-action p-0">
+                                <div class="custom-control custom-checkbox d-flex">
+                                    <input class="custom-control-input refresh-on-change" id="Role-@role.Id" name="roles" type="checkbox" value="@role.Id" />
+                                    <label class="custom-control-label col m-2 mt-1 mb-1" for="Role-@role.Id">
+                                        @role.Name.CamelCaseToString().ToTitleCase()
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="users-subs-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#users-subs-panel" href="#users-subs-panel" aria-expanded="false" aria-controls="users-subs-panel">
+                            Subscriptions
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body p-0 collapse" aria-labelledby="users-subs-panel-heading" id="users-subs-panel">
+                    <div class="list-group list-group-flush">
+                        @{ var subs = await Engine.AccountManager.GetSubscriptionPlansAsync();}
+                        @foreach (var sub in subs.List)
+                        {
+                            <div class="list-group-item list-group-item-action p-0">
+                                <div class="custom-control custom-checkbox d-flex">
+                                    <input class="custom-control-input refresh-on-change" id="Subscription-@sub.Id" name="subs" type="checkbox" value="@sub.Id" />
+                                    <label class="custom-control-label col m-2 mt-1 mb-1" for="Subscription-@sub.Id">
+                                        @sub.Name
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="users-search-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#users-search-panel" href="#users-search-panel" aria-expanded="false" aria-controls="users-search-panel">
+                            Search Filters
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body p-4 collapse show" aria-labelledby="users-search-panel-heading" id="users-search-panel">
+                    <input type="hidden" asp-for="PageIndex" />
+                    <input type="hidden" asp-for="PageSize" />
+                    <div class="form-group floating-label">
+                        <label asp-for="Order"></label>
+                        <select class="form-control" asp-for="Order">
+                            <option value="DateDesc">Newest First</option>
+                            <option value="Date">Oldest First</option>
+                            <option value="LastLogOn">By Log in time</option>
+                            <option value="UserName">By Username (A-Z)</option>
+                            <option value="UserNameDesc">By Username (Z-A)</option>
+                            <option value="Email">By Email (A-Z)</option>
+                            <option value="EmailDesc">By Email (Z-A)</option>
+                            <option value="LastName">By Last Name (A-Z)</option>
+                            <option value="LastNameDesc">By Last Name (Z-A)</option>
+                        </select>
+                        <small asp-for="Search"></small>
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="Search"></label>
+                        <input asp-for="Search" type="text" placeholder="Search" class="form-control">
+                        <small asp-for="Search"></small>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block"> Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,41 @@
+@model PropertyListModel
+@{
+    ViewBag.Title = "Property Listings";
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+@section buttons {
+    <a class="btn btn-success hood-modal" asp-action="Create" data-complete="$.hood.Property.Create">
+        <i class="fa fa-user-plus mr-2"></i>
+        Create New
+    </a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (_propertySettings.ShowList)
+        {
+            <a class="dropdown-item" href="/@_propertySettings.Slug" target="_blank"><i class="fa fa-desktop"></i>Preview</a>
+        }
+        <div class="dropdown-divider"></div>
+        @if (User.IsAdminOrBetter())
+        {
+            <a class="dropdown-item property-delete-all" asp-action="DeleteAll"><i class="fa fa-trash"></i>Delete All</a>
+        }
+    </div>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+}
+<form class="inline" data-target="#property-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="property-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Property.Lists.Property.Loaded">
+                <partial name="_List_Property" />
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <partial name="_Filters" />
+        </div>
+    </div>
+</form>

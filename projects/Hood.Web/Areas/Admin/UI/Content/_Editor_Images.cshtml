@@ -1,0 +1,56 @@
+@model Content
+<h5 class="mt-2 mb-0">Featured & Sharer Images</h5>
+<p>Set images for this content. You can enable/disable these images for this content type in <a asp-action="Content" asp-controller="Settings">content settings</a>.</p>
+@if (Model.Type.ShowImage)
+{
+    <input type="hidden" asp-for="FeaturedImageJson">
+    <div class="form-group row align-items-center">
+        <div class="col-auto">
+            <fixedImage src="@Model.FeaturedImage.SmallUrl" class="img-sm img-circle m-0 FeaturedImage" id="content-feature-image" />
+        </div>
+        <div class="col">
+            <h6>Featured Image</h6>
+            <p>Choose a featured image for this @Model.Type.TypeName. This will appear in content lists, and as the main featured image.</p>
+            <p class="m-0">
+                <mediaAttach asp-for="FeaturedImage" asp-entity="@nameof(Content)" asp-id="@Model.Id" asp-filetype="Image" asp-json="FeaturedImageJson">
+                    Choose...
+                </mediaAttach>
+            </p>
+        </div>
+    </div>
+}
+@if (Model.Type.ShowBanner)
+{
+    <hr class="mt-4 mb-4" />
+    <input type="hidden" asp-for="ShareImageJson">
+    <div class="form-group row align-items-center">
+        <div class="col-auto">
+            <fixedImage src="@Model.ShareImage.SmallUrl" class="img-sm img-circle m-0 ShareImage" id="content-share-image" />
+        </div>
+        <div class="col">
+            <h6>Sharer Image</h6>
+            <p>Choose a sharer image for this @Model.Type.TypeName. This will appear when shared in social media, or in links, this will override the featured image if one is set.</p>
+            <p class="m-0">
+                <mediaAttach asp-for="ShareImage" asp-entity="@nameof(Content)" asp-id="@Model.Id" asp-filetype="Image" asp-json="ShareImageJson">
+                    Choose...
+                </mediaAttach>
+            </p>
+        </div>
+    </div>
+}
+@{
+    var imageSettings = Model.Metadata.Where(c => c.IsImageSetting).OrderBy(cm => cm.Name);
+}
+@if (imageSettings.Count() > 0)
+{
+    <hr class="mt-4 mb-4" />
+    <h5 class="mb-0">Image Settings</h5>
+    <p>These image settings will dictate how the featured image is displayed in standard templates.</p>
+    foreach (ContentMeta cm in imageSettings)
+    {
+        if (Model.Type.ShowImage && cm.Name.Contains("Featured"))
+        {
+            <partial name="_Editor_Metadata" model="cm" />
+        }
+    }
+}

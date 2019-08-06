@@ -1,0 +1,128 @@
+@model ApiKeyModel
+@{
+    ViewBag.Title = "Manage Api Keys";
+}
+@section buttons {
+    <button class="btn btn-success create-api-key">
+        <i class="fa fa-plus-circle mr-2"></i>Create New
+    </button>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+}
+<form>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title m-0">Search &amp; Filter</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group floating-label">
+                        <input asp-for="Search" name="search" type="text" placeholder="Search" class="form-control">
+                        <label asp-for="Search"></label>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-block"> Search</button>
+
+                </div>
+            </div>
+        </div>
+         <div class="col-md">
+       <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="card-title m-0">Api Keys</h5>
+                    </div>
+                    <div class="col-auto text-right">
+                        <select class="form-control d-inline-block pt-0 pb-1 submit-on-change" asp-for="Order" name="sort">
+                            <option value="date+desc">Newest First</option>
+                            <option value="date">Oldest First</option>
+                            <option value="name">By Title (A-Z)</option>
+                            <option value="name+desc">By Title (Z-A)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model.List.Count > 0)
+                {
+                    @foreach (var key in Model.List)
+                    {
+                        <div class="data-item">
+                            <div class="row row-center">
+                                <div class="col-md-4">
+                                    <a class="forum-item-title" asp-action="Edit" asp-route-id="@key.Id">
+                                        @key.Name
+                                        @if (key.Active)
+                                        {
+                                            <small class="txt-color-greenLight">Active</small>
+                                        }
+                                        else
+                                        {
+                                            <small class="txt-color-red">Deactivated</small>
+                                        }
+                                    </a>
+                                    <small>Created on <i class="fa fa-clock-o"></i> @key.CreatedOn.ToDisplay()</small><br />
+                                </div>
+                                <div class="col-md-2 visible-lg">
+                                    <p class="small font-bold">Key</p>
+                                    <p><strong>@key.Key</strong></p>
+                                </div>
+                                <div class="col-md-2 visible-lg visible-md">
+                                    <p class="small font-bold">Access Level</p>
+                                    <p><strong>@key.AccessLevel</strong></p>
+                                </div>
+                                <div class="col-md-1 visible-lg visible-md">
+                                    <span class="small font-bold">Owner</span>
+                                    <div class="tag-list">
+                                        <span class="tag-item">@key.User?.ToFullName()</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-right">
+                                    @if (!key.Active)
+                                    {
+                                        <a class="activate-api-key btn btn-sm btn-success" data-id="@key.Id">
+                                            <i class="fa fa-thumbs-up m-r-xs"></i>
+                                            <span>
+                                                Activate
+                                            </span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="deactivate-api-key btn btn-sm btn-warning" data-id="@key.Id">
+                                            <i class="fa fa-archive m-r-xs"></i>
+                                            <span>
+                                                Deactivate
+                                            </span>
+                                        </a>
+                                    }
+                                    <a class="btn-danger btn btn-sm delete-api-key" data-id="@key.Id">
+                                        <i class="fa fa-edit m-r-xs"></i>
+                                        <span>
+                                            Delete
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="text-center">
+                        <partial name="_Pagination" model="Model" />
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info text-center m-0">
+                        <p><i class="fa fa-3x fa-info-circle"></i></p>
+                        <p class="m-0">There are no api keys yet, click "Create New" to add the first key.</p>
+                    </div>
+                }
+
+            </div>
+        </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,20 @@
+@{
+    Layout = null;
+}
+<div class="container-fluid">
+    <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="logo">
+        <img src="~/hood/images/hood-cms.png" alt="HoodCMS - Content Managed" />
+    </a>
+
+    <partial name="_Sidebar_Theme_Top" />
+    <partial name="_Sidebar_Nav" />
+    <partial name="_Sidebar_Theme_Bottom" />
+
+    <div class="mt-auto"></div>
+
+    <a href="/" target="_blank" class="btn btn-block btn-primary text-white mb-4 mt-4">
+        <i class="fe fe-sliders mr-2"></i> View Site
+    </a>
+
+    <partial name="_Sidebar_Profile" />
+</div>

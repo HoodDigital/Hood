@@ -1,0 +1,56 @@
+﻿@model ContentModel
+@{
+    if (!Model.ContentType.IsUnknown)
+    {
+        ViewBag.Title = Model.ContentType.Title;
+    }
+    else
+    {
+        ViewBag.Title = "All Content";
+    }
+}
+@section buttons {
+    @if (!Model.ContentType.IsUnknown)
+    {
+        <a class="btn btn-success hood-modal" asp-action="Create" asp-route-type="@Model.ContentType.Slug" data-complete="$.hood.Content.Create">
+            <i class="fa fa-user-plus mr-2"></i>
+            Create New
+        </a>
+    }
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        @if (Model.ContentType.IsPublic)
+        {
+            <a class="dropdown-item" href="@string.Format("/{0}/", Model.ContentType.Slug)" target="_blank">
+                <i class="fa fa-desktop"></i>
+                Preview
+            </a>
+        }
+        <div class="dropdown-divider"></div>
+        @if (User.IsAdminOrBetter())
+        {
+            <a class="dropdown-item warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.ContentType.TypeNamePlural.ToLower() from the site!">
+                <i class="fa fa-trash"></i>
+                Delete All
+            </a>
+        }
+    </div>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+}
+<form class="inline" data-target="#content-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="content-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Content.Lists.Content.Loaded">
+                <partial name="_List_Content" />
+            </div>
+        </div>
+        <div class="col-lg-4">
+                 <partial name="_Filters" />
+        </div>
+    </div>
+</form>

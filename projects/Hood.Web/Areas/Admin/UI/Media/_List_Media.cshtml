@@ -1,0 +1,91 @@
+@model MediaListModel
+@inject IDirectoryManager _directoryManager
+@{
+    Layout = null;
+}
+@if (Model.DirectoryId.HasValue)
+{
+    <div class="card mb-3 d-none d-md-block">
+        <div class="card-body p-2">
+            <i class="fa fa-folder-open mr-2 text-warning"></i> @_directoryManager.GetBreadcrumb(Model.DirectoryId.Value)
+        </div>
+    </div>
+}
+@if (Model.TotalCount > 0)
+{
+    <div class="card-deck card-deck-5">
+        @foreach (var media in Model.List)
+        {
+            var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });
+            <div class="card text-center hover">
+                @switch (Model.Action)
+                {
+                    case MediaWindowAction.Select:
+                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
+                        break;
+                    case MediaWindowAction.Insert:
+                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-insert" data-tag="@Model.Tag" data-url="@media.Url" />
+                        break;
+                    case MediaWindowAction.Attach:
+                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-attach" data-url="@attachUrl" />
+                        break;
+                    default:
+                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
+                        break;
+                }
+                <div class="card-body p-1">
+                    <p class="m-0 font-weight-bold text-truncate">
+                        @media.Filename
+                    </p>
+                    <p>
+                        <small>@media.FormattedSize</small>
+                    </p>
+                    @switch (Model.Action)
+                    {
+                        case MediaWindowAction.Select:
+                            <p>
+                                <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
+                                    <span>
+                                        Small
+                                    </span>
+                                </a>
+                                <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
+                                    <span>
+                                        Medium
+                                    </span>
+                                </a>
+                                <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
+                                    <span>
+                                        Large
+                                    </span>
+                                </a>
+                            </p>
+                            break;
+                        case MediaWindowAction.Insert:
+
+                            break;
+                        case MediaWindowAction.Attach:
+                            <p class="no-margin">
+                                <a class="media-attach btn btn-sm btn-outline-success" data-tag="@Model.Tag" data-url="@attachUrl">
+                                    <i class="fa fa-link mr-2"></i>
+                                    Attach
+                                </a>
+                            </p>
+                            break;
+                        default:
+                            <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">@media.Filename</a>
+                            break;
+                    }
+
+                </div>
+            </div>
+        }
+    </div>
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        No media found.
+    </alert>
+}
