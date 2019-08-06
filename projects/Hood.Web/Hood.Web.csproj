@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Themes\default\Views\Shared\_Scripts_Bootstrap.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
   </ItemGroup>
   
@@ -23,15 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Themes\default\Views\Shared\_Scripts_Bootstrap.cshtml" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Themes\hood2019\Views\Shared\" />
   </ItemGroup>
   
 </Project>
