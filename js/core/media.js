@@ -77,23 +77,23 @@ $.hood.Media = {
     Complete: {
       Attach: function Attach(e) {
         e.preventDefault();
-        $image = $.hood.Media.Actions.Target;
-        $json = $.hood.Media.Actions.Json;
+        var $image = $.hood.Media.Actions.Target;
+        var $json = $.hood.Media.Actions.Json;
         $.post($(this).data('url'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
 
           if (data.Success) {
-            icon = data.Media.Icon;
+            var _icon = data.Media.Icon;
 
             if (data.Media.GeneralFileType === "Image") {
-              icon = data.Media.MediumUrl;
+              _icon = data.Media.MediumUrl;
             }
 
             if (!$.hood.Helpers.IsNullOrUndefined($image)) {
               $image.css({
-                'background-image': 'url(' + icon + ')'
+                'background-image': 'url(' + _icon + ')'
               });
-              $image.find('img').attr('src', icon);
+              $image.find('img').attr('src', _icon);
               $image.removeClass('loading');
             }
 
@@ -106,14 +106,14 @@ $.hood.Media = {
         }).fail($.hood.Inline.HandleError);
       },
       Insert: function Insert(e) {
-        url = $(e.target).data('url');
-        editor = this;
+        var url = $(e.target).data('url');
+        var editor = this;
         editor.insertContent('<img alt="Your image..." src="' + url + '"/>');
         $.hood.Modals.Close('#attach-media-modal');
       },
       Select: function Select(e) {
-        url = $(this).data('url');
-        tag = $.hood.Media.Actions.Target;
+        var url = $(this).data('url');
+        var tag = $.hood.Media.Actions.Target;
         $(tag).each(function () {
           if ($(this).is("input")) {
             $(this).val(url);
@@ -130,8 +130,8 @@ $.hood.Media = {
       },
       Clear: function Clear(e) {
         e.preventDefault();
-        $image = $($(this).data('tag'));
-        $json = $($(this).data('json'));
+        var $image = $($(this).data('tag'));
+        var $json = $($(this).data('json'));
         $.post($(this).data('url'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
 
@@ -233,7 +233,7 @@ $.hood.Media = {
   Delete: function Delete(e) {
     var $this = $(this);
 
-    deleteMediaCallback = function deleteMediaCallback(confirmed) {
+    var deleteMediaCallback = function deleteMediaCallback(confirmed) {
       if (confirmed) {
         // delete functionality
         $.post('/admin/media/delete', {
@@ -250,7 +250,7 @@ $.hood.Media = {
       }
     };
 
-    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, type = 'warning', footer = '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
+    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, 'warning', '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', 'Ok', 'Cancel');
   },
   RestrictDir: function RestrictDir() {
     var pattern = /[^0-9A-Za-z- ]*/g; // default pattern
@@ -286,7 +286,7 @@ $.hood.Media = {
       e.preventDefault();
       var $this = $(this);
 
-      deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
+      var deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
         if (confirmed) {
           $.post($this.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);

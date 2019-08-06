@@ -79,7 +79,7 @@ $.hood.Helpers = {
     });
   },
   ProcessResponse: function ProcessResponse(data) {
-    title = '';
+    var title = '';
     if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");
 
     if (data.Success) {
@@ -230,12 +230,12 @@ $.hood.Helpers = {
     return ret;
   },
   GenerateRandomString: function GenerateRandomString(numSpecials) {
-    specials = '!@#$&*';
-    lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    numbers = '0123456789';
-    all = lowercase + uppercase + numbers;
-    password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
+    var specials = '!@#$&*';
+    var lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    var uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var numbers = '0123456789';
+    var all = lowercase + uppercase + numbers;
+    var password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
     return password;
   }
 };

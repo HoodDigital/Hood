@@ -28,12 +28,12 @@ $.hood.Handlers = {
     },
     ScrollToTarget: function(e) {
         if (e) e.preventDefault();
-        var url = $(this).attr('href').split('#')[0];
+        let url = $(this).attr('href').split('#')[0];
         if (url !== window.location.pathname && url !== "") {
             return;
         }
-        var target = this.hash;
-        var $target = $(target);
+        let target = this.hash;
+        let $target = $(target);
         $('html, body').stop().animate({
             'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
         }, 900, 'swing');
@@ -45,15 +45,15 @@ $.hood.Handlers = {
     DateChange: function (e) {
         if (e) e.preventDefault();
        // update the date element attached to the field's attach
-        $field = $(this).parents('.hood-date').find('.date-output');
-        date = $field.parents('.hood-date').find('.date-value').val();
-        pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
+        let $field = $(this).parents('.hood-date').find('.date-output');
+        let date = $field.parents('.hood-date').find('.date-value').val();
+        let pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
         if (!pattern.test(date))
             date = "01/01/2001";
-        hour = $field.parents('.hood-date').find('.hour-value').val();
+        let hour = $field.parents('.hood-date').find('.hour-value').val();
         if (!$.isNumeric(hour))
             hour = "00";
-        minute = $field.parents('.hood-date').find('.minute-value').val();
+        let minute = $field.parents('.hood-date').find('.minute-value').val();
         if (!$.isNumeric(minute))
             minute = "00";
         $field.val(date + " " + hour + ":" + minute + ":00");
@@ -62,40 +62,40 @@ $.hood.Handlers = {
     CheckboxChange: function (e) {
         if (e) e.preventDefault();
         // when i change - create an array, with any other checked of the same data-input checkboxes. and add to the data-input referenced tag.
-        var items = new Array();
+        let items = new Array();
         $('input[data-input="' + $(this).data('input') + '"]').each(function () {
             if ($(this).is(":checked"))
                 items.push($(this).val());
         });
-        id = '#' + $(this).data('input');
-        vals = JSON.stringify(items);
+        let id = '#' + $(this).data('input');
+        let vals = JSON.stringify(items);
         $(id).val(vals);
     },
     SelectSetup: function () {
-        sel = $(this).data('selected');
+        let sel = $(this).data('selected');
         if ($(this).data('selected') !== 'undefined' && $(this).data('selected') !== '') {
-            selected = String($(this).data('selected'));
+            let selected = String($(this).data('selected'));
             $(this).val(selected);
         }
     },
     ClickSelect: function () {
-        var $this = $(this);
-        targetId = '#' + $this.data('target');
+        let $this = $(this);
+        let targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));
         $(targetId).trigger('change');
         $('.click-select[data-target="' + $this.data('target') + '"]').each(function () { $(this).html($(this).data('temp')).removeClass('active'); });
         $('.click-select[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).data('temp', $(this).html()).html('Selected').addClass('active'); });
     },
     ClickSelectClean: function () {
-        var $this = $(this);
-        targetId = '#' + $this.data('target');
+        let $this = $(this);
+        let targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));
         $(targetId).trigger('change');
         $('.click-select.clean[data-target="' + $this.data('target') + '"]').each(function () { $(this).removeClass('active'); });
         $('.click-select.clean[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).addClass('active'); });
     },
     SelectTextContent: function () {
-        var $this = $(this);
+        let $this = $(this);
         $this.select();
         // Work around Chrome's little problem
         $this.mouseup(function () {
@@ -105,8 +105,8 @@ $.hood.Handlers = {
         });
     },
     SlideToAnchor: function () {
-        var scrollTop = $('body').scrollTop();
-        var top = $($.attr(this, 'href')).offset().top;
+        let scrollTop = $('body').scrollTop();
+        let top = $($.attr(this, 'href')).offset().top;
 
         $('html, body').animate({
             scrollTop: top
@@ -133,9 +133,9 @@ $.hood.Handlers = {
         },
         SingleImage: function (tag, jsontag) {
             tag = '#' + tag;
-            $tag = $(tag);
+            let $tag = $(tag);
             Dropzone.autoDiscover = false;
-            var avatarDropzone = new Dropzone(tag, {
+            let avatarDropzone = new Dropzone(tag, {
                 url: $(tag).data('url'),
                 maxFiles: 1,
                 paramName: 'file',
@@ -177,12 +177,12 @@ $.hood.Handlers = {
         Gallery: function (tag) {
             Dropzone.autoDiscover = false;
 
-            var previewNode = document.querySelector(tag + "-template");
+            let previewNode = document.querySelector(tag + "-template");
             previewNode.id = "";
-            var previewTemplate = previewNode.parentNode.innerHTML;
+            let previewTemplate = previewNode.parentNode.innerHTML;
             previewNode.parentNode.removeChild(previewNode);
 
-            var galleryDropzone = new Dropzone(tag, {
+            let galleryDropzone = new Dropzone(tag, {
                 url: $(tag).data('url'),
                 thumbnailWidth: 80,
                 thumbnailHeight: 80,

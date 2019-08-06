@@ -144,14 +144,14 @@ $.fn.warningAlert = function () {
   var warningAlertHandler = function warningAlertHandler(e) {
     e.preventDefault();
 
-    warningAlertCallback = function warningAlertCallback(confirmed) {
+    var warningAlertCallback = function warningAlertCallback(confirmed) {
       if (confirmed) {
-        url = $(e.currentTarget).attr('href');
+        var url = $(e.currentTarget).attr('href');
         window.location = url;
       }
     };
 
-    $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('title'), warningAlertCallback, type = 'warning', footer = $(e.currentTarget).data('footer'), confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
+    $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('title'), warningAlertCallback, 'warning', $(e.currentTarget).data('footer'), 'Ok', 'Cancel');
     return false;
   };
 
@@ -207,23 +207,6 @@ $.numberWithCommas = function (x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-if (typeof kendo !== 'undefined') {
-  kendo.data.binders.date = kendo.data.Binder.extend({
-    init: function init(element, bindings, options) {
-      kendo.data.Binder.fn.init.call(this, element, bindings, options);
-      this.dateformat = $(element).data("dateformat");
-    },
-    refresh: function refresh() {
-      var data = this.bindings["date"].get();
-
-      if (data) {
-        var dateObj = new Date(data);
-        $(this.element).text(kendo.toString(dateObj, this.dateformat));
-      }
-    }
-  });
-}
-
 if ($.validator) {
   $.validator.addMethod("time", function (value, element) {
     return this.optional(element) || /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/i.test(value);
@@ -273,23 +256,31 @@ if (!$.mobile.Android) {
 } else {
   $.body.addClass("desktop-device");
   $.device = "desktop";
-} // Force prevent autocomplete
-// Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
+}
 
+(function () {
+  // Force prevent autocomplete
+  // Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
+  var trackInputs = {
+    password: "0",
+    username: "0"
+  }; //Password and username fields ids as object's property, and "0" as its their values
 
-$('body').on('change', '.prevent-autocomplete', function (e) {
-  // Change event is fired as autocomplete occurred at the input field 
-  trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
+  $('body').on('change', '.prevent-autocomplete', function (e) {
+    // Change event is fired as autocomplete occurred at the input field 
+    var trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
 
-  if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
-    //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
-    $(this).val(''); // empty the field
-  }
-});
-$('body').on('keyup', '.prevent-autocomplete', function (e) {
-  trackId = $(this).attr('id');
-  trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
-}); // Custom Event polyfill
+    if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
+      //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
+      $(this).val(''); // empty the field
+    }
+  });
+  $('body').on('keyup', '.prevent-autocomplete', function (e) {
+    var trackId = $(this).attr('id');
+    trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
+  });
+})(); // Custom Event polyfill
+
 
 (function () {
   if (typeof window.CustomEvent === "function") return false;
@@ -463,7 +454,7 @@ $.hood.Helpers = {
     });
   },
   ProcessResponse: function ProcessResponse(data) {
-    title = '';
+    var title = '';
     if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");
 
     if (data.Success) {
@@ -614,12 +605,12 @@ $.hood.Helpers = {
     return ret;
   },
   GenerateRandomString: function GenerateRandomString(numSpecials) {
-    specials = '!@#$&*';
-    lowercase = 'abcdefghijklmnopqrstuvwxyz';
-    uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    numbers = '0123456789';
-    all = lowercase + uppercase + numbers;
-    password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
+    var specials = '!@#$&*';
+    var lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    var uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var numbers = '0123456789';
+    var all = lowercase + uppercase + numbers;
+    var password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
     return password;
   }
 };
@@ -668,13 +659,13 @@ $.hood.Handlers = {
   DateChange: function DateChange(e) {
     if (e) e.preventDefault(); // update the date element attached to the field's attach
 
-    $field = $(this).parents('.hood-date').find('.date-output');
-    date = $field.parents('.hood-date').find('.date-value').val();
-    pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
+    var $field = $(this).parents('.hood-date').find('.date-output');
+    var date = $field.parents('.hood-date').find('.date-value').val();
+    var pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
     if (!pattern.test(date)) date = "01/01/2001";
-    hour = $field.parents('.hood-date').find('.hour-value').val();
+    var hour = $field.parents('.hood-date').find('.hour-value').val();
     if (!$.isNumeric(hour)) hour = "00";
-    minute = $field.parents('.hood-date').find('.minute-value').val();
+    var minute = $field.parents('.hood-date').find('.minute-value').val();
     if (!$.isNumeric(minute)) minute = "00";
     $field.val(date + " " + hour + ":" + minute + ":00");
     $field.attr("value", date + " " + hour + ":" + minute + ":00");
@@ -686,21 +677,21 @@ $.hood.Handlers = {
     $('input[data-input="' + $(this).data('input') + '"]').each(function () {
       if ($(this).is(":checked")) items.push($(this).val());
     });
-    id = '#' + $(this).data('input');
-    vals = JSON.stringify(items);
+    var id = '#' + $(this).data('input');
+    var vals = JSON.stringify(items);
     $(id).val(vals);
   },
   SelectSetup: function SelectSetup() {
-    sel = $(this).data('selected');
+    var sel = $(this).data('selected');
 
     if ($(this).data('selected') !== 'undefined' && $(this).data('selected') !== '') {
-      selected = String($(this).data('selected'));
+      var selected = String($(this).data('selected'));
       $(this).val(selected);
     }
   },
   ClickSelect: function ClickSelect() {
     var $this = $(this);
-    targetId = '#' + $this.data('target');
+    var targetId = '#' + $this.data('target');
     $(targetId).val($this.data('value'));
     $(targetId).trigger('change');
     $('.click-select[data-target="' + $this.data('target') + '"]').each(function () {
@@ -712,7 +703,7 @@ $.hood.Handlers = {
   },
   ClickSelectClean: function ClickSelectClean() {
     var $this = $(this);
-    targetId = '#' + $this.data('target');
+    var targetId = '#' + $this.data('target');
     $(targetId).val($this.data('value'));
     $(targetId).trigger('change');
     $('.click-select.clean[data-target="' + $this.data('target') + '"]').each(function () {
@@ -760,7 +751,7 @@ $.hood.Handlers = {
     },
     SingleImage: function SingleImage(tag, jsontag) {
       tag = '#' + tag;
-      $tag = $(tag);
+      var $tag = $(tag);
       Dropzone.autoDiscover = false;
       var avatarDropzone = new Dropzone(tag, {
         url: $(tag).data('url'),
@@ -1141,8 +1132,7 @@ var swalWithBootstrapButtons = Swal.mixin({
 var Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
-  showConfirmButton: true //timer: 10000
-
+  showConfirmButton: true
 });
 if (!$.hood) $.hood = {};
 $.hood.Alerts = {
@@ -1281,7 +1271,7 @@ $.hood.Inline = {
     }
 
     $.get(url, function (data) {
-      modalId = '#' + $(data).attr('id');
+      var modalId = '#' + $(data).attr('id');
       $(data).addClass('hood-inline-modal');
 
       if ($(modalId).length) {
@@ -1306,7 +1296,7 @@ $.hood.Inline = {
   },
   Task: function Task(e) {
     e.preventDefault();
-    $tag = $(e.currentTarget);
+    var $tag = $(e.currentTarget);
     $tag.addClass('loading');
     complete = $tag.data('complete');
     $.get($tag.attr('href'), function (data) {
@@ -1336,14 +1326,14 @@ $.hood.Inline = {
         $.hood.Loader(true);
         var url = document.createElement('a');
         url.href = $(this).attr('href');
-        $list = $(this).parents('.hood-inline-list');
+        var $list = $(this).parents('.hood-inline-list');
         $.hood.Inline.DataList.Reload($list, url);
       });
       $('body').on('submit', '.hood-inline-list form', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
-        $form = $(this);
-        $list = $form.parents('.hood-inline-list');
+        var $form = $(this);
+        var $list = $form.parents('.hood-inline-list');
         var url = document.createElement('a');
         url.href = $list.data('url');
         url.search = "?" + $form.serialize();
@@ -1352,8 +1342,8 @@ $.hood.Inline = {
       $('body').on('submit', 'form.inline', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
-        $form = $(this);
-        $list = $($form.data('target'));
+        var $form = $(this);
+        var $list = $($form.data('target'));
         var url = document.createElement('a');
         url.href = $list.data('url');
         url.search = "?" + $form.serialize();
@@ -1362,8 +1352,8 @@ $.hood.Inline = {
       $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
-        $form = $(this).parents('form');
-        $list = $($form.data('target'));
+        var $form = $(this).parents('form');
+        var $list = $($form.data('target'));
         var url = document.createElement('a');
         url.href = $list.data('url');
         url.search = "?" + $form.serialize();
@@ -1488,23 +1478,23 @@ $.hood.Media = {
     Complete: {
       Attach: function Attach(e) {
         e.preventDefault();
-        $image = $.hood.Media.Actions.Target;
-        $json = $.hood.Media.Actions.Json;
+        var $image = $.hood.Media.Actions.Target;
+        var $json = $.hood.Media.Actions.Json;
         $.post($(this).data('url'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
 
           if (data.Success) {
-            icon = data.Media.Icon;
+            var _icon = data.Media.Icon;
 
             if (data.Media.GeneralFileType === "Image") {
-              icon = data.Media.MediumUrl;
+              _icon = data.Media.MediumUrl;
             }
 
             if (!$.hood.Helpers.IsNullOrUndefined($image)) {
               $image.css({
-                'background-image': 'url(' + icon + ')'
+                'background-image': 'url(' + _icon + ')'
               });
-              $image.find('img').attr('src', icon);
+              $image.find('img').attr('src', _icon);
               $image.removeClass('loading');
             }
 
@@ -1517,14 +1507,14 @@ $.hood.Media = {
         }).fail($.hood.Inline.HandleError);
       },
       Insert: function Insert(e) {
-        url = $(e.target).data('url');
-        editor = this;
+        var url = $(e.target).data('url');
+        var editor = this;
         editor.insertContent('<img alt="Your image..." src="' + url + '"/>');
         $.hood.Modals.Close('#attach-media-modal');
       },
       Select: function Select(e) {
-        url = $(this).data('url');
-        tag = $.hood.Media.Actions.Target;
+        var url = $(this).data('url');
+        var tag = $.hood.Media.Actions.Target;
         $(tag).each(function () {
           if ($(this).is("input")) {
             $(this).val(url);
@@ -1541,8 +1531,8 @@ $.hood.Media = {
       },
       Clear: function Clear(e) {
         e.preventDefault();
-        $image = $($(this).data('tag'));
-        $json = $($(this).data('json'));
+        var $image = $($(this).data('tag'));
+        var $json = $($(this).data('json'));
         $.post($(this).data('url'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
 
@@ -1644,7 +1634,7 @@ $.hood.Media = {
   Delete: function Delete(e) {
     var $this = $(this);
 
-    deleteMediaCallback = function deleteMediaCallback(confirmed) {
+    var deleteMediaCallback = function deleteMediaCallback(confirmed) {
       if (confirmed) {
         // delete functionality
         $.post('/admin/media/delete', {
@@ -1661,7 +1651,7 @@ $.hood.Media = {
       }
     };
 
-    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, type = 'warning', footer = '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
+    $.hood.Alerts.Confirm("The media file will be permanently removed. This cannot be undone.", "Are you sure?", deleteMediaCallback, 'warning', '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> Ensure this file is not attached to any posts, pages or features of the site, or it will appear as a broken image or file.</span>', 'Ok', 'Cancel');
   },
   RestrictDir: function RestrictDir() {
     var pattern = /[^0-9A-Za-z- ]*/g; // default pattern
@@ -1697,7 +1687,7 @@ $.hood.Media = {
       e.preventDefault();
       var $this = $(this);
 
-      deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
+      var deleteDirectoryCallback = function deleteDirectoryCallback(confirmed) {
         if (confirmed) {
           $.post($this.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);

@@ -217,19 +217,19 @@ $.hood.Admin = {
             });
         },
         DoCharts: function (data) {
-            datasets = [];
-            dataLabels = [];
-            contentColour = '#6f42c1';
-            propertyColour = '#20c997';
-            userColour = '#fd7e14';
-            subColour = '#17a2b8';
+            let datasets = [];
+            let dataLabels = [];
+            let contentColour = '#6f42c1';
+            let propertyColour = '#20c997';
+            let userColour = '#fd7e14';
+            let subColour = '#17a2b8';
             if (Number($('#history').val()) < 100) {
 
-                labels = [];
+                let labels = [];
 
                 // Content by day
                 var content = data.content.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-                contentSet = [];
+                let contentSet = [];
                 content.forEach(function (element) {
                     contentSet.push(element.Value);
                     labels.push(element.Key);
@@ -245,7 +245,7 @@ $.hood.Admin = {
                 });
 
                 // users by day
-                var users = data.users.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
+                let users = data.users.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
                 contentSet = [];
                 users.forEach(function (element) {
                     contentSet.push(element.Value);
@@ -261,7 +261,7 @@ $.hood.Admin = {
                 });
 
                 // subs by day
-                var subs = data.subs.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
+                let subs = data.subs.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
                 contentSet = [];
                 subs.forEach(function (element) {
                     contentSet.push(element.Value);
@@ -277,7 +277,7 @@ $.hood.Admin = {
                 });
 
                 // Properties by day
-                var properties = data.properties.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
+                let properties = data.properties.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
                 contentSet = [];
                 properties.forEach(function (element) {
                     contentSet.push(element.Value);
@@ -296,10 +296,10 @@ $.hood.Admin = {
             }
             else {
                 // 12 months
-                labels = [];
+                let labels = [];
 
                 // Content by day
-                contentSet = [];
+                let  contentSet = [];
                 data.content.months.forEach(function (element) {
                     contentSet.push(element.Value);
                     labels.push(element.Key);
@@ -371,6 +371,9 @@ $.hood.Admin = {
                 responsive: true,
                 maintainAspectRatio: false,
                 options: {
+                    events: [],
+                    tooltips: { enabled: false },
+                    hover: { mode: null },
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -409,12 +412,12 @@ $.hood.Admin = {
     CheckAndLoadTabs: function (tag) {
         $(tag).each(function () {
             // build the mobile jobber
-            var button = $('<li class="nav-item d-inline d-lg-none"></li>');
-            var dropdown = $('<div class="dropdown-menu"></ul>');
-            var nav = $('<ul class="navbar-nav"></ul>');
+            let button = $('<li class="nav-item d-inline d-lg-none"></li>');
+            let dropdown = $('<div class="dropdown-menu"></ul>');
+            let nav = $('<ul class="navbar-nav"></ul>');
             $(this).find('> li').each(function () {
-                link = $(this).children('a:first-child');
-                var item = $('<li class="nav-item"><a href="' + link.attr('href') + '" data-toggle="tab" class="nav-link tab-switch">' + link.html() + '</a></li>');
+                let link = $(this).children('a:first-child');
+                let item = $('<li class="nav-item"><a href="' + link.attr('href') + '" data-toggle="tab" class="nav-link tab-switch">' + link.html() + '</a></li>');
                 nav.append(item);
                 $(this).addClass('d-none d-lg-inline');
             });

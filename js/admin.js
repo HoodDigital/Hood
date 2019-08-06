@@ -172,18 +172,18 @@ $.hood.Admin = {
       });
     },
     DoCharts: function DoCharts(data) {
-      datasets = [];
-      dataLabels = [];
-      contentColour = '#6f42c1';
-      propertyColour = '#20c997';
-      userColour = '#fd7e14';
-      subColour = '#17a2b8';
+      var datasets = [];
+      var dataLabels = [];
+      var contentColour = '#6f42c1';
+      var propertyColour = '#20c997';
+      var userColour = '#fd7e14';
+      var subColour = '#17a2b8';
 
       if (Number($('#history').val()) < 100) {
-        labels = []; // Content by day
+        var labels = []; // Content by day
 
         var content = data.content.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-        contentSet = [];
+        var contentSet = [];
         content.forEach(function (element) {
           contentSet.push(element.Value);
           labels.push(element.Key);
@@ -241,61 +241,62 @@ $.hood.Admin = {
         dataLabels = labels;
       } else {
         // 12 months
-        labels = []; // Content by day
+        var _labels = []; // Content by day
 
-        contentSet = [];
+        var _contentSet = [];
         data.content.months.forEach(function (element) {
-          contentSet.push(element.Value);
-          labels.push(element.Key);
+          _contentSet.push(element.Value);
+
+          _labels.push(element.Key);
         });
         datasets.push({
           label: 'New Content',
-          data: contentSet,
+          data: _contentSet,
           borderColor: contentColour,
           backgroundColor: contentColour,
           pointBackgroundColor: contentColour,
           pointBorderColor: '#ffffff'
         }); // users by day
 
-        contentSet = [];
+        _contentSet = [];
         data.users.months.forEach(function (element) {
-          contentSet.push(element.Value);
+          _contentSet.push(element.Value);
         });
         datasets.push({
           label: 'New Users',
-          data: contentSet,
+          data: _contentSet,
           borderColor: contentColour,
           backgroundColor: contentColour,
           pointBackgroundColor: contentColour,
           pointBorderColor: '#ffffff'
         }); // subs by day
 
-        contentSet = [];
+        _contentSet = [];
         data.subs.months.forEach(function (element) {
-          contentSet.push(element.Value);
+          _contentSet.push(element.Value);
         });
         datasets.push({
           label: 'New Subscriptions',
-          data: contentSet,
+          data: _contentSet,
           borderColor: subColour,
           backgroundColor: subColour,
           pointBackgroundColor: subColour,
           pointBorderColor: '#ffffff'
         }); // Properties by day
 
-        contentSet = [];
+        _contentSet = [];
         data.properties.months.forEach(function (element) {
-          contentSet.push(element.Value);
+          _contentSet.push(element.Value);
         });
         datasets.push({
           label: 'New Properties',
-          data: contentSet,
+          data: _contentSet,
           borderColor: propertyColour,
           backgroundColor: propertyColour,
           pointBackgroundColor: propertyColour,
           pointBorderColor: '#ffffff'
         });
-        dataLabels = labels;
+        dataLabels = _labels;
       }
 
       var ctx = document.getElementById("admin-stats-chart");
@@ -308,6 +309,13 @@ $.hood.Admin = {
         responsive: true,
         maintainAspectRatio: false,
         options: {
+          events: [],
+          tooltips: {
+            enabled: false
+          },
+          hover: {
+            mode: null
+          },
           responsive: true,
           maintainAspectRatio: false,
           scales: {
@@ -347,7 +355,7 @@ $.hood.Admin = {
       var dropdown = $('<div class="dropdown-menu"></ul>');
       var nav = $('<ul class="navbar-nav"></ul>');
       $(this).find('> li').each(function () {
-        link = $(this).children('a:first-child');
+        var link = $(this).children('a:first-child');
         var item = $('<li class="nav-item"><a href="' + link.attr('href') + '" data-toggle="tab" class="nav-link tab-switch">' + link.html() + '</a></li>');
         nav.append(item);
         $(this).addClass('d-none d-lg-inline');

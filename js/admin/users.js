@@ -18,9 +18,9 @@ $.hood.Users = {
   },
   Delete: function Delete(e) {
     e.preventDefault();
-    $tag = $(this);
+    var $tag = $(this);
 
-    deleteUserCallback = function deleteUserCallback(isConfirm) {
+    var deleteUserCallback = function deleteUserCallback(isConfirm) {
       if (isConfirm) {
         $.post($tag.attr('href'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
@@ -79,9 +79,9 @@ $.hood.Users = {
   Edit: {
     ResetPassword: function ResetPassword(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
-      resetPasswordCallback = function resetPasswordCallback(inputValue) {
+      var resetPasswordCallback = function resetPasswordCallback(inputValue) {
         if (inputValue === false) return false;
 
         if (inputValue === "") {
@@ -101,9 +101,9 @@ $.hood.Users = {
     Notes: {
       Add: function Add(e) {
         e.preventDefault();
-        $tag = $(this);
+        var $tag = $(this);
 
-        addNoteCallback = function addNoteCallback(inputValue) {
+        var addNoteCallback = function addNoteCallback(inputValue) {
           if (inputValue === false || inputValue === "") {
             swal.showInputError("You enter anything!");
             return false;
@@ -121,9 +121,9 @@ $.hood.Users = {
       },
       Delete: function Delete(e) {
         e.preventDefault();
-        $tag = $(this);
+        var $tag = $(this);
 
-        deleteUserNoteCallback = function deleteUserNoteCallback(isConfirm) {
+        var deleteUserNoteCallback = function deleteUserNoteCallback(isConfirm) {
           if (isConfirm) {
             // delete functionality
             $.post($tag.attr('href'), function (data) {

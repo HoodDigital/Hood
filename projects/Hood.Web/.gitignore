@@ -27,5 +27,5 @@ package-lock.json
 /wwwroot/themes/**/*.packaged.js
 /wwwroot/themes/**/lib
 
-# Ignore Local appsettings.Development.json
-appsettings.Development.json
+# Ignore Local appsettings.ProductionTesting.json - used to test production environment variables locally.
+appsettings.ProductionTesting.json

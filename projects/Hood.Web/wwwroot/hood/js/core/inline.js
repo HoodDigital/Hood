@@ -19,7 +19,7 @@ $.hood.Inline = {
         $.hood.Inline.Reload(this);
     },
     Reload: function (tag, complete) {        
-        var $tag = $(tag);
+        let $tag = $(tag);
         $tag.addClass('loading');
         if (!complete)
             complete = $tag.data('complete');
@@ -38,7 +38,7 @@ $.hood.Inline = {
             $.hood.Inline.CurrentModal.modal('hide');
         }
         $.get(url, function (data) {
-            modalId = '#' + $(data).attr('id');
+            let modalId = '#' + $(data).attr('id');
             $(data).addClass('hood-inline-modal');
 
             if ($(modalId).length) {
@@ -65,7 +65,7 @@ $.hood.Inline = {
     },
     Task: function (e) {
         e.preventDefault();
-        $tag = $(e.currentTarget);
+        var $tag = $(e.currentTarget);
         $tag.addClass('loading');
         complete = $tag.data('complete');
         $.get($tag.attr('href'), function (data) {
@@ -94,14 +94,14 @@ $.hood.Inline = {
                 $.hood.Loader(true);
                 var url = document.createElement('a');
                 url.href = $(this).attr('href');
-                $list = $(this).parents('.hood-inline-list');
+                let $list = $(this).parents('.hood-inline-list');
                 $.hood.Inline.DataList.Reload($list, url);
             });
             $('body').on('submit', '.hood-inline-list form', function (e) {
                 e.preventDefault();
                 $.hood.Loader(true);
-                $form = $(this);
-                $list = $form.parents('.hood-inline-list');
+                let $form = $(this);
+                let $list = $form.parents('.hood-inline-list');
                 var url = document.createElement('a');
                 url.href = $list.data('url');
                 url.search = "?" + $form.serialize();
@@ -110,8 +110,8 @@ $.hood.Inline = {
             $('body').on('submit', 'form.inline', function (e) {
                 e.preventDefault();
                 $.hood.Loader(true);
-                $form = $(this);
-                $list = $($form.data('target'));
+                let $form = $(this);
+                let $list = $($form.data('target'));
                 var url = document.createElement('a');
                 url.href = $list.data('url');
                 url.search = "?" + $form.serialize();
@@ -120,9 +120,9 @@ $.hood.Inline = {
             $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form', function (e) {
                 e.preventDefault();
                 $.hood.Loader(true);
-                $form = $(this).parents('form');
-                $list = $($form.data('target'));
-                var url = document.createElement('a');
+                let $form = $(this).parents('form');
+                let $list = $($form.data('target'));
+                let url = document.createElement('a');
                 url.href = $list.data('url');
                 url.search = "?" + $form.serialize();
                 $.hood.Inline.DataList.Reload($list, url);
@@ -130,7 +130,7 @@ $.hood.Inline = {
         },
         Reload: function (list, url) {
             if (history.pushState && list.hasClass('query')) {
-                var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + url.href.substring(url.href.indexOf('?') + 1);
+                let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?' + url.href.substring(url.href.indexOf('?') + 1);
                 window.history.pushState({ path: newurl }, '', newurl);
             }
             list.data('url', $.hood.Helpers.InsertQueryStringParamToUrl(url, 'inline', 'true'));
@@ -153,7 +153,7 @@ $.hood.Inline = {
     },
     RunComplete: function (complete) {
         if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
-            var func = eval(complete);
+            let func = eval(complete);
             if (typeof func === 'function') {
                 func();
             }

@@ -13,9 +13,9 @@ $.hood.Themes = {
   },
   Activate: function Activate(e) {
     e.preventDefault();
-    $tag = $(this);
+    var $tag = $(this);
 
-    activateThemeCallback = function activateThemeCallback(isConfirm) {
+    var activateThemeCallback = function activateThemeCallback(isConfirm) {
       if (isConfirm) {
         $.post($tag.attr('href'), function (data) {
           $.hood.Helpers.ProcessResponse(data);

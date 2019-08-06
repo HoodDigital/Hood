@@ -27,8 +27,8 @@ $.hood.Addresses = {
         $.get('/account/addresses/get', null, function (data) {
             $('.address-select').empty().append($('<option>', { value: '', text: '--- Choose an address ---' }));
             for (var i in data) {
-                var id = data[i].Id;
-                var address = data[i].FullAddress;
+                let id = data[i].Id;
+                let address = data[i].FullAddress;
                 $('.address-select').append($('<option>', { value: id, text: address }));
             }
         });

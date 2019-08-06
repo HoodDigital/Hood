@@ -3,21 +3,21 @@
 $.hood.Helpers = {
 
     IsNullOrUndefined: function (a) {
-        var rc = false;
+        let rc = false;
         if (a === null || typeof (a) === "undefined" || a === "") {
             rc = true;
         }
         return rc;
     },
     IsSet: function (a) {
-        var rc = false;
+        let rc = false;
         if (a === null || typeof (a) === "undefined" || a === "") {
             rc = true;
         }
         return !rc;
     },
     IsEventSupported: function (eventName) {
-        var el = document.createElement('div');
+        let el = document.createElement('div');
         eventName = 'on' + eventName;
         var isSupported = (eventName in el);
         if (!isSupported) {
@@ -31,7 +31,7 @@ $.hood.Helpers = {
         return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
     },
     IsUrlExternal: function (url) {
-        var match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
+        let match = url.match(/^([^:\/?#]+:)?(?:\/\/([^\/?#]*))?([^?#]+)?(\?[^#]*)?(#.*)?/);
         if (typeof match[1] === "string" && match[1].length > 0 && match[1].toLowerCase() !== location.protocol) return true;
         if (typeof match[2] === "string" && match[2].length > 0 && match[2].replace(new RegExp(":(" + { "http:": 80, "https:": 443 }[location.protocol] + ")?$"), "") !== location.host) return true;
         return false;
@@ -73,7 +73,7 @@ $.hood.Helpers = {
     },
 
     ProcessResponse: function (data) {
-        title = '';
+        let title = '';
         if (data.Title) title = `<strong>${data.Title}</strong><br />`;
         if (data.Success) {
             $.hood.Alerts.Success(`${title}${data.Message}`);
@@ -139,7 +139,7 @@ $.hood.Helpers = {
     },
 
     UrlToLocationObject: function (href) {
-        var l = document.createElement("a");
+        let l = document.createElement("a");
         l.href = href;
         return l;
     },
@@ -153,7 +153,7 @@ $.hood.Helpers = {
         });
     },
     FindAndReturnFromArray: function (array, property, value) {
-        var outputItem = null;
+        let outputItem = null;
         $.each(array, function (index, result) {
             if (result[property] === value) {
                 //return it
@@ -164,7 +164,7 @@ $.hood.Helpers = {
     },
 
     LeftPad: function (number, targetLength) {
-        var output = number + '';
+        let output = number + '';
         while (output.length < targetLength) {
             output = '0' + output;
         }
@@ -172,7 +172,7 @@ $.hood.Helpers = {
     },
 
     DateAdd: function (date, interval, units) {
-        var ret = new Date(date); //don't change original date
+        let ret = new Date(date); //don't change original date
         switch (interval.toLowerCase()) {
             case 'year': ret.setFullYear(ret.getFullYear() + units); break;
             case 'quarter': ret.setMonth(ret.getMonth() + 3 * units); break;
@@ -188,12 +188,12 @@ $.hood.Helpers = {
     },
 
     GenerateRandomString: function (numSpecials) {
-        specials = '!@#$&*';
-        lowercase = 'abcdefghijklmnopqrstuvwxyz';
-        uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        numbers = '0123456789';
-        all = lowercase + uppercase + numbers;
-        password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
+        let  specials = '!@#$&*';
+        let  lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        let uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let numbers = '0123456789';
+        let all = lowercase + uppercase + numbers;
+        let password = (specials.pick(1) + lowercase.pick(1) + uppercase.pick(1) + all.pick(5, 10)).shuffle();
         return password;
     }
 };

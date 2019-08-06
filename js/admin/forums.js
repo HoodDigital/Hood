@@ -20,7 +20,6 @@ $.hood.Forum = {
   },
   Categories: {
     Edit: function Edit(e) {
-      var $this = $(this);
       e.preventDefault();
       $.hood.Blades.OpenWithLoader('.edit-forum-category', '/admin/forums/categories/edit/' + $(this).data('id'), null);
     },

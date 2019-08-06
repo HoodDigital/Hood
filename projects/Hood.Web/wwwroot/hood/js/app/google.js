@@ -50,8 +50,8 @@ $.hood.Google = {
             for (var component in $.hood.Google.Addresses.AddressForm) {
                 if ($('#' + component).doesExist()) {
                     $('#' + component).val('');
-                    newVal = $.hood.Google.Addresses.AddressForm[component];
-                    placeholders = $.hood.Google.GetPlaceholders(newVal);
+                    let newVal = $.hood.Google.Addresses.AddressForm[component];
+                    let  placeholders = $.hood.Google.GetPlaceholders(newVal);
                     for (var placeholder in placeholders) {
                         newVal = newVal.replace("{" + placeholders[placeholder] + "}", $.hood.Google.Addresses.GetValueFromAddressComponents(placeholders[placeholder]));
                     }
@@ -68,7 +68,7 @@ $.hood.Google = {
             // and fill the corresponding field on the form.
             for (var i = 0; i < $.hood.Google.Addresses.place.address_components.length; i++) {
                 var addressType = $.hood.Google.Addresses.place.address_components[i].types[0];
-                if (addressType == key) {
+                if (addressType === key) {
                     return $.hood.Google.Addresses.place.address_components[i].long_name;
                 }
             }
@@ -186,7 +186,7 @@ $.hood.Google = {
     GetPlaceholders: function (str) {
         var regex = /\{(\w+)\}/g;
         var result = [];
-        while (match = regex.exec(str)) {
+        while (match === regex.exec(str)) {
             result.push(match[1]);
         }
         return result;

@@ -72,6 +72,11 @@
       "library": "jquery-validation-unobtrusive@3.2.11"
     },
     {
+      "destination": "wwwroot/lib/markerclusterer",
+      "library": "@google/markerclusterer@1.0.3",
+      "provider": "unpkg"
+    },
+    {
       "destination": "wwwroot/lib/moment",
       "library": "moment.js@2.24.0"
     },

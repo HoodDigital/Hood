@@ -45,13 +45,13 @@ $.hood.Handlers = {
   DateChange: function DateChange(e) {
     if (e) e.preventDefault(); // update the date element attached to the field's attach
 
-    $field = $(this).parents('.hood-date').find('.date-output');
-    date = $field.parents('.hood-date').find('.date-value').val();
-    pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
+    var $field = $(this).parents('.hood-date').find('.date-output');
+    var date = $field.parents('.hood-date').find('.date-value').val();
+    var pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
     if (!pattern.test(date)) date = "01/01/2001";
-    hour = $field.parents('.hood-date').find('.hour-value').val();
+    var hour = $field.parents('.hood-date').find('.hour-value').val();
     if (!$.isNumeric(hour)) hour = "00";
-    minute = $field.parents('.hood-date').find('.minute-value').val();
+    var minute = $field.parents('.hood-date').find('.minute-value').val();
     if (!$.isNumeric(minute)) minute = "00";
     $field.val(date + " " + hour + ":" + minute + ":00");
     $field.attr("value", date + " " + hour + ":" + minute + ":00");
@@ -63,21 +63,21 @@ $.hood.Handlers = {
     $('input[data-input="' + $(this).data('input') + '"]').each(function () {
       if ($(this).is(":checked")) items.push($(this).val());
     });
-    id = '#' + $(this).data('input');
-    vals = JSON.stringify(items);
+    var id = '#' + $(this).data('input');
+    var vals = JSON.stringify(items);
     $(id).val(vals);
   },
   SelectSetup: function SelectSetup() {
-    sel = $(this).data('selected');
+    var sel = $(this).data('selected');
 
     if ($(this).data('selected') !== 'undefined' && $(this).data('selected') !== '') {
-      selected = String($(this).data('selected'));
+      var selected = String($(this).data('selected'));
       $(this).val(selected);
     }
   },
   ClickSelect: function ClickSelect() {
     var $this = $(this);
-    targetId = '#' + $this.data('target');
+    var targetId = '#' + $this.data('target');
     $(targetId).val($this.data('value'));
     $(targetId).trigger('change');
     $('.click-select[data-target="' + $this.data('target') + '"]').each(function () {
@@ -89,7 +89,7 @@ $.hood.Handlers = {
   },
   ClickSelectClean: function ClickSelectClean() {
     var $this = $(this);
-    targetId = '#' + $this.data('target');
+    var targetId = '#' + $this.data('target');
     $(targetId).val($this.data('value'));
     $(targetId).trigger('change');
     $('.click-select.clean[data-target="' + $this.data('target') + '"]').each(function () {
@@ -137,7 +137,7 @@ $.hood.Handlers = {
     },
     SingleImage: function SingleImage(tag, jsontag) {
       tag = '#' + tag;
-      $tag = $(tag);
+      var $tag = $(tag);
       Dropzone.autoDiscover = false;
       var avatarDropzone = new Dropzone(tag, {
         url: $(tag).data('url'),

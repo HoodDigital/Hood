@@ -15,7 +15,7 @@ $.fn.doesExist = function () {
     return $(this).length;
 };
 $.fn.restrictToSlug = function (restrictPattern) {
-    var targets = $(this);
+    let targets = $(this);
 
     // The characters inside this pattern are accepted
     // and everything else will be 'cleaned'
@@ -39,14 +39,14 @@ $.fn.restrictToSlug = function (restrictPattern) {
 };
 $('.restrict-to-slug').restrictToSlug();
 $.fn.restrictToPageSlug = function (restrictPattern) {
-    var targets = $(this);
+    let targets = $(this);
 
     // The characters inside this pattern are accepted
     // and everything else will be 'cleaned'
-    var pattern = restrictPattern ||
+    let pattern = restrictPattern ||
         /[^0-9a-zA-Z-//]*/g; // default pattern
 
-    var restrictHandler = function () {
+    let restrictHandler = function () {
         var val = $(this).val();
         var newVal = val.replace(pattern, '');
         if ((newVal.match(new RegExp("/", "g")) || []).length > 4) {
@@ -66,18 +66,18 @@ $.fn.restrictToPageSlug = function (restrictPattern) {
 };
 $('.restrict-to-page-slug').restrictToPageSlug();
 $.fn.restrictToMetaSlug = function (restrictPattern) {
-    var targets = $(this);
+    let targets = $(this);
 
     // The characters inside this pattern are accepted
     // and everything else will be 'cleaned'
-    var pattern = restrictPattern ||
+    let pattern = restrictPattern ||
         /[^0-9a-zA-Z.]*/g; // default pattern
 
-    var restrictHandler = function () {
-        var val = $(this).val();
-        var newVal = val.replace(pattern, '');
+    let restrictHandler = function () {
+        let val = $(this).val();
+        let newVal = val.replace(pattern, '');
         if ((newVal.match(new RegExp(".", "g")) || []).length > 1) {
-            var pos = newVal.lastIndexOf('.');
+            let pos = newVal.lastIndexOf('.');
             newVal = newVal.substring(0, pos) + newVal.substring(pos + 1);
             $.hood.Alerts.Warning("You can only have up to 1 '.' characters in a meta slug.");
         }
@@ -93,8 +93,8 @@ $.fn.restrictToMetaSlug = function (restrictPattern) {
 };
 $('.restrict-to-meta-slug').restrictToMetaSlug();
 $.fn.characterCounter = function (val) {
-    var targets = $(this);
-    var characterCounterHandler = function () {
+    let targets = $(this);
+    let characterCounterHandler = function () {
         counter = $(this).data('counter');
         max = Number($(this).attr('maxlength'));
         len = $(this).val().length;
@@ -119,12 +119,12 @@ $.fn.removeLoader = function () {
     $(this).removeClass('loading');
 };
 $.fn.warningAlert = function () {
-    var targets = $(this);
-    var warningAlertHandler = function (e) {
+    let targets = $(this);
+    let warningAlertHandler = function (e) {
         e.preventDefault();
-        warningAlertCallback = function (confirmed) {
+        let warningAlertCallback = function (confirmed) {
             if (confirmed) {
-                url = $(e.currentTarget).attr('href');
+                let url = $(e.currentTarget).attr('href');
                 window.location = url;
             }
         };
@@ -132,10 +132,10 @@ $.fn.warningAlert = function () {
             $(e.currentTarget).data('warning'),
             $(e.currentTarget).data('title'),
             warningAlertCallback,
-            type = 'warning',
-            footer = $(e.currentTarget).data('footer'),
-            confirmButtonText = 'Ok',
-            cancelButtonText = 'Cancel'
+            'warning',
+            $(e.currentTarget).data('footer'),
+            'Ok',
+            'Cancel'
         );
         return false;
     };
@@ -143,7 +143,7 @@ $.fn.warningAlert = function () {
 };
 $('.warning-alert').warningAlert();
 $.commonHeight = function (element, columnTag) {
-    var maxHeight = 0;
+    let maxHeight = 0;
     element.children(columnTag).each(function () {
         var elementChild = $(this).children();
         if (elementChild.hasClass('max-height')) {
@@ -156,7 +156,7 @@ $.commonHeight = function (element, columnTag) {
     element.children(columnTag).each(function () {
         $(this).height(maxHeight);
     });
-}
+};
 $.loadCss = function (id, location) {
     if (!$('link#' + id).length)
         $('<link/>', {
@@ -175,29 +175,13 @@ $.getUrlVars = function () {
         vars[hash[0]] = hash[1];
     }
     return vars;
-}
+};
 $.decodeUrl = function (str) {
     return decodeURIComponent(str).replace('+', ' ');
-}
+};
 $.numberWithCommas = function (x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-if (typeof kendo !== 'undefined') {
-    kendo.data.binders.date = kendo.data.Binder.extend({
-        init: function (element, bindings, options) {
-            kendo.data.Binder.fn.init.call(this, element, bindings, options);
-
-            this.dateformat = $(element).data("dateformat");
-        },
-        refresh: function () {
-            var data = this.bindings["date"].get();
-            if (data) {
-                var dateObj = new Date(data);
-                $(this.element).text(kendo.toString(dateObj, this.dateformat));
-            }
-        }
-    });
-}
+};
 if ($.validator) {
     $.validator.addMethod("time", function (value, element) {
         return this.optional(element) || /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/i.test(value);
@@ -250,19 +234,21 @@ if (!$.mobile.Android) {
     $.body.addClass("desktop-device");
     $.device = "desktop";
 }
-
-// Force prevent autocomplete
-// Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
-$('body').on('change', '.prevent-autocomplete', function (e) { // Change event is fired as autocomplete occurred at the input field 
-    trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
-    if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) { //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
-        $(this).val(''); // empty the field
-    }
-});
-$('body').on('keyup', '.prevent-autocomplete', function (e) {
-    trackId = $(this).attr('id');
-    trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
-});
+(function () {
+    // Force prevent autocomplete
+    // Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
+    var trackInputs = { password: "0", username: "0" }; //Password and username fields ids as object's property, and "0" as its their values
+    $('body').on('change', '.prevent-autocomplete', function (e) { // Change event is fired as autocomplete occurred at the input field 
+        let trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
+        if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) { //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
+            $(this).val(''); // empty the field
+        }
+    });
+    $('body').on('keyup', '.prevent-autocomplete', function (e) {
+        let  trackId = $(this).attr('id');
+        trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
+    });
+})();
 
 // Custom Event polyfill
 (function () {
@@ -276,6 +262,7 @@ $('body').on('keyup', '.prevent-autocomplete', function (e) {
     CustomEvent.prototype = window.Event.prototype;
     window.CustomEvent = CustomEvent;
 })();
+
 $.hood.LinkClasses = [
     { title: 'None', value: '' },
     { title: 'Button link', value: 'btn btn-default' },
@@ -305,6 +292,7 @@ $.hood.ImageClasses = [
 
 new CustomEvent('loader-show');
 new CustomEvent('loader-hide');
+
 $.hood.Loader = function (show) {
     if (show)
         $('body').trigger('loader-show');

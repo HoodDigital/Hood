@@ -46,9 +46,9 @@ $.hood.Property = {
   },
   Delete: function Delete(e) {
     e.preventDefault();
-    $tag = $(this);
+    var $tag = $(this);
 
-    deletePropertyCallback = function deletePropertyCallback(isConfirm) {
+    var deletePropertyCallback = function deletePropertyCallback(isConfirm) {
       if (isConfirm) {
         $.post($tag.attr('href'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
@@ -70,7 +70,7 @@ $.hood.Property = {
   },
   DeleteAll: function DeleteAll(e) {
     e.preventDefault();
-    $tag = $(this);
+    var $tag = $(this);
     Swal.fire({
       title: "Are you sure?",
       html: "ALL of the properties will be permanently removed. Type 'DELETE' to continue.",
@@ -112,9 +112,9 @@ $.hood.Property = {
   },
   SetStatus: function SetStatus(e) {
     e.preventDefault();
-    $tag = $(this);
+    var $tag = $(this);
 
-    publishPropertyCallback = function publishPropertyCallback(isConfirm) {
+    var publishPropertyCallback = function publishPropertyCallback(isConfirm) {
       if (isConfirm) {
         $.post($tag.attr('href'), $tag.data('status'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
@@ -196,9 +196,9 @@ $.hood.Property = {
   },
   DeleteFloorArea: function DeleteFloorArea(e) {
     e.preventDefault();
-    $tag = $(this);
+    var $tag = $(this);
 
-    deleteFloorAreaCallback = function deleteFloorAreaCallback(isConfirm) {
+    var deleteFloorAreaCallback = function deleteFloorAreaCallback(isConfirm) {
       if (isConfirm) {
         $.post($tag.attr('href'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
@@ -334,9 +334,9 @@ $.hood.Property = {
   Media: {
     Delete: function Delete(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
-      deleteMediaCallback = function deleteMediaCallback(isConfirm) {
+      var deleteMediaCallback = function deleteMediaCallback(isConfirm) {
         if (isConfirm) {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);

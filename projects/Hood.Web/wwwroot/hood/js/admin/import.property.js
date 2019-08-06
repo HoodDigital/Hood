@@ -6,38 +6,38 @@ $.hood.Import.Property = {
     UpdateInterval: -1,
     Init: function () {
         if ($('#import-property-start').doesExist()) {
-        $.hood.Import.Property.Update();
-        $('#import-property-start').click(function () {
-            //$(this).addLoader();
-            $.ajax({
-                url: $('#import-property-start').data('url'), 
-                type: "POST",
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
-                },
-                success: function (result) {
-                    $.hood.Import.Property.Update();
-                },
-                complete: function () {
-                    //$(this).removeLoader();
-                }
+            $.hood.Import.Property.Update();
+            $('#import-property-start').click(function () {
+                //$(this).addLoader();
+                $.ajax({
+                    url: $('#import-property-start').data('url'),
+                    type: "POST",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
+                    },
+                    success: function (result) {
+                        $.hood.Import.Property.Update();
+                    },
+                    complete: function () {
+                        //$(this).removeLoader();
+                    }
+                });
             });
-        });
-        $('#import-property-cancel').click(function () {
-            //$(this).addLoader();
-            $.ajax({
-                url: $('#import-property-cancel').data('url'),
-                type: "POST",
-                error: function (jqXHR, textStatus, errorThrown) {
-                    $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
-                },
-                success: function (result) {
-                    $.hood.Import.Property.Update();
-                },
-                complete: function () {
-                    //$(this).removeLoader();
-                }
-            });
+            $('#import-property-cancel').click(function () {
+                //$(this).addLoader();
+                $.ajax({
+                    url: $('#import-property-cancel').data('url'),
+                    type: "POST",
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
+                    },
+                    success: function (result) {
+                        $.hood.Import.Property.Update();
+                    },
+                    complete: function () {
+                        //$(this).removeLoader();
+                    }
+                });
             });
         }
     },

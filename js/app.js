@@ -48,15 +48,15 @@ $.hood.App = {
     },
     StickyMenu: function StickyMenu() {
       var headerOffset = 0;
-      $header = $($.hood.App.Options.Header.Target);
+      var $header = $($.hood.App.Options.Header.Target);
 
       if ($header.length > 0) {
         headerOffset = $header.offset().top;
       }
 
-      header = $header.height();
-      win = $.window.height() + 2 * header;
-      doc = $(document).height();
+      var header = $header.height();
+      var win = $.window.height() + 2 * header;
+      var doc = $(document).height();
 
       if ($.window.scrollTop() > headerOffset && doc > win) {
         $header.addClass($.hood.App.Options.Header.StickyClass);
@@ -65,6 +65,8 @@ $.hood.App = {
       }
     },
     RemoveStickyness: function RemoveStickyness() {
+      var $header = $($.hood.App.Options.Header.Target);
+
       if ($header.hasClass($.hood.App.Options.Header.StickyClass)) {
         $header.removeClass($.hood.App.Options.Header.StickyClass);
       }
@@ -82,7 +84,7 @@ $.hood.App = {
       });
     },
     Submit: function Submit(tag) {
-      $form = $(tag);
+      var $form = $(tag);
 
       if ($form.valid()) {
         if ($form.hasClass('g-recaptcha')) {
@@ -138,7 +140,7 @@ $.hood.App = {
       var highlight = $.getUrlVars()['highlight'];
 
       if ($.isNumeric(highlight)) {
-        $post = $('#post-' + highlight);
+        var $post = $('#post-' + highlight);
         $('html,body').animate({
           scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset
         }, 'slow');
@@ -149,9 +151,10 @@ $.hood.App = {
       var reply = $.getUrlVars()['reply'];
 
       if ($.isNumeric(reply)) {
-        $post = $('#forum-post-form');
+        var _$post = $('#forum-post-form');
+
         $('html,body').animate({
-          scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset
+          scrollTop: _$post.offset().top - $.hood.App.Options.Scroll.Offset
         }, 'slow');
       } // toggle editors
 

@@ -55,9 +55,9 @@ $.hood.Subscriptions = {
   Subscriptions: {
     Delete: function Delete(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
-      deleteSubscriptionCallback = function deleteSubscriptionCallback(isConfirm) {
+      var deleteSubscriptionCallback = function deleteSubscriptionCallback(isConfirm) {
         if (isConfirm) {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
@@ -81,9 +81,9 @@ $.hood.Subscriptions = {
   Plans: {
     Delete: function Delete(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
-      deletePlanCallback = function deletePlanCallback(isConfirm) {
+      var deletePlanCallback = function deletePlanCallback(isConfirm) {
         if (isConfirm) {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
@@ -137,9 +137,9 @@ $.hood.Subscriptions = {
   Products: {
     Delete: function Delete(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
-      deleteProductCallback = function deleteProductCallback(isConfirm) {
+      var deleteProductCallback = function deleteProductCallback(isConfirm) {
         if (isConfirm) {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);

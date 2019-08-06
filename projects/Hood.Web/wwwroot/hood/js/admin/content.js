@@ -68,9 +68,9 @@ $.hood.Content = {
 
     Delete: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        deleteContentCallback = function (isConfirm) {
+        let deleteContentCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -98,9 +98,9 @@ $.hood.Content = {
 
     SetStatus: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        publishContentCallback = function (isConfirm) {
+        let publishContentCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), $tag.data('status'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -119,9 +119,9 @@ $.hood.Content = {
 
     Clone: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        duplicateContentCallback = function (isConfirm) {
+        let duplicateContentCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), $tag.data('status'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -262,9 +262,9 @@ $.hood.Content = {
         },
         Delete: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
-            deleteCategoryCallback = function (isConfirm) {
+            let deleteCategoryCallback = function (isConfirm) {
                 if (isConfirm) {
                     $.post($tag.attr('href'), function (data) {
                         $.hood.Helpers.ProcessResponse(data);
@@ -305,9 +305,9 @@ $.hood.Content = {
         },
         Delete: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
-            deleteCategoryCallback = function (isConfirm) {
+            let deleteCategoryCallback = function (isConfirm) {
                 if (isConfirm) {
                     $.post($tag.attr('href'), function (data) {
                         $.hood.Helpers.ProcessResponse(data);
@@ -331,9 +331,9 @@ $.hood.Content = {
     Media: {
         Delete: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
-            deleteMediaCallback = function (isConfirm) {
+            let deleteMediaCallback = function (isConfirm) {
                 if (isConfirm) {
                     $.post($tag.attr('href'), function (data) {
                         $.hood.Helpers.ProcessResponse(data);
@@ -356,9 +356,9 @@ $.hood.Content = {
     // Content Types
     Types: {
         AddField: function () {
-            var name = $('#custom-field-name-' + $(this).data('id')).val();
-            var fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
-            exists = false;
+            let name = $('#custom-field-name-' + $(this).data('id')).val();
+            let fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
+            let exists = false;
             $.each(fields, function (key, value) {
                 if (value.Name === name)
                     exists = true;
@@ -376,7 +376,7 @@ $.hood.Content = {
                 return;
             }
             // Add the new item.
-            newField = {
+            let newField = {
                 Name: $('#custom-field-name-' + $(this).data('id')).data('prefix') + $('#custom-field-name-' + $(this).data('id')).val(),
                 Default: $('#custom-field-default-' + $(this).data('id')).val(),
                 Type: $('#custom-field-type-' + $(this).data('id')).val(),
@@ -388,8 +388,8 @@ $.hood.Content = {
             $.hood.Alerts.Success("Added field.");
         },
         DeleteField: function () {
-            var fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
-            var name = $(this).data('name');
+            let fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
+            let name = $(this).data('name');
             fields = $.grep(fields, function (e) {
                 return e.Name !== name;
             });
@@ -399,7 +399,7 @@ $.hood.Content = {
         },
         GetFieldsList: function (id) {
             // Take the contents of the fields input. 
-            fieldsInput = $('#custom-fields-' + id).val();
+            let fieldsInput = $('#custom-fields-' + id).val();
             // if it is null, we need a new object.
             if (fieldsInput !== null && fieldsInput !== '') {
                 var obj = JSON.parse(fieldsInput);
@@ -414,9 +414,9 @@ $.hood.Content = {
             return new Array();
         },
         ReRenderFields: function (arr, id) {
-            newList = $('#field-list-' + id).empty();
+            let newList = $('#field-list-' + id).empty();
             for (i = 0; i < arr.length; i++) {
-                fld = "<tr><td class='col-xs-8'><strong>" + arr[i].Name + "</strong> " + arr[i].Type + "</td><td class='col-xs-4 text-right'>";
+                let fld = "<tr><td class='col-xs-8'><strong>" + arr[i].Name + "</strong> " + arr[i].Type + "</td><td class='col-xs-4 text-right'>";
                 if (!arr[i].System) {
                     fld += "<a class='delete-custom-field btn btn-xs bg-color-red txt-color-white' data-name='" + arr[i].Name + "' data-id='" + id + "'><i class='fa fa-trash-o'></i></a>";
                 }

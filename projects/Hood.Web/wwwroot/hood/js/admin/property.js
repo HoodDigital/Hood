@@ -54,9 +54,9 @@ $.hood.Property = {
 
     Delete: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        deletePropertyCallback = function (isConfirm) {
+        let deletePropertyCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -84,7 +84,7 @@ $.hood.Property = {
 
     DeleteAll: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
         Swal.fire({
             title: "Are you sure?",
@@ -128,9 +128,9 @@ $.hood.Property = {
 
     SetStatus: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        publishPropertyCallback = function (isConfirm) {
+        let publishPropertyCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), $tag.data('status'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -221,9 +221,9 @@ $.hood.Property = {
     },
     DeleteFloorArea: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        deleteFloorAreaCallback = function (isConfirm) {
+        let deleteFloorAreaCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -335,7 +335,7 @@ $.hood.Property = {
             myDropzone.on("success", function (file, data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Property.Lists.Floorplans.Reload();
-         });
+            });
 
             myDropzone.on("addedfile", function (file) {
                 $('#property-floorplans-total-progress .progress-bar').css({ width: 0 + "%" });
@@ -371,9 +371,9 @@ $.hood.Property = {
     Media: {
         Delete: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
-            deleteMediaCallback = function (isConfirm) {
+            let deleteMediaCallback = function (isConfirm) {
                 if (isConfirm) {
                     $.post($tag.attr('href'), function (data) {
                         $.hood.Helpers.ProcessResponse(data);

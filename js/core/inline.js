@@ -39,7 +39,7 @@ $.hood.Inline = {
     }
 
     $.get(url, function (data) {
-      modalId = '#' + $(data).attr('id');
+      var modalId = '#' + $(data).attr('id');
       $(data).addClass('hood-inline-modal');
 
       if ($(modalId).length) {
@@ -64,7 +64,7 @@ $.hood.Inline = {
   },
   Task: function Task(e) {
     e.preventDefault();
-    $tag = $(e.currentTarget);
+    var $tag = $(e.currentTarget);
     $tag.addClass('loading');
     complete = $tag.data('complete');
     $.get($tag.attr('href'), function (data) {
@@ -94,14 +94,14 @@ $.hood.Inline = {
         $.hood.Loader(true);
         var url = document.createElement('a');
         url.href = $(this).attr('href');
-        $list = $(this).parents('.hood-inline-list');
+        var $list = $(this).parents('.hood-inline-list');
         $.hood.Inline.DataList.Reload($list, url);
       });
       $('body').on('submit', '.hood-inline-list form', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
-        $form = $(this);
-        $list = $form.parents('.hood-inline-list');
+        var $form = $(this);
+        var $list = $form.parents('.hood-inline-list');
         var url = document.createElement('a');
         url.href = $list.data('url');
         url.search = "?" + $form.serialize();
@@ -110,8 +110,8 @@ $.hood.Inline = {
       $('body').on('submit', 'form.inline', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
-        $form = $(this);
-        $list = $($form.data('target'));
+        var $form = $(this);
+        var $list = $($form.data('target'));
         var url = document.createElement('a');
         url.href = $list.data('url');
         url.search = "?" + $form.serialize();
@@ -120,8 +120,8 @@ $.hood.Inline = {
       $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
-        $form = $(this).parents('form');
-        $list = $($form.data('target'));
+        var $form = $(this).parents('form');
+        var $list = $($form.data('target'));
         var url = document.createElement('a');
         url.href = $list.data('url');
         url.search = "?" + $form.serialize();

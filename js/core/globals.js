@@ -139,14 +139,14 @@ $.fn.warningAlert = function () {
   var warningAlertHandler = function warningAlertHandler(e) {
     e.preventDefault();
 
-    warningAlertCallback = function warningAlertCallback(confirmed) {
+    var warningAlertCallback = function warningAlertCallback(confirmed) {
       if (confirmed) {
-        url = $(e.currentTarget).attr('href');
+        var url = $(e.currentTarget).attr('href');
         window.location = url;
       }
     };
 
-    $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('title'), warningAlertCallback, type = 'warning', footer = $(e.currentTarget).data('footer'), confirmButtonText = 'Ok', cancelButtonText = 'Cancel');
+    $.hood.Alerts.Confirm($(e.currentTarget).data('warning'), $(e.currentTarget).data('title'), warningAlertCallback, 'warning', $(e.currentTarget).data('footer'), 'Ok', 'Cancel');
     return false;
   };
 
@@ -202,23 +202,6 @@ $.numberWithCommas = function (x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-if (typeof kendo !== 'undefined') {
-  kendo.data.binders.date = kendo.data.Binder.extend({
-    init: function init(element, bindings, options) {
-      kendo.data.Binder.fn.init.call(this, element, bindings, options);
-      this.dateformat = $(element).data("dateformat");
-    },
-    refresh: function refresh() {
-      var data = this.bindings["date"].get();
-
-      if (data) {
-        var dateObj = new Date(data);
-        $(this.element).text(kendo.toString(dateObj, this.dateformat));
-      }
-    }
-  });
-}
-
 if ($.validator) {
   $.validator.addMethod("time", function (value, element) {
     return this.optional(element) || /^(([0-1]?[0-9])|([2][0-3])):([0-5]?[0-9])(:([0-5]?[0-9]))?$/i.test(value);
@@ -268,23 +251,31 @@ if (!$.mobile.Android) {
 } else {
   $.body.addClass("desktop-device");
   $.device = "desktop";
-} // Force prevent autocomplete
-// Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
+}
 
+(function () {
+  // Force prevent autocomplete
+  // Thanks to SaidbakR - https://stackoverflow.com/a/50438500/1663500
+  var trackInputs = {
+    password: "0",
+    username: "0"
+  }; //Password and username fields ids as object's property, and "0" as its their values
 
-$('body').on('change', '.prevent-autocomplete', function (e) {
-  // Change event is fired as autocomplete occurred at the input field 
-  trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
+  $('body').on('change', '.prevent-autocomplete', function (e) {
+    // Change event is fired as autocomplete occurred at the input field 
+    var trackId = $(this).attr('id'); //get the input field id to access the trackInputs object            
 
-  if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
-    //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
-    $(this).val(''); // empty the field
-  }
-});
-$('body').on('keyup', '.prevent-autocomplete', function (e) {
-  trackId = $(this).attr('id');
-  trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
-}); // Custom Event polyfill
+    if (trackInputs[trackId] === '0' || trackInputs[trackId] !== $(this).val()) {
+      //trackInputs property value not changed or the prperty value ever it it is not equals the input field value
+      $(this).val(''); // empty the field
+    }
+  });
+  $('body').on('keyup', '.prevent-autocomplete', function (e) {
+    var trackId = $(this).attr('id');
+    trackInputs[trackId] = $(this).val(); //Update trackInputs property with the value of the field with each keyup.
+  });
+})(); // Custom Event polyfill
+
 
 (function () {
   if (typeof window.CustomEvent === "function") return false;

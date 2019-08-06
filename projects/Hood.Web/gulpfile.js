@@ -240,7 +240,7 @@ gulp.task('js:package:admin', function () {
 
 });
 
-gulp.task('package', gulp.series('js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
+gulp.task('package', gulp.series('js', 'js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
 gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images', 'sql'), gulp.parallel('scss:copy', 'cssnano', 'package')));
 
 // Site workload, to compile theme less/scss and JS.

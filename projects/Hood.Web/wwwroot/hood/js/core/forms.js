@@ -3,7 +3,7 @@
 $.hood.Forms = {
     Init: function () {
         $('.floating-label > label').each(function () {
-            var $me = $(this);
+            let $me = $(this);
             $me.parent().append($me);
         });
     },

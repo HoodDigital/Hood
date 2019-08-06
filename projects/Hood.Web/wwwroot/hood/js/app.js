@@ -62,11 +62,11 @@ $.hood.App = {
         },
         StickyMenu: function () {
             var headerOffset = 0;
-            $header = $($.hood.App.Options.Header.Target);
+            var $header = $($.hood.App.Options.Header.Target);
             if ($header.length > 0) { headerOffset = $header.offset().top; }
-            header = $header.height();
-            win = $.window.height() + 2 * header;
-            doc = $(document).height();
+            let header = $header.height();
+            let  win = $.window.height() + 2 * header;
+            let doc = $(document).height();
             if ($.window.scrollTop() > headerOffset && doc > win) {
                 $header.addClass($.hood.App.Options.Header.StickyClass);
             } else {
@@ -74,6 +74,7 @@ $.hood.App = {
             }
         },
         RemoveStickyness: function () {
+            var $header = $($.hood.App.Options.Header.Target);
             if ($header.hasClass($.hood.App.Options.Header.StickyClass)) {
                 $header.removeClass($.hood.App.Options.Header.StickyClass);
             }
@@ -91,7 +92,7 @@ $.hood.App = {
             });
         },
         Submit: function (tag) {
-            $form = $(tag);
+            var $form = $(tag);
             if ($form.valid()) {
                 if ($form.hasClass('g-recaptcha')) {
                     var recaptchaId = $form.find('.recaptcha').data('recaptchaid');
@@ -147,7 +148,7 @@ $.hood.App = {
             // check for highlight.
             var highlight = $.getUrlVars()['highlight'];
             if ($.isNumeric(highlight)) {
-                $post = $('#post-' + highlight);
+                let $post = $('#post-' + highlight);
                 $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
                 $post.addClass('highlight');
                 if ($.getUrlVars()['message'] === "Created")
@@ -156,7 +157,7 @@ $.hood.App = {
 
             var reply = $.getUrlVars()['reply'];
             if ($.isNumeric(reply)) {
-                $post = $('#forum-post-form');
+                let $post = $('#forum-post-form');
                 $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
             }
 

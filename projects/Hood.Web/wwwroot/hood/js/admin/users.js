@@ -23,9 +23,9 @@ $.hood.Users = {
 
     Delete: function (e) {
         e.preventDefault();
-        $tag = $(this);
+        let $tag = $(this);
 
-        deleteUserCallback = function (isConfirm) {
+        let deleteUserCallback = function (isConfirm) {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
@@ -74,7 +74,7 @@ $.hood.Users = {
                 submitFunction: function (data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Users.Reload();
-               }
+                }
             });
         },
         GeneratePassword: function () {
@@ -91,9 +91,9 @@ $.hood.Users = {
     Edit: {
         ResetPassword: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
-            resetPasswordCallback = function (inputValue) {
+            let resetPasswordCallback = function (inputValue) {
                 if (inputValue === false) return false; if (inputValue === "") {
                     swal.showInputError("You didn't supply a new password, we can't reset the password without it!"); return false
                 }
@@ -112,9 +112,9 @@ $.hood.Users = {
         Notes: {
             Add: function (e) {
                 e.preventDefault();
-                $tag = $(this);
+                let $tag = $(this);
 
-                addNoteCallback = function (inputValue) {
+                let addNoteCallback = function (inputValue) {
                     if (inputValue === false || inputValue === "") {
                         swal.showInputError("You enter anything!");
                         return false;
@@ -135,9 +135,9 @@ $.hood.Users = {
             },
             Delete: function (e) {
                 e.preventDefault();
-                $tag = $(this);
+                let $tag = $(this);
 
-                deleteUserNoteCallback = function (isConfirm) {
+                let deleteUserNoteCallback = function (isConfirm) {
                     if (isConfirm) {
                         // delete functionality
                         $.post($tag.attr('href'), function (data) {
