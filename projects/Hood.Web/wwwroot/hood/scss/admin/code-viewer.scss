@@ -1,0 +1,19 @@
+﻿.code-viewer {
+    height: auto;
+
+    @include media-breakpoint-up(sm) {
+        height: 120px;
+        overflow: auto;
+    }
+
+    &.large {
+        @include media-breakpoint-up(sm) {
+            height: 500px;
+            overflow: auto;
+        }
+    }
+
+    &.auto {
+        height:auto!important;
+    }
+}

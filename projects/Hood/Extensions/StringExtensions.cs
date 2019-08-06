@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Hood.Interfaces;
+using Hood.Models;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -81,10 +83,14 @@ namespace Hood.Extensions
 
 
         #endregion
-
-        public static string ToHtmlLineBreaks(this string str)
+        /// <summary>
+        /// Adds HTML style line breaks. <br /> in place of newlines.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToHtml(this string str)
         {
-            return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br>").Replace("\r", "<br>").Replace("\n", "<br>");
+            return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br />").Replace("\r", "<br />").Replace("\n", "<br />");
         }
 
         public static bool IsNullOrEmpty(this string str)
@@ -373,15 +379,15 @@ namespace Hood.Extensions
         }
         public static string ParseURL(this string s)
         {
-            return Regex.Replace(s, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?", new MatchEvaluator(StringExtensions.URL));
+            return Regex.Replace(s, @"(http(s)?://)?([\w-]+\.)+[\w-]+(/\S\w[\w- ;,./?%&=]\S*)?", new MatchEvaluator(URL));
         }
         public static string ParseUsername(this string s)
         {
-            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(StringExtensions.Username));
+            return Regex.Replace(s, "(@)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Username));
         }
         public static string ParseHashtag(this string s)
         {
-            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(StringExtensions.Hashtag));
+            return Regex.Replace(s, "(#)((?:[A-Za-z0-9-_]*))", new MatchEvaluator(Hashtag));
         }
         private static string Hashtag(Match m)
         {
@@ -401,10 +407,47 @@ namespace Hood.Extensions
             return x.Link(x);
         }
 
-        public static string AddHtmlBreaks(this string str)
+        public static string ToFirstName(this string fullName)
         {
-            return str.Replace("  ", "&nbsp;&nbsp;").Replace(Environment.NewLine, "<br/>");
+            List<string> names = fullName.Split(' ').ToList();
+            return names.First();
+        }
+        public static string ToLastName(this string fullName)
+        {
+            List<string> names = fullName.Split(' ').ToList();
+            names.RemoveAt(0);
+            return string.Join(" ", names.ToArray());
         }
 
+        public static string ReplaceSiteVariables(this string text)
+        {
+            var settings = Core.Engine.Settings.Basic;
+            return text
+                .Replace("{Site.Title}", settings.FullTitle)
+                .Replace("{SITETITLE}", settings.FullTitle) // Backwards Compat Removed-v3.0.0
+                .Replace("{Site.CompanyName}", settings.CompanyName)
+                .Replace("{Site.Phone}", settings.Phone)
+                .Replace("{Site.Logo}", settings.Logo)
+                .Replace("{Site.LogoLight}", settings.LogoLight)
+                .Replace("{Site.Address}", settings.Address.ToFormat(Enums.AddressFormat.SingleLine))
+                .Replace("{Site.Owner.Name}", settings.Owner.ToFullName())
+                .Replace("{Site.Owner.Phone}", settings.Owner.Phone)
+                .Replace("{Site.Owner.Email}", settings.Owner.Email);
+        }
+        public static string ReplaceUserVariables(this string text, IUserProfile user)
+        {
+            return text
+                .Replace("{User.Username}", user.UserName)
+                .Replace("{User.Email}", user.Email)
+                .Replace("{User.PhoneNumber}", user.PhoneNumber)
+                .Replace("{User.Facebook}", user.Facebook)
+                .Replace("{User.LinkedIn}", user.LinkedIn)
+                .Replace("{User.Twitter}", user.Twitter)
+                .Replace("{User.Instagram}", user.Instagram)
+                .Replace("{User.WebsiteUrl}", user.WebsiteUrl)
+                .Replace("{User.FullName}", user.ToFullName())
+                .Replace("{User.FirstName}", user.FirstName)
+                .Replace("{User.LastName}", user.LastName);
+        }
     }
 }

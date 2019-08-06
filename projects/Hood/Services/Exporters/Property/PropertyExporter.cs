@@ -12,29 +12,28 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.IO.Compression;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class PropertyExporter : IPropertyExporter
     {
         // Services
-        private IFTPService _ftp;
-        private IConfiguration _config;
-        private IMediaManager<MediaObject> _media;
+        private readonly IFTPService _ftp;
+        private readonly IConfiguration _config;
+        private readonly IMediaManager _media;
         private PropertySettings _propertySettings;
-        private ISettingsRepository _settings;
-        private IEmailSender _email;
+        private readonly IEmailSender _email;
         private HoodDbContext _db { get; set; }
 
         // Members
         private ReaderWriterLock Lock { get; set; }
         private PropertyExporterReport Status { get; set; }
-        private AccountInfo Account { get; set; }
         private string _tempFolder { get; set; }
         private string _contentFolder { get; set; }
         private bool _killFlag { get; set; }
 
-        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<MediaObject> media, ISettingsRepository site, IEmailSender email)
+        public PropertyExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager media, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;
@@ -52,9 +51,8 @@ namespace Hood.Services
                 HasFile = false,
                 Message = "Not running..."
             };
-            _settings = site;
             _email = email;
-            _propertySettings = site.GetPropertySettings();
+            _propertySettings = Engine.Settings.Property;
             _media = media;
             _tempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(PropertyExporter) + "\\";
             _contentFolder = _tempFolder + "Content\\";
@@ -195,7 +193,7 @@ namespace Hood.Services
 
                 // Output the lot to json
                 MarkCompleteTask("Outputting all content data to JSON...");
-                System.IO.File.WriteAllText(_contentFolder + "index.json", JsonConvert.SerializeObject(export));
+                File.WriteAllText(_contentFolder + "index.json", JsonConvert.SerializeObject(export));
 
                 // Zip the file
                 MarkCompleteTask("Zipping files...");
@@ -216,7 +214,7 @@ namespace Hood.Services
 
                 // Send email to site email with the export link in it.
                 MarkCompleteTask("Sending file link via email...");
-                BasicSettings settings = _settings.GetBasicSettings();
+                BasicSettings settings = Engine.Settings.Basic;
                 if (settings.Email.IsSet())
                 {
                     MailObject mail = new MailObject()
@@ -337,9 +335,8 @@ namespace Hood.Services
                 FileError = false,
                 HasFile = false
             };
-            Account = context.GetAccountInfo();
             Status.Message = "Starting import, loading property files from FTP Service...";
-            _propertySettings = _settings.GetPropertySettings();
+            _propertySettings = Engine.Settings.Property;
 
             // Get a new instance of the HoodDbContext for this import.
             var options = new DbContextOptionsBuilder<HoodDbContext>();

@@ -1,8 +1,7 @@
 ﻿using Hood.Controllers;
 using Hood.Extensions;
-using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,7 +13,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class LogsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class LogsController : BaseController
     {
         public LogsController()
             : base()
@@ -25,15 +24,37 @@ namespace Hood.Areas.Admin.Controllers
         {
             return await Show(model);
         }
+        public async Task<IActionResult> Clear()
+        {
+            try
+            {
+                var logs = _db.Logs;
+                logs.ForEach(a => _db.Entry(a).State = EntityState.Deleted);
+                await _db.SaveChangesAsync();
+                SaveMessage = "Logs have been cleared.";
+                MessageType = Enums.AlertType.Success;
+            } catch (Exception ex)
+            {
+                SaveMessage = "Error clearing the site logs.";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<LogsController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Index));
+        }
 
         public async Task<IActionResult> Show(LogListModel model)
         {
             var logs = _db.Logs
                 .Include(l => l.User).Where(l => l.Time > DateTime.MinValue);
 
-            if (model.EntityId.IsSet())
+            if (model.Source.IsSet())
             {
-                //logs = logs.Where(l => l.QuestionWidgetId == model.QuestionWidgetId);
+                logs = logs.Where(l => l.Source == model.Source);
+            }
+
+            if (model.LogType.HasValue)
+            {
+                logs = logs.Where(l => l.Type == model.LogType);
             }
 
             if (model.UserId.IsSet())

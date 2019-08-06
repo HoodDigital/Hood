@@ -1,20 +1,17 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public class HoodController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class HoodController : BaseController
     {
         public HoodController()
             : base()
@@ -33,9 +30,9 @@ namespace Hood.Controllers
                 if (model.IsSpambot)
                     return new Response("You have been flagged as a spam bot. If this is not true, please contact us via email.");
 
-                await _settings.ProcessCaptchaOrThrowAsync(Request);
+                await Request.ProcessCaptchaOrThrowAsync();
 
-                var contactSettings = _settings.GetContactSettings();
+                var contactSettings = Engine.Settings.Contact;
 
                 model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";
@@ -65,7 +62,7 @@ namespace Hood.Controllers
             sw.WriteLine("Disallow: /account/ ");
             sw.WriteLine("Disallow: /manage/ ");
             sw.WriteLine("Disallow: /install/ ");
-            foreach (ContentType ct in _settings.GetContentSettings().GetRestrictedTypes())
+            foreach (ContentType ct in Engine.Settings.Content.RestrictedTypes)
             {
                 sw.WriteLine("Disallow: /" + ct.Slug + "/ ");
             }
@@ -74,35 +71,10 @@ namespace Hood.Controllers
         }
 
         [Route("sitemap.xml")]
-        public ActionResult SitemapXml()
+        public async Task<ActionResult> SitemapXmlAsync()
         {
-            string xml = _content.GetSitemapDocument(Url);
+            string xml = await _content.GetSitemapDocumentAsync(Url);
             return Content(xml, "text/xml", Encoding.UTF8);
-        }
-
-        [Route("error/")]
-        public IActionResult Error()
-        {
-            var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
-            var error = feature?.Error;
-            return View("~/Views/Shared/Error.cshtml", error);
-        }
-
-        [Route("error/{code}")]
-        public IActionResult ErrorCode(int code)
-        {
-            var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
-            var error = feature?.Error;
-
-            switch (code)
-            {
-                case 404:
-                    ViewData["Title"] = "Gone!";
-                    ViewData["Message"] = "Unfortunately, we can't locate what you are looking for...";
-                    break;
-            }
-
-            return View("~/Views/Shared/ErrorCode.cshtml");
         }
 
         [Route("enter-access-code")]
@@ -135,7 +107,7 @@ namespace Hood.Controllers
         [Route("hood/version/")]
         public JsonResult GetVersion()
         {
-            return Json(new { version = _settings.GetVersion() });
+            return Json(new { version = Engine.Version });
         }
     }
 }

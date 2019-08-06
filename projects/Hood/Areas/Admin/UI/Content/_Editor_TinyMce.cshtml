@@ -1,7 +1,0 @@
-@model EditContentModel
-@{
-    var _basics = _settings.GetBasicSettings();
-}
-<h4>Content Body</h4>
-<p>This is the main content, and you can edit it with the following rich text editor:</p>
-<textarea id="Body" name="Body" class="@_settings.WysiwygEditorClass-content">@Model.Content.Body</textarea>

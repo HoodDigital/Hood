@@ -1,0 +1,40 @@
+﻿@model ContentModel
+@inject ContentCategoryCache _categories
+@{
+    Layout = null;
+    var categories = _categories.TopLevel(Model.ContentType.Type);
+}
+<div class="card mb-3">
+    <div class="card-header position-relative" id="content-category-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#content-category-panel" href="#content-category-panel" aria-expanded="true" aria-controls="content-category-panel">
+                Categories
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body p-0 collapse show" aria-labelledby="content-category-panel-heading" id="content-category-panel">
+        <div class='list-group list-group-flush'>
+            @if (_categories.Count(Model.ContentType.Type) > 0)
+            {
+                @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Type)
+            }
+            else
+            {
+                <alert type="Light" icon="fa-info" size="Small" class="text-center m-0">
+                    No categories added yet.
+                </alert>
+            }
+            <div class="list-group-item list-group-item-action">
+                <a class="stretched-link text-success text-decoration-none hood-modal"
+                   asp-action="CreateCategory" 
+                   asp-route-type="@Model.ContentType.Type"
+                   data-complete="$.hood.Content.Categories.Editor">
+                    <i class="fa fa-plus-circle mr-2"></i>
+                    Add category
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,18 +1,14 @@
 @model MediaSettings
 @{
     ViewData["Title"] = "Media Settings";
-    Layout = "_SettingsLayout";
+    Layout = "_Layout_Settings";
 }
 @section buttons {
     <a asp-action="RefreshMedia" class="btn btn-warning warning-alert" data-warning="This will refresh all media items, removing any broken media, and updating the location to the currently set up cloud storage. Are you sure?"><i class="fa fa-refresh"></i> Refresh all media</a>
-    @if (User.IsInRole("Admin")) { 
+    @if (User.IsAdminOrBetter())
+    {
         <a asp-action="ResetMedia" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
     }
-}
-@section description {
-    <p class="no-margin">
-        Settings for uploading media to the site.
-    </p>
 }
 @section alerts {
     @if (Model.UpdateReport.HasRun)
@@ -40,64 +36,53 @@
         </div>
     }
 }
-<div class="tabs-container">
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#billing">Media Settings</a></li>
-    </ul>
-    <div class="tab-content">
-        <div id="billing" class="tab-pane active">
-            <div class="panel-body">
-                <strong>Media Settings</strong>
-                <p>
-                    Settings for uploading media to the site.
-                </p>
-                <hr />
-                <form method="post" id="settings-form">
-                    <fieldset class="form-horizontal">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" asp-for="AzureKey"></label>
-                            <div class="col-sm-8">
-                                <input asp-for="AzureKey" type="text" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" asp-for="AzureHost"></label>
-                            <div class="col-sm-8">
-                                <input asp-for="AzureHost" type="text" class="form-control" />
-                                <small>Note: Images or files may take a few minutes to propogate and cache on your CDN endpoint, if you chose to use one.</small>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" asp-for="AzureScheme"></label>
-                            <div class="col-sm-8">
-                                <select asp-for="AzureScheme" class="form-control">
-                                    <option value="https">HTTPS (Secure)</option>
-                                    <option value="http">HTTP (Insecure)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" asp-for="ContainerName"></label>
-                            <div class="col-sm-8">
-                                <input asp-for="ContainerName" type="text" class="form-control" />
-                                <small>Note: This is the container (folder) name that the site will use to store media uploads on your Azure Storage account.</small>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label" asp-for="NoImage"></label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <input asp-for="NoImage" type="url" class="form-control NoImage" placeholder="Enter a url..." />
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default hood-image-set" data-target=".NoImage" data-restrict="image" type="button"><i class="fa fa-camera"></i></button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="mail-tab" data-toggle="tab" href="#mail" role="tab" aria-controls="mail" aria-selected="true">
+                        Azure Storage
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="true">
+                        Images
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="mail" class="tab-pane active" role="tabpanel" aria-labelledby="mail-tab">
+                <div class="form-group floating-label">
+                    <label asp-for="AzureKey"></label>
+                    <input asp-for="AzureKey" type="text" class="form-control" />
+                    <small asp-for="AzureKey"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="AzureHost"></label>
+                    <input asp-for="AzureHost" type="text" class="form-control" />
+                    <small asp-for="AzureHost"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="AzureScheme"></label>
+                    <select asp-for="AzureScheme" class="form-control">
+                        <option value="https">HTTPS (Secure)</option>
+                        <option value="http">HTTP (Insecure)</option>
+                    </select>
+                    <small asp-for="AzureScheme"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="ContainerName" type="text" class="form-control" />
+                    <small asp-for="ContainerName"></small>
+                </div>
+                </div>
+                        <div id="image" class="tab-pane" role="tabpanel" aria-labelledby="image-tab">
+                <mediaSelect asp-for="NoImage"></mediaSelect>
+                <mediaSelect asp-for="NoProfileImage" asp-></mediaSelect>
+        </div>
         </div>
     </div>
 </div>

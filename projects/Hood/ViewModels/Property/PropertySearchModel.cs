@@ -1,25 +1,21 @@
 ﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Services;
+using Hood.Models;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
-    public class PropertySearchModel : PagedList<PropertyListing>, IPageableModel
+    public class PropertyListModel : PagedList<PropertyListing>, IPageableModel
     {
-        public PropertySearchModel()
+        public PropertyListModel()
         {
-            var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-            var propertySettings = siteSettings.GetPropertySettings();
-            PageSize = propertySettings.DefaultPageSize;
+            PageSize = Engine.Settings.Property.DefaultPageSize;
             if (PageSize <= 0)
                 PageSize = 20;
             PageIndex = 1;
         }
-
-        public string Order { get; set; }
-        public string Search { get; set; }
 
         /// <summary>
         /// Specify the exact filter term for listing type - cannot be used in conjunction with Transaction, which specifies generally. 
@@ -63,11 +59,12 @@ namespace Hood.Models
         public Dictionary<string, string> PlanningTypes { get; set; }
         public List<MapMarker> Locations { get; set; }
         public GeoCoordinate CentrePoint { get; internal set; }
+        public ContentStatus? PublishStatus { get; set; }
+        public bool Featured { get; set; }
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
-            query += Search.IsSet() ? "&search=" + Search : "";
+            var query = base.GetPageUrl(pageIndex);
             query += Type.IsSet() ? "&type=" + Type : "";
             query += PlanningType.IsSet() ? "&planning=" + PlanningType : "";
             query += Bedrooms.HasValue ? "&Bedrooms=" + Bedrooms : "";
@@ -77,7 +74,7 @@ namespace Hood.Models
             query += MaxPrice.HasValue ? "&MaxPrice=" + MaxPrice : "";
             query += MinRent.HasValue ? "&MinRent=" + MinRent : "";
             query += MaxRent.HasValue ? "&MaxRent=" + MaxRent : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
+            query += PublishStatus.HasValue ? "&publishStatus=" + PublishStatus : "";
             return query;
         }
     }

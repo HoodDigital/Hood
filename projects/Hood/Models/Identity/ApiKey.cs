@@ -1,8 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Entities;
 using Hood.Enums;
-using Hood.Extensions;
-using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -25,7 +23,6 @@ namespace Hood.Models
         public AccessLevel AccessLevel { get; set; }
 
         public string UserId { get; set; }
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
 
         public List<ApiEvent> Events { get; set; }
@@ -36,7 +33,7 @@ namespace Hood.Models
             {
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Key));
 
-                var _contextAccessor = Engine.Current.Resolve<IHttpContextAccessor>();
+                var _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
                 var claims = new Claim[] {
                     new Claim(ClaimTypes.NameIdentifier, Id),
                     new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddDays(7)).ToUnixTimeSeconds()}")
@@ -53,11 +50,10 @@ namespace Hood.Models
             get
             {
                 var privateKey = Key;
-                var _settings = Engine.Current.Resolve<ISettingsRepository>();
-                privateKey += _settings.Get<string>("Hood.Api.SystemPrivateKey");
+                privateKey += Engine.Settings["Hood.Api.SystemPrivateKey"];
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));
 
-                var _contextAccessor = Engine.Current.Resolve<IHttpContextAccessor>();
+                var _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
                 var claims = new Claim[] {
                     new Claim(ClaimTypes.NameIdentifier, Id),
                     new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddDays(7)).ToUnixTimeSeconds()}")
@@ -75,8 +71,7 @@ namespace Hood.Models
 
             if (access == AccessLevel.Public)
             {
-                var _settings = Engine.Current.Resolve<ISettingsRepository>();
-                privateKey += _settings.Get<string>("Hood.Api.SystemPrivateKey");
+                privateKey += Engine.Settings["Hood.Api.SystemPrivateKey"];
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(privateKey));

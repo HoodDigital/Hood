@@ -1,0 +1,26 @@
+@inject IConfiguration Config
+<!DOCTYPE html>
+<html>
+<head>
+    <partial name="_Metas_Base" />
+    <title>@ViewData["Title"]</title>
+    @RenderSection("metas", required: false)
+    <partial name="_Styles_Login" />
+    @RenderSection("styles", required: false)
+</head>
+<body class="@ViewData["BodyClass"]">
+    <div class="login-block">
+        <header>
+            <a href="/">
+                <img src="~/hood/images/hood-cms.png" alt="@Engine.Settings.Basic.FullTitle" />
+            </a>
+        </header>
+        @RenderBody()
+        <footer>
+            <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
+        </footer>
+    </div>
+    <partial name="_Scripts_Login" />
+    @RenderSection("scripts", required: false)
+</body>
+</html>

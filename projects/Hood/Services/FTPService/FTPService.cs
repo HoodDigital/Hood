@@ -8,13 +8,13 @@ namespace Hood.Services
     public class FTPService : IFTPService
     {
 
-        private ReaderWriterLock Lock;
+        private readonly ReaderWriterLock Lock;
         private bool Running;
         private double Complete;
         private byte[] Buffer;
         private long TotalBytes;
         private long BytesTransferred;
-        private int BufferSize;
+        private readonly int BufferSize;
         private string StatusMessage;
         private bool Cancelled;
         private bool Success;
@@ -110,7 +110,7 @@ namespace Hood.Services
                     }
 
                     outputStream = new FileStream(destination + filename, FileMode.OpenOrCreate);
-                    FtpWebRequest reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(server + filename));
+                    FtpWebRequest reqFTP = (FtpWebRequest)WebRequest.Create(new Uri(server + filename));
                     reqFTP.Method = WebRequestMethods.Ftp.DownloadFile;
                     reqFTP.UseBinary = true;
                     reqFTP.Credentials = new NetworkCredential(username, password);

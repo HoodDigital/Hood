@@ -1,0 +1,74 @@
+@model SubscriptionProductListModel
+@{
+    ViewBag.Title = "Product Groups";
+}
+@section buttons {
+    <a class="btn btn-success hood-modal" asp-action="CreateProduct" data-complete="$.hood.Subscriptions.Products.Create">
+        <i class="fa fa-user-plus mr-2"></i>
+        Create New
+    </a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+         <a class="dropdown-item" asp-action="Select" asp-controller="Subscriptions" asp-area="" target="_blank">
+            <i class="fab fa-stripe-s mr-2"></i>Pricing Page
+        </a>
+        <div class="dropdown-divider"></div>
+       <a class="dropdown-item" asp-action="Plans">
+            <i class="fa fa-award mr-2"></i>Plans
+        </a>
+        <a class="dropdown-item" asp-action="Stripe">
+            <i class="fab fa-stripe-s mr-2"></i>Connected Stripe Plans
+        </a>
+        <a class="dropdown-item" asp-action="StripeProducts">
+            <i class="fab fa-stripe-s mr-2"></i>Connected Stripe Products
+        </a>
+                <li><a asp-action="Select" asp-controller="Subscriptions">Pricing</a></li>
+    </div>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+}
+<form class="inline" data-target="#subscriptions-products-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="subscriptions-products-list" class="hood-inline-list refresh query" data-url="@Url.Action("ProductsList")" data-complete="$.hood.Subscriptions.Lists.Products.Loaded">
+                <partial name="_List_Products" />
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="subscription-products-filters-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#subscription-products-filters-panel" href="#subscription-products-filters-panel" aria-expanded="true" aria-controls="subscription-products-filters-panel">
+                            Search Filters
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body collapse show" aria-labelledby="subscription-products-filters-panel-heading" id="subscription-products-filters-panel">
+                   <div class="form-product floating-label">
+                        <label asp-for="Search"></label>
+                        <select class="form-control refresh-on-change" asp-for="Order">
+                            <optproduct label="Product">
+                                <option value="Title">Title/Name (A-Z)</option>
+                                <option value="TitleDesc">Title/Name (Z-A)</option>
+                            </optproduct>
+                        </select>
+                        <small asp-for="Search"></small>
+                    </div>
+                   <div class="form-product floating-label mb-0">
+                        <label asp-for="Search"></label>
+                        <input asp-for="Search" class="form-control">
+                        <small asp-for="Search"></small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-block"> Search!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

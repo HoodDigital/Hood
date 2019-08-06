@@ -1,22 +1,19 @@
 using Hood.Controllers;
-using Hood.Enums;
-using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
-    public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    [Authorize(Roles = "SuperUser,Admin")]
+    public class ApiController : BaseController
     {
         public ApiController()
             : base()
@@ -24,7 +21,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/api/keys/manage/")]
-        public async Task<IActionResult> Index(ApiKeyModel model, EditorMessage? message)
+        public async Task<IActionResult> Index(ApiKeyModel model)
         {
             IQueryable<ApiKey> apiKeys = _db.ApiKeys
                 .Include(f => f.User)
@@ -63,7 +60,6 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             await model.ReloadAsync(apiKeys);
-            model.AddEditorMessage(message);
             return View(model);
         }
 
@@ -91,19 +87,19 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Add(model);
                 await _db.SaveChangesAsync();
-
-                var response = new Response(true, "Created successfully.");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Created });
-                return response;
+    #warning TODO: Handle response in JS.
+                return new Response(true, "Created successfully.");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                var message = $"Error creating an API key";
+                await _logService.AddExceptionAsync<ApiController>(message, ex);
+                return new Response(ex, message);
             }
         }
 
         [Route("admin/api/keys/activate/{id}/")]
-        [HttpPost()]
+        [HttpPost]
         public async Task<Response> Activate(string id)
         {
             try
@@ -115,19 +111,18 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Update(model);
                 await _db.SaveChangesAsync();
-
-                var response = new Response(true, "Activated successfully.");
-                response.Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Activated });
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Activated successfully.");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                await _logService.AddExceptionAsync<ApiController>($"Error activating an API key", ex);
+                return new Response(ex);
             }
         }
 
         [Route("admin/api/keys/deactivate/{id}")]
-        [HttpPost()]
+        [HttpPost]
         public async Task<Response> Deactivate(string id)
         {
             try
@@ -139,18 +134,16 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.ApiKeys.Update(model);
                 await _db.SaveChangesAsync();
-
-                var response = new Response(true, "Deactivated successfully.");
-                response.Url = Url.Action("Index", new { id = model.Id, message = EditorMessage.Deactivated });
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Deactivated successfully.");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                return await ErrorResponseAsync<ApiController>($"Error deactivating an API key.", ex);
             }
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("admin/api/keys/delete/{id}")]
         public async Task<Response> Delete(string id)
         {
@@ -163,14 +156,12 @@ namespace Hood.Areas.Admin.Controllers
 
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
-
-                var response = new Response(true, "Deleted!");
-                response.Url = Url.Action("Index", new { message = EditorMessage.Deleted });
-                return response;
+#warning TODO: Handle response in JS.
+                return new Response(true, "Deleted!");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                return await ErrorResponseAsync<ApiController>($"Error deleting an API key.", ex);
             }
         }
 

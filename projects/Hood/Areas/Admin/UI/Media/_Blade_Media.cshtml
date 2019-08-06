@@ -1,0 +1,84 @@
+@model MediaObject
+@{
+    Layout = null;
+}
+<div class="modal fade modal-right media-blade" id="@string.Format("media-object-{0}", Model.Id)" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <div>
+                    <h5 class="modal-title">
+                        @Model.GenericFileType.ToString() File
+                    </h5>
+                    <p class="m-0 text-muted">
+                        <i class="fa fa-file mr-2"></i> @Model.Filename
+                    </p>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @switch (Model.GenericFileType)
+                {
+                    case GenericFileType.Audio:
+                        <video id="mediaplayer-@Model.Id"
+                                class="hood-media mediaplayer audio azuremediaplayer amp-default-skin always-show-controls embed-responsive-item mb-3"
+                                tabindex="0"
+                                seeking
+                                data-id="@Model.Id"
+                                data-file="@Model.DownloadUrlHttps"
+                                data-type="@Model.FileType"></video>
+                        break;
+                    case GenericFileType.Video:
+                        <div class="embed-responsive embed-responsive-16by9 mb-3">
+                            <video id="mediaplayer-@Model.Id"
+                                   class="hood-media mediaplayer video azuremediaplayer amp-default-skin vjs-fluid amp-big-play-centered embed-responsive-item"
+                                   tabindex="0"
+                                   seeking data-id="@Model.Id"
+                                   data-file="@Model.DownloadUrlHttps"
+                                   data-type="@Model.FileType"></video>
+                        </div>
+                        break;
+                    case GenericFileType.Image:
+                        <img src="@Model.LargeUrl" class="img img-wide img-full rounded mx-auto d-block mb-3" alt="@Model.Filename" />
+                        <display asp-for="ThumbUrl"></display>
+                        <display asp-for="SmallUrl"></display>
+                        <display asp-for="MediumUrl"></display>
+                        <display asp-for="LargeUrl"></display>
+                        break;
+                }
+                <display asp-for="DownloadUrlHttps"></display>
+                <display asp-for="FormattedSize"></display>
+                <display asp-for="Directory.DisplayName"></display>
+                <display asp-for="BlobReference"></display>
+                <display asp-for="CreatedOn"></display>
+                <display asp-for="UniqueId"></display>
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" data-id="@Model.Id" class="btn btn-xs btn-danger media-delete">Delete</a>
+                @switch (Model.GenericFileType)
+                {
+                    case GenericFileType.Image:
+                        <div class="btn-group dropup">
+                            <button data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle" aria-expanded="true">Download <span class="caret"></span></button>
+                            <div class="dropdown-menu p-2 dropdown-menu-right" style="width:13rem;">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item"><a class="nav-link" target="_blank" href="@Model.ThumbUrl"><i class="fa fa-save"></i> Download Thumbnail</a></li>
+                                    <li class="nav-item"><a class="nav-link" target="_blank" href="@Model.SmallUrl"><i class="fa fa-save"></i> Download Small</a></li>
+                                    <li class="nav-item"><a class="nav-link" target="_blank" href="@Model.MediumUrl"><i class="fa fa-save"></i> Download Medium</a></li>
+                                    <li class="nav-item"><a class="nav-link" target="_blank" href="@Model.LargeUrl"><i class="fa fa-save"></i> Download Large</a></li>
+                                    <li class="divider"></li>
+                                    <li class="nav-item"><a class="nav-link" target="_blank" href="@Model.DownloadUrlHttps"><i class="fa fa-save"></i> Download Original</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        break;
+                    default:
+                        <a target="_blank" href="@Model.DownloadUrlHttps" class="btn btn-xs btn-default"><i class="fa fa-save"></i> Download</a>
+                        break;
+                }
+            </div>
+        </div>
+    </div>
+</div>

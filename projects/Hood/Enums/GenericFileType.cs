@@ -7,11 +7,18 @@
         Word,
         Photoshop,
         Excel,
-        Unknown,
         PowerPoint,
         Directory,
         Audio,
-        Video
+        Video,
+        Unknown
     }
 
+    public enum MediaWindowAction
+    {
+        View, 
+        Select,
+        Attach,
+        Insert
+    }
 }

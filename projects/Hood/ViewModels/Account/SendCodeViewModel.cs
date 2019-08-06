@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class SendCodeViewModel
     {

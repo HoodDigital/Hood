@@ -5,6 +5,7 @@ using System.IO;
 
 namespace Hood.Infrastructure
 {
+    [Obsolete("Use Hood.Models.Response from now on.", false)]
     public class OperationResult<TObject> : OperationResult
     {
         public TObject Item { get; set; }
@@ -16,6 +17,7 @@ namespace Hood.Infrastructure
         }
     }
 
+    [Obsolete("Use Hood.Models.Response from now on.",false)]
     public class OperationResult
     {
         public Exception Exception { get; set; }
@@ -110,6 +112,7 @@ namespace Hood.Infrastructure
         }
     }
 
+    [Obsolete("Use Hood.Models.Response from now on.", false)]
     public class OperationError
     {
         /// <summary>

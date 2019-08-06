@@ -1,14 +1,12 @@
 ﻿using Hood.Entities;
 using Hood.Extensions;
 using Hood.Services;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Hood.Models
 {
@@ -27,7 +25,6 @@ namespace Hood.Models
 
         // Author
         public string AuthorId { get; set; }
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Author { get; set; }
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
@@ -51,7 +48,6 @@ namespace Hood.Models
         public DateTime? EditedTime { get; set; }
         public string EditedById { get; set; }
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser EditedBy { get; set; }
 
         public bool Deleted { get; set; }
@@ -59,7 +55,6 @@ namespace Hood.Models
         public DateTime? DeletedTime { get; set; }
         public string DeletedById { get; set; }
 
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser DeletedBy { get; set; }
 
         [NotMapped]

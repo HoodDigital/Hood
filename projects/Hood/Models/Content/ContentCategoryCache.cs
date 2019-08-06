@@ -1,7 +1,12 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -13,18 +18,15 @@ namespace Hood.Caching
     public class ContentCategoryCache
     {
         private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
-
         private Lazy<Dictionary<int, ContentCategory>> byKey;
         private Dictionary<string, Lazy<Dictionary<string, ContentCategory>>> bySlug;
         private Lazy<ContentCategory[]> topLevel;
 
-        public ContentCategoryCache(IConfiguration config,
-                                    ISettingsRepository settings,
-                                    IEventsService events)
+        public ContentCategoryCache(
+            IConfiguration config,
+            IEventsService events)
         {
             _config = config;
-            _settings = settings;
             EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
             {
                 ResetCache();
@@ -46,7 +48,13 @@ namespace Hood.Caching
             return bySlug[contentType].Value[slug];
         }
 
-        public int Count { get { return byKey.Value.Count; } }
+        public int Count(string type)
+        {
+            if (type.IsSet())
+                return bySlug[type].Value.Count;
+            else
+                return byKey.Value.Count;
+        }
 
         public void ResetCache()
         {
@@ -65,12 +73,12 @@ namespace Hood.Caching
                             ParentCategoryId = d.ParentCategoryId,
                             ParentCategory = d.ParentCategory,
                             Children = d.Children,
-                            Count = d.Content.Where(c => c.Content.Status == (int)Status.Published).Count(),
+                            Count = d.Content.Where(c => c.Content.Status == ContentStatus.Published).Count(),
                         };
                 return q.ToDictionary(c => c.Id);
             });
 
-            ContentSettings contentSettings = _settings.GetContentSettings();
+            ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<string, ContentCategory>>>();
             foreach (var type in contentSettings.Types.Where(t => t.Enabled))
             {
@@ -89,7 +97,7 @@ namespace Hood.Caching
                                     ParentCategoryId = d.ParentCategoryId,
                                     ParentCategory = d.ParentCategory,
                                     Children = d.Children,
-                                    Count = d.Content.Where(c => c.Content.Status == (int)Status.Published).Count(),
+                                    Count = d.Content.Where(c => c.Content.Status == ContentStatus.Published).Count(),
                                 };
                         return q.ToDictionary(c => c.Slug);
                     })
@@ -149,7 +157,7 @@ namespace Hood.Caching
                     var category = FromKey(key);
 
                     htmlOutput += "<li>";
-                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-category\">", contentSlug, category.Slug);
+                    htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-categories\">", contentSlug, category.Slug);
                     htmlOutput += string.Format("{0} <span>{1}</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";
                     htmlOutput += ContentCategoryTree(category.Children, contentSlug);
@@ -203,23 +211,40 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<tr>";
-                    htmlOutput += "<td>";
+                    string carets = "";
                     for (int i = 0; i < startingLevel; i++)
                     {
-                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                        carets += "<i class='fa fa-caret-right mr-1'></i>";
                     }
-                    htmlOutput += string.Format("<a href=\"/admin/content/{0}/manage?category={1}\" class=\"content-category\">", contentType, category.Slug);
-                    htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
-                    htmlOutput += "</a>";
-                    htmlOutput += " <small>[" + category.Slug + "]</small>";
-                    htmlOutput += "</td>";
-                    htmlOutput += "<td class='text-right'>";
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-content-category action-button\" data-id=\"{0}\" data-type=\"{1}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id, category.ContentType);
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-content-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
-                    htmlOutput += "</td>";
+
+                    htmlOutput += $@"
+                        <div class='list-group-item list-group-item-action p-0'>
+                            <div class='custom-control custom-checkbox d-flex'>
+                                <input class='custom-control-input refresh-on-change'
+                                       id='Category-{category.Slug}' name='categories'
+                                       type='checkbox'
+                                       value='{category.Slug}' />
+                                <label class='custom-control-label col m-2 mt-1 mb-1' for='Category-{category.Slug}'>
+                                    {carets}{category.DisplayName} <span>({category.Count})</span>
+                                </label>
+                                <div class='col-auto p-2'>
+                                    <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
+                                        <i class='fa fa-edit'></i><span>
+                                            Edit
+                                        </span>
+                                    </a>
+                                    <a class='btn-link text-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
+                                        <i class='fa fa-trash'></i>
+                                        <span>
+                                            Delete
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>";
+
                     htmlOutput += AdminContentCategoryTree(category.Children, contentType, startingLevel + 1);
-                    htmlOutput += "</tr>";
+
                 }
             }
 
@@ -237,14 +262,42 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<div class=\"checkbox\">";
+                    string carets = "";
                     for (int i = 0; i < startingLevel; i++)
                     {
-                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                        carets += "<i class='fa fa-caret-right mr-1'></i>";
                     }
-                    htmlOutput += string.Format("<input class=\"styled content-category-check\" id=\"content-category-check-{1}\" name=\"content-category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", content.Id, category.Id, content.IsInCategory(category.Id) ? "checked" : "");
-                    htmlOutput += string.Format("<label for=\"content-category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
-                    htmlOutput += "</div>";
+
+                    string check = content.Categories.Any(c => c.CategoryId == category.Id) ? "checked" : "";
+
+                    htmlOutput += $@"
+                        <div class='list-group-item list-group-item-action p-0'>
+                            <div class='custom-control custom-checkbox d-flex'>
+                                <input class='custom-control-input content-categories-check'
+                                       id='content-categories-check-{category.Id}'
+                                       name='content-categories-check-{category.Id}'
+                                       type='checkbox'
+                                       data-url='/admin/content/{content.Id}/categories/toggle'
+                                       value='{category.Id}' {check} />
+                                <label class='custom-control-label col m-2 mt-1 mb-1' for='content-categories-check-{category.Id}'>
+                                    {carets}{category.DisplayName} <span>({category.Count})</span>
+                                </label>
+                                <div class='col-auto p-2'>
+                                    <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
+                                        <i class='fa fa-edit'></i><span>
+                                            Edit
+                                        </span>
+                                    </a>
+                                    <a class='btn-link text-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
+                                        <i class='fa fa-trash'></i>
+                                        <span>
+                                            Delete
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>";
+
                     htmlOutput += AddToCategoryTree(category.Children, content, contentSlug, startingLevel + 1);
                 }
             }

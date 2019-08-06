@@ -1,5 +1,4 @@
-﻿using Hood.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Hood.ViewModels
 {

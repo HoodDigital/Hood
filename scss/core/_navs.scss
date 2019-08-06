@@ -1,0 +1,29 @@
+.nav-pills {
+    &.nav-buttons {
+        .nav-link {
+            border-radius: 0.25rem;
+            background: $gray-200;
+            margin-bottom: .2rem;
+
+            &.active {
+                background: $primary;
+                color: white;
+            }
+        }
+    }
+}
+.dropdown-menu {
+    .dropdown-item {
+        padding: .5rem 2rem;
+        padding-left: 1.5rem;
+
+        i {
+            padding: 0.5rem;
+            padding-left: 0;
+        }
+    }
+
+    a {
+        cursor: pointer;
+    }
+}

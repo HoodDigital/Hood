@@ -9,8 +9,7 @@ namespace Hood.Web
         public static void Main(string[] args)
         {
             IWebHost host = BuildWebHost(args);
-            host.InstallDatabase<ApplicationDbContext>();
-            host.Run();
+            host.LoadHood<ApplicationDbContext>().Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

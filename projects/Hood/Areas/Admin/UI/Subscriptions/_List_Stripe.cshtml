@@ -1,0 +1,112 @@
+@model StripePlanListModel
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var stripePlan in Model.List)
+    {
+        var plan = stripePlan.SubscriptionPlan;
+
+        <div class="card hover mb-3 p-3">
+            <div class="row no-gutters align-items-center">
+                @if (plan != null)
+                {
+                    <div class="col-auto">
+                        <a asp-action="ManageStripesubscription" asp-route-id="@stripePlan.Id">
+                            <fixedImage src="@plan.FeaturedImage.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@plan.Name"></fixedImage>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-auto">
+                        <a asp-action="ManageStripesubscription" asp-route-id="@stripePlan.Id">
+                            <fixedImage src="" class="img img-circle img-sm m-2 mr-4" alt="@stripePlan.Nickname"></fixedImage>
+                        </a>
+                    </div>
+                }
+                <div class="col">
+                    <div class="mb-1">
+                        <h5 class="card-title d-lg-inline">
+                            <a asp-action="ManageStripesubscription" asp-route-id="@stripePlan.Id">
+                                @if (plan != null)
+                                {
+                                    <span><i class="fa fa-link mr-2"></i>@plan.Name</span>
+                                }
+                                else
+                                {
+                                    if (!stripePlan.Nickname.IsSet())
+                                    {
+                                        <span><i class="fa fa-unlink mr-2"></i>Unnamed Subscription Plan</span>
+                                    }
+                                    else
+                                    {
+                                        <span><i class="fa fa-unlink mr-2"></i>@stripePlan.Nickname</span>
+                                    }
+                                }
+                            </a>
+                        </h5>
+                        <small class="ml-2 badge badge-dark d-lg-inline">@stripePlan.Id</small>
+                    </div>
+                    <p class="card-text mb-1">
+                        Price:
+                        <strong>@stripePlan.Price()</strong>
+                    </p>
+                    <p class="card-text mb-0">
+                        @if (stripePlan.TrialPeriodDays > 0)
+                        {
+                            <small class="d-block text-info">
+                                Trial Period:
+                                <strong>@stripePlan.TrialPeriodDays days</strong>
+                            </small>
+                        }
+                        else
+                        {
+                            <small class="d-block text-warning">
+                                <i class="fa fa-exclamation-triangle mr-2"></i>No trial.
+                            </small>
+                        }
+                    </p>
+                    @if (plan != null)
+                    {
+                        <p class="card-text mb-0">
+                            <small class="ml-1 badge badge-success">@plan.ActiveCount Active</small>
+                            <small class="ml-1 badge badge-warning">@plan.TrialCount Trials</small>
+                            <small class="ml-1 badge badge-danger">@plan.InactiveCount Inactive</small>
+                            <small class="ml-1 badge badge-dark">@plan.TotalCount Total</small>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-danger mt-2 mb-0">
+                            <i class="fa fa-exclamation-triangle mr-2"></i>This plan is not linked to a subscription plan on this site, click Sync to connect it.
+                        </p>
+                    }
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="SyncPlan" asp-route-stripeId="@stripePlan.Id" asp-route-id="@stripePlan.SubscriptionPlanId">
+                            <i class="fa fa-sync-alt"></i>
+                            Sync with Stripe
+                        </a>
+                        <a class="dropdown-item" href="@($"https://dashboard.stripe.com/plans/{stripePlan.Id}")" target="_blank">
+                            <i class="fa fa-edit"></i>
+                            Manage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        No results found.
+    </alert>
+}

@@ -1,42 +1,44 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
+using Hood.ViewModels;
 
-// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
-    public class ThemesController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    [Authorize(Roles = "SuperUser,Admin")]
+    public class ThemesController : BaseController
     {
         public ThemesController()
             : base()
         {
         }
 
+        [Route("admin/theme/")]
+        public IActionResult Index(ThemeListView model) => List(model, "Index");
+        [Route("admin/theme/list/")]
+        public IActionResult List(ThemeListView model, string viewName = "_List_Themes")
+        {
+            model.Reload(_themeService.Themes);
+            return View(viewName, model);
+        }
+
         [HttpPost()]
         [Route("admin/themes/activate/")]
-        public Response Activate(string name)
+        public async Task<Response> Activate(string name)
         {
             try
             {
-                // set the site theme
-                bool res = _settings.Set("Hood.Settings.Theme", name);
-                if (res)
-                {
-                    return new Response(true);
-                }
-                else
-                {
-                    throw new Exception("The database could not be updated, please try later.");
-                }
+                Engine.Settings.Set(name, "Hood.Settings.Theme");
+                return new Response(true, $"The theme, {name}, has been activated successfully.");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                return await ErrorResponseAsync<ThemesController>($"Error activating a theme.", ex);
             }
         }
 

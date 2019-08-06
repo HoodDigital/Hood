@@ -4,22 +4,21 @@ using Hood.Interfaces;
 using Geocoding;
 using Geocoding.Google;
 using Hood.Extensions;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class AddressService : IAddressService
     {
-        private readonly ISettingsRepository _settings;
 
-        public AddressService(ISettingsRepository site)
+        public AddressService()
         {
-            _settings = site;
         }
 
         public GoogleAddress GeocodeAddress(IAddress address)
         {
-            var key = _settings.GetIntegrationSettings().GoogleMapsApiKey;
-            if (!key.IsSet() || !_settings.GetIntegrationSettings().EnableGoogleGeocoding)
+            var key = Engine.Settings.Integrations.GoogleMapsApiKey;
+            if (!key.IsSet() || !Engine.Settings.Integrations.EnableGoogleGeocoding)
                 return null;
 
             IGeocoder geocoder = new GoogleGeocoder() { ApiKey = key };

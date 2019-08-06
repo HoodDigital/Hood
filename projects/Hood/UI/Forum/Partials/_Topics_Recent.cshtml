@@ -15,7 +15,7 @@
                 <div class="media-body">
                     <h5 class="media-heading"><a class="title-link" href="@forum.Url">@forum.Title</a></h5>
                     <small>
-                        <i class="m-r-xs fa fa-user"></i>@forum.Author.FullName
+                        <i class="m-r-xs fa fa-user"></i>@forum.Author.ToDisplayName()
                         <i class="m-r-xs m-l-sm fa fa-clock-o"></i>@forum.CreatedOn.ToLongDateString()
                     </small>
                 </div>

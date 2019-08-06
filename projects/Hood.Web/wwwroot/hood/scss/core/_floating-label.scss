@@ -1,0 +1,115 @@
+﻿.floating-label {
+    position: relative;
+
+    > input,
+    > select,
+    > label {
+        height: 3.5rem;
+        padding: 1rem .5rem;
+    }
+
+    > textarea {
+        min-height: 6rem;
+        padding: .75rem;
+    }
+
+    > label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        margin-bottom: 0; /* Override default `<label>` margin */
+        line-height: 1.5;
+        color: $gray-400;
+        pointer-events: none;
+        cursor: text; /* Match the input under the label */
+        border: 1px solid transparent;
+        border-radius: .25rem;
+        transition: all .1s ease-in-out;
+        font-weight: $font-weight-normal;
+
+        &.error {
+            color: $danger;
+            position: relative;
+            top: auto;
+            bottom: auto;
+            padding: .25rem;
+            height: auto;
+            font-size: .7rem;
+        }
+
+        &.success {
+            color: $success;
+            position: relative;
+            top: auto;
+            bottom: auto;
+            padding: .25rem;
+            height: auto;
+            font-size: .7rem;
+        }
+    }
+
+    input, textarea, select {
+        &:-internal-autofill-selected {
+            background-color: transparent !important;
+            background-image: none !important;
+        }
+
+        &::-webkit-input-placeholder {
+            color: transparent;
+        }
+
+        &:-ms-input-placeholder {
+            color: transparent;
+        }
+
+        &::-ms-input-placeholder {
+            color: transparent;
+        }
+
+        &::-moz-placeholder {
+            color: transparent;
+        }
+
+        &::placeholder {
+            color: transparent;
+        }
+
+        &:not(:placeholder-shown) {
+            padding-top: 1.5rem;
+            padding-bottom: .35rem;
+        }
+
+        &:not(:placeholder-shown) ~ label, select ~ label {
+            padding-top: .35rem;
+            padding-bottom: .35rem;
+            font-size: 12px;
+            color: $teal;
+        }
+    }
+}
+
+/* Fallback for IE */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .floating-label > label {
+        display: none;
+    }
+
+    .floating-label input:-ms-input-placeholder {
+        color: #777;
+    }
+}
+
+/* Fallback for Edge */
+@supports (-ms-ime-align: auto) {
+    .floating-label {
+        > label {
+            display: none;
+        }
+
+        input::-ms-input-placeholder {
+            color: #777;
+        }
+    }
+}

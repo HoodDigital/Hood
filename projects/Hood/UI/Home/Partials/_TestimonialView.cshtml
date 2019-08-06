@@ -1,7 +1,4 @@
 @model ContentModel
-<div class="m-b-lg">
-    @{ await Html.RenderPartialAsync("_NeighbourPosts"); }
-</div>
 <div class="row">
     <div class="col-sm-8">
         <div class="blog-post mb-30">
@@ -9,18 +6,24 @@
             @if (Model.Content.Author != null)
             {
                 <p>
-                    <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), Model.Content.Author.UserName)">@Model.Content.Author.FullName</a></span>
+                    <span class="m-r-sm"><i class="fa fa-user"></i> <a href="@string.Format("/{0}/author/{1}", Model.ContentType.Type.ToLower(), Model.Content.Author.UserName)">@Model.Content.Author.ToDisplayName()</a></span>
                     <span><i class="fa fa-clock-o"></i> @Model.Content.PublishDate.ToLongDateString() at @Model.Content.PublishDate.ToShortTimeString()</span>
                 </p>
             }
             <p>@Model.Content.Excerpt</p>
-            <p class="text-muted"><em>@Model.Content.TagString</em></p>
-            @{ await Html.RenderPartialAsync("_FeaturedMedia", Model.Content); }
+            <partial name="_FeaturedMedia" model="Model.Content" />
             <p><a href="#post-content" class="scroll-to-target">Read on...</a></p>
             <hr />
             <div id="share"></div>
             <div id="post-content">
-                @{ await Html.RenderPartialAsync("_EditableContent"); }
+                @if (Model.Content.Body.IsSet())
+                {
+                    <partial name="_EditableContent" />
+                }
+                else
+                {
+                    <alert type="Info">Nothing to see here just yet.</alert>
+                }
             </div>
             <div id="gallery">
                 @foreach (var media in Model.Content.Media)
@@ -31,15 +34,13 @@
                 }
             </div>
         </div>
-        <hr />
-        @{ await Html.RenderPartialAsync("_Author"); }
-        <hr />
-        @{ await Html.RenderPartialAsync("_Disqus"); }
+        <partial name="_Author" />
+        <partial name="_Disqus" />
     </div>
     <div class="col-sm-4">
-        @{ await Html.RenderPartialAsync("_Sidebar"); }
+        <partial name="_Sidebar" />
     </div>
 </div>
 <div class="m-t-lg">
-    @{ await Html.RenderPartialAsync("_NeighbourPosts"); }
+    <partial name="_NeighbourPosts" />
 </div>

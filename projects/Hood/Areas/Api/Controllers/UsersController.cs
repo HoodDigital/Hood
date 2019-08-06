@@ -3,19 +3,17 @@ using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Hood.Areas.Api.Controllers
 {
     [Area("Api")]
-    public class UsersController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class UsersController : BaseController
     {
         public UsersController()
             : base()

@@ -1,17 +1,13 @@
-﻿using Hood.Extensions;
-using Hood.Interfaces;
+﻿using Hood.Interfaces;
+using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class PostModel : PagedList<Post>, IPageableModel
     {
         // Params
-        [FromQuery(Name = "sort")]
-        public string Order { get; set; }
-        [FromQuery(Name = "search")]
-        public string Search { get; set; }
         [FromRoute(Name = "slug")]
         public string Slug { get; set; }
         [FromRoute(Name = "topicId")]
@@ -34,11 +30,9 @@ namespace Hood.Models
 
         public List<Topic> Recent { get; set; }
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
-            query += Search.IsSet() ? "&search=" + Search : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
+            var query = base.GetPageUrl(pageIndex);
             return query;
         }
 

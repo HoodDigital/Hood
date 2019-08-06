@@ -1,4 +1,6 @@
-﻿namespace Hood.Models
+﻿using Hood.Models;
+
+namespace Hood.ViewModels
 {
     public class BlockContent : ContentBlockSettings
     {

@@ -1,5 +1,4 @@
 ﻿using Hood.Enums;
-using Hood.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 
@@ -87,22 +86,6 @@ namespace Hood.Extensions
                 default:
                     return GenericFileType.Unknown;
             }
-
         }
-
-        public static OperationResult CheckImage(this IFormFile file)
-        {
-            OperationResult result = new OperationResult(true);
-
-            // Check the file, every time an error is found, flag the result, and add to the error list
-            if (file.ContentType.ToFileType() != GenericFileType.Image)
-                result.AddError("The provided file is not a valid image of type JPG, GIF or PNG.");
-
-            if (file.Length > 6 * Megabyte)
-                result.AddError("The provided file is over 6Mb in size, this is inadvisable for an image file.");
-
-            return result;
-        }
-
     }
 }

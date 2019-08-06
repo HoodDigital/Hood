@@ -1,0 +1,74 @@
+@using Hood.Enums
+@model BillingMessage?
+<div class="row">
+    <div class="col-xs-12 text-center">
+        @switch (Model)
+        {
+            case BillingMessage.Error:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />There was an error updating or changing your subscription. Please try again.<br />An unspecified error occurred.</p>
+                </div>
+                break;
+            case BillingMessage.SubscriptionCreated:
+                <div class="alert alert-success">
+                    <p><i class="fa fa-thumbs-up fa-4x m-b-md"></i><br />Your subscription has been created and is ready to use right away!</p>
+                </div>
+                break;
+            case BillingMessage.SubscriptionExists:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />You are already actively subscribed to this subscription plan!</p>
+                </div>
+                break;
+            case BillingMessage.SubscriptionReactivated:
+                <div class="alert alert-success">
+                    <p><i class="fa fa-refresh fa-4x m-b-md"></i><br />Your subscription has been re-activated. Changes to your access will be active right away.</p>
+                </div>
+                break;
+            case BillingMessage.SubscriptionUpdated:
+                <div class="alert alert-success">
+                    <p><i class="fa fa-thumbs-up fa-4x m-b-md"></i><br />Your subscription has been updated. Changes to your access will be active right away.</p>
+                </div>
+                break;
+            case BillingMessage.SubscriptionCancelled:
+                <div class="alert alert-warning">
+                    <p><i class="fa fa-hourglass-end fa-4x m-b-md"></i><br />Your subscription has been cancelled. You will no longer be billed, however your access will continue until your current billing cycle ends.</p>
+                </div>
+                break;
+            case BillingMessage.SubscriptionEnded:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-ban fa-4x m-b-md"></i><br />Your subscription has been ended. Changes to your access will be active right away.</p>
+                </div>
+                break;
+            case BillingMessage.NoCustomerObject:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />There was an error updating or changing your subscription. Please try again.<br />Could not create your Stripe customer reference.</p>
+                </div>
+                break;
+            case BillingMessage.NoStripeId:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />There was an error updating or changing your subscription. Please try again.<br />There is no Stripe account linked to your account.</p>
+                </div>
+                break;
+            case BillingMessage.NoSubscription:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />You cannot access this without an active subscription, please upgrade your account to view this area.</p>
+                </div>
+                break;
+            case BillingMessage.NoPaymentSource:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />You cannot upgrade your account as you do not have a valid payment source, please enter a valid credit or debit card to create your subscription.</p>
+                </div>
+                break;
+            case BillingMessage.UpgradeRequired:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />You cannot access this with your current subscription, please upgrade your subscription to view this area.</p>
+                </div>
+                break;
+            case BillingMessage.InvalidToken:
+                <div class="alert alert-danger">
+                    <p><i class="fa fa-exclamation-triangle fa-4x m-b-md"></i><br />The provided credit/debit card token is invalid.</p>
+                </div>
+                break;
+        }
+    </div>
+</div>

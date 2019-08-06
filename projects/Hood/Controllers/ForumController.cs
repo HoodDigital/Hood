@@ -1,12 +1,13 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public class ForumController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ForumController : BaseController
     {
         public ForumController()
             : base()
@@ -25,7 +26,7 @@ namespace Hood.Controllers
 
         [Route("forums/")]
         [ForumAuthorize(ForumAccess.View)]
-        public async Task<IActionResult> Index(ForumModel model, ForumMessage? message)
+        public async Task<IActionResult> Index(ForumModel model)
         {
             IQueryable<Forum> forums = _db.Forums
                 .Include(f => f.Author)
@@ -77,13 +78,12 @@ namespace Hood.Controllers
             }
 
             await model.ReloadAsync(forums);
-            model.AddForumMessage(message);
             return View(model);
         }
 
         [Route("forum/{slug}")]
         [ForumAuthorize(ForumAccess.View)]
-        public async Task<IActionResult> Topics(TopicModel model, ForumMessage? message)
+        public async Task<IActionResult> Topics(TopicModel model)
         {
             if (model.Forum == null)
                 model.Forum = await _db.Forums
@@ -110,9 +110,6 @@ namespace Hood.Controllers
             }
 
             await model.ReloadAsync(topics);
-
-            if (!model.SaveMessage.IsSet())
-                model.AddForumMessage(message);
 
             return View("Topics", model);
         }
@@ -155,8 +152,8 @@ namespace Hood.Controllers
                 }
                 var user = await _userManager.GetUserAsync(User);
                 model.Topic.AuthorId = user.Id;
-                model.Topic.AuthorDisplayName = user.FullName;
-                model.Topic.AuthorName = user.UserName;
+                model.Topic.AuthorDisplayName = user.ToDisplayName();
+                model.Topic.AuthorName = user.ToFullName();
                 model.Topic.ForumId = model.Forum.Id;
                 model.Topic.CreatedOn = DateTime.Now;
 
@@ -174,19 +171,21 @@ namespace Hood.Controllers
                 model.Forum.NumTopics = await _db.Topics.CountAsync(f => f.ForumId == model.Topic.ForumId);
                 await _db.SaveChangesAsync();
 
+                SaveMessage = $"The topic was added successfully.";
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.MessageType = AlertType.Danger;
-                model.SaveMessage = "An error occured while adding your message: " + ex.Message;
+                MessageType = AlertType.Danger;
+                SaveMessage = "An error occured while adding your message: " + ex.Message;
             }
 
-            return await Topics(model, ForumMessage.Created);
+            return await Topics(model);
         }
 
         [Route("forum/{slug}/{topicId}/{title}/")]
         [ForumAuthorize(ForumAccess.View)]
-        public async Task<IActionResult> ShowTopic(PostModel model, ForumMessage? message)
+        public async Task<IActionResult> ShowTopic(PostModel model)
         {
             if (model.Topic == null)
                 model.Topic = await _db.Topics
@@ -239,14 +238,13 @@ namespace Hood.Controllers
 
             await model.ReloadAsync(posts);
 
-            model.AddForumMessage(message);
             return View("ShowTopic", model);
         }
 
         [HttpPost]
         [Route("forum/{slug}/{topicId}/{title}/")]
         [ForumAuthorize(ForumAccess.Post)]
-        public async Task<IActionResult> AddPost(PostModel model, ForumMessage? message)
+        public async Task<IActionResult> AddPost(PostModel model)
         {
             try
             {
@@ -264,16 +262,16 @@ namespace Hood.Controllers
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (model.Post == null)
                 {
-                    model.MessageType = AlertType.Danger;
-                    model.SaveMessage = "No topic was submitted.";
-                    return await ShowTopic(model, null);
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "No topic was submitted.";
+                    return await ShowTopic(model);
                 }
 
                 if (!model.Post.Body.IsSet())
                 {
-                    model.MessageType = AlertType.Danger;
-                    model.SaveMessage = "You have to enter a message.";
-                    return await ShowTopic(model, null);
+                    MessageType = AlertType.Danger;
+                    SaveMessage = "You have to enter a message.";
+                    return await ShowTopic(model);
                 }
 
                 var user = await _userManager.GetUserAsync(User);
@@ -282,7 +280,7 @@ namespace Hood.Controllers
                 model.Post.Signature = user.ForumSignature;
                 model.Post.PostedTime = DateTime.Now;
                 model.Post.AuthorIp = HttpContext.Connection.RemoteIpAddress.ToString();
-                model.Post.AuthorDisplayName = user.FullName;
+                model.Post.AuthorDisplayName = user.ToFullName();
 
                 if (model.Topic.Forum.RequireTopicModeration)
                     model.Post.Approved = false;
@@ -299,13 +297,13 @@ namespace Hood.Controllers
                 model.Topic.Forum.LastPostId = model.Post.Id;
                 model.Topic.Forum.LastUserId = user.Id;
                 model.Topic.Forum.LastUserName = user.UserName;
-                model.Topic.Forum.LastUserDisplayName = user.FullName;
+                model.Topic.Forum.LastUserDisplayName = user.ToDisplayName();
 
                 model.Topic.LastPosted = DateTime.Now;
                 model.Topic.LastPostId = model.Post.Id;
                 model.Topic.LastUserId = user.Id;
                 model.Topic.LastUserName = user.UserName;
-                model.Topic.LastUserDisplayName = user.FullName;
+                model.Topic.LastUserDisplayName = user.ToDisplayName();
 
                 model.Topic.Forum.NumTopics = await _db.Topics.CountAsync(f => f.ForumId == model.Topic.ForumId);
                 model.Topic.Forum.NumPosts = await _db.Posts.CountAsync(f => f.Topic.ForumId == model.Topic.ForumId);
@@ -313,21 +311,23 @@ namespace Hood.Controllers
 
                 await _db.SaveChangesAsync();
 
+                SaveMessage = $"Your post was submitted successfully.";
+                MessageType = AlertType.Success;
+
                 // Highlight the post we just created, so it is shown on load.#
                 return RedirectToAction(nameof(ForumController.ShowTopic), new
                 {
                     topicId = model.Topic.Id,
                     slug = model.Topic.Forum.Slug,
                     title = model.Topic.Title.ToSeoUrl(),
-                    message = ForumMessage.Created,
                     highlight = model.Post.Id
                 });
             }
             catch (Exception ex)
             {
-                model.MessageType = AlertType.Danger;
-                model.SaveMessage = "An error occured while adding your message: " + ex.Message;
-                return await ShowTopic(model, null);
+                MessageType = AlertType.Danger;
+                SaveMessage = "An error occured while adding your message: " + ex.Message;
+                return await ShowTopic(model);
             }
         }
 
@@ -350,7 +350,7 @@ namespace Hood.Controllers
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (post == null)
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoPostFound });
+                    throw new Exception("Post not found.");
 
                 post.Body = body;
 
@@ -367,31 +367,39 @@ namespace Hood.Controllers
 
                 await _db.SaveChangesAsync();
 
+                SaveMessage = $"The post has been updated.";
+                MessageType = AlertType.Success;
+
                 return RedirectToAction(nameof(ForumController.ShowTopic),
                     new
                     {
                         topicId = post.Topic.Id,
                         slug = post.Topic.Forum.Slug,
                         title = post.Topic.Title.ToSeoUrl(),
-                        highlight = post.Id,
-                        message = ForumMessage.Saved
+                        highlight = post.Id
                     });
 
             }
             catch (Exception ex)
             {
+                SaveMessage = $"Error occurred while editing a {nameof(Post)}.";
                 if (post != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, post, ex);
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
                             topicId = post.Topic.Id,
                             slug = post.Topic.Forum.Slug,
                             title = post.Topic.Title.ToSeoUrl(),
-                            highlight = post.Id,
-                            message = ForumMessage.Error
+                            highlight = post.Id
                         });
+                }
                 else
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                    return RedirectToAction(nameof(ForumController.Index));
+                }
             }
         }
 
@@ -409,7 +417,7 @@ namespace Hood.Controllers
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (topic == null)
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoTopicFound });
+                    throw new Exception("Topic not found.");
 
                 topic.Title = title;
                 topic.Description = description;
@@ -422,29 +430,38 @@ namespace Hood.Controllers
 
                 await _db.SaveChangesAsync();
 
+                SaveMessage = $"The topic has been updated.";
+                MessageType = AlertType.Success;
+
                 return RedirectToAction(nameof(ForumController.ShowTopic),
                     new
                     {
                         topicId = topic.Id,
                         slug = topic.Forum.Slug,
-                        title = topic.Title.ToSeoUrl(),
-                        message = ForumMessage.Saved
+                        title = topic.Title.ToSeoUrl()
                     });
 
             }
             catch (Exception ex)
             {
+                SaveMessage = $"Error editing a {nameof(Topic)}.";
                 if (topic != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, topic, ex);
+                    MessageType = AlertType.Danger;
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
                             topicId = topic.Id,
                             slug = topic.Forum.Slug,
-                            title = topic.Title.ToSeoUrl(),
-                            message = ForumMessage.Saved
+                            title = topic.Title.ToSeoUrl()
                         });
+                }
                 else
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                    return RedirectToAction(nameof(ForumController.Index));
+                }
             }
         }
 
@@ -466,7 +483,7 @@ namespace Hood.Controllers
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (post == null)
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoPostFound });
+                    throw new Exception("Post not found.");
 
                 _db.Entry(post).State = EntityState.Deleted;
 
@@ -486,24 +503,30 @@ namespace Hood.Controllers
                     {
                         topicId = post.Topic.Id,
                         slug = post.Topic.Forum.Slug,
-                        title = post.Topic.Title.ToSeoUrl(),
-                        message = ForumMessage.PostDeleted
+                        title = post.Topic.Title.ToSeoUrl()
                     });
 
             }
             catch (Exception ex)
             {
+                SaveMessage = $"Error occurred while editing a {nameof(Post)}.";
+                MessageType = AlertType.Danger;
                 if (post != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, post, ex);
                     return RedirectToAction(nameof(ForumController.ShowTopic),
                         new
                         {
                             topicId = post.Topic.Id,
                             slug = post.Topic.Forum.Slug,
-                            title = post.Topic.Title.ToSeoUrl(),
-                            message = ForumMessage.Error
+                            title = post.Topic.Title.ToSeoUrl()
                         });
+                }
                 else
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                    return RedirectToAction(nameof(ForumController.Index));
+                }
             }
         }
 
@@ -520,7 +543,7 @@ namespace Hood.Controllers
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (topic == null)
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoTopicFound });
+                    throw new Exception("Topic not found.");
 
                 _db.Entry(topic).State = EntityState.Deleted;
 
@@ -533,25 +556,34 @@ namespace Hood.Controllers
 
                 await _db.SaveChangesAsync();
 
+                SaveMessage = $"The topic has been deleted.";
+                MessageType = AlertType.Success;
+
                 return RedirectToAction(nameof(ForumController.Topics),
                     new
                     {
-                        slug = topic.Forum.Slug,
-                        message = ForumMessage.TopicDeleted
+                        slug = topic.Forum.Slug
                     });
 
             }
             catch (Exception ex)
             {
+                SaveMessage = $"Error occurred while editing a {nameof(Topic)}.";
+                MessageType = AlertType.Danger;
                 if (topic != null)
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, topic, ex);
                     return RedirectToAction(nameof(ForumController.Topics),
                         new
                         {
-                            slug = topic.Forum.Slug,
-                            message = ForumMessage.Error
+                            slug = topic.Forum.Slug
                         });
+                }
                 else
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                {
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage,  ex);
+                    return RedirectToAction(nameof(ForumController.Index));
+                }
             }
         }
 
@@ -568,14 +600,16 @@ namespace Hood.Controllers
 
                 // check the topic - if its not up to snuff dont use it, just fire an error and pass the model on.
                 if (post == null)
-                    return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.NoPostFound });
+                    throw new Exception("Post not found.");
 
                 var reporter = await _userManager.GetUserAsync(User);
 
-                MailObject message = new MailObject();
-                message.PreHeader = _settings.ReplacePlaceholders("Abuse report");
-                message.Subject = _settings.ReplacePlaceholders("Abuse report");
-                message.AddParagraph(_settings.ReplacePlaceholders("The following post has been reported for abuse."));
+                MailObject message = new MailObject
+                {
+                    PreHeader = "Abuse report",
+                    Subject = "Abuse report"
+                };
+                message.AddParagraph("The following post has been reported for abuse.");
                 message = post.WriteToMailObject(message);
                 message.AddParagraph("The report was sent by: ");
                 if (reporter == null)
@@ -587,7 +621,7 @@ namespace Hood.Controllers
                 {
                     message.AddParagraph(string.Format("Username - <strong>{0}</strong>", reporter.UserName));
                     message.AddParagraph(string.Format("Email - <strong>{0}</strong>", reporter.Email));
-                    message.AddParagraph(string.Format("Display Name - <strong>{0}</strong>", reporter.DisplayName));
+                    message.AddParagraph(string.Format("Display Name - <strong>{0}</strong>", reporter.ToDisplayName()));
                     message.AddParagraph(string.Format("IP Address - <strong>{0}</strong>", HttpContext.Connection.RemoteIpAddress.ToString()));
                 }
                 message.AddDiv("<hr /><br />");
@@ -605,18 +639,22 @@ namespace Hood.Controllers
                     await _emailSender.NotifyRoleAsync(message, "Moderator");
                 }
 
+                SaveMessage = $"Thank you. The post has been reported to our moderators.";
+                MessageType = AlertType.Success;
+
                 return RedirectToAction(nameof(ForumController.ShowTopic), new
                 {
                     topicId = post.Topic.Id,
                     slug = post.Topic.Forum.Slug,
-                    title = post.Topic.Title.ToSeoUrl(),
-                    message = ForumMessage.PostReported
+                    title = post.Topic.Title.ToSeoUrl()
                 });
 
             }
             catch (Exception ex)
             {
-                return RedirectToAction(nameof(ForumController.Index), new { message = ForumMessage.Error });
+                SaveMessage = $"Errorreporting a {nameof(Post)} with Id: {postId}.";
+                await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
+                return RedirectToAction(nameof(ForumController.Index));
             }
         }
 

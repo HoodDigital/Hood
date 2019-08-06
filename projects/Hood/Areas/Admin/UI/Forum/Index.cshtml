@@ -27,7 +27,7 @@
 }
 @if (Model.SaveMessage.IsSet())
 {
-    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
 }
 <div class="tabs-container">
     <ul class="nav nav-tabs">
@@ -104,7 +104,7 @@
                                         {
                                             <span class="tag-item bg-color-green txt-color-white">Published</span>
                                         }
-                                        else 
+                                        else
                                         {
                                             <span class="tag-item bg-color-purple txt-color-white">Archived</span>
                                         }
@@ -113,7 +113,7 @@
                                 <div class="col-md-1 visible-lg visible-md">
                                     <span class="small font-bold">Author</span>
                                     <div class="tag-list">
-                                        <span class="tag-item">@forum.Author?.FullName</span>
+                                        <span class="tag-item">@forum.Author?.ToFullName()</span>
                                     </div>
                                 </div>
                                 <div class="col-md-2 visible-lg">
@@ -151,7 +151,8 @@
                                     <a class="btn-default btn btn-sm action-button" asp-action="Edit" asp-route-id="@forum.Id">
                                         <i class="fa fa-edit m-r-xs"></i>
                                         <span>
-                                        Edit</span>
+                                            Edit
+                                        </span>
                                     </a>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -181,7 +182,7 @@
                         </div>
                     }
                     <div class="text-center">
-                        @{ await Html.RenderPartialAsync("_Pagination"); }
+                        <partial name="_Pagination" />
                     </div>
                 }
                 else

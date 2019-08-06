@@ -1,17 +1,16 @@
-﻿using Hood.Extensions;
+﻿using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class ContentModel : PagedList<Content>, IPageableModel
     {
         // Params
-        [FromQuery(Name = "sort")]
-        public string Order { get; set; }
-        [FromQuery(Name = "search")]
-        public string Search { get; set; }
         [FromQuery(Name = "category")]
         public string Category { get; set; }
         [FromRoute(Name = "type")]
@@ -20,11 +19,18 @@ namespace Hood.Models
         public string Filter { get; set; }
         [FromQuery(Name = "author")]
         public string AuthorName { get; set; }
+        [FromQuery(Name = "status")]
+        public ContentStatus? Status { get; set; }
+        [FromQuery(Name = "filter")]
+        public bool Featured { get; set; }
+        [FromQuery(Name = "inline")]
+        public bool Inline { get; set; }
+        [FromQuery(Name = "categories")]
+        public List<string> Categories { get; set; }
 
         // Sidebar Stuff
         public ContentType ContentType { get; set; }
         public PagedList<Content> Recent { get; set; }
-        public IEnumerable<ContentCategory> Categories { get; set; }
 
         // Single Stuff
         public Content Content { get; set; }
@@ -35,14 +41,21 @@ namespace Hood.Models
         // List Stuff
         public ApplicationUser Author { get; set; }
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
-            query += Search.IsSet() ? "&search=" + Search : "";
+            var query = base.GetPageUrl(pageIndex);
+            if (Categories != null)
+                foreach (var cat in Categories)
+                {
+                    query += "&categories=" + cat;
+                }
             query += Category.IsSet() ? "&category=" + Category : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
+            query += Type.IsSet() ? "&type=" + Type : "";
+            query += Filter.IsSet() ? "&filter=" + Filter : "";
+            query += AuthorName.IsSet() ? "&author=" + AuthorName : "";
+            query += Status.HasValue ? "&status=" + Status : "";
+            query += Inline ? "&inline=" + Inline : "";
             return query;
         }
-
     }
 }

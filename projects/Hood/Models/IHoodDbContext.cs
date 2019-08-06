@@ -12,7 +12,6 @@ namespace Hood.Models
         DbSet<ApiKey> ApiKeys { get; set; }
         DbSet<Content> Content { get; set; }
         DbSet<ContentCategory> ContentCategories { get; set; }
-        DbSet<ContentTag> ContentTags { get; set; }
         DbSet<ForumCategory> ForumCategories { get; set; }
         DbSet<Forum> Forums { get; set; }
         DbSet<Log> Logs { get; set; }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Stripe;
-using Newtonsoft.Json;
 
 namespace Hood.Events
 {
@@ -11,7 +10,7 @@ namespace Hood.Events
 
         public StripeWebHookTriggerArgs(string json)
         {
-            Event = Stripe.EventUtility.ParseEvent(json);
+            Event = EventUtility.ParseEvent(json);
             Action = Event.Type;
         }
         public StripeWebHookTriggerArgs(Stripe.Event stripeEvent)

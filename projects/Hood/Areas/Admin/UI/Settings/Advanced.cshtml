@@ -3,7 +3,6 @@
 @inject IContentRepository _data
 @inject IHoodCache _cache
 @{
-    var theme = _theme.CurrentTheme;
     ViewData["Title"] = "Administrator Tools";
 }
 @section buttons {
@@ -11,158 +10,141 @@
         Reset Cache
     </a>
 }
-<div class="row">
-    <div class="col-md-4 col-md-push-8">
-        <div class="right-column">
-            <div class="m-b-md">
-                <h5>
-                    @ViewData["Title"]
-                </h5>
-            </div>
-            <div>
-                <div class="ibox-content">
-                    <p>Advanced raw information and options for administration of the site.</p>
-                    <p>WARNING: Please be cautious when modifying anything in this area. There may be a drastic effect on the site.</p>
-                </div>
+<div class="container ml-md-0 p-0">
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="appsettings-tab" data-toggle="tab" href="#appsettings" role="tab" aria-controls="appsettings" aria-selected="true">
+                            App Settings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="cache-tab" data-toggle="tab" href="#cache" role="tab" aria-controls="cache" aria-selected="false">
+                            Cache
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
-    </div>
-    <div class="col-md-8 col-md-pull-4">
-        <div class="tabs-container">
-            <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#basics">App Settings</a></li>
-                <li><a data-toggle="tab" href="#cache">Cache</a></li>
-            </ul>
+        <div class="card-body p-4">
             <div class="tab-content">
-                <div id="basics" class="tab-pane active">
-                    <div class="panel-body">
-                        <strong>View Site Setup</strong>
-                        <p>
-                            Here you can view the site's deep settings, these should NEVER be distributed or shown to anyone other than site administrators. To modify these settings you can edit the appSettings.json file in the site's root directory.
-                        </p>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="list-group settings-list clear-list m-t">
-                            @if (_config.IsDatabaseConfigured())
-                            {
+                <div id="appsettings" class="tab-pane active" role="tabpanel" aria-labelledby="appsettings-tab">
+                    <div class="tab-content">
+                        <div id="basics" class="tab-pane active">
+                            <alert type="Info" size="Medium" icon="fa-info-circle">
+                                Advanced raw information and options for administration of the site.
+                            </alert>
+                            <alert type="Danger" size="Medium" icon="fa-exclamation-triangle">
+                                Please be cautious when modifying anything in this area. There may be a drastic effect on the site.
+                            </alert>
+                            <ul class="list-group settings-list clear-list m-t">
                                 @if (_config.IsDatabaseConfigured())
                                 {
-                                    <li class="list-group-item">
-                                        <span class="pull-right">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>DataSource</span>
+                                        <span class="col font-weight-bold">
                                             @_config.GetConnectionSettings().DataSource
                                         </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span>
-                                        <span>DataSource</span>
                                     </li>
-                                    <li class="list-group-item">
-                                        <span class="pull-right">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>Database</span>
+                                        <span class="col font-weight-bold">
                                             @_config.GetConnectionSettings().InitialCatalog
                                         </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span>
-                                        <span>Database</span>
                                     </li>
-                                    <li class="list-group-item">
-                                        <span class="pull-right">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>UserID</span>
+                                        <span class="col font-weight-bold">
                                             @_config.GetConnectionSettings().UserID
                                         </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span>
-                                        <span>UserID</span>
                                     </li>
-                                    <li class="list-group-item">
-                                        <span class="pull-right">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>Password</span>
+                                        <span class="col font-weight-bold">
                                             Hidden for security. See your appSettings file, or Environment Variables.
                                         </span>
-                                        <span class="label label-success"><i class="fa fa-check"></i></span>
-                                        <span>Password</span>
                                     </li>
                                 }
                                 else
                                 {
-                                    <li class="list-group-item">
-                                        <span class="pull-right">
-                                            -
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>DataSource</span>
+                                        <span class="col font-weight-bold text-danger">
+                                            Database not configured!
                                         </span>
-                                        <span class="label label-danger"><i class="fa fa-close"></i></span> <span>Database not configured!</span>
                                     </li>
                                 }
-                            }
-                            else
-                            {
-                                <span class="pull-right">
-                                    -
-                                </span>
-                                <span class="label label-danger"><i class="fa fa-close"></i></span>
-                                <span>Connection String</span>
-                            }
-                            <li class="list-group-item">
                                 @if (_config["ASPNETCORE_ENVIRONMENT"].IsSet())
                                 {
-                                    <span class="pull-right">
-                                        @_config["ASPNETCORE_ENVIRONMENT"]
-                                    </span>
-                                    <span class="label label-success"><i class="fa fa-check"></i></span> <span>Hosting Environment</span>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>Hosting Environment</span>
+                                        <span class="col font-weight-bold">
+                                            @_config["ASPNETCORE_ENVIRONMENT"]
+                                        </span>
+                                    </li>
                                 }
                                 else
                                 {
-                                    <span class="pull-right">
-                                        -
-                                    </span>
-                                    <span class="label label-danger"><i class="fa fa-close"></i></span> <span>Hosting Environment</span>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span class="col-3"><i class="fa fa-exclamation-triangle mr-2 text-danger"></i>Hosting Environment</span>
+                                        <span class="col font-weight-bold text-danger">
+                                            Not Set!
+                                        </span>
+                                    </li>
                                 }
-                            </li>
-                            <li class="list-group-item">
-                                <span class="pull-right">
-                                    @string.Join(",", (_settings.GetContentSettings().GetAllowedTypes()).Select(c => c.Type))
-                                </span>
-                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Enabled Types</span>
-                            </li>
-                            <li class="list-group-item">
-                                <span class="pull-right">
-                                    @string.Join(",", (_settings.GetContentSettings().GetDisallowedTypes()).Select(c => c.Type))
-                                </span>
-                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Disabled Types</span>
-                            </li>
-                            <li class="list-group-item">
-                                <span class="pull-right">
-                                    @string.Join(",", (_settings.GetContentSettings().GetPublicTypes()).Select(c => c.Type))
-                                </span>
-                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Public Types</span>
-                            </li>
-                            <li class="list-group-item">
-                                <span class="pull-right">
-                                    @string.Join(",", (_settings.GetContentSettings().GetRestrictedTypes()).Select(c => c.Type))
-                                </span>
-                                <span class="label label-success"><i class="fa fa-check"></i></span> <span>Restricted Types</span>
-                            </li>
-                        </ul>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="col-3"><i class="fa fa-check-circle mr-2 text-success"></i>Enabled Types</span>
+                                    <span class="col font-weight-bold">
+                                        @string.Join(",", (Engine.Settings.Content.AllowedTypes).Select(c => c.Type))
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="col-3"><i class="fa fa-minus-circle mr-2 text-dark"></i>Disabled Types</span>
+                                    <span class="col font-weight-bold">
+                                        @string.Join(",", (Engine.Settings.Content.DisallowedTypes).Select(c => c.Type))
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="col-3"><i class="fa fa-exclamation-triangle mr-2 text-success"></i>Public Types</span>
+                                    <span class="col font-weight-bold">
+                                        @string.Join(",", (Engine.Settings.Content.PublicTypes).Select(c => c.Type))
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span class="col-3"><i class="fa fa-minus-circle mr-2 text-danger"></i>Restricted Types</span>
+                                    <span class="col font-weight-bold">
+                                        @string.Join(",", (Engine.Settings.Content.RestrictedTypes).Select(c => c.Type))
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                <div id="cache" class="tab-pane">
-                    <div class="panel-body">
-                        <strong>Cache Contents &amp; Reset</strong>
-                        <p>
-                            Here you can view the site's current cache and reset it if need be.
-                        </p>
-                    </div>
-                    <div class="panel-body">
-                        @foreach (string key in _cache.Keys.OrderBy(s => s))
+                <div id="cache" class="tab-pane" role="tabpanel" aria-labelledby="cache-tab">
+                    <alert type="Info" size="Medium" icon="fa-info-circle">
+                        Cache Contents &amp; Reset - Reset areas stored in the site cache, this can help if items are not updating correctly on the site.
+                    </alert>
+                    <ul class="list-group settings-list clear-list m-t">
+                        @foreach (var entry in _cache.Entries.OrderBy(s => s.Value))
                         {
-                            <div class="list-group-item">
-                                <div class="pull-right">
-                                    <a class="btn btn-xs btn-danger" href="@Url.Action("RemoveCacheItem", new { key = key })">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span class="col font-weight-bold ">
+                                    <i class="fa fa-check-circle mr-2 text-success"></i>@entry.Key 
+                                    <small>Last Updated: @entry.Value.ToDisplay()</small>
+                                </span>
+                                <span class="col-auto text-right">
+                                    <a class="btn btn-sm btn-danger" href="@Url.Action("RemoveCacheItem", new { entry = entry.Key })">
                                         Remove
                                     </a>
-                                </div>
-                                <p>@key</p>
-                            </div>
+                                </span>
+                            </li>
                         }
-                    </div>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
-

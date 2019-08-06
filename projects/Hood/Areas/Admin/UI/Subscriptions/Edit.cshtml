@@ -2,40 +2,157 @@
 @{
     ViewBag.Title = "Edit " + Model.Name;
 }
+@section buttons {
+    <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Plan</a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" asp-action="Subscribers" asp-route-plan="@Model.Id"><i class="fa fa-user-plus"></i> Subscribers</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item subscriptions-plans-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete Plan</a>
+    </div>
+}
 @section breadcrumbs {
-    <ol class="breadcrumb">
-        <li>
-            <a href="/admin">Home</a>
-        </li>
-        <li>
-            <a asp-action="Index" asp-route-area="Admin">
-                <i class="fa fa-building m-r-xs"></i>
-                Subscriptions
-            </a>
-        </li>
-        <li class="active">
-            <strong>@ViewBag.Title</strong>
-        </li>
-    </ol>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page"><a href="/admin">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Plans"><i class="fa fa-award mr-2"></i>Subscription Plans</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+        </ol>
+    </nav>
 }
-@if (Model.SaveMessage.IsSet())
-{
-    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
-}
-<form method="post">
-    <div class="row">
-        <div class="col-md-8">
-            @{ await Html.RenderPartialAsync("_Editor_Subscription", Model); }
+<alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+<div class="container ml-md-0 p-0">
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="plan-tab" data-toggle="tab" href="#plan" role="tab" aria-controls="plan" aria-selected="true">
+                            Profile
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="col-md-4">
-            <div class="panel-body">
-                <h4 class="font-bold text-center">
-                    <span>@Model.Name</span>
-                </h4>
-                <p class="no-margin">
-                    <button type="submit" class="btn btn-success btn-block m-t-md"><i class="fa fa-save m-r-xs"></i> Save Subscription</button>
-                </p>
+        <div class="card-body p-0">
+            <div class="tab-content">
+                <div id="plan" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="plan-tab">
+                    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="edit-user-form" data-id="@Model.Id">
+                        @if (!Model.LiveMode)
+                        {
+                            <alert type="Warning" icon="fa fa-info" size="Medium">
+                                <p class="m-0">This was created in Test mode.</p>
+                            </alert>
+                        }
+                        @if (Model.StripePlan != null)
+                        {
+                            <alert type="Info" icon="fa fa-info" size="Medium">
+                                <a class="float-right" href="@($"https://dashboard.stripe.com/plans/{Model.StripePlan.Id}")" target="_blank">View on Stripe<i class="ml-2 fa fa-external-link-alt"></i></a>
+                                <p class="m-0">This is linked to stripe, with stripe Id: <strong>@Model.StripePlan.Id</strong></p>
+                            </alert>
+                        }
+                        else
+                        {
+                            if (Model.StripePlan != null)
+                            {
+                                <alert type="Warning" icon="fa fa-info" size="Medium">
+                                    <p class="m-0">There is a stripe Id set, <strong>@Model.StripeId</strong>, but it is not connected to stripe, are you using the correct API keys?</p>
+                                </alert>
+                            }
+                            else
+                            {
+                                <alert type="Danger" icon="fa fa-info" size="Medium">
+                                    <p class="m-0">This is not connected to stripe.</p>
+                                </alert>
+                            }
+                        }
+                        <alert type="Dark" icon="fa fa-info" size="Medium">
+                            <p class="m-0">
+                                The plan costs: <strong>@Model.FullPrice</strong><br />
+                                <em>Prices cannot be changed once the plan has been created. To change your pricing, you need to create a new plan, then move your subscribers to it.</em>
+                            </p>
+                        </alert>
+
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="StripeId" type="hidden" />
+                        <input asp-for="Amount" type="hidden" />
+                        <input asp-for="Created" type="hidden" />
+                        <input asp-for="Currency" type="hidden" />
+                        <input asp-for="Interval" type="hidden" />
+                        <input asp-for="IntervalCount" type="hidden" />
+                        <input asp-for="LiveMode" type="hidden" />
+                        <input asp-for="StatementDescriptor" type="hidden" />
+                        <input asp-for="TrialPeriodDays" type="hidden" />
+                        <input asp-for="CreatedBy" type="hidden" />
+                        <input asp-for="LastEditedOn" type="hidden" />
+                        <input asp-for="LastEditedBy" type="hidden" />
+                        <div class="form-group floating-label">
+                            <label asp-for="Name"></label>
+                            <input asp-for="Name" class="form-control">
+                            <small asp-for="Name"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Description"></label>
+                            <textarea type="text" class="form-control tinymce-simple" asp-for="Description"></textarea>
+                            <small asp-for="Description"></small>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input asp-for="Public" class="custom-control-input">
+                                <label asp-for="Public" class="custom-control-label"></label>
+                            </div>
+                            <small asp-for="Public"></small>
+                        </div>
+                        <hr class="mt-4 mb-4" />
+                        <div class="form-group floating-label">
+                            <label asp-for="SubscriptionProductId"></label>
+                            <select asp-for="SubscriptionProductId" class="form-control">
+                                <option value="">No Group</option>
+                                @{
+                                    var products = await Engine.AccountManager.GetSubscriptionProductsAsync();
+                                }
+                                @foreach (var product in products.List)
+                                {
+                                    <option value="@product.Id">@product.DisplayName</option>
+                                }
+                            </select>
+                            <small asp-for="SubscriptionProductId"></small>
+                        </div>
+                        <div class="form-group floating-label">
+                            <label asp-for="Level"></label>
+                            <input asp-for="Level" class="form-control" type="number" step="1" min="0">
+                            <small asp-for="Level"></small>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input asp-for="Addon" class="custom-control-input">
+                                <label asp-for="Addon" class="custom-control-label"></label>
+                            </div>
+                            <small asp-for="Addon"></small>
+                        </div>
+                        <hr class="mt-4" />
+                        <h5 class="mt-2 mb-0">Featured Image</h5>
+                        <p>Set the featured image for this property.</p>
+                        <input type="hidden" asp-for="FeaturedImageJson">
+                        <div class="form-group row align-items-center">
+                            <div class="col-auto">
+                                <fixedImage src="@Model.FeaturedImage.SmallUrl" class="img-sm img-circle m-0 FeaturedImage" id="property-feature-image" />
+                            </div>
+                            <div class="col">
+                                <h6>Featured Image</h6>
+                                <p>Choose a featured image for this property. This will appear in property lists, and as the main featured image.</p>
+                                <p class="m-0">
+                                    <mediaAttach asp-for="FeaturedImage" asp-entity="@nameof(Subscription)" asp-id="@Model.Id" asp-filetype="Image" asp-json="FeaturedImageJson">
+                                        Choose...
+                                    </mediaAttach>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</form>
+</div>

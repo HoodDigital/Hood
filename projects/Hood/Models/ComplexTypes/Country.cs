@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Hood.Models
@@ -87,7 +88,17 @@ namespace Hood.Models
             CurrencyName = currencyName;
         }
 
-        public static List<Country> AllCountries
+    }
+
+    public class Countries
+    {
+        public static Country GetCountry(string name)
+        {
+            var country = All.Where(c => c.Name == name).FirstOrDefault();
+            return country;
+        }
+
+        public static List<Country> All
         {
             get
             {
@@ -347,5 +358,17 @@ namespace Hood.Models
                 return dictionary;
             }
         }
+
+        public static List<SelectListItem> AsSelectListItems
+        {
+            get
+            {
+                var output = new List<SelectListItem>();
+                output.Add(new SelectListItem() { Text = "--- Choose a country ---", Value = "" });
+                output.AddRange(All.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Name }));
+                return output;
+            }
+        }
+
     }
 }

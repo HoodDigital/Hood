@@ -1,15 +1,17 @@
-﻿using Hood.Core;
+﻿using Hood.BaseTypes;
+using Hood.Caching;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Models;
-using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Text;
@@ -19,22 +21,16 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize]
-    public class ManageController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ManageController : BaseController
     {
         private readonly UrlEncoder _urlEncoder;
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
-
-        [TempData]
-        public string SaveMessage { get; set; }
-        [TempData]
-        public AlertType MessageType { get; set; }
 
         public ManageController(UrlEncoder urlEncoder)
             : base()
         {
             _urlEncoder = urlEncoder;
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -44,10 +40,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-            var profile = new UserProfile();
-            profile.SetProfile(user);
-
-            var model = new IndexViewModel
+            var model = new UserViewModel
             {
                 UserId = user.Id,
                 Username = user.UserName,
@@ -56,34 +49,31 @@ namespace Hood.Controllers
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
-                Profile = profile,
+                Profile = User.GetUserProfile(),
                 Roles = await _userManager.GetRolesAsync(user)
             };
-
-            model.SaveMessage = SaveMessage;
-            model.MessageType = MessageType;
-
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(IndexViewModel model)
+        public async Task<IActionResult> Index(UserViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            var user = await _userManager.GetUserAsync(User);
             try
             {
 
-                var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
                     throw new Exception($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
 
-                model.Roles = await _userManager.GetRolesAsync(user);
+
+                if (!ModelState.IsValid)
+                {
+                    model.Roles = await _userManager.GetRolesAsync(user);
+                    return View(model);
+                }
 
                 var email = user.Email;
                 if (model.Email != email)
@@ -106,74 +96,65 @@ namespace Hood.Controllers
                     }
                 }
 
-                user.SetProfile(model.Profile);
-                _account.UpdateUser(user);
-                SaveMessage = "Saved!";
-                MessageType = Enums.AlertType.Success;
+                model.Profile.Id = user.Id;
+                model.Profile.Notes = user.Notes;
+                await _account.UpdateProfileAsync(model.Profile);
+
+                SaveMessage = "Your profile has been updated.";
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
                     throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
                 }
-                var profile = new UserProfile();
-                profile.SetProfile(user);
-                model = new IndexViewModel
-                {
-                    UserId = user.Id,
-                    Username = user.UserName,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    IsEmailConfirmed = user.EmailConfirmed,
-                    StatusMessage = SaveMessage,
-                    Avatar = user.Avatar,
-                    Profile = profile,
-                    Roles = await _userManager.GetRolesAsync(user)
-                };
                 SaveMessage = "Something went wrong: " + ex.Message;
-                MessageType = Enums.AlertType.Danger;
-                return RedirectToAction(nameof(Index));
+                MessageType = AlertType.Danger;
             }
 
-            SaveMessage = "Your profile has been updated";
-            MessageType = Enums.AlertType.Success;
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> UploadAvatar(IFormFile file, string userId)
+        public async Task<Response> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
-            var user = _account.GetUserById(userId);
-            if (user == null)
-                return NotFound();
 
             try
             {
-                MediaObject mediaResult = null;
+                var user = await _account.GetUserByIdAsync(userId);
+                if (user == null)
+                    throw new Exception("Could not locate the user to add an avatar to.");
+
+                IMediaObject mediaResult = null;
                 if (file != null)
                 {
                     // If the club already has an avatar, delete it from the system.
                     if (user.Avatar != null)
                     {
+                        var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == user.Avatar.UniqueId);
+                        if (mediaItem != null)
+                            _db.Entry(mediaItem).State = EntityState.Deleted;
                         await _media.DeleteStoredMedia((MediaObject)user.Avatar);
                     }
-                    mediaResult = await _media.ProcessUpload(file, new MediaObject() { Directory = string.Format("users/{0}/", userId) });
+                    var directory = await Engine.AccountManager.GetDirectoryAsync(User.GetUserId());
+                    mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));                    
                     user.Avatar = mediaResult;
-                    _account.UpdateUser(user);
+                    await _account.UpdateUserAsync(user);
+                    _db.Media.Add(new MediaObject(mediaResult, directory.Id));
+                    await _db.SaveChangesAsync();
                 }
-                return Json(new { Success = true, Image = mediaResult });
+                return new Response(true, mediaResult, $"The media has been set for attached successfully.");
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Error = ex.InnerException != null ? ex.InnerException.Message : ex.Message });
+                return await ErrorResponseAsync<ManageController>($"There was an error setting the avatar.", ex);
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendVerificationEmail(IndexViewModel model)
+        public async Task<IActionResult> SendVerificationEmail(UserViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -238,7 +219,7 @@ namespace Hood.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            await _logService.AddLogAsync($"User ({user.UserName}) changed their password successfully.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.", userId: user.Id);
             SaveMessage = "Your password has been changed.";
 
             return RedirectToAction(nameof(ChangePassword));
@@ -424,7 +405,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
             }
-            await _logService.AddLogAsync($"User ({user.UserName}) has disabled 2fa.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) has disabled 2fa.", userId: user.Id);
             return RedirectToAction(nameof(TwoFactorAuthentication));
         }
 
@@ -481,7 +462,7 @@ namespace Hood.Controllers
             }
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
-            await _logService.AddLogAsync($"User with ID {user.Id} has enabled 2FA with an authenticator app.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has enabled 2FA with an authenticator app.", userId: user.Id);
             return RedirectToAction(nameof(GenerateRecoveryCodes));
         }
 
@@ -504,7 +485,7 @@ namespace Hood.Controllers
             await _userManager.SetTwoFactorEnabledAsync(user, false);
             await _userManager.ResetAuthenticatorKeyAsync(user);
 
-            await _logService.AddLogAsync($"User with ID {user.Id} has reset their authentication app key.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has reset their authentication app key.", userId: user.Id);
 
             return RedirectToAction(nameof(EnableAuthenticator));
         }
@@ -526,56 +507,41 @@ namespace Hood.Controllers
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
 
-            await _logService.AddLogAsync($"User with ID {user.Id} has generated new 2FA recovery codes.", LogSource.Identity, "", LogType.Info, user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has generated new 2FA recovery codes.", userId: user.Id);
 
             return View(model);
         }
 
         [HttpGet]
-        public IActionResult Delete(EditorMessage? message)
+        public IActionResult Delete()
         {
-            var model = new Hood.BaseTypes.SaveableModel();
-            model.AddEditorMessage(message);
-            return View(nameof(Delete), model);
+            return View(nameof(Delete), new SaveableModel());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmDelete(string id)
+        public async Task<IActionResult> ConfirmDelete()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction(nameof(Delete), new { message = EditorMessage.NotFound });
-            }
-
-            // Delete functionality.
             try
             {
-                if (User.IsInRole("Admin") || User.IsInRole("SuperUser"))
-                {
-                    return RedirectToAction(nameof(Delete), new { message = EditorMessage.CannotDeleteAdmin });
-                }
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    throw new Exception("User not found.");
+
+                await _account.DeleteUserAsync(user.Id, User);
 
                 await _signInManager.SignOutAsync();
 
-                await _logService.AddLogAsync($"User with ID {user.Id} has deleted their account.", LogSource.Identity, "", LogType.Warning);
-
-                var userLogs = _db.Logs.Where(l => l.UserId == user.Id);
-                foreach (var log in userLogs)
-                {
-                    log.UserId = null;
-                }
-                _db.SaveChanges();
-
-                await _account.DeleteUserAsync(user);
-
+                await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.");
                 return RedirectToAction(nameof(Deleted));
             }
             catch (Exception ex)
             {
-                return RedirectToAction(nameof(Delete), new { message = EditorMessage.Error });
+                SaveMessage = $"Error deleting your account: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ApiController>($"Error when user attemted to delete their account.", ex);
             }
+            return RedirectToAction(nameof(Delete));
         }
 
         [AllowAnonymous]

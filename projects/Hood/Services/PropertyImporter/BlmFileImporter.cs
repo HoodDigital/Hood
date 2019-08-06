@@ -18,30 +18,33 @@ using Microsoft.Extensions.DependencyInjection;
 using Hood.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
+using Hood.Interfaces;
 
 namespace Hood.Services
 {
     public class BlmFileImporter : IPropertyImporter
     {
-        private IFTPService _ftp;
-        private IConfiguration _config;
-        private IMediaManager<MediaObject> _media;
+        private readonly IFTPService _ftp;
+        private readonly IConfiguration _config;
+        private readonly IDirectoryManager _directoryManager;
+        private readonly IMediaManager _media;
         private PropertySettings _propertySettings;
-        private ISettingsRepository _settings;
-        private IHttpContextAccessor _context;
+        private readonly IHttpContextAccessor _context;
 
         public BlmFileImporter(
             IFTPService ftp,
             IHostingEnvironment env,
             IHttpContextAccessor context,
             IConfiguration config,
-            IMediaManager<MediaObject> media,
-            ISettingsRepository site,
+            IMediaManager media,
             IAddressService address,
-            ILogService logService)
+            ILogService logService, 
+            IDirectoryManager directoryManager
+            )
         {
             _ftp = ftp;
             _config = config;
+            _directoryManager = directoryManager;
             Lock = new ReaderWriterLock();
             Total = 0;
             Tasks = 0;
@@ -61,8 +64,8 @@ namespace Hood.Services
             Warnings = new List<string>();
             StatusMessage = "Not running...";
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(BlmFileImporter) + "\\";
-            _settings = site;
-            _propertySettings = site.GetPropertySettings();
+            _propertySettings = Engine.Settings.Property;
+
             LocalFolder = env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
             _media = media;
             _context = context;
@@ -96,7 +99,8 @@ namespace Hood.Services
         private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
-        private ILogService _logService;
+        private readonly ILogService _logService;
+        private string DirectoryPath { get; set; }
 
         public bool RunUpdate(HttpContext context)
         {
@@ -122,7 +126,7 @@ namespace Hood.Services
                 Errors = new List<string>();
                 Warnings = new List<string>();
                 StatusMessage = "Starting import, loading property files from FTP Service...";
-                _propertySettings = _settings.GetPropertySettings();
+                _propertySettings = Engine.Settings.Property;
                 // Get a new instance of the HoodDbContext for this import.
                 var options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
@@ -140,6 +144,11 @@ namespace Hood.Services
                         throw new Exception("Could not load the PropertyImporter user account.");
                 }
 
+                MediaDirectory propertyDirectory = _db.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
+                if (propertyDirectory == null)
+                    throw new Exception("Could not load the Property directory.");
+                DirectoryPath = _directoryManager.GetPath(propertyDirectory.Id);
+
                 Lock.ReleaseWriterLock();
 
                 ThreadStart pts = new ThreadStart(Import);
@@ -156,7 +165,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Running = false;
-                _logService.LogErrorAsync("An error occurred starting a property update.", ex, LogType.Error, LogSource.Properties);
+                _logService.AddExceptionAsync<BlmFileImporter>("An error occurred starting a property update.", ex);
                 StatusMessage = ex.Message;
                 Lock.ReleaseWriterLock();
                 return false;
@@ -175,16 +184,18 @@ namespace Hood.Services
                 CleanTempFolder();
 
                 // open a socket to the FTP site, and pull the property file out
-                if (_propertySettings.FTPImporterSettings.UseFTP)
-                    GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
-                else
+                switch (_propertySettings.FTPImporterSettings.Method)
                 {
-                    if (_propertySettings.FTPImporterSettings.RequireUnzip)
-                    {
-                        UnzipLocalFile();
-                    }
-
-                    GetFileFromLocal(_propertySettings.FTPImporterSettings.Filename);
+                    case PropertyImporterMethod.Directory:
+                        if (_propertySettings.FTPImporterSettings.RequireUnzip)
+                        {
+                            UnzipLocalFile();
+                        }
+                        GetFileFromLocal(_propertySettings.FTPImporterSettings.Filename);
+                        break;
+                    case PropertyImporterMethod.FtpBlm:
+                        GetFileFromFtp(_propertySettings.FTPImporterSettings.Filename);
+                        break;
                 }
 
                 if (HasFileError())
@@ -249,7 +260,7 @@ namespace Hood.Services
                         Processed++;
                         Added++;
                         Errors.Add(FormatLog("Error adding property: " + addPropertyException.Message, propertyRef));
-                        await _logService.LogErrorAsync("An error occurred adding a property via BLM import.", addPropertyException, LogType.Error, LogSource.Properties);
+                        await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred adding a property via BLM import.", addPropertyException);
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Adding property failed: " + addPropertyException.Message);
                     }
@@ -283,8 +294,7 @@ namespace Hood.Services
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Updated++;
-                        Errors.Add(FormatLog("Error updating property: " + updatePropertyException.Message, propertyRef));
-                        await _logService.LogErrorAsync("An error occurred updating a property via BLM import.", updatePropertyException, LogType.Error, LogSource.Properties);
+                        await _logService.AddLogAsync<BlmFileImporter>("Error updating property: " + updatePropertyException.Message, FormatLog("Error updating property: " + updatePropertyException.Message, propertyRef), LogType.Error);
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Updating property failed: " + updatePropertyException.Message);
                     }
@@ -323,7 +333,7 @@ namespace Hood.Services
                         Processed++;
                         Updated++;
                         Errors.Add(FormatLog("Error removing property: " + removePropertyException.Message, property));
-                        await _logService.LogErrorAsync("An error occurred updating a removing via BLM import.", removePropertyException, LogType.Error, LogSource.Properties);
+                        await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred updating a removing via BLM import.", removePropertyException);
                         Lock.ReleaseWriterLock();
                         MarkCompleteTask("Removing property failed: " + removePropertyException.Message);
                     }
@@ -340,7 +350,7 @@ namespace Hood.Services
                 StatusMessage = "Update completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
                 Lock.ReleaseWriterLock();
 
-                await _logService.AddLogAsync("Sucessfully imported properties via BLM.", LogSource.Properties, "Process completed!", LogType.Success);
+                await _logService.AddLogAsync<BlmFileImporter>("Sucessfully imported properties via BLM.", "Process completed!", LogType.Success);
 
                 return;
             }
@@ -348,7 +358,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Running = false;
-                await _logService.LogErrorAsync("An error occurred importing properties via BLM.", ex, LogType.Error, LogSource.Properties);
+                await _logService.AddExceptionAsync<BlmFileImporter>("An error occurred importing properties via BLM.", ex);
                 StatusMessage = ex.Message;
                 Lock.ReleaseWriterLock();
                 return;
@@ -418,7 +428,7 @@ namespace Hood.Services
             CheckForCancel();
 
             property = ProcessProperty(property, data);
-            property = UpdateMetadata(property, data);
+            property = await UpdateMetadataAsync(property, data);
 
             if (data != null)
             {
@@ -428,11 +438,11 @@ namespace Hood.Services
                 }
                 catch (Exception ex)
                 {
-                    //Lock.AcquireWriterLock(Timeout.Infinite);
-                    //StatusMessage = "There was an error processing the images...";
-                    //await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
-                    //Errors.Add(FormatLog(StatusMessage, property));
-                    //Lock.ReleaseWriterLock();
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = "There was an error processing the images...";
+                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    Errors.Add(FormatLog(StatusMessage, property));
+                    Lock.ReleaseWriterLock();
                 }
 
                 try
@@ -441,11 +451,11 @@ namespace Hood.Services
                 }
                 catch (Exception ex)
                 {
-                    //Lock.AcquireWriterLock(Timeout.Infinite);
-                    //StatusMessage = "There was an error processing the floor plans..";
-                    //await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
-                    //Errors.Add(FormatLog(StatusMessage, property));
-                    //Lock.ReleaseWriterLock();
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = "There was an error processing the floor plans..";
+                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    Errors.Add(FormatLog(StatusMessage, property));
+                    Lock.ReleaseWriterLock();
                 }
 
                 try
@@ -454,11 +464,11 @@ namespace Hood.Services
                 }
                 catch (Exception ex)
                 {
-                    //Lock.AcquireWriterLock(Timeout.Infinite);
-                    //StatusMessage = "There was an error processing the info document...";
-                    //await _logService.AddLogAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
-                    //Errors.Add(FormatLog(StatusMessage, property));
-                    //Lock.ReleaseWriterLock();
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = "There was an error processing the info document...";
+                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    Errors.Add(FormatLog(StatusMessage, property));
+                    Lock.ReleaseWriterLock();
                 }
 
             }
@@ -474,10 +484,15 @@ namespace Hood.Services
                 if (data[key].IsSet())
                 {
                     // We have a document, download it with the FTPService
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -486,11 +501,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        MediaObject mediaResult = null;
+                        IMediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = string.Format("property/{0}/", property.Id) });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
@@ -520,10 +535,15 @@ namespace Hood.Services
                 if (data[key].IsSet())
                 {
                     // We have a floor plan reference, download it with the FTPService
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -532,11 +552,11 @@ namespace Hood.Services
                         Lock.ReleaseWriterLock();
 
                         string imageFile = TempFolder + data[key];
-                        MediaObject mediaResult = null;
+                        IMediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
@@ -580,10 +600,15 @@ namespace Hood.Services
                 if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
                 {
                     // We have an image, download it with the FTPService
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -596,7 +621,7 @@ namespace Hood.Services
                         FileInfo fi = new FileInfo(imageFile);
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, new MediaObject() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {
@@ -635,10 +660,15 @@ namespace Hood.Services
                 else if (data[key].IsSet() && key.Contains("60"))
                 {
                     // We have an EPC, download it with the FTPService.
-                    if (_propertySettings.FTPImporterSettings.UseFTP)
-                        GetFileFromFtp(data[key]);
-                    else
-                        GetFileFromLocal(data[key]);
+                    switch (_propertySettings.FTPImporterSettings.Method)
+                    {
+                        case PropertyImporterMethod.Directory:
+                            GetFileFromLocal(data[key]);
+                            break;
+                        case PropertyImporterMethod.FtpBlm:
+                            GetFileFromFtp(data[key]);
+                            break;
+                    }
 
                     if (!HasFileError())
                     {
@@ -652,7 +682,7 @@ namespace Hood.Services
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, new MediaObject() { Directory = "Property/Epc" });
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {
@@ -719,7 +749,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 StatusMessage = "There was an error with validating a property.";
-                _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
                 Warnings.Add(FormatLog(StatusMessage));
                 Lock.ReleaseWriterLock();
                 return false;
@@ -750,7 +780,7 @@ namespace Hood.Services
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 StatusMessage = "There was an error downloading the file (" + filename + ")...";
-                _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
                 Errors.Add(FormatLog(StatusMessage));
                 FileError = true;
                 Lock.ReleaseWriterLock();
@@ -873,7 +903,7 @@ namespace Hood.Services
         {
             CheckForCancel();
 
-            property.Status = data["PUBLISHED_FLAG"] == "1" ? (int)Status.Published : (int)Status.Archived;
+            property.Status = data["PUBLISHED_FLAG"] == "1" ? ContentStatus.Published : ContentStatus.Archived;
 
             property.Reference = data["AGENT_REF"];
 
@@ -1018,21 +1048,21 @@ namespace Hood.Services
                         case GoogleStatus.RequestDenied:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
-                            _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                            _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
                         case GoogleStatus.OverQueryLimit:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
-                            _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                            _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
                         default:
                             Lock.AcquireWriterLock(Timeout.Infinite);
                             StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
-                            _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                            _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
                             Errors.Add(FormatLog(StatusMessage, property));
                             Lock.ReleaseWriterLock();
                             break;
@@ -1042,7 +1072,7 @@ namespace Hood.Services
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
                     StatusMessage = "There was an error GeoLocating the property.";
-                    _logService.LogErrorAsync("BLM Property Importer: " + StatusMessage, ex, LogType.Error, LogSource.Properties);
+                    _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -1058,7 +1088,7 @@ namespace Hood.Services
             return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), statusMessage);
         }
 
-        private PropertyListing UpdateMetadata(PropertyListing property, Dictionary<string, string> data)
+        private async Task<PropertyListing> UpdateMetadataAsync(PropertyListing property, Dictionary<string, string> data)
         {
             if (property.Metadata == null)
                 property.Metadata = new List<PropertyMeta>();
@@ -1100,28 +1130,29 @@ namespace Hood.Services
             {
 
                 bool includesWater = data["LET_BILL_INC_WATER"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Water", JsonConvert.SerializeObject(includesWater), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesWater", JsonConvert.SerializeObject(includesWater), "System.Boolean");
 
                 bool includesGas = data["LET_BILL_INC_GAS"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Gas", JsonConvert.SerializeObject(includesGas), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesGas", JsonConvert.SerializeObject(includesGas), "System.Boolean");
 
                 bool includesElectricity = data["LET_BILL_INC_ELECTRICITY"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Electricity", JsonConvert.SerializeObject(includesElectricity), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesElectricity", JsonConvert.SerializeObject(includesElectricity), "System.Boolean");
 
                 bool includesTvLicense = data["LET_BILL_INC_TV_LICENCE"] == "Y";
-                property = AddMeta(property, "Bill.Includes.TV.License", JsonConvert.SerializeObject(includesTvLicense), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesTVLicense", JsonConvert.SerializeObject(includesTvLicense), "System.Boolean");
 
                 bool includesTv = data["LET_BILL_INC_TV_SUBSCRIPTION"] == "Y";
-                property = AddMeta(property, "Bill.Includes.TV.Subscription", JsonConvert.SerializeObject(includesTv), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesTVSubscription", JsonConvert.SerializeObject(includesTv), "System.Boolean");
 
                 bool includesInternet = data["LET_BILL_INC_INTERNET"] == "Y";
-                property = AddMeta(property, "Bill.Includes.Internet", JsonConvert.SerializeObject(includesInternet), "System.Boolean");
+                property = AddMeta(property, "Bill.IncludesInternet", JsonConvert.SerializeObject(includesInternet), "System.Boolean");
 
             }
             catch (Exception ex)
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                StatusMessage = "Could not get the letting data for the property, this could be a sale property.";
+                StatusMessage = "Could not get the bills inclusive data for the property.";
+                await _logService.AddExceptionAsync<BlmFileImporter>(StatusMessage, property, ex, LogType.Warning);
                 Warnings.Add(FormatLog(StatusMessage, property));
                 Lock.ReleaseWriterLock();
             }

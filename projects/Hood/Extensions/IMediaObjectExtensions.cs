@@ -1,8 +1,6 @@
-﻿using Hood.Core;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Interfaces;
 using Hood.Models;
-using Hood.Services;
 using System;
 
 namespace Hood.Extensions
@@ -30,37 +28,33 @@ namespace Hood.Extensions
         }
         public static string ToIcon(this IMediaObject mediaObject)
         {
-            GenericFileType type = GenericFileType.Unknown;
-            string output = "";
-            if (Enum.TryParse(mediaObject.GeneralFileType, out type))
+            string output;
+            switch (mediaObject.GenericFileType)
             {
-                switch (type)
-                {
-                    case GenericFileType.Image:
-                        output = mediaObject.SmallUrl;
-                        break;
-                    case GenericFileType.Excel:
-                        return "/lib/hood/images/icons/excel.png";
-                    case GenericFileType.PDF:
-                        return "/lib/hood/images/icons/pdf.png";
-                    case GenericFileType.PowerPoint:
-                        return "/lib/hood/images/icons/powerpoint.png";
-                    case GenericFileType.Word:
-                        return "/lib/hood/images/icons/word.png";
-                    case GenericFileType.Photoshop:
-                        return "/lib/hood/images/icons/photoshop.png";
-                    case GenericFileType.Audio:
-                        return "/lib/hood/images/icons/audio.png";
-                    case GenericFileType.Video:
-                        return "/lib/hood/images/icons/video.png";
-                    case GenericFileType.Unknown:
-                    default:
-                        return "/lib/hood/images/icons/file.png";
-                }
+                case GenericFileType.Image:
+                    output = mediaObject.SmallUrl;
+                    break;
+                case GenericFileType.Excel:
+                    return "/hood/images/icons/excel.png";
+                case GenericFileType.PDF:
+                    return "/hood/images/icons/pdf.png";
+                case GenericFileType.PowerPoint:
+                    return "/hood/images/icons/powerpoint.png";
+                case GenericFileType.Word:
+                    return "/hood/images/icons/word.png";
+                case GenericFileType.Photoshop:
+                    return "/hood/images/icons/photoshop.png";
+                case GenericFileType.Audio:
+                    return "/hood/images/icons/audio.png";
+                case GenericFileType.Video:
+                    return "/hood/images/icons/video.png";
+                case GenericFileType.Unknown:
+                default:
+                    return "/hood/images/icons/file.png";
             }
             if (!output.IsSet())
             {
-                output = MediaObjectBase.NoImageUrl;
+                output = MediaBase.NoImageUrl;
             }
             return output;
         }
@@ -68,7 +62,6 @@ namespace Hood.Extensions
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(mediaObject);
         }
-
     }
 
 }

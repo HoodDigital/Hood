@@ -24,18 +24,18 @@ namespace Hood.Services
         {
             get
             {
-                BasicSettings _basicSettings = Engine.Current.Resolve<ISettingsRepository>().GetBasicSettings();
-                Models.MailSettings _mailSettings = Engine.Current.Resolve<ISettingsRepository>().GetMailSettings();
+                BasicSettings basicSettings = Engine.Settings.Basic;
+                Models.MailSettings mailSettings = Engine.Settings.Mail;
 
                 if (!Title.IsSet())
-                    Title = _basicSettings.SiteTitle;
+                    Title = basicSettings.FullTitle;
 
                 if (!Logo.IsSet())
-                    if (_mailSettings.Logo.IsSet())
-                        Logo = _mailSettings.Logo;
+                    if (mailSettings.Logo.IsSet())
+                        Logo = mailSettings.Logo;
                     else
-                        if (_basicSettings.SiteLogo.IsSet())
-                        Logo = _basicSettings.SiteLogo;
+                        if (basicSettings.Logo.IsSet())
+                        Logo = basicSettings.Logo;
 
                 if (Logo.IsSet())
                     return $"<h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>" +

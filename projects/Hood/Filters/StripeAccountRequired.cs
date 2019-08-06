@@ -1,12 +1,11 @@
-﻿using Hood.Enums;
+﻿using Hood.Controllers;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
-using System;
 
 namespace Hood.Filters
 {
@@ -25,43 +24,37 @@ namespace Hood.Filters
 
         private class StripeAccountRequiredAttributeImpl : IActionFilter
         {
-            private readonly ILogger _logger;
-            private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
+            private readonly IStripeService _stripe;
             private readonly UserManager<ApplicationUser> _userManager;
 
-            public StripeAccountRequiredAttributeImpl(ILoggerFactory loggerFactory,
-                                      IBillingService billing,
-                                      UserManager<ApplicationUser> userManager,
-                                      ISettingsRepository site)
+            public StripeAccountRequiredAttributeImpl(
+                IStripeService stripe,
+                UserManager<ApplicationUser> userManager)
             {
-                _logger = loggerFactory.CreateLogger<StripeAccountRequiredAttribute>();
-                _billing = billing;
-                _settings = site;
+                _stripe = stripe;
                 _userManager = userManager;
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
             {
-                var result = _settings.BillingEnabled();
-                if (!result.Succeeded)
+#warning Test for graceful error here.
+                if (Core.Engine.Settings.Billing.CheckStripeOrThrow())
                 {
-                    throw new Exception(result.ErrorString);
-                }
-                var user = _userManager.GetUserAsync(context.HttpContext.User).Result;
+                    var user = _userManager.GetUserAsync(context.HttpContext.User).Result;
 
-                if (!user.StripeId.IsSet())
-                {
-                    context.Result = new RedirectToActionResult("Index", "Billing", new { message = BillingMessage.NoStripeId });
-                    return;
-                }
+                    if (!user.StripeId.IsSet())
+                    {
+                        context.Result = new RedirectToActionResult(nameof(BillingController.Index), "Billing", null);
+                        return;
+                    }
 
-                var customer = _billing.Customers.FindByIdAsync(user.StripeId).Result;
+                    var customer = _stripe.GetCustomerByIdAsync(user.StripeId).Result;
 
-                if (customer == null)
-                {
-                    context.Result = new RedirectToActionResult("Index", "Billing", new { message = BillingMessage.NoCustomerObject });
-                    return;
+                    if (customer == null)
+                    {
+                        context.Result = new RedirectToActionResult(nameof(BillingController.Index), "Billing", null);
+                        return;
+                    }
                 }
             }
 

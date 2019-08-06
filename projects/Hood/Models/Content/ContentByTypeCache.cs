@@ -1,4 +1,5 @@
-﻿using Hood.Models;
+﻿using Hood.Core;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,19 +12,16 @@ namespace Hood.Caching
     public class ContentByTypeCache
     {
         private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
 
         private Dictionary<string, Lazy<Dictionary<int, Content>>> bySlug;
         private readonly ContentCategoryCache _categories;
         private readonly IEventsService _events;
 
         public ContentByTypeCache(IConfiguration config, 
-                                  ISettingsRepository settings,
                                   ContentCategoryCache categories,
                                   IEventsService events)
         {
             _config = config;
-            _settings = settings;
             _categories = categories;
             _events = events;
             EventHandler<EventArgs> resetContentByTypeCache = (sender, eventArgs) =>
@@ -49,7 +47,7 @@ namespace Hood.Caching
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             var db = new HoodDbContext(options.Options);
 
-            ContentSettings contentSettings = _settings.GetContentSettings();
+            ContentSettings contentSettings = Engine.Settings.Content;
             bySlug = new Dictionary<string, Lazy<Dictionary<int, Content>>>();
             foreach (var type in contentSettings.Types.Where(t => t.Enabled && t.CachedByType))
             {

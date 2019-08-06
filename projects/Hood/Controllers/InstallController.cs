@@ -1,7 +1,12 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
+using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Linq;
 
 namespace Hood.Controllers
 {
@@ -17,7 +22,19 @@ namespace Hood.Controllers
 
         public IActionResult Install()
         {
-            return View();
+            var model = new InstallModel();
+            var context = Engine.Services.Resolve<HoodDbContext>();
+            model.DatabaseConfigured = _config.IsDatabaseConfigured();
+            try
+            {
+                var profile = context.UserProfiles.FirstOrDefault();
+                model.ViewsInstalled = true;
+            }
+            catch (Exception)
+            {
+                model.ViewsInstalled = false;
+            }
+            return View(model);
         }
 
         [HttpPost]

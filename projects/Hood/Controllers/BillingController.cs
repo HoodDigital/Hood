@@ -1,7 +1,8 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
 using Hood.Extensions;
 using Hood.Filters;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,129 +14,188 @@ namespace Hood.Controllers
 {
     [Authorize]
     [StripeRequired]
-    public class BillingController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class BillingController : BaseController
     {
         public BillingController()
             : base()
         { }
 
         [HttpGet]
-        public async Task<IActionResult> Index(BillingMessage? message = null)
+        public async Task<IActionResult> Index()
         {
-            AccountInfo account = HttpContext.GetAccountInfo();
-            BillingHomeModel model = new BillingHomeModel()
-            {
-                User = account.User
-            };
+
+            BillingHomeModel model = new BillingHomeModel();
             try
             {
-                model.Customer = await _account.LoadCustomerObject(model.User?.StripeId, true);
+                model.Customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id);
                 if (model.Customer != null)
                 {
-                    model.Invoices = await _billing.Invoices.GetAllAsync(model.Customer.Id, null);
+
+                    model.Invoices = await _stripe.GetAllInvoicesAsync(model.Customer.Id, null);
                     try
                     {
-                        model.NextInvoice = await _billing.Invoices.GetUpcoming(model.Customer.Id);
+                        model.NextInvoice = await _stripe.GetUpcomingInvoiceAsync(model.Customer.Id);
                     }
                     catch (StripeException)
                     {
                         model.NextInvoice = null;
                     }
                 }
-                model.Message = message;
-                return View(model);
+                var subs = await _account.GetUserSubscriptionsAsync(new UserSubscriptionListModel() { UserId = Engine.Account.Id, PageSize = int.MaxValue });
+                model.Subscriptions = subs.List;
+            }
+            catch (StripeException stripeEx)
+            {
+                SaveMessage = $"Stripe error loading billing information for {Engine.Account.UserName}: {stripeEx.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, stripeEx);
             }
             catch (Exception ex)
             {
-                model.Message = ex.Message.ToEnum(BillingMessage.Error);
-                return View(model);
+                SaveMessage = $"Error loading billing information for {Engine.Account.UserName}: {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> PaymentMethods(string viewName = "_List_PaymentMethods")
+        {
+            PaymentMethodsModel model = new PaymentMethodsModel();
+            try
+            {
+                model.Customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id);
+                if (model.Customer != null)
+                {
+
+                }
+                var subs = await _account.GetUserSubscriptionsAsync(new UserSubscriptionListModel() { UserId = Engine.Account.Id, PageSize = int.MaxValue });
+                model.PaymentMethods = await _stripe.GetAllPaymentMethodsAsync(model.Customer.Id, "card");
+                return View(viewName, model);
+            }
+            catch (StripeException stripeEx)
+            {
+                SaveMessage = $"Stripe error loading billing information for {Engine.Account.UserName}: {stripeEx.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, stripeEx);
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"Error loading billing information for {Engine.Account.UserName}: {ex.Message}";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<BillingController>(SaveMessage, ex);
+                return BadRequest();
             }
         }
 
-        public async Task<IActionResult> AddCard()
+        #region Add Card
+        [StripeAccountRequired]
+        [Route("account/billing/payment-methods/add-card/")]
+        public IActionResult AddCard()
         {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
+            SetupIntent setupIntent = _stripe.SetupIntentService.Create(new SetupIntentCreateOptions());
+            ViewData["ClientSecret"] = setupIntent.ClientSecret;
             return View();
         }
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddCard(SubscriptionModel model, string returnUrl = null)
+        [StripeAccountRequired]
+        [Route("account/billing/payment-methods/add-card/")]
+        public async Task<IActionResult> AddCard([FromBody] SetupIntent intent)
         {
             try
             {
-                ApplicationUser user = await _userManager.GetUserAsync(User);
+                if (!intent.Id.IsSet())
+                    throw new Exception("The card could not be added, an invalid payment intent Id was supplied.");
 
-                // Check if the user has a stripeId - if they do, we dont need to create them again, we can simply add a new card token to their account, or use an existing one maybe.
-                if (user.StripeId.IsSet())
-                    model.Customer = await _billing.Customers.FindByIdAsync(user.StripeId);
-
-                // if not, then the user must have supplied a token
-                Stripe.Token stripeToken = _billing.Stripe.TokenService.Get(model.StripeToken);
-                if (stripeToken == null)
-                    throw new Exception("The provided card token was not valid.");
-
-                // Check if the customer object exists.
-                if (model.Customer == null)
+                var confirmOptions = new SetupIntentConfirmOptions { };
+                intent = await _stripe.SetupIntentService.GetAsync(intent.Id);
+                return await GenerateAddCardResponseAsync(intent);
+            }
+            catch (StripeException e)
+            {
+                return Json(new { error = e.StripeError.Message });
+            }
+            catch (Exception e)
+            {
+                return Json(new { error = e.Message });
+            }
+        }
+        private async Task<IActionResult> GenerateAddCardResponseAsync(SetupIntent intent)
+        {
+            if (intent.Status == "requires_action" && intent.NextAction.Type == "use_stripe_sdk")
+            {
+                return Json(new
                 {
-                    // if it does not, create it, add the card and subscribe the plan.
-                    model.Customer = await _billing.Customers.CreateCustomer(user, model.StripeToken);
-                    user.StripeId = model.Customer.Id;
-                    IdentityResult result = await _userManager.UpdateAsync(user);
-                }
-                else
+                    requires_action = true,
+                    payment_intent_client_secret = intent.ClientSecret
+                });
+            }
+            else
+            {
+                if (intent.Status == "succeeded")
                 {
-                    // finally, add the user to the subscription, using the new card as the charge source.
-                    await _billing.Cards.CreateCard(model.Customer.Id, model.StripeToken);
+                    // Attach to the customer object now.
+                    var customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id);
+                    if (customer == null)
+                        throw new Exception("Could not load or create a Stripe customer object for the user.");
+
+                    var options = new PaymentMethodAttachOptions
+                    {
+                        CustomerId = customer.Id,
+                    };
+                    await _stripe.PaymentMethodService.AttachAsync(intent.PaymentMethodId, options);
+
+                    return Json(new
+                    {
+                        success = true,
+                        url = Url.Action(nameof(Index))
+                    });
                 }
+                else throw new Exception("The card could not be added, an invalid payment intent status was supplied.");
+            }
+        }
+        #endregion
 
-                return RedirectToAction("Index");
-
+        #region Update/Delete Payment Methods
+        [StripeAccountRequired]
+        [Route("account/billing/payment-methods/set-default")]
+        public async Task<Response> SetDefault(string id)
+        {
+            try
+            {
+                await _stripe.SetDefaultPaymentMethodAsync(Engine.Account.StripeId, id);
+                return new Response(true, "This has now been set as your default card.");
+            }
+            catch (StripeException stripeEx)
+            {
+                return await ErrorResponseAsync<BillingController>($"Stripe error setting a default card for {Engine.Account.UserName}: {stripeEx.Message}", stripeEx);
             }
             catch (Exception ex)
             {
-                BillingMessage bm = BillingMessage.Null;
-                if (Enum.TryParse(ex.Message, out bm))
-                {
-                    model.AddBillingMessage(bm);
-                }
-                else
-                {
-                    model.AddBillingMessage(BillingMessage.StripeError);
-                }
-                return View(model);
+                return await ErrorResponseAsync<BillingController>($"Error setting a default card for {Engine.Account.UserName}: {ex.Message}", ex);
             }
         }
-
         [StripeAccountRequired]
-        public async Task<IActionResult> SetDefaultCard(string uid)
+        [Route("account/billing/payment-methods/delete")]
+        public async Task<Response> DeletePaymentMethod(string id)
         {
             try
             {
-                AccountInfo account = HttpContext.GetAccountInfo();
-                await _billing.Customers.SetDefaultCard(account.User.StripeId, uid);
-                return RedirectToAction("Index", "Billing");
+                await _stripe.DeletePaymentMethodAsync(Engine.Account.StripeId, id);
+                SaveMessage = $"Card deleted.";
+                MessageType = Enums.AlertType.Success;
+                return new Response(true, "This has now been deleting as a payment method.");
             }
-            catch (Exception)
+            catch (StripeException stripeEx)
             {
-                return RedirectToAction("Index", "Billing", new { Message = BillingMessage.Error });
+                return await ErrorResponseAsync<BillingController>($"Stripe error deleting a default card for {Engine.Account.UserName}: {stripeEx.Message}", stripeEx);
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<BillingController>($"Error deleting a default card for {Engine.Account.UserName}: {ex.Message}", ex);
             }
         }
-
-        [StripeAccountRequired]
-        public async Task<IActionResult> DeleteCard(string uid)
-        {
-            try
-            {
-                AccountInfo account = HttpContext.GetAccountInfo();
-                await _billing.Cards.DeleteCard(account.User.StripeId, uid);
-                return RedirectToAction("Index", "Billing");
-            }
-            catch (Exception)
-            {
-                return RedirectToAction("Index", "Billing", new { Message = BillingMessage.Error });
-            }
-        }
-
+        #endregion
     }
 }

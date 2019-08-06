@@ -1,0 +1,109 @@
+@model Subscription
+@inject IContentRepository _data
+@{
+    Layout = null;
+}
+<div class="modal fade modal-right media-blade" id="subscriptions-plans-create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <form id="subscriptions-plans-create-form" action="@Url.Action("Create")" asp-antiforgery="true" autocomplete="off" class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <div>
+                    <h5 class="modal-title">
+                        Add a subscription plan
+                    </h5>
+                    <p class="m-0 text-muted">
+                        <i class="fa fa-plus-circle mr-2"></i>Create a new subscription plan for users to pay for
+                    </p>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group floating-label">
+                    <input asp-for="Name" class="form-control" />
+                    <label asp-for="Name" class="control-label"></label>
+                    <small asp-for="Name"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <textarea type="text" class="form-control tinymce-simple" asp-for="Description"></textarea>
+                    <label asp-for="Description"></label>
+                    <small asp-for="Description"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="Public" class="custom-control-input">
+                        <label asp-for="Public" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="Public"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="CreatePrice" class="form-control" type="number" step="0.01" />
+                            <label asp-for="CreatePrice" class="control-label"></label>
+                            <small asp-for="CreatePrice"></small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group floating-label">
+                            <select asp-for="Currency" class="form-control">
+                                <option value="gbp">Pound Sterling (GBP)</option>
+                                <option value="usd">United States Dollar (USD)</option>
+                                <option value="eur">Euro (EUR)</option>
+                            </select>
+                            <label asp-for="Currency" class="control-label"></label>
+                            <small asp-for="Currency"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group floating-label">
+                            <select asp-for="Interval" class="form-control">
+                                <option value="day">Day</option>
+                                <option value="week">Week</option>
+                                <option value="month" selected>Month</option>
+                                <option value="year">Year</option>
+                            </select>
+                            <label asp-for="Interval" class="control-label"></label>
+                            <small asp-for="Interval"></small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="IntervalCount" type="number" min="1" step="1" class="form-control" />
+                            <label asp-for="IntervalCount" class="control-label"></label>
+                            <small asp-for="IntervalCount"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="TrialPeriodDays" class="form-control" />
+                    <label asp-for="TrialPeriodDays" class="control-label"></label>
+                    <small asp-for="TrialPeriodDays"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="form-group floating-label">
+                    <select asp-for="SubscriptionProductId" class="form-control">
+                        <option value="">No Group</option>
+                        @{
+                            var products = await Engine.AccountManager.GetSubscriptionProductsAsync();
+                        }
+                        @foreach (var product in products.List)
+                        {
+                            <option value="@product.Id">@product.DisplayName</option>
+                        }
+                    </select>
+                    <label asp-for="SubscriptionProductId"></label>
+                    <small asp-for="SubscriptionProductId"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="subscriptions-plans-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

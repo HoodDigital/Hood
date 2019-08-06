@@ -1,7 +1,7 @@
-﻿@model MailObject
+@model MailObject
 @{
-    MailSettings _mail = _settings.GetMailSettings();
-    SeoSettings _seoSettings = _settings.GetSeo();
+    MailSettings _mail = Engine.Settings.Mail;
+    SeoSettings _seoSettings = Engine.Settings.Seo;
 }
 <!doctype html>
 <html>

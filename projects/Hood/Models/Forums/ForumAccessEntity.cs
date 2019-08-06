@@ -11,13 +11,11 @@ namespace Hood.Models
     public class ForumAccessEntity : BaseEntity
     {
 
-        [Display(Name = "Viewing Requires Login")]
+        [Display(Name = "Viewing Requires Login", Description = "Choose whether or not users need to be logged in order to view the forums.")]
         public bool ViewingRequiresLogin { get; set; }
-        [Display(Name = "Viewing Requires Subscription")]
-        public bool ViewingRequiresSubscription { get; set; }
-        [Display(Name = "Viewing Susbcriptions")]
+        [Display(Name = "Viewing Susbcriptions", Description = "Choose which subscriptions users need to be subscribed to in order to view the forums.")]
         public string ViewingSubscriptions { get; set; }
-        [Display(Name = "Viewing Roles")]
+        [Display(Name = "Viewing Roles", Description = "Choose which roles users need to be added to in order to view the forums.")]
         public string ViewingRoles { get; set; }
 
         [NotMapped]
@@ -45,13 +43,11 @@ namespace Hood.Models
             }
         }
 
-        [Display(Name = "Posting Requires Login")]
+        [Display(Name = "Posting Requires Login", Description = "Choose whether or not users need to be logged in order to post on the forums.")]
         public bool PostingRequiresLogin { get; set; }
-        [Display(Name = "Posting Requires Subscription")]
-        public bool PostingRequiresSubscription { get; set; }
-        [Display(Name = "Posting Susbcriptions")]
+        [Display(Name = "Posting Susbcriptions", Description = "Choose which subscriptions users need to be subscribed to in order to post on the forums.")]
         public string PostingSubscriptions { get; set; }
-        [Display(Name = "Posting Roles")]
+        [Display(Name = "Posting Roles", Description = "Choose which roles users need to be added to in order to post on the forums.")]
         public string PostingRoles { get; set; }
 
         [NotMapped]
@@ -78,8 +74,10 @@ namespace Hood.Models
             }
         }
 
+        [NotMapped]
         [JsonIgnore]
-        public IList<Subscription> Subscriptions { get; set; }
+        public IList<SubscriptionPlan> Subscriptions { get; set; }
+        [NotMapped]
         [JsonIgnore]
         public IList<IdentityRole> Roles { get; set; }
     }

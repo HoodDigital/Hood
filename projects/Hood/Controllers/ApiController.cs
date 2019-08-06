@@ -1,9 +1,7 @@
 ﻿using Hood.Enums;
-using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,7 +11,7 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
     [Authorize(Roles= "Admin,Api")]
-    public class ApiController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class ApiController : BaseController
     {
         private readonly UrlEncoder _urlEncoder;
 
@@ -23,7 +21,7 @@ namespace Hood.Controllers
             _urlEncoder = urlEncoder;
         }
 
-        public async Task<IActionResult> Index(EditorMessage? message = null)
+        public async Task<IActionResult> Index()
         {
             // if the user doesnt have a key - create them one!
             var user = await _userManager.GetUserAsync(User);
@@ -32,41 +30,44 @@ namespace Hood.Controllers
                 .Include(f => f.Events)
                 .FirstOrDefaultAsync(f => f.UserId == user.Id);
 
-            model.AddEditorMessage(message);
-
             if (model == null)
             {
                 await CreateNewKeyAsync(user);
-
                 model = await _db.ApiKeys
                     .Include(f => f.User)
                     .Include(f => f.Events)
                     .FirstOrDefaultAsync(f => f.UserId == user.Id);
-
-                model.AddEditorMessage(EditorMessage.KeyCreated);
             }
+
             return View(model);
         }
 
-        public async Task<IActionResult> Roll()
+        public async Task<IActionResult> Roll(string keyId)
         {
-            // if the user doesnt have a key - create them one!
-            var user = await _userManager.GetUserAsync(User);
-            var model = await _db.ApiKeys
-                .Include(f => f.User)
-                .Include(f => f.Events)
-                .FirstOrDefaultAsync(f => f.UserId == user.Id);
-
-            if (model == null)
+            try
             {
-                return RedirectToAction("Index", new { message = EditorMessage.NotFound });
+                // if the user doesnt have a key - create them one!
+                var user = await _userManager.GetUserAsync(User);
+                var model = await _db.ApiKeys
+                    .Include(f => f.User)
+                    .Include(f => f.Events)
+                    .SingleOrDefaultAsync(f => f.Id == keyId);
+
+                if (model == null)
+                    throw new Exception("Could not find a key for matching that Id.");
+
+                var generator = new KeyGenerator(true, true, true, false);
+                model.Key = generator.Generate(24);
+                await _db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"Error rolling an API key ({keyId}).";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ApiController>(SaveMessage, ex);
             }
 
-            var generator = new KeyGenerator(true, true, true, false);
-            model.Key = generator.Generate(24);
-            await _db.SaveChangesAsync();
-
-            return View(model);
+            return RedirectToAction(nameof(Index));
         }
 
         private async Task CreateNewKeyAsync(ApplicationUser user)

@@ -1,105 +1,53 @@
 @model PropertyListing
 @inject IContentRepository _data
 @{
-    var _integrationSettings = _settings.GetIntegrationSettings();
+    var _integrationSettings = Engine.Settings.Integrations;
 }
 <div id="info" class="tab-pane active">
-    <div class="panel-body">
-        <fieldset class="form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Title</label>
-                <div class="col-sm-8"><input asp-for="Title" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Short Description</label>
-                <div class="col-sm-8"><input asp-for="ShortDescription" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Internal Reference</label>
-                <div class="col-sm-8"><input asp-for="Reference" type="text" class="form-control" /></div>
-            </div>
-            <hr />
-            @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
+    <h5 class="mt-2 mb-0">Property Listing, Title and Description</h5>
+    <p>Set titles, descriptions and enter the main body of the property. You can adjust what editors you see here in the <a asp-action="Property" asp-controller="Settings">content settings</a> area.</p>
+   <div class="form-group floating-label">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" type="text" class="form-control" />
+        <small asp-for="Title"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="ShortDescription"></label>
+        <textarea asp-for="ShortDescription" class="tinymce-simple"></textarea>
+        <small asp-for="ShortDescription"></small>
+    </div>
+    <div class="form-group floating-label">
+        <label asp-for="Reference"></label>
+        <input asp-for="Reference" type="text" class="form-control" />
+        <small asp-for="Reference"></small>
+    </div>
+    <hr class="mt-4 mb-4" />
+    <partial name="_Editor_Images" />
+    <hr class="mt-4 mb-4" />
+    <h5 class="mt-2 mb-0">Property Address</h5>
+    <p>Addres and location information for this property listing.</p>
+    @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
     {
-        <div class="form-group">
-            <label class="col-sm-3 control-label">Lookup Address</label>
-            <div class="col-sm-8">
-                <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." autocomplete="off" />
-            </div>
+        <div class="form-group floating-label">
+            <label for="address-autocomplete">Search for an address (Google Lookup)</label>
+            <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." autocomplete="off" />
+            <small class="text-info form-text">Search for an address here with Google, and automatically fill in the address form, including the map Latitude/Longitude fields.</small>
         </div>
         <hr />
-}
-            <div class="form-group">
-                <label class="col-sm-3 control-label" asp-for="Number"></label>
-                <div class="col-sm-8"><input asp-for="Number" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Address 1</label>
-                <div class="col-sm-8"><input asp-for="Address1" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Address 2</label>
-                <div class="col-sm-8"><input asp-for="Address2" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">City</label>
-                <div class="col-sm-8"><input asp-for="City" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">County</label>
-                <div class="col-sm-8"><input asp-for="County" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Country</label>
-                <div class="col-sm-8">
-                    <select class="form-control" asp-for="Country">
-                        <option value="">-- Choose a country --</option>
-                        @foreach (var itm in _data.AllCountries())
-                {
-                    if (itm.Name == "United Kingdom")
-                    {
-                        <option value="@itm.Name" selected>@itm.Name</option>
-            }
-            else
-            {
-                <option value="@itm.Name">@itm.Name</option>
     }
-}
-                    </select>
-                </div>
+    <partial name="_Editor_Address" />
+    @if (Engine.Settings.Integrations.IsGoogleGeocodingEnabled)
+    {
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="AutoGeocode" class="custom-control-input">
+                <label asp-for="AutoGeocode" class="custom-control-label"></label>
             </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Postcode</label>
-                <div class="col-sm-8"><input asp-for="Postcode" type="text" class="form-control" /></div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Auto locate address?</label>
-                <div class="col-sm-8">
-                    <div class="checkbox">
-                        <input asp-for="AutoGeocode" class="styled">
-                        <label asp-for="AutoGeocode">Use the Google Address Service to lookup your address from the postcode/address information provided, and get a map Latitude/Longitude reference to use with Google Maps.</label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Latitude/Longitude</label>
-                <div class="col-sm-4"><input asp-for="Latitude" type="text" class="form-control" /></div>
-                <div class="col-sm-4"><input asp-for="Longitude" type="text" class="form-control" /></div>
-            </div>
-        </fieldset>
-        <hr />
-        <fieldset class="form-horizontal">
-            <div class="form-group">
-                <label class="col-sm-3 control-label">Info PDF Download</label>
-                <div class="col-sm-8">
-                    <input type="hidden" asp-for="InfoDownloadJson" />
-                    <a href="@Model.InfoDownload?.DownloadUrl">
-                        <fixedImage src="@Model.InfoDownload?.Icon" class="img-xs img-circle m-r-sm content-infodownload-@Model.Id" id="property-info-@Model.Id" title="@Model.InfoDownload?.Filename" />
-                    </a>
-                    <attacher dataid="@Model.Id" entity="PropertyListing" field="InfoDownload" type="image" refresh="/admin/property/getmedia?type=InfoDownload" tag="content-infodownload-@Model.Id" data-json="InfoDownloadJson" title="Choose a featured image." class="btn btn-xs btn-primary">Choose...</attacher>
-                    <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearField" asp-controller="Property" asp-area="Admin" asp-route-id="@Model.Id" data-complete="$.hood.Uploader.RefreshImage('.property-feature-@Model.Id', '/admin/property/getmedia?type=InfoDownload', @Model.Id)"><i class="fa fa-trash"></i></a>
-                </div>
-            </div>
-        </fieldset>
-    </div>
+            <small asp-for="AutoGeocode"></small>
+        </div>
+    }
+    else
+    {
+        <input asp-for="AutoGeocode" type="hidden">
+    }
 </div>

@@ -1,13 +1,9 @@
-﻿using Hood.Extensions;
-using Hood.Models;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 
 namespace Hood.Filters
 {
@@ -16,27 +12,17 @@ namespace Hood.Filters
     /// </summary>
     public class LockoutModeFilter : IActionFilter
     {
-        private readonly ILogger _logger;
-        private readonly ISettingsRepository _settings;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _config;
+        private readonly ILogService _logService;
 
-        public LockoutModeFilter(IConfiguration config,
-            ILoggerFactory loggerFactory,
-            IBillingService billing,
-            ISettingsRepository settings,
-            UserManager<ApplicationUser> userManager)
+        public LockoutModeFilter()
         {
-            _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
-            _settings = settings;
-            _config = config;
-            _userManager = userManager;
+            _logService = Engine.Services.Resolve<ILogService>();
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
             IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-            var basicSettings = _settings.GetBasicSettings();
+            var basicSettings = Engine.Settings.Basic;
             if (basicSettings.LockoutMode)
             {
                 // if this is the login page, or the betalock page allow the user through.
@@ -63,17 +49,15 @@ namespace Hood.Filters
                 }
 
                 // If they are in an override role, let them through.
-                if (context.HttpContext.User.Identity.IsAuthenticated)
+                if (context.HttpContext.User.IsAdminOrBetter())
                 {
-                    AccountInfo _account = context.HttpContext.GetAccountInfo();
-
-                    string[] _roles = { "SuperUser", "Admin" };
-                    if (_userManager.GetRolesAsync(_account.User).Result.Any(r => _roles.Contains(r)))
-                        return;
+                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User.Identity.Name}, accessed the site through the code lockout, as they are an administrator.");
+                    return;
                 }
 
-                if (context.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
+                if (context.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
                 {
+                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User}, accessed the site through the code lockout, as they are an administrator.");
                     context.Result = result;
                     return;
                 }

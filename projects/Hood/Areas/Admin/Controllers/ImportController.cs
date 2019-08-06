@@ -1,18 +1,19 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
-    public class ImportController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    [Authorize(Roles = "SuperUser,Admin")]
+    public class ImportController : BaseController
     {
         private readonly IFTPService _ftp;
         private readonly IPropertyImporter _blm;
@@ -39,9 +40,9 @@ namespace Hood.Areas.Admin.Controllers
         [HttpPost]
         [Route("admin/property/import/blm/trigger")]
         [AllowAnonymous]
-        public IActionResult BlmPropertyImporterTrigger()
+        public async Task<IActionResult> BlmPropertyImporterTrigger()
         {
-            var triggerAuth = _settings.GetPropertySettings().TriggerAuthKey;
+            var triggerAuth = Engine.Settings.Property.TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
             {
                 _blm.RunUpdate(HttpContext);
@@ -58,7 +59,7 @@ namespace Hood.Areas.Admin.Controllers
             logWriter.WriteLine("Blm Importer Report: ");
             logWriter.Write(status.ToFormattedJson());
 
-            _env.WriteLogToFile<IPropertyImporter>(logWriter.ToString());
+            await _logService.AddLogAsync<ImportController>("Unauthorized API access attempt.", logWriter.ToString(), LogType.Warning);
 
             return StatusCode(401);
         }

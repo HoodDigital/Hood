@@ -1,262 +1,372 @@
 ﻿using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
-using Hood.Services;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
-using System.IO;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Manager")]
-    public class SubscriptionsController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    [Authorize(Roles = "SuperUser,Admin")]
+    public class SubscriptionsController : BaseController
     {
         public SubscriptionsController()
             : base()
         {
         }
 
-        [Route("admin/subscriptions/")]
-        public async Task<IActionResult> Index(SubscriptionSearchModel model)
+        #region Lists
+        [Route("admin/subscriptions/plans/")]
+        public async Task<IActionResult> Plans(SubscriptionPlanListModel model)
         {
-            model = await _account.GetPagedSubscriptionPlans(model);
-            return View(model);
+            return await PlansList(model, "Plans");
         }
 
-        [Route("admin/subscribers/")]
-        public async Task<IActionResult> Subscribers(SubscriberSearchModel model)
+        [Route("admin/subscriptions/subscribers/")]
+        public async Task<IActionResult> Subscribers(UserSubscriptionListModel model)
         {
-            model = await _account.GetPagedSubscribers(model);
-            return View(model);
+            return await SubscribersList(model, "Subscribers");
         }
 
-        [Route("admin/subscriptions/edit/{id}/")]
-        public async Task<IActionResult> Edit(int id, EditorMessage? message)
+        [Route("admin/subscriptions/products/")]
+        public async Task<IActionResult> Products(SubscriptionProductListModel model)
         {
-            var model = await _account.GetSubscriptionPlanById(id);
-            model.AddEditorMessage(message);
+            return await ProductsList(model, "Products");
+        }
+
+        [Route("admin/subscriptions/stripe/plans/")]
+        public async Task<IActionResult> Stripes(StripePlanListModel model)
+        {
+            return await StripeList(model, "Stripe");
+        }
+
+        [Route("admin/subscriptions/stripe/products/")]
+        public async Task<IActionResult> StripeProducts(StripeProductListModel model)
+        {
+            return await StripeProductList(model, "StripeProducts");
+        }
+
+        [Route("admin/subscriptions/plans/list/")]
+        public async Task<IActionResult> PlansList(SubscriptionPlanListModel model, string viewName)
+        {
+            model = await _account.GetSubscriptionPlansAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Plans", model);
+        }
+
+        [Route("admin/subscriptions/subscribers/list/")]
+        public async Task<IActionResult> SubscribersList(UserSubscriptionListModel model, string viewName)
+        {
+            model = await _account.GetUserSubscriptionsAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Subscribers", model);
+        }
+
+        [Route("admin/subscriptions/products/list/")]
+        public async Task<IActionResult> ProductsList(SubscriptionProductListModel model, string viewName)
+        {
+            model = await _account.GetSubscriptionProductsAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Products", model);
+        }
+
+        [Route("admin/subscriptions/stripe/plans/list/")]
+        public async Task<IActionResult> StripeList(StripePlanListModel model, string viewName)
+        {
+            model = await _account.GetStripeSubscriptionPlansAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Stripe", model);
+        }
+        [Route("admin/subscriptions/stripe/products/list/")]
+        public async Task<IActionResult> StripeProductList(StripeProductListModel model, string viewName)
+        {
+            model = await _account.GetStripeProductsAsync(model);
+            return View(viewName.IsSet() ? viewName : "_List_Stripe", model);
+        }
+        #endregion
+
+
+        #region Edit Subscription (Plan)
+        [Route("admin/subscriptions/plans/edit/{id}/")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            Models.Subscription model = await _account.GetSubscriptionPlanByIdAsync(id);
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            model.StripePlan = await _stripe.GetPlanByIdAsync(model.StripeId);
+
             return View(model);
         }
 
         [HttpPost()]
-        [Route("admin/subscriptions/edit/{id}/")]
-        public async Task<ActionResult> Edit(Subscription model)
+        [Route("admin/subscriptions/plans/edit/{id}/")]
+        public async Task<ActionResult> Edit(Models.Subscription model)
         {
             try
             {
-                await _account.UpdateSubscription(model);
-                model.SaveMessage = "Subscription saved.";
-                model.MessageType = Enums.AlertType.Success;
+                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedOn = DateTime.Now;
+
+                await _account.UpdateSubscriptionPlanAsync(model);
+                SaveMessage = "Subscription saved.";
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                model.SaveMessage = "An error occurred while saving: " + ex.Message;
-                model.MessageType = Enums.AlertType.Danger;
-                await _logService.LogErrorAsync(
+                SaveMessage = "Errorsaving: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
                    ex,
                    LogType.Error,
-                   LogSource.Subscriptions,
                    _userManager.GetUserId(User),
-                   model.Id.ToString(),
-                   nameof(Subscription),
                    Url.AbsoluteAction("Index", "Subscriptions")
                );
             }
+
+            model.StripePlan = await _stripe.GetPlanByIdAsync(model.StripeId);
+
             return View(model);
         }
+        #endregion
 
-        [Route("admin/subscriptions/create/")]
+        #region Create Subscription (Plan)
+        [Route("admin/subscriptions/plans/create")]
         public IActionResult Create()
         {
-            return View();
+            return View("_Blade_Plan", new Models.Subscription() { IntervalCount = 1, Public = true });
         }
 
         [HttpPost]
-        [Route("admin/subscriptions/add")]
-        public async Task<Response> Add(CreateSubscriptionModel model)
+        [Route("admin/subscriptions/plans/create")]
+        public async Task<Response> Create(Models.Subscription model)
         {
-            Subscription subscription = new Subscription();
             try
             {
                 ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-                BillingSettings billingSettings = _settings.GetBillingSettings();
+                BillingSettings billingSettings = Engine.Settings.Billing;
 
-                var newId = model.StripeId.IsSet() ? model.StripeId : Guid.NewGuid().ToString();
-                if (_settings.GetBillingSettings().EnableStripeTestMode)
-                    newId += "-test";
+                model.Currency = billingSettings.StripeCurrency;
+                model.CreatedBy = user.UserName;
+                model.Created = DateTime.Now;
+                model.LastEditedBy = user.UserName;
+                model.LastEditedOn = DateTime.Now;
+                model.Amount = (int)Math.Floor(model.CreatePrice * 100);
+                model.LiveMode = billingSettings.EnableStripeTestMode;
 
-                subscription = new Subscription
-                {
-                    CreatedBy = user.Id,
-                    StripeId = newId,
-                    Created = DateTime.Now,
-                    LastEditedBy = user.UserName,
-                    LastEditedOn = DateTime.Now,
-                    Amount = (int)Math.Floor(model.Amount * 100),
-                    Currency = model.Currency,
-                    Description = model.Description,
-                    Interval = model.Interval,
-                    IntervalCount = model.IntervalCount,
-                    Name = model.Name,
-                    Public = model.Public,
-                    Level = model.Level,
-                    Addon = model.AddOn,
-                    TrialPeriodDays = model.TrialPeriodDays,
-                    LiveMode = billingSettings.EnableStripeTestMode
-                };
-                subscription = await _account.AddSubscriptionPlan(subscription);
-                await _logService.AddLogAsync(
-                    string.Format("Subscription ({0}) added with name: {1}", subscription.StripeId, subscription.Name),
-                    LogSource.Subscriptions,
-                    JsonConvert.SerializeObject(subscription),
-                    LogType.Success,
-                    _userManager.GetUserId(User),
-                    subscription.Id.ToString(),
-                    nameof(Subscription),
-                    Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
+                model = await _account.CreateSubscriptionPlanAsync(model);
+                await _logService.AddLogAsync<SubscriptionsController>(
+                    $"Subscription ({model.StripeId}) added with name: {model.Name}",
+                    model
                 );
-
-                var response = new Response(true, "Published successfully.");
-                response.Url = Url.Action("Edit", new { id = subscription.Id, message = EditorMessage.Created });
-                return response;
+                return new Response(true, $"The subscription plan was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { id = model.Id })}'>Go to the new plan</a>");
             }
             catch (Exception ex)
             {
-                await _logService.LogErrorAsync(
-                    string.Format("Error adding subscription ({0}) with name: {1}", subscription.StripeId.IsSet() ? subscription.StripeId : "No Stripe Id", subscription.Name),
-                    ex,
-                    LogType.Error,
-                    LogSource.Subscriptions,
-                    _userManager.GetUserId(User),
-                    subscription.Id.ToString(),
-                    nameof(Subscription),
-                    Url.AbsoluteAction("Index", "Subscriptions")
+                return await ErrorResponseAsync<SubscriptionsController>(
+                    $"Error adding subscription ({model.StripeId}) with name: {model.Name}",
+                    ex
                 );
-                return new Response(ex.Message);
             }
         }
+        #endregion
 
-        [Route("admin/subscriptions/delete")]
+        #region Delete Subscription (Plan)
+        [Route("admin/subscriptions/plans/delete")]
         [HttpPost()]
         public async Task<Response> Delete(int id)
         {
             try
             {
-                var subscription = await _account.GetSubscriptionPlanById(id);
-                await _account.DeleteSubscriptionPlan(id);
-                await _logService.AddLogAsync(
-                string.Format("Subscription ({0}) deleted with name: {1}", subscription.StripeId, subscription.Name),
-                    LogSource.Subscriptions,
-                    JsonConvert.SerializeObject(subscription),
-                    LogType.Success,
-                    _userManager.GetUserId(User),
-                    subscription.Id.ToString(),
-                    nameof(Subscription),
-                    Url.AbsoluteAction("Edit", "Subscriptions", new { id = subscription.Id })
-                );
-                return new Response(true);
+                Models.Subscription subscription = await _account.DeleteSubscriptionPlanAsync(id);
+
+                await _logService.AddLogAsync<SubscriptionsController>($"Subscription plan {subscription.Name} ({subscription.StripeId}) was deleted.", type: LogType.Success);
+                return new Response(true, $"The subscription plan has been deleted.");
             }
             catch (Exception ex)
             {
-                await _logService.LogErrorAsync(
-                    string.Format("Error deleting subscription with id: {0}", id),
-                    ex,
-                    LogType.Error,
-                    LogSource.Subscriptions,
-                    _userManager.GetUserId(User),
-                    id.ToString(),
-                    nameof(Subscription),
-                    Url.AbsoluteAction("Index", "Subscriptions")
-                );
-                return new Response(ex.Message);
+                return await ErrorResponseAsync<SubscriptionsController>($"Error deleting subscription plan with id: {id}", ex);
             }
         }
+        #endregion
 
-        [Route("admin/subscriptions/stripe/")]
-        public async Task<IActionResult> Stripe()
+
+        #region Edit Subscription (Product)
+        [Route("admin/subscriptions/products/edit/{id}/")]
+        public async Task<IActionResult> EditProduct(int id)
         {
-            var model = await _billing.SubscriptionPlans.GetAllAsync();
+            SubscriptionProduct model = await _account.GetSubscriptionProductByIdAsync(id);
+            model.StripeProduct = await _stripe.GetProductByIdAsync(model.StripeId);
             return View(model);
         }
 
-        [Route("admin/subscriptions/stripe/test/webhook")]
-        public IActionResult Webhook()
+        [HttpPost()]
+        [Route("admin/subscriptions/products/edit/{id}/")]
+        public async Task<ActionResult> EditProduct(SubscriptionProduct model)
         {
-            return View();
+            try
+            {
+                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedOn = DateTime.Now;
+
+                await _account.UpdateSubscriptionProductAsync(model);
+                SaveMessage = "Subscription product group saved.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Error saving: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                   $"Error saving subscription product ({model.StripeId}) with name: {model.DisplayName}",
+                   ex
+                );
+            }
+            model.StripeProduct = await _stripe.GetProductByIdAsync(model.StripeId);
+            return View(model);
+        }
+        #endregion
+
+        #region Create Subscription (Product)
+        [Route("admin/subscriptions/products/create/")]
+        public IActionResult CreateProduct()
+        {
+            return View("_Blade_Product", new SubscriptionProduct());
         }
 
         [HttpPost]
-        [Route("admin/subscriptions/stripe/test/webhook")]
-        public IActionResult Webhook(StripeWebhookTest model)
+        [Route("admin/subscriptions/products/create/")]
+        public async Task<Response> CreateProduct(SubscriptionProduct model)
         {
-            string url = string.Format("{0}stripe/webhooks", ControllerContext.HttpContext.GetSiteUrl());
             try
             {
-                if (!model.Body.IsSet())
-                    throw new Exception("You must enter a body, in json format.");
-
-                HttpWebRequest testRequest = (HttpWebRequest)WebRequest.Create(url);
-
-                ASCIIEncoding encoding = new ASCIIEncoding();
-                byte[] data = encoding.GetBytes(model.Body);
-
-                testRequest.Method = "POST";
-                testRequest.ContentType = "text/json"; //place MIME type here
-                testRequest.ContentLength = data.Length;
-
-                Stream newStream = testRequest.GetRequestStream();
-                newStream.Write(data, 0, data.Length);
-                newStream.Close();
-
-                HttpWebResponse response = (HttpWebResponse)testRequest.GetResponse();
-
-                using (var reader = new System.IO.StreamReader(response.GetResponseStream(), encoding))
-                {
-                    model.Response = reader.ReadToEnd();
-                }
-
-                ViewBag.Message = string.Format(
-                    "<div class='alert alert-success'><i class='fa fa-info-circle m-r-sm'></i>Remote server call to {0} was sent successfully.</div>",
-                    url);
-            }
-            catch (WebException wex)
-            {
-                var httpResponse = wex.Response as HttpWebResponse;
-                if (httpResponse != null)
-                {
-                    ViewBag.Message = string.Format(
-                        "<div class='alert alert-danger'><i class='fa fa-exclamation-triangle m-r-sm'></i>Remote server call to {0} resulted in a http error {1} {2}.</div>",
-                        url,
-                        httpResponse.StatusCode,
-                        httpResponse.StatusDescription);
-                }
-                else
-                {
-                    ViewBag.Message = string.Format(
-                        "<div class='alert alert-danger'><i class='fa fa-exclamation-triangle m-r-sm'></i>Remote server call to {0} resulted in an error.</div>",
-                        url);
-                }
+                await _account.CreateSubscriptionProductAsync(model.DisplayName, model.StripeId);
+                await _logService.AddLogAsync<SubscriptionsController>($"Subscription product ({model.StripeId}) added with name: {model.DisplayName}", model);
+                return new Response(true, $"The subscription product was created successfully.<br /><a href='{Url.Action(nameof(EditProduct), new { id = model.Id })}'>Go to the new product</a>");
             }
             catch (Exception ex)
             {
-                ViewBag.Message = string.Format(
-                    "<div class='alert alert-danger'><i class='fa fa-exclamation-triangle m-r-sm'></i>An error occurred: <strong>{0}</strong><br />{1}</div>",
-                    ex.Message.ToString(),
-                    ex.ToString());
+                return await ErrorResponseAsync<SubscriptionsController>($"Error adding subscription product ({model.StripeId}) with name: {model.DisplayName}", ex);
             }
-            return View(model);
         }
+        #endregion
 
+        #region Delete Subscription (Product)
+        [Route("admin/subscriptions/products/delete")]
+        [HttpPost()]
+        public async Task<Response> DeleteProduct(int id)
+        {
+            try
+            {
+                SubscriptionProduct subscriptionProduct = await _account.DeleteSubscriptionProductAsync(id);
+
+                await _logService.AddLogAsync<SubscriptionsController>($"Subscription product group {subscriptionProduct.DisplayName} ({subscriptionProduct.StripeId}) was deleted.", type: LogType.Success);
+                return new Response(true, $"The subscription product group has been deleted.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<SubscriptionsController>($"Error deleting subscription product group with id: {id}", ex);
+            }
+        }
+        #endregion
+
+
+        #region Delete Subscription (Subscription)
+        [Route("admin/subscriptions/subscription/delete")]
+        [HttpPost()]
+        public async Task<Response> DeleteSubscription(int id)
+        {
+            try
+            {
+                UserSubscription subscription = await _account.DeleteUserSubscriptionAsync(id);
+                await _logService.AddLogAsync<SubscriptionsController>($"Subscription ({subscription.StripeId}) deleted with for user: {subscription.UserId}", type: LogType.Success);
+                return new Response(true, $"The subscription has been deleted.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<SubscriptionsController>($"Error deleting user subscription with id: {id}", ex);
+            }
+        }
+        #endregion
+
+
+        #region Syncing
+        [Route("admin/subscriptions/products/sync")]
+        public async Task<IActionResult> SyncProduct(int? id, string stripeId)
+        {
+            try
+            {
+                SubscriptionProduct product = await _account.SyncSubscriptionProductAsync(id, stripeId);
+
+                SaveMessage = "Product successfully synced with Stripe.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "There was an error while syncing: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                    $"Error syncing subscription product with Id: {id} / {stripeId}",
+                    ex,
+                    LogType.Error,
+                    _userManager.GetUserId(User),
+                    Url.AbsoluteAction("SyncProduct", "Subscriptions")
+                );
+            }
+            return RedirectToAction(nameof(Products));
+        }
+        [Route("admin/subscriptions/plans/sync")]
+        public async Task<IActionResult> SyncPlan(int? id, string stripeId)
+        {
+            try
+            {
+                Models.Subscription subscription = await _account.SyncSubscriptionPlanAsync(id, stripeId);
+
+                SaveMessage = "Product successfully synced with Stripe.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "There was an error while syncing: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                   $"Error syncing subscription plan with Id: {id} / {stripeId}",
+                   ex,
+                   LogType.Error,
+                   _userManager.GetUserId(User),
+                   Url.AbsoluteAction("SyncPlan", "Subscriptions")
+               );
+            }
+            return RedirectToAction(nameof(Plans));
+        }
+        [Route("admin/subscriptions/subscribers/sync")]
+        public async Task<IActionResult> SyncSubscription(int id)
+        {
+            try
+            {
+                UserSubscription subscription = await _account.SyncUserSubscriptionAsync(id, null);
+                SaveMessage = "Subscription successfully synced with Stripe.";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "There was an error while syncing: " + ex.Message;
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<SubscriptionsController>(
+                  $"Error syncing user subscription with Id: {id}",
+                  ex,
+                  LogType.Error,
+                  _userManager.GetUserId(User),
+                  Url.AbsoluteAction("SyncSubscription", "Subscriptions")
+              );
+            }
+            return RedirectToAction(nameof(Subscribers));
+        }
+        #endregion
     }
 }
 

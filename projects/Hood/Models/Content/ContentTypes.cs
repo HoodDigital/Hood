@@ -1,89 +1,7 @@
-﻿using Hood.Extensions;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Hood.Models
 {
-    public class ContentType
-    {
-        public string BaseName { get; set; }
-        public bool Enabled { get; set; }
-        public string Slug { get; set; }
-        public string Title { get; set; }
-        public string MetaTitle { get; set; }
-        public string Description { get; set; }
-        public string Search { get; set; }
-        public string Type { get; set; }
-        public string TypeName { get; set; }
-        public string TypeNamePlural { get; set; }
-        public string Icon { get; set; }
-        public bool HasPage { get; set; }
-        public bool IsPublic { get; set; }
-        public string TitleName { get; set; }
-        public string ExcerptName { get; set; }
-        public bool ShowPreview { get; set; }
-        public bool ShowEditor { get; set; }
-        public bool ShowDesigner { get; set; }
-        public bool MultiLineExcerpt { get; set; }
-        public bool RichTextExcerpt { get; set; }
-        public bool ShowCategories { get; set; }
-        public bool ShowImage { get; set; }
-        public bool ShowBanner { get; set; }
-        public bool ShowMeta { get; set; }
-        public bool Templates { get; set; }
-        public bool Gallery { get; set; }
-        public string CustomFieldsJson { get; set; }
-        public string TemplateFolder { get; set; }
-        public string UrlFormatting { get; set; }
-
-        public List<CustomField> CustomFields
-        {
-            get
-            {
-                if (!CustomFieldsJson.IsSet())
-                    return new List<CustomField>();
-                return JsonConvert.DeserializeObject<List<CustomField>>(CustomFieldsJson);
-            }
-            set
-            {
-                CustomFieldsJson = JsonConvert.SerializeObject(value);
-            }
-        }
-
-        public bool CachedByType { get; internal set; }
-
-        public CustomField GetMetaDetails(string name)
-        {
-            var field = CustomFields.SingleOrDefault(c => c.Name == name);
-            if (field != null)
-                return field;
-            var baseType = ContentTypes.All.SingleOrDefault(t => t.TypeName == TypeName);
-            if (baseType != null)
-            {
-                field = baseType.CustomFields.SingleOrDefault(c => c.Name == name);
-                if (field != null)
-                    return field;
-            }
-            return new CustomField()
-            {
-                Default = "",
-                Name = name,
-                System = false,
-                Type = "System.String"
-            };
-        }
-    }
-
-    public class CustomField
-    {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Default { get; set; }
-        public bool System { get; set; }
-    }
-
-    // Static Functionality
     public static class ContentTypes
     {
         public static List<ContentType> All
@@ -111,7 +29,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = true,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "SliderTemplates",
@@ -129,7 +46,7 @@ namespace Hood.Models
                         Type = "news",
                         Search = "news",
                         Title = "News Stories",
-                        Icon = "fa-newspaper-o",
+                        Icon = "fa-newspaper",
                         TypeName = "Story",
                         Enabled = true,
                         IsPublic = true,
@@ -143,7 +60,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = true,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = true,
                         UrlFormatting = "news-title",
                         Templates = false,
@@ -175,7 +91,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = false,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
@@ -196,12 +111,12 @@ namespace Hood.Models
                         TitleName = "Question",
                         ExcerptName = "Answer",
                         MultiLineExcerpt = true,
+                        RichTextExcerpt = true,
                         ShowDesigner = false,
                         ShowEditor = false,
                         ShowCategories = true,
                         ShowBanner = false,
                         ShowImage = false,
-                        ShowMeta = true,
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
@@ -231,7 +146,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = true,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = false,
                         Templates = true,
                         TemplateFolder = "Templates",
@@ -261,7 +175,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = true,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
@@ -287,7 +200,7 @@ namespace Hood.Models
                         Icon = "fa-comments",
                         Enabled = false,
                         IsPublic = false,
-                        HasPage = false,
+                        HasPage = true,
                         TypeName = "Testimonial",
                         TypeNamePlural = "Testimonials",
                         TitleName = "Client Name",
@@ -298,7 +211,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = false,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
@@ -329,7 +241,6 @@ namespace Hood.Models
                         ShowCategories = true,
                         ShowBanner = true,
                         ShowImage = true,
-                        ShowMeta = true,
                         Gallery = true,
                         Templates = true,
                         UrlFormatting = "news-title",
@@ -348,7 +259,6 @@ namespace Hood.Models
                 };
             }
         }
-
         public static List<CustomField> BaseFields(List<CustomField> fields)
         {
             fields.AddRange(new List<CustomField>()

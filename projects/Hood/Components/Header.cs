@@ -1,7 +1,7 @@
 ﻿using Hood.Services;
-using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
-using Hood.Extensions;
+using Hood.ViewModels;
+using System.Threading.Tasks;
 
 namespace Hood.ViewComponents
 {
@@ -15,14 +15,12 @@ namespace Hood.ViewComponents
             _content = content;
         }
 
-        public IViewComponentResult Invoke()
+        public async Task<IViewComponentResult> InvokeAsync()
         {
             HeaderModel model = new HeaderModel()
             {
-                Pages = _content.GetContentByType("page"),
-                Subscription = HttpContext.GetAccountInfo()
+                Pages = await _content.GetPages()
             };
-            model.User = model.Subscription.User;
             return View(model);
         }
     }

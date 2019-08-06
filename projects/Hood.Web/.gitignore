@@ -3,10 +3,29 @@ package-lock.json
 /Properties/PublishProfiles
 /Temporary
 /Temporary/*
-/Admin/Views
+
+/Areas/Admin/Views
 /Views
 /Migrations
+
+# Ignore Libraries
 /wwwroot/lib
+
+# Ignore Hood Compiled Client Files
+/wwwroot/hood/css
+/wwwroot/hood/**/*.min.js
+/wwwroot/hood/**/*.packaged.js
+
+# Ignore Site Compiled Client Files
 /wwwroot/css
 /wwwroot/js/**/*.min.js
 /wwwroot/js/**/*.packaged.js
+
+# Ignore Theme Libraries & Compiled Client Files
+/wwwroot/themes/**/css
+/wwwroot/themes/**/*.min.js
+/wwwroot/themes/**/*.packaged.js
+/wwwroot/themes/**/lib
+
+# Ignore Local appsettings.ProductionTesting.json - used to test production environment variables locally.
+appsettings.ProductionTesting.json

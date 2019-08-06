@@ -1,15 +1,20 @@
-﻿using Hood.Enums;
-using Stripe;
+﻿using Hood.BaseTypes;
+using Hood.Enums;
+using Hood.Models;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
-    public partial class BillingHomeModel
+    public partial class BillingHomeModel : SaveableModel
     {
-        public BillingMessage? Message { get; set; }
         public Stripe.Customer Customer { get; set; }
-        public ApplicationUser User { get; set; }
         public IEnumerable<Stripe.Invoice> Invoices { get; set; }
         public Stripe.Invoice NextInvoice { get; set; }
+        public List<UserSubscription> Subscriptions { get; set; }
+    }
+    public partial class PaymentMethodsModel : SaveableModel
+    {
+        public List<Stripe.PaymentMethod> PaymentMethods { get; set; }
+        public Stripe.Customer Customer { get; set; }
     }
 }

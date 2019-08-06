@@ -1,8 +1,8 @@
 ﻿using Hood.Core;
 using Hood.Entities;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
-using Hood.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -21,12 +21,16 @@ namespace Hood.Models
         [Required]
         public string Excerpt { get; set; }
         public string Body { get; set; }
+
+        [Display(Name = "URL Slug", Description = "Do not start your url slug with reserved words as they will not reach this page.<br />These include: <strong>account, about, store, admin, api, services.</strong>")]
         public string Slug { get; set; }
+        
 
         // Parent Content
         public int? ParentId { get; set; }
 
         // Dates
+        [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
@@ -35,7 +39,7 @@ namespace Hood.Models
         public ContentType Type { get; set; }
 
         // Publish Status
-        public int Status { get; set; }
+        public ContentStatus Status { get; set; }
 
         // Creator/Editor
         public DateTime CreatedOn { get; set; }
@@ -54,7 +58,21 @@ namespace Hood.Models
 
         // Settings
         public bool AllowComments { get; set; }
+        public bool ShowAuthor
+        {
+            get
+            {
+                if (Type == null || Type.HideAuthor || Author == null || Author.Anonymous)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
         public bool Public { get; set; }
+
+        [Display(Name = "Featured Content", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]
         public bool Featured { get; set; }
 
         // MVVM Helpers
@@ -67,11 +85,10 @@ namespace Hood.Models
             }
             set
             {
-                    DateTime dt = DateTime.Now;
-                    if (DateTime.TryParse(value, out dt))
-                    {
+                if (DateTime.TryParse(value, out DateTime dt))
+                {
                     PublishDate = new DateTime(dt.Year, dt.Month, dt.Day, PublishDate.Hour, PublishDate.Minute, PublishDate.Second);
-                    }
+                }
             }
         }
         [NotMapped]
@@ -98,25 +115,25 @@ namespace Hood.Models
                 PublishDate = new DateTime(PublishDate.Year, PublishDate.Month, PublishDate.Day, PublishDate.Hour, value, PublishDate.Second);
             }
         }
-
+        
         // Formatted Members
         public string StatusString
         {
             get
             {
-                switch ((Enums.Status)Status)
+                switch ((Enums.ContentStatus)Status)
                 {
-                    case Enums.Status.Published:
+                    case ContentStatus.Published:
                         if (PublishDate > DateTime.Now)
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         else
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
-                    case Enums.Status.Draft:
+                    case ContentStatus.Draft:
                     default:
                         return "Draft";
-                    case Enums.Status.Archived:
+                    case ContentStatus.Archived:
                         return "Archived";
-                    case Enums.Status.Deleted:
+                    case ContentStatus.Deleted:
                         return "Deleted";
                 }
             }
@@ -125,7 +142,7 @@ namespace Hood.Models
         {
             get
             {
-                if (Status == (int)Enums.Status.Published)
+                if (Status == ContentStatus.Published)
                     return PublishDate > DateTime.Now;
                 else
                     return false;
@@ -135,9 +152,7 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                ContentSettings _contentSettings = siteSettings.GetContentSettings();
-                ContentType type = _contentSettings.GetContentType(ContentType);
+                ContentType type = Engine.Settings.Content.GetContentType(ContentType);
 
                 if (type == null)
                     return string.Format("/{0}/{1}", ContentType, Id);
@@ -163,16 +178,15 @@ namespace Hood.Models
         {
             get
             {
-                var siteSettings = Engine.Current.Resolve<ISettingsRepository>();
-                BasicSettings basicSettings = siteSettings.GetBasicSettings();
+                BasicSettings basicSettings = Engine.Settings.Basic;
                 return Id == basicSettings.Homepage;
             }
         }
         public string GetImageStyle(string imageType = "Featured")
         {
-            string align = GetMetaValue(string.Format("Settings.Image.{0}.Align", imageType));
-            string fit = GetMetaValue(string.Format("Settings.Image.{0}.Fit", imageType));
-            string bg = GetMetaValue(string.Format("Settings.Image.{0}.Background", imageType));
+            string align = GetMetaValue<string>(string.Format("Settings.Image.{0}.Align", imageType));
+            string fit = GetMetaValue<string>(string.Format("Settings.Image.{0}.Fit", imageType));
+            string bg = GetMetaValue<string>(string.Format("Settings.Image.{0}.Background", imageType));
             return string.Format("{0}{1}{2}",
                 !string.IsNullOrEmpty(align) ? "background-position:" + align + ";" : "",
                 !string.IsNullOrEmpty(fit) ? "background-size:" + fit + ";" : "",
@@ -182,18 +196,17 @@ namespace Hood.Models
         [NotMapped]
         public IEnumerable<ContentCategory> AllowedCategories { get; set; }
         // Author 
+        [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public string AuthorId { get; set; }
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
+        [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public ApplicationUser Author { get; set; }
 
         public List<ContentCategoryJoin> Categories { get; set; }
         public List<ContentMeta> Metadata { get; set; }
         public List<ContentMedia> Media { get; set; }
-        public List<ContentTagJoin> Tags { get; set; }
 
         public string FeaturedImageJson { get; set; }
         [NotMapped]
-        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject FeaturedImage
         {
             get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : ContentMedia.Blank; }
@@ -202,48 +215,29 @@ namespace Hood.Models
 
         public string ShareImageJson { get; set; }
         [NotMapped]
-        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject ShareImage
         {
             get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(ShareImageJson) : ContentMedia.Blank; }
             set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
 
-        [NotMapped]
-        public string TagString
-        {
-            get
-            {
-                if (Tags != null)
-                    return string.Join(",", Tags.Select(x => x.Tag?.Value).ToArray());
-                return "";
-            }
-        }
         public bool IsInCategory(int categoryId)
         {
             if (Categories == null)
                 return false;
             return Categories.Select(c => c.Category.Id).Contains(categoryId);
         }
-        public void AddTag(string value)
-        {
-            if (Tags == null)
-                Tags = new List<ContentTagJoin>();
-            if (!Tags.Select(c => c.Tag.Value).Contains(value))
-            {
-                Tags.Add(new ContentTagJoin() { ContentId = Id, TagId = value });
-            }
-        }
-        public void RemoveTag(string value)
-        {
-            if (Tags == null)
-                Tags = new List<ContentTagJoin>();
-            var tag = Tags.Where(c => c.Tag.Value == value).FirstOrDefault();
-            if (tag != null)
-            {
-                Tags.Remove(tag);
-            }
-        }
+
+        #region Edit View Model Stuff
+        [NotMapped]
+        public Dictionary<string, string> Templates { get; set; }
+        [NotMapped]
+        public List<SubscriptionPlan> Subscriptions { get; set; }
+        [NotMapped]
+        public List<UserProfile> Authors { get; set; }
+        #endregion
+
+        #region Metadata
         public ContentMeta GetMeta(string name)
         {
             ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
@@ -256,12 +250,12 @@ namespace Hood.Models
                 };
             return cm;
         }
-        public string GetMetaValue(string name)
+        public T GetMetaValue<T>(string name)
         {
             ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
             if (cm != null)
-                return cm.GetStringValue();
-            return null;
+                return cm.GetValue<T>();
+            return default;
         }
         public void UpdateMeta<T>(string name, T value)
         {
@@ -291,13 +285,7 @@ namespace Hood.Models
             }
             return false;
         }
-        public Content Clean()
-        {
-            Author.Content = null;
-            Author.Properties = null;
-            Author.Addresses = null;
-            return this;
-        }
+        #endregion
     }
 }
 
