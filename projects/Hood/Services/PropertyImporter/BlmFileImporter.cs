@@ -436,11 +436,10 @@ namespace Hood.Services
                 {
                     property = await ProcessImages(property, data);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the images...";
-                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    StatusMessage = "There was an error processing the images.";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -449,11 +448,10 @@ namespace Hood.Services
                 {
                     property = await ProcessFloorPlans(property, data);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the floor plans..";
-                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    StatusMessage = "There was an error processing the floor plans.";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -461,12 +459,11 @@ namespace Hood.Services
                 try
                 {
                     property = await ProcessDocuments(property, data);
-                }
-                catch (Exception ex)
+                }css / site.min.css
+                catch (Exception)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the info document...";
-                    await _logService.AddExceptionAsync<BlmFileImporter>("BLM Property Importer: " + StatusMessage, ex);
+                    StatusMessage = "There was an error processing the info document.";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -1172,18 +1169,16 @@ namespace Hood.Services
 
         public bool IsRunning()
         {
-            bool running = false;
-            Lock.AcquireWriterLock(Timeout.Infinite);
-            running = Running;
-            Lock.ReleaseWriterLock();
+            Lock.AcquireReaderLock(Timeout.Infinite);
+            bool running = Running;
+            Lock.ReleaseReaderLock();
             return running;
         }
         public bool IsComplete()
         {
-            bool running = false;
-            Lock.AcquireWriterLock(Timeout.Infinite);
-            running = Running;
-            Lock.ReleaseWriterLock();
+            Lock.AcquireReaderLock(Timeout.Infinite);
+            bool running = Running;
+            Lock.ReleaseReaderLock();
             return !running;
         }
         public void Kill()
@@ -1198,9 +1193,8 @@ namespace Hood.Services
         }
         public PropertyImporterReport Report()
         {
-            PropertyImporterReport report = new PropertyImporterReport();
-            Lock.AcquireWriterLock(Timeout.Infinite);
-            report = new PropertyImporterReport
+            Lock.AcquireReaderLock(Timeout.Infinite);
+            PropertyImporterReport report = new PropertyImporterReport
             {
                 Added = Added,
                 Complete = Succeeded ? 100 : Tasks > 0 ? ((double)CompletedTasks / (double)Tasks) * (double)100 : 0,
@@ -1216,7 +1210,7 @@ namespace Hood.Services
                 Errors = Errors,
                 Warnings = Warnings
             };
-            Lock.ReleaseWriterLock();
+            Lock.ReleaseReaderLock();
             return report;
         }
 

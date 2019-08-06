@@ -190,19 +190,17 @@ namespace Hood.Services
 
         public bool IsComplete()
         {
-            bool running = false;
-            Lock.AcquireWriterLock(Timeout.Infinite);
-            running = Running;
-            Lock.ReleaseWriterLock();
+            Lock.AcquireReaderLock(Timeout.Infinite);
+            bool running = Running;
+            Lock.ReleaseReaderLock();
             return !running;
         }
 
         public bool Succeeded()
         {
-            bool succeeded = false;
-            Lock.AcquireWriterLock(Timeout.Infinite);
-            succeeded = !Running && Success;
-            Lock.ReleaseWriterLock();
+            Lock.AcquireReaderLock(Timeout.Infinite);
+            bool succeeded = !Running && Success;
+            Lock.ReleaseReaderLock();
             return succeeded;
         }
 
@@ -217,14 +215,13 @@ namespace Hood.Services
 
         public FTPServiceReport Report()
         {
-            FTPServiceReport report = new FTPServiceReport();
-            Lock.AcquireWriterLock(Timeout.Infinite);
-            report = new FTPServiceReport
+            Lock.AcquireReaderLock(Timeout.Infinite);
+            FTPServiceReport report = new FTPServiceReport
             {
                 Complete = Complete,
                 StatusMessage = StatusMessage
             };
-            Lock.ReleaseWriterLock();
+            Lock.ReleaseReaderLock();
             return report;
         }
     }
