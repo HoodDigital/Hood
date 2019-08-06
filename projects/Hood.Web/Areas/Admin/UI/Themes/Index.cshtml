@@ -1,7 +1,0 @@
-@model ThemeListView
-@{
-    ViewData["Title"] = $"Website Theme";
-}
-<div id="themes-list" class="hood-inline-list query" data-url="@Url.Action("List")" data-complete="$.hood.Themes.Loaded">
-    <partial name="_List_Themes" />
-</div>

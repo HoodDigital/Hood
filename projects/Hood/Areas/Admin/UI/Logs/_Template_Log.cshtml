@@ -4,7 +4,6 @@
         <div class="col-md-1">
             @switch (Model.Type)
             {
-                case LogType.Transaction:
                 case LogType.Success:
                     <span class="badge badge-success">Success</span>
                     break;
@@ -15,11 +14,7 @@
                     <span class="badge badge-warning">Warning</span>
                     break;
                 case LogType.Info:
-                case LogType.Message:
                     <span class="badge badge-info">Info</span>
-                    break;
-                case LogType.Error404:
-                    <span class="badge badge-warning">404 Error</span>
                     break;
             }
         </div>
