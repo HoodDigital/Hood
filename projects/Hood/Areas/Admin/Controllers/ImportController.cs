@@ -45,7 +45,7 @@ namespace Hood.Areas.Admin.Controllers
             var triggerAuth = Engine.Settings.Property.TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
             {
-                _blm.RunUpdate(HttpContext);
+               await _blm.RunUpdate(HttpContext);
                 return StatusCode(200);
             }
 

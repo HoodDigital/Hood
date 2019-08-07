@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Hood.Services
 {
@@ -6,7 +7,7 @@ namespace Hood.Services
     {
         bool IsComplete();
         bool IsRunning();
-        bool RunUpdate(HttpContext context);
+        Task RunUpdate(HttpContext context);
         void Kill();
         PropertyImporterReport Report();
     }
