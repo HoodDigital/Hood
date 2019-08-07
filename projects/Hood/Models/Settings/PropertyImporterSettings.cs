@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Hood.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
@@ -63,6 +64,11 @@ namespace Hood.Models
         [Display(Name = "Unzip File name", Description = "Name of the Zip file to extract before BLM import.")]
         public string ZipFile { get; set; }
 
+        /// <summary>
+        /// Name of the zip file which contains the import data
+        /// </summary>
+        [Display(Name = "Removal of Extraneous Properties", Description = "How do you want extraneous properties to be handled by the property importer.")]
+        public ExtraneousPropertyProcess ExtraneousPropertyProcess { get; set; }
     }
 
 }

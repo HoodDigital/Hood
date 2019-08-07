@@ -1,24 +1,24 @@
-﻿using System;
+﻿using Geocoding.Google;
+using Hood.Core;
+using Hood.Enums;
+using Hood.Extensions;
+using Hood.Interfaces;
+using Hood.Models;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
-using System.IO;
-using Microsoft.AspNetCore.Http;
-using Hood.Models;
-using Hood.Extensions;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using Geocoding.Google;
-using Hood.Enums;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Hood.Core;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Core;
-using Hood.Interfaces;
 
 namespace Hood.Services
 {
@@ -128,25 +128,33 @@ namespace Hood.Services
                 StatusMessage = "Starting import, loading property files from FTP Service...";
                 _propertySettings = Engine.Settings.Property;
                 // Get a new instance of the HoodDbContext for this import.
-                var options = new DbContextOptionsBuilder<HoodDbContext>();
+                DbContextOptionsBuilder<HoodDbContext> options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new HoodDbContext(options.Options);
 
-                var userManager = context.RequestServices.GetService<UserManager<ApplicationUser>>();
+                UserManager<ApplicationUser> userManager = context.RequestServices.GetService<UserManager<ApplicationUser>>();
                 User = userManager.FindByNameAsync("PropertyImporter").Result;
                 if (User == null)
                 {
-                    var identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter", Email = "importer@domain.con" }, Guid.NewGuid().ToString()).Result;
+                    IdentityResult identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter", Email = "importer@domain.con" }, Guid.NewGuid().ToString()).Result;
                     if (!identityResult.Succeeded)
+                    {
                         throw new Exception("Could not load the PropertyImporter user account.");
+                    }
+
                     User = userManager.FindByNameAsync("PropertyImporter").Result;
                     if (User == null)
+                    {
                         throw new Exception("Could not load the PropertyImporter user account.");
+                    }
                 }
 
                 MediaDirectory propertyDirectory = _db.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);
                 if (propertyDirectory == null)
+                {
                     throw new Exception("Could not load the Property directory.");
+                }
+
                 DirectoryPath = _directoryManager.GetPath(propertyDirectory.Id);
 
                 Lock.ReleaseWriterLock();
@@ -196,7 +204,9 @@ namespace Hood.Services
                 }
 
                 if (HasFileError())
+                {
                     throw new Exception("There was a problem downloading the properties file. Please try again.");
+                }
 
                 // Go through the file, and extract key/value pairs of
                 List<Dictionary<string, string>> properties = await GetPropertiesFromFileAsync();
@@ -216,15 +226,15 @@ namespace Hood.Services
                     StatusMessage = "Checking property (" + data["ADDRESS_1"] + ", " + data["ADDRESS_2"] + ") information from the BLM file...";
                     Lock.ReleaseWriterLock();
 
-                    var property = new PropertyListing();
+                    PropertyListing property = new PropertyListing();
                     await ProcessPropertyAsync(property, data, true);
                     feedProperties.Add(property);
                 }
 
                 // Now we have a list of properties, in the feed
-                var newProperties = feedProperties.Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference));
-                var existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));
-                var extraneous = siteProperties.Where(p => !feedProperties.Any(p2 => p2.Reference == p.Reference));
+                IEnumerable<PropertyListing> newProperties = feedProperties.Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference));
+                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));
+                IEnumerable<PropertyListing> extraneous = siteProperties.Where(p => !feedProperties.Any(p2 => p2.Reference == p.Reference));
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 ToAdd = newProperties.Count();
@@ -232,7 +242,7 @@ namespace Hood.Services
                 ToUpdate = existingProperties.Count();
                 Lock.ReleaseWriterLock();
 
-                foreach (var propertyRef in newProperties)
+                foreach (PropertyListing propertyRef in newProperties)
                 {
                     CheckForCancel();
                     try
@@ -240,7 +250,7 @@ namespace Hood.Services
                         // Find matching record to update the property.
                         Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
 
-                        var property = await ProcessAsync(new PropertyListing(), data);
+                        PropertyListing property = await ProcessAsync(new PropertyListing(), data);
 
                         _db.Properties.Add(property);
                         await _db.SaveChangesAsync();
@@ -264,14 +274,14 @@ namespace Hood.Services
                 }
                 await _db.SaveChangesAsync();
 
-                foreach (var propertyRef in existingProperties)
+                foreach (PropertyListing propertyRef in existingProperties)
                 {
                     CheckForCancel();
                     Dictionary<string, string> data = properties.SingleOrDefault(p => p["AGENT_REF"] == propertyRef.Reference);
 
                     try
                     {
-                        var property = _db.Properties
+                        PropertyListing property = _db.Properties
                             .Include(p => p.Media)
                             .Include(p => p.FloorPlans)
                             .Include(p => p.Metadata)
@@ -300,24 +310,63 @@ namespace Hood.Services
 
 
                 // Clean any from the DB that have been removed from the BLM file.
-                foreach (var property in extraneous)
+                foreach (PropertyListing property in extraneous)
                 {
                     CheckForCancel();
                     try
                     {
-                        // Property has been sold or let, mark it as such.
-                        // It will be the user's responsibility to remove any old properties that are not required from the site manually.
-
-                        if (property.ListingType == "Sale")
+                        switch (_propertySettings.FTPImporterSettings.ExtraneousPropertyProcess)
                         {
-                            property.LeaseStatus = "Sold";
-                        }
-                        else
-                        {
-                            property.LeaseStatus = "Let";
+                            case ExtraneousPropertyProcess.Delete:
+                                property.Media.ForEach(async m =>
+                                {
+                                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    _db.Entry(m).State = EntityState.Deleted;
+
+                                });
+                                property.FloorPlans.ForEach(async m =>
+                                {
+                                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    _db.Entry(m).State = EntityState.Deleted;
+
+                                });
+                                property.Metadata.ForEach(m =>
+                                {
+                                    _db.Entry(m).State = EntityState.Deleted;
+                                });
+                                await _db.SaveChangesAsync();
+
+                                _db.Entry(property).State = EntityState.Deleted;
+                                await _db.SaveChangesAsync();
+                                break;
+
+                            case ExtraneousPropertyProcess.StatusDelete:
+                                property.Status = ContentStatus.Deleted;
+                                _db.Properties.Update(property);
+                                await _db.SaveChangesAsync();
+                                break;
+
+                            case ExtraneousPropertyProcess.StatusArchive:
+                                property.Status = ContentStatus.Archived;
+                                _db.Properties.Update(property);
+                                await _db.SaveChangesAsync();
+                                break;
+
+                            case ExtraneousPropertyProcess.LeaseStatusLetSold:
+                                if (property.ListingType == "Sale")
+                                {
+                                    property.LeaseStatus = "Sold";
+                                }
+                                else
+                                {
+                                    property.LeaseStatus = "Let";
+                                }
+                                _db.Properties.Update(property);
+                                await _db.SaveChangesAsync();
+                                break;
                         }
 
-                        _db.Properties.Update(property);
+
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
                         Deleted++;
@@ -369,7 +418,7 @@ namespace Hood.Services
             FileError = false;
             Lock.ReleaseWriterLock();
             // First thing is to get the zip file, and unzip the contents to the local folder.
-            var zipFilename = Path.Combine(LocalFolder, _propertySettings.FTPImporterSettings.ZipFile);
+            string zipFilename = Path.Combine(LocalFolder, _propertySettings.FTPImporterSettings.ZipFile);
             ZipFile zf = null;
 
             try
@@ -394,11 +443,13 @@ namespace Hood.Services
                     Stream zipStream = zf.GetInputStream(zipEntry);
 
                     // Manipulate the output filename here as desired.
-                    String fullZipToPath = Path.Combine(LocalFolder, entryFileName);
+                    string fullZipToPath = Path.Combine(LocalFolder, entryFileName);
                     string directoryName = Path.GetDirectoryName(fullZipToPath);
 
                     if (directoryName.Length > 0)
+                    {
                         Directory.CreateDirectory(directoryName);
+                    }
 
                     // Unzip file in buffered chunks. This is just as fast as unpacking to a buffer the full size
                     // of the file, but does not waste memory.
@@ -496,7 +547,7 @@ namespace Hood.Services
                         string imageFile = TempFolder + data[key];
                         IMediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
-                        using (var s = File.OpenRead(imageFile))
+                        using (FileStream s = File.OpenRead(imageFile))
                         {
                             mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
                         }
@@ -547,16 +598,18 @@ namespace Hood.Services
                         string imageFile = TempFolder + data[key];
                         IMediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
-                        using (var s = File.OpenRead(imageFile))
+                        using (FileStream s = File.OpenRead(imageFile))
                         {
                             mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
                         }
                         if (mediaResult != null)
                         {
                             if (property.FloorPlans == null)
+                            {
                                 property.FloorPlans = new List<PropertyFloorplan>();
+                            }
 
-                            var fp = property.FloorPlans.FirstOrDefault(f => f.Filename == fi.Name);
+                            PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
                                 await _media.DeleteStoredMedia(fp);
@@ -612,17 +665,19 @@ namespace Hood.Services
                         string imageFile = TempFolder + data[key];
                         MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
-                        using (var s = File.OpenRead(imageFile))
+                        using (FileStream s = File.OpenRead(imageFile))
                         {
                             mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
                         }
                         if (mediaResult != null)
                         {
                             if (property.Media == null)
+                            {
                                 property.Media = new List<PropertyMedia>();
+                            }
 
                             // if the photo exists, overwrite it.
-                            var fp = property.Media.FirstOrDefault(f => f.Filename == fi.Name);
+                            PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
                                 await _media.DeleteStoredMedia(fp);
@@ -673,7 +728,7 @@ namespace Hood.Services
                         MediaObject mediaResult = null;
                         FileInfo fi = new FileInfo(imageFile);
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
-                        using (var s = File.OpenRead(imageFile))
+                        using (FileStream s = File.OpenRead(imageFile))
                         {
                             mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, DirectoryPath) as MediaObject;
                         }
@@ -681,13 +736,19 @@ namespace Hood.Services
                         {
                             string url = mediaResult.Url;
                             if (!property.HasMeta("EnergyPerformanceCertificate"))
+                            {
                                 property.AddMeta(new PropertyMeta("EnergyPerformanceCertificate", url));
+                            }
                             else
+                            {
                                 property.UpdateMeta("EnergyPerformanceCertificate", url);
+                            }
 
-                            var existing = _db.Media.SingleOrDefault(m => m.Filename == fileName);
+                            MediaObject existing = _db.Media.SingleOrDefault(m => m.Filename == fileName);
                             if (existing == null)
+                            {
                                 _db.Media.Add(mediaResult);
+                            }
                             else
                             {
                                 _db.Media.Remove(existing);
@@ -716,7 +777,9 @@ namespace Hood.Services
             CheckForCancel();
 
             if (!Directory.Exists(TempFolder))
+            {
                 Directory.CreateDirectory(TempFolder);
+            }
 
             DirectoryInfo directoryInfo = new DirectoryInfo(TempFolder);
             FileInfo[] oldFiles = directoryInfo.GetFiles();
@@ -829,7 +892,7 @@ namespace Hood.Services
             objStreamReader.Close();
 
             string[] definitions = fileContents.ExtractTextBetween("#DEFINITION#", "#DATA#").Trim(Environment.NewLine.ToCharArray()).Trim().Split(new[] { '^' }, StringSplitOptions.RemoveEmptyEntries);
-            var defs = definitions.ToList();
+            List<string> defs = definitions.ToList();
             int imageTasks = defs.Count(c => c.Contains("MEDIA_IMAGE") && !c.Contains("TEXT"));
             int docTasks = defs.Count(c => c.Contains("MEDIA_FLOOR_PLAN") && !c.Contains("TEXT"));
             int fpTasks = defs.Count(c => c.Contains("MEDIA_DOCUMENT") && !c.Contains("TEXT"));
@@ -850,9 +913,13 @@ namespace Hood.Services
 
                 Dictionary<string, string> propertyDetails = GetPropertyDetails(currentProperty.Split('^'), definitions);
                 if (!await ValidatePropertyAsync(propertyDetails))
+                {
                     continue;
+                }
                 else
+                {
                     allProperties.Add(propertyDetails);
+                }
 
                 MarkCompleteTask();
                 counter++;
@@ -905,7 +972,10 @@ namespace Hood.Services
 
             int bedrooms = 0;
             if (data.ContainsKey("BEDROOMS") && !int.TryParse(data["BEDROOMS"], out bedrooms))
+            {
                 bedrooms = 0;
+            }
+
             property.Bedrooms = bedrooms;
 
 
@@ -1008,20 +1078,26 @@ namespace Hood.Services
             {
                 try
                 {
-                    var loc = _address.GeocodeAddress(property);
+                    GoogleAddress loc = _address.GeocodeAddress(property);
                     property.SetLocation(loc.Coordinates);
 
                     // check for missing address elements
                     try
                     {
                         if (!property.Address2.IsSet())
+                        {
                             property.Address2 = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.Route)).LongName;
+                        }
 
                         if (!property.County.IsSet())
+                        {
                             property.County = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.AdministrativeAreaLevel2)).LongName;
+                        }
 
                         if (!property.City.IsSet())
+                        {
                             property.City = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.PostalTown)).LongName;
+                        }
                     }
                     catch (Exception)
                     {
@@ -1070,45 +1146,67 @@ namespace Hood.Services
         private string FormatLog(string statusMessage, PropertyListing property = null)
         {
             if (property != null)
+            {
                 return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
+            }
+
             return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), statusMessage);
         }
         private async Task<PropertyListing> UpdateMetadataAsync(PropertyListing property, Dictionary<string, string> data)
         {
             if (property.Metadata == null)
+            {
                 property.Metadata = new List<PropertyMeta>();
+            }
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
             DateTime available = DateTime.Now;
 
             if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
+            {
                 available = date;
+            }
 
             if (!property.HasMeta("LetDate"))
+            {
                 property.AddMeta(new PropertyMeta() { Name = "LetDate", BaseValue = JsonConvert.SerializeObject(available), Type = "System.DateTime" });
+            }
             else
+            {
                 property.UpdateMeta("LetDate", available);
-
+            }
 
             string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
             if (!property.HasMeta("Furnished"))
+            {
                 property.AddMeta(new PropertyMeta("Furnished", furnished));
+            }
             else
+            {
                 property.UpdateMeta("Furnished", furnished);
+            }
 
             string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
             if (!property.HasMeta("PriceQualifier"))
+            {
                 property.AddMeta(new PropertyMeta("PriceQualifier", priceQual));
+            }
             else
+            {
                 property.UpdateMeta("Furnished", furnished);
+            }
 
             foreach (string key in data.Keys.Where(k => k.Contains("FEATURE")))
             {
                 string metaKey = key.ToTitleCase();
                 if (!property.HasMeta(metaKey))
+                {
                     property.AddMeta(new PropertyMeta(metaKey, data[key]));
+                }
                 else
+                {
                     property.UpdateMeta(metaKey, data[key]);
+                }
             }
 
             try
@@ -1146,9 +1244,14 @@ namespace Hood.Services
         private PropertyListing AddMeta(PropertyListing property, string key, string value, string type)
         {
             if (!property.HasMeta(key))
+            {
                 property.AddMeta(new PropertyMeta(key, value, type));
+            }
             else
+            {
                 property.UpdateMeta(key, value);
+            }
+
             return property;
         }
         #region "Externals"
@@ -1183,7 +1286,7 @@ namespace Hood.Services
             PropertyImporterReport report = new PropertyImporterReport
             {
                 Added = Added,
-                Complete = Succeeded ? 100 : Tasks > 0 ? ((double)CompletedTasks / (double)Tasks) * (double)100 : 0,
+                Complete = Succeeded ? 100 : Tasks > 0 ? (CompletedTasks / (double)Tasks) * 100 : 0,
                 Deleted = Deleted,
                 Processed = Processed,
                 Running = Running,
@@ -1211,7 +1314,10 @@ namespace Hood.Services
         {
             Lock.AcquireWriterLock(Timeout.Infinite);
             if (message.IsSet())
+            {
                 StatusMessage = message;
+            }
+
             CompletedTasks++;
             Lock.ReleaseWriterLock();
         }
