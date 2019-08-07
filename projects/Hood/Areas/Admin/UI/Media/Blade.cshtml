@@ -34,12 +34,12 @@
         <div class="blade-field">
             @switch (Model.GenericFileType)
             {
-                        case GenericFileType.Audio:
-                            <video id="mediaplayer-@Model.Id" class="mediaplayer audio azuremediaplayer amp-default-skin always-show-controls m-b-lg" tabindex="0" seeking data-id="@Model.Id" data-file="@Model.DownloadUrlHttps" data-type="@Model.FileType"></video>
-                            break;
-                        case GenericFileType.Video:
-                            <video id="mediaplayer-@Model.Id" class="mediaplayer video azuremediaplayer amp-default-skin vjs-fluid amp-big-play-centered m-b-lg" tabindex="0" seeking data-id="@Model.Id" data-file="@Model.DownloadUrlHttps" data-type="@Model.FileType"></video>
-                            break;
+                case GenericFileType.Audio:
+                    <video id="mediaplayer-@Model.Id" class="mediaplayer audio azuremediaplayer amp-default-skin always-show-controls m-b-lg" tabindex="0" seeking data-id="@Model.Id" data-file="@Model.DownloadUrlHttps" data-type="@Model.FileType"></video>
+                    break;
+                case GenericFileType.Video:
+                    <video id="mediaplayer-@Model.Id" class="mediaplayer video azuremediaplayer amp-default-skin vjs-fluid amp-big-play-centered m-b-lg" tabindex="0" seeking data-id="@Model.Id" data-file="@Model.DownloadUrlHttps" data-type="@Model.FileType"></video>
+                    break;
                 case GenericFileType.Image:
                     <showField db-field="cuFirstName" field-type="text" field-name="Thumbnail Url" db-value="@Model.ThumbUrl" />
                     <showField db-field="cuFirstName" field-type="text" field-name="Small Url" db-value="@Model.SmallUrl" />

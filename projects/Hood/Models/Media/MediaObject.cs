@@ -15,7 +15,10 @@ namespace Hood.Models
         {}
 
         public MediaObject(IMediaObject mediaResult) : base(mediaResult)
-        {}
+        { }
+
+        public MediaObject(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null) : base(url, smallUrl, mediumUrl, largeUrl, thumbUrl)
+        { }
 
         public new static IMediaObject Blank => MediaObjectBase.Blank;
     }
@@ -24,6 +27,15 @@ namespace Hood.Models
     {
         public MediaObjectBase()
         {}
+
+        public MediaObjectBase(string url, string smallUrl = null, string mediumUrl = null, string largeUrl = null, string thumbUrl = null)
+        {
+            ThumbUrl = thumbUrl.IsSet() ? thumbUrl : url;
+            SmallUrl = smallUrl.IsSet() ? thumbUrl : url;
+            MediumUrl = mediumUrl.IsSet() ? thumbUrl : url;
+            LargeUrl = largeUrl.IsSet() ? thumbUrl : url;
+            Url = url;
+        }
 
         public MediaObjectBase(IMediaObject mediaResult)
         {

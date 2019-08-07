@@ -311,6 +311,15 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.ClearImagesBeforeImport">Clear images before import:</label>
+                        <div class="col-sm-8">
+                            <select asp-for="FTPImporterSettings.ClearImagesBeforeImport" class="form-control">
+                                <option value="true">Clear all images from each property before importing new ones.</option>
+                                <option value="false">Update images on this site, adding new ones, or updating old ones.</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-3 control-label" asp-for="FTPImporterSettings.RequireUnzip">Require Unzip:</label>
                         <div class="col-sm-8">
                             <select asp-for="FTPImporterSettings.RequireUnzip" class="form-control">

@@ -355,7 +355,7 @@ namespace Hood.Services
             return media;
         }
 
-        public async Task DeleteStoredMedia(TMediaObject media)
+        public async Task DeleteStoredMedia(IMediaObject media)
         {
             if (media != null)
             {

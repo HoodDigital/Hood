@@ -235,7 +235,7 @@ namespace Hood.Services
                         var property = await Process(new PropertyListing(), data);
 
                         _db.Properties.Add(property);
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
 
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
@@ -254,7 +254,7 @@ namespace Hood.Services
                         MarkCompleteTask("Adding property failed: " + addPropertyException.Message);
                     }
                 }
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
                 foreach (var propertyRef in existingProperties)
                 {
@@ -270,7 +270,7 @@ namespace Hood.Services
                             .FirstOrDefault(p => p.Id == propertyRef.Id);
                         property = await Process(property, data);
                         _db.Properties.Update(property);
-                        _db.SaveChanges();
+                        await _db.SaveChangesAsync();
 
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
@@ -289,7 +289,7 @@ namespace Hood.Services
                         MarkCompleteTask("Updating property failed: " + updatePropertyException.Message);
                     }
                 }
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
 
                 // Clean any from the DB that have been removed from the BLM file.
@@ -328,7 +328,7 @@ namespace Hood.Services
                         MarkCompleteTask("Removing property failed: " + removePropertyException.Message);
                     }
                 }
-                _db.SaveChanges();
+                await _db.SaveChangesAsync();
 
                 // Clean the temp directory...
                 CleanTempFolder();
@@ -497,7 +497,6 @@ namespace Hood.Services
                             if (property.InfoDownload == null)
                             {
                                 // It's new, add the mediaitem to the site.
-                                _db.Media.Add(mediaResult);
                                 property.InfoDownload = mediaResult;
                             }
                             else
@@ -547,14 +546,13 @@ namespace Hood.Services
                             var fp = property.FloorPlans.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
-                                fp = fp.UpdateUrls(new PropertyFloorplan(mediaResult)) as PropertyFloorplan;
+                                await _media.DeleteStoredMedia(fp);
+                                _db.Entry(fp).State = EntityState.Deleted;
+                                await _db.SaveChangesAsync();
                             }
-                            else
-                            {
-                                // It's new, add the mediaitem to the site.
-                                _db.Media.Add(mediaResult);
-                                property.FloorPlans.Add(new PropertyFloorplan(mediaResult));
-                            }
+
+                            property.FloorPlans.Add(new PropertyFloorplan(mediaResult));
+                            await _db.SaveChangesAsync();
                         }
                     }
                     MarkCompleteTask("Attached floor plan successfully.");
@@ -566,7 +564,18 @@ namespace Hood.Services
         private async Task<PropertyListing> ProcessImages(PropertyListing property, Dictionary<string, string> data)
         {
             // Images
-            foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")))
+            if (_propertySettings.FTPImporterSettings.ClearImagesBeforeImport)
+            {
+                if (property.Media != null)
+                {
+                    property.Media.ForEach(m =>
+                    {
+                        _db.Entry(m).State = EntityState.Deleted;
+                    });
+                    await _db.SaveChangesAsync();
+                }
+            }
+            foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")).OrderBy(k => k))
             {
                 if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
                 {
@@ -598,15 +607,14 @@ namespace Hood.Services
                             var fp = property.Media.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
-                                fp = fp.UpdateUrls(new PropertyMedia(mediaResult)) as PropertyMedia;
+                                await _media.DeleteStoredMedia(fp);
+                                property.Media.Remove(fp);
+                                _db.Entry(fp).State = EntityState.Deleted;
+                                await _db.SaveChangesAsync();
                             }
-                            else
-                            {
-                                // It's new, add the mediaitem to the site.
-                                _db.Media.Add(mediaResult);
 
-                                property.Media.Add(new PropertyMedia(mediaResult));
-                            }
+                            property.Media.Add(new PropertyMedia(mediaResult));
+
                             if (property.FeaturedImageJson != null)
                             {
                                 if (data[key] == property.FeaturedImage?.Filename)
@@ -619,6 +627,7 @@ namespace Hood.Services
                                 // add it.
                                 property.FeaturedImage = mediaResult;
                             }
+                            await _db.SaveChangesAsync();
                         }
                     }
                     MarkCompleteTask("Attached image successfully.");
@@ -643,7 +652,7 @@ namespace Hood.Services
                         string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                         using (var s = File.OpenRead(imageFile))
                         {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, new MediaObject() { Directory = "Property" });
+                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, new MediaObject() { Directory = "Property/Epc" });
                         }
                         if (mediaResult != null)
                         {
@@ -662,7 +671,7 @@ namespace Hood.Services
                                 _db.Media.Add(mediaResult);
                             }
 
-                            _db.SaveChanges();
+                            await _db.SaveChangesAsync();
                         }
                     }
                     MarkCompleteTask("Attached image successfully.");
