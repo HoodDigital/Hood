@@ -204,7 +204,7 @@ namespace Hood.Services
             switch (media.GenericFileType)
             {
                 case GenericFileType.Image:
-                    media = await ProcessImageAsync(media);
+                    media = ProcessImage(media);
                     break;
             }
 
@@ -236,7 +236,7 @@ namespace Hood.Services
             switch (type)
             {
                 case GenericFileType.Image:
-                    media = await ProcessImageAsync(media);
+                    media = ProcessImage(media);
                     break;
             }
 
@@ -283,70 +283,88 @@ namespace Hood.Services
             return blockBlob.Uri + sasBlobToken;
         }
 
-        private async Task<IMediaObject> ProcessImageAsync(IMediaObject media)
+
+
+        private IMediaObject ProcessImage(IMediaObject media)
         {
             string fileName = Path.GetFileNameWithoutExtension(media.Url);
             string fileExt = Path.GetExtension(media.Url);
             string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
+
             string tempGuid = Guid.NewGuid().ToString();
             string tempFileName = tempDir + tempGuid + fileExt;
 
+            // create three thumbnailed versions, and add to the array of files to upload.
+
             if (!Directory.Exists(tempDir))
-            {
                 Directory.CreateDirectory(tempDir);
-            }
 
             // download the file.
-            using (WebClient client = new WebClient())
+            using (var client = new WebClient())
             {
                 client.DownloadFile(media.Url, tempFileName);
             }
 
-            // create three thumbnailed versions, and add to the array of files to upload.
-            string XsFilename = string.Format("{0}/{1}_xs{2}", media.Path, fileName, fileExt);
-            string SmFilename = string.Format("{0}/{1}_sm{2}", media.Path, fileName, fileExt);
-            string MdFilename = string.Format("{0}/{1}_md{2}", media.Path, fileName, fileExt);
-            string LgFilename = string.Format("{0}/{1}_lg{2}", media.Path, fileName, fileExt);
-            string tempXs = tempDir + tempGuid + "_xs" + fileExt;
-            string tempSm = tempDir + tempGuid + "_sm" + fileExt;
-            string tempMd = tempDir + tempGuid + "_md" + fileExt;
-            string tempLg = tempDir + tempGuid + "_lg" + fileExt;
-
-            System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
-            switch (fileExt.ToLowerInvariant())
+            Task[] tasks = new Task[4]
             {
-                case ".gif":
-                    format = System.Drawing.Imaging.ImageFormat.Gif;
-                    break;
-                case ".bmp":
-                    format = System.Drawing.Imaging.ImageFormat.Bmp;
-                    break;
-                case ".png":
-                    format = System.Drawing.Imaging.ImageFormat.Png;
-                    break;
-            }
+                Task.Factory.StartNew(() => media.ThumbUrl = GenerateThumb(media, tempFileName, tempGuid, ".xs", 250)),
+                Task.Factory.StartNew(() => media.SmallUrl = GenerateThumb(media, tempFileName, tempGuid, ".sm", 600)),
+                Task.Factory.StartNew(() => media.MediumUrl = GenerateThumb(media, tempFileName, tempGuid, ".md", 1280)),
+                Task.Factory.StartNew(() => media.LargeUrl = GenerateThumb(media, tempFileName, tempGuid, ".xl", 1920))
+            };
 
-            ImageProcessor.ResizeImage(tempFileName, tempXs, 250, 250, format);
-            ImageProcessor.ResizeImage(tempFileName, tempSm, 640, 640, format);
-            ImageProcessor.ResizeImage(tempFileName, tempMd, 1280, 1280, format);
-            ImageProcessor.ResizeImage(tempFileName, tempLg, 1920, 1920, format);
-
-            // foreach, file in the list of thumbnails
-            // upload to the thumbLocation
-            using (FileStream fs = File.OpenRead(tempXs)) { media.ThumbUrl = (await Upload(fs, XsFilename)).Uri.ToUrlString(); }
-            using (FileStream fs = File.OpenRead(tempSm)) { media.SmallUrl = (await Upload(fs, SmFilename)).Uri.ToUrlString(); }
-            using (FileStream fs = File.OpenRead(tempMd)) { media.MediumUrl = (await Upload(fs, MdFilename)).Uri.ToUrlString(); }
-            using (FileStream fs = File.OpenRead(tempLg)) { media.LargeUrl = (await Upload(fs, LgFilename)).Uri.ToUrlString(); }
-
-            // add the url to the array of urls to send back
-            // remove the temporary image
-            try { File.Delete(tempFileName); } catch (Exception) { }
-            try { File.Delete(tempXs); } catch (Exception) { }
-            try { File.Delete(tempSm); } catch (Exception) { }
-            try { File.Delete(tempMd); } catch (Exception) { }
-            try { File.Delete(tempLg); } catch (Exception) { }
-
+            //Block until all tasks complete.
+            Task.WaitAll(tasks);
             return media;
+        }
+
+        private string GenerateThumb(IMediaObject media, string tempFileName, string tempGuid, string prefix, int size)
+        {
+            try
+            {
+                string fileName = Path.GetFileNameWithoutExtension(media.Url);
+                string fileExt = Path.GetExtension(media.Url);
+                string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
+
+                string tempThumbFile = tempDir + tempGuid + prefix + fileExt;
+                string thumbFilename = $"{media.Path}/{fileName}{prefix}{fileExt}";
+
+                System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
+                switch (fileExt.ToLowerInvariant())
+                {
+                    case ".gif":
+                        format = System.Drawing.Imaging.ImageFormat.Gif;
+                        break;
+                    case ".bmp":
+                        format = System.Drawing.Imaging.ImageFormat.Bmp;
+                        break;
+                    case ".png":
+                        format = System.Drawing.Imaging.ImageFormat.Png;
+                        break;
+                }
+
+                ImageProcessor.ResizeImage(tempFileName, tempThumbFile, size, size, format);
+
+                // foreach, file in the list of thumbnails
+                // upload to the thumbLocation
+                string url = "";
+                using (var fs = File.OpenRead(tempThumbFile))
+                {
+                    url = Upload(fs, thumbFilename).Result.Uri.ToUrlString();
+                }
+
+                // add the url to the array of urls to send back
+                // remove the temporary image
+                try { File.Delete(tempFileName); } catch (Exception) { }
+                try { File.Delete(tempThumbFile); } catch (Exception) { }
+
+                return url;
+            }
+            catch (Exception)
+            {
+                // Thumbnailing failed, just send back the Url.
+                return media.Url;
+            }
         }
 
         public async Task DeleteStoredMedia(IMediaObject media)
