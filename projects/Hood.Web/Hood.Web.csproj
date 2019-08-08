@@ -19,10 +19,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="wwwroot\themes\default\.bowerrc" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
   

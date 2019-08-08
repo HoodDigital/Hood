@@ -1,0 +1,34 @@
+{
+  "name": "hoodcms",
+  "version": "3.0.0-pre3",
+  "description": "Hood Digital's own content management system, built in ASP.NET Core 2.2, with JS and SCSS.",
+  "main": "js/app.packaged.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HoodDigital/Hood.git"
+  },
+  "keywords": [
+    "hood",
+    "nuget",
+    "myget",
+    "visual-studio",
+    "cms",
+    "netcore2",
+    "efcore",
+    "ef",
+    "dotnet",
+    "js",
+    "scss"
+  ],
+  "author": "George Whysall",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/HoodDigital/Hood/issues"
+  },
+  "homepage": "https://github.com/HoodDigital/Hood#readme"
+}

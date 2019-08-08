@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>Hood</AssemblyName>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Description>The Hood CMS is a full content management system providing a solid backbone to any website. Created by George Whysall.</Description>
+    <Description>Hood Digital's own content management system, built entirely in ASP.NET Core 2.2.</Description>
     <Authors>Hood Digital;George Whysall;</Authors>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <OutputType>Library</OutputType>
