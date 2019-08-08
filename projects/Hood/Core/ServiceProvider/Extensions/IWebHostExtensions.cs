@@ -1,4 +1,5 @@
-﻿using Hood.Models;
+﻿using Hood.Core;
+using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -30,6 +31,7 @@ namespace Hood.Extensions
                 {
                     var logService = scope.ServiceProvider.GetService<ILogService>();
                     logService.AddExceptionAsync<IWebHost>("An error occurred while installing or updating the database.", ex);
+                    Engine.Services.DatabaseMigrationFailed = true;
                 }
 
                 try
@@ -42,7 +44,8 @@ namespace Hood.Extensions
                 catch (Exception ex)
                 {
                     var logService = scope.ServiceProvider.GetService<ILogService>();
-                    logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings.", ex);
+                    logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings. Please ensure that you have correctly installed all the necessary migrations as instructed in the installation or update instructions.", ex);
+                    Engine.Services.DatabaseSeedFailed = true;
                 }
 
                 try

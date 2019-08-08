@@ -11,6 +11,9 @@ namespace Hood.Core
     /// </summary>
     public interface IHoodServiceProvider
     {
+        bool DatabaseMigrationFailed { get; set; }
+        bool DatabaseSeedFailed { get; set;  }
+
         /// <summary>
         /// Initialize engine
         /// </summary>

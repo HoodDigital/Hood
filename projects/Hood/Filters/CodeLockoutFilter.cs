@@ -3,6 +3,7 @@ using Hood.Extensions;
 using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Hood.Filters
@@ -13,14 +14,19 @@ namespace Hood.Filters
     public class LockoutModeFilter : IActionFilter
     {
         private readonly ILogService _logService;
+        private readonly IConfiguration _config;
 
         public LockoutModeFilter()
         {
             _logService = Engine.Services.Resolve<ILogService>();
+            _config = Engine.Services.Resolve<IConfiguration>();
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
+            if (!_config.IsDatabaseConfigured())
+                return;
+
             IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
             var basicSettings = Engine.Settings.Basic;
             if (basicSettings.LockoutMode)

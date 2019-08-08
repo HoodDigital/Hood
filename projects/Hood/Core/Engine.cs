@@ -150,7 +150,6 @@ namespace Hood.Core
                 return string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
             }
         }
-
         #endregion
     }
 }

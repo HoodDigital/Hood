@@ -1,37 +1,76 @@
 @model InstallModel
-@{ 
-    Layout = "_Layout_Login";
-    ViewData["BodyClass"] = "install";
+@{
+    Layout = null;
 }
-<div class="header">
-    <h2>Install</h2>
-    <p>The CMS Setup is currently incomplete. Please correct the errors below before restarting the service, once you have done this the application will start up correctly.</p>
-    <p><strong>Once you have updated the settings, you MUST restart the web application for them to take effect.</strong></p>
-</div>
-@if (!Model.DatabaseConfigured)
-{
-    <alert icon="fa fa-exclamation-triangle" type="Danger" size="Medium">
-        <h6>
-            Database connected
-        </h6>
-        <p>No database connection has been detected. Please ensure you have set set the database connecion string inside your appsettings.json file, or your ConnectionStrings in your environment variables.</p>
-        <p class="m-0">
-            If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
-            <a href="https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
-        </p>
-    </alert>
-}
-@if (!Model.ViewsInstalled)
-{
-    <alert icon="fa fa-exclamation-triangle" type="Danger" size="Epic">
-        <h6>
-            Database not installed
-        </h6>
-        <p class="m-0">
-            You have not correctly installed the views for the database.
-            You need to run the file <code>InstallHoodViews.sql</code> from the SQL folder in the Hood CMS package, while connected to your database using a suitable SQL editor,
-            such as <a href="https://visualstudio.microsoft.com/" target="_blank">Microsoft Visual Studio</a> or
-            <a href="https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms" target="_blank">Microsoft SSMS</a>.
-        </p>
-    </alert>
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://hood.azureedge.net/cdn/3.0.0/css/install.min.css" />
+</head>
+<body class="install @ViewData["BodyClass"]">
+    <div class="login-block">
+        <header>
+            <a href="/">
+                <img src="https://hood.azureedge.net/cdn/3.0.0/images/hood-cms.png" alt="Hood CMS" />
+            </a>
+        </header>
+
+        <div class="header">
+            <h2>Install</h2>
+            <p>The CMS Setup is currently incomplete. Please correct the errors below before restarting the service, once you have done this the application will start up correctly.</p>
+            <p><strong>Once you have updated the settings, you MUST restart the web application for them to take effect.</strong></p>
+        </div>
+
+        @if (!Model.DatabaseConfigured)
+        {
+            <alert type="Danger" size="Medium">
+                <h6>
+                    Database connected
+                </h6>
+                <p>No database connection has been detected. Please ensure you have set set the database connecion string inside your appsettings.json file, or your ConnectionStrings in your environment variables.</p>
+                <p class="m-0">
+                    If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
+                    <a href="https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
+                </p>
+            </alert>
+        }
+
+        @if (!Model.DatabaseMigrated || !Model.DatabaseSeeded)
+        {
+            <alert type="Danger" size="Epic">
+                <h6>
+                    Database not migrated/seeded correctly
+                </h6>
+                <p>
+                    The database seed or migration has failed, perhaps you have not correctly installed the migrations for the database.
+                </p>
+                <p class="m-0">
+                    You will need to add a new migration to the database, for more information follow the guide here:
+                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
+                </p>
+            </alert>
+        }
+
+        @if (!Model.ViewsInstalled)
+        {
+            <alert type="Danger" size="Epic">
+                <h6>
+                    Database SQL Views not setup
+                </h6>
+                <p class="m-0">
+                    You have not correctly installed the views for the database.
+                    You need to run the file <code>InstallHoodViews.sql</code> from the SQL folder in the Hood CMS package, while connected to your database using a suitable SQL editor,
+                    such as <a href="https://visualstudio.microsoft.com/" target="_blank">Microsoft Visual Studio</a> or
+                    <a href="https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms" target="_blank">Microsoft SSMS</a>.
+                </p>
+            </alert>
+        }
+
+
+        <footer>
+            <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
+        </footer>
+    </div>
+</body>
+</html>

@@ -35,7 +35,7 @@ namespace Hood.Extensions
                 .AddMvc()
                 .AddApplicationPart(typeof(Engine).Assembly);
 
-            if (config.IsDatabaseConfigured())
+            if (config.IsDatabaseConnected())
             {
                 services.ConfigureHoodServices();
                 services.ConfigureHoodDatabase<TContext>(config);
