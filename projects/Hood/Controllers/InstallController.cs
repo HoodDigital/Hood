@@ -22,9 +22,13 @@ namespace Hood.Controllers
 
         public IActionResult Install()
         {
-            var model = new InstallModel();
+            var model = new InstallModel()
+            {
+                DatabaseSeeded = !Engine.Services.DatabaseSeedFailed,
+                DatabaseMigrated = !Engine.Services.DatabaseMigrationFailed
+            };
             var context = Engine.Services.Resolve<HoodDbContext>();
-            model.DatabaseConfigured = _config.IsDatabaseConfigured();
+            model.DatabaseConfigured = _config.IsDatabaseConnected();
             try
             {
                 var profile = context.UserProfiles.FirstOrDefault();
