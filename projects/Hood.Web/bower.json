@@ -1,9 +1,6 @@
 {
   "name": "Hood.Web",
   "dependencies": {
-    "hood": "2.2.7"
-  },
-  "resolutions": {
-    "jquery": "3.3.1"
+    "hood": "3.0.0-pre2"
   }
 }

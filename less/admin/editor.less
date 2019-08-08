@@ -1,0 +1,52 @@
+.right-column {
+    padding: @panel-body-padding;
+    border: 0;
+    background-color: @gray-lighter;
+    margin-bottom: @grid-gutter-width;
+    border-radius: @border-radius-base;
+
+    .editor-box {
+        padding-bottom: @panel-body-padding;
+    }
+}
+
+.twitter-typeahead {
+    width: 100%;
+    margin-top: 5px;
+
+    .tt-menu {
+        width: 100%;
+        background: white;
+        border-bottom: 1px solid #ccc;
+        border-left: 1px solid #ccc;
+        border-right: 1px solid #ccc;
+
+        .tt-suggestion {
+            padding: 5px;
+
+            &.tt-selectable {
+                &:hover {
+                    background: #ccc;
+                }
+            }
+        }
+    }
+}
+
+.category-list {
+    padding: 5px @panel-body-padding;
+    max-height: 170px;
+    overflow-y: auto;
+    margin: -15px;
+
+    .checkbox .fa-caret-right {
+        margin-left: -13px;
+        margin-right: 28px;
+    }
+}
+
+.url-preview {
+    text-align: center;
+    background-color: #ECFFEC;
+    padding: 10px 2px;
+}

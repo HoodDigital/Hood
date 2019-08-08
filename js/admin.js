@@ -45,8 +45,7 @@ $.hood.Admin = {
         link_class_list: $.hood.LinkClasses,
         image_class_list: $.hood.ImageClasses,
         setup: $.hood.Media.Actions.Load.Insert,
-        image_dimensions: false,
-        content_css: ['/css/site.min.css']
+        image_dimensions: false
       });
       tinymce.init({
         selector: '.tinymce-simple',
@@ -56,8 +55,7 @@ $.hood.Admin = {
         toolbar: 'bold italic | bullist numlist | undo redo | link',
         link_class_list: $.hood.LinkClasses,
         image_class_list: $.hood.ImageClasses,
-        image_dimensions: false,
-        content_css: ['/css/site.min.css']
+        image_dimensions: false
       });
       tinymce.init({
         selector: '.tinymce-full-content',
@@ -68,8 +66,7 @@ $.hood.Admin = {
         link_class_list: $.hood.LinkClasses,
         image_class_list: $.hood.ImageClasses,
         setup: $.hood.Media.Actions.Load.Insert,
-        image_dimensions: false,
-        content_css: ['/css/site.min.css']
+        image_dimensions: false
       });
       tinymce.init({
         selector: '.tinymce-simple-content',
@@ -79,8 +76,7 @@ $.hood.Admin = {
         toolbar: 'bold italic | bullist numlist | undo redo | link',
         link_class_list: $.hood.LinkClasses,
         image_class_list: $.hood.ImageClasses,
-        image_dimensions: false,
-        content_css: ['/css/site.min.css']
+        image_dimensions: false
       });
     }
   },

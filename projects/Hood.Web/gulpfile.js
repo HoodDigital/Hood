@@ -20,12 +20,14 @@ var gulp = require('gulp'),
         js: './wwwroot/hood/js/',
         css: './wwwroot/hood/css/',
         scss: './wwwroot/hood/scss/',
+        less: './wwwroot/hood/less/',
         images: './wwwroot/hood/images/'
     },
     output = {
         js: './../../js/',
         css: './../../css/',
         scss: './../../scss/',
+        less: './../../less/',
         images: './../../images/',
         sql: './../../sql/'
     };
@@ -54,6 +56,12 @@ gulp.task('scss', function () {
 gulp.task('scss:copy', function () {
     return gulp.src(hood.scss + "**/*.scss")
         .pipe(gulp.dest(output.scss));
+});
+
+// copy legacy less for working with older theme styles.
+gulp.task('less:copy', function () {
+    return gulp.src(hood.less + "**/*.less")
+        .pipe(gulp.dest(output.less));
 });
 
 gulp.task('cssnano', function () {
@@ -241,7 +249,7 @@ gulp.task('js:package:admin', function () {
 });
 
 gulp.task('package', gulp.series('js', 'js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
-gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images', 'sql'), gulp.parallel('scss:copy', 'cssnano', 'package')));
+gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images', 'sql'), gulp.parallel('scss:copy', 'less:copy', 'cssnano', 'package')));
 
 // Site workload, to compile theme less/scss and JS.
 gulp.task('themes:scss', function () {
