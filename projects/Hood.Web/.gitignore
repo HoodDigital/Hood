@@ -11,11 +11,6 @@ package-lock.json
 # Ignore Libraries
 /wwwroot/lib
 
-# Ignore Hood Compiled Client Files
-/wwwroot/hood/css
-/wwwroot/hood/**/*.min.js
-/wwwroot/hood/**/*.packaged.js
-
 # Ignore Site Compiled Client Files
 /wwwroot/css
 /wwwroot/js/**/*.min.js
