@@ -26,7 +26,8 @@ To use the latest version, ensure you set your feed source to MyGet: https://www
 
 ### Client Side Code
 
-You can download and use the full ASP.NET Core Source Code form Hood CMS here: [Hood CMS](https://github.com/HoodDigital/Hood)
+You can download and use the full ASP.NET Core Source Code for Hood CMS here: 
+https://www.npmjs.com/package/hoodcms
 
 [![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
 [![Bower](https://img.shields.io/myget/hood/vpre/hood.svg?label=Bower&colorB=ffcc2f)](https://bower.io/search/?q=hood)
