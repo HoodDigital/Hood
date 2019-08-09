@@ -514,7 +514,6 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
-#warning Replace this with a client side lookup.
             UserListModel authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
             model.Authors = authors.List;
 
@@ -530,7 +529,7 @@ namespace Hood.Areas.Admin.Controllers
                 switch (model.Type.BaseName)
                 {
                     case "Page":
-                        if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
+                        if (Engine.Settings.Billing.IsSubscriptionsEnabled)
                         {
                             // get subscriptions - if there are any.
                             SubscriptionPlanListModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });

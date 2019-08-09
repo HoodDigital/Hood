@@ -136,7 +136,7 @@ namespace Hood.Controllers
                     if (!User.Identity.IsAuthenticated && model.Content.GetMetaValue<bool>("Settings.Security.Public") == false)
                         return NotFound();
 
-                if (Engine.Settings.Billing.CheckSubscriptionsOrThrow())
+                if (Engine.Settings.Billing.IsSubscriptionsEnabled)
                 {
                     if (model.Content.GetMeta("Settings.Security.Subscription") != null)
                     {
@@ -163,7 +163,6 @@ namespace Hood.Controllers
             }
             return View("Show", model);
         }
-
 
         #endregion
 
