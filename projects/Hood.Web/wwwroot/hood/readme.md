@@ -12,6 +12,8 @@ https://github.com/HoodDigital/Hood
 Hood CMS Hood Digital's own content management system, built entirely in ASP.NET Core 2.2. With a fully functional CMS admin area and themable front site, including subscriptions powered by Stripe. 
 Access and security is all based on the latest patterns for ASP.NET Core & EF Core Identity provider.
 
+## Client Side Code
+
 [![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
 [![Bower](https://img.shields.io/myget/hood/vpre/hood.svg?label=Bower&colorB=ffcc2f)](https://bower.io/search/?q=hood)
 

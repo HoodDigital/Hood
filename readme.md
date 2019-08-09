@@ -24,7 +24,7 @@ PM> Install-Package Hood
 ```
 To use the latest version, ensure you set your feed source to MyGet: https://www.myget.org/feed/hood/package/nuget/Hood
 
-### Client Side Code
+## Client Side Code
 
 [![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
 [![Bower](https://img.shields.io/myget/hood/vpre/hood.svg?label=Bower&colorB=ffcc2f)](https://bower.io/search/?q=hood)
