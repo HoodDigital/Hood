@@ -7,12 +7,16 @@
 Hood CMS Hood Digital's own content management system, built entirely in ASP.NET Core 2.2. With a fully functional CMS admin area and themable front site, including subscriptions powered by Stripe. 
 Access and security is all based on the latest patterns for ASP.NET Core & EF Core Identity provider.
 
-## Installation
-This package can be installed via NuGet and npm, or you can download the [latest release](https://github.com/HoodDigital/Hood/releases).
+## Installation in Visual Studio 2019 Template Project
+This template can be installed via NuGet and npm, or you can download the [latest release](https://github.com/HoodDigital/Hood/releases).
 
 To install Hood JS & LESS via LibMan, add the following lines to your libman.json file:
 ```
-
+{
+    "destination": "wwwroot/hood",
+    "library": "hoodcms@3.0.0-pre2",
+    "provider": "jsdelivr"
+}
 ```
 
 
