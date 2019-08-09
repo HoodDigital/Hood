@@ -38,4 +38,10 @@ bower install --save hood
 ```
 
 ## Full documentation
-Is coming soon.
+
+Documentation is a work in progress!
+
+You can check our growing documentation for HoodCMS here where you can also raise support requests: 
+https://hooddigital.atlassian.net/servicedesk/customer/portals
+
+Also, feel free to add your issues or pull requests to this repo, we always welcome contributions!
