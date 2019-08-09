@@ -26,11 +26,11 @@ To use the latest version, ensure you set your feed source to MyGet: https://www
 
 ### Client Side Code
 
-You can download and use the full ASP.NET Core Source Code for Hood CMS here: 
-https://www.npmjs.com/package/hoodcms
-
 [![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
 [![Bower](https://img.shields.io/myget/hood/vpre/hood.svg?label=Bower&colorB=ffcc2f)](https://bower.io/search/?q=hood)
+
+You can download and use the client side code, containing all JavaScript, SCSS, Less and compiled CSS, including the default theme for Hood CMS here: 
+https://www.npmjs.com/package/hoodcms
 
 To install Hood JS & LESS, run the following command in the command line (bower required):
 ```
