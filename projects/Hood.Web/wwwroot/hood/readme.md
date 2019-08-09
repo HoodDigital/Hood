@@ -1,7 +1,6 @@
 # Hood CMS
 
 [![GitHub](https://img.shields.io/github/tag/HoodDigital/Hood?label=GitHub&colorB=000000)](https://bower.io/search/?q=hood)
-[![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
 [![Visual Studio Version](https://img.shields.io/badge/Visual%20Studio-2019-magenta.svg?colorB=770ca3)](https://www.visualstudio.com/)
 [![Demo](https://img.shields.io/badge/dynamic/json.svg?label=Demo&url=http%3A%2F%2Fcms.hooddigital.com%2Fhood%2Fversion&query=%24.version&colorB=%23eab92d&prefix=v)](http://cms.hooddigital.com/)
 
