@@ -44,8 +44,18 @@ namespace Hood.Extensions
                 catch (Exception ex)
                 {
                     var logService = scope.ServiceProvider.GetService<ILogService>();
-                    logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings. Please ensure that you have correctly installed all the necessary migrations as instructed in the installation or update instructions.", ex);
-                    Engine.Services.DatabaseSeedFailed = true;
+                    if (ex.Message.Contains("Invalid object name"))
+                    {
+                        // migrations have failed, suggest adding migrations.
+                        logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings due to an invalid database object, perhaps migrations are missing.", ex);
+                        Engine.Services.DatabaseSeedFailed = true;
+                        Engine.Services.DatabaseMigrationsMissing = true;
+                    }
+                    else
+                    {
+                        logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings.", ex);
+                        Engine.Services.DatabaseSeedFailed = true;
+                    }
                 }
 
                 try

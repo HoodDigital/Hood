@@ -25,7 +25,8 @@ namespace Hood.Controllers
             var model = new InstallModel()
             {
                 DatabaseSeeded = !Engine.Services.DatabaseSeedFailed,
-                DatabaseMigrated = !Engine.Services.DatabaseMigrationFailed
+                DatabaseMigrated = !Engine.Services.DatabaseMigrationFailed,
+                DatabaseMigrationMissing = Engine.Services.DatabaseMigrationsMissing
             };
             var context = Engine.Services.Resolve<HoodDbContext>();
             model.DatabaseConfigured = _config.IsDatabaseConnected();

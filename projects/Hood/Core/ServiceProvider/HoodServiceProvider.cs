@@ -14,6 +14,7 @@ namespace Hood.Core
     class HoodServiceProvider : IHoodServiceProvider
     {
         public bool DatabaseMigrationFailed { get; set; }
+        public bool DatabaseMigrationsMissing { get; set; }
         public bool DatabaseSeedFailed { get; set; }
         private IServiceProvider _serviceProvider { get; set; }
         public virtual IServiceProvider ServiceProvider => _serviceProvider;

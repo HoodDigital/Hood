@@ -36,6 +36,23 @@
             </alert>
         }
 
+        @if  (Model.DatabaseMigrationMissing)
+        {
+            <alert type="Danger" size="Epic">
+                <h6>
+                    Database migrations missing
+                </h6>
+                <p>
+                    The database seed has failed due to an invalid object, this usually means that migrations have not been applied to the database yet. You will need to add a migration to your project
+                    if you have upgraded from an existing project or added the Hood Framework to a standard ASP.NET Core Web project.
+                </p>
+                <p class="m-0">
+                    If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide to create and apply a database migration here:
+                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
+                </p>
+            </alert>
+        }
+
         @if (!Model.DatabaseMigrated || !Model.DatabaseSeeded)
         {
             <alert type="Danger" size="Epic">
@@ -46,7 +63,7 @@
                     The database seed or migration has failed, perhaps you have not correctly installed the migrations for the database.
                 </p>
                 <p class="m-0">
-                    You will need to add a new migration to the database, for more information follow the guide here:
+                    If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide here:
                     <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
                 </p>
             </alert>

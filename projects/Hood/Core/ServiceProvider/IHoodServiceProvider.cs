@@ -12,6 +12,7 @@ namespace Hood.Core
     public interface IHoodServiceProvider
     {
         bool DatabaseMigrationFailed { get; set; }
+        bool DatabaseMigrationsMissing { get; set; }
         bool DatabaseSeedFailed { get; set;  }
 
         /// <summary>
