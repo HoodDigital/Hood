@@ -147,7 +147,14 @@ namespace Hood.Core
             get
             {
                 var version = typeof(Engine).Assembly.GetName().Version;
-                return string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
+                if (version.Revision != 0)
+                {
+                    return $"{version.Major}.{version.Major}.{version.Minor}-pre{version.Revision}";
+                }
+                else
+                {
+                    return $"{version.Major}.{version.Major}.{version.Minor}";
+                }
             }
         }
         #endregion
