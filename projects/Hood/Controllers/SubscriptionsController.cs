@@ -69,7 +69,10 @@ namespace Hood.Controllers
                 Customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id)
             };
             if (User.IsSubscribedToProduct(model.Plan.SubscriptionProductId))
+            {
                 throw new Exception("You already have an active subscription to this product. You can change to another package from your Manage Subscriptions page");
+            }
+
             return View(model);
         }
         [HttpPost]
@@ -81,7 +84,10 @@ namespace Hood.Controllers
             {
                 Models.Subscription plan = await _account.GetSubscriptionPlanByIdAsync(model.PlanId);
                 if (User.IsSubscribedToProduct(plan.SubscriptionProductId))
+                {
                     throw new Exception("You already have an active subscription to this product. You can change to another package from your Manage Subscriptions page");
+                }
+
                 Customer customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id);
                 if (customer == null)
                 {
@@ -106,7 +112,7 @@ namespace Hood.Controllers
 
                 if (subscription.Status == Stripe.SubscriptionStatuses.Trialing || subscription.LatestInvoice.PaymentIntent.Status == "succeeded")
                 {
-                    var userSub = await _account.CreateUserSubscription(plan.Id, Engine.Account.Id, subscription);
+                    Models.UserSubscription userSub = await _account.CreateUserSubscription(plan.Id, Engine.Account.Id, subscription);
                     return Json(new
                     {
                         success = true,
@@ -130,7 +136,9 @@ namespace Hood.Controllers
                     });
                 }
                 else
+                {
                     throw new Exception("An invalid response was received when setting up the subscription.");
+                }
             }
             catch (StripeException e)
             {
@@ -336,7 +344,8 @@ namespace Hood.Controllers
         [Route("stripe/webhooks/")]
         public async Task<StatusCodeResult> WebHooks()
         {
-            string json = new StreamReader(Request.Body).ReadToEnd();
+            StreamReader streamReader = new StreamReader(Request.Body);
+            string json = streamReader.ReadToEnd();
 
             try
             {

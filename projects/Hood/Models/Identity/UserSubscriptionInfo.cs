@@ -15,7 +15,7 @@ namespace Hood.Models
         public bool Public { get; set; }
         public int Level { get; set; }
         public int Amount { get; set; }
-        public int SubscriptionProductId { get; set; }
+        public int? SubscriptionProductId { get; set; }
         public bool Addon { get; set; }
         public bool CancelAtPeriodEnd { get; set; }
         public string Interval { get; set; }

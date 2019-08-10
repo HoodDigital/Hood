@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Hood.Interfaces;
-using Hood.Extensions;
+﻿using Hood.Core;
 using Hood.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
+using Hood.Extensions;
+using Hood.Interfaces;
 using Newtonsoft.Json;
 using Stripe;
-using Hood.Core;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
@@ -96,7 +95,7 @@ namespace Hood.Models
         {
             get
             {
-                var billing = Engine.Settings.Billing;
+                BillingSettings billing = Engine.Settings.Billing;
                 if (billing != null)
                 {
                     switch (billing.StripeCurrency)
@@ -113,13 +112,7 @@ namespace Hood.Models
             }
         }
         [NotMapped]
-        public string FullPrice
-        {
-            get
-            {
-                return $"{Price} every {IntervalCount} {Interval} (s)";
-            }
-        }
+        public string FullPrice => $"{Price} every {IntervalCount} {Interval} (s)";
 
         // Featured Images
         /// <summary>
@@ -129,8 +122,8 @@ namespace Hood.Models
         [NotMapped]
         public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : MediaBase.Blank; }
-            set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
+            get => FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ContentMedia>(FeaturedImageJson) : MediaBase.Blank;
+            set => FeaturedImageJson = JsonConvert.SerializeObject(value);
         }
 
         // Creator/Editor
@@ -138,8 +131,8 @@ namespace Hood.Models
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
 
-        [Display(Name="Subscription Product", Description = "Choose a product group for this plan, if you leave it unset, a product group will be generated.")]
-        public int SubscriptionProductId { get; set; }
+        [Display(Name = "Subscription Product", Description = "Choose a product group for this plan, if you leave it unset, a product group will be generated.")]
+        public int? SubscriptionProductId { get; set; }
         public SubscriptionProduct SubscriptionProduct { get; set; }
 
         /// <summary>
