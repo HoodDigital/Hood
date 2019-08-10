@@ -40,7 +40,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/subscriptions/stripe/plans/")]
-        public async Task<IActionResult> Stripes(StripePlanListModel model)
+        public async Task<IActionResult> Stripe(StripePlanListModel model)
         {
             return await StripeList(model, "Stripe");
         }
