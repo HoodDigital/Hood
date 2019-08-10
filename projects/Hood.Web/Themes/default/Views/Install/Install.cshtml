@@ -84,6 +84,23 @@
             </alert>
         }
 
+        @if (
+          Model.DatabaseConfigured &&
+          !Model.DatabaseMigrationMissing &&
+          Model.DatabaseConfigured &&
+          Model.DatabaseMigrated &&
+          Model.DatabaseSeeded
+          )
+        {
+            <alert type="Success" size="Epic">
+                <h6>
+                    Your database and site is ready to roll!
+                </h6>
+                <p class="m-0">
+                    You will need to restart the application in order to start the site and complete the startup process.
+                </p>
+            </alert>
+        }
 
         <footer>
             <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>

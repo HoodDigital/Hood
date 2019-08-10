@@ -162,8 +162,12 @@ namespace Hood.Models
                     MediaDirectories.Add(new MediaDirectory { DisplayName = "Property", Slug = MediaManager.PropertyDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
                 }
 
+
                 if (Media.Any(o => o.DirectoryId == null))
                 {
+                    // Save any existing seeding, in case directories needed creating.
+                    SaveChanges();
+
                     // Translate any un directoried images.
                     var defaultDir = MediaDirectories.SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
                     Media.Where(o => o.DirectoryId == null).ToList().ForEach(a => a.DirectoryId = defaultDir.Id);
