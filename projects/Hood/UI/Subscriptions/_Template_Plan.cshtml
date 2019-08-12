@@ -14,7 +14,7 @@
             }
         </div>
         <div class="p-lg text-center">
-            @Model.Description
+            @Html.Raw(Model.Description)
         </div>
         <div class="panel-footer text-center">
             <partial name="_Button_Subscribe" model="Model" />

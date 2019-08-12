@@ -1,29 +1,34 @@
 @model ContentModel
 @{
+    Layout = "_Blank";
+
+    ViewData["Content"] = Model.Content;
+
     SeoSettings _seoSettings = Engine.Settings.Seo;
     BasicSettings _basicSettings = Engine.Settings.Basic;
 
-    var cmTitle = Model.Content.GetMeta("SEO.Meta.Title");
-    var cmDesc = Model.Content.GetMeta("SEO.Meta.Description");
-    string metaTitle = Model.Content.Title + " - " + _basicSettings.FullTitle;
-    string metaDesc = Model.Content.Excerpt;
-    if (!cmTitle.GetStringValue().IsNullOrEmpty())
+    string seoTitle = Model.Content.GetMetaValue<string>("SEO.Meta.Title");
+    string seoDescription = Model.Content.GetMetaValue<string>("SEO.Meta.Description");
+    string title = Model.Content.Title + " - " + _basicSettings.FullTitle;
+    string description = Model.Content.Excerpt;
+    if (!seoTitle.IsSet())
     {
-        metaTitle = cmTitle.GetStringValue();
+        title = seoTitle;
     }
-    if (!cmDesc.GetStringValue().IsNullOrEmpty())
+    if (!seoDescription.IsSet())
     {
-        metaDesc = cmDesc.GetStringValue();
+        description = seoDescription;
     }
-    ViewBag.Title = Model.Content.Title;
+    ViewBag.Title = title;
+
     ViewData["EditUrl"] = Url.Action("Edit", "Content", new { area = "Admin", id = Model.Content.Id });
+
     if (Model.ContentType.ShowDesigner)
     {
         ViewData["DesignerUrl"] = string.Format("{0}?editMode=true", Model.Content.Url);
         ViewData["ExitDesignerUrl"] = Model.Content.Url;
     }
-    ViewData["Content"] = Model.Content;
-    Layout = "_Blank";
+
     @switch (Model.ContentType.BaseName)
     {
         case "FAQ":
@@ -67,9 +72,9 @@
     }
 }
 @section metas {
-    <meta name="description" content="@metaDesc" />
+    <meta name="description" content="@description" />
     <meta property="og:author" content="@Model.Content.Author.ToDisplayName()" />
-    <meta property="og:title" content="@metaTitle" />
+    <meta property="og:title" content="@title" />
     @if (Model.Content.ShareImage.DownloadUrl.IsSet())
     {
         <meta property="og:image" content="@Model.Content.ShareImage.LargeUrl" />
@@ -88,9 +93,9 @@
         <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
         <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
     }
-    <meta property="og:description" content="@metaDesc" />
-    <meta name="twitter:title" content="@metaTitle" />
-    <meta name="twitter:description" content="@metaDesc" />
+    <meta property="og:description" content="@description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@description" />
 }
 @if (template.IsSet())
 {
