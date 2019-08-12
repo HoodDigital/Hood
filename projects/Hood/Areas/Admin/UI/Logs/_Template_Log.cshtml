@@ -16,6 +16,12 @@
                 case LogType.Info:
                     <span class="badge badge-info">Info</span>
                     break;
+                case LogType.Error404:
+                    <span class="badge badge-dark">404 Error</span>
+                    break;
+                default:
+                    <span class="badge badge-light">@Model.Type.ToString()</span>
+                    break;
             }
         </div>
         <div class="col-md-3">
@@ -84,6 +90,15 @@
                         <div class="modal-header bg-info text-white">
                             <h5 class="modal-title">
                                 Info
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    default:
+                        <div class="modal-header bg-dark text-white">
+                            <h5 class="modal-title">
+                                @Model.Type.ToString().CamelCaseToString().ToTitleCase()
                             </h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
