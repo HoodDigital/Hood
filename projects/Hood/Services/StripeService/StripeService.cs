@@ -289,7 +289,7 @@ namespace Hood.Services
         }
         public async Task<List<PaymentMethod>> GetAllPaymentMethodsAsync(string customerId, string type)
         {
-            var pms = await PaymentMethodService.ListAsync(new PaymentMethodListOptions()
+            StripeList<PaymentMethod> pms = await PaymentMethodService.ListAsync(new PaymentMethodListOptions()
             {
                 CustomerId = customerId,
                 Type = type,
@@ -342,7 +342,7 @@ namespace Hood.Services
         {
             SubscriptionListOptions options = new Stripe.SubscriptionListOptions()
             {
-                CustomerId = customerId, 
+                CustomerId = customerId,
                 PlanId = planId
             };
             return await SubscriptionService.ListAsync(options);
@@ -351,7 +351,7 @@ namespace Hood.Services
         {
             try
             {
-                var options = new SubscriptionGetOptions();
+                SubscriptionGetOptions options = new SubscriptionGetOptions();
                 options.AddExpand("latest_invoice.payment_intent");
                 return await SubscriptionService.GetAsync(subscriptionId, options);
             }
@@ -365,20 +365,36 @@ namespace Hood.Services
                 throw stripeEx;
             }
         }
-        public async Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, DateTime? trialEnd = null, string paymentMethodId = null)
+        public async Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, string paymentMethodId = null)
         {
+            var plan = await PlanService.GetAsync(planId);
+            if (plan == null)
+                throw new Exception("The plan could not be found on Stripe.");
+
             List<SubscriptionItemOption> items = new List<SubscriptionItemOption> {
                     new SubscriptionItemOption {
-                        PlanId = planId,
+                        PlanId = plan.Id,
                         Quantity = quantity
                     }
                 };
+
             SubscriptionCreateOptions options = new SubscriptionCreateOptions
             {
                 CustomerId = customerId,
                 Items = items,
-                DefaultPaymentMethodId = paymentMethodId
+                PaymentBehavior = "allow_incomplete"
             };
+
+            if (plan.TrialPeriodDays.HasValue && plan.TrialPeriodDays != 0)
+            {
+                options.TrialEnd = DateTime.UtcNow.AddDays(plan.TrialPeriodDays.Value);
+            }
+
+            if (paymentMethodId != null)
+            {
+                options.DefaultPaymentMethodId = paymentMethodId;
+            }
+
             options.AddExpand("latest_invoice.payment_intent");
             return await SubscriptionService.CreateAsync(options);
         }
@@ -439,12 +455,14 @@ namespace Hood.Services
                 throw new Exception("Could not find a plan from the same product to switch from in the given subscription");
             }
 
-            List<SubscriptionItemUpdateOption> items = new List<SubscriptionItemUpdateOption>();
-            items.Add(new SubscriptionItemUpdateOption()
+            List<SubscriptionItemUpdateOption> items = new List<SubscriptionItemUpdateOption>
             {
-                Id = oldPlanItem.Id,
-                PlanId = newPlan.Id
-            });
+                new SubscriptionItemUpdateOption()
+                {
+                    Id = oldPlanItem.Id,
+                    PlanId = newPlan.Id
+                }
+            };
             SubscriptionUpdateOptions options = new SubscriptionUpdateOptions
             {
                 CancelAtPeriodEnd = false,

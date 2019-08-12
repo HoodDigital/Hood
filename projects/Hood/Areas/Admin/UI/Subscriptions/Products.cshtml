@@ -11,11 +11,7 @@
         <i class="fa fa-ellipsis-h"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right">
-         <a class="dropdown-item" asp-action="Select" asp-controller="Subscriptions" asp-area="" target="_blank">
-            <i class="fab fa-stripe-s mr-2"></i>Pricing Page
-        </a>
-        <div class="dropdown-divider"></div>
-       <a class="dropdown-item" asp-action="Plans">
+        <a class="dropdown-item" asp-action="Plans">
             <i class="fa fa-award mr-2"></i>Plans
         </a>
         <a class="dropdown-item" asp-action="Stripe">
@@ -25,7 +21,7 @@
             <i class="fab fa-stripe-s mr-2"></i>Connected Stripe Products
         </a>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" asp-action="Select" asp-controller="Subscriptions" asp-area="">
+        <a class="dropdown-item" asp-action="Select" asp-controller="Subscriptions" asp-area="" target="_blank">
             <i class="fa fa-shopping-bag mr-2"></i>Pricing Page
         </a>
     </div>
@@ -52,7 +48,7 @@
                     </p>
                 </div>
                 <div class="card-body collapse show" aria-labelledby="subscription-products-filters-panel-heading" id="subscription-products-filters-panel">
-                   <div class="form-product floating-label">
+                    <div class="form-product floating-label">
                         <label asp-for="Search"></label>
                         <select class="form-control refresh-on-change" asp-for="Order">
                             <optproduct label="Product">
@@ -62,7 +58,7 @@
                         </select>
                         <small asp-for="Search"></small>
                     </div>
-                   <div class="form-product floating-label mb-0">
+                    <div class="form-product floating-label mb-0">
                         <label asp-for="Search"></label>
                         <input asp-for="Search" class="form-control">
                         <small asp-for="Search"></small>

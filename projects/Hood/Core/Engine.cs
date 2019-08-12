@@ -149,11 +149,11 @@ namespace Hood.Core
                 var version = typeof(Engine).Assembly.GetName().Version;
                 if (version.Revision != 0)
                 {
-                    return $"{version.Major}.{version.Major}.{version.Minor}-pre{version.Revision}";
+                    return $"{version.Major}.{version.MajorRevision}.{version.Minor}-pre{version.Revision}";
                 }
                 else
                 {
-                    return $"{version.Major}.{version.Major}.{version.Minor}";
+                    return $"{version.Major}.{version.MajorRevision}.{version.Minor}";
                 }
             }
         }

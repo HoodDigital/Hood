@@ -74,7 +74,7 @@ namespace Hood.Services
         #region Subscriptions 
         Task<IEnumerable<Stripe.Subscription>> GetSusbcriptionsByCustomerIdAsync(string customerId, string planId = null);
         Task<Stripe.Subscription> GetSusbcriptionByIdAsync(string subscriptionId);
-        Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, DateTime? trialEnd = null, string paymentMethodId = null);
+        Task<Stripe.Subscription> AddCustomerToPlan(string customerId, string planId, int quantity = 1, string paymentMethodId = null);
         Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true, bool invoiceNow = false, bool prorate = false);
         Task<Stripe.Subscription> ReactivateSubscriptionAsync(string subscriptionId);
         Task<Stripe.Subscription> SwitchSubscriptionPlanAsync(string subscriptionId, string newPlanId);
