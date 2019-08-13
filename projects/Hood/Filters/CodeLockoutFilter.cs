@@ -27,7 +27,12 @@ namespace Hood.Filters
             if (!_config.IsDatabaseConfigured())
                 return;
 
-            IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
+            IActionResult result = new RedirectToActionResult(
+                nameof(Hood.Controllers.HoodController.LockoutModeEntrance), 
+                "Home", 
+                new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() }
+            );
+
             var basicSettings = Engine.Settings.Basic;
             if (basicSettings.LockoutMode)
             {
@@ -35,21 +40,25 @@ namespace Hood.Filters
                 string action = (string)context.RouteData.Values["action"];
                 string controller = (string)context.RouteData.Values["controller"];
 
-                if (action.Equals("LockoutModeEntrance", StringComparison.InvariantCultureIgnoreCase) &&
+                if (action.Equals(nameof(Hood.Controllers.HoodController.LockoutModeEntrance), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Hood", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals("WebHooks", StringComparison.InvariantCultureIgnoreCase) &&
+                if (action.Equals(nameof(Hood.Controllers.ErrorController.PageNotFound), StringComparison.InvariantCultureIgnoreCase) &&
+                    controller.Equals("Error", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals(nameof(Hood.Controllers.SubscriptionsController.WebHooks), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Subscriptions", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals("Index", StringComparison.InvariantCultureIgnoreCase) &&
+                if (action.Equals(nameof(Hood.Controllers.HomeController.Index), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
                 if (!basicSettings.LockLoginPage)
                 {
-                    if (action.Equals("Login", StringComparison.InvariantCultureIgnoreCase) &&
+                    if (action.Equals(nameof(Hood.Controllers.AccountController.Login), StringComparison.InvariantCultureIgnoreCase) &&
                         controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
                         return;
                 }
@@ -61,12 +70,14 @@ namespace Hood.Filters
                     return;
                 }
 
-                if (context.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
+                if (context.HttpContext.User.Identity.IsAuthenticated && context.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
                 {
-                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User}, accessed the site through the code lockout, as they are an administrator.");
+                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User}, was blocked from using the site due to lockout.");
                     context.Result = result;
                     return;
                 }
+
+                context.Result = new RedirectToActionResult(nameof(Hood.Controllers.HomeController.Index), "Home", null);
             }
         }
 
