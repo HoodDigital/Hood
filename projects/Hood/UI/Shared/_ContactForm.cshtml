@@ -14,11 +14,11 @@
     @Html.RenderHoneypotField()
     <div class="thank-you">
         <h2>@_contactSettings.ThankYouTitle</h2>
-        <p>@_contactSettings.ThankYouMessage</p>
+        <p>@Html.Raw(_contactSettings.ThankYouMessage)</p>
     </div>
     <div class="form">
         <h2>@_contactSettings.ContactFormTitle</h2>
-        <p>@_contactSettings.ContactFormMessage</p>
+        <p>@Html.Raw(_contactSettings.ContactFormMessage)</p>
         <div asp-validation-summary="All" class="validation-summary"></div>
         <div class="form-group">
             <label asp-for="Name" class="control-label"></label>

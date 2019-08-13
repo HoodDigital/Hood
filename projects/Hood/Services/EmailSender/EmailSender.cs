@@ -67,9 +67,6 @@ namespace Hood.Services
                 from = GetSiteFromEmail();
 
             var html = await _renderer.Render(message.Template, message);
-            var textContent = new SendGrid.Helpers.Mail.Content("text/plain", message.ToString());
-            var htmlContent = new SendGrid.Helpers.Mail.Content("text/html", html);
-
             var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
             var response = await client.SendEmailAsync(msg);
             var body = await response.DeserializeResponseBodyAsync(response.Body);

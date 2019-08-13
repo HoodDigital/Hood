@@ -39,7 +39,7 @@ namespace Hood.Services
 
                 if (Logo.IsSet())
                     return $"<h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>" +
-                       $"    <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;max-width:75%;max-height:100px;'>" +
+                       $"    <img src='{Logo}' alt='{Title}' align='center' style='border:none;-ms-interpolation-mode:bicubic;max-width:75%;max-height:60px;'>" +
                        $"</h1>";
                 else
                     return $"<h1 class='align-center' style='color:#222222;font-family:sans-serif;font-weight:300;line-height:1.4;margin:0;margin-bottom:30px;font-size:25px;text-transform:capitalize;text-align:center;text-decoration:none;'>" +

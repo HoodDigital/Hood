@@ -32,10 +32,12 @@ namespace Hood.Controllers
 
                 await Request.ProcessCaptchaOrThrowAsync();
 
-                var contactSettings = Engine.Settings.Contact;
-
                 model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";
+                model.NotifyEmails = new System.Collections.Generic.List<SendGrid.Helpers.Mail.EmailAddress>()
+                {
+                    new SendGrid.Helpers.Mail.EmailAddress(Engine.Settings.Contact.Email, Engine.Settings.Basic.FullTitle)
+                };
 
                 return await _mailService.ProcessAndSend(model);
             }
