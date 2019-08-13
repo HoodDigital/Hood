@@ -24,17 +24,7 @@ namespace Hood.Controllers
         [Route("500")]
         public async System.Threading.Tasks.Task<IActionResult> AppError()
         {
-            BasicSettings basicSettings = Engine.Settings.Basic;
-            if (basicSettings.LockoutMode && ControllerContext.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
-            {
-                return RedirectToActionPreserveMethod(nameof(HomeController.Index), "Home");
-            }
-
-            ErrorModel model = new ErrorModel
-            {
-                OriginalUrl = "unknown",
-                Code = 500
-            };
+            ErrorModel model = GetErrorInformation();
 
             if (HttpContext.Items.ContainsKey("originalPath"))
             {
@@ -86,9 +76,13 @@ namespace Hood.Controllers
         {
             var model = new ErrorModel();
             var feature = HttpContext.Features.Get<IExceptionHandlerFeature>();
-            model.Error = feature?.Error;
-            model.RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            model.ErrorMessage = feature.Error.Message;
+            if (feature != null && feature.Error != null)
+            {
+                model.Error = feature.Error;
+                model.RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                model.ErrorMessage = feature.Error.Message;
+            }
+            model.Code = 500;
             return model;
         }
     }

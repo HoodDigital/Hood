@@ -142,6 +142,24 @@ namespace Hood.Core
                 return Services.Resolve<IEventsService>();
             }
         }
+        /// <summary>
+        /// <para>Gets the location for the Hood Client Side library folder containing all CSS/JS for the app.</para>
+        /// <para>Default is "/lib/hood/".</para>
+        /// <para>Should always start with '/' and end with '/'.</para>
+        /// <para>Config section Hood:LibraryFolder</para>
+        /// </summary>
+        public static string LibraryFolder
+        {
+            get
+            {
+                var config = Services.Resolve<IConfiguration>();
+                if (config["Hood:LibraryFolder"] != null)
+                {
+                    return config["Hood:LibraryFolder"].ToString();
+                }
+                return "/lib/hood/";
+            }
+        }
         public static string Version
         {
             get
