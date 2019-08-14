@@ -248,7 +248,7 @@ namespace Hood.Services
             if (failedInvoice.SubscriptionId.IsSet())
             {
                 // Get the subscription.
-                Stripe.Subscription failedInvoiceSubscription = _billing.Subscriptions.FindById(failedInvoice.CustomerId, failedInvoice.SubscriptionId).Result;
+                Stripe.Subscription failedInvoiceSubscription = _billing.Subscriptions.FindById(failedInvoice.SubscriptionId).Result;
                 _mailObject.AddParagraph("StripeSubscription Object:");
                 _mailObject.AddParagraph(JsonConvert.SerializeObject(failedInvoiceSubscription).ToFormattedJson() + Environment.NewLine);
 
@@ -276,7 +276,7 @@ namespace Hood.Services
                 {
                     _mailObject.AddParagraph("There is no subscription, so ensure that there is no subscription left on stripe.");
                     _mailObject.AddParagraph("Cancelling subscription...");
-                    _billing.Subscriptions.CancelSubscriptionAsync(failedInvoice.CustomerId, failedInvoice.SubscriptionId, false).GetAwaiter().GetResult();
+                    _billing.Subscriptions.CancelSubscriptionAsync(failedInvoice.SubscriptionId, false).GetAwaiter().GetResult();
                     _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
                     var failedInvoiceUser = _auth.GetUserByStripeId(failedInvoice.CustomerId).Result;
 
@@ -309,7 +309,7 @@ namespace Hood.Services
             if (successfulInvoice.SubscriptionId.IsSet())
             {
                 // Get the subscription.
-                Stripe.Subscription subscription = _billing.Subscriptions.FindById(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId).Result;
+                Stripe.Subscription subscription = _billing.Subscriptions.FindById(successfulInvoice.SubscriptionId).Result;
                 _mailObject.AddParagraph($"StripeSubscription Object loaded from Stripe: {successfulInvoice.SubscriptionId}");
 
                 UserSubscription userSub = _auth.FindUserSubscriptionByStripeId(subscription.Id);
@@ -322,7 +322,7 @@ namespace Hood.Services
                     Stripe.Refund refund = _billing.Stripe.RefundService.CreateAsync(new RefundCreateOptions { ChargeId = successfulInvoice.ChargeId }).Result;
                     _mailObject.AddParagraph("StripeRefund Object Created.");
 
-                    _billing.Subscriptions.CancelSubscriptionAsync(successfulInvoice.CustomerId, successfulInvoice.SubscriptionId, false).GetAwaiter().GetResult();
+                    _billing.Subscriptions.CancelSubscriptionAsync(successfulInvoice.SubscriptionId, false).GetAwaiter().GetResult();
                     _mailObject.AddParagraph("Subscription Cancelled.");
 
                     _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
@@ -463,7 +463,7 @@ namespace Hood.Services
             else
             {
                 _mailObject.AddParagraph("There is no subscription, so ensure that there is no subscription left on stripe.");
-                _billing.Subscriptions.CancelSubscriptionAsync(endTrialSubscription.CustomerId, endTrialSubscription.Id, false).GetAwaiter().GetResult();
+                _billing.Subscriptions.CancelSubscriptionAsync(endTrialSubscription.Id, false).GetAwaiter().GetResult();
                 _mailObject.AddParagraph("Send an email to the customer letting them know what has happened...");
                 var endTrialUser = _auth.GetUserByStripeId(endTrialSubscription.CustomerId).Result;
 

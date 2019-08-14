@@ -185,6 +185,10 @@ namespace Hood.Extensions
             switch (message)
             {
                 case BillingMessage.Error:
+                case BillingMessage.ErrorCancellingSubscription:
+                case BillingMessage.ErrorReactivatingSubscription:
+                case BillingMessage.ErrorRemovingSubscription:
+                case BillingMessage.ErrorUpdatingSubscription:
                     model.MessageType = AlertType.Danger;
                     model.SaveMessage = "There was an error updating or changing your subscription.Please try again. An unspecified error occurred.";
                     break;

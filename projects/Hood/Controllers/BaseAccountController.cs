@@ -215,6 +215,7 @@ namespace Hood.Controllers
                     url += "?returnUrl=" + System.Net.WebUtility.UrlEncode(returnUrl);
                 return Redirect(url);
             }
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 

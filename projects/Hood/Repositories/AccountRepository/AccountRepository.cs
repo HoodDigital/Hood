@@ -157,7 +157,7 @@ namespace Hood.Services
                     {
                         try
                         {
-                            var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.CustomerId, sub.StripeId, false);
+                            var res = await _billing.Subscriptions.CancelSubscriptionAsync(sub.StripeId, false);
                         }
                         catch (Stripe.StripeException ex)
                         {
@@ -622,7 +622,7 @@ namespace Hood.Services
                 // there is a payment source - continue                  
                 // Load the plan from stripe, then add to the user's subscription.
                 Stripe.Plan plan = await _billing.SubscriptionPlans.FindByIdAsync(subscription.StripeId);
-                Stripe.Subscription sub = await _billing.Subscriptions.UpdateSubscriptionAsync(customer.Id, userSub.StripeId, plan);
+                Stripe.Subscription sub = await _billing.Subscriptions.UpdateSubscriptionAsync(userSub.StripeId, plan);
                 userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
                 userSub.Subscription = subscription;
                 userSub.SubscriptionId = subscription.Id;
@@ -644,7 +644,7 @@ namespace Hood.Services
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
-            Stripe.Subscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, true);
+            Stripe.Subscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(userSub.StripeId, true);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
             UpdateUser(user);
             return userSub;
@@ -660,7 +660,7 @@ namespace Hood.Services
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
-            Stripe.Subscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(customer.Id, userSub.StripeId, false);
+            Stripe.Subscription sub = await _billing.Subscriptions.CancelSubscriptionAsync(userSub.StripeId, false);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
             UpdateUser(user);
             return userSub;
@@ -676,10 +676,10 @@ namespace Hood.Services
             // Check for subscription or throw.
             UserSubscription userSub = GetUserSubscription(user, userSubscriptionId);
 
-            Stripe.Subscription sub = await _billing.Subscriptions.FindById(user.StripeId, userSub.StripeId);
+            Stripe.Subscription sub = await _billing.Subscriptions.FindById(userSub.StripeId);
             Stripe.SubscriptionUpdateOptions options = new Stripe.SubscriptionUpdateOptions();
 
-            sub = await _billing.Subscriptions.UpdateSubscriptionAsync(customer.Id, sub.Id, sub.Plan);
+            sub = await _billing.Subscriptions.ReactivateSubscriptionAsync(sub.Id);
             userSub = UpdateUserSubscriptionFromStripe(userSub, sub);
             UpdateUser(user);
             return userSub;

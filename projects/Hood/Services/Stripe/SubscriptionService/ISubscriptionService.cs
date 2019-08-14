@@ -16,7 +16,7 @@ namespace Hood.Services
         /// </summary>
         /// <param name="stripeSubscriptionId">The stripe subscription identifier.</param>
         /// <returns></returns>
-        Task<Stripe.Subscription> FindById(string customerId, string subscriptionId);
+        Task<Stripe.Subscription> FindById(string subscriptionId);
 
         /// <summary>
         /// Subscribes the user asynchronous.
@@ -59,14 +59,15 @@ namespace Hood.Services
         /// <param name="subscriptionEnDateTime">The subscription en date time.</param>
         /// <param name="reasonToCancel">The reason to cancel.</param>
         /// <returns></returns>
-        Task<Stripe.Subscription> CancelSubscriptionAsync(string customerId, string subscriptionId, bool cancelAtPeriodEnd = true);
+        Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true);
 
         /// <summary>
         /// Changes the plan of the subscription, asyncronous
         /// </summary>
         /// <param name="subscription">The subscription.</param>
         /// <returns></returns>
-        Task<Stripe.Subscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, Stripe.Plan subscription);
+        Task<Stripe.Subscription> UpdateSubscriptionAsync(string subscriptionId, Stripe.Plan subscription);
+        Task<Stripe.Subscription> ReactivateSubscriptionAsync(string subscriptionId);
 
         /// <summary>
         /// Updates the subscription tax.

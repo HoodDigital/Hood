@@ -21,20 +21,28 @@ namespace Hood.Services
             _userManager = userManager;
         }
 
-        public async Task<Stripe.Subscription> CancelSubscriptionAsync(string customerId, string subscriptionId, bool cancelAtPeriodEnd = true)
+        public async Task<Stripe.Subscription> CancelSubscriptionAsync(string subscriptionId, bool cancelAtPeriodEnd = true)
         {
             if (!cancelAtPeriodEnd)
-                return await _stripe.SubscriptionService.CancelAsync(subscriptionId, new SubscriptionCancelOptions() { });  
+                return await _stripe.SubscriptionService.CancelAsync(subscriptionId, new SubscriptionCancelOptions() { });
 
+            var options = new SubscriptionUpdateOptions
+            {
+                CancelAtPeriodEnd = true,
+            };
+            return await _stripe.SubscriptionService.UpdateAsync(subscriptionId, options);
+
+        }
+        public async Task<Stripe.Subscription> ReactivateSubscriptionAsync(string subscriptionId)
+        {
             var options = new SubscriptionUpdateOptions
             {
                 CancelAtPeriodEnd = false,
             };
             return await _stripe.SubscriptionService.UpdateAsync(subscriptionId, options);
-
         }
 
-        public async Task<Stripe.Subscription> FindById(string customerId, string subscriptionId)
+        public async Task<Stripe.Subscription> FindById(string subscriptionId)
         {
             return await _stripe.SubscriptionService.GetAsync(subscriptionId);
         }
@@ -58,7 +66,7 @@ namespace Hood.Services
             return stripeSubscription;
         }
 
-        public async Task<Stripe.Subscription> UpdateSubscriptionAsync(string customerId, string subscriptionId, Stripe.Plan subscription)
+        public async Task<Stripe.Subscription> UpdateSubscriptionAsync(string subscriptionId, Stripe.Plan subscription)
         {
             Stripe.Subscription currentSubscription = await _stripe.SubscriptionService.GetAsync(subscriptionId);
             var updateOptions = new Stripe.SubscriptionUpdateOptions()
@@ -67,24 +75,20 @@ namespace Hood.Services
                 {
                     new Stripe.SubscriptionItemUpdateOption()
                     {
-                        Id = subscriptionId
+                        Id = currentSubscription.Items.Data[0].Id,
+                        PlanId = subscription.Id,
                     }
                 }
             };
             if (currentSubscription.Status == "trialing" && subscription.TrialPeriodDays > 0)
             {
-                // if the current trialEnd is before the new subscription's trial WOULD end
-                var newTrialEnd = DateTime.Now.AddDays(subscription.TrialPeriodDays.Value);
-                if (newTrialEnd < currentSubscription.TrialEnd)
-                    updateOptions.TrialEnd = newTrialEnd;
-                else
-                    updateOptions.TrialEnd = currentSubscription.TrialEnd;
+                updateOptions.TrialFromPlan = true;
             }
             else
             {
-                updateOptions.TrialEnd = DateTime.Now;
+                updateOptions.TrialEnd = Stripe.SubscriptionTrialEnd.Now;
             }
-            currentSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
+            currentSubscription = await _stripe.SubscriptionService.UpdateAsync(currentSubscription.Id, updateOptions);
             return currentSubscription;
         }
 
