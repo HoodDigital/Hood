@@ -28,7 +28,7 @@ namespace Hood.Services
             {
                 Email = user.Email,
                 Description = string.Format("{0} {1} ({2})", user.FirstName, user.LastName, user.Email),
-                SourceToken = token,
+                Source = token,
                 PlanId = planId
             };
             Stripe.Customer stripeCustomer = await _stripe.CustomerService.CreateAsync(customer);

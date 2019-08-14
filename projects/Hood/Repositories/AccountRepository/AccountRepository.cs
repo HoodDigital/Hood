@@ -790,9 +790,8 @@ namespace Hood.Services
             userSubscription.CurrentPeriodStart = stripeSubscription.CurrentPeriodStart;
             userSubscription.EndedAt = stripeSubscription.EndedAt;
             userSubscription.Quantity = stripeSubscription.Quantity ?? 0;
-            userSubscription.Start = stripeSubscription.Start;
+            userSubscription.Start = stripeSubscription.StartDate;
             userSubscription.Status = stripeSubscription.Status;
-            userSubscription.TaxPercent = stripeSubscription.TaxPercent;
             userSubscription.TrialEnd = stripeSubscription.TrialEnd;
             userSubscription.TrialStart = stripeSubscription.TrialStart;
             userSubscription.Notes += DateTime.Now.ToShortDateString() + " at " + DateTime.Now.ToShortTimeString() + " Stripe.Event - Updated Subscription" + Environment.NewLine;

@@ -183,7 +183,7 @@ namespace Hood.Services
         public void CustomerDeleted(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Customer Deleted] processing...");
-            Stripe.Customer deletedCustomer = Stripe.Mapper<Stripe.Customer>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Customer deletedCustomer = stripeEvent.Data.Object as Stripe.Customer;
             _mailObject.AddParagraph("Customer Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(deletedCustomer).ToFormattedJson() + Environment.NewLine);
             var dcUser = _auth.GetUserByStripeId(deletedCustomer.Id).Result;
@@ -242,7 +242,7 @@ namespace Hood.Services
         public void InvoicePaymentFailed(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentFailed] processing...");
-            Stripe.Invoice failedInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Invoice failedInvoice = stripeEvent.Data.Object as Stripe.Invoice;
             _mailObject.AddParagraph("StripeInvoice Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(failedInvoice).ToFormattedJson() + Environment.NewLine);
             if (failedInvoice.SubscriptionId.IsSet())
@@ -302,7 +302,7 @@ namespace Hood.Services
         public void InvoicePaymentSucceeded(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Invoice PaymentSucceeded] processing...");
-            Stripe.Invoice successfulInvoice = Stripe.Mapper<Stripe.Invoice>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Invoice successfulInvoice = stripeEvent.Data.Object as Stripe.Invoice;
             _mailObject.AddH3("StripeInvoice Object:");
             _mailObject.AddParagraph(JsonConvert.SerializeObject(successfulInvoice).ToFormattedJson() + Environment.NewLine);
 
@@ -402,7 +402,7 @@ namespace Hood.Services
         public void SubscriptionCreated(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Created] processing...");
-            Stripe.Subscription created = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription created = stripeEvent.Data.Object as Stripe.Subscription;
             var log = _auth.ConfirmSubscriptionObject(created, stripeEvent.Created);
             _mailObject.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
             _mailObject.AddParagraph("[Subscription Created] complete!");
@@ -414,7 +414,7 @@ namespace Hood.Services
         public void SubscriptionUpdated(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Updated] processing...");
-            Stripe.Subscription updated = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription updated = stripeEvent.Data.Object as Stripe.Subscription;
             var log = _auth.UpdateSubscriptionObject(updated, stripeEvent.Created);
             _mailObject.AddParagraph(log.Replace(Environment.NewLine, "<br />"));
             _mailObject.AddParagraph("[Subscription Updated] complete!");
@@ -426,7 +426,7 @@ namespace Hood.Services
         public void SubscriptionDeleted(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription Deleted] processing...");
-            Stripe.Subscription deleted = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription deleted = stripeEvent.Data.Object as Stripe.Subscription;
             _mailObject.AddH2("Log:");
             var log = _auth.RemoveUserSubscriptionObject(deleted, stripeEvent.Created);
             _mailObject.AddParagraph("[Subscription Deleted] complete!");
@@ -438,7 +438,7 @@ namespace Hood.Services
         public void SubscriptionTrialWillEnd(Stripe.Event stripeEvent)
         {
             _mailObject.AddParagraph("[Subscription TrialWillEnd] processing...");
-            Stripe.Subscription endTrialSubscription = Stripe.Mapper<Stripe.Subscription>.MapFromJson(stripeEvent.Data.Object.ToString());
+            Stripe.Subscription endTrialSubscription = stripeEvent.Data.Object as Stripe.Subscription;
             UserSubscription endTrialUserSub = _auth.FindUserSubscriptionByStripeId(endTrialSubscription.Id);
             if (endTrialUserSub != null)
             {

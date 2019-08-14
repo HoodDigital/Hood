@@ -22,7 +22,7 @@ namespace Hood.Services
         {
             var card = new Stripe.CardCreateOptions()
             {
-                SourceToken = token
+                Source = token
             };
             Stripe.Card stripeCard = await _stripe.CardService.CreateAsync(customerId, card); // optional isRecipient
 

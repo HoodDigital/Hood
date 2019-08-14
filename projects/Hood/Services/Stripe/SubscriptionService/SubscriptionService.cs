@@ -44,7 +44,6 @@ namespace Hood.Services
             var options = new Stripe.SubscriptionCreateOptions()
             {
                 TrialEnd = trialEnd,
-                TaxPercent = taxPercent,
                 CustomerId = customerId,
                 Items = new List<SubscriptionItemOption>()
                 {
@@ -83,7 +82,7 @@ namespace Hood.Services
             }
             else
             {
-                updateOptions.EndTrialNow = true;
+                updateOptions.TrialEnd = DateTime.Now;
             }
             currentSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
             return currentSubscription;
@@ -91,10 +90,7 @@ namespace Hood.Services
 
         public async Task<Stripe.Subscription> UpdateSubscriptionTax(string customerId, string subscriptionId, decimal taxPercent)
         {
-            var updateOptions = new Stripe.SubscriptionUpdateOptions()
-            {
-                TaxPercent = taxPercent
-            };
+            var updateOptions = new Stripe.SubscriptionUpdateOptions();
             Stripe.Subscription stripeSubscription = await _stripe.SubscriptionService.UpdateAsync(subscriptionId, updateOptions);
             return stripeSubscription;
         }

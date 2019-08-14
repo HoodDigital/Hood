@@ -19,7 +19,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.PlanService(StripeApiKey);
+                return new Stripe.PlanService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -27,7 +27,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.SubscriptionService(StripeApiKey);
+                return new Stripe.SubscriptionService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -35,7 +35,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.CustomerService(StripeApiKey);
+                return new Stripe.CustomerService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -43,7 +43,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.CardService(StripeApiKey);
+                return new Stripe.CardService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -51,7 +51,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.ChargeService(StripeApiKey);
+                return new Stripe.ChargeService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -59,7 +59,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.InvoiceService(StripeApiKey);
+                return new Stripe.InvoiceService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -67,7 +67,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.InvoiceItemService(StripeApiKey);
+                return new Stripe.InvoiceItemService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -75,7 +75,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.TokenService(StripeApiKey);
+                return new Stripe.TokenService(new StripeClient(StripeApiKey));
             }
         }
 
@@ -83,7 +83,7 @@ namespace Hood.Services
         {
             get
             {
-                return new Stripe.RefundService(StripeApiKey);
+                return new Stripe.RefundService(new StripeClient(StripeApiKey));
             }
         }
     }

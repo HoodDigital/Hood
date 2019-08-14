@@ -181,8 +181,9 @@ namespace Hood.Controllers
                 _webHooks.ProcessEvent(json);
                 return new StatusCodeResult(200);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logService.LogErrorAsync("Error processing WebHook:", ex, LogType.Error, LogSource.Subscriptions);
                 return new StatusCodeResult(202);
             }
         }
