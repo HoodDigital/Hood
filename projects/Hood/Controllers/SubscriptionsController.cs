@@ -354,7 +354,7 @@ namespace Hood.Controllers
                     throw new Exception("Cannot process a signed webhook without a Stripe Webhook Secret. Set one in the Billing Settings to fix this.");
                 }
 
-                Event stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], Engine.Settings.Billing.StripeWebhookSecret);
+                Event stripeEvent = EventUtility.ParseEvent(json);
                 await _webHooks.ProcessEventAsync(stripeEvent);
                 return new StatusCodeResult(200);
             }
