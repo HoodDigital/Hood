@@ -62,4 +62,14 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Areas\Admin\UI\Forum\_Blade_Category.cshtml" />
+    <None Remove="Areas\Admin\UI\Forum\_Blade_Forum.cshtml" />
+    <None Remove="Areas\Admin\UI\Forum\_Editor_Images.cshtml" />
+    <None Remove="Areas\Admin\UI\Forum\_Editor_Sidebar.cshtml" />
+    <None Remove="Areas\Admin\UI\Forum\_Filters.cshtml" />
+    <None Remove="Areas\Admin\UI\Forum\_List_Categories.cshtml" />
+    <None Remove="Areas\Admin\UI\Forum\_List_Forums.cshtml" />
+  </ItemGroup>
+
 </Project>

@@ -50,7 +50,7 @@
                 <div class="form-group floating-label">
                     <select asp-for="ParentCategoryId" class="form-control">
                         <option>No Parent</option>
-                        @_categories.CategorySelectOptions(Model.Categories, Model.ParentCategoryId.ToString())
+                        @_categories.CategorySelectOptions(Model.Categories, Model.ParentCategoryId)
                     </select>
                     <label asp-for="ParentCategoryId" class="control-label"></label>
                 </div>

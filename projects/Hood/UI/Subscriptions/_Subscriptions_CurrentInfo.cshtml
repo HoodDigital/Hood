@@ -15,7 +15,7 @@
     <p>
         @if (!Context.Request.Path.ToString().Contains("account/subscriptions/change"))
         {
-            <a class="btn btn-sm btn-primary" asp-action="Select" asp-route-product="@Model.SubscriptionProductId">Change Package</a>
+            <a class="btn btn-sm btn-primary" asp-action="Product" asp-route-id="@Model.SubscriptionProductId" asp-route-title="@Model.Name.ToSeoUrl()">Change Package</a>
         }
         @if (Model != null)
         {

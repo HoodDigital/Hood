@@ -65,6 +65,9 @@ namespace Hood.Filters
                     if (action.Equals(nameof(Hood.Controllers.AccountController.Login), StringComparison.InvariantCultureIgnoreCase) &&
                         controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
                         return;
+                    if (action.Equals(nameof(Hood.Controllers.AccountController.LogOff), StringComparison.InvariantCultureIgnoreCase) &&
+                        controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
+                        return;
                 }
 
                 // If they are in an override role, let them through.

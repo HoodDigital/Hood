@@ -1442,12 +1442,5 @@ namespace Hood.Services
         }
         #endregion
 
-        #region Obsolete
-        [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
-        public AccountInfo LoadAccountInfo(string userId)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

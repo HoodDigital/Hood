@@ -78,9 +78,6 @@ namespace Hood.Extensions
             return value == null ? default : JsonConvert.DeserializeObject<T>(value);
         }
 
-        [Obsolete("Use Hood.Core.Engine.Account from now on.", true)]
-        public static AccountInfo GetAccountInfo(this HttpContext context) => throw new NotImplementedException();
-
         public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
         {
             if (context.User.IsAdminOrBetter())

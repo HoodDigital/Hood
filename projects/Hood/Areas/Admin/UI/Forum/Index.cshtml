@@ -4,226 +4,32 @@
     ViewBag.Title = "Manage Forums";
 }
 @section buttons {
-    <a class="btn btn-info btn-sm" href="/forums/" target="_blank">
-        <i class="fa fa-desktop m-r-sm"></i>
-        Preview
+    <a class="btn btn-success hood-modal" asp-action="Create" data-complete="$.hood.Forums.Create">
+        <i class="fa fa-plus-circle mr-2"></i>Create New
     </a>
-    <button class="btn btn-success btn-sm create-forum">
-        <i class="fa fa-plus-circle m-r-sm"></i>Create New
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
     </button>
-}
-@section breadcrumbs {
-    <ol class="breadcrumb">
-        <li>
-            <a href="/admin">Home</a>
-        </li>
-        <li>
-            <a asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
-                <i class="fa fa-comments m-r-xs"></i>
-                Manage Forums
-            </a>
-        </li>
-    </ol>
-}
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" asp-action="Index" asp-controller="Forum" asp-area="" target="_blank">
+            <i class="fa fa-desktop"></i>
+            Preview
+        </a>
+    </div>
+}    
 @if (Model.SaveMessage.IsSet())
 {
-    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+    <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
 }
-<div class="tabs-container">
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#items" aria-expanded="false"> Forum Setup</a></li>
-        <li class=""><a data-toggle="tab" href="#categories" aria-expanded="false"> Categories</a></li>
-    </ul>
-    <div class="tab-content">
-        <div id="items" class="tab-pane active">
-            <div class="panel-body">
-                <form>
-                    <div class="row m-b-sm m-t-sm">
-                        <div class="col-md-4">
-                            <select class="form-control submit-on-change" asp-for="Order" name="sort">
-                                <option value="date+desc">Newest First</option>
-                                <option value="date">Oldest First</option>
-                                <option value="latest+desc">Latest Activity First</option>
-                                <option value="latest">Oldest Activity First</option>
-                                <option value="name">By Title (A-Z)</option>
-                                <option value="name+desc">By Title (Z-A)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select class="form-control submit-on-change" asp-for="Category" name="category" data-selected="@Model.Category">
-                                <option value="">Show All</option>
-                                @_categories.CategorySelectOptions(_categories.TopLevel(), Model.Category, true)
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <input asp-for="Search" name="search" type="text" placeholder="Search" class="form-control">
-                                <span class="input-group-btn">
-                                    <button type="submit" class="btn btn-primary"> Search!</button>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                @if (Model.List.Count > 0)
-                {
-                    @foreach (var forum in Model.List)
-                    {
-                        <div class="data-item">
-                            <div class="row row-center">
-                                <div class="col-md-6">
-                                    <div class="media">
-                                        <div class="media-left media-middle">
-                                            <a asp-action="Edit" asp-route-id="@forum.Id">
-                                                <figure class="img-xs forum-feature-@forum.Id hood-image" style="background-image:url(@forum.FeaturedImage.ThumbUrl)">
-                                                    <img src="@forum.FeaturedImage.ThumbUrl" alt="@forum.Title">
-                                                </figure>
-                                            </a>
-                                        </div>
-                                        <div class="media-body">
-                                            <a class="forum-item-title" asp-action="Edit" asp-route-id="@forum.Id">
-                                                @forum.Title
-                                                @if (!forum.Published)
-                                                {
-                                                    <small class="txt-color-orange">Archived</small>
-                                                }
-                                                else
-                                                {
-                                                    <small class="txt-color-greenLight">Published &amp; Live</small>
-                                                }
-                                            </a>
-                                            <small>Created on <i class="fa fa-clock-o"></i> @forum.CreatedOn.ToDisplay()</small><br />
-                                            <small class="font-bold"><a href="@forum.Url" target="_blank">@forum.Url</a></small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-1 visible-lg">
-                                    <span class="small font-bold">Status</span>
-                                    <div class="tag-list">
-                                        @if (forum.Published)
-                                        {
-                                            <span class="tag-item bg-color-green txt-color-white">Published</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="tag-item bg-color-purple txt-color-white">Archived</span>
-                                        }
-                                    </div>
-                                </div>
-                                <div class="col-md-1 visible-lg visible-md">
-                                    <span class="small font-bold">Author</span>
-                                    <div class="tag-list">
-                                        <span class="tag-item">@forum.Author?.ToFullName()</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 visible-lg">
-                                    <span class="small font-bold">Categories</span>
-                                    <div class="tag-list">
-                                        @if (forum.Categories?.Count == 0)
-                                        {
-                                            <span class="tag-item">Not in a category.</span>
-                                        }
-                                        @foreach (var category in forum.Categories)
-                                        {
-                                            <span class="tag-item">@category.Category?.DisplayName</span>
-                                        }
-                                    </div>
-                                </div>
-                                <div class="col-md-2 action-buttons">
-                                    @if (!forum.Published)
-                                    {
-                                        <a class="publish-forum btn btn-sm btn-primary" data-id="@forum.Id">
-                                            <i class="fa fa-thumbs-up m-r-xs"></i>
-                                            <span>
-                                                Publish
-                                            </span>
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <a class="archive-forum btn btn-sm btn-danger" data-id="@forum.Id">
-                                            <i class="fa fa-archive m-r-xs"></i>
-                                            <span>
-                                                Archive
-                                            </span>
-                                        </a>
-                                    }
-                                    <a class="btn-default btn btn-sm action-button" asp-action="Edit" asp-route-id="@forum.Id">
-                                        <i class="fa fa-edit m-r-xs"></i>
-                                        <span>
-                                            Edit
-                                        </span>
-                                    </a>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fa fa-cog"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-right">
-                                            <li>
-                                                <a href="@forum.Url" target="_blank">
-                                                    <i class="fa fa-search m-r-sm"></i>
-                                                    <span>
-                                                        Preview
-                                                    </span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="delete-forum" data-id="@forum.Id">
-                                                    <i class="fa fa-trash-o m-r-sm"></i>
-                                                    <span>
-                                                        Delete
-                                                    </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    <div class="text-center">
-                        <partial name="_Pagination" />
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-info">
-                        <p class="text-center m-t-xs m-b-lg">There are no forums yet, click "Create New" to add your first forum.</p>
-                    </div>
-                }
+<form class="inline" data-target="#forum-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="forum-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Forums.Lists.Forums.Loaded">
+                <partial name="_List_Forums" />
             </div>
         </div>
-        <div id="categories" class="tab-pane">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-sm-8">
-                        <div class="hood-inline categorylist" data-url="@Url.Action("CategoryList")"></div>
-                    </div>
-                    <div class="col-sm-4">
-                        <form id="add-forum-category-form" class="well">
-                            <h4>Add a category...</h4>
-                            <div class="form-group">
-                                <label class="control-label" for="Add-DisplayName">Category</label>
-                                <div>
-                                    <input class="form-control" type="text" id="Add-DisplayName" name="DisplayName" />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="Add-ParentCategoryId">Parent Category</label>
-                                <div>
-                                    <select class="form-control" id="Add-ParentCategoryId" name="ParentCategoryId">
-                                        <option>No Parent</option>
-                                        @_categories.CategorySelectOptions(_categories.TopLevel(), "")
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary add-forum-category"><i class="fa fa-save"></i> Add Category</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+        <div class="col-lg-4">
+            <partial name="_Filters" />
         </div>
     </div>
-</div>
+</form>

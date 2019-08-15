@@ -1,7 +1,7 @@
 @model BuySubscriptionModel
 @{
     ViewBag.Title = $"Complete your purchase: {Model.Plan.Name}";
-    Layout = "_BasicLayout";
+    Layout = "_Layout_Basic";
     BillingSettings settings = Engine.Settings.Billing;
 }
 <section class="page-section">

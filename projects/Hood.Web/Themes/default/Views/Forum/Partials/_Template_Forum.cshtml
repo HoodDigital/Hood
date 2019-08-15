@@ -1,7 +1,4 @@
 @model Forum
-@{
-    var _account = Context.GetAccountInfo();
-}
 <div class="post forum" id="@string.Format("topic-{0}", Model.Id)">
     <fixedImage src="@Model.FeaturedImage.MediumUrl" class="image" />
     <a href="@Model.Url" class="full-box-link"></a>

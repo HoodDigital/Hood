@@ -18,6 +18,14 @@
                     </a>
                 </li>
             }
+            @if (User.IsImpersonating())
+            {
+                <li>
+                    <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin">
+                        <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
+                    </a>
+                </li>
+            }
             <li>
                 <a asp-action="Index" asp-controller="Manage">
                     <i class="fa fa-cogs m-r-xs"></i>Manage Account

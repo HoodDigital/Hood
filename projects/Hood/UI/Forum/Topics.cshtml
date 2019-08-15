@@ -7,7 +7,6 @@
     ViewData["SubTitle"] = Model.Forum.Description;
     ViewData["EditUrl"] = Url.Action("Edit", "Forum", new { area = "Admin", id = Model.Forum.Id });
     ViewData["Forum"] = Model.Forum;
-    Layout = "_ForumLayout";
 
     string url = Context.GetSiteUrl(true, true);
     if (_seoSettings.CanonicalUrl.IsSet())
@@ -46,7 +45,7 @@
     @Html.ContainedBootstrapAlert(Model.SaveMessage, Model.MessageType, true, "no-margin");
 }
 <div class="row">
-    <div class="col-sm-9">
+    <div class="col-sm-8">
         @if (Model.List.Count == 0)
         {
             <partial name="_Topics_NoResults" />
@@ -67,7 +66,7 @@
         <hr />
         <partial name="_Forms_Topic" />
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <partial name="_Topics_Sidebar" />
     </div>
 </div>

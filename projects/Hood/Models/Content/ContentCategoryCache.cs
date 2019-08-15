@@ -169,7 +169,7 @@ namespace Hood.Caching
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent CategorySelectOptions(IEnumerable<ContentCategory> startLevel, string selectedValue, bool useSlug = false, int startingLevel = 0)
+        public IHtmlContent CategorySelectOptions(IEnumerable<ContentCategory> startLevel, int? selectedValue, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
             if (startLevel != null && startLevel.Count() > 0)
@@ -179,21 +179,14 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    if (useSlug)
-                    {
-                        htmlOutput += "<option value=\"" + category.Slug + "\"" + (selectedValue == category.Slug ? " selected" : "") + ">";
-                    }
-                    else
-                    {
-                        htmlOutput += "<option value=\"" + category.Id + "\"" + (selectedValue == category.Id.ToString() ? " selected" : "") + ">";
-                    }
+                    htmlOutput += "<option value=\"" + category.Id + "\"" + (selectedValue == category.Id ? " selected" : "") + ">";
                     for (int i = 0; i < startingLevel; i++)
                     {
                         htmlOutput += "- ";
                     }
                     htmlOutput += string.Format("{0} ({1})", category.DisplayName, category.Count);
                     htmlOutput += "</option>";
-                    htmlOutput += CategorySelectOptions(category.Children, selectedValue, useSlug, startingLevel + 1);
+                    htmlOutput += CategorySelectOptions(category.Children, selectedValue, startingLevel + 1);
                 }
             }
 
@@ -251,7 +244,7 @@ namespace Hood.Caching
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent AddToCategoryTree(IEnumerable<ContentCategory> startLevel, Content content, string contentSlug, int startingLevel = 0)
+        public IHtmlContent AddToCategoryTree(IEnumerable<ContentCategory> startLevel, Content content, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
 
@@ -298,7 +291,7 @@ namespace Hood.Caching
                             </div>
                         </div>";
 
-                    htmlOutput += AddToCategoryTree(category.Children, content, contentSlug, startingLevel + 1);
+                    htmlOutput += AddToCategoryTree(category.Children, content, startingLevel + 1);
                 }
             }
 

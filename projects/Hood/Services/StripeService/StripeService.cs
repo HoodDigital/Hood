@@ -382,13 +382,8 @@ namespace Hood.Services
             {
                 CustomerId = customerId,
                 Items = items,
-                PaymentBehavior = "allow_incomplete"
-            };
-
-            if (plan.TrialPeriodDays.HasValue && plan.TrialPeriodDays != 0)
-            {
-                options.TrialEnd = DateTime.UtcNow.AddDays(plan.TrialPeriodDays.Value);
-            }
+                TrialFromPlan = true
+            };            
 
             if (paymentMethodId != null)
             {

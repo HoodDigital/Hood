@@ -148,7 +148,6 @@ namespace Hood.Areas.Admin.Controllers
         }
         private async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
-#warning Replace this with client side user lookup.
             IList<ApplicationUser> admins = await _userManager.GetUsersInRoleAsync("Admin");
             IList<ApplicationUser> editors = await _userManager.GetUsersInRoleAsync("Editor");
             listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();

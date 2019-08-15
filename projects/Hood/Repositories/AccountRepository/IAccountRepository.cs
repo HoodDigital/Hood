@@ -43,6 +43,7 @@ namespace Hood.Services
         #region Stripe customer object
         Task<Stripe.Customer> GetOrCreateStripeCustomerForUser(string userId);
         Task<List<Stripe.Customer>> GetMatchingCustomerObjectsAsync(string email);
+        Task<ApplicationUser> CreateLocalUserForCustomerObject(Customer customer);
         #endregion
 
         #region Subscription Products
@@ -81,12 +82,6 @@ namespace Hood.Services
         #region Statistics
         Task<object> GetStatisticsAsync();
         Task<object> GetSubscriptionStatisticsAsync();
-        #endregion
-
-        #region Obsolete
-        [Obsolete("Use _userManager.GetUserSubscriptionView(ClaimsPrincipal principal) from now on.", true)]
-        AccountInfo LoadAccountInfo(string userId);
-        Task<ApplicationUser> CreateLocalUserForCustomerObject(Customer customer);
         #endregion
     }
 }

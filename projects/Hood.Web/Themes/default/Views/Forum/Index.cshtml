@@ -2,10 +2,9 @@
 @{
     ViewData["Title"] = "Our Forums";
     ViewData["SubTitle"] = "Browse and engage with our interactive forums.";
-    Layout = "_ForumLayout";
 }
 <div class="row">
-    <div class="col-sm-9">
+    <div class="col-sm-8">
         @if (Model.List.Count == 0)
         {
             <partial name="_Forums_NoResults" />
@@ -14,7 +13,7 @@
         {
             @foreach (var forum in Model.List)
             {
-                <partial name="_Template_Forum" />
+                <partial name="_Template_Forum" model="forum" />
             }
             @if (Model.TotalPages > 1)
             {
@@ -24,7 +23,7 @@
             }
         }
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <partial name="_Forums_Sidebar" />
     </div>
 </div>

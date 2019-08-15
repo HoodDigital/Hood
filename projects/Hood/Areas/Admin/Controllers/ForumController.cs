@@ -1,4 +1,5 @@
 using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
@@ -25,16 +26,23 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/forums/manage/")]
-        public async Task<IActionResult> Index(ForumModel model)
+        public async Task<IActionResult> Index(ForumModel model) => await List(model, "Index");
+
+        [Route("admin/forums/list/")]
+        public async Task<IActionResult> List(ForumModel model, string viewName = "_List_Forums")
         {
             IQueryable<Forum> forums = _db.Forums
                 .Include(f => f.Author)
                 .Include(f => f.Categories).ThenInclude(c => c.Category)
                 .Include(f => f.Topics);
 
-            if (model.Category.IsSet())
+            if (model.Categories != null && model.Categories.Count > 0)
             {
-                forums = forums.Where(c => c.Categories.Any(cat => cat.Category.Slug == model.Category));
+                forums = forums.Where(f => f.Categories.Any(fc => model.Categories.Any(mc => fc.Category.Slug == mc)));
+            }
+            if (!string.IsNullOrEmpty(model.Category))
+            {
+                forums = forums.Where(f => f.Categories.Any(fc => fc.Category.Slug == model.Category));
             }
 
             if (!string.IsNullOrEmpty(model.Search))
@@ -77,9 +85,11 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             await model.ReloadAsync(forums);
-            return View(model);
+
+            return View(viewName, model);
         }
 
+        #region Edit
         [Route("admin/forums/edit/{id}/")]
         public async Task<IActionResult> Edit(int id)
         {
@@ -162,12 +172,14 @@ namespace Hood.Areas.Admin.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region Create
         [Route("admin/forums/create/")]
         public IActionResult Create()
         {
             Forum model = new Forum();
-            return View(model);
+            return View("_Blade_Forum", model);
         }
 
         [HttpPost]
@@ -204,8 +216,7 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Forums.Add(model);
                 await _db.SaveChangesAsync();
 
-#warning TODO: Handle response in JS.
-                return new Response(true, "Created successfully.");
+                return new Response(true, $"The forum was created successfully.<br /><a href='{Url.Action(nameof(Edit), new { id = model.Id })}'>Go to the new forum</a>");
             }
             catch (Exception ex)
             {
@@ -213,81 +224,84 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [Route("admin/forums/categories/")]
-        public IActionResult CategoryList()
+        #endregion
+
+        [Route("admin/forum/{id}/categories/")]
+        public async Task<IActionResult> ForumCategories(int id)
         {
-            return View();
+            Forum model = await LoadForum(id);
+            return View(model);
         }
 
+        #region Categories
         [HttpPost]
-        [Route("admin/forums/categories/add/")]
-        public async Task<Response> AddCategory(int forumId, int categoryId)
+        [Route("admin/forums/{id}/categories/toggle/")]
+        public async Task<Response> ToggleCategory(int id, int categoryId, bool add)
         {
             try
             {
-                Forum model = await LoadForum(forumId, false);
+                Forum model = await LoadForum(id, false);
 
-                if (model.IsInCategory(categoryId))
+                if (add)
                 {
-                    return new Response(true, "Forum already is in that category.");
+                    if (model.IsInCategory(categoryId))
+                    {
+                        return new Response(true, "Forum already is in that category.");
+                    }
+
+                    ForumCategory category = await _db.ForumCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
+                    if (category == null)
+                    {
+                        throw new Exception("The category does not exist.");
+                    }
+
+                    model.Categories.Add(new ForumCategoryJoin() { CategoryId = category.Id, ForumId = model.Id });
+
+                    _db.Update(model);
+                }
+                else
+                {
+                    if (!model.IsInCategory(categoryId))
+                    {
+                        return new Response(true, "Forum is not in that category.");
+                    }
+
+                    ForumCategoryJoin cat = model.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
+
+                    if (cat == null)
+                    {
+                        throw new Exception("The category does not exist.");
+                    }
+
+                    model.Categories.Remove(cat);
+
+                    _db.Update(model);
                 }
 
-                ForumCategory category = await _db.ForumCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
-                if (category == null)
-                {
-                    throw new Exception("The category does not exist.");
-                }
-
-                model.Categories.Add(new ForumCategoryJoin() { CategoryId = category.Id, ForumId = model.Id });
-
-                _db.Update(model);
                 await _db.SaveChangesAsync();
                 _forumCategoryCache.ResetCache();
 
-#warning TODO: Handle response in JS.
                 return new Response(true, "Added the category to the forum.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<ForumController>($"Error adding a forum category", ex);
+                return await ErrorResponseAsync<ForumController>($"Error toggling a forum category.", ex);
             }
         }
+        #endregion
 
-        [HttpPost]
-        [Route("admin/forums/categories/remove/")]
-        public async Task<Response> RemoveCategory(int forumId, int categoryId)
+        #region Manage Categories
+        [Route("admin/content/categories/list/")]
+        public IActionResult Categories()
         {
-            try
-            {
-                Forum model = await LoadForum(forumId, false);
-
-                if (!model.IsInCategory(categoryId))
-                {
-                    return new Response(true, "Forum is not in that category.");
-                }
-
-                ForumCategoryJoin cat = model.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
-
-                if (cat == null)
-                {
-                    throw new Exception("The category does not exist.");
-                }
-
-                model.Categories.Remove(cat);
-
-                _db.Update(model);
-                await _db.SaveChangesAsync();
-                _forumCategoryCache.ResetCache();
-
-#warning TODO: Handle response in JS.
-                return new Response(true, "Removed the category from the forum.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<ForumController>($"Error removing a forum category.", ex);
-            }
+            return View("_List_Categories");
         }
 
+        [Route("admin/forums/categories/create/")]
+        public IActionResult CreateCategory()
+        {
+            return View("_Blade_Category", new ForumCategory());
+        }
         [HttpPost]
         [Route("admin/forums/categories/create/")]
         public async Task<Response> CreateCategory(ForumCategory model)
@@ -317,7 +331,6 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
                 _forumCategoryCache.ResetCache();
 
-#warning TODO: Handle response in JS.
                 return new Response(true, "The category was created successfully.");
             }
             catch (Exception ex)
@@ -330,7 +343,6 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> EditCategory(int id)
         {
             ForumCategory model = await _db.ForumCategories.FirstOrDefaultAsync(c => c.Id == id);
-            model.Categories = _forumCategoryCache.TopLevel();
             return View(model);
         }
 
@@ -379,7 +391,7 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<ForumController>($"Error deleting a forum category, did you make sure it was empty first?", ex);
             }
         }
-
+        #endregion
 
         [Route("admin/forums/publish/{id}/")]
         [HttpPost()]
@@ -395,7 +407,6 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
 
 
-#warning TODO: Handle response in JS.
                 return new Response(true, "Published successfully.");
             }
             catch (Exception ex)
@@ -416,8 +427,6 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Forums.Update(model);
                 await _db.SaveChangesAsync();
 
-
-#warning TODO: Handle response in JS.
                 return new Response(true, "Archived successfully.");
             }
             catch (Exception ex)
@@ -437,20 +446,12 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Entry(model).State = EntityState.Deleted;
                 _db.SaveChanges();
 
-#warning TODO: Handle response in JS.
                 return new Response(true, "Deleted!");
             }
             catch (Exception ex)
             {
                 return await ErrorResponseAsync<ForumController>($"Error deleting a forum.", ex);
             }
-        }
-
-        [Route("admin/forums/categories/suggestions/")]
-        public IActionResult CategorySuggestions()
-        {
-            var suggestions = _forumCategoryCache.GetSuggestions().Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
-            return Json(suggestions.ToArray());
         }
 
         private bool CheckSlug(string slug, int? id = null)

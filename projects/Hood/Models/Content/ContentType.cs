@@ -8,25 +8,26 @@ namespace Hood.Models
 {
     public class ContentType
     {
-        public static ContentType Null
+        public static ContentType CustomType
         {
             get {
                 return new ContentType()
                 {
-                    BaseName = "Unknown",
-                    Slug = "unknown",
-                    Type = "unknown",
-                    Search = "unknown",
-                    Title = "Unknowns",
-                    Icon = "fa-newspaper",
-                    TypeName = "Unknown",
+                    BaseName = "Custom",
+                    Slug = "new-content-type",
+                    Type = "Custom",
+                    Search = "custom",
+                    Title = "Custom Content Items",
+                    Icon = "fa-file-o",
+                    TypeName = "Custom",
                     Enabled = false,
-                    IsPublic = false,
-                    HasPage = false,
-                    TypeNamePlural = "Unknown",
+                    IsPublic = true,
+                    HasPage = true,
+                    TypeNamePlural = "CustomItems",
                     TitleName = "Title",
                     ExcerptName = "Excerpt",
                     MultiLineExcerpt = true,
+                    RichTextExcerpt = true,
                     ShowDesigner = false,
                     ShowEditor = true,
                     ShowCategories = false,

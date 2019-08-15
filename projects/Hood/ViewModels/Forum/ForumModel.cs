@@ -16,11 +16,19 @@ namespace Hood.ViewModels
 
         // Sidebar Stuff
         public List<Forum> Recent { get; set; }
+        [FromQuery(Name = "categories")]
+        public List<string> Categories { get; set; }
 
         public override string GetPageUrl(int pageIndex)
         {
             var query = base.GetPageUrl(pageIndex);
+            if (Categories != null)
+                foreach (var cat in Categories)
+                {
+                    query += "&categories=" + cat;
+                }
             query += Category.IsSet() ? "&category=" + Category : "";
+            query += AuthorName.IsSet() ? "&author=" + AuthorName : "";
             return query;
         }
 

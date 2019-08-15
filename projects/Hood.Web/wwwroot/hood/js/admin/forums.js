@@ -1,174 +1,73 @@
 ﻿if (!$.hood)
     $.hood = {};
-$.hood.Forum = {
+$.hood.Forums = {
     Init: function () {
-        $('body').on('click', '.delete-forum', $.hood.Forum.Delete);
-        $('body').on('click', '.create-forum', $.hood.Forum.Create.Init);
-        $('body').on('click', '.publish-forum', $.hood.Forum.Publish);
-        $('body').on('click', '.archive-forum', $.hood.Forum.Archive);
-        $('body').on('click', '.create-forum', $.hood.Forum.Create.Init);
-        $('body').on('click', '.edit-forum-category', $.hood.Forum.Categories.Edit);
-        $('body').on('click', '.save-forum-category', $.hood.Forum.Categories.Save);
-        $('body').on('click', '.add-forum-category', $.hood.Forum.Categories.Add);
-        $('body').on('click', '.delete-forum-category', $.hood.Forum.Categories.Delete);
-        $('body').on('change', '.forum-category-check', $.hood.Forum.Categories.ToggleCategory);
+        $('body').on('click', '.forum-delete', $.hood.Forums.Delete);
+        $('body').on('click', '.forum-archive', $.hood.Forums.Archive);
+        $('body').on('click', '.forum-publish', $.hood.Forums.Publish);
+
+        $('body').on('click', '.forum-categories-delete', $.hood.Forums.Categories.Delete);
+        $('body').on('change', '.forum-categories-check', $.hood.Forums.Categories.ToggleCategory);
 
         $('body').on('keyup', '#Slug', function () {
             $('.slug-display').html($(this).val());
         });
 
         if ($('#edit-forum').doesExist())
-            $.hood.Forum.Edit.Init();
+            $.hood.Forums.Edit.Init();
     },
-    Categories: {
-        Edit: function (e) {
-            e.preventDefault();
-            $.hood.Blades.OpenWithLoader('.edit-forum-category', '/admin/forums/categories/edit/' + $(this).data('id'), null);
+
+    Lists: {
+        Forums: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#forum-list').doesExist())
+                    $.hood.Inline.Reload($('#forum-list'), complete);
+            }
         },
-        Save: function (e) {
-            $.post('/admin/forums/categories/save/', $('#edit-forum-category-form').serialize(), function (data) {
-                if (data.Success) {
-                    $.hood.Inline.Reload('.categorylist');
-                    swal({
-                        title: "Saved!",
-                        text: "The category has been saved.",
-                        timer: 1300,
-                        type: "success"
-                    });
-                } else {
-                    swal({
-                        title: "Error!",
-                        text: "There was a problem saving the category: " + data.Error,
-                        timer: 1300,
-                        type: "error"
-                    });
-                }
-            });
-        },
-        Add: function (e) {
-            $.post('/admin/forums/categories/create/', $('#add-forum-category-form').serialize(), function (data) {
-                if (data.Success) {
-                    $.hood.Inline.Reload('.categorylist');
-                    swal({
-                        title: "Saved!",
-                        text: "The category has been added.",
-                        timer: 1300,
-                        type: "success"
-                    });
-                } else {
-                    swal({
-                        title: "Error!",
-                        text: "There was a problem adding the category: " + data.Error,
-                        timer: 1300,
-                        type: "error"
-                    });
-                }
-            });
-        },
-        ToggleCategory: function () {
-            if ($(this).is(':checked')) {
-                $.post('/admin/forums/categories/add/', { categoryId: $(this).val(), forumId: $(this).data('id') }, function (data) {
+        Categories: {
+            Loaded: function (data) {
+                $.hood.Loader(false);
+            },
+            Reload: function (complete) {
+                if ($('#forum-categories-list').doesExist())
+                    $.hood.Inline.Reload($('#forum-categories-list'), complete);
+            }
+        }
+    },
+
+    Delete: function (e) {
+        e.preventDefault();
+        let $tag = $(this);
+
+        let deleteForumCallback = function (isConfirm) {
+            if (isConfirm) {
+                $.post($tag.attr('href'), function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    $.hood.Forums.Lists.Forums.Reload();
                     if (data.Success) {
-                        $.hood.Alerts.Success("Added category.");
-                    } else {
-                        $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
-                    }
-                });
-            } else {
-                $.post('/admin/forums/categories/remove/', { categoryId: $(this).val(), forumId: $(this).data('id') }, function (data) {
-                    if (data.Success) {
-                        $.hood.Alerts.Success("Removed category.");
-                    } else {
-                        $.hood.Alerts.Error("Couldn't add the category: " + data.Error);
+                        if ($tag && $tag.data('redirect')) {
+                            $.hood.Alerts.Success(`<strong>Forum deleted, redirecting...</strong><br />Just taking you back to the forum list.`);
+                            setTimeout(function () {
+                                window.location = $tag.data('redirect');
+                            }, 1500);
+                        }
                     }
                 });
             }
+        };
 
-        },
-        Delete: function () {
-            var $this = $(this);
-            swal({
-                title: "Are you sure?",
-                text: "The field will be permanently removed.",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, go ahead.",
-                cancelButtonText: "No, cancel!",
-                closeOnConfirm: false,
-                showLoaderOnConfirm: true,
-                closeOnCancel: false
-            },
-                function (isConfirm) {
-                    if (isConfirm) {
-                        // delete functionality
-                        $.post('/admin/forums/categories/delete/' + $this.data('id'), null, function (data) {
-                            if (data.Success) {
-                                $.hood.Inline.Reload('.categorylist');
-                                swal({
-                                    title: "Deleted!",
-                                    text: "The field has now been removed from the website.",
-                                    timer: 1300,
-                                    type: "success"
-                                });
-                            } else {
-                                swal({
-                                    title: "Error!",
-                                    text: "There was a problem deleting the field: " + data.Errors,
-                                    timer: 5000,
-                                    type: "error"
-                                });
-                            }
-                        });
-                    } else {
-                        swal("Cancelled", "It's all good in the hood!", "error");
-                    }
-                });
-        }
+        $.hood.Alerts.Confirm(
+            "The forum will be permanently removed.",
+            "Are you sure?",
+            deleteForumCallback,
+            'error',
+            '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+        );
     },
-    Delete: function (e) {
-        var $this = $(this);
-        swal({
-            title: "Are you sure?",
-            text: "The forum will be permanently removed.",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: "Yes, go ahead.",
-            cancelButtonText: "No, cancel!",
-            closeOnConfirm: false,
-            showLoaderOnConfirm: true,
-            closeOnCancel: false
-        },
-            function (isConfirm) {
-                if (isConfirm) {
-                    // delete functionality
-                    $.post('/admin/forums/delete/' + $this.data('id'), null, function (data) {
-                        if (data.Success) {
-                            $.hood.Blades.Close();
-                            swal({
-                                title: "Deleted!",
-                                text: "The forum has now been removed from the website.",
-                                timer: 1300,
-                                type: "success"
-                            });
-                            setTimeout(function () {
-                                window.location = data.Url;
-                            }, 500);
-                        } else {
-                            swal({
-                                title: "Error!",
-                                text: "There was a problem deleting the forum: " + data.Errors,
-                                timer: 5000,
-                                type: "error"
-                            });
-                        }
-                    });
-                } else {
-                    swal("Cancelled", "It's all good in the hood!", "error");
-                }
-            });
-    },
+
     Publish: function (e) {
         var $this = $(this);
         swal({
@@ -252,48 +151,90 @@ $.hood.Forum = {
                 }
             });
     },
-    Create: {
-        Init: function (e) {
-            var $this = $(this);
-            e.preventDefault();
-            $.hood.Blades.OpenWithLoader('button.create-forum', '/admin/forums/create/', $.hood.Forum.Create.SetupCreateForm);
-        },
-        SetupCreateForm: function () {
-            $('#create-forum-form').find('.datepicker').datetimepicker({
+
+    Create: function () {
+        $('#forum-create-form').find('.datepicker').datetimepicker({
+            locale: 'en-gb',
+            format: 'L'
+        });
+        $('#forum-create-form').hoodValidator({
+            validationRules: {
+                Title: {
+                    required: true
+                },
+                Description: {
+                    required: true
+                }
+            },
+            submitButtonTag: $('#forum-create-submit'),
+            submitUrl: $('#forum-create-form').attr('action'),
+            submitFunction: function (data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Forums.Lists.Forums.Reload();
+            }
+        });
+    },
+
+    Edit: {
+        Init: function () {
+            $('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
             });
-            $('#create-forum-form').hoodValidator({
-                validationRules: {
-                    Title: {
-                        required: true
-                    },
-                    Description: {
-                        required: true
-                    }
-                },
-                submitButtonTag: $('#create-forum-submit'),
-                submitUrl: '/admin/forums/create',
-                submitFunction: function (data) {
-                    if (data.Success) {
-                        swal("Created!", "The forum has now been created!", "success");
-                        setTimeout(function () {
-                            window.location = data.Url;
-                        }, 500);
-                    } else {
-                        swal("Error", "There was a problem creating the forum:\n\n" + data.Errors, "error");
-                    }
-                }
+            $('.datetimepicker').datetimepicker({
+                locale: 'en-gb',
+                format: 'LT'
             });
         }
     },
-    Edit: {
-        Init: function () {
-            $('#edit-forum-form').find('.datepicker').datetimepicker({
-                locale: 'en-gb',
-                format: 'L'
+
+    Categories: {
+        Editor: function () {
+            $('#forum-categories-edit-form').hoodValidator({
+                validationRules: {
+                    DisplayName: {
+                        required: true
+                    },
+                    Slug: {
+                        required: true
+                    }
+                },
+                submitButtonTag: $('#forum-categories-edit-submit'),
+                submitUrl: $('#forum-categories-edit-form').attr('action'),
+                submitFunction: function (data) {
+                    $.hood.Helpers.ProcessResponse(data);
+                    $.hood.Forums.Lists.Categories.Reload();
+                }
             });
+        },
+        ToggleCategory: function () {
+            $.post($(this).data('url'), { categoryId: $(this).val(), add: $(this).is(':checked') }, function (data) {
+                $.hood.Helpers.ProcessResponse(data);
+                $.hood.Forums.Lists.Categories.Reload();
+            });
+        },
+        Delete: function (e) {
+            e.preventDefault();
+            let $tag = $(this);
+
+            let deleteCategoryCallback = function (isConfirm) {
+                if (isConfirm) {
+                    $.post($tag.attr('href'), function (data) {
+                        $.hood.Helpers.ProcessResponse(data);
+                        $.hood.Forums.Lists.Categories.Reload();
+                    });
+                }
+            };
+
+            $.hood.Alerts.Confirm(
+                "The category will be permanently removed.",
+                "Are you sure?",
+                deleteCategoryCallback,
+                'error',
+                '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
+            );
         }
     }
 };
-$(document).ready($.hood.Forum.Init);
+
+$(document).ready($.hood.Forums.Init);

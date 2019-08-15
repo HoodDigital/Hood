@@ -8,7 +8,6 @@
     ViewData["EditUrl"] = Url.Action("Edit", "Forum", new { area = "Admin", id = Model.Topic.Forum.Id });
     ViewData["Forum"] = Model.Topic.Forum;
     ViewData["Topic"] = Model.Topic;
-    Layout = "_ForumLayout";
 
     string url = Context.GetSiteUrl(true, true);
     if (_seoSettings.CanonicalUrl.IsSet())
@@ -16,9 +15,7 @@
         url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
     }
 
-    var _account = Context.GetAccountInfo();
-
-    bool moderator = User.IsForumModerator() || Model.Topic.AuthorId == _account.User.Id;
+    bool moderator = User.IsForumModerator() || Model.Topic.AuthorId == Engine.Account.Id;
 }
 <script src="~/lib/tinymce/tinymce.min.js" asp-location="BeforeScripts"></script>
 <script src="~/lib/tinymce/themes/inlite/theme.min.js" asp-location="BeforeScripts"></script>
@@ -53,7 +50,7 @@
     @Html.ContainedBootstrapAlert(Model.SaveMessage, Model.MessageType, true, "no-margin");
 }
 <div class="row">
-    <div class="col-sm-9">
+    <div class="col-sm-8">
         <div class="post">
             <div class="post-view">
                 <div class="post-content">
@@ -130,7 +127,7 @@
         <hr />
         <partial name="_Forms_Post" />
     </div>
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <partial name="_Posts_Sidebar" />
     </div>
 </div>

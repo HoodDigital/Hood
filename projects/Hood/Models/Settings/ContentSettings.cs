@@ -19,7 +19,7 @@ namespace Hood.Models
             var type = Types.Where(t => t.Slug == slug || t.Type == slug || t.TypeNamePlural.ToLower() == slug).FirstOrDefault();
             if (type != null)
                 return type;
-            return ContentType.Null;
+            return ContentType.CustomType;
         }
         public List<ContentType> AllowedTypes
         {

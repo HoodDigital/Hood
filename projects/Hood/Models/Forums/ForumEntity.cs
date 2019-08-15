@@ -3,6 +3,7 @@ using Hood.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
@@ -42,8 +43,9 @@ namespace Hood.Models
         public int Views { get; set; }
         public int ShareCount { get; set; }
 
-        // Settings
+        [Display(Name = "Published", Description = "If checked, the forum will be visible and accessible on the site.")]
         public bool Published { get; set; }
+        [Display(Name = "Featured", Description = "Show this forum in any featured lists.")]
         public bool Featured { get; set; }
 
         // Images

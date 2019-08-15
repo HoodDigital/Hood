@@ -29,32 +29,20 @@
         ViewData["ExitDesignerUrl"] = Model.Content.Url;
     }
 
+    var View = "_View";
+
     @switch (Model.ContentType.BaseName)
     {
-        case "FAQ":
-            Layout = "_FaqLayout";
-            break;
-        case "News":
-            Layout = "_NewsLayout";
-            break;
-        case "Page":
-            Layout = "_Page";
-            break;
-        case "Portfolio":
-            Layout = "_PortfolioLayout";
-            break;
-        case "Product":
-            Layout = "_ProductLayout";
-            break;
-        case "Team":
-            Layout = "_TeamLayout";
-            break;
-        case "Testimonial":
-            Layout = "_TestimonialLayout";
+        case "Custom":
+            View = $"_View_{Model.ContentType.TypeName}";
+            Layout = $"_Layout_{Model.ContentType.TypeName}";
             break;
         default:
+            View = $"_View_{Model.ContentType.BaseName}";
+            Layout = $"_Layout_{Model.ContentType.BaseName}";
             break;
     }
+
     string template = null;
     if (Model.ContentType.Templates)
     {
@@ -101,44 +89,10 @@
 {
     if (Model.Content.Body.IsSet())
     {
-        <partial name="_EditableContent" />
-    }
-    else
-    {
-        <alert type="Info">Nothing to see here just yet.</alert>
+        @Html.Raw(Model.Content.Body)
     }
 }
 else
 {
-    switch (Model.ContentType.BaseName)
-    {
-        case "Event":
-            <partial name="_EventView" />
-            break;
-        case "Faq":
-            <partial name="_FaqView" />
-            break;
-        case "Job":
-            <partial name="_JobView" />
-            break;
-        case "Portfolio":
-            <partial name="_PortfolioView" />
-            break;
-        case "Product":
-            <partial name="_ProductView" />
-            break;
-        case "Team":
-            <partial name="_TeamView" />
-            break;
-        case "Testimonial":
-            <partial name="_TestimonialView" />
-            break;
-        case "Page":
-            <partial name="_EditableContent" />
-            break;
-        case "News":
-        default:
-            <partial name="_NewsView" />
-            break;
-    }
+    <partial name="@View" />
 }

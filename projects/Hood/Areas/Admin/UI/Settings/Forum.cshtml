@@ -72,7 +72,7 @@
                             <em>If you select none, then then any subscription can (if subscriptions are required).</em>
                         </alert>
                         <input class="form-control checkbox-values" type="hidden" asp-for="ViewingSubscriptions" />
-                        @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                        @foreach (SubscriptionPlan sub in Model.Subscriptions.OrderBy(p => p.Amount))
                         {
                             <div class="custom-control custom-checkbox">
                                 @if (subs == null || !subs.Contains(sub.StripeId))
@@ -174,7 +174,7 @@
                             <em>If you select none, then then any subscription can (if subscriptions are required).</em>
                         </alert>
                         <input class="form-control checkbox-values" type="hidden" asp-for="PostingSubscriptions" />
-                        @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                        @foreach (SubscriptionPlan sub in Model.Subscriptions.OrderBy(p => p.Amount))
                         {
                             <div class="custom-control custom-checkbox">
                                 @if (subs == null || !subs.Contains(sub.StripeId))

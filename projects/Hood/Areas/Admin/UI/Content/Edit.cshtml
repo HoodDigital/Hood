@@ -20,7 +20,7 @@
 @section breadcrumbs {
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page"><a href="/admin">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
             @if (Model.Type.IsUnknown)
             {
                 <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="" asp-route-area="Admin"><i class="fa fa-archive mr-1"></i>All Content</a></li>

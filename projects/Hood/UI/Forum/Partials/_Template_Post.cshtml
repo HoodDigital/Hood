@@ -1,10 +1,7 @@
 @model Post
 @{
-    var _account = Context.GetAccountInfo();
     bool moderator = User.Identity.IsAuthenticated &&
-        (Model.AuthorId == _account.User.Id ||
-        User.IsInRole("Administrator") ||
-        User.IsInRole("Moderator"));
+        (Model.AuthorId == Engine.Account.Id || User.IsForumModerator() || User.IsAdminOrBetter());
 }
 <div class="post" id="@string.Format("post-{0}", Model.Id)">
     <div class="row">

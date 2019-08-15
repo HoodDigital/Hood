@@ -1,6 +1,7 @@
 @model Topic
 @{
-    var _account = Context.GetAccountInfo();
+    bool moderator = User.Identity.IsAuthenticated &&
+        (Model.AuthorId == Engine.Account.Id || User.IsForumModerator() || User.IsAdminOrBetter());
 }
 <div class="post" id="@string.Format("topic-{0}", Model.Id)">
     <a asp-action="ShowTopic" asp-route-topicId="@Model.Id" asp-route-title="@Model.Title.ToSeoUrl()" class="full-box-link"></a>
@@ -29,7 +30,7 @@
             </p>
         </div>
     </div>
-    @if (Model.AuthorId == _account.User.Id || User.IsForumModerator())
+    @if (moderator)
     {
         <hr class="m-t-sm m-b-sm" />
         <p class="no-margin">

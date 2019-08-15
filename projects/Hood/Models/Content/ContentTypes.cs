@@ -255,7 +255,8 @@ namespace Hood.Models
                             new CustomField() { Name = "Content.Portfolio.DeliveryDate", Default = "", System = true, Type="System.DateTime" },
                             new CustomField() { Name = "Content.Portfolio.Headline", Default = "", System = true, Type="System.String" }
                         })
-                    }
+                    },
+                    ContentType.CustomType
                 };
             }
         }

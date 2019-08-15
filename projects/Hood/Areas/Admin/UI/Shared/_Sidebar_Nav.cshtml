@@ -59,19 +59,10 @@
     @if (User.IsEditorOrBetter() && Engine.Settings.Forum.Enabled)
     {
         <li class="nav-item">
-            <a class="nav-link dropdown collapsed" href="#sidebar-forums" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-forums">
+            <a class="nav-link" asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
                 <i class="fa fa-comments"></i>
                 Forums
             </a>
-            <div class="collapse" id="sidebar-forums">
-                <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-action="Index" asp-controller="Forum" asp-route-area="Admin">
-                            <i class="fa fa-cogs"></i>Manage Forums
-                        </a>
-                    </li>
-                </ul>
-            </div>
         </li>
     }
     @if (User.IsAdminOrBetter() && Engine.Settings.Billing.IsSubscriptionsEnabled)

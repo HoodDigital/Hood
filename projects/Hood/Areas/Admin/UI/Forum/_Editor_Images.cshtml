@@ -1,0 +1,34 @@
+@model Forum
+<h5 class="mt-2 mb-0">Featured & Sharer Images</h5>
+<p>Set images for this forum. You can enable/disable these images for this forum type in <a asp-action="Forum" asp-controller="Settings">forum settings</a>.</p>
+<input type="hidden" asp-for="FeaturedImageJson">
+<div class="form-group row align-items-center">
+    <div class="col-auto">
+        <fixedImage src="@Model.FeaturedImage.SmallUrl" class="img-sm img-circle m-0 FeaturedImage" id="forum-feature-image" />
+    </div>
+    <div class="col">
+        <h6>Featured Image</h6>
+        <p>Choose a featured image for this forum. This will appear in forum lists, and as the main featured image.</p>
+        <p class="m-0">
+            <mediaAttach asp-for="FeaturedImage" asp-entity="@nameof(Forum)" asp-id="@Model.Id" asp-filetype="Image" asp-json="FeaturedImageJson">
+                Choose...
+            </mediaAttach>
+        </p>
+    </div>
+</div>
+<hr class="mt-4 mb-4" />
+<input type="hidden" asp-for="ShareImageJson">
+<div class="form-group row align-items-center">
+    <div class="col-auto">
+        <fixedImage src="@Model.ShareImage.SmallUrl" class="img-sm img-circle m-0 ShareImage" id="forum-share-image" />
+    </div>
+    <div class="col">
+        <h6>Sharer Image</h6>
+        <p>Choose a sharer image for this forum. This will appear when shared in social media, or in links, this will override the featured image if one is set.</p>
+        <p class="m-0">
+            <mediaAttach asp-for="ShareImage" asp-entity="@nameof(Forum)" asp-id="@Model.Id" asp-filetype="Image" asp-json="ShareImageJson">
+                Choose...
+            </mediaAttach>
+        </p>
+    </div>
+</div>

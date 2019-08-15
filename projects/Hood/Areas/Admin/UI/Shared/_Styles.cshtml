@@ -1,6 +1,6 @@
 <environment include="Development">
-    <link rel="stylesheet" href="~/hood/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@string.Format("{0}/css/admin.css", Engine.LibraryFolder)" asp-append-version="true" />
 </environment>
 <environment exclude="Development">
-    <link rel="stylesheet" href="~/hood/css/admin.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@string.Format("{0}/css/admin.min.css", Engine.LibraryFolder)" asp-append-version="true" />
 </environment>

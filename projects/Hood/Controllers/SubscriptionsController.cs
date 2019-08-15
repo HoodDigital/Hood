@@ -34,7 +34,7 @@ namespace Hood.Controllers
             return View(model);
         }
 
-        [Route("account/subscriptions/products/")]
+        [Route("account/subscriptions/plans/")]
         public async Task<IActionResult> Select(string returnUrl = null)
         {
             SubscriptionProductsModel model = new SubscriptionProductsModel()

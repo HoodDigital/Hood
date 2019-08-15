@@ -11,7 +11,7 @@
         </p>
     </div>
     <div class="card-body collapse show" aria-labelledby="content-access-panel-heading" id="content-access-panel">
-        <div class="form-group floating-label">
+        <div class="form-group">
             <label asp-for="Status">Publish Status</label>
             <select class="form-control" asp-for="Status" asp-items="@(Html.GetEnumSelectList<ContentStatus>())"></select>
             <small asp-for="Status"></small>
@@ -56,15 +56,15 @@
         <p class="font-weight-bold m-0">URL Preview:</p>
         @if (Model.IsHomepage)
         {
-            <a class="d-block" href="@Url.AbsoluteUrl()" target="_blank"><strong>@Url.AbsoluteUrl()</strong></a>
+            <p class="m-0"><strong>@Url.AbsoluteUrl()</strong></p>
         }
         else if (Model.ContentType == "page")
         {
-            <a class="d-block" href="@Url.AbsoluteUrl(Model.Slug)" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Slug</span></strong></a>
+            <p class="m-0">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Slug</span></strong></p>
         }
         else
         {
-            <a class="d-block" href="@Model.Url" target="_blank">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Url.TrimStart('/')</span></strong></a>
+            <p class="m-0k">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Url.TrimStart('/')</span></strong></p>
         }
     </div>
 </div>
@@ -90,7 +90,7 @@
                 }
                 else
                 {
-                    <p>No categories added yet. To add a category, go back to the @Model.Type.TypeName list and select @Model.Type.TypeName Categories.</p>
+                    <p class="text-center p-2">No categories added yet. To add a category, go back to the @Model.Type.TypeName list and select @Model.Type.TypeName Categories.</p>
                 }
             </div>
         }
