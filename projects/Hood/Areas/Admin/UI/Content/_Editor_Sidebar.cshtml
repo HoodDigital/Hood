@@ -86,7 +86,7 @@
                 }
                 @if (_categories.Count(Model.Type.Type) > 0)
                 {
-                    @_categories.AddToCategoryTree(_categories.TopLevel(Model.Type.Type), Model, Model.Type.Slug)
+                    @_categories.AddToCategoryTree(_categories.TopLevel(Model.Type.Type), Model)
                 }
                 else
                 {
