@@ -24,7 +24,7 @@
                         <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
                         break;
                     case MediaWindowAction.Insert:
-                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-insert" data-tag="@Model.Tag" data-url="@media.Url" />
+                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-insert" data-url="@media.Url" />
                         break;
                     case MediaWindowAction.Attach:
                         <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-attach" data-url="@attachUrl" />
@@ -45,28 +45,32 @@
                         case MediaWindowAction.Select:
                             <p>
                                 <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
-                                    <span>
-                                        Small
-                                    </span>
+                                    Small
                                 </a>
                                 <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
-                                    <span>
-                                        Medium
-                                    </span>
+                                    Medium
                                 </a>
                                 <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
-                                    <span>
-                                        Large
-                                    </span>
+                                    Large
                                 </a>
                             </p>
                             break;
                         case MediaWindowAction.Insert:
-
+                            <p>
+                                <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.SmallUrl" data-title="@media.Filename" href="javascript:void(0);">
+                                    Small
+                                </a>
+                                <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.MediumUrl" data-title="@media.Filename" href="javascript:void(0);">
+                                    Medium
+                                </a>
+                                <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.LargeUrl" data-title="@media.Filename" href="javascript:void(0);">
+                                    Large
+                                </a>
+                            </p>
                             break;
                         case MediaWindowAction.Attach:
                             <p class="no-margin">
-                                <a class="media-attach btn btn-sm btn-outline-success" data-tag="@Model.Tag" data-url="@attachUrl">
+                                <a class="media-insert btn btn-sm btn-outline-success" data-url="@attachUrl">
                                     <i class="fa fa-link mr-2"></i>
                                     Attach
                                 </a>

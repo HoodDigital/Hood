@@ -52,19 +52,22 @@ $.hood.Media = {
                 });
             },
             Insert: function (editor) {
-                editor.addButton('hoodimage', {
-                    text: 'Insert image...',
-                    icon: false,
-                    onclick: function () {
-                        $.hood.Inline.Modal($(this).data('url'), function () {
-                            $.hood.Media.Reload(function () {
-                                $('body').off('click');
-                                $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
+                $this = $('#'+ editor.id);
+                if ($this.data('imagesUrl')) {
+                    editor.addButton('hoodimage', {
+                        text: 'Insert image...',
+                        icon: false,
+                        onclick: $.proxy(function (e) {
+                            $.hood.Inline.Modal($(this).data('imagesUrl'), function () {
+                                $.hood.Media.Reload(function () {
+                                    $('body').off('click');
+                                    $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
+                                });
+                                $.hood.Media.Upload.Init();
                             });
-                            $.hood.Media.Upload.Init();
-                        });
-                    }
-                });
+                        }, $this)
+                    });
+                }
             },
             Select: function (e) {
                 $.hood.Media.Actions.Target = $($(this).data('target'));
@@ -111,10 +114,10 @@ $.hood.Media = {
                     .fail($.hood.Inline.HandleError);
             },
             Insert: function (e) {
-                let  url = $(e.target).data('url');
-                let  editor = this;
-                editor.insertContent('<img alt="Your image..." src="' + url + '"/>');
-                $.hood.Modals.Close('#attach-media-modal');
+                let btn = $(e.target);
+                let editor = this;
+                editor.insertContent('<img alt="' + btn.data('title') + '" src="' + btn.data('url') + '"/>');
+                $.hood.Inline.CloseModal();
             },
             Select: function (e) {
                 let  url = $(this).data('url');

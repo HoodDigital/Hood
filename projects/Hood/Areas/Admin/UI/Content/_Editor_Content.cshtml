@@ -27,7 +27,7 @@ else
     @if (Model.Type.ShowEditor)
     {
         <label asp-for="Body" class="sr-only"></label>
-        <textarea asp-for="Body" class="tinymce-full"></textarea>
+        <textarea asp-for="Body" class="tinymce-full" data-images-url="@Url.Action("Action", "Media", new { doAction = MediaWindowAction.Insert })"></textarea>
         <small asp-for="Body"></small>
     }
 </div>
