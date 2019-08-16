@@ -175,6 +175,15 @@ namespace Hood.Extensions
             .AddEntityFrameworkStores<HoodDbContext>()
             .AddDefaultTokenProviders();
 
+            services
+                .AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    IConfigurationSection googleAuthNSection = config.GetSection("Authentication:Google");
+                    options.ClientId = googleAuthNSection["ClientId"];
+                    options.ClientSecret = googleAuthNSection["ClientSecret"];
+                });
+
             var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
             services.ConfigureApplicationCookie(options =>

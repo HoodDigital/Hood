@@ -53,6 +53,10 @@ $.hood.Inline = {
             $(modalId).on('shown.bs.modal', function () {
                 $(document).off('focusin.modal');
             });
+            $(modalId).on('hidden.bs.modal', function (e) {
+                $(this).remove();
+            });
+
         })
             .done(function () { $.hood.Inline.RunComplete(complete); })
             .fail($.hood.Inline.HandleError)
