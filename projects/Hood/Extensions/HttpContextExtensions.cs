@@ -135,13 +135,20 @@ namespace Hood.Extensions
 
                 if (includePath)
                 {
-                    if (appPath.EndsWith("/"))
-                        appPath = appPath.TrimEnd('/');
-                    appPath += context.Request.Path;
-                    if (includeQuery)
-                        appPath += context.Request.QueryString.ToUriComponent();
+                    if (context.Items.ContainsKey("originalPath"))
+                    {
+                        var originalPath = context.Items["originalPath"] as string;
+                        appPath += originalPath.TrimStart('/');
+                    }
+                    else
+                    {
+                        if (appPath.EndsWith("/"))
+                            appPath = appPath.TrimEnd('/');
+                        appPath += context.Request.Path;
+                        if (includeQuery)
+                            appPath += context.Request.QueryString.ToUriComponent();
+                    }
                 }
-
             }
             return appPath;
         }

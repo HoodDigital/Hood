@@ -136,7 +136,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<PropertyController>("Error saving a property listing.", ex, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+                await _logService.AddExceptionAsync<PropertyController>("Error saving a property listing.", ex);
 
                 SaveMessage = "An error occurred: " + ex.Message;
                 MessageType = AlertType.Danger;

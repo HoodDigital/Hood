@@ -26,9 +26,10 @@ namespace Hood.Controllers
         {
             ErrorModel model = GetErrorInformation();
 
+            model.OriginalUrl = HttpContext.GetSiteUrl().TrimEnd('/');
             if (HttpContext.Items.ContainsKey("originalPath"))
             {
-                model.OriginalUrl = HttpContext.Items["originalPath"] as string;
+                model.OriginalUrl += HttpContext.Items["originalPath"] as string;
             }
 
             await _logService.AddExceptionAsync<ErrorController>($"500 - Application Error: {model.OriginalUrl}", model.Error);
@@ -57,9 +58,10 @@ namespace Hood.Controllers
                 Code = 404
             };
 
+            model.OriginalUrl = HttpContext.GetSiteUrl().TrimEnd('/');
             if (HttpContext.Items.ContainsKey("originalPath"))
             {
-                model.OriginalUrl = HttpContext.Items["originalPath"] as string;
+                model.OriginalUrl += HttpContext.Items["originalPath"] as string;
             }
 
             await _logService.AddLogAsync<ErrorController>($"404 - Page not found: {model.OriginalUrl}", type: LogType.Error404);

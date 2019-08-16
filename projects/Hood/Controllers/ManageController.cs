@@ -219,7 +219,7 @@ namespace Hood.Controllers
             }
 
             await _signInManager.SignInAsync(user, isPersistent: false);
-            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.", userId: user.Id);
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.");
             SaveMessage = "Your password has been changed.";
 
             return RedirectToAction(nameof(ChangePassword));
@@ -405,7 +405,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
             }
-            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) has disabled 2fa.", userId: user.Id);
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) has disabled 2fa.");
             return RedirectToAction(nameof(TwoFactorAuthentication));
         }
 
@@ -462,7 +462,7 @@ namespace Hood.Controllers
             }
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
-            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has enabled 2FA with an authenticator app.", userId: user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has enabled 2FA with an authenticator app.");
             return RedirectToAction(nameof(GenerateRecoveryCodes));
         }
 
@@ -485,7 +485,7 @@ namespace Hood.Controllers
             await _userManager.SetTwoFactorEnabledAsync(user, false);
             await _userManager.ResetAuthenticatorKeyAsync(user);
 
-            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has reset their authentication app key.", userId: user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has reset their authentication app key.");
 
             return RedirectToAction(nameof(EnableAuthenticator));
         }
@@ -507,7 +507,7 @@ namespace Hood.Controllers
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             var model = new GenerateRecoveryCodesViewModel { RecoveryCodes = recoveryCodes.ToArray() };
 
-            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has generated new 2FA recovery codes.", userId: user.Id);
+            await _logService.AddLogAsync<ManageController>($"User with ID {user.Id} has generated new 2FA recovery codes.");
 
             return View(model);
         }

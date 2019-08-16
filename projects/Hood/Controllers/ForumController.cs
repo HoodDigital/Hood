@@ -581,7 +581,7 @@ namespace Hood.Controllers
                 }
                 else
                 {
-                    await _logService.AddExceptionAsync<ForumController>(SaveMessage,  ex);
+                    await _logService.AddExceptionAsync<ForumController>(SaveMessage, ex);
                     return RedirectToAction(nameof(ForumController.Index));
                 }
             }

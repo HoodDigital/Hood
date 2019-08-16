@@ -132,7 +132,7 @@ namespace Hood.Controllers
                 user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                 await _userManager.UpdateAsync(user);
 
-                await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with 2fa.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with 2fa.");
                 return RedirectToLocal(returnUrl);
             }
             else if (result.IsLockedOut)
@@ -141,7 +141,7 @@ namespace Hood.Controllers
             }
             else
             {
-                await _logService.AddLogAsync<AccountController<TContext>>($"Invalid authenticator code entered for user with ID {user.Id}.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"Invalid authenticator code entered for user with ID {user.Id}.");
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return View();
             }
@@ -190,7 +190,7 @@ namespace Hood.Controllers
                 user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                 await _userManager.UpdateAsync(user);
 
-                await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with a recovery code.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"User with ID {user.Id} logged in with a recovery code.");
                 return RedirectToLocal(returnUrl);
             }
             if (result.IsLockedOut)
@@ -199,7 +199,7 @@ namespace Hood.Controllers
             }
             else
             {
-                await _logService.AddLogAsync<AccountController<TContext>>($"Invalid recovery code entered for user with ID {user.Id}", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"Invalid recovery code entered for user with ID {user.Id}");
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return View();
             }
@@ -528,7 +528,7 @@ namespace Hood.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created a new account with password.", userId: user.Id);
+                await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created a new account with password.");
 
                 if (Engine.Settings.Account.EnableWelcome)
                 {
@@ -644,7 +644,7 @@ namespace Hood.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created an account using {info.LoginProvider} provider.", userId: user.Id);
+                        await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created an account using {info.LoginProvider} provider.");
                         return RedirectToLocal(returnUrl);
                     }
                 }

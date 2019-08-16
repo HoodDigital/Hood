@@ -121,10 +121,7 @@ namespace Hood.Areas.Admin.Controllers
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
                    string.Format("Error saving subscription ({0}) with name: {1}", model.StripeId.IsSet() ? model.StripeId : "No Stripe Id", model.Name),
-                   ex,
-                   LogType.Error,
-                   _userManager.GetUserId(User),
-                   Url.AbsoluteAction("Index", "Subscriptions")
+                   ex
                );
             }
 
@@ -222,8 +219,8 @@ namespace Hood.Areas.Admin.Controllers
                 SaveMessage = "Error saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
-                   $"Error saving subscription product ({model.StripeId}) with name: {model.DisplayName}",
-                   ex
+                    $"Error saving subscription product ({model.StripeId}) with name: {model.DisplayName}",
+                    ex
                 );
             }
             model.StripeProduct = await _stripe.GetProductByIdAsync(model.StripeId);
@@ -311,10 +308,7 @@ namespace Hood.Areas.Admin.Controllers
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
                     $"Error syncing subscription product with Id: {id} / {stripeId}",
-                    ex,
-                    LogType.Error,
-                    _userManager.GetUserId(User),
-                    Url.AbsoluteAction("SyncProduct", "Subscriptions")
+                    ex
                 );
             }
             return RedirectToAction(nameof(Products));
@@ -335,10 +329,7 @@ namespace Hood.Areas.Admin.Controllers
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
                    $"Error syncing subscription plan with Id: {id} / {stripeId}",
-                   ex,
-                   LogType.Error,
-                   _userManager.GetUserId(User),
-                   Url.AbsoluteAction("SyncPlan", "Subscriptions")
+                   ex
                );
             }
             return RedirectToAction(nameof(Plans));
@@ -358,10 +349,7 @@ namespace Hood.Areas.Admin.Controllers
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(
                   $"Error syncing user subscription with Id: {id}",
-                  ex,
-                  LogType.Error,
-                  _userManager.GetUserId(User),
-                  Url.AbsoluteAction("SyncSubscription", "Subscriptions")
+                  ex
               );
             }
             return RedirectToAction(nameof(Subscribers));

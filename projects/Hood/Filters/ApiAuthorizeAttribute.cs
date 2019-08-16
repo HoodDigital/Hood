@@ -95,11 +95,11 @@ namespace Hood.Filters
                     _db.ApiEvents.Add(apiEvent);
                     _db.SaveChanges();
 
-                    _logService.AddLogAsync<ApiAuthorizeAttribute>("Api was accessed using API Key: " + apiKey.Name, userId: apiKey.UserId, url: context.HttpContext.GetSiteUrl(true, true));
+                    _logService.AddLogAsync<ApiAuthorizeAttribute>("Api was accessed using API Key: " + apiKey.Name);
                 }
                 catch (Exception ex)
                 {
-                    _logService.AddExceptionAsync<ApiAuthorizeAttribute>("Error accessing API using an API Key.", ex, url: context.HttpContext.GetSiteUrl(true, true));
+                    _logService.AddExceptionAsync<ApiAuthorizeAttribute>("Error accessing API using an API Key.", ex);
                     context.Result = new UnauthorizedResult();
                     return;
                 }

@@ -337,6 +337,7 @@ namespace Hood.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
         #endregion
 
         [HttpPost]

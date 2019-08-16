@@ -1,5 +1,7 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -20,14 +22,28 @@ namespace Hood.Services
             }
         }
         private readonly IConfiguration _config;
+        private readonly IHttpContextAccessor _contextAccessor;
 
-        public LogService(IConfiguration config)
+        public LogService(IConfiguration config, IHttpContextAccessor contextAccessor)
         {
             _config = config;
+            _contextAccessor = contextAccessor;
         }
 
-        private async Task AddLogAsync(string message, string detail = "", LogType type = LogType.Info, string userId = null, string url = null, string source = "")
+        private async Task AddLogAsync(string message, string detail = "", LogType type = LogType.Info, string source = "")
         {
+            string userId = null;
+            if (Engine.Account != null)
+            {
+                userId = Engine.Account.Id;
+            }
+
+            string url = null;
+            if (_contextAccessor.HttpContext != null)
+            {
+                url = _contextAccessor.HttpContext.GetSiteUrl(true, true);
+            }
+            
             using (HoodDbContext context = _hoodDbContext)
             {
                 Log log = new Log()
@@ -45,26 +61,26 @@ namespace Hood.Services
             }
         }
 
-        public async Task AddLogAsync<TSource>(string message, object logObject = null, LogType type = LogType.Info, string userId = null, string url = null)
+        public async Task AddLogAsync<TSource>(string message, object logObject = null, LogType type = LogType.Info)
         {
             try
             {
                 if (logObject is string)
                 {
-                    await AddLogAsync(message, logObject.ToString(), type, userId, url, typeof(TSource).ToString());
+                    await AddLogAsync(message, logObject.ToString(), type, typeof(TSource).ToString());
                 }
                 else
                 {
-                    await AddLogAsync(message, logObject.ToJson(), type, userId, url, typeof(TSource).ToString());
+                    await AddLogAsync(message, logObject.ToJson(), type, typeof(TSource).ToString());
                 }
             }
             catch (Exception loggingException)
             {
-                await AddExceptionAsync<TSource>("Error logging exception.", loggingException, type, userId, url);
+                await AddExceptionAsync<TSource>("Error logging exception.", loggingException, type);
             }
         }
 
-        public async Task AddExceptionAsync<TSource>(string message, Exception ex, LogType type = LogType.Error, string userId = null, string url = null)
+        public async Task AddExceptionAsync<TSource>(string message, Exception ex, LogType type = LogType.Error)
         {
             try
             {
@@ -73,15 +89,15 @@ namespace Hood.Services
                     Exception = ex.ToDictionary(),
                     InnerException = ex.InnerException?.ToDictionary()
                 });
-                await AddLogAsync<TSource>(message, json, LogType.Error, userId, url);
+                await AddLogAsync<TSource>(message, json, LogType.Error);
             }
             catch (Exception loggingException)
             {
-                await AddExceptionAsync<TSource>("Error logging exception.", loggingException, type, userId, url);
+                await AddExceptionAsync<TSource>("Error logging exception.", loggingException, type);
             }
         }
 
-        public async Task AddExceptionAsync<TSource>(string message, object logObject, Exception ex, LogType type = LogType.Error, string userId = null, string url = null)
+        public async Task AddExceptionAsync<TSource>(string message, object logObject, Exception ex, LogType type = LogType.Error)
         {
             try
             {
@@ -91,11 +107,11 @@ namespace Hood.Services
                     Exception = ex.ToDictionary(),
                     InnerException = ex.InnerException?.ToDictionary()
                 });
-                await AddLogAsync<TSource>(message, json, LogType.Error, userId, url);
+                await AddLogAsync<TSource>(message, json, LogType.Error);
             }
             catch (Exception loggingException)
             {
-                await AddExceptionAsync<TSource>("Error logging exception.", loggingException, type, userId, url);
+                await AddExceptionAsync<TSource>("Error logging exception.", loggingException, type);
             }
         }
 

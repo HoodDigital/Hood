@@ -54,6 +54,13 @@ namespace Hood.Controllers
         public string SaveMessage { get; set; }
         [TempData]
         public AlertType MessageType { get; set; }
+        protected string CurrentUrl
+        {
+            get
+            {
+                return CurrentUrl;
+            }
+        }
 
         public BaseController()
         {
@@ -98,7 +105,7 @@ namespace Hood.Controllers
         {
             if (!_env.IsProduction())
             {
-                await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+                await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success);
             }
             return new Response(true, successMessage, title);
         }
@@ -106,18 +113,18 @@ namespace Hood.Controllers
         {
             if (!_env.IsProduction())
             {
-                await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+                await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success);
             }
             return new Response(true, successMessage, title);
         }
         public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
         {
-            await _logService.AddExceptionAsync<TSource>(errorMessage, ex, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+            await _logService.AddExceptionAsync<TSource>(errorMessage, ex);
             return new Response(ex, errorMessage);
         }
         public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
         {
-            await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex, userId: User.GetUserId(), url: ControllerContext.HttpContext.GetSiteUrl(true, true));
+            await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex);
             return new Response(ex, errorMessage);
         }
 
