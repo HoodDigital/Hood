@@ -73,8 +73,9 @@ namespace Hood.Services
                 mailObject.AddH1("A Stripe Webhook ran into a serious error!");
                 mailObject.AddParagraph($"Webhook received on site: <strong>{stripeEvent.GetEventName()}</strong>");
                 mailObject.AddParagraph($"Message: <strong>{ex.Message}</strong>");
-                mailObject.AddParagraph($"Url: <strong>{_context.GetSiteUrl()}</strong>");
-                mailObject.AddParagraph($"Exception: <strong>{_context.GetSiteUrl()}</strong>");
+                if (ex.InnerException != null)
+                mailObject.AddParagraph($"Detail: <strong>{ex.InnerException.Message}</strong>");
+                mailObject.AddParagraph($"<strong>Stripe Event:</strong><br />");
                 mailObject.AddDiv(stripeEvent.ToJson().ToHtml());
                 mailObject.Template = MailSettings.DangerTemplate;
                 await _emailSender.NotifyRoleAsync(mailObject, "Admin");
@@ -226,46 +227,16 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         protected async Task InvoicePaymentFailedAsync(Invoice failedInvoice)
         {
-            if (failedInvoice.SubscriptionId.IsSet())
+            var user = await _account.GetUserByStripeIdAsync(failedInvoice.CustomerId);
+            if (user != null)
             {
-                // Get the subscription.
                 Stripe.Subscription failedInvoiceSubscription = await _stripe.GetSusbcriptionByIdAsync(failedInvoice.SubscriptionId);
-
-                UserSubscription failedInvoiceUserSub = await _account.GetUserSubscriptionByStripeIdAsync(failedInvoiceSubscription.Id);
-                if (failedInvoiceUserSub != null)
-                {
-                    MailObject message = new MailObject()
-                    {
-                        To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUserSub.User.Email),
-                        PreHeader = "Error with your subscription on " + Engine.Settings.Basic.FullTitle,
-                        Subject = "Error with your subscription..."
-                    };
-                    message.AddH1("Oops!");
-                    message.AddParagraph("Seems there was an error with your subscription.");
-                    message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the");
-                    message.Template = MailSettings.DangerTemplate;
-                    await _emailSender.SendEmailAsync(message);
-
-                }
-                else
-                {
-                    await _stripe.CancelSubscriptionAsync(failedInvoice.SubscriptionId, false);
-                    ApplicationUser failedInvoiceUser = await _account.GetUserByStripeIdAsync(failedInvoice.CustomerId);
-
-                    MailObject message = new MailObject()
-                    {
-                        To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoiceUser.Email),
-                        PreHeader = "Error with your subscription on " + Engine.Settings.Basic.FullTitle,
-                        Subject = "Error with your subscription..."
-                    };
-                    message.AddH1("Oops!");
-                    message.AddParagraph("Seems there was an error with your subscription.");
-                    message.AddParagraph("The charge has failed, this could be due to an expired card or other issue, please check your account and update your payment information to continue using the");
-                    message.Template = MailSettings.DangerTemplate;
-                    await _emailSender.SendEmailAsync(message);
-                }
+                throw new AlertedException($"An invoice payment for subscription ({failedInvoice.SubscriptionId}) has failed for user: {user.ToAdminName()}", new Exception($"Invoice URL: {failedInvoice.HostedInvoiceUrl}"));
             }
-
+            else
+            {
+                throw new AlertedException($"An invoice payment for subscription ({failedInvoice.SubscriptionId}) has failed for customer (could not match user): {failedInvoice.CustomerId}", new Exception($"Invoice URL: {failedInvoice.HostedInvoiceUrl}"));
+            }
         }
         /// <summary>
         /// Occurs whenever an invoice attempts to be paid, and the payment succeeds.
@@ -282,14 +253,8 @@ namespace Hood.Services
                 // if ths sub is set up in the db ALL IS WELL. Continuer
                 if (userSub == null)
                 {
-
                     // if ths sub is NOT set up in the db warn the administrators that a charge has been issued without a matching subscription.
-
-                    //Stripe.Refund refund = _stripe.Stripe.RefundService.CreateAsync(new RefundCreateOptions { ChargeId = successfulInvoice.ChargeId }).Result;
-                    //await _stripe.CancelSubscriptionAsync(successfulInvoice.SubscriptionId, false);
-
                     throw new AlertedException($"A charge was created, but it did not match a subscription. The charge can be found on Stripe here: {successfulInvoice.HostedInvoiceUrl}");
-
                 }
                 else
                 {

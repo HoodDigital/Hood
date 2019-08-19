@@ -190,19 +190,27 @@ namespace Hood.Services
         #endregion
 
         #region Customers
-        public async Task<Customer> CreateCustomerAsync(IUserProfile user)
+        public async Task<Customer> CreateCustomerAsync(ApplicationUser user)
         {
             CustomerCreateOptions customer = new CustomerCreateOptions()
             {
                 Email = user.Email,
-                Description = $"{user.ToAdminName()} - {user.UserName} ({user.Email})",
+                Phone = user.PhoneNumber,
+                Address = user.BillingAddress.ToStripeAddress(),
                 Name = user.ToAdminName()
             };
             return await CustomerService.CreateAsync(customer);
         }
-        public async Task<Customer> UpdateCustomerAsync(string customerId, CustomerUpdateOptions options)
+        public async Task<Customer> UpdateCustomerAsync(string customerId, ApplicationUser user)
         {
-            return await CustomerService.UpdateAsync(customerId, options);
+            CustomerUpdateOptions customer = new CustomerUpdateOptions()
+            {
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                Address = user.BillingAddress.ToStripeAddress(),
+                Name = user.ToAdminName()
+            };
+            return await CustomerService.UpdateAsync(customerId, customer);
         }
         public async Task<Customer> DeleteCustomerAsync(string customerId)
         {

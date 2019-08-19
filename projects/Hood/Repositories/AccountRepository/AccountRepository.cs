@@ -132,7 +132,7 @@ namespace Hood.Services
         public async Task UpdateUserAsync(ApplicationUser user)
         {
             _db.Update(user);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();           
         }
         public async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
@@ -332,6 +332,11 @@ namespace Hood.Services
 
             _db.Update(userToUpdate);
             _db.SaveChanges();
+
+            if (userToUpdate.StripeId.IsSet())
+            {
+                await _stripe.UpdateCustomerAsync(userToUpdate.StripeId, userToUpdate);
+            }
         }
         #endregion
 
@@ -349,7 +354,7 @@ namespace Hood.Services
         }
         public async Task DeleteAddressAsync(int id)
         {
-            Task<Models.Address> address = GetAddressByIdAsync(id);
+            Models.Address address = await GetAddressByIdAsync(id);
             _db.Entry(address).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
         }

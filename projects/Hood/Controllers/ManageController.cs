@@ -152,15 +152,9 @@ namespace Hood.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendVerificationEmail(UserViewModel model)
+        [AllowAnonymous]
+        public async Task<IActionResult> SendVerificationEmail()
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -169,12 +163,19 @@ namespace Hood.Controllers
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-            var verifyModel = new VerifyEmailModel(user, callbackUrl) { SendToRecipient = true };
+            var verifyModel = new VerifyEmailModel(user, callbackUrl)
+            {
+                SendToRecipient = true
+            };
 
             await _mailService.ProcessAndSend(verifyModel);
 
             SaveMessage = "Verification email sent. Please check your email.";
-            return RedirectToAction(nameof(Index));
+
+            if (user.Active)
+                return RedirectToAction(nameof(Index));
+            else
+                return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
         }
 
         [HttpGet]

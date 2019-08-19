@@ -40,10 +40,21 @@ namespace Hood.Models
         {
             var _accountSettings = Engine.Settings.Account;
 
-            message.Subject = _accountSettings.WelcomeSubject.ReplaceUserVariables(User).ReplaceSiteVariables();
-            message.PreHeader = _accountSettings.WelcomeTitle.ReplaceUserVariables(User).ReplaceSiteVariables();
+            if (_accountSettings.WelcomeSubject.IsSet())
+                message.Subject = _accountSettings.WelcomeSubject.ReplaceUserVariables(User).ReplaceSiteVariables();
+            else
+                message.Subject = "Your new account: {Site.Title}.".ReplaceUserVariables(User).ReplaceSiteVariables(); 
 
-            message.AddDiv(_accountSettings.WelcomeMessage.ReplaceUserVariables(User).ReplaceSiteVariables());
+            if (_accountSettings.WelcomeTitle.IsSet())
+                message.PreHeader = _accountSettings.WelcomeTitle.ReplaceUserVariables(User).ReplaceSiteVariables();
+            else
+                message.PreHeader = "Your new account.";
+
+            if (_accountSettings.WelcomeMessage.IsSet())
+                message.AddDiv(_accountSettings.WelcomeMessage.ReplaceUserVariables(User).ReplaceSiteVariables());
+            else
+                message.AddParagraph("You have been sent this in order to validate your email.");
+
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
 
             if (ConfirmLink.IsSet())

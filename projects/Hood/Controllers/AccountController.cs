@@ -66,6 +66,12 @@ namespace Hood.Controllers
                     await _userManager.UpdateAsync(user);
 
                     await _logService.AddLogAsync<AccountController<TContext>>($"User ({model.Username}) logged in.");
+
+                    if (!user.Active && !user.EmailConfirmed)
+                    {
+                        return RedirectToAction(nameof(ConfirmRequired));
+                    }
+
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -676,8 +682,25 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
+
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            if (!result.Succeeded)
+                throw new Exception("Your email address could not be confirmed, the link you have clicked is invalid, perhaps it has expired. You can log in to resend a new verification email.");
+
+            if (user.Active)
+            { 
+                if (User.Identity.IsAuthenticated)
+                {
+                    SaveMessage = "Your email address has been successfully validated.";
+                    RedirectToAction(nameof(ManageController.Index), "Manage");
+                }
+            }
+            else
+            {
+                user.Active = true;
+                await _userManager.UpdateAsync(user);
+            }
+            return View("ConfirmEmail");
         }
 
         //

@@ -36,6 +36,7 @@ namespace Hood.ViewModels
         public int PlanId { get; set; }
         public string Token { get; set; }
         public string PaymentMethodId { get; set; }
+        public string IntentId { get; set; }
     }
     public class ChangeSubscriptionModel : SubscriptionPlansModel
     {

@@ -49,8 +49,8 @@ namespace Hood.Services
         #endregion
 
         #region Customers
-        Task<Customer> CreateCustomerAsync(IUserProfile user);
-        Task<Customer> UpdateCustomerAsync(string customerId, CustomerUpdateOptions options);
+        Task<Customer> CreateCustomerAsync(ApplicationUser user);
+        Task<Customer> UpdateCustomerAsync(string customerId, ApplicationUser user);
         Task<Customer> DeleteCustomerAsync(string customerId);
         Task<Customer> GetCustomerByIdAsync(string customerId);
         Task<List<Customer>> GetCustomersByEmailAsync(string email);

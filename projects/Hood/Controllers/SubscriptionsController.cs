@@ -93,23 +93,32 @@ namespace Hood.Controllers
                 {
                     throw new Exception("There was a problem loading the customer object.");
                 }
+
                 Subscription subscription = null;
-                if (model.Token.IsSet())
+                if (model.IntentId.IsSet())
                 {
-                    // Add the new token source to the customer, then create the plan using the default customer source.
-                    CustomerUpdateOptions options = new CustomerUpdateOptions
-                    {
-                        Source = model.Token,
-                    };
-                    customer = await _stripe.CustomerService.UpdateAsync(customer.Id, options);
-                    subscription = await _stripe.AddCustomerToPlan(customer.Id, plan.StripeId);
+                    // We are already processing a payment intent, just try and get the subscription.
+                    var intent = await _stripe.PaymentIntentService.GetAsync(model.IntentId, new PaymentIntentGetOptions() { Expand = new System.Collections.Generic.List<string>() { "invoice" } });
+                    subscription = await _stripe.GetSusbcriptionByIdAsync(intent.Invoice.SubscriptionId);
                 }
                 else
                 {
-                    // Pass the payment method id, if there is one, otherwise it will just go with whatever is on file.
-                    subscription = await _stripe.AddCustomerToPlan(customer.Id, plan.StripeId, paymentMethodId: model.PaymentMethodId);
+                    if (model.Token.IsSet())
+                    {
+                        // Add the new token source to the customer, then create the plan using the default customer source.
+                        CustomerUpdateOptions options = new CustomerUpdateOptions
+                        {
+                            Source = model.Token,
+                        };
+                        customer = await _stripe.CustomerService.UpdateAsync(customer.Id, options);
+                        subscription = await _stripe.AddCustomerToPlan(customer.Id, plan.StripeId);
+                    }
+                    else if (model.PaymentMethodId.IsSet())
+                    {
+                        // Pass the payment method id, if there is one, otherwise it will just go with whatever is on file.
+                        subscription = await _stripe.AddCustomerToPlan(customer.Id, plan.StripeId, paymentMethodId: model.PaymentMethodId);
+                    }
                 }
-
                 if (subscription.Status == Stripe.SubscriptionStatuses.Trialing || subscription.LatestInvoice.PaymentIntent.Status == "succeeded")
                 {
                     Models.UserSubscription userSub = await _account.CreateUserSubscription(plan.Id, Engine.Account.Id, subscription);

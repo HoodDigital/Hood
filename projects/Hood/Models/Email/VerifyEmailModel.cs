@@ -39,11 +39,22 @@ namespace Hood.Models
         public MailObject WriteToMailObject(MailObject message)
         {
             var _accountSettings = Engine.Settings.Account;
-            message.Subject = _accountSettings.VerifySubject.IsSet() ? _accountSettings.VerifySubject.ReplaceSiteVariables().ReplaceUserVariables(User) : "Verify your email";
-            message.PreHeader = _accountSettings.VerifyTitle.IsSet() ? _accountSettings.VerifyTitle.ReplaceSiteVariables().ReplaceUserVariables(User) : "You have been sent this in order to validate your email.";;
 
-            message.AddH1(_accountSettings.VerifyTitle.ReplaceSiteVariables().ReplaceUserVariables(User));
-            message.AddDiv(_accountSettings.VerifyMessage.ReplaceSiteVariables().ReplaceUserVariables(User));
+            if (_accountSettings.VerifySubject.IsSet())
+                message.Subject = _accountSettings.VerifySubject.ReplaceUserVariables(User).ReplaceSiteVariables();
+            else
+                message.Subject = "Validate your email address: {Site.Title}.".ReplaceUserVariables(User).ReplaceSiteVariables();
+
+            if (_accountSettings.VerifyTitle.IsSet())
+                message.PreHeader = _accountSettings.VerifyTitle.ReplaceUserVariables(User).ReplaceSiteVariables();
+            else
+                message.PreHeader = "Validate your email address.";
+
+            if (_accountSettings.VerifyMessage.IsSet())
+                message.AddDiv(_accountSettings.VerifyMessage.ReplaceSiteVariables().ReplaceUserVariables(User));
+            else
+                message.AddParagraph("You have been sent this in order to validate your email.");
+
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
 
             if (ConfirmLink.IsSet())

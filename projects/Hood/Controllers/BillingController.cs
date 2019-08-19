@@ -185,7 +185,7 @@ namespace Hood.Controllers
                 await _stripe.DeletePaymentMethodAsync(Engine.Account.StripeId, id);
                 SaveMessage = $"Card deleted.";
                 MessageType = Enums.AlertType.Success;
-                return new Response(true, "This has now been deleting as a payment method.");
+                return new Response(true, "This has now been deleted as a payment method.");
             }
             catch (StripeException stripeEx)
             {

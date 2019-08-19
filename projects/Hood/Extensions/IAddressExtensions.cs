@@ -136,9 +136,11 @@ namespace Hood.Extensions
             return html.Raw(ret);
         }
 
-        public static Stripe.Address ToStripeAddress(this IAddress address)
+        public static Stripe.AddressOptions ToStripeAddress(this IAddress address)
         {
-            return new Stripe.Address()
+            if (address == null)
+                return new Stripe.AddressOptions();
+            return new Stripe.AddressOptions()
             {
                 Line1 = address.Address1,
                 Line2 = address.Address2,

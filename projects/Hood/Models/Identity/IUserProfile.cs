@@ -72,6 +72,5 @@ namespace Hood.Models
         string Longitude { get; set; }
         #endregion
 
-
     }
 }

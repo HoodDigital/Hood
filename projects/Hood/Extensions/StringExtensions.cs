@@ -409,11 +409,17 @@ namespace Hood.Extensions
 
         public static string ToFirstName(this string fullName)
         {
+            if (!fullName.IsSet())
+                return fullName;
+
             List<string> names = fullName.Split(' ').ToList();
             return names.First();
         }
         public static string ToLastName(this string fullName)
         {
+            if (!fullName.IsSet())
+                return fullName;
+
             List<string> names = fullName.Split(' ').ToList();
             names.RemoveAt(0);
             return string.Join(" ", names.ToArray());
@@ -421,6 +427,9 @@ namespace Hood.Extensions
 
         public static string ReplaceSiteVariables(this string text)
         {
+            if (!text.IsSet())
+                return text;
+
             var settings = Core.Engine.Settings.Basic;
             return text
                 .Replace("{Site.Title}", settings.FullTitle)
@@ -436,6 +445,9 @@ namespace Hood.Extensions
         }
         public static string ReplaceUserVariables(this string text, IUserProfile user)
         {
+            if (!text.IsSet() || user == null)
+                return text;
+
             return text
                 .Replace("{User.Username}", user.UserName)
                 .Replace("{User.Email}", user.Email)
