@@ -463,7 +463,7 @@ namespace Hood.Services
                 new SubscriptionItemUpdateOption()
                 {
                     Id = oldPlanItem.Id,
-                    PlanId = newPlan.Id
+                    PlanId = newPlan.Id                    
                 }
             };
             SubscriptionUpdateOptions options = new SubscriptionUpdateOptions
@@ -471,6 +471,23 @@ namespace Hood.Services
                 CancelAtPeriodEnd = false,
                 Items = items,
             };
+
+            options.TrialEnd = SubscriptionTrialEnd.Now;
+
+            if (subscription.Status == SubscriptionStatuses.Trialing)
+            {
+                // how many days of trial are used?
+                int daysUsed = (int)(DateTime.UtcNow - subscription.TrialStart.Value).TotalDays;
+                if (newPlan.TrialPeriodDays > 0)
+                {
+                    int newTrialLength = (int)(newPlan.TrialPeriodDays - daysUsed);
+                    if (newTrialLength > 0)
+                    {
+                        options.TrialEnd = DateTime.Now.AddDays(newTrialLength);
+                    }
+                }
+            }
+
             return await SubscriptionService.UpdateAsync(subscriptionId, options);
         }
         #endregion

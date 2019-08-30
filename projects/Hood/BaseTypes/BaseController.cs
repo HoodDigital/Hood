@@ -49,6 +49,7 @@ namespace Hood.Controllers
         protected readonly IAddressService _address;
         protected readonly IThemesService _themeService;
         protected readonly IEventsService _eventService;
+        protected readonly IRecaptchaService _recaptcha;
 
         [TempData]
         public string SaveMessage { get; set; }
@@ -86,6 +87,7 @@ namespace Hood.Controllers
             _directoryManager = Engine.Services.Resolve<IDirectoryManager>();
             _themeService = Engine.Services.Resolve<IThemesService>();
             _media = Engine.Services.Resolve<IMediaManager>();
+            _recaptcha = Engine.Services.Resolve<IRecaptchaService>();
         }
 
         public ViewResult View(ISaveableModel model)

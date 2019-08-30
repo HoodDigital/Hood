@@ -35,7 +35,7 @@ namespace Hood.Services
             _bundleFileProcessor = new BundleFileProcessor();
         }
 
-        public virtual void AddScriptParts(ResourceLocation location, string src, string debugSrc, bool excludeFromBundle, bool isAsync)
+        public virtual void AddScriptParts(ResourceLocation location, string src, string debugSrc, bool excludeFromBundle, bool isAsync, bool isDefer)
         {
             if (!_scripts.ContainsKey(location))
                 _scripts.Add(location, new List<FileReferenceMetadata>());
@@ -50,12 +50,13 @@ namespace Hood.Services
             {
                 ExcludeFromBundle = excludeFromBundle,
                 IsAsync = isAsync,
+                IsDefer = isDefer,
                 Src = src,
                 DebugSrc = debugSrc
             });
         }
 
-        public virtual void AppendScriptParts(ResourceLocation location, string src, string debugSrc, bool excludeFromBundle, bool isAsync)
+        public virtual void AppendScriptParts(ResourceLocation location, string src, string debugSrc, bool excludeFromBundle, bool isAsync, bool isDefer)
         {
             if (!_scripts.ContainsKey(location))
                 _scripts.Add(location, new List<FileReferenceMetadata>());
@@ -70,6 +71,7 @@ namespace Hood.Services
             {
                 ExcludeFromBundle = excludeFromBundle,
                 IsAsync = isAsync,
+                IsDefer = isDefer,
                 Src = src,
                 DebugSrc = debugSrc
             });
@@ -143,7 +145,7 @@ namespace Hood.Services
                 foreach (var item in partsToDontBundle)
                 {
                     var src = debugModel ? item.DebugSrc : item.Src;
-                    result.AppendFormat("<script {1}src=\"{0}\"></script>", urlHelper.Content(src), item.IsAsync ? "async " : "");
+                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
                     result.Append(Environment.NewLine);
                 }
                 return result.ToString();
@@ -155,7 +157,7 @@ namespace Hood.Services
                 foreach (var item in _scripts[location].Distinct())
                 {
                     var src = debugModel ? item.DebugSrc : item.Src;
-                    result.AppendFormat("<script {1}src=\"{0}\"></script>", urlHelper.Content(src), item.IsAsync ? "async " : "");
+                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
                     result.Append(Environment.NewLine);
                 }
                 return result.ToString();

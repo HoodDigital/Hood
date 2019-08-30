@@ -7,17 +7,11 @@
     <div class="container">
         <ul class="nav navbar-nav main">
             @{
-                var pages = await _content.GetContentAsync(new ContentModel()
-                {
-                    Category = "main-menu",
-                    Type = "page",
-                    PageSize = 999,
-                    Order = "Meta:Custom.DisplayOrder"
-                });
+                var pages = await _content.GetPages("main-menu");
             }
-            @if (pages.TotalCount > 0)
+            @if (pages.Count > 0)
             {
-                @foreach (var pg in pages.List)
+                @foreach (var pg in pages)
                 {
                     <li class="@(path == pg.Url ? "highlight" : "")">
                         <a href="@pg.Url">

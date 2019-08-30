@@ -441,7 +441,7 @@ namespace Hood.Services
         // Sitemap
         public async Task<List<Content>> GetPages(string category = null)
         {
-            string cacheKey = typeof(Content).ToString() + ".Pages";
+            string cacheKey = typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
             if (!_cache.TryGetValue(cacheKey, out List<Content> pages))
             {
                 var content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });

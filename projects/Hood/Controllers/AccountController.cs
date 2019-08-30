@@ -279,11 +279,9 @@ namespace Hood.Controllers
                         };
                         await _mailService.ProcessAndSend(welcomeModel);
 
-                        return RedirectToAction(nameof(ConfirmRequired));
                     }
-                    else
-                        user.Active = true;
 
+                    user.Active = !Engine.Settings.Account.RequireEmailConfirmation;
                     user.LastLogOn = DateTime.Now;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
@@ -292,7 +290,10 @@ namespace Hood.Controllers
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    return RedirectToLocal(returnUrl);
+                    if (user.Active)
+                        return RedirectToLocal(returnUrl);
+                    else
+                        return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
                 }
                 AddErrors(result);
             }

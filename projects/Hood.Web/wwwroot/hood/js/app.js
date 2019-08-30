@@ -94,14 +94,6 @@ $.hood.App = {
         Submit: function (tag) {
             var $form = $(tag);
             if ($form.valid()) {
-                if ($form.hasClass('g-recaptcha')) {
-                    var recaptchaId = $form.find('.recaptcha').data('recaptchaid');
-                    if (grecaptcha.getResponse(recaptchaId) === "") {
-                        $.hood.Alerts.Error('Please tell us you are not a robot!', 'Confirm Humanity!', null, true);
-                        $form.removeClass('loading');
-                        return false;
-                    }
-                }
                 $.post($form.attr('action'), $form.serialize(), function (data) {
                     if (data.Success) {
                         if ($form.attr('data-redirect'))
@@ -113,10 +105,10 @@ $.hood.App = {
                         $form.find('.form').hide();
                         $form.find('.thank-you').show();
                     } else {
-                        if (typeof ($form.attr('data-alert-error')) !== 'undefined')
-                            $.hood.Alerts.Success($form.attr('data-alert-error'), "Error", null, true);
-
-                        $.hood.Alerts.Error("There was an error sending the message: " + data.Errors, "Error", null, true);
+                        if ($form.attr('data-alert-error'))
+                            $.hood.Alerts.Error($form.attr('data-alert-error'), "Error", null, true);
+                        else
+                            $.hood.Alerts.Error("There was an error sending the message: " + data.Errors, "Error", null, true);
                     }
                     $form.removeClass('loading');
                 });

@@ -46,7 +46,7 @@ $.hood.Stripe = {
         SubmitCardForm: function (e) {
             e.preventDefault();
             if (!$('#card-add-consent').is(":checked")) {
-                $('#card-add-errors').html("You cannot add a card without agreeing to the customer agreement.");
+                $.hood.Stripe.PaymentMethods.ShowError("You cannot add a card without agreeing to the customer agreement.");
                 $.hood.Stripe.PaymentMethods.ToggleButton(false);
                 return;
             }
@@ -64,10 +64,11 @@ $.hood.Stripe = {
                     }
                 ).then(function (result) {
                     if (result.error) {
-                        $('#card-add-errors').html(result.error.message);
+                        $.hood.Stripe.PaymentMethods.ShowError(response.error);
                         $.hood.Stripe.PaymentMethods.ToggleButton(false);
                     } else {
                         // Otherwise send paymentMethod.id to your server (see Step 2)
+                        $.hood.Stripe.PaymentMethods.ShowSuccess('Confirming your card...');
                         $.hood.Stripe.PaymentMethods.ConfirmIntent(result);
                     }
                 });
@@ -75,26 +76,27 @@ $.hood.Stripe = {
         },
         HandleServerResponse: function (response) {
             if (response.error) {
-                $('#card-add-errors').html(response.error.message);
+                $.hood.Stripe.PaymentMethods.ShowError(response.error);
                 $.hood.Stripe.PaymentMethods.ToggleButton(false);
             } else if (response.requires_action) {
                 // Use Stripe.js to handle required card action
+                $.hood.Stripe.PaymentMethods.ShowError('We require confirmation from your card issuer to continue...');
                 $.hood.Stripe.PaymentMethods.Stripe.handleCardAction(
                     response.payment_intent_client_secret
                 ).then(function (result) {
                     if (result.error) {
-                        $('#card-add-errors').html(result.error.message);
+                        $.hood.Stripe.PaymentMethods.ShowError(result.error);
                         $.hood.Stripe.PaymentMethods.ToggleButton(false);
                     } else {
                         // The card action has been handled
                         // The PaymentIntent can be confirmed on the server
+                        $.hood.Stripe.PaymentMethods.ShowSuccess('Confirming your card...');
                         $.hood.Stripe.PaymentMethods.ConfirmIntent(result);
                     }
                 });
             } else {
                 // Success, move user on to completed Url, received from the server.
-                $('#card-add-errors').html('');
-                $('#card-add-success').html("Card added successfully, please wait...");
+                $.hood.Stripe.PaymentMethods.ShowSuccess('Card added successfully, please wait...');
                 $.hood.Stripe.PaymentMethods.ToggleButton(false);
                 $.hood.Stripe.Lists.PaymentMethods.Reload();
                 $.hood.Inline.CloseModal();
@@ -106,8 +108,8 @@ $.hood.Stripe = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ Id: result.setupIntent.id })
             }).then(function (confirmResult) {
-                return confirmResult.json();
-            }).then($.hood.Stripe.PaymentMethods.HandleServerResponse);
+                return confirmResult.json().then($.hood.Stripe.PaymentMethods.HandleServerResponse);
+            });
         },
         ToggleButton: function (processing) {
             if (processing) {
@@ -167,6 +169,17 @@ $.hood.Stripe = {
                 'error',
                 '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
             );
+        },
+        ShowError: function (message) {
+            $('#card-add-success').html('');
+            if (message.message)
+                $('#card-add-errors').html(message.message);
+            else
+                $('#card-add-errors').html(message);
+        },
+        ShowSuccess: function (message) {
+            $('#card-add-errors').html('');
+            $('#card-add-success').html(message);
         }
     },
 
@@ -185,9 +198,9 @@ $.hood.Stripe = {
 
             $.hood.Stripe.Subscriptions.CardElement.addEventListener('change', function (event) {
                 if (event.error) {
-                    $('#buy-plan-errors').html(event.error.message);
+                    $.hood.Stripe.Subscriptions.ShowError(result.error);
                 } else {
-                    $('#buy-plan-errors').html();
+                    $.hood.Stripe.Subscriptions.ShowError('');
                 }
             });
 
@@ -202,13 +215,13 @@ $.hood.Stripe = {
         CompletePurchase: function (e) {
             var paymentMethod = $("input[name='buy-plan-method']:checked").val();
             if (!paymentMethod) {
-                $('#buy-plan-errors').html("You have to select a payment method to continue with your purchase.");
+                $.hood.Stripe.Subscriptions.ShowError("You have to select a payment method to continue with your purchase.");
                 $.hood.Stripe.Subscriptions.ToggleButton(false);
                 return;
             }
 
             if (!$('#buy-plan-consent').is(":checked")) {
-                $('#buy-plan-errors').html("You cannot purchase a subscription without agreeing to the customer agreement.");
+                $.hood.Stripe.Subscriptions.ShowError("You cannot purchase a subscription without agreeing to the customer agreement.");
                 $.hood.Stripe.Subscriptions.ToggleButton(false);
                 return;
             }
@@ -228,8 +241,7 @@ $.hood.Stripe = {
             } else {
                 $('#buy-plan-add-card-form').slideUp();
             }
-            $('#buy-plan-errors').html('');
-            $('#buy-plan-success').html('');
+            $.hood.Stripe.Subscriptions.ShowError('');
         },
 
         BuyWithExisting: function (e) {
@@ -238,7 +250,7 @@ $.hood.Stripe = {
                 fetch($('#buy-plan-submit').data('url'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ PlanId: $('#buy-plan-id').val(), PaymentMethodId: $("input[name='buy-plan-method']:checked").val() })
+                    body: JSON.stringify({ PlanId: $('#buy-plan-id').val(), PaymentMethodId: $("input[name='buy-plan-method']:checked").val() })
                 }).then(function (confirmResult) {
                     return confirmResult.json();
                 }).then($.hood.Stripe.Subscriptions.HandleServerResponse);
@@ -252,9 +264,10 @@ $.hood.Stripe = {
                     $.hood.Stripe.Subscriptions.CardElement
                 ).then(function (result) {
                     if (result.error) {
-                        $('#buy-plan-errors').html(result.error.message);
+                        $.hood.Stripe.Subscriptions.ShowError(result.error);
                         $.hood.Stripe.Subscriptions.ToggleButton(false);
                     } else {
+                        $.hood.Stripe.PaymentMethods.ShowSuccess('Confirming your card...');
                         fetch($('#buy-plan-submit').data('url'), {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -269,7 +282,7 @@ $.hood.Stripe = {
 
         HandleServerResponse: function (response) {
             if (response.error) {
-                $('#buy-plan-errors').html(response.error.message);
+                $.hood.Stripe.Subscriptions.ShowError(response.error);
                 $.hood.Stripe.Subscriptions.ToggleButton(false);
             } else if (response.requires_action) {
                 // Use Stripe.js to handle required card action
@@ -277,18 +290,18 @@ $.hood.Stripe = {
                     response.payment_intent_client_secret
                 ).then(function (result) {
                     if (result.error) {
-                        $('#buy-plan-errors').html(result.error.message);
+                        $.hood.Stripe.Subscriptions.ShowError(result.error);
                         $.hood.Stripe.Subscriptions.ToggleButton(false);
                     } else {
                         // The card action has been handled
                         // The Intent can be confirmed on the server
+                        $.hood.Stripe.PaymentMethods.ShowSuccess('Confirming your card...');
                         $.hood.Stripe.Subscriptions.ConfirmIntent(result);
                     }
                 });
             } else {
                 // Success, move user on to completed Url, received from the server.
-                $('#buy-plan-errors').html('');
-                $('#buy-plan-success').html("Subscription created successfully, please wait...");
+                $.hood.Stripe.Subscriptions.ShowSuccess("Subscription created successfully, please wait...");
                 $.hood.Stripe.Subscriptions.ToggleButton(false);
                 if (response.url)
                     window.location = response.url;
@@ -300,8 +313,8 @@ $.hood.Stripe = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ PlanId: $('#buy-plan-id').val(), IntentId: result.paymentIntent.id })
             }).then(function (confirmResult) {
-                return confirmResult.json();
-            }).then($.hood.Stripe.Subscriptions.HandleServerResponse);
+                return confirmResult.json().then($.hood.Stripe.Subscriptions.HandleServerResponse);
+            });
         },
 
         ToggleButton: function (processing) {
@@ -311,7 +324,18 @@ $.hood.Stripe = {
             } else {
                 $('#buy-plan-submit').removeClass("processing");
                 $('#buy-plan-submit').html('Confirm &amp; Pay');
-           }
+            }
+        },
+        ShowError: function (message) {
+            $('#buy-plan-success').html('');
+            if (message.message)
+                $('#buy-plan-errors').html(message.message);
+            else
+                $('#buy-plan-errors').html(message);
+        },
+        ShowSuccess: function (message) {
+            $('#buy-plan-errors').html('');
+            $('#buy-plan-success').html(message);
         }
     }
 };

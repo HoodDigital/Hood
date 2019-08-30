@@ -6,12 +6,13 @@
 <form method="post"
       role="form"
       id="contact-form"
-      class="contact-form @(_integrationSettings.EnableGoogleRecaptcha ? "g-recaptcha" : "")"
+      class="contact-form"
       asp-action="ProcessContactForm"
       asp-controller="Hood"
       data-redirect="@_contactSettings.ThankYouUrl"
       data-alert-message="@_contactSettings.ThankYouMessage">
     @Html.RenderHoneypotField()
+    <recaptcha />
     <div class="thank-you">
         <h2>@_contactSettings.ThankYouTitle</h2>
         <p>@_contactSettings.ThankYouMessage</p>
@@ -47,10 +48,6 @@
         </div>
         <div class="row">
             <div class="col-xs-12 text-center">
-                @if (_integrationSettings.EnableGoogleRecaptcha)
-                {
-                    <div class="recaptcha" id="contact-recaptcha"></div>
-                }
                 <p class="m-t-md"><button class="btn btn-md btn-primary form-full" type="submit">Send Message</button></p>
             </div>
         </div>

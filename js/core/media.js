@@ -49,7 +49,7 @@ $.hood.Media = {
         });
       },
       Insert: function Insert(editor) {
-        $this = $('#' + editor.id);
+        var $this = $('#' + editor.id);
 
         if ($this.data('imagesUrl')) {
           editor.addButton('hoodimage', {

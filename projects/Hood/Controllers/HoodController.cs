@@ -30,7 +30,9 @@ namespace Hood.Controllers
                 if (model.IsSpambot)
                     return new Response("You have been flagged as a spam bot. If this is not true, please contact us via email.");
 
-                await Request.ProcessCaptchaOrThrowAsync();
+                var recaptcha = await _recaptcha.Validate(Request);
+                if (!recaptcha.Success)
+                    return new Response("You have failed to pass the reCaptcha check.");
 
                 model.SendToRecipient = true;
                 model.NotifyRole = "ContactFormNotifications";

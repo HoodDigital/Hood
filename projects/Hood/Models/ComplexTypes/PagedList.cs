@@ -133,7 +133,10 @@ namespace System.Collections.Generic
             this.PageSize = pageSize;
             this.PageIndex = pageIndex;
             _list = new List<T>();
-            _list.AddRange(source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList());
+            if (PageSize > TotalCount)
+                _list.AddRange(source.ToList());
+            else
+                _list.AddRange(source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList());
             return this;
         }
 
@@ -147,7 +150,10 @@ namespace System.Collections.Generic
             this.PageSize = pageSize;
             this.PageIndex = pageIndex;
             _list = new List<T>();
-            _list.AddRange(await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync());
+            if (PageSize > TotalCount)
+                _list.AddRange(await source.ToListAsync());
+            else
+                _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
             return this;
         }
 
@@ -159,7 +165,10 @@ namespace System.Collections.Generic
             if (PageIndex > TotalPages)
                 PageIndex = TotalPages;
             _list = new List<T>();
-            _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
+            if (PageSize > TotalCount)
+                _list.AddRange(await source.ToListAsync());
+            else
+                _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
             return this;
         }
 

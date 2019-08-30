@@ -152,7 +152,6 @@ namespace Hood.Controllers
             }
         }
 
-        [AllowAnonymous]
         public async Task<IActionResult> SendVerificationEmail()
         {
             var user = await _userManager.GetUserAsync(User);

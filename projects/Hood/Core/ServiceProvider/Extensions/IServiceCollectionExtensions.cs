@@ -90,6 +90,7 @@ namespace Hood.Extensions
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<IRecaptchaService, RecaptchaService>();
 
             return services;
         }
