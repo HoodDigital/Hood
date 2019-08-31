@@ -1,0 +1,21 @@
+@{ 
+    ViewData["Title"] = "Enter an Access Token";
+}
+
+<h2 class="text-danger">Enter an access token to continue</h2>
+<p class="lead">In order to view this application, you must enter an access token.</p>
+<form method="post">
+    <input type="hidden" name="returnUrl" value="@ViewData["returnUrl"]" />
+    <div class="form-group">
+        <label class="control-label" for="token"></label>
+        <div>
+            <input name="token" id="token" class="form-control" type="text" value="@ViewData["token"]" />
+        </div>
+    </div>
+    <p>@ViewData["error"]</p>
+    <p>
+        <button type="submit" class="btn btn-primary">
+            Enter
+        </button>
+    </p>
+</form>

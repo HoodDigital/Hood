@@ -1,18 +1,11 @@
 @model ContentModel
 @{
     ViewBag.Title = "Export all Content";
-    BasicSettings _basicSettings  = _settings.GetBasicSettings();
+    BasicSettings _basicSettings  = Engine.Settings.Basic;
 }
 @section buttons {
 }
-@section scripts {
-    <environment names="Development,Staging,ErrorTesting">
-        <script src="~/lib/hood/src/js/includes/io.reporter.js"></script>
-    </environment>
-    <environment names="Production,PreProduction">
-        <script src="~/lib/hood/dist/js/includes/io.reporter.min.js"></script>
-    </environment>
-}
+<script src="~/lib/hood/dist/js/includes/io.reporter.min.js" asp-location="AfterScripts"></script>
 <div class="row">
     <div class="col-lg-12">
         <div class="wrapper wrapper-content">

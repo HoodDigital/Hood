@@ -19,7 +19,7 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "PreProduction"
+        "ASPNETCORE_ENVIRONMENT": "ProductionTesting"
       }
     },
     "Hood.Web": {

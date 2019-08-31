@@ -1,221 +1,255 @@
 @model ForumSettings
 @{
     ViewData["Title"] = "Forum Settings";
-    Layout = "_SettingsLayout";
-
-    BasicSettings _basicSettings = _settings.GetBasicSettings();
-    Hood.Infrastructure.OperationResult subResult = _settings.SubscriptionsEnabled();
-    bool subsEnabled = subResult.Succeeded;
+    Layout = "_Layout_Settings";
 }
 @section buttons {
-    @if (User.IsInRole("Admin")) { 
+    @if (User.IsAdminOrBetter())
+    {
         <a asp-action="ResetForum" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
     }
 }
-@section description {
-    <p class="no-margin">
-        Settings for site's forums.
-    </p>
-}
-<div class="tabs-container">
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#forum">Forum Settings</a></li>
-    </ul>
-    <div class="tab-content">
-        <div id="forum" class="tab-pane active">
-            <div class="panel-body">
-                <h5>
-                    Forum Settings
-                </h5>
-                <p>
-                    Settings for site's forums.
-                </p>
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="forum-tab" data-toggle="tab" href="#forum" role="tab" aria-controls="forum" aria-selected="false">
+                        Forum Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="viewing-tab" data-toggle="tab" href="#viewing" role="tab" aria-controls="viewing" aria-selected="false">
+                        Viewing
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="posting-tab" data-toggle="tab" href="#posting" role="tab" aria-controls="posting" aria-selected="false">
+                        Posting
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="forum" class="tab-pane active" role="tabpanel" aria-labelledby="forum-tab">
                 <div class="form-group">
-                    <div class="checkbox">
-                        <input asp-for="Enabled" class="styled">
-                        <label asp-for="Enabled"></label>
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="Enabled" class="custom-control-input">
+                        <label asp-for="Enabled" class="custom-control-label"></label>
                     </div>
+                    <small asp-for="Enabled"></small>
                 </div>
-                <hr />
-                <h5>
-                    Viewing Settings
-                </h5>
-                <fieldset>
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <input asp-for="ViewingRequiresLogin" class="styled">
-                            <label asp-for="ViewingRequiresLogin"></label>
-                        </div>
+                <div class="form-group floating-label">
+                    <label asp-for="ForumAreaName"></label>
+                    <input asp-for="ForumAreaName" class="form-control" />
+                    <small asp-for="ForumAreaName"></small>
+                </div>
+            </div>
+            <div id="viewing" class="tab-pane" role="tabpanel" aria-labelledby="viewing-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ViewingRequiresLogin" class="custom-control-input">
+                        <label asp-for="ViewingRequiresLogin" class="custom-control-label"></label>
                     </div>
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <input asp-for="ViewingRequiresSubscription" class="styled">
-                            <label asp-for="ViewingRequiresSubscription"></label>
-                        </div>
+                    <small asp-for="ViewingRequiresLogin"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ViewingRequiresSpecificSubscription" class="custom-control-input">
+                        <label asp-for="ViewingRequiresSpecificSubscription" class="custom-control-label"></label>
                     </div>
-                    <div class="well well-sm">
-                        <div class="form-group no-margin">
-                            <label asp-for="ViewingSubscriptions" class="col-sm-3 control-label">
-                                Viewer Subscriptions:
-                            </label>
-                            <div class="col-sm-8">
-                                @if (subsEnabled && Model.Subscriptions.Count() > 0)
+                    <small asp-for="ViewingRequiresSpecificSubscription"></small>
+                </div>
+                <div class="card p-3 mb-3">
+                    <label asp-for="ViewingSubscriptions"></label>
+                    @if (Engine.Settings.Billing.IsSubscriptionsEnabled && Model.Subscriptions.Count() > 0)
+                    {
+                        List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingSubscriptions.IsSet() ? Model.ViewingSubscriptions : "[]");
+                        <alert type="Info" size="Small" icon="fa-info-circle">
+                            Select subscriptions that can view the forums.<br />
+                            <em>If you select none, then then any subscription can (if subscriptions are required).</em>
+                        </alert>
+                        <input class="form-control checkbox-values" type="hidden" asp-for="ViewingSubscriptions" />
+                        @foreach (SubscriptionPlan sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                        {
+                            <div class="custom-control custom-checkbox">
+                                @if (subs == null || !subs.Contains(sub.StripeId))
                                 {
-                                    List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingSubscriptions.IsSet() ? Model.ViewingSubscriptions : "[]");
-                                    <p class="m-t-xs">Select subscriptions that can view the forums. <em>If you select none, then then any subscription can (if subscriptions are required).</em></p>
-                                    <input class="form-control checkbox-values" type="hidden" asp-for="ViewingSubscriptions" />
-                                    @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
-                                    {
-                                        <div class="checkbox">
-                                            @if (subs == null || !subs.Contains(sub.StripeId))
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="ViewingSubscriptions" id="ViewingSubscriptions-@sub.StripeId.ToSeoUrl()" />
-                                            }
-                                            else
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="ViewingSubscriptions" id="ViewingSubscriptions-@sub.StripeId.ToSeoUrl()" checked />
-                                            }
-                                            <label for="ViewingSubscriptions-@sub.StripeId.ToSeoUrl()">
-                                                @sub.Name
-                                            </label>
-                                        </div>
-                                    }
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", sub.StripeId)"
+                                           data-input="ViewingSubscriptions"
+                                           id="ViewingSubscriptions-@sub.StripeId.ToSeoUrl()"
+                                           class="custom-control-input" />
                                 }
                                 else
                                 {
-                                    <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", sub.StripeId)"
+                                           data-input="ViewingSubscriptions"
+                                           id="ViewingSubscriptions-@sub.StripeId.ToSeoUrl()"
+                                           checked
+                                           class="custom-control-input" />
                                 }
+                                <label for="ViewingSubscriptions-@sub.StripeId.ToSeoUrl()" class="custom-control-label">
+                                    @sub.Name
+                                </label>
                             </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-                    <div class="well well-sm">
-                        <div class="form-group no-margin">
-                            <label asp-for="ViewingRoles" class="col-sm-3 control-label">
-                                Viewer Roles:
-                            </label>
-                            <div class="col-sm-8">
-                                @if (subsEnabled && Model.Roles.Count() > 0)
+                        }
+                    }
+                    else
+                    {
+                        <alert type="Danger" size="Small" icon="fa-times-circle" class="m-0">
+                            Subscriptions are not enabled, or none are available to use.
+                        </alert>
+                    }
+                </div>
+                <div class="card p-3">
+                    <label asp-for="ViewingRoles"></label>
+                    @if (Model.Roles.Count() > 0)
+                    {
+                        List<string> roles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingRoles.IsSet() ? Model.ViewingRoles : "[]");
+                        <alert type="Info" size="Small" icon="fa-info-circle">
+                            Select roles that can ALWAYS view the forums.<br />
+                            <em>These roles will not require a subscription to access the forums, even if a specific forum requires it.</em>
+                        </alert>
+                        <input class="form-control checkbox-values" type="hidden" asp-for="ViewingRoles" />
+                        @foreach (IdentityRole role in Model.Roles.OrderBy(p => p.Name))
+                        {
+                            <div class="custom-control custom-checkbox">
+                                @if (roles == null || !roles.Contains(role.Name))
                                 {
-                                    List<string> roles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.ViewingRoles.IsSet() ? Model.ViewingRoles : "[]");
-                                    <p class="m-t-xs">Select roles that can ALWAYS view the forums. <em>These roles will not require a subscription to access the forums, even if a specific forum requires it.</em></p>
-                                    <input class="form-control checkbox-values" type="hidden" asp-for="ViewingRoles" />
-                                    @foreach (IdentityRole role in Model.Roles.OrderBy(p => p.Name))
-                                    {
-                                        <div class="checkbox">
-                                            @if (roles == null || !roles.Contains(role.Name))
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="ViewingRoles" id="ViewingRoles-@role.Name.ToSeoUrl()" />
-                                            }
-                                            else
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="ViewingRoles" id="ViewingRoles-@role.Name.ToSeoUrl()" checked />
-                                            }
-                                            <label for="ViewingRoles-@role.Name.ToSeoUrl()">
-                                                @role.Name
-                                            </label>
-                                        </div>
-                                    }
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", role.Name)"
+                                           data-input="ViewingRoles"
+                                           id="ViewingRoles-@role.Name.ToSeoUrl()"
+                                           class="custom-control-input" />
                                 }
                                 else
                                 {
-                                    <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", role.Name)"
+                                           data-input="ViewingRoles"
+                                           id="ViewingRoles-@role.Name.ToSeoUrl()"
+                                           checked
+                                           class="custom-control-input" />
                                 }
+                                <label for="ViewingRoles-@role.Name.ToSeoUrl()" class="custom-control-label">
+                                    @role.Name
+                                </label>
                             </div>
-                            <div class="clearfix"></div>
-                        </div>
+                        }
+                    }
+                    else
+                    {
+                        <alert type="Danger" size="Small" icon="fa-times-circle" class="m-0">
+                            No roles can be found to use.
+                        </alert>
+                    }
+                </div>
+            </div>
+            <div id="posting" class="tab-pane" role="tabpanel" aria-labelledby="posting-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="PostingRequiresLogin" class="custom-control-input">
+                        <label asp-for="PostingRequiresLogin" class="custom-control-label"></label>
                     </div>
-                </fieldset>
-                <hr />
-                <h5>
-                    Posting Settings
-                </h5>
-                <fieldset>
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <input asp-for="PostingRequiresLogin" class="styled">
-                            <label asp-for="PostingRequiresLogin"></label>
-                        </div>
+                    <small asp-for="PostingRequiresLogin"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="PostingRequiresSpecificSubscription" class="custom-control-input">
+                        <label asp-for="PostingRequiresSpecificSubscription" class="custom-control-label"></label>
                     </div>
-                    <div class="form-group">
-                        <div class="checkbox">
-                            <input asp-for="PostingRequiresSubscription" class="styled">
-                            <label asp-for="PostingRequiresSubscription"></label>
-                        </div>
-                    </div>
-                    <div class="well well-sm">
-                        <div class="form-group no-margin">
-                            <label asp-for="PostingSubscriptions" class="col-sm-3 control-label">
-                                Posting Subscriptions:
-                            </label>
-                            <div class="col-sm-8">
-                                @if (Model.Subscriptions.Count() > 0)
+                    <small asp-for="PostingRequiresSpecificSubscription"></small>
+                </div>
+                <div class="card p-3 mb-3">
+                    <label asp-for="PostingSubscriptions"></label>
+                    @if (Model.Subscriptions.Count() > 0)
+                    {
+                        List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.PostingSubscriptions.IsSet() ? Model.PostingSubscriptions : "[]");
+                        <alert type="Info" size="Small" icon="fa-info-circle">
+                            Select subscriptions that can post on the forums.<br />
+                            <em>If you select none, then then any subscription can (if subscriptions are required).</em>
+                        </alert>
+                        <input class="form-control checkbox-values" type="hidden" asp-for="PostingSubscriptions" />
+                        @foreach (SubscriptionPlan sub in Model.Subscriptions.OrderBy(p => p.Amount))
+                        {
+                            <div class="custom-control custom-checkbox">
+                                @if (subs == null || !subs.Contains(sub.StripeId))
                                 {
-                                    List<string> subs = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.PostingSubscriptions.IsSet() ? Model.PostingSubscriptions : "[]");
-                                    <p class="m-t-xs">Select subscriptions that can post on the forums. <em>If you select none, then then any subscription can (if subscriptions are required).</em></p>
-                                    <input class="form-control checkbox-values" type="hidden" asp-for="PostingSubscriptions" />
-                                    @foreach (Subscription sub in Model.Subscriptions.OrderBy(p => p.Amount))
-                                    {
-                                        <div class="checkbox">
-                                            @if (subs == null || !subs.Contains(sub.StripeId))
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingSubscriptions" id="PostingSubscriptions-@sub.StripeId.ToSeoUrl()" />
-                                            }
-                                            else
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", sub.StripeId)" data-input="PostingSubscriptions" id="PostingSubscriptions-@sub.StripeId.ToSeoUrl()" checked />
-                                            }
-                                            <label for="PostingSubscriptions-@sub.StripeId.ToSeoUrl()">
-                                                @sub.Name
-                                            </label>
-                                        </div>
-                                    }
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", sub.StripeId)"
+                                           data-input="PostingSubscriptions"
+                                           id="PostingSubscriptions-@sub.StripeId.ToSeoUrl()"
+                                           class="custom-control-input" />
                                 }
                                 else
                                 {
-                                    <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", sub.StripeId)"
+                                           data-input="PostingSubscriptions"
+                                           id="PostingSubscriptions-@sub.StripeId.ToSeoUrl()"
+                                           checked
+                                           class="custom-control-input" />
                                 }
+                                <label for="PostingSubscriptions-@sub.StripeId.ToSeoUrl()" class="custom-control-label">
+                                    @sub.Name
+                                </label>
                             </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-                    <div class="well well-sm">
-                        <div class="form-group no-margin">
-                            <label asp-for="PostingRoles" class="col-sm-3 control-label">
-                                Posting Roles:
-                            </label>
-                            <div class="col-sm-8">
-                                @if (Model.Roles.Count() > 0)
+                        }
+                    }
+                    else
+                    {
+                        <alert type="Danger" size="Small" icon="fa-times-circle" class="m-0">
+                            Subscriptions are not enabled, or none are available to use.
+                        </alert>
+                    }
+                </div>
+                <div class="card p-3">
+                    <label asp-for="PostingRoles"></label>
+                    @if (Model.Roles.Count() > 0)
+                    {
+                        List<string> roles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.PostingRoles.IsSet() ? Model.PostingRoles : "[]");
+                        <alert type="Info" size="Small" icon="fa-info-circle">
+                            Select roles that can ALWAYS post in the forums.<br />
+                            <em>These roles will not require a subscription to post in the forums, even if a specific forum requires it.</em>
+                        </alert>
+                        <input class="form-control checkbox-values" type="hidden" asp-for="PostingRoles" />
+                        @foreach (IdentityRole role in Model.Roles.OrderBy(p => p.Name))
+                        {
+                            <div class="custom-control custom-checkbox">
+                                @if (roles == null || !roles.Contains(role.Name))
                                 {
-                                    List<string> roles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(Model.PostingRoles.IsSet() ? Model.PostingRoles : "[]");
-                                    <p class="m-t-xs">Select roles that can ALWAYS post in the forums. <em>These roles will not require a subscription to post in the forums, even if a specific forum requires it.</em></p>
-                                    <input class="form-control checkbox-values" type="hidden" asp-for="PostingRoles" />
-                                    @foreach (IdentityRole role in Model.Roles.OrderBy(p => p.Name))
-                                    {
-                                        <div class="checkbox">
-                                            @if (roles == null || !roles.Contains(role.Name))
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="PostingRoles" id="PostingRoles-@role.Name.ToSeoUrl()" />
-                                            }
-                                            else
-                                            {
-                                                <input type="checkbox" value="@string.Format("{0}", role.Name)" data-input="PostingRoles" id="PostingRoles-@role.Name.ToSeoUrl()" checked />
-                                            }
-                                            <label for="PostingRoles-@role.Name.ToSeoUrl()">
-                                                @role.Name
-                                            </label>
-                                        </div>
-                                    }
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", role.Name)"
+                                           data-input="PostingRoles"
+                                           id="PostingRoles-@role.Name.ToSeoUrl()"
+                                           class="custom-control-input" />
                                 }
                                 else
                                 {
-                                    <span class="label label-warning form-control-message"><i class="fa fa-exclamation-triangle m-r-xs"></i>Subscriptions are not enabled.</span>
+                                    <input type="checkbox"
+                                           value="@string.Format("{0}", role.Name)"
+                                           data-input="PostingRoles"
+                                           id="PostingRoles-@role.Name.ToSeoUrl()"
+                                           checked
+                                           class="custom-control-input" />
                                 }
+                                <label for="PostingRoles-@role.Name.ToSeoUrl()" class="custom-control-label">
+                                    @role.Name
+                                </label>
                             </div>
-                            <div class="clearfix"></div>
-                        </div>
-                    </div>
-                </fieldset>
+                        }
+                    }
+                    else
+                    {
+                        <alert type="Danger" size="Small" icon="fa-times-circle" class="m-0">
+                            No roles can be found to use.
+                        </alert>
+                    }
+                </div>
             </div>
         </div>
     </div>

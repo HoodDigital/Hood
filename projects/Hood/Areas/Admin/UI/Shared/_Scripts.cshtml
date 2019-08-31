@@ -1,0 +1,55 @@
+@inject IThemesService _themes
+@{
+    IntegrationSettings _plugins = Engine.Settings.Integrations;
+}
+
+@Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
+@Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
+
+<partial name="_Scripts_JQuery" />
+
+@Html.RenderScripts(Url, ResourceLocation.BeforeVendors)
+@Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
+
+<partial name="_Scripts_Bootstrap" />
+<partial name="_Scripts_Validation" />
+<partial name="_Scripts_Vendors" />
+
+@Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
+@Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
+
+<environment include="Development">
+
+    <script src="@string.Format("{0}/js/core/production.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/globals.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+
+    <script src="@string.Format("{0}/js/core/handlers.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/helpers.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/stringhelpers.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/validator.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+
+    <script src="@string.Format("{0}/js/core/addresses.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/alerts.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/forms.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/inline.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/core/media.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+
+    <script src="@string.Format("{0}/js/admin/content.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/admin/forums.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/admin/logs.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/admin/property.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/admin/subscriptions.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/admin/themes.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+    <script src="@string.Format("{0}/js/admin/users.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+
+    <script src="@string.Format("{0}/js/admin.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+
+</environment>
+<environment exclude="Development">
+    <script src="@string.Format("{0}/js/admin.packaged.js", Engine.LibraryFolder)" asp-append-version="true"></script>
+</environment>
+
+<partial name="_Scripts_Google" />
+
+@Html.RenderScripts(Url, ResourceLocation.AfterScripts)
+@Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)

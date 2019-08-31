@@ -1,11 +1,10 @@
-﻿using Hood.Entities;
-using Hood.Extensions;
+﻿using Hood.Extensions;
 using Hood.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace Hood.Models
 {
@@ -13,7 +12,6 @@ namespace Hood.Models
     {
         // Author 
         public string AuthorId { get; set; }
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser Author { get; set; }
         public string AuthorName { get; set; }
         public string AuthorDisplayName { get; set; }
@@ -45,26 +43,25 @@ namespace Hood.Models
         public int Views { get; set; }
         public int ShareCount { get; set; }
 
-        // Settings
+        [Display(Name = "Published", Description = "If checked, the forum will be visible and accessible on the site.")]
         public bool Published { get; set; }
+        [Display(Name = "Featured", Description = "Show this forum in any featured lists.")]
         public bool Featured { get; set; }
 
         // Images
         public string FeaturedImageJson { get; set; }
         [NotMapped]
-        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject FeaturedImage
         {
-            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<ForumMedia>(FeaturedImageJson) : ForumMedia.Blank; }
+            get { return FeaturedImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(FeaturedImageJson) : MediaObject.Blank; }
             set { FeaturedImageJson = JsonConvert.SerializeObject(value); }
         }
 
         public string ShareImageJson { get; set; }
         [NotMapped]
-        [JsonConverter(typeof(MediaObjectJsonConverter))]
         public IMediaObject ShareImage
         {
-            get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<ForumMedia>(ShareImageJson) : ForumMedia.Blank; }
+            get { return ShareImageJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(ShareImageJson) : MediaObject.Blank; }
             set { ShareImageJson = JsonConvert.SerializeObject(value); }
         }
     }

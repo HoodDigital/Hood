@@ -1,38 +1,30 @@
-﻿using Hood.Enums;
+﻿using Hood.Caching;
+using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public class MediaManager<TMediaObject> : IMediaManager<TMediaObject>
-        where TMediaObject : IMediaObject
+    public class MediaManager : IMediaManager
     {
-
-        private const int Megabyte = 1048576;
         private CloudStorageAccount _storageAccount;
         private string _container;
         private string _key;
-        private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
         private readonly IHostingEnvironment _env;
 
-        public MediaManager(IConfiguration config, ISettingsRepository site, IHostingEnvironment env)
+        public MediaManager(IHostingEnvironment env)
         {
-            _config = config;
-            _settings = site;
             _env = env;
             Initialise();
         }
@@ -41,12 +33,14 @@ namespace Hood.Services
         {
             Initialise();
             if (_storageAccount == null)
+            {
                 throw new Exception("Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and add a valid Azure Storage Key.");
+            }
         }
 
         private void Initialise()
         {
-            var _mediaSettings = _settings.GetMediaSettings(true);
+            MediaSettings _mediaSettings = Engine.Settings.Media;
             _container = _mediaSettings.ContainerName.ToSeoUrl();
             _key = _mediaSettings.AzureKey;
             try
@@ -63,20 +57,16 @@ namespace Hood.Services
         public string GetBlobReference(string directory, string filename)
         {
             if (!directory.EndsWith("/"))
-                directory += "/";
-            if (filename.EndsWith("/"))
-                filename = filename.TrimEnd('/');
-            return string.Concat(directory, filename).ToLowerInvariant();
-        }
-        public string GetSeoDirectory(string directory)
-        {
-            string[] dirs = directory.Split('/');
-            for (int i = 0; i < dirs.Length; i++)
             {
-                dirs[i] = dirs[i].ToSeoUrl();
+                directory += "/";
             }
-            string seoDir = string.Join("/", dirs);
-            return seoDir;
+
+            if (filename.EndsWith("/"))
+            {
+                filename = filename.TrimEnd('/');
+            }
+
+            return string.Concat(directory, filename).ToLowerInvariant();
         }
         #endregion
 
@@ -138,7 +128,9 @@ namespace Hood.Services
         {
             // if there is an old file
             if (string.IsNullOrEmpty(blobReference))
+            {
                 throw new ArgumentNullException("blobReference");
+            }
 
             // check if it is a full url - if so strip the bollocks.
             bool result = Uri.TryCreate(blobReference, UriKind.Absolute, out Uri uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
@@ -187,47 +179,49 @@ namespace Hood.Services
             return blockBlob;
         }
 
-        public async Task<TMediaObject> ProcessUpload(IFormFile file, TMediaObject media)
+        public async Task<IMediaObject> ProcessUpload(IFormFile file, string directoryPath)
         {
-            // Create a ClubMedia - attach it to the club.
-            string seoDirectory = GetSeoDirectory(media.Directory);
-            media.Filename = file.GetFilename();
-            media.BlobReference = GetBlobReference(seoDirectory, await GetSafeFilename(seoDirectory, file.GetFilename()));
-            media.UniqueId = Guid.NewGuid().ToString();
+            IMediaObject media = new MediaObject
+            {
+                Filename = file.GetFilename(),
+                BlobReference = GetBlobReference(directoryPath, await GetSafeFilename(directoryPath, file.GetFilename())),
+                UniqueId = Guid.NewGuid().ToString(),
+                CreatedOn = DateTime.Now,
+                FileSize = file.Length,
+                FileType = file.ContentType,
+                Path = directoryPath
+            };
+            media.GenericFileType = media.FileType.ToFileType();
 
             // Upload the media, filename as the name, check it doesn't already exist first.
-            var uploadResult = await Upload(file.OpenReadStream(), media.BlobReference);
+            CloudBlockBlob uploadResult = await Upload(file.OpenReadStream(), media.BlobReference);
 
             // Attach to the entity
             media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
 
             // Process type, size etc.
-            media.CreatedOn = DateTime.Now;
-            media.FileSize = file.Length;
-            media.FileType = file.ContentType;
-            media.GeneralFileType = media.FileType.ToFileType().ToString();
 
-            ThumbSet thumbs = new ThumbSet();
-            var type = media.FileType.ToFileType();
-            switch (type)
+            switch (media.GenericFileType)
             {
                 case GenericFileType.Image:
-                    media = await ProcessImageAsync(media);
+                    media = ProcessImage(media);
                     break;
             }
 
             return media;
         }
-        public async Task<TMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, TMediaObject media)
+        public async Task<IMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, string directoryPath)
         {
-            // Create a ClubMedia - attach it to the club.
-            string seoDirectory = GetSeoDirectory(media.Directory);
-            media.Filename = filename;
-            media.BlobReference = GetBlobReference(seoDirectory, await GetSafeFilename(seoDirectory, filename));
-            media.UniqueId = Guid.NewGuid().ToString();
+            IMediaObject media = new MediaObject
+            {
+                Filename = filename,
+                BlobReference = GetBlobReference(directoryPath, await GetSafeFilename(directoryPath, filename)),
+                UniqueId = Guid.NewGuid().ToString(),
+                Path = directoryPath
+            };
 
             // Upload the media, filename as the name, check it doesn't already exist first.
-            var uploadResult = await Upload(file, media.BlobReference);
+            CloudBlockBlob uploadResult = await Upload(file, media.BlobReference);
 
             // Attach to the entity
             media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
@@ -236,13 +230,13 @@ namespace Hood.Services
             media.CreatedOn = DateTime.Now;
             media.FileSize = file.Length;
             media.FileType = filetype;
-            media.GeneralFileType = filetype.ToFileType().ToString();
+            media.GenericFileType = filetype.ToFileType();
 
-            var type = filetype.ToFileType();
+            GenericFileType type = filetype.ToFileType();
             switch (type)
             {
                 case GenericFileType.Image:
-                    media = await ProcessImageAsync(media);
+                    media = ProcessImage(media);
                     break;
             }
 
@@ -289,15 +283,18 @@ namespace Hood.Services
             return blockBlob.Uri + sasBlobToken;
         }
 
-        private async Task<TMediaObject> ProcessImageAsync(TMediaObject media)
-        {
-            ThumbSet thumbs = new ThumbSet();
 
+
+        private IMediaObject ProcessImage(IMediaObject media)
+        {
             string fileName = Path.GetFileNameWithoutExtension(media.Url);
             string fileExt = Path.GetExtension(media.Url);
             string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
+
             string tempGuid = Guid.NewGuid().ToString();
             string tempFileName = tempDir + tempGuid + fileExt;
+
+            // create three thumbnailed versions, and add to the array of files to upload.
 
             if (!Directory.Exists(tempDir))
                 Directory.CreateDirectory(tempDir);
@@ -308,51 +305,66 @@ namespace Hood.Services
                 client.DownloadFile(media.Url, tempFileName);
             }
 
-            // create three thumbnailed versions, and add to the array of files to upload.
-            string XsFilename = string.Format("{0}/{1}_xs{2}", media.Directory.ToLower(), fileName, fileExt);
-            string SmFilename = string.Format("{0}/{1}_sm{2}", media.Directory.ToLower(), fileName, fileExt);
-            string MdFilename = string.Format("{0}/{1}_md{2}", media.Directory.ToLower(), fileName, fileExt);
-            string LgFilename = string.Format("{0}/{1}_lg{2}", media.Directory.ToLower(), fileName, fileExt);
-            string tempXs = tempDir + tempGuid + "_xs" + fileExt;
-            string tempSm = tempDir + tempGuid + "_sm" + fileExt;
-            string tempMd = tempDir + tempGuid + "_md" + fileExt;
-            string tempLg = tempDir + tempGuid + "_lg" + fileExt;
-
-            System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
-            switch (fileExt.ToLowerInvariant())
+            Task[] tasks = new Task[4]
             {
-                case ".gif":
-                    format = System.Drawing.Imaging.ImageFormat.Gif;
-                    break;
-                case ".bmp":
-                    format = System.Drawing.Imaging.ImageFormat.Bmp;
-                    break;
-                case ".png":
-                    format = System.Drawing.Imaging.ImageFormat.Png;
-                    break;
-            }
+                Task.Factory.StartNew(() => media.ThumbUrl = GenerateThumb(media, tempFileName, tempGuid, ".xs", 250)),
+                Task.Factory.StartNew(() => media.SmallUrl = GenerateThumb(media, tempFileName, tempGuid, ".sm", 600)),
+                Task.Factory.StartNew(() => media.MediumUrl = GenerateThumb(media, tempFileName, tempGuid, ".md", 1280)),
+                Task.Factory.StartNew(() => media.LargeUrl = GenerateThumb(media, tempFileName, tempGuid, ".xl", 1920))
+            };
 
-            ImageProcessor.ResizeImage(tempFileName, tempXs, 250, 250, format);
-            ImageProcessor.ResizeImage(tempFileName, tempSm, 640, 640, format);
-            ImageProcessor.ResizeImage(tempFileName, tempMd, 1280, 1280, format);
-            ImageProcessor.ResizeImage(tempFileName, tempLg, 1920, 1920, format);
-
-            // foreach, file in the list of thumbnails
-            // upload to the thumbLocation
-            using (var fs = File.OpenRead(tempXs)) { media.ThumbUrl = (await Upload(fs, XsFilename)).Uri.ToUrlString(); }
-            using (var fs = File.OpenRead(tempSm)) { media.SmallUrl = (await Upload(fs, SmFilename)).Uri.ToUrlString(); }
-            using (var fs = File.OpenRead(tempMd)) { media.MediumUrl = (await Upload(fs, MdFilename)).Uri.ToUrlString(); }
-            using (var fs = File.OpenRead(tempLg)) { media.LargeUrl = (await Upload(fs, LgFilename)).Uri.ToUrlString(); }
-
-            // add the url to the array of urls to send back
-            // remove the temporary image
-            try { File.Delete(tempFileName); } catch (Exception) { }
-            try { File.Delete(tempXs); } catch (Exception) { }
-            try { File.Delete(tempSm); } catch (Exception) { }
-            try { File.Delete(tempMd); } catch (Exception) { }
-            try { File.Delete(tempLg); } catch (Exception) { }
-
+            //Block until all tasks complete.
+            Task.WaitAll(tasks);
             return media;
+        }
+
+        private string GenerateThumb(IMediaObject media, string tempFileName, string tempGuid, string prefix, int size)
+        {
+            try
+            {
+                string fileName = Path.GetFileNameWithoutExtension(media.Url);
+                string fileExt = Path.GetExtension(media.Url);
+                string tempDir = _env.ContentRootPath + "\\Temporary\\" + typeof(ImageProcessor) + "\\";
+
+                string tempThumbFile = tempDir + tempGuid + prefix + fileExt;
+                string thumbFilename = $"{media.Path}/{fileName}{prefix}{fileExt}";
+
+                System.Drawing.Imaging.ImageFormat format = System.Drawing.Imaging.ImageFormat.Jpeg;
+                switch (fileExt.ToLowerInvariant())
+                {
+                    case ".gif":
+                        format = System.Drawing.Imaging.ImageFormat.Gif;
+                        break;
+                    case ".bmp":
+                        format = System.Drawing.Imaging.ImageFormat.Bmp;
+                        break;
+                    case ".png":
+                        format = System.Drawing.Imaging.ImageFormat.Png;
+                        break;
+                }
+
+                ImageProcessor.ResizeImage(tempFileName, tempThumbFile, size, size, format);
+
+                // foreach, file in the list of thumbnails
+                // upload to the thumbLocation
+                string url = "";
+                using (var fs = File.OpenRead(tempThumbFile))
+                {
+                    url = Upload(fs, thumbFilename).Result.Uri.ToUrlString();
+                }
+
+                // add the url to the array of urls to send back
+                // remove the temporary image
+                try { File.Delete(tempFileName); } catch (Exception) { }
+                try { File.Delete(tempThumbFile); } catch (Exception) { }
+
+                return url;
+            }
+            catch (Exception)
+            {
+                // Thumbnailing failed, just send back the Url.
+                return media.Url;
+            }
         }
 
         public async Task DeleteStoredMedia(IMediaObject media)
@@ -367,27 +379,32 @@ namespace Hood.Services
             }
         }
 
-        public async Task<TMediaObject> RefreshMedia(TMediaObject media, string tempDirectory)
+        public async Task<IMediaObject> RefreshMedia(IMediaObject media, string tempDirectory)
         {
             // copy record of original files into new object
-            var old = new MediaObject();
+            MediaObject old = new MediaObject();
             media.CopyProperties(old);
 
             // download the orignal file, and save it to temp.
-            var tempFile = tempDirectory + media.UniqueId;
-            using (var client = new WebClient())
+            string tempFile = tempDirectory + media.UniqueId;
+            using (WebClient client = new WebClient())
             {
                 client.DownloadFile(new Uri(media.Url), tempFile);
             }
 
-            using (var fileStream = File.OpenRead(tempFile))
+            using (FileStream fileStream = File.OpenRead(tempFile))
             {
                 // reupload to a new location, and process.
-                await ProcessUpload(fileStream, media.Filename, media.FileType, media.FileSize, media);
+                await ProcessUpload(fileStream, media.Filename, media.FileType, media.FileSize, media.Path);
             }
 
             // save the new file urls to the media object
             return media;
         }
+
+        public const string UserDirectorySlug = "users";
+        public const string SiteDirectorySlug = "site";
+        public const string ContentDirectorySlug = "content";
+        public const string PropertyDirectorySlug = "property";
     }
 }

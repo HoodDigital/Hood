@@ -1,56 +1,117 @@
-﻿using Hood.Extensions;
-using Hood.Infrastructure;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
     [Authorize]
-    public class AddressController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class AddressController : BaseController
     {
         public AddressController()
             : base()
         { }
 
-        public ActionResult Index()
+        public async Task<IActionResult> Index(AddressListModel model) => await List(model, "Index");
+        [Route("account/[controller]/list")]
+        public async Task<IActionResult> List(AddressListModel model, string viewName = "_List_Addresses")
         {
-            var user = _account.GetCurrentUser(false);
-            return View(user);
+            IQueryable<Address> addresses = _db.Addresses;
+
+            if (model.UserId.IsSet())
+            {
+                model.UserProfile = await _account.GetUserProfileByIdAsync(model.UserId);
+                addresses = addresses.Where(a => a.UserId == model.UserId);
+            }
+            else
+            {
+                model.UserProfile = Engine.Account;
+                addresses = addresses.Where(a => a.UserId == Engine.Account.Id);
+            }
+
+            if (!string.IsNullOrEmpty(model.Search))
+            {
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                addresses = addresses.Where(n => searchTerms.Any(s => n.QuickName != null && n.QuickName.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.Address1 != null && n.Address1.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.Address2 != null && n.Address2.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.City != null && n.City.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                                      || searchTerms.Any(s => n.Country != null && n.Country.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+            }
+
+            if (!string.IsNullOrEmpty(model.Order))
+            {
+                switch (model.Order)
+                {
+                    case "name":
+                    case "title":
+                        addresses = addresses.OrderBy(n => n.QuickName);
+                        break;
+
+                    case "name+desc":
+                    case "title+desc":
+                        addresses = addresses.OrderByDescending(n => n.QuickName);
+                        break;
+
+                    default:
+                        addresses = addresses.OrderByDescending(n => n.QuickName).ThenBy(n => n.Postcode);
+                        break;
+                }
+            }
+
+            await model.ReloadAsync(addresses);
+
+            return View(viewName, model);
         }
 
-        public ActionResult Create()
+        [Route("account/[controller]/create")]
+        public ActionResult Create(string userId)
         {
-            string userID = _userManager.GetUserId(User);
-            Address add = new Address() { UserId = userID };
+            if (!userId.IsSet())
+                userId = _userManager.GetUserId(User);
+            Address add = new Address() { UserId = userId };
             return View(add);
         }
-
         [HttpPost]
-        public IActionResult Create(Address address)
+        [Route("account/[controller]/create")]
+        public async Task<IActionResult> Create(Address address)
         {
             try
             {
-                // Geocode
-                var location = _address.GeocodeAddress(address);
-                if (location != null)
+                if (Engine.Settings.Integrations.IsGoogleGeocodingEnabled)
                 {
-                    address.SetLocation(location.Coordinates);
+                    try
+                    {
+                        var location = _address.GeocodeAddress(address);
+                        if (location != null)
+                        {
+                            address.SetLocation(location.Coordinates);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await _logService.AddExceptionAsync<AddressController>("Error geocoding a user address.", ex);
+                    }
                 }
 
-                var user = _account.GetCurrentUser(false);
+                var user = await _account.GetCurrentUserAsync(false);
                 address.UserId = user.Id;
                 user.Addresses.Add(address);
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
 
                 if (user.BillingAddress == null)
                     user.BillingAddress = address.CloneTo<Address>();
                 if (user.DeliveryAddress == null)
                     user.DeliveryAddress = address.CloneTo<Address>();
 
-                _account.UpdateUser(user);
+                await _account.UpdateUserAsync(user);
 
                 return Json(new Response(true));
             }
@@ -60,24 +121,33 @@ namespace Hood.Controllers
             }
         }
 
-        public ActionResult Edit(int id)
+        [Route("account/[controller]/edit/{id}")]
+        public async Task<ActionResult> Edit(int id)
         {
-            return View(_account.GetAddressById(id));
+            return View(await _account.GetAddressByIdAsync(id));
         }
-
         [HttpPost]
-        public IActionResult Edit(Address address)
+        [Route("account/[controller]/edit/{id}")]
+        public async Task<IActionResult> Edit(Address address)
         {
             try
             {
-                // Geocode
-                var location = _address.GeocodeAddress(address);
-                if (location != null)
+                if (Engine.Settings.Integrations.IsGoogleGeocodingEnabled)
                 {
-                    address.SetLocation(location.Coordinates);
+                    try
+                    {
+                        var location = _address.GeocodeAddress(address);
+                        if (location != null)
+                        {
+                            address.SetLocation(location.Coordinates);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        await _logService.AddExceptionAsync<AddressController>("Error geocoding a user address.", ex);
+                    }
                 }
-
-                OperationResult result = _account.UpdateAddress(address);
+                await _account.UpdateAddressAsync(address);
                 return Json(new Response(true));
             }
             catch (Exception ex)
@@ -87,49 +157,48 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(int id)
+        [Route("account/[controller]/delete/{id}")]
+        public async Task<Response> Delete(int id)
         {
             try
             {
-                OperationResult result = _account.DeleteAddress(id);
-                if (result.Succeeded)
-                    return Json(new { success = true });
-                else
-                    throw new Exception(result.ErrorString);
+                await _account.DeleteAddressAsync(id);
+                return new Response(true, $"The address has been deleted.");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message });
+                return new Response(ex);
             }
         }
 
         [HttpPost]
-        public ActionResult SetBilling(int id)
+        [Route("account/[controller]/set-billing/{id}")]
+        public async Task<Response> SetBilling(int id)
         {
             try
             {
                 string userId = _userManager.GetUserId(User);
-                OperationResult result = _account.SetBillingAddress(userId, id);
-                return Json(new { success = true });
+                await _account.SetBillingAddressAsync(userId, id);
+                return new Response(true, $"The billing address has been updated.");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message });
+                return new Response(ex);
             }
         }
-
         [HttpPost]
-        public ActionResult SetDelivery(int id)
+        [Route("account/[controller]/set-delivery/{id}")]
+        public async Task<Response> SetDelivery(int id)
         {
             try
             {
                 string userId = _userManager.GetUserId(User);
-                OperationResult result = _account.SetDeliveryAddress(userId, id);
-                return Json(new { success = true });
+                await _account.SetDeliveryAddressAsync(userId, id);
+                return new Response(true, $"The delivery address has been updated.");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, error = ex.Message });
+                return new Response(ex);
             }
         }
     }

@@ -22,7 +22,7 @@ namespace Hood.Services
                 _ForumChanged -= value;
             }
         }
-        public void triggerForumChanged(object sender)
+        public void TriggerForumChanged(object sender)
         {
             try
             {
@@ -33,8 +33,8 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
-                logService.LogErrorAsync("An error while triggering a Forum Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+                var logService = Engine.Services.Resolve<ILogService>();
+                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerForumChanged), ex);
             }
         }
 
@@ -53,7 +53,7 @@ namespace Hood.Services
                 _ContentChanged -= value;
             }
         }
-        public void triggerContentChanged(object sender)
+        public void TriggerContentChanged(object sender)
         {
             _ContentChanged?.Invoke(sender, new EventArgs());
         }
@@ -73,7 +73,7 @@ namespace Hood.Services
                 _PropertiesChanged -= value;
             }
         }
-        public void triggerPropertiesChanged(object sender)
+        public void TriggerPropertiesChanged(object sender)
         {
             try
             {
@@ -84,8 +84,8 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
-                logService.LogErrorAsync("An error while triggering a Properties Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+                var logService = Engine.Services.Resolve<ILogService>();
+                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerPropertiesChanged), ex);
             }
         }
 
@@ -104,7 +104,7 @@ namespace Hood.Services
                 _OptionsChanged -= value;
             }
         }
-        public void triggerOptionsChanged(object sender)
+        public void TriggerOptionsChanged(object sender)
         {
             try
             {
@@ -115,8 +115,8 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
-                logService.LogErrorAsync("An error while triggering a Options Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+                var logService = Engine.Services.Resolve<ILogService>();
+                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerOptionsChanged), ex);
             }
         }
 
@@ -135,7 +135,7 @@ namespace Hood.Services
                 _UserSubcriptionChanged -= value;
             }
         }
-        public void triggerUserSubcriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
+        public void TriggerUserSubcriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
         {
             try
             {
@@ -146,8 +146,8 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
-                logService.LogErrorAsync("An error while triggering a User Subcription Changed event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+                var logService = Engine.Services.Resolve<ILogService>();
+                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerUserSubcriptionChanged), ex);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Hood.Services
                 _StripeWebhook -= value;
             }
         }
-        public void triggerStripeWebhook(object sender, StripeWebHookTriggerArgs e)
+        public void TriggerStripeWebhook(object sender, StripeWebHookTriggerArgs e)
         {
             try
             {
@@ -177,8 +177,8 @@ namespace Hood.Services
             }
             catch (Exception ex)
             {
-                var logService = Engine.Current.Resolve<ILogService>();
-                logService.LogErrorAsync("An error while triggering a Stripe Webhook event handler.", ex, Models.LogType.Error, Models.LogSource.System, null, null, nameof(IEventsService), null);
+                var logService = Engine.Services.Resolve<ILogService>();
+                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerStripeWebhook), ex);
             }
         }
     }

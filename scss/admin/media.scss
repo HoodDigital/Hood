@@ -1,0 +1,100 @@
+.media-list {
+    background-color: $gray-200;
+    padding-top: $grid-gutter-width;
+    padding-left: $grid-gutter-width / 2;
+    padding-right: $grid-gutter-width / 2;
+    border-radius: $border-radius;
+
+    figure.attach-media-select {
+        cursor: pointer;
+    }
+
+    .thumbnail {
+        display: block;
+        padding: $thumbnail-padding;
+        margin-bottom: $grid-gutter-width;
+        line-height: $line-height-base;
+        background-color: $thumbnail-bg;
+        border: 0;
+        border-radius: $thumbnail-border-radius;
+        @include transition(border .2s ease-in-out);
+        overflow: hidden;
+
+        &:hover {
+            background-color: #f6f6f6;
+        }
+
+        > img,
+        > .img,
+        a > img {
+            margin-top: -$thumbnail-padding;
+            margin-left: -$thumbnail-padding;
+            margin-right: -$thumbnail-padding;
+            margin-bottom: $thumbnail-padding;
+            max-width: none !important;
+            width: auto !important;
+        }
+        // Image captions
+        .caption {
+            padding: $grid-gutter-width / 2;
+        }
+    }
+
+    .k-loading-mask {
+        position: relative;
+        display: block;
+        background: lighten($primary, 40%);
+        border: 1px solid $primary;
+        width: auto !important;
+        padding: $grid-gutter-width / 2 $grid-gutter-width;
+        margin: $grid-gutter-width / 2;
+        margin-top: 0;
+        margin-bottom: $grid-gutter-width;
+        border-radius: $border-radius;
+        color: #000000;
+    }
+
+    &:before, &:after {
+        content: " ";
+        display: table;
+    }
+
+    &:after {
+        clear: both;
+    }
+}
+
+span.no-items {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 7px 6px;
+    display: inline-block;
+}
+
+.directories {
+    .nav-pills {
+        > li {
+            > a {
+                background-color: #ccc;
+                border-radius: $nav-pills-border-radius;
+
+                &:hover,
+                &:focus {
+                    color: black;
+                    background-color: #bbb;
+                }
+            }
+
+            &.active > a {
+                background-color: $primary;
+                color: white;
+
+                &:hover,
+                &:focus {
+                    color: white;
+                    background-color: darken($primary, 10%);
+                }
+            }
+        }
+    }
+}

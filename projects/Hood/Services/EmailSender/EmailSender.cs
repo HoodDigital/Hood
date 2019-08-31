@@ -7,13 +7,14 @@ using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Hood.Models;
 using System.Linq;
+using Hood.Interfaces;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class EmailSender : IEmailSender
     {
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly ISettingsRepository _settings;
         private Models.MailSettings _mail;
         private Models.BasicSettings _info;
         private readonly IRazorViewRenderer _renderer;
@@ -21,27 +22,25 @@ namespace Hood.Services
 
         public EmailSender(IHttpContextAccessor contextAccessor,
             UserManager<ApplicationUser> userManager,
-            ISettingsRepository site,
             IRazorViewRenderer renderer)
         {
             _contextAccessor = contextAccessor;
             _userManager = userManager;
-            _settings = site;
             _renderer = renderer;
         }
 
         private SendGridClient GetMailClient()
         {
-            _info = _settings.GetBasicSettings();
-            _mail = _settings.GetMailSettings();
+            _info = Engine.Settings.Basic;
+            _mail = Engine.Settings.Mail;
             return new SendGridClient(_mail.SendGridKey);
         }
 
         public EmailAddress GetSiteFromEmail()
         {
-            _info = _settings.GetBasicSettings();
-            _mail = _settings.GetMailSettings();
-            string siteTitle = _settings.GetSiteTitle();
+            _info = Engine.Settings.Basic;
+            _mail = Engine.Settings.Mail;
+            string siteTitle = Engine.Settings.Basic.FullTitle;
             string fromName = _mail.FromName.IsSet() ? _mail.FromName : siteTitle.IsSet() ? siteTitle : "HoodCMS";
             string fromEmail = _mail.FromEmail.IsSet() ? _mail.FromEmail : _info.Email.IsSet() ? _info.Email : "info@hooddigital.com";
             return new EmailAddress(fromEmail, fromName);
@@ -68,9 +67,6 @@ namespace Hood.Services
                 from = GetSiteFromEmail();
 
             var html = await _renderer.Render(message.Template, message);
-            var textContent = new SendGrid.Helpers.Mail.Content("text/plain", message.ToString());
-            var htmlContent = new SendGrid.Helpers.Mail.Content("text/html", html);
-
             var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
             var response = await client.SendEmailAsync(msg);
             var body = await response.DeserializeResponseBodyAsync(response.Body);
@@ -111,7 +107,7 @@ namespace Hood.Services
         public async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
-            var emails = users.Select(u => new EmailAddress(u.Email, u.FullName)).ToArray();
+            var emails = users.Select(u => new EmailAddress(u.Email, u.ToFullName())).ToArray();
             return await SendEmailAsync(emails, subject, htmlContent, textContent);
         }
     }

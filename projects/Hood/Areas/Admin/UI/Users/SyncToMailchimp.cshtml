@@ -1,6 +1,6 @@
 @model MailchimpSyncStats
 @{
-    IntegrationSettings _integrations = _settings.GetIntegrationSettings();
+    IntegrationSettings _integrations = Engine.Settings.Integrations;
     ViewBag.Title = "Synced Users to Mailchimp List";
 }
 @section buttons {
@@ -45,7 +45,7 @@
                 <label>Unsubscribed Emails</label>
                 <textarea class="form-control">@Model.UnsubscribedUserList</textarea>
                 <small>
-                    Note: These users have marked their Mailchimp status as unsubscribed.<br />
+                    <strong>These users have marked their Mailchimp status as unsubscribed.</strong><br />
                     This is for information purposes only, and it is YOUR RESPONSIBILITY to maintain your list and purge data where necessary.
                 </small>
             </div>

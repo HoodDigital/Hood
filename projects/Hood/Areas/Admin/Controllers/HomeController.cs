@@ -1,14 +1,15 @@
 ﻿using Hood.Controllers;
 using Hood.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "SuperUser,Admin,Editor,Manager")]
-    public class HomeController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    [Authorize(Roles = "SuperUser,Admin,Editor")]
+    public class HomeController : BaseController
     {
         public HomeController()
             : base()
@@ -21,21 +22,30 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        [Route("admin/theme/")]
-        [Authorize(Roles = "Admin,Manager")]
-        public IActionResult Theme()
+        [Route("admin/debug")]
+        [Authorize(Roles = "SuperUser")]
+        public async Task<IActionResult> Debug()
         {
+            var user = await _userManager.GetUserAsync(User);
+            user.AddUserNote(new UserNote()
+            {
+                Id = Guid.NewGuid(),
+                CreatedBy = user.Id,
+                CreatedOn = DateTime.Now,
+                Note = "This account was loaded and checked via the debug page."
+            });
+            await _userManager.UpdateAsync(user);
+
             return View();
         }
 
         [Route("admin/stats/")]
-        [Authorize(Roles = "Admin,Manager")]
-        public IActionResult Stats()
+        public async Task<IActionResult> StatsAsync()
         {
-            var content = _content.GetStatistics();
-            var users = _account.GetStatistics();
-            var subs = _account.GetSubscriptionStatistics();
-            var properties = _property.GetStatistics();
+            var content = await _content.GetStatisticsAsync();
+            var users = await _account.GetStatisticsAsync();
+            var subs = await _account.GetSubscriptionStatisticsAsync();
+            var properties = await _property.GetStatisticsAsync();
 
             return Json(new { content, users, subs, properties });
         }

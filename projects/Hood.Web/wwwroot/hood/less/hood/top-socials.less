@@ -1,0 +1,35 @@
+#top-social,
+#top-social ul {
+    margin: 0;
+}
+
+#top-social {
+    li,
+    li a {
+        display: block;
+        position: relative;
+        float: left;
+        width: auto;
+        overflow: hidden;
+        height: @topbar-line-height;
+        line-height: @topbar-line-height;
+    }
+
+    li {
+        border-left: 1px solid #EEE;
+        text-align: center;
+
+        &:first-child {
+            border-left: 0 !important;
+        }
+
+        a {
+            float: none;
+            width: @topbar-line-height;
+            font-weight: bold;
+            -webkit-transition: color .3s ease-in-out, background-color .3s ease-in-out, width .3s ease-in-out;
+            -o-transition: color .3s ease-in-out, background-color .3s ease-in-out, width .3s ease-in-out;
+            transition: color .3s ease-in-out, background-color .3s ease-in-out, width .3s ease-in-out;
+        }
+    }
+}

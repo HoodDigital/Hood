@@ -1,0 +1,23 @@
+@model ContentModel
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div id="designer-bar" data-upload="@Model.ContentType.TypeNamePlural">
+    <p>
+        <a class="btn btn-danger admin back-to-edit" asp-action="Edit" asp-controller="Content" asp-route-id="@Model.Content.Id" asp-area="Admin"><i class="fa fa-step-backward m-r-xs"></i>Exit</a>
+        <a class="btn btn-warning admin open-full" asp-action="Show" asp-controller="Content" asp-route-id="@Model.Content.Id" asp-route-editMode="true" target="_top"><i class="fa fa-arrows-alt m-r-xs"></i>Full Editor</a>
+        <button class="btn btn-info admin toggle-editors"><i class="fa fa-arrows-alt m-r-sm"></i>Edit Mode</button>
+        <button class="btn btn-success admin save-content"><i class="fa fa-save m-r-xs"></i>Save</button>
+    </p>
+</div>
+<div id="hood-designer-loader">
+    <div>
+        <div class="load-animation loader">
+            <div class="loader-job">
+                <div class="loader-inner ball-pulse"></div>
+            </div>
+        </div>
+    </div>
+</div>

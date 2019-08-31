@@ -1,16 +1,10 @@
-﻿using Hood.Caching;
-using Hood.Enums;
+﻿using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -35,35 +29,16 @@ namespace Hood.Filters
         private class ApiAuthorizeAttributeImpl : IActionFilter
         {
             private readonly HoodDbContext _db;
-            private readonly ILogger _logger;
-            private readonly IBillingService _billing;
-            private readonly ISettingsRepository _settings;
-
-            private readonly UserManager<ApplicationUser> _userManager;
-            private readonly IAccountRepository _auth;
-            private readonly RoleManager<IdentityRole> _roleManager;
-
+            private readonly ILogService _logService;
             private readonly AccessLevel _access;
 
             public ApiAuthorizeAttributeImpl(
                 HoodDbContext db,
-                IAccountRepository auth,
-                ILoggerFactory loggerFactory,
-                IBillingService billing,
-                IHttpContextAccessor contextAccessor,
-                IHoodCache cache,
-                ISettingsRepository settings,
-                RoleManager<IdentityRole> roleManager,
-                UserManager<ApplicationUser> userManager,
+                ILogService logService,
                 AccessLevel access)
             {
                 _db = db;
-                _auth = new AccountRepository(db, settings, billing, contextAccessor, cache, userManager, roleManager);
-                _logger = loggerFactory.CreateLogger<SubscriptionRequiredAttribute>();
-                _billing = billing;
-                _settings = settings;
-                _userManager = userManager;
-                _roleManager = roleManager;
+                _logService = logService;
                 _access = access;
             }
 
@@ -120,47 +95,15 @@ namespace Hood.Filters
                     _db.ApiEvents.Add(apiEvent);
                     _db.SaveChanges();
 
-                    var log = new Log()
-                    {
-                        Type = LogType.Info,
-                        Source = LogSource.Api,
-                        Detail = "Api was accessed using API Key: " + apiKey.Name,
-                        Time = DateTime.Now,
-                        Title = "Api was accessed using API Key: " + apiKey.Name,
-                        UserId = apiKey.UserId,
-                        EntityId = apiEvent.Id.ToString(),
-                        EntityType = nameof(ApiEvent),
-                        SourceUrl = context.HttpContext.GetSiteUrl(true, true)
-                    };
-                    _db.Logs.Add(log);
-                    _db.SaveChanges();
-
+                    _logService.AddLogAsync<ApiAuthorizeAttribute>("Api was accessed using API Key: " + apiKey.Name);
                 }
                 catch (Exception ex)
                 {
-                    LogError("API Access Error: " + ex.Message, context.HttpContext.GetSiteUrl(true, true));
+                    _logService.AddExceptionAsync<ApiAuthorizeAttribute>("Error accessing API using an API Key.", ex);
                     context.Result = new UnauthorizedResult();
                     return;
                 }
 
-            }
-
-            private void LogError(string reason, string url, string userId = null, string keyId = null)
-            {
-                var log = new Log()
-                {
-                    Type = LogType.Error,
-                    Source = LogSource.Api,
-                    Detail = reason,
-                    Time = DateTime.Now,
-                    Title = reason,
-                    UserId = userId,
-                    EntityId = keyId,
-                    EntityType = keyId.IsSet() ? nameof(ApiKey) : null,
-                    SourceUrl = url
-                };
-                _db.Logs.Add(log);
-                _db.SaveChanges();
             }
 
             public void OnActionExecuted(ActionExecutedContext context)

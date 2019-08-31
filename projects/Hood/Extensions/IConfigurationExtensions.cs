@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Hood.Core;
+using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
 
 namespace Hood.Extensions
@@ -10,6 +11,14 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="config"></param>
         public static bool IsDatabaseConfigured(this IConfiguration config)
+        {
+            if (Engine.Services.DatabaseMigrationFailed)
+                return false;
+            if (Engine.Services.DatabaseSeedFailed)
+                return false;
+            return config.IsDatabaseConnected();
+        }
+        public static bool IsDatabaseConnected(this IConfiguration config)
         {
             return config.CheckConfiguration("ConnectionString", "ConnectionStrings:DefaultConnection");
         }

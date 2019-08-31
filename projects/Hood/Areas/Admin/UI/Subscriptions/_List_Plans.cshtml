@@ -1,0 +1,84 @@
+@model SubscriptionPlanListModel
+@{
+    Layout = null;
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var plan in Model.List)
+    {
+        <div class="card hover mb-3 p-2">
+            <div class="row no-gutters align-items-center">
+                <div class="col-auto">
+                    <a asp-action="Edit" asp-route-id="@plan.Id">
+                        <fixedImage src="@plan.FeaturedImage.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@plan.Name"></fixedImage>
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="mb-1">
+                        <h5 class="card-title d-lg-inline">
+                            <a asp-action="Edit" asp-route-id="@plan.Id">@plan.Name</a>
+                        </h5>
+                        @if (plan.SubscriptionProduct != null)
+                        {
+                            <small class="d-lg-inline">
+                                <a asp-action="EditProduct" asp-route-id="@plan.SubscriptionProductId" class="text-muted">@plan.SubscriptionProduct.DisplayName</a>
+                            </small>
+                        }
+                    </div>
+                    <p class="card-text mb-1">
+                    </p>
+                    <p class="card-text mb-1">
+                        <small class="d-block">
+                            Price:
+                            <strong>@plan.FullPrice</strong>
+                        </small>
+                        @if (plan.TrialPeriodDays > 0)
+                        {
+                            <small class="d-block text-info">
+                                Trial Period:
+                                <strong>@plan.TrialPeriodDays days</strong>
+                            </small>
+                        }
+                    </p>
+                    <p class="card-text mb-2">
+                        <small class="ml-1 badge badge-success">@plan.ActiveCount Active</small>
+                        <small class="ml-1 badge badge-warning">@plan.TrialCount Trials</small>
+                        <small class="ml-1 badge badge-danger">@plan.InactiveCount Inactive</small>
+                        <small class="ml-1 badge badge-dark">@plan.TotalCount Total</small>
+                    </p>
+                    @if (!plan.LiveMode)
+                    {
+                        <p class="m-0 text-warning"><i class="fa fa-exclamation-triangle mr-2"></i>This was created in Test mode.</p>
+                    }
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" asp-action="Edit" asp-route-id="@plan.Id">
+                            <i class="fa fa-edit"></i>
+                            Edit Item
+                        </a>
+                        <a class="dropdown-item" asp-action="SyncPlan" asp-route-id="@plan.Id" asp-route-stripeId="@plan.StripeId">
+                            <i class="fa fa-sync-alt"></i>
+                            Sync with Stripe
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item subscriptions-plans-delete" asp-action="Delete" asp-route-id="@plan.Id">
+                            <i class="fa fa-trash-alt"></i>
+                            Delete Item
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        There are no subscription plans yet, click "Create New" to add your first subscription plan.
+    </alert>
+}

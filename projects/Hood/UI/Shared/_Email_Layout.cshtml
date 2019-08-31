@@ -1,7 +1,7 @@
-﻿@model MailObject
+@model MailObject
 @{
-    MailSettings _mail = _settings.GetMailSettings();
-    SeoSettings _seoSettings = _settings.GetSeo();
+    MailSettings _mail = Engine.Settings.Mail;
+    SeoSettings _seoSettings = Engine.Settings.Seo;
 }
 <!doctype html>
 <html>
@@ -145,11 +145,11 @@
     </xml>
     <![endif]-->
 </head>
-<body class="" style="font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: @_mail.BackgroundColour; margin: 0; padding: 0;">
+<body class="" style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.4; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background-color: @_mail.BackgroundColour; margin: 0; padding: 0;">
     <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background-color: @_mail.BackgroundColour;" width="100%" bgcolor="@_mail.BackgroundColour">
         <tr>
-            <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
-            <td class="container" style="font-family: sans-serif; font-size: 14px; vertical-align: top; Margin: 0 auto !important; max-width: 580px; padding: 10px; width: 580px;" width="580" valign="top">
+            <td style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
+            <td class="container" style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; font-size: 14px; vertical-align: top; Margin: 0 auto !important; max-width: 580px; padding: 10px; width: 580px;" width="580" valign="top">
                 <div class="content" style="box-sizing: border-box; display: block; Margin: 0 auto; max-width: 580px; padding: 10px;">
                     @RenderBody()
                     <div class="footer" style="clear: both; padding-top: 10px; text-align: center; width: 100%;">
@@ -157,15 +157,15 @@
                             @if (Model.ShowSiteSocials && _seoSettings != null)
                             {
                                 <tr>
-                                    <td class="content-block" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: #999999; text-align: center;width: 100%;" width="100%" valign="top" align="center">
+                                    <td class="content-block" style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 12px; color: #999999; text-align: center;width: 100%;" width="100%" valign="top" align="center">
                                         <table class="social-sharing" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto; Margin: 0 auto; text-align: center;" align="center">
                                             <tr>
-                                                <td style="font-family: sans-serif; vertical-align: top; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
+                                                <td style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; vertical-align: top; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
                                                     Follow us for updates.
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td style="font-family: sans-serif; vertical-align: top; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
+                                                <td style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; vertical-align: top; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
                                                     @if (_seoSettings.Twitter.IsSet())
                                                     {
                                                         <span>
@@ -205,7 +205,7 @@
                             @if (Model.EmailSmallPrint.IsSet())
                             {
                                 <tr>
-                                    <td class="content-block powered-by" style="font-family: sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 10px; color: #999999; text-align: center;" valign="top" align="center">
+                                    <td class="content-block powered-by" style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; vertical-align: top; padding-top: 10px; padding-bottom: 10px; font-size: 10px; color: #999999; text-align: center;" valign="top" align="center">
                                         @Html.Raw(Model.EmailSmallPrint)
                                     </td>
                                 </tr>
@@ -214,7 +214,7 @@
                     </div>
                 </div>
             </td>
-            <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
+            <td style="font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
         </tr>
     </table>
 </body>

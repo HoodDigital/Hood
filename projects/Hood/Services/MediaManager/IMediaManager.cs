@@ -3,16 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.IO;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Hood.Services
 {
-    public interface IMediaManager<TMediaObject>
-        where TMediaObject : IMediaObject
+    public interface IMediaManager
     {
         string GetBlobReference(string directory, string filename);
-        string GetSeoDirectory(string directory); 
-
         /// <summary>
         /// Gets a safe filename for use with Azure storage. Unsafe characters will be removed.
         /// If the filename is already present, a number will be postfixed.
@@ -72,14 +70,14 @@ namespace Hood.Services
         /// <param name="file">IFormFile object (Http File Request object)</param>
         /// <param name="media">Object of type IMediaItem to contain the file information and details aqcuired in the upload process.</param>
         /// <returns></returns>
-        Task<TMediaObject> ProcessUpload(IFormFile file, TMediaObject media);
+        Task<IMediaObject> ProcessUpload(IFormFile file, string directoryPath);
         /// <summary>
         /// Complete function to take an file stream and basic file data, check it's contents, add it's information to an IMediaItem object, if the file is an image, 
         /// thumbnails will be processed, uploaded to Azure storage and placed into the IMediaItem.
         /// </summary>
         /// <param name="media">Object of type IMediaItem to contain the file information and details aqcuired in the upload process.</param>
         /// <returns></returns>
-        Task<TMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, TMediaObject media);
+        Task<IMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, string directoryPath);
 
         Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read);
 
@@ -89,12 +87,13 @@ namespace Hood.Services
         /// <param name="media">The media item to remove all associated media from Azure.</param>
         /// <returns></returns>
         Task DeleteStoredMedia(IMediaObject media);
+       
 
         /// <summary>
         /// Refreshes image data for all files stored on the media item, reuploading to the current storage account, CDN and folder structure etc.
         /// </summary>
         /// <param name="media">The media item to remove all associated media from Azure.</param>
         /// <returns></returns>
-        Task<TMediaObject> RefreshMedia(TMediaObject media, string tempDirectory);
+        Task<IMediaObject> RefreshMedia(IMediaObject media, string tempDirectory);
     }
 }

@@ -12,29 +12,27 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.IO.Compression;
+using Hood.Core;
 
 namespace Hood.Services
 {
     public class ContentExporter : IContentExporter
     {
         // Services
-        private IFTPService _ftp;
-        private IConfiguration _config;
-        private IMediaManager<MediaObject> _media;
-        private PropertySettings _propertySettings;
-        private ISettingsRepository _settings;
-        private IEmailSender _email;
-        private HoodDbContext _db { get; set; }
+        private readonly IFTPService _ftp;
+        private readonly IConfiguration _config;
+        private readonly IMediaManager _media;
+        private readonly IEmailSender _email;
+        private HoodDbContext _db;
 
         // Members
         private ReaderWriterLock Lock { get; set; }
         private ContentExporterReport Status { get; set; }
-        private AccountInfo Account { get; set; }
-        private string _tempFolder { get; set; }
-        private string _contentFolder { get; set; }
-        private bool _killFlag { get; set; }
+        private string TempFolder { get; set; }
+        private string ContentFolder { get; set; }
+        private bool KillFlag { get; set; }
 
-        public ContentExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager<MediaObject> media, ISettingsRepository site, IEmailSender email)
+        public ContentExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager media, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;
@@ -52,12 +50,10 @@ namespace Hood.Services
                 HasFile = false,
                 Message = "Not running..."
             };
-            _settings = site;
             _email = email;
-            _propertySettings = site.GetPropertySettings();
             _media = media;
-            _tempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(ContentExporter) + "\\";
-            _contentFolder = _tempFolder + "Content\\";
+            TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(ContentExporter) + "\\";
+            ContentFolder = TempFolder + "Content\\";
         }
 
         #region "Content"
@@ -69,7 +65,7 @@ namespace Hood.Services
 
             try
             {
-                ResetImporter(context);
+                ResetImporter();
 
                 ThreadStart pts = new ThreadStart(ExportContent);
                 Thread thread = new Thread(pts)
@@ -180,13 +176,13 @@ namespace Hood.Services
 
                 // Output the lot to json
                 MarkCompleteTask("Outputting all content data to JSON...");
-                System.IO.File.WriteAllText(_contentFolder + "index.json", JsonConvert.SerializeObject(export));
+                File.WriteAllText(ContentFolder + "index.json", JsonConvert.SerializeObject(export));
 
                 // Zip the file
                 MarkCompleteTask("Zipping files...");
                 string fileName = Guid.NewGuid().ToString() + ".zip";
-                string zipTemp = Path.Combine(_tempFolder, fileName);
-                ZipFile.CreateFromDirectory(_contentFolder, zipTemp);
+                string zipTemp = Path.Combine(TempFolder, fileName);
+                ZipFile.CreateFromDirectory(ContentFolder, zipTemp);
 
                 // Upload the zip with an expiry
                 MarkCompleteTask("Publishing zip file...");
@@ -201,7 +197,7 @@ namespace Hood.Services
 
                 // Send email to site email with the export link in it.
                 MarkCompleteTask("Sending file link via email...");
-                BasicSettings settings = _settings.GetBasicSettings();
+                BasicSettings settings = Engine.Settings.Basic;
                 if (settings.Email.IsSet())
                 {
                     MailObject mail = new MailObject()
@@ -247,9 +243,8 @@ namespace Hood.Services
 
         public bool IsComplete()
         {
-            bool running = false;
             Lock.AcquireWriterLock(Timeout.Infinite);
-            running = Status.Running;
+            bool running = Status.Running;
             Lock.ReleaseWriterLock();
             return !running;
         }
@@ -265,10 +260,9 @@ namespace Hood.Services
         }
         public ContentExporterReport Report()
         {
-            ContentExporterReport report = new ContentExporterReport();
             Lock.AcquireWriterLock(Timeout.Infinite);
             Status.PercentComplete = Status.Tasks == 0 ? 0 : (Status.CompletedTasks / Status.Tasks) * 100;
-            report = Status;
+            ContentExporterReport report = Status;
             Lock.ReleaseWriterLock();
             return report;
         }
@@ -285,19 +279,19 @@ namespace Hood.Services
 
             CheckForCancel();
 
-            if (!Directory.Exists(_tempFolder))
-                Directory.CreateDirectory(_tempFolder);
-            if (!Directory.Exists(_contentFolder))
-                Directory.CreateDirectory(_contentFolder);
+            if (!Directory.Exists(TempFolder))
+                Directory.CreateDirectory(TempFolder);
+            if (!Directory.Exists(ContentFolder))
+                Directory.CreateDirectory(ContentFolder);
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(_contentFolder);
+            DirectoryInfo directoryInfo = new DirectoryInfo(ContentFolder);
             FileInfo[] oldFiles = directoryInfo.GetFiles();
             foreach (FileInfo fi in oldFiles)
             {
                 // Delete the files in the directory. 
                 fi.Delete();
             }
-            directoryInfo = new DirectoryInfo(_tempFolder);
+            directoryInfo = new DirectoryInfo(TempFolder);
             oldFiles = directoryInfo.GetFiles();
             foreach (FileInfo fi in oldFiles)
             {
@@ -306,7 +300,7 @@ namespace Hood.Services
             }
         }
 
-        private void ResetImporter(HttpContext context)
+        private void ResetImporter()
         {
             Lock.AcquireWriterLock(Timeout.Infinite);
             Status = new ContentExporterReport()
@@ -322,9 +316,7 @@ namespace Hood.Services
                 FileError = false,
                 HasFile = false
             };
-            Account = context.GetAccountInfo();
             Status.Message = "Starting import, loading property files from FTP Service...";
-            _propertySettings = _settings.GetPropertySettings();
 
             // Get a new instance of the HoodDbContext for this import.
             var options = new DbContextOptionsBuilder<HoodDbContext>();
@@ -335,9 +327,8 @@ namespace Hood.Services
 
         private bool IsRunning()
         {
-            bool isRunning = false;
             Lock.AcquireWriterLock(Timeout.Infinite);
-            isRunning = Status.Running;
+            bool isRunning = Status.Running;
             Lock.ReleaseWriterLock();
             return isRunning;
         }
@@ -354,20 +345,20 @@ namespace Hood.Services
         private void CheckForCancel()
         {
             Lock.AcquireWriterLock(Timeout.Infinite);
-            _killFlag = Status.Cancelled;
+            KillFlag = Status.Cancelled;
             Lock.ReleaseWriterLock();
-            if (_killFlag)
+            if (KillFlag)
                 throw new Exception("Action cancelled...");
         }
 
         private void SaveFileToTemp(string url, string uniqueId)
         {
-            if (!Directory.Exists(_contentFolder))
-                Directory.CreateDirectory(_contentFolder);
+            if (!Directory.Exists(ContentFolder))
+                Directory.CreateDirectory(ContentFolder);
 
             using (var client = new WebClient())
             {
-                client.DownloadFile(url, _contentFolder + uniqueId);
+                client.DownloadFile(url, ContentFolder + uniqueId);
             }
         }
 

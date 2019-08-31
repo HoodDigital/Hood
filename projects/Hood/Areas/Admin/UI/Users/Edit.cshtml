@@ -1,311 +1,401 @@
-@using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-@model EditUserModel
+@model UserProfile
 @{
-    ViewBag.Title = "Edit User: " + Model.User.UserName;
-    BasicSettings _basicSettings = _settings.GetBasicSettings();
+    ViewBag.Title = "Edit User: " + Model.UserName;
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+    var stripeUrl = string.Format("https://dashboard.stripe.com{0}", Engine.Settings.Billing.EnableStripeTestMode ? "/test" : "");
 }
 @section buttons {
-    @if (Model.User.StripeId.IsSet())
-    {
-        <a class="btn btn-info" target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/customers/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", Model.User.StripeId)">
-            <i class="fa fa-cc-stripe"></i><span>&nbsp;View on Stripe</span>
-        </a>
-    }
-    <a class="btn btn-default reset-password"><i class="fa fa-lock"></i> Reset Password</a>
-    <a class="btn btn-warning" asp-action="Impersonate" asp-route-id="@Model.User.Id"><i class="fa fa-user-secret"></i> Impersonate</a>
     <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item user-reset-password" asp-action="ResetPassword" asp-route-id="@Model.Id"><i class="fa fa-lock"></i> Reset Password</a>
+        <a class="dropdown-item" asp-action="Impersonate" asp-route-id="@Model.Id"><i class="fa fa-user-secret"></i> Impersonate User</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item user-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete User</a>
+    </div>
 }
 @section breadcrumbs {
-    <ol class="breadcrumb">
-        <li>
-            <a href="/admin">Home</a>
-        </li>
-        <li>
-            <a asp-action="Index" asp-controller="Users" asp-route-area="Admin">
-                <i class="fa fa-users"></i> Users
-            </a>
-        </li>
-        <li class="active">
-            <strong>@ViewBag.Title</strong>
-        </li>
-    </ol>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Users" asp-route-area="Admin"><i class="fa fa-users"></i> Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+        </ol>
+    </nav>
 }
-@if (Model.SaveMessage.IsSet())
-{
-    @Html.BootstrapAlert(Model.SaveMessage, Model.MessageType);
-}
-<form asp-action="Edit" asp-route-id="@Model.User.Id" method="post" id="edit-user-form" data-id="@Model.User.Id">
-    <div class="row">
-        <div class="col-md-8">
-            <div class="tabs-container m-b-lg">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#info" aria-expanded="true"> Basics</a></li>
-                    <li><a data-toggle="tab" href="#socials"> Socials</a></li>
-                    <li><a data-toggle="tab" href="#bio"> Bio</a></li>
-                    <li><a data-toggle="tab" href="#subscriptions"> Subscriptions</a></li>
-                    <li><a data-toggle="tab" href="#accesscodes"> Access codes</a></li>
+<alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="edit-user-form" data-id="@Model.Id" class="container ml-md-0 p-0">
+    <div class="card">
+        <div class="card-header">
+            <div class="row align-items-center">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">
+                            Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="roles-tab" data-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="false">
+                            Roles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
+                            Addresses
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="subscriptions-tab" data-toggle="tab" href="#subscriptions" role="tab" aria-controls="subscriptions" aria-selected="false">
+                            Subscriptions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="codes-tab" data-toggle="tab" href="#codes" role="tab" aria-controls="codes" aria-selected="false">
+                            Access codes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">
+                            Notes
+                        </a>
+                    </li>
                 </ul>
-                <div class="tab-content">
-                    <div id="info" class="tab-pane active">
-                        <div class="panel-body">
-                            <h5>Basic Profile &amp; Contact Info</h5>
-                            <fieldset class="form-horizontal">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.UserName"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.UserName">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.Email"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.Email">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.FirstName"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.FirstName">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.LastName"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.LastName">
-                                    </div>
-                                </div>
-                                <hr />
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.CompanyName"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.CompanyName">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.JobTitle"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.JobTitle">
-                                    </div>
-                                </div>
-                                <hr />
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.ForumSignature"></label>
-                                    <div class="col-sm-8">
-                                        <textarea type="text" class="form-control" asp-for="User.ForumSignature"></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">Anonymous:</label>
-                                    <div class="col-sm-8">
-                                        <div class="checkbox">
-                                            <input class="styled" asp-for="User.Anonymous" type="checkbox" />
-                                            <label for="User.Anonymous">
-                                                Anonymous
-                                                <small>
-                                                    <strong><i class="fa fa-info m-l-sm m-r-xs"></i>If set, user will details will not show up in forums or on the site.</strong>
-                                                </small>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </div>
-                    <div id="socials" class="tab-pane">
-                        <div class="panel-body">
-                            <h5>
-                                Social Media Accounts
-                            </h5>
-                            <fieldset class="form-horizontal">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.Facebook"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.Facebook">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.GooglePlus"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.GooglePlus">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.LinkedIn"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.LinkedIn">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.Twitter"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.Twitter">
-                                    </div>
-                                </div>
-                            </fieldset>
-                            <hr />
-                            <fieldset class="form-horizontal">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.TwitterHandle"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.TwitterHandle">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label" asp-for="User.WebsiteUrl"></label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="form-control" asp-for="User.WebsiteUrl">
-                                    </div>
-                                </div>
-                            </fieldset>
-                        </div>
-                    </div>
-                    <div id="bio" class="tab-pane">
-                        <div class="panel-body">
-                            <h5>
-                                Bio and Notes
-                            </h5>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="User.Bio"></label>
-                                <div class="">
-                                    <textarea type="text" class="form-control" asp-for="User.Bio"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" asp-for="User.Notes"></label>
-                                <div class="">
-                                    <textarea type="text" class="form-control" asp-for="User.Notes"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="subscriptions" class="tab-pane">
-                        <div class="panel-body">
-                            <h5>Active Subscriptions</h5>
-                            <div class="tag-list">
-                                @{ var subs = Model.User.Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing"); }
-                                @foreach (var sub in subs)
-                                {
-                                    <ul>
-                                        <li>
-                                            <div class="pull-right">
-                                                <a class="btn btn-info btn-xs" target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/subscriptions/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", sub.StripeId)">View on Stripe</a>
-                                            </div>
-                                            <p>
-                                                @sub.StripeId -
-                                                @if (sub.Status == "active")
-                                                {
-                                                    <span class="label label-success">@sub.Status</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="label label-warning">@sub.Status</span>
-                                                }
-                                                <span class="label label-default">Next cycle: @sub.CurrentPeriodEnd.Value.ToDisplay()</span>
-                                            </p>
-                                        </li>
-                                    </ul>
-                                }
-                                @if (subs.Count() == 0)
-                                {
-                                    @Html.BootstrapAlert("No active subscriptions.", AlertType.Info, false)
-                                }
-                            </div>
-                            <hr />
-                            <h5>Inactive Subscriptions</h5>
-                            <div class="tag-list">
-                                @{ subs = Model.User.Subscriptions.Where(s => s.Status != "active" && s.Status != "trialing"); }
-                                @foreach (var sub in subs)
-                                {
-                                    <ul>
-                                        <li>
-                                            <div class="pull-right">
-                                                <a class="btn btn-danger btn-xs" asp-action="CancelUserSubscription" id="@sub.SubscriptionId">Cancel Subscription</a>
-                                                <a class="btn btn-info btn-xs" target="_blank" href="@string.Format("https://dashboard.stripe.com{0}/subscriptions/{1}", _settings.GetBillingSettings().EnableStripeTestMode? "/test" : "", sub.StripeId)">View on Stripe</a>
-                                            </div>
-                                            <p>
-                                                @sub.StripeId -
-                                                @if (sub.Status == "active")
-                                                {
-                                                    <span class="label label-success">@sub.Status</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="label label-warning">@sub.Status</span>
-                                                }
-                                                <span class="label label-default">Next cycle: @sub.CurrentPeriodEnd.Value.ToDisplay()</span>
-                                            </p>
-                                        </li>
-                                    </ul>
-                                }
-                                @if (subs.Count() == 0)
-                                {
-                                    @Html.BootstrapAlert("No inactive subscriptions.", AlertType.Info, false)
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    <div id="accesscodes" class="tab-pane">
-                        <div class="panel-body">
-                            <h5>Access Codes</h5>
-
-                            <div class="tag-list">
-                                @foreach (var code in Model.User.AccessCodes)
-                                {
-                                    <ul>
-                                        <li>
-                                            <p>
-                                                @code.Type - @code.Code - @code.Expiry.ToDisplay()
-                                            </p>
-                                        </li>
-                                    </ul>
-                                }
-                                @if (Model.User.AccessCodes.Count() == 0)
-                                {
-                                    @Html.BootstrapAlert("No access codes.", AlertType.Info, false)
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="panel-body">
-                <h4 class="font-bold text-center">
-                    <span>@Model.User.FullName</span>
-                </h4>
-                <p class="no-margin">
-                    <button type="submit" class="btn btn-success btn-block no-margin"><i class="fa fa-save m-r-xs"></i> Save User Profile</button>
-                </p>
-            </div>
-            <div class="panel-body small">
-                <h4>Avatar</h4>
-                <fieldset class="form-horizontal">
-                    <div class="form-group row-center">
-                        <label class="col-sm-3 text-right">Avatar</label>
-                        <div class="col-sm-8">
-                            <fixedImage src="@Model.User.Avatar.SmallUrl" class="img-xs img-circle m-r-sm @Model.User.Id" id="user-edit-avatar" />
-                            <attacher dataid="@Model.User.Id" entity="ApplicationUser" field="Avatar" type="image" refresh="/admin/users/getavatar" tag="@Model.User.Id" class="btn btn-xs btn-primary">Choose profile image...</attacher>
-                            <a class="btn btn-xs btn-danger hood-inline-task" asp-action="ClearImage" asp-controller="Users" asp-area="Admin" asp-route-id="@Model.User.Id" data-complete="$.hood.Uploader.RefreshImage('.@Model.User.Id', '/admin/users/getavatar', '@Model.User.Id')"><i class="fa fa-trash"></i></a>
+        <div class="card-body p-0">
+            <div class="tab-content">
+                <div id="profile" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="profile-tab">
+                    <div class="form-group floating-label">
+                        <label asp-for="UserName"></label>
+                        <input type="text" class="form-control" asp-for="UserName">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="Email"></label>
+                        <input type="text" class="form-control" asp-for="Email">
+                        @if (Model.PhoneNumberConfirmed)
+                        {
+                            <small class="text-success"><i class="fa fa-info-circle mr-2"></i>This email is confirmed.</small>
+                        }
+                        else
+                        {
+                            <small class="text-danger"><i class="fa fa-info-circle mr-2"></i>This email is not confirmed.</small>
+                        }
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="PhoneNumber"></label>
+                        <input type="text" class="form-control" asp-for="PhoneNumber">
+                        @if (Model.PhoneNumberConfirmed)
+                        {
+                            <small class="text-success"><i class="fa fa-info-circle mr-2"></i>This phone number is confirmed.</small>
+                        }
+                        else
+                        {
+                            <small class="text-danger"><i class="fa fa-info-circle mr-2"></i>This phone number is not confirmed.</small>
+                        }
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="FirstName"></label>
+                        <input type="text" class="form-control" asp-for="FirstName">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="LastName"></label>
+                        <input type="text" class="form-control" asp-for="LastName">
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input asp-for="Anonymous" class="custom-control-input">
+                            <label asp-for="Anonymous" class="custom-control-label"></label>
+                        </div>
+                        <small asp-for="Anonymous"></small>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input asp-for="MarketingEmails" class="custom-control-input">
+                            <label asp-for="MarketingEmails" class="custom-control-label"></label>
+                        </div>
+                        <small asp-for="MarketingEmails"></small>
+                    </div>
+                    <hr class="mt-4 mb-4" />
+                    <input type="hidden" asp-for="AvatarJson">
+                    <div class="form-group row align-items-center">
+                        <div class="col-auto">
+                            <fixedImage src="@Model.Avatar.SmallUrl" class="img-sm img-circle m-0 Avatar" id="user-edit-avatar" />
+                        </div>
+                        <div class="col">
+                            <h6>Avatar</h6>
+                            <p class="m-0">
+                                <mediaAttach asp-for="Avatar" asp-entity="@nameof(ApplicationUser)" asp-id="@Model.Id" asp-filetype="Image" asp-json="AvatarJson">
+                                    Choose profile image...
+                                </mediaAttach>
+                            </p>
                         </div>
                     </div>
-                </fieldset>
-            </div>
-            <div class="panel-body small">
-                <h4>User Roles</h4>
-                <div class="category-list">
-                    @foreach (var role in Model.AllRoles)
-                    {
-                        <div class="checkbox">
-                            <input class="styled role-check" id="role-check-@role.Id" name="role-check-@role.Id" type="checkbox" data-id="@Model.User.Id" value="@role" @(Model.Roles.Contains(role.Name) ? "checked" : "")>
-                            <label for="category-check-@role.Id">
-                                @role.Name.CamelCaseToString()
-                            </label>
-                            @*<a class="btn btn-primary btn-sm delete-role" data-id="@role.Id"><i class="fa fa-plus-circle"></i> Delete role</a>*@
-                        </div>
-                    }
+                    <hr class="mt-4 mb-4" />
+                    <div class="form-group floating-label">
+                        <label asp-for="CompanyName"></label>
+                        <input type="text" class="form-control" asp-for="CompanyName">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="JobTitle"></label>
+                        <input type="text" class="form-control" asp-for="JobTitle">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label class="control-label" asp-for="Bio"></label>
+                        <textarea type="text" class="form-control" asp-for="Bio"></textarea>
+                    </div>
+                    <hr />
+                    <div class="form-group floating-label">
+                        <label asp-for="ForumSignature"></label>
+                        <textarea type="text" class="form-control" asp-for="ForumSignature"></textarea>
+                    </div>
+                    <hr class="mt-4 mb-4" />
+                    <div class="form-group floating-label">
+                        <label asp-for="Facebook"></label>
+                        <input type="text" class="form-control" asp-for="Facebook">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="Instagram"></label>
+                        <input type="text" class="form-control" asp-for="Instagram">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="LinkedIn"></label>
+                        <input type="text" class="form-control" asp-for="LinkedIn">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="Twitter"></label>
+                        <input type="text" class="form-control" asp-for="Twitter">
+                    </div>
+                    <hr class="mt-4 mb-4" />
+                    <div class="form-group floating-label">
+                        <label asp-for="TwitterHandle"></label>
+
+                        <input type="text" class="form-control" asp-for="TwitterHandle">
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="WebsiteUrl"></label>
+                        <input type="text" class="form-control" asp-for="WebsiteUrl">
+                    </div>
                 </div>
-                @*<a class="btn btn-primary btn-sm add-role"><i class="fa fa-plus-circle"></i> Add new site role</a>*@
+                <div id="address" class="tab-pane p-4" role="tabpanel" aria-labelledby="address-tab">
+                </div>
+                <div id="roles" class="tab-pane" role="tabpanel" aria-labelledby="roles-tab">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <h5 class="m-0 text-success">User Roles</h5>
+                        </div>
+                        @foreach (var role in Model.AllRoles)
+                        {
+                            <div class="list-group-item list-group-item-action p-3 pt-2 pb-2">
+                                <div class="form-group m-0">
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input user-role-check"
+                                               id="role-check-@role.Id"
+                                               name="role-check-@role.Id"
+                                               type="checkbox"
+                                               data-url="@Url.Action("SetRole", new { id = Model.Id })"
+                                               value="@role"
+                                               @(Model.Roles.Any(r => r.Name == role.Name) ? "checked" : "") />
+                                        <label class="custom-control-label d-block" for="role-check-@role.Id">
+                                            @role.Name.CamelCaseToString()
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <div class="list-group-item list-group-item-action">
+                            <a class="stretched-link text-success text-decoration-none" href="CreateRole"><i class="fa fa-plus-circle mr-2"></i>Add new site role</a>
+                        </div>
+                    </div>
+                </div>
+                <div id="subscriptions" class="tab-pane" role="tabpanel" aria-labelledby="subscriptions-tab">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item  p-3">
+                            @if (Model.Customer == null)
+                            {
+                                if (Model.MatchedCustomerObjects == null || Model.MatchedCustomerObjects.Count() == 0)
+                                {
+                                    <alert type="Warning" size="Medium" icon="fa-exclamation-triangle" class="m-0">
+                                        There is no Stripe customer account associated with this user account.
+                                    </alert>
+                                }
+                                else
+                                {
+                                    <alert type="Info" size="Large" icon="fa-info-circle" class="m-0">
+                                        <p>We found a matching Stripe customer account, but it is not attached to this user. Attach it now?</p>
+                                        @foreach (var match in Model.MatchedCustomerObjects)
+                                        {
+                                            <p class="m-0">
+                                                <span class="font-weight-bold">Customer Id: @match.Id</span>
+                                                <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, match.Id)">
+                                                    <i class="fa fa-external-link-alt mr-2"></i>Stripe
+                                                </a>
+                                                <a class="btn btn-sm btn-success" asp-action="LinkToStripe" asp-route-id="@Model.Id" asp-route-customerId="@match.Id">
+                                                    <i class="fa fa-link mr-2"></i>Link to Stripe
+                                                </a>
+                                            </p>
+                                        }
+                                    </alert>
+                                }
+                            }
+                            else
+                            {
+                                <alert type="Success" size="Medium" icon="fa-thumbs-up" class="m-0">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            The Stripe customer account (@Model.StripeId) is linked correctly to this account.
+                                        </div>
+                                        <div class="col-auto text-right">
+                                            <a class="btn btn-success" target="_blank" href="@string.Format("{0}/customers/{1}", stripeUrl, Model.StripeId)">
+                                                <i class="fa fa-external-link-alt"></i><span>&nbsp;View on Stripe</span>
+                                            </a>
+                                        </div>
+                                    </div>                                
+                                </alert>
+                            }
+                        </div>
+                        <div class="list-group-item">
+                            <h5 class="m-0 text-success">Active Subscriptions</h5>
+                        </div>
+                        @{ var subs = Model.Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing"); }
+                        @foreach (var sub in subs)
+                        {
+                            <div class="list-group-item list-group-item-action">
+                                <div class=" row align-items-center">
+                                    <div class="col">
+                                        <p class=" m-0">
+                                            <strong>@sub.Name</strong> <small class="text-info">@sub.StripeId</small>
+                                        </p>
+                                        <p class="mb-0">
+                                            @if (sub.Status == "active")
+                                            {
+                                                <span class="badge-success badge">@sub.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">@sub.Status</span>
+                                            }
+                                            <span class="badge badge-default">Next cycle: @sub.CurrentPeriodEnd</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a class="btn btn-danger btn-sm" asp-action="CancelUserSubscription" id="@sub.StripeSubscriptionId">
+                                            <i class="fa fa-minus-circle mr-2"></i>Cancel
+                                        </a>
+                                        <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, sub.StripeSubscriptionId)">
+                                            <i class="fa fa-external-link-alt mr-2"></i>Stripe
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (subs.Count() == 0)
+                        {
+                            <div class="list-group-item">
+                                <p class="m-0 text-muted">No active subscriptions.</p>
+                            </div>
+                        }
+                        <div class="list-group-item">
+                            <h5 class="m-0 text-danger">Inactive Subscriptions</h5>
+                        </div>
+                        @{ subs = Model.Subscriptions.Where(s => s.Status != "active" && s.Status != "trialing"); }
+                        @foreach (var sub in subs)
+                        {
+                            <div class="list-group-item list-group-item-action">
+                                <div class=" row align-items-center">
+                                    <div class="col">
+                                        <p class=" m-0">
+                                            <strong>@sub.Name</strong> <small class="text-info">@sub.StripeId</small>
+                                        </p>
+                                        <p class="mb-0">
+                                            @if (sub.Status == "active")
+                                            {
+                                                <span class="badge-success badge">@sub.Status</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">@sub.Status</span>
+                                            }
+                                            <span class="badge badge-default">Next cycle: @sub.CurrentPeriodEnd</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a class="btn btn-info btn-sm" target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, sub.StripeSubscriptionId)">
+                                            <i class="fa fa-external-link-alt mr-2"></i>Stripe
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (subs.Count() == 0)
+                        {
+                            <div class="list-group-item">
+                                <p class="m-0 text-muted">No inactive subscriptions.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div id="codes" class="tab-pane" role="tabpanel" aria-labelledby="codes-tab">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <h5 class="m-0 text-success">Access Codes</h5>
+                        </div>
+                        @foreach (var code in Model.AccessCodes)
+                        {
+                            <div class="list-group-item list-group-item-action">
+                                <div class=" row align-items-center">
+                                    <div class="col">
+                                        <p class=" m-0">
+                                            <strong>@code.Code</strong> <small class="text-info">Expires @code.Expiry.ToDisplay()</small>
+                                        </p>
+                                        <p class="mb-0">
+                                            @if (code.Used)
+                                            {
+                                                <span class="badge-success badge">Used on @code.DateUsed.ToDisplay()</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-warning">Unused</span>
+                                            }
+                                            <span class="badge badge-default">Type: @code.Type</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-auto">
+                                        <a class="btn btn-danger btn-sm" target="_blank" asp-action="DeleteAccessCode" asp-route-id="@code.Id">
+                                            <i class="fa fa-external-link-alt mr-2"></i>Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (Model.AccessCodes.Count() == 0)
+                        {
+                            <div class="list-group-item">
+                                <p class="m-0 text-muted">No access codes created.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div id="notes" class="tab-pane" role="tabpanel" aria-labelledby="notes-tab">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <h5 class="m-0 text-success">User Notes</h5>
+                        </div>
+                        <div id="user-notes" class="hood-inline" data-url="@Url.Action("Notes", new { id = Model.Id })">
+                            <partial name="_Inline_Notes" />
+                        </div>
+                        @if (subs.Count() == 0)
+                        {
+                            <div class="list-group-item">
+                                <p class="m-0 text-muted">No notes created.</p>
+                            </div>
+                        }
+                        <div class="list-group-item list-group-item-action">
+                            <a class="stretched-link text-success text-decoration-none user-notes-add" asp-action="AddNote" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2"></i>Add note</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

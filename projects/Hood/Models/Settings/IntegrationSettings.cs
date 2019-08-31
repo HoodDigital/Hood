@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using Hood.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,15 +9,6 @@ namespace Hood.Models
     [Serializable]
     public class IntegrationSettings : SaveableModel
     {
-        // Loading Animations
-        [Display(Name = "Enable Loading Animation")]
-        public bool LoadingAnimation { get; set; }
-        [Display(Name = "Loading Animation")]
-        public string LoadingAnimationType { get; set; }
-
-        [Display(Name = "Use Hood CDN")]
-        public bool UseCDN { get; set; }
-
         // Twitter Feed
         [Display(Name = "Twitter Feed")]
         public bool EnableTwitter { get; set; }
@@ -45,6 +37,28 @@ namespace Hood.Models
         [Display(Name = "Google API Key")]
         public string GoogleMapsApiKey { get; set; }
 
+        public bool IsGoogleMapsEnabled
+        {
+            get
+            {
+                return GoogleMapsApiKey.IsSet() && EnableGoogleMaps;
+            }
+        }
+        public bool IsGoogleGeocodingEnabled
+        {
+            get
+            {
+                return GoogleMapsApiKey.IsSet() && EnableGoogleGeocoding;
+            }
+        }
+        public bool IsGoogleRecaptchaEnabled
+        {
+            get
+            {
+                return GoogleRecaptchaSiteKey.IsSet() && GoogleRecaptchaSecretKey.IsSet() && EnableGoogleRecaptcha;
+            }
+        }
+
         // Google Analytics
         [Display(Name = "Google Analytics Code")]
         public string GoogleAnalytics { get; set; }
@@ -62,11 +76,6 @@ namespace Hood.Models
         public bool EnableChat { get; set; }
         [Display(Name = "Script for Chat Plugin")]
         public string ChatCode { get; set; }
-
-        public IntegrationSettings()
-        {
-            UseCDN = false;
-        }
     }
 
 }

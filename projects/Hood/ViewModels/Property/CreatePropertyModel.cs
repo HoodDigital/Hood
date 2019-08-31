@@ -1,9 +1,10 @@
-﻿using System;
-namespace Hood.Models
+﻿using Hood.Enums;
+using System;
+namespace Hood.ViewModels
 {
     public class CreatePropertyModel
     {
-        public int cpStatus { get; set; }
+        public ContentStatus cpStatus { get; set; }
         public string cpTitle { get; set; }
         public DateTime cpPublishDate { get; set; }
         public string cpType { get; set; }

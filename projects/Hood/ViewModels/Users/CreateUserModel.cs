@@ -1,4 +1,4 @@
-﻿namespace Hood.Models
+﻿namespace Hood.ViewModels
 {
     public class CreateUserModel
     {

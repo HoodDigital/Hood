@@ -10,6 +10,8 @@ namespace Hood.ViewModels
 
         public static string Index => "Index";
 
+        public static string Address => "Address";
+
         public static string ChangePassword => "ChangePassword";
 
         public static string ExternalLogins => "ExternalLogins";
@@ -19,6 +21,8 @@ namespace Hood.ViewModels
         public static string DeleteAccount => "DeleteAccount";
 
         public static string IndexNavClass(ViewContext viewContext) => PageNavClass(viewContext, Index);
+
+        public static string AddressNavClass(ViewContext viewContext) => PageNavClass(viewContext, Address);
 
         public static string ChangePasswordNavClass(ViewContext viewContext) => PageNavClass(viewContext, ChangePassword);
 

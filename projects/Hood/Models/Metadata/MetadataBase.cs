@@ -1,24 +1,13 @@
-﻿using Hood.Extensions;
-using Hood.Interfaces;
+﻿using Hood.Entities;
+using Hood.Extensions;
 using Newtonsoft.Json;
+using System.Linq;
 using System.Reflection;
 
 namespace Hood.Models
 {
-    public abstract class MetadataBase : IMetadata
+    public abstract class MetadataBase : BaseEntity, IMetadata
     {
-        public int Id { get; set; }
-        public string BaseValue { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public new System.Type GetType
-        {
-            get
-            {
-                Assembly a = Assembly.Load("Hood");
-                return a.GetType(Type);
-            }
-        }
         public MetadataBase()
         {
         }
@@ -27,6 +16,46 @@ namespace Hood.Models
             Type = type;
             Name = name;
             BaseValue = value;
+        }
+
+        public string BaseValue { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
+
+        public string InputId => $"Meta-{Name.ToSeoUrl()}";
+        public string InputName => $"Meta:{Name}";
+        public string InputDisplayName
+        {
+            get
+            {
+                if (IsTemplate)
+                {
+                    var name = Name.Split('.')[Name.Split('.').Length - 2].Replace("-", " ").CamelCaseToString().ToTitleCase();
+                    return $"{name} - {InputType}";
+                }
+
+                return Name.Split('.').Last().CamelCaseToString().ToTitleCase();
+            }
+        }
+        public string InputType
+        {
+            get
+            {
+                if (IsTemplate)
+                {
+                    return Name.Split('.')[Name.Split('.').Length - 1];
+                }
+
+                return Type;
+            }
+        }
+        public new System.Type GetType
+        {
+            get
+            {
+                Assembly a = Assembly.Load("Hood");
+                return a.GetType(Type);
+            }
         }
         public override string ToString()
         {
@@ -54,5 +83,8 @@ namespace Hood.Models
         {
             return JsonConvert.DeserializeObject<T>(BaseValue);
         }
+
+        public bool IsTemplate => Name.StartsWith("Template.");
+        public bool IsImageSetting => Name.StartsWith("Settings.Image.");
     }
 }

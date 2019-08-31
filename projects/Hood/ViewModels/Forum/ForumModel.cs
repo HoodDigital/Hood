@@ -1,17 +1,14 @@
 ﻿using Hood.Extensions;
 using Hood.Interfaces;
+using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
-namespace Hood.Models
+namespace Hood.ViewModels
 {
     public class ForumModel : PagedList<Forum>, IPageableModel
     {
         // Params
-        [FromQuery(Name = "sort")]
-        public string Order { get; set; }
-        [FromQuery(Name = "search")]
-        public string Search { get; set; }
         [FromQuery(Name = "category")]
         public string Category { get; set; }
         [FromQuery(Name = "author")]
@@ -19,13 +16,19 @@ namespace Hood.Models
 
         // Sidebar Stuff
         public List<Forum> Recent { get; set; }
+        [FromQuery(Name = "categories")]
+        public List<string> Categories { get; set; }
 
-        public string GetPageUrl(int pageIndex)
+        public override string GetPageUrl(int pageIndex)
         {
-            var query = string.Format("?page={0}&pageSize={1}", pageIndex, PageSize);
-            query += Search.IsSet() ? "&search=" + Search : "";
+            var query = base.GetPageUrl(pageIndex);
+            if (Categories != null)
+                foreach (var cat in Categories)
+                {
+                    query += "&categories=" + cat;
+                }
             query += Category.IsSet() ? "&category=" + Category : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
+            query += AuthorName.IsSet() ? "&author=" + AuthorName : "";
             return query;
         }
 

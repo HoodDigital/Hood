@@ -33,7 +33,6 @@ namespace Hood.Models
         public double Longitude { get; set; }
 
         public string UserId { get; set; }
-        [JsonConverter(typeof(ApplicationUserJsonConverter))]
         public ApplicationUser User { get; set; }
 
         public string FullAddress

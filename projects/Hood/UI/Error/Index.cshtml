@@ -1,0 +1,23 @@
+@model ErrorModel
+@{
+    Layout = "_Layout_Basic";
+}
+<div class="container">
+    @switch (Model.Code)
+    {
+        case 404:
+            ViewData["Title"] = "404 -Resource Not Found";
+            <h2 class="text-danger">We could not find that...</h2>
+            <p class="lead">It seems that the page you have requested does not exist, or has been removed. If this error continues to occur, please let us know so we can get it rectified as soon as possible. Thank you!</p>
+            break;
+        default:
+            ViewData["Title"] = "An error occurred.";
+            <h2 class="text-danger">Unfortunately, something seems to have gone wrong...</h2>
+            <p class="lead">If this error continues to occur, please let us know so we can get it rectified as soon as possible. Thank you!</p>
+            break;
+    }
+    @if (Model.Error != null)
+    {
+        @Html.Raw(@Model.Error.Message.ToHtml())
+    }
+</div>

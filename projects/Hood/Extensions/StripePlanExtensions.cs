@@ -1,6 +1,4 @@
-﻿using Stripe;
-
-namespace Hood.Models
+﻿namespace Hood.Models
 {
     public static class StripePlanExtensions
     {

@@ -1,10 +1,9 @@
-﻿using Hood.Controllers;
+﻿using Hood.Core;
+using Hood.Controllers;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Mail;
 using System;
@@ -14,7 +13,7 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles="SuperUser,Admin")]
-    public class MailController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public class MailController : BaseController
     {
         public MailController()
             : base()
@@ -57,18 +56,23 @@ namespace Hood.Areas.Admin.Controllers
                 mail.PreHeader = "This is a test email from HoodCMS.";
                 mail.Template = template;
                 await _emailSender.SendEmailAsync(mail);
-                return RedirectToAction("Mail", "Settings", new { status = EditorMessage.Sent });
+
+                SaveMessage = $"Test message sent to {email}.";
+                MessageType = AlertType.Success;
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Mail", "Settings", new { status = EditorMessage.ErrorSending });
+                SaveMessage = $"Error sending test email to {email}.";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<MailController>(SaveMessage, ex);
             }
+            return RedirectToAction("Mail", "Settings");
         }
 
         [Route("hood/test-email-full/")]
         public IActionResult Terms()
         {
-            var mailSettings = _settings.GetMailSettings();
+            var mailSettings = Engine.Settings.Mail;
             var mail = GetDemoMail();
 
             mail.Subject = "Testing basic email sends";

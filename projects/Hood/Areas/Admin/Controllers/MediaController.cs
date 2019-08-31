@@ -1,13 +1,14 @@
 ﻿using Hood.Controllers;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
+using Hood.Services;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,222 +17,282 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor,Manager")]
-    public class MediaController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    [Authorize(Roles = "SuperUser,Admin,Editor")]
+    public class MediaController : BaseController
     {
         public MediaController()
             : base()
         {
         }
 
-        [Route("admin/media/")]
-        public async Task<IActionResult> Index()
+        [Route("admin/media/list/")]
+        public async Task<IActionResult> List(MediaListModel model, string viewName = "_List_Media")
         {
-            ManageMediaModel model = new ManageMediaModel()
-            {
-                Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync()
-            };
-            if (!model.Directories.Contains("Default"))
-                model.Directories.Add("Default");
-            return View(model);
-        }
+            IQueryable<MediaObject> media = _db.Media.AsQueryable();
 
-        [Route("admin/media/directories/")]
-        public async Task<IActionResult> Directories()
-        {
-            ManageMediaModel model = new ManageMediaModel()
+            if (model.GenericFileType.HasValue)
             {
-                Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync()
-            };
-            if (!model.Directories.Contains("Default"))
-                model.Directories.Add("Default");
-            return View(model);
-        }
-
-        [HttpGet]
-        [Route("admin/media/get/")]
-        public async Task<JsonResult> Get(ListFilters request, string search, string sort, string type, string directory, string container = "mediaitem")
-        {
-            IList<MediaObject> media = new List<MediaObject>();
-            if (!string.IsNullOrEmpty(type))
-            {
-                media = await _db.Media.Where(m => m.GeneralFileType == type).ToListAsync();
+                media = media.Where(m => m.GenericFileType == model.GenericFileType);
             }
             else
             {
-                media = await _db.Media.Where(m => m.GeneralFileType != GenericFileType.Directory.ToString()).ToListAsync();
+                media = media.Where(m => m.GenericFileType != GenericFileType.Directory);
             }
-            if (!string.IsNullOrEmpty(directory))
+
+            if (model.DirectoryId.HasValue)
             {
-                media = media.Where(n => n.Directory == directory).ToList();
+                var directory = _directoryManager.GetDirectoryById(model.DirectoryId.Value);
+                if (directory != null)
+                {
+                    var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
+                    media = media.Where(n => tree.Any(t => t.Id == n.DirectoryId));
+                }
             }
-            if (!string.IsNullOrEmpty(search))
+            else
             {
-                string[] searchTerms = search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                media = media.Where(n => searchTerms.Any(s => n.Filename.ToLower().Contains(s.ToLower()))).ToList();
+                var directory = await _db.MediaDirectories.SingleOrDefaultAsync(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
+                directory = _directoryManager.GetDirectoryById(directory.Id);
+                var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
+                media = media.Where(n => tree.Any(t => t.Id == n.DirectoryId));
+                model.DirectoryId = directory.Id;
             }
-            switch (sort)
+
+            if (model.UserId.IsSet())
+            {
+                media = media.Where(n => n.Directory.OwnerId == model.UserId);
+            }
+
+            if (model.Search.IsSet())
+            {
+                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                media = media.Where(n => searchTerms.Any(s => n.Filename.ToLower().Contains(s.ToLower())));
+            }
+
+            switch (model.Order)
             {
                 case "Size":
-                    media = media.OrderBy(n => n.FileSize).ToList();
+                    media = media.OrderBy(n => n.FileSize);
                     break;
                 case "Filename":
-                    media = media.OrderBy(n => n.Filename).ToList();
+                    media = media.OrderBy(n => n.Filename);
                     break;
                 case "Date":
-                    media = media.OrderBy(n => n.CreatedOn).ToList();
+                    media = media.OrderBy(n => n.CreatedOn);
                     break;
 
                 case "SizeDesc":
-                    media = media.OrderByDescending(n => n.FileSize).ToList();
+                    media = media.OrderByDescending(n => n.FileSize);
                     break;
                 case "FilenameDesc":
-                    media = media.OrderByDescending(n => n.Filename).ToList();
+                    media = media.OrderByDescending(n => n.Filename);
                     break;
                 case "DateDesc":
-                    media = media.OrderByDescending(n => n.CreatedOn).ToList();
+                    media = media.OrderByDescending(n => n.CreatedOn);
                     break;
 
                 default:
-                    media = media.OrderByDescending(n => n.CreatedOn).ToList();
+                    media = media.OrderByDescending(n => n.CreatedOn);
                     break;
             }
-            Response response = new Response(media.Skip(request.skip).Take(request.take).ToArray(), media.Count());
-            JsonSerializerSettings settings = new JsonSerializerSettings()
-            {
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc
-            };
-            return Json(response, settings);
+
+            await model.ReloadAsync(media);
+            model.TopLevelDirectories = GetDirectoriesForCurrentUser();
+            return View(viewName, model);
         }
 
-        [HttpGet]
-        [Route("admin/media/getdirectories/")]
-        public async Task<IEnumerable<string>> GetDirectories(bool normalised = false)
+        [Route("admin/media/")]
+        public async Task<IActionResult> Index(MediaListModel model)
         {
-            List<string> dirs = await _db.Media.Select(u => u.Directory).Distinct().OrderBy(s => s).ToListAsync();
-            if (!dirs.Contains("Default"))
-                dirs.Add("Default");
-            return dirs;
+            return await List(model, "Index");
         }
 
-        [Route("admin/media/adddirectory/")]
-        public async Task<Response> AddDirectory(string directory)
+        [Route("admin/media/action/")]
+        public async Task<IActionResult> Action(MediaListModel model)
         {
-            try
-            {
-                MediaObject newMedia = new MediaObject()
-                {
-                    BlobReference = "",
-                    CreatedOn = DateTime.Now,
-                    Filename = directory,
-                    FileSize = 0,
-                    FileType = "directory/dir",
-                    GeneralFileType = GenericFileType.Directory.ToString(),
-                    SmallUrl = "",
-                    MediumUrl = "",
-                    LargeUrl = "",
-                    Directory = directory,
-                    Url = ""
-                };
-                _db.Media.Add(newMedia);
-                await _db.SaveChangesAsync();
-                return new Models.Response(true);
-            }
-            catch (Exception ex)
-            {
-                return new Models.Response(ex.Message);
-            }
-
+            return await List(model, "Action");
         }
 
-        [HttpGet]
-        [Route("admin/media/getbyid/")]
-        public async Task<JsonResult> GetById(int id)
+        [Route("admin/media/blade/")]
+        public async Task<IActionResult> Blade(int id)
         {
-            IList<MediaObject> media = await _db.Media.Where(u => u.Id == id).ToListAsync();
-            return Json(media.ToArray());
+            MediaObject media = await _db.Media.Include(m => m.Directory).SingleOrDefaultAsync(u => u.Id == id);
+            return View("_Blade_Media", media);
         }
 
-        [HttpPost()]
+        [HttpPost]
         [Route("admin/media/delete/")]
         public async Task<Response> Delete(int id)
         {
             try
             {
-                var media = _db.Media.SingleOrDefault(m => m.Id == id);
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == id);
                 try { await _media.DeleteStoredMedia(media); } catch (Exception) { }
                 _db.Media.Remove(media);
                 await _db.SaveChangesAsync();
-                return new Response(true);
+                _directoryManager.ResetCache();
+                return new Response(true, $"The media has been deleted.");
             }
             catch (Exception ex)
             {
-                return new Response(ex.Message);
+                return await ErrorResponseAsync<MediaController>($"Error deleting a media object.", ex);
             }
         }
 
-        [HttpPost()]
-        [Route("admin/media/directory/delete")]
-        public async Task<Response> DeleteDirectory(string directory)
+        #region Directories
+        [Route("admin/media/directories/list/")]
+        public IActionResult Directories(MediaListModel model)
         {
-            try
+            model.TopLevelDirectories = GetDirectoriesForCurrentUser();
+            return View("_List_Directories", model);
+        }
+
+        private IEnumerable<MediaDirectory> GetDirectoriesForCurrentUser()
+        {
+            if (User.IsAdminOrBetter())
             {
-                var directoryList = _db.Media.AsQueryable();
-                if (directory.IsSet())
-                    directoryList = directoryList.Where(m => m.Directory == directory);
-
-                foreach (var media in directoryList)
-                {
-                    try { await _media.DeleteStoredMedia(media); } catch (Exception) { }
-                    _db.Entry(media).State = EntityState.Deleted;
-                }
-
-                await _db.SaveChangesAsync();
-                return new Response(true);
+                return _directoryManager.TopLevel();
             }
-            catch (Exception ex)
+            else if (User.IsEditorOrBetter())
             {
-                return new Response(ex.Message);
+                return _directoryManager.MediaDirectories();
+            }
+            else
+            {
+                return _directoryManager.UserDirectories(User.GetUserId());
             }
         }
 
-
-        [Route("admin/media/blade/{id}/")]
-        public async Task<IActionResult> Blade(int id)
+        [Route("admin/media/directory/create/")]
+        public IActionResult CreateDirectory()
         {
-            MediaObject media = await _db.Media.SingleAsync(m => m.Id == id);
-            return View(media);
-        }
-
-        // THIS HANDLES THE CHOOSE-ATTACH FUNCTION ON THE UPLOADER
-        [Route("admin/media/attach/")]
-        public async Task<IActionResult> AttachLoad(AttachMediaModel attach)
-        {
-            attach.Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync();
-            if (!attach.Directories.Contains("Default"))
-                attach.Directories.Add("Default");
-            return View(attach);
+            MediaDirectory model = new MediaDirectory
+            {
+                TopLevelDirectories = GetDirectoriesForCurrentUser()
+            };
+            return View("_Blade_Directory", model);
         }
 
         [HttpPost]
+        [Route("admin/media/directory/create/")]
+        public async Task<Response> CreateDirectory(MediaDirectory model)
+        {
+            try
+            {
+                if (!model.ParentId.HasValue)
+                {
+                    throw new Exception("You must select a parent directory to create your directory in.");
+                }
+
+                MediaDirectory parentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Id == model.ParentId.Value);
+                if (parentDirectory == null)
+                {
+                    throw new Exception($"The parent directory with id {model.ParentId} could not be found.");
+                }
+
+                MediaDirectory root = _directoryManager.GetTopLevelDirectory(parentDirectory.Id);
+                if (root.Type != DirectoryType.System || root.Slug != MediaManager.SiteDirectorySlug)
+                {
+                    throw new Exception("You cannot create directories outside the site media folders.");
+                }
+
+                if (!User.IsEditorOrBetter())
+                {
+                    if (root.Type != DirectoryType.System || root.Slug != MediaManager.UserDirectorySlug)
+                    {
+                        throw new Exception("You cannot create directories outside the user folders folders.");
+                    }
+
+                    if (parentDirectory.OwnerId != User.GetUserId())
+                    {
+                        throw new Exception("You cannot create directories outside your own folder.");
+                    }
+                }
+
+                model.OwnerId = User.GetUserId();
+                model.Type = DirectoryType.Site;
+                model.Slug = model.DisplayName.ToSeoUrl();
+
+                _db.MediaDirectories.Add(model);
+                await _db.SaveChangesAsync();
+                _directoryManager.ResetCache();
+                return new Response(true, "The directory has been created and you can add files to it right away.");
+            }
+            catch (Exception ex)
+            {
+                return new Response(ex.Message);
+            }
+
+        }
+
+        [HttpPost]
+        [Route("admin/media/directory/delete/")]
+        public async Task<Response> DeleteDirectory(int id)
+        {
+            try
+            {
+                MediaDirectory directory = await _db.MediaDirectories.Include(md => md.Children).SingleOrDefaultAsync(md => md.Id == id);
+
+                if (directory == null)
+                    throw new Exception("You have to select a directory to delete.");
+
+                if (directory.Type == DirectoryType.System)
+                    throw new Exception("You cannot delete a system directory.");
+
+                if (directory.Type == DirectoryType.User)
+                    throw new Exception("You cannot delete a user directory.");
+
+                IEnumerable<MediaDirectory> directories = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
+
+                foreach (MediaDirectory dir in directories)
+                {
+                    IQueryable<MediaObject> directoryList = _db.Media.AsQueryable();
+                    directoryList = directoryList.Where(m => m.DirectoryId == dir.Id);
+
+                    foreach (MediaObject media in directoryList)
+                    {
+                        try { await _media.DeleteStoredMedia(media); } catch (Exception) { }
+                        _db.Entry(media).State = EntityState.Deleted;
+                    }
+                }
+
+                directory.Children.ForEach(c => _db.Entry(c).State = EntityState.Deleted);
+                await _db.SaveChangesAsync();
+
+                _db.Entry(directory).State = EntityState.Deleted;
+                await _db.SaveChangesAsync();
+
+                _directoryManager.ResetCache();
+                return new Response(true, $"The directory has been deleted.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error deleting a directory.", ex);
+            }
+        }
+        #endregion
+
+        #region Attaching To Entities 
+        /// <summary>
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the CHOOSE -> ATTACH modal.
+        /// </summary>
+        [HttpPost]
         [Route("admin/media/attach/")]
-        public async Task<MediaResponse> Attach(AttachMediaModel attach)
+        public async Task<Response> Attach(MediaListModel model)
         {
             try
             {
                 // load the media object.
-                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == attach.MediaId);
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
                 string cacheKey;
-                switch (attach.Entity)
+                switch (model.Entity)
                 {
                     case "Content":
 
                         // create the new media item for content =>
-                        int contentId = int.Parse(attach.Id);
+                        int contentId = int.Parse(model.Id);
                         Content content = await _db.Content.Where(p => p.Id == contentId).FirstOrDefaultAsync();
 
-                        switch (attach.Field)
+                        switch (model.Field)
                         {
                             case "FeaturedImage":
                                 content.FeaturedImage = new ContentMedia(media);
@@ -241,18 +302,18 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
-                        await _db.SaveChangesAsync();
                         cacheKey = typeof(Content).ToString() + ".Single." + contentId;
                         _cache.Remove(cacheKey);
-                        return new MediaResponse(true, media);
+
+                        break;
 
                     case "Forum":
 
                         // create the new media item for content =>
-                        int forumId = int.Parse(attach.Id);
+                        int forumId = int.Parse(model.Id);
                         Forum forum = await _db.Forums.Where(p => p.Id == forumId).FirstOrDefaultAsync();
 
-                        switch (attach.Field)
+                        switch (model.Field)
                         {
                             case "FeaturedImage":
                                 forum.FeaturedImage = new ContentMedia(media);
@@ -262,15 +323,14 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
-                        await _db.SaveChangesAsync();
-                        return new MediaResponse(true, media);
+                        break;
 
                     case "ApplicationUser":
 
                         // create the new media item for content =>
-                        ApplicationUser user = await _db.Users.Where(p => p.Id == attach.Id).FirstOrDefaultAsync();
+                        ApplicationUser user = await _db.Users.Where(p => p.Id == model.Id).FirstOrDefaultAsync();
 
-                        switch (attach.Field)
+                        switch (model.Field)
                         {
                             case "Avatar":
                                 user.Avatar = media;
@@ -278,17 +338,17 @@ namespace Hood.Areas.Admin.Controllers
                         }
 
 
-                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + attach.Id;
+                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + model.Id;
                         _cache.Remove(cacheKey);
-                        await _db.SaveChangesAsync();
-                        return new MediaResponse(true, media);
+
+                        break;
 
                     case "PropertyListing":
 
-                        int propertyId = int.Parse(attach.Id);
+                        int propertyId = int.Parse(model.Id);
                         PropertyListing property = await _db.Properties.Where(p => p.Id == propertyId).FirstOrDefaultAsync();
 
-                        switch (attach.Field)
+                        switch (model.Field)
                         {
                             case "FeaturedImage":
                                 property.FeaturedImage = media;
@@ -298,104 +358,275 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
-                        await _db.SaveChangesAsync();
                         cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
                         _cache.Remove(cacheKey);
-                        return new MediaResponse(true, media);
+
+                        break;
+
+                    case nameof(Subscription):
+
+                        // create the new media item for content =>
+                        int subId = int.Parse(model.Id);
+                        Subscription subscription = await _db.Subscriptions.Where(p => p.Id == subId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(Subscription.FeaturedImage):
+                                subscription.FeaturedImage = media;
+                                break;
+                        }
+
+                        break;
+
+                    case nameof(SubscriptionProduct):
+
+                        // create the new media item for content =>
+                        int subgId = int.Parse(model.Id);
+                        SubscriptionProduct subscriptionGroup = await _db.SubscriptionProducts.Where(p => p.Id == subgId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(SubscriptionProduct.FeaturedImage):
+                                subscriptionGroup.FeaturedImage = media;
+                                break;
+                        }
+
+                        break;
 
                     case "ContentMeta":
 
-                        int idForMeta = int.Parse(attach.Id);
+                        int idForMeta = int.Parse(model.Id);
                         Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();
-                        MediaObject mi = await _db.Media.Where(m => m.Id == attach.MediaId).FirstOrDefaultAsync();
-                        contentForMeta.UpdateMeta(attach.Field, mi);
-                        if (await _db.SaveChangesAsync() == 0)
-                            throw new Exception("Could not update the database");
+                        MediaObject mi = await _db.Media.Where(m => m.Id == model.MediaId).FirstOrDefaultAsync();
+                        contentForMeta.UpdateMeta(model.Field, mi);
+
                         cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
                         _cache.Remove(cacheKey);
-                        return new MediaResponse(true, media);
+
+                        break;
 
                     default:
-                        return new MediaResponse(false);
+                        throw new Exception("No field set to attach the media item to.");
+                }
+
+                await _db.SaveChangesAsync();
+                return new Response(true, media, $"The media has been set for attached successfully.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the CHOOSE -> ATTACH modal.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/media/clear/")]
+        public async Task<Response> Clear(MediaListModel model)
+        {
+            try
+            {
+                // load the media object.
+                string cacheKey;
+                switch (model.Entity)
+                {
+                    case nameof(Models.Content):
+
+                        // create the new media item for content =>
+                        int contentId = int.Parse(model.Id);
+                        Content content = await _db.Content.Where(p => p.Id == contentId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(Models.Content.FeaturedImage):
+                                content.FeaturedImageJson = null;
+                                break;
+                            case nameof(Models.Content.ShareImage):
+                                content.ShareImageJson = null;
+                                break;
+                        }
+
+                        await _db.SaveChangesAsync();
+                        cacheKey = typeof(Content).ToString() + ".Single." + contentId;
+                        _cache.Remove(cacheKey);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(Forum):
+
+                        // create the new media item for content =>
+                        int forumId = int.Parse(model.Id);
+                        Forum forum = await _db.Forums.Where(p => p.Id == forumId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(Forum.FeaturedImage):
+                                forum.FeaturedImage = null;
+                                break;
+                            case nameof(Forum.ShareImage):
+                                forum.ShareImage = null;
+                                break;
+                        }
+
+                        await _db.SaveChangesAsync();
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(ApplicationUser):
+
+                        // create the new media item for content =>
+                        ApplicationUser user = await _db.Users.Where(p => p.Id == model.Id).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(ApplicationUser.Avatar):
+                                user.AvatarJson = null;
+                                break;
+                        }
+
+
+                        cacheKey = typeof(ApplicationUser).ToString() + ".Single." + model.Id;
+                        _cache.Remove(cacheKey);
+                        await _db.SaveChangesAsync();
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(PropertyListing):
+
+                        int propertyId = int.Parse(model.Id);
+                        PropertyListing property = await _db.Properties.Where(p => p.Id == propertyId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(PropertyListing.FeaturedImage):
+                                property.FeaturedImageJson = null;
+                                break;
+                            case nameof(PropertyListing.InfoDownload):
+                                property.InfoDownloadJson = null;
+                                break;
+                        }
+
+                        await _db.SaveChangesAsync();
+                        cacheKey = typeof(PropertyListing).ToString() + ".Single." + propertyId;
+                        _cache.Remove(cacheKey);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(Subscription):
+
+                        // create the new media item for content =>
+                        int subId = int.Parse(model.Id);
+                        Subscription subscription = await _db.Subscriptions.Where(p => p.Id == subId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(Subscription.FeaturedImage):
+                                subscription.FeaturedImage = null;
+                                break;
+                        }
+
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(SubscriptionProduct):
+
+                        // create the new media item for content =>
+                        int subgId = int.Parse(model.Id);
+                        SubscriptionProduct subscriptionGroup = await _db.SubscriptionProducts.Where(p => p.Id == subgId).FirstOrDefaultAsync();
+
+                        switch (model.Field)
+                        {
+                            case nameof(SubscriptionProduct.FeaturedImage):
+                                subscriptionGroup.FeaturedImage = null;
+                                break;
+                        }
+
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    case nameof(ContentMeta):
+
+                        int idForMeta = int.Parse(model.Id);
+                        Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();
+                        MediaObject mi = await _db.Media.Where(m => m.Id == model.MediaId).FirstOrDefaultAsync();
+                        contentForMeta.UpdateMeta(model.Field, mi);
+                        if (await _db.SaveChangesAsync() == 0)
+                        {
+                            throw new Exception("Could not update the database");
+                        }
+
+                        cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
+                        _cache.Remove(cacheKey);
+                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+                    default:
+                        throw new Exception($"No entity supplied to remove from.");
                 }
 
             }
             catch (Exception ex)
             {
-                return new MediaResponse(ex.Message);
+                return await ErrorResponseAsync<MediaController>($"Error removing a media file from an entity.", ex);
             }
         }
+        #endregion
 
-        // THIS HANDLES THE INSERT TO EDITOR
-        [Route("admin/media/insert/")]
-        public async Task<IActionResult> Insert(AttachMediaModel attach)
-        {
-            attach.Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync();
-            if (!attach.Directories.Contains("Default"))
-                attach.Directories.Add("Default");
-            return View(attach);
-        }
-
-        // THIS HANDLES THE SWITCH/SET FUNCTIONS ON THE UPLOADER
-        [Route("admin/media/select/")]
-        public async Task<IActionResult> Select(AttachMediaModel attach)
-        {
-            attach.Directories = await _db.Media.Select(u => u.Directory).Distinct().ToListAsync();
-            if (!attach.Directories.Contains("Default"))
-                attach.Directories.Add("Default");
-            return View(attach);
-        }
-
+        #region Uploads 
         [HttpPost]
         [Route("admin/media/upload/simple/")]
-        public async Task<IActionResult> UploadToDirectory(IEnumerable<IFormFile> files, string directory)
+        public async Task<Response> UploadToDirectory(IEnumerable<IFormFile> files, int? directoryId)
         {
             try
             {
-                if (!directory.IsSet())
-                    directory = "Default";
+                if (!directoryId.HasValue)
+                {
+                    throw new Exception("You must select a directory to upload to.");
+                }
+
+                MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Id == directoryId.Value);
+                if (directory == null)
+                {
+                    throw new Exception($"The directory with id {directoryId} could not be found.");
+                }
+
+                if (directory.OwnerId != User.GetUserId())
+                {
+                    if (User.IsAdminOrBetter())
+                    {
+                        // admins can upload anywhere, let them through.
+                    }
+                    else if (User.IsEditorOrBetter())
+                    {
+                        // if the user is an editor, they can only upload to directories in the media folder.
+                        MediaDirectory root = _directoryManager.GetTopLevelDirectory(directory.Id);
+                        if (root.Type != DirectoryType.System || root.Slug != MediaManager.SiteDirectorySlug)
+                        {
+                            throw new Exception("You do not have permission to upload to this directory.");
+                        }
+                    }
+                    else // otherwise throw
+                    {
+                        throw new Exception("You do not have permission to upload to this directory.");
+                    }
+                }
+
                 if (files != null)
                 {
                     foreach (IFormFile file in files)
                     {
-                        MediaObject mi = await _media.ProcessUpload(file, new MediaObject() { Directory = directory });
-                        _db.Media.Add(mi);
+                        MediaObject mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
+                        mediaResult.DirectoryId = directoryId;
+                        _db.Media.Add(mediaResult);
                         _db.SaveChanges();
                     }
-                    return Json(new { Success = true });
+                    _directoryManager.ResetCache();
+                    return new Response(true, MediaObject.Blank, "The files have been uploaded successfully.");
                 }
                 else
-                    throw new Exception("No files supplied.");
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Success = false, Message = ex.Message });
-            }
-        }
-
-        [HttpPost]
-        [Route("admin/media/upload/single/")]
-        public async Task<IActionResult> UploadSingle(IFormFile file, string directory)
-        {
-            try
-            {
-                if (!directory.IsSet())
-                    directory = "Default";
-                if (file != null)
                 {
-                    MediaObject mi = await _media.ProcessUpload(file, new MediaObject() { Directory = directory });
-                    _db.Media.Add(mi);
-                    _db.SaveChanges();
-                    return Json(new { Success = false, Message = mi.LargeUrl });
+                    throw new Exception("No files supplied.");
                 }
-                else
-                    throw new Exception("No file supplied.");
-
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Message = ex.Message });
+                return await ErrorResponseAsync<MediaController>($"Error uploading multiple files.", ex);
             }
         }
+        #endregion
     }
 }

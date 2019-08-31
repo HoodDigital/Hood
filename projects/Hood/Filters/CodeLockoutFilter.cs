@@ -1,13 +1,10 @@
-﻿using Hood.Extensions;
-using Hood.Models;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 
 namespace Hood.Filters
 {
@@ -16,67 +13,82 @@ namespace Hood.Filters
     /// </summary>
     public class LockoutModeFilter : IActionFilter
     {
-        private readonly ILogger _logger;
-        private readonly ISettingsRepository _settings;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogService _logService;
         private readonly IConfiguration _config;
 
-        public LockoutModeFilter(IConfiguration config,
-            ILoggerFactory loggerFactory,
-            IBillingService billing,
-            ISettingsRepository settings,
-            UserManager<ApplicationUser> userManager)
+        public LockoutModeFilter()
         {
-            _logger = loggerFactory.CreateLogger<StripeRequiredAttribute>();
-            _settings = settings;
-            _config = config;
-            _userManager = userManager;
+            _logService = Engine.Services.Resolve<ILogService>();
+            _config = Engine.Services.Resolve<IConfiguration>();
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            IActionResult result = new RedirectToActionResult("LockoutModeEntrance", "Home", new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() });
-            var basicSettings = _settings.GetBasicSettings();
+            if (!_config.IsDatabaseConfigured())
+                return;
+
+            IActionResult result = new RedirectToActionResult(
+                nameof(Hood.Controllers.HoodController.LockoutModeEntrance), 
+                "Home", 
+                new { returnUrl = context.HttpContext.Request.Path.ToUriComponent() }
+            );
+
+            var basicSettings = Engine.Settings.Basic;
             if (basicSettings.LockoutMode)
             {
                 // if this is the login page, or the betalock page allow the user through.
                 string action = (string)context.RouteData.Values["action"];
                 string controller = (string)context.RouteData.Values["controller"];
 
-                if (action.Equals("LockoutModeEntrance", StringComparison.InvariantCultureIgnoreCase) &&
+                if (action.Equals(nameof(Hood.Controllers.HoodController.LockoutModeEntrance), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Hood", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals("WebHooks", StringComparison.InvariantCultureIgnoreCase) &&
+                if (action.Equals(nameof(Hood.Controllers.HoodController.Version), StringComparison.InvariantCultureIgnoreCase) &&
+                    controller.Equals("Hood", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals(nameof(Hood.Controllers.ErrorController.AppError), StringComparison.InvariantCultureIgnoreCase) &&
+                    controller.Equals("Error", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals(nameof(Hood.Controllers.ErrorController.PageNotFound), StringComparison.InvariantCultureIgnoreCase) &&
+                    controller.Equals("Error", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                if (action.Equals(nameof(Hood.Controllers.SubscriptionsController.WebHooks), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Subscriptions", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals("Index", StringComparison.InvariantCultureIgnoreCase) &&
+                if (action.Equals(nameof(Hood.Controllers.HomeController.Index), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
                 if (!basicSettings.LockLoginPage)
                 {
-                    if (action.Equals("Login", StringComparison.InvariantCultureIgnoreCase) &&
+                    if (action.Equals(nameof(Hood.Controllers.AccountController.Login), StringComparison.InvariantCultureIgnoreCase) &&
+                        controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
+                        return;
+                    if (action.Equals(nameof(Hood.Controllers.AccountController.LogOff), StringComparison.InvariantCultureIgnoreCase) &&
                         controller.Equals("Account", StringComparison.InvariantCultureIgnoreCase))
                         return;
                 }
 
                 // If they are in an override role, let them through.
-                if (context.HttpContext.User.Identity.IsAuthenticated)
+                if (context.HttpContext.User.IsAdminOrBetter())
                 {
-                    AccountInfo _account = context.HttpContext.GetAccountInfo();
-
-                    string[] _roles = { "SuperUser", "Admin" };
-                    if (_userManager.GetRolesAsync(_account.User).Result.Any(r => _roles.Contains(r)))
-                        return;
+                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User.Identity.Name}, accessed the site through the code lockout, as they are an administrator.");
+                    return;
                 }
 
-                if (context.HttpContext.IsLockedOut(_settings.LockoutAccessCodes))
+                if (context.HttpContext.User.Identity.IsAuthenticated && context.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
                 {
+                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User}, was blocked from using the site due to lockout.");
                     context.Result = result;
                     return;
                 }
+
+                context.Result = new RedirectToActionResult(nameof(Hood.Controllers.HomeController.Index), "Home", null);
             }
         }
 

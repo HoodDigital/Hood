@@ -1,40 +1,72 @@
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model RegisterViewModel
 @{
     Layout = null;
 }
-<div class="sidebar-container">
-    <div class="sidebar-title create">
-        <button type="button" class="close close-blade"><span>&times;</span></button>
-        <h3><i class="fa fa-user-plus"></i> Create new user</h3>
-        <p><i class="fa fa-plus-circle"></i> Add a new user account to the website.</p>
+<div class="modal fade modal-right media-blade" id="create-user-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <form id="user-create-form" asp-antiforgery="true" autocomplete="off" class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <div>
+                    <h5 class="modal-title">
+                        Create new user
+                    </h5>
+                    <p class="m-0 text-muted">
+                        <i class="fa fa-user-plus mr-2"></i>  Add a new user account to the website.
+                    </p>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group floating-label">
+                    <input class="form-control prevent-autocomplete" asp-for="Username">
+                    <label asp-for="Username"></label>
+                    <small asp-for="Username"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="GeneratePassword">
+                        <label class="custom-control-label" for="GeneratePassword">Generate Password</label>
+                    </div>
+                </div>
+                <div class="form-group floating-label">
+                    <input class="form-control prevent-autocomplete" asp-for="Password">
+                    <label asp-for="Password"></label>
+                    <small asp-for="Password"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input class="form-control" asp-for="FirstName">
+                    <label asp-for="FirstName"></label>
+                    <small asp-for="FirstName"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input class="form-control" asp-for="LastName">
+                    <label asp-for="LastName"></label>
+                    <small asp-for="LastName"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input class="form-control" asp-for="Email">
+                    <label asp-for="Email"></label>
+                    <small asp-for="Email"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input class="form-control" asp-for="PhoneNumber">
+                    <label asp-for="PhoneNumber"></label>
+                    <small asp-for="PhoneNumber"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" asp-for="NotifyUser">
+                        <label class="custom-control-label" asp-for="NotifyUser"></label>
+                    </div>
+                    <small asp-for="NotifyUser"></small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="user-create-submit" class="btn btn-success"><i class="fa fa-user-plus"></i> Create user</button>
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+            </div>
+        </form>
     </div>
-    <form id="create-user-form" asp-antiforgery="true" autocomplete="off">
-        <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
-        <input style="display:none" type="text" name="fakeusernameremembered" />
-        <input style="display:none" type="password" name="fakepasswordremembered" />
-
-        <div class="blade-field">
-            <createField db-field="cuFirstName" field-type="text" field-name="First Name" db-value="" />
-        </div>
-        <div class="blade-field">
-            <createField db-field="cuLastName" field-type="text" field-name="Last Name" db-value="" />
-        </div>
-        <div class="blade-field">
-            <createField db-field="cuUserName" field-type="email" field-name="E-mail Address" db-value="" />
-        </div>
-        <div class="blade-field">
-            <createField db-field="cuGeneratePassword" field-type="switch" field-name="Generate password" db-value="" />
-            <hr />
-            <createField db-field="cuPassword" field-type="text" field-name="Temporary Password" db-value="" />
-        </div>
-        <div class="blade-field">
-            <createField db-field="cuNotifyUser" field-type="switch" field-name="Notify user" db-value="" />
-        </div>
-        <div class="blade-field">
-            <button type="button" id="create-user-submit" class="btn btn-primary"><i class="fa fa-user-plus"></i> Create user</button>
-            <button type="button" class="btn btn-default close-blade"><i class="fa fa-ban"></i> Cancel</button>
-        </div>
-    </form>
 </div>

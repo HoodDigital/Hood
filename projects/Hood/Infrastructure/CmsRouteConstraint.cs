@@ -1,4 +1,4 @@
-﻿using Hood.Models;
+﻿using Hood.Core;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -11,7 +11,7 @@ namespace Hood.Infrastructure
 {
     public class CmsUrlConstraint : IRouteConstraint
     {
-        private Object codeLock = new Object();
+        private readonly object codeLock = new Object();
 
         public bool Match(HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection)
         {
@@ -34,12 +34,11 @@ namespace Hood.Infrastructure
                     fullUrl = fullUrl.TrimEnd('/');
                 IContentRepository _content = (IContentRepository)httpContext.RequestServices.GetService(typeof(IContentRepository));
                 IMemoryCache _cache = (IMemoryCache)httpContext.RequestServices.GetService(typeof(IMemoryCache));
-                ISettingsRepository _settings = (ISettingsRepository)httpContext.RequestServices.GetService(typeof(ISettingsRepository));
                 try
                 {
                     string[] tokenised = fullUrl.ToLower().Split('/');
-                    var type = _settings.GetContentSettings().GetContentType(tokenised[0]);
-                    if (type != null)
+                    var type = Engine.Settings.Content.GetContentType(tokenised[0]);
+                    if (type != null && !type.IsUnknown)
                     {
                         // if a type is matched, we must use the Hood routes, content CMS routes cannot be overridden.
                         if (tokenised.Length > 1)
@@ -89,7 +88,7 @@ namespace Hood.Infrastructure
                     }
                     else
                     {
-                        var settings = _settings.GetPropertySettings();
+                        var settings = Engine.Settings.Property;
                         if (tokenised[0].ToLower() == settings.Slug)
                         {
                             values["action"] = "Index";
@@ -97,12 +96,12 @@ namespace Hood.Infrastructure
                             return true;
                         }
                     }
-                    var pages = _content.GetPages();
-                    if (pages.Select(p => p.Url).Contains(fullUrl))
+                    var pages = _content.GetPages().Result;
+                    if (pages.Select(p => p.Url.ToLower().Trim('/')).Contains(fullUrl))
                     {
-                        SitemapPage pg = pages.Where(p => p.Url == fullUrl).FirstOrDefault();
+                        var pg = pages.Where(p => p.Url.ToLower().Trim('/') == fullUrl).FirstOrDefault();
                         if (!values.ContainsKey("id"))
-                            values.Add("id", pg.PageId);
+                            values.Add("id", pg.Id);
                         return true;
                     }
                     return false;

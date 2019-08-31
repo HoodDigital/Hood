@@ -1,5 +1,4 @@
-﻿using Hood.Enums;
-using Hood.Models;
+﻿using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Html;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +12,6 @@ namespace Hood.Caching
     public class ForumCategoryCache
     {
         private readonly IConfiguration _config;
-        private readonly ISettingsRepository _settings;
 
         private Lazy<Dictionary<int, ForumCategory>> byKey;
         private Lazy<Dictionary<string, ForumCategory>> bySlug;
@@ -21,12 +19,11 @@ namespace Hood.Caching
 
         public int Count { get { return byKey.Value.Count; } }
 
-        public ForumCategoryCache(IConfiguration config,
-                                    ISettingsRepository settings,
-                                    IEventsService events)
+        public ForumCategoryCache(
+            IConfiguration config,
+            IEventsService events)
         {
             _config = config;
-            _settings = settings;
             EventHandler<EventArgs> resetForumCache = (sender, eventArgs) =>
             {
                 ResetCache();
@@ -148,7 +145,7 @@ namespace Hood.Caching
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent CategorySelectOptions(IEnumerable<ForumCategory> startLevel, string selectedValue, bool useSlug = false, int startingLevel = 0)
+        public IHtmlContent CategorySelectOptions(IEnumerable<ForumCategory> startLevel, int? selectedValue, bool useSlug = false, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
             if (startLevel != null && startLevel.Count() > 0)
@@ -158,14 +155,7 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    if (useSlug)
-                    {
-                        htmlOutput += "<option value=\"" + category.Slug + "\"" + (selectedValue == category.Slug ? " selected" : "") + ">";
-                    }
-                    else
-                    {
-                        htmlOutput += "<option value=\"" + category.Id + "\"" + (selectedValue == category.Id.ToString() ? " selected" : "") + ">";
-                    }
+                    htmlOutput += "<option value=\"" + category.Id + "\"" + (selectedValue == category.Id ? " selected" : "") + ">";
                     for (int i = 0; i < startingLevel; i++)
                     {
                         htmlOutput += "- ";
@@ -189,23 +179,40 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<tr>";
-                    htmlOutput += "<td>";
+                    string carets = "";
                     for (int i = 0; i < startingLevel; i++)
                     {
-                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                        carets += "<i class='fa fa-caret-right mr-1'></i>";
                     }
-                    htmlOutput += string.Format("<a href=\"/admin/forums/manage?category={0}/\" class=\"forum-category\">", category.Slug);
-                    htmlOutput += string.Format("{0} <span>({1})</span>", category.DisplayName, category.Count);
-                    htmlOutput += "</a>";
-                    htmlOutput += " <small>[" + category.Slug + "]</small>";
-                    htmlOutput += "</td>";
-                    htmlOutput += "<td class='text-right'>";
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-warning m-l-sm edit-forum-category action-button\" data-id=\"{0}\"><i class=\"fa fa-edit\"></i><span>&nbsp;Edit</span></a>", category.Id);
-                    htmlOutput += string.Format("<a class=\"btn btn-sm btn-danger m-l-xs delete-forum-category action-button\" data-id=\"{0}\"><i class=\"fa fa-trash\"></i><span>&nbsp;Delete</span></a>", category.Id);
-                    htmlOutput += "</td>";
+
+                    htmlOutput += $@"
+                        <div class='list-group-item list-group-item-action p-0'>
+                            <div class='custom-control custom-checkbox d-flex'>
+                                <input class='custom-control-input refresh-on-change'
+                                       id='Category-{category.Slug}' name='categories'
+                                       type='checkbox'
+                                       value='{category.Slug}' />
+                                <label class='custom-control-label col m-2 mt-1 mb-1' for='Category-{category.Slug}'>
+                                    {carets}{category.DisplayName} <span>({category.Count})</span>
+                                </label>
+                                <div class='col-auto p-2'>
+                                    <a class='btn-link text-warning hood-modal mr-2' href='/admin/forum/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Forum.Categories.Editor'>
+                                        <i class='fa fa-edit'></i><span>
+                                            Edit
+                                        </span>
+                                    </a>
+                                    <a class='btn-link text-danger forum-categories-delete' href='/admin/forum/categories/delete/{category.Id}'>
+                                        <i class='fa fa-trash'></i>
+                                        <span>
+                                            Delete
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>";
+
                     htmlOutput += AdminForumCategoryTree(category.Children, startingLevel + 1);
-                    htmlOutput += "</tr>";
+
                 }
             }
 
@@ -223,14 +230,42 @@ namespace Hood.Caching
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<div class=\"checkbox\">";
+                    string carets = "";
                     for (int i = 0; i < startingLevel; i++)
                     {
-                        htmlOutput += "<i class=\"fa fa-caret-right m-r-sm\"></i> ";
+                        carets += "<i class='fa fa-caret-right mr-1'></i>";
                     }
-                    htmlOutput += string.Format("<input class=\"styled forum-category-check\" id=\"forum-category-check-{1}\" name=\"forum-category-check-{1}\" type=\"checkbox\" data-id=\"{0}\" value=\"{1}\" {2}>", forum.Id, category.Id, forum.IsInCategory(category.Id) ? "checked" : "");
-                    htmlOutput += string.Format("<label for=\"forum-category-check-{1}\">{0}</label>", category.DisplayName, category.Id);
-                    htmlOutput += "</div>";
+
+                    string check = forum.Categories.Any(c => c.CategoryId == category.Id) ? "checked" : "";
+
+                    htmlOutput += $@"
+                        <div class='list-group-item list-group-item-action p-0'>
+                            <div class='custom-control custom-checkbox d-flex'>
+                                <input class='custom-control-input forum-categories-check'
+                                       id='forum-categories-check-{category.Id}'
+                                       name='forum-categories-check-{category.Id}'
+                                       type='checkbox'
+                                       data-url='/admin/forums/{forum.Id}/categories/toggle'
+                                       value='{category.Id}' {check} />
+                                <label class='custom-control-label col m-2 mt-1 mb-1' for='forum-categories-check-{category.Id}'>
+                                    {carets}{category.DisplayName} <span>({category.Count})</span>
+                                </label>
+                                <div class='col-auto p-2'>
+                                    <a class='btn-link text-warning hood-modal mr-2' href='/admin/forums/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Forum.Categories.Editor'>
+                                        <i class='fa fa-edit'></i><span>
+                                            Edit
+                                        </span>
+                                    </a>
+                                    <a class='btn-link text-danger forum-categories-delete' href='/admin/forums/categories/delete/{category.Id}'>
+                                        <i class='fa fa-trash'></i>
+                                        <span>
+                                            Delete
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>";
+
                     htmlOutput += AddToCategoryTree(category.Children, forum, startingLevel + 1);
                 }
             }

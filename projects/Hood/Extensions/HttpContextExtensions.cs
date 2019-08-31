@@ -1,14 +1,55 @@
-﻿using Hood.Models;
+﻿using Hood.Core;
+using Hood.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Hood.Extensions
 {
     public static class HttpContextExtensions
     {
+        public static async Task ProcessCaptchaOrThrowAsync(this HttpRequest request)
+        {
+            if (Engine.Settings.Integrations.EnableGoogleRecaptcha)
+            {
+                var captcha = request.Form["g-recaptcha-response"].FirstOrDefault();
+                if (captcha.IsSet())
+                {
+                    // process the captcha.
+                    using (var client = new HttpClient())
+                    {
+                        var remoteIpAddress = request.HttpContext.Connection.RemoteIpAddress.ToString();
+                        var values = new Dictionary<string, string>
+                        {
+                            { "secret",  Engine.Settings.Integrations.GoogleRecaptchaSecretKey },
+                            { "response", captcha },
+                            { "remoteip", remoteIpAddress }
+                        };
+
+                        var content = new FormUrlEncodedContent(values);
+
+                        var responseContent = await client.PostAsync("https://www.google.com/recaptcha/api/siteverify", content);
+
+                        var responseString = await responseContent.Content.ReadAsStringAsync();
+
+                        RecaptchaResponse response = JsonConvert.DeserializeObject<RecaptchaResponse>(responseString);
+
+                        if (!response.success)
+                            throw new Exception("Sorry, your reCaptcha validation failed.");
+
+                        if (request.Host.Host != response.hostname)
+                            throw new Exception("Sorry, your reCaptcha validation failed, your host name does not match the validated host name.");
+                    }
+                }
+                else
+                    throw new Exception("Sorry, your reCaptcha validation failed, no captcha response found.");
+            }
+        }
+
         public static string GetSubdomain(this HttpContext httpContext)
         {
 
@@ -34,21 +75,17 @@ namespace Hood.Extensions
         public static T Get<T>(this HttpContext context, string key)
         {
             var value = context.Items[key] as string;
-            return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
-        }
-
-        public static AccountInfo GetAccountInfo(this HttpContext context)
-        {
-            return context.Items["AccountInfo"] as AccountInfo;
+            return value == null ? default : JsonConvert.DeserializeObject<T>(value);
         }
 
         public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
         {
-            if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
+            if (context.User.IsAdminOrBetter())
                 return false;
 
             if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
                 return true;
+
             var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
 
             if (allowedCodes.Contains(betaCode))
@@ -60,7 +97,7 @@ namespace Hood.Extensions
 
         public static bool MatchesAccessCode(this HttpContext context, string code)
         {
-            if (context.User.IsInRole("Admin") || context.User.IsInRole("SuperUser"))
+            if (context.User.IsAdminOrBetter())
                 return true;
 
             if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
@@ -98,13 +135,20 @@ namespace Hood.Extensions
 
                 if (includePath)
                 {
-                    if (appPath.EndsWith("/"))
-                        appPath = appPath.TrimEnd('/');
-                    appPath += context.Request.Path;
-                    if (includeQuery)
-                        appPath += context.Request.QueryString.ToUriComponent();
+                    if (context.Items.ContainsKey("originalPath"))
+                    {
+                        var originalPath = context.Items["originalPath"] as string;
+                        appPath += originalPath.TrimStart('/');
+                    }
+                    else
+                    {
+                        if (appPath.EndsWith("/"))
+                            appPath = appPath.TrimEnd('/');
+                        appPath += context.Request.Path;
+                        if (includeQuery)
+                            appPath += context.Request.QueryString.ToUriComponent();
+                    }
                 }
-
             }
             return appPath;
         }

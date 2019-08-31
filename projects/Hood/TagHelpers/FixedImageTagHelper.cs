@@ -1,5 +1,5 @@
-﻿using Hood.Extensions;
-using Hood.Services;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
@@ -7,37 +7,27 @@ namespace Hood.TagHelpers
     [HtmlTargetElement("fixedImage")]
     public class FixedImageTagHelper : TagHelper
     {
-        private const string AltAttrName = "alt";
-        [HtmlAttributeName(AltAttrName)]
+        [HtmlAttributeName("alt")]
         public string Alt { get; set; }
 
-        private const string SrcAttrName = "src";
-        [HtmlAttributeName(SrcAttrName)]
+        [HtmlAttributeName("src")]
         public string Src { get; set; }
 
-        private const string DefaultAttrName = "default";
-        [HtmlAttributeName(DefaultAttrName)]
+        [HtmlAttributeName("default")]
         public bool UseDefault { get; set; } = true;
 
-        private const string FallbackAttrName = "fallback";
-        [HtmlAttributeName(FallbackAttrName)]
+        [HtmlAttributeName("fallback")]
         public string Fallback { get; set; }
 
-        private const string ColourAttrName = "color";
-        [HtmlAttributeName(ColourAttrName)]
+        [HtmlAttributeName("color")]
         public string Colour { get; set; }
 
-        private ISettingsRepository _settings;
-
-        public FixedImageTagHelper(ISettingsRepository settings)
+        public FixedImageTagHelper()
         {
-            _settings = settings;
         }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            var mediaSettings = _settings.GetMediaSettings();
-
             output.TagName = "figure";
             output.TagMode = TagMode.StartTagAndEndTag;
 
@@ -52,10 +42,10 @@ namespace Hood.TagHelpers
             string url = "";
 
             if (UseDefault)
-                if (mediaSettings.NoImage.IsSet())
-                    url = mediaSettings.NoImage;
+                if (Engine.Settings.Media.NoImage.IsSet())
+                    url = Engine.Settings.Media.NoImage;
                 else
-                    url = "/lib/hood/images/no-image.jpg";
+                    url = "/hood/images/no-image.jpg";
 
             if (Fallback.IsSet())
                 url = Fallback;

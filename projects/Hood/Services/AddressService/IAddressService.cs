@@ -1,5 +1,4 @@
-﻿using Geocoding;
-using Geocoding.Google;
+﻿using Geocoding.Google;
 using Hood.Interfaces;
 
 namespace Hood.Services

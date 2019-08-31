@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,23 +19,23 @@ namespace Hood.Models
             var type = Types.Where(t => t.Slug == slug || t.Type == slug || t.TypeNamePlural.ToLower() == slug).FirstOrDefault();
             if (type != null)
                 return type;
-            return null;
+            return ContentType.Null;
         }
-        public List<ContentType> GetAllowedTypes()
+        public List<ContentType> AllowedTypes
         {
-            return Types.Where(t => t.Enabled).ToList();
+            get => Types.Where(t => t.Enabled).ToList();
         }
-        public List<ContentType> GetDisallowedTypes()
+        public List<ContentType> DisallowedTypes
         {
-            return Types.Where(t => !t.Enabled).ToList();
+            get => Types.Where(t => !t.Enabled).ToList();
         }
-        public List<ContentType> GetPublicTypes()
+        public List<ContentType> PublicTypes
         {
-            return Types.Where(t => t.IsPublic && t.Enabled).ToList();
+            get => Types.Where(t => t.IsPublic && t.Enabled).ToList();
         }
-        public List<ContentType> GetRestrictedTypes()
+        public List<ContentType> RestrictedTypes
         {
-            return Types.Where(t => !t.IsPublic || !t.Enabled).ToList();
+            get => Types.Where(t => !t.IsPublic || !t.Enabled).ToList();
         }
 
         internal void CheckBaseFields()
@@ -71,5 +72,16 @@ namespace Hood.Models
                 }
             }
         }
+
+        #region Obsolete
+        [Obsolete("Use AllowedTypes instead.", true)]
+        public List<ContentType> GetAllowedTypes() => throw new NotImplementedException();
+        [Obsolete("Use DisallowedTypes instead.", true)]
+        public List<ContentType> GetDisallowedTypes() => throw new NotImplementedException();
+        [Obsolete("Use PublicTypes instead.", true)]
+        public List<ContentType> GetPublicTypes() => throw new NotImplementedException();
+        [Obsolete("Use RestrictedTypes instead.", true)]
+        public List<ContentType> GetRestrictedTypes() => throw new NotImplementedException();
+        #endregion
     }
 }

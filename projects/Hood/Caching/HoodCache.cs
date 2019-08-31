@@ -1,8 +1,11 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,112 +13,129 @@ namespace Hood.Caching
 {
     public class HoodCache : IHoodCache
     {
+        private readonly ConcurrentDictionary<string, DateTime> _entryKeys;
         private readonly IMemoryCache _cache;
-
-        private IList<string> _entries { get; set; }
-
-        public HoodCache(IMemoryCache cache,
-                         IEventsService events)
+        public HoodCache(IMemoryCache cache)
         {
+            // Memory Cache stuff
+            _entryKeys = new ConcurrentDictionary<string, DateTime>();
             _cache = cache;
-            _entries = new List<string>();
-            events.ContentChanged += onContentChanged;
-            events.PropertiesChanged += onPropertiesChanged;
-            events.OptionsChanged += onOptionsChanged;
+
+            Engine.Events.ContentChanged += OnContentChanged;
+            Engine.Events.PropertiesChanged += OnPropertiesChanged;
+            Engine.Events.OptionsChanged += OnOptionsChanged;
         }
 
-        public string Add<T>(string key, T cacheItem, MemoryCacheEntryOptions options = null)
+        public void Add<T>(string key, T cacheItem, MemoryCacheEntryOptions options = null)
         {
             if (options == null)
                 _cache.Set(key, cacheItem);
             else
                 _cache.Set(key, cacheItem, options);
-            if (_entries == null)
-                _entries = new List<string>();
-            if (!_entries.Contains(key))
-                _entries.Add(key);
-            return key;
+
+            AddToKeyStore(key);
         }
 
-        public IList<string> Keys
+        private void AddToKeyStore(string key)
+        {
+            if (_entryKeys.TryGetValue(key, out DateTime priorEntry))
+            {
+                // Try to update with the new entry if a previous entries exist.
+                bool entryAdded = _entryKeys.TryUpdate(key, DateTime.Now, priorEntry);
+
+                if (!entryAdded)
+                {
+                    // The update will fail if the previous entry was removed after retrival.
+                    // Adding the new entry will succeed only if no entry has been added since.
+                    // This guarantees removing an old entry does not prevent adding a new entry.
+                    _entryKeys.TryAdd(key, DateTime.Now);
+                }
+            }
+            else
+            {
+                // Try to add the new entry if no previous entries exist.
+                _entryKeys.TryAdd(key, DateTime.Now);
+            }
+        }
+        private void RemoveKey(string key)
+        {
+            if (!_entryKeys.ContainsKey(key))
+                return;
+            if (_entryKeys.TryRemove(key, out _))
+            {
+            }
+        }
+
+        /// <summary>
+        /// A key/value list of all Keys in the Cache, along with the DateTime they were added to it.
+        /// </summary>
+        public IDictionary<string, DateTime> Entries
         {
             get
             {
-                if (_entries == null)
-                    _entries = new List<string>();
-                return _entries;
+                if (_entryKeys == null)
+                    return null;
+                return _entryKeys;
             }
         }
 
-
         public bool TryGetValue<T>(string key, out T cacheItem)
         {
-            if (_entries == null)
-                _entries = new List<string>();
-            if (_cache.TryGetValue(key, out cacheItem)) // Get the value from cache.
+            try
             {
-                if (!_entries.Contains(key)) // Item is in cache, but not entry dictionary. Add it.
-                    _entries.Add(key);
-                return true;
+                if (_cache.TryGetValue(key, out cacheItem))
+                {
+                    if (!_entryKeys.ContainsKey(key))
+                        AddToKeyStore(key);
+                    return true;
+                }
+                RemoveKey(key);
+                return false;
             }
-            if (_entries.Contains(key)) // Item has fallen out of cache, remove from entries.
-                _entries.Remove(key);
-            return false;
-
+            catch (Exception)
+            {
+                cacheItem = default;
+                return false;
+            }
         }
 
         public void Remove(string key)
         {
-            if (_entries == null)
-                _entries = new List<string>();
             if (!key.IsSet())
                 return;
-            if (_entries.Contains(key)) // Item has fallen out of cache, remove from entries.
-                _entries.Remove(key);
+            RemoveKey(key);
             _cache.Remove(key);
-        }
-
-        public void RemoveWhere(Func<string, bool> predicate)
-        {
-            if (_entries == null)
-                _entries = new List<string>();
-            var toRemove = _entries.Where(predicate).ToList();
-            foreach (string key in toRemove)
-                Remove(key);
         }
 
         public void RemoveByType(Type type)
         {
-            if (_entries == null)
-                _entries = new List<string>();
             if (type == null)
                 return;
-            var toRemove = _entries.Where(e => e.StartsWith(type.ToString())).ToList();
-            foreach (string key in toRemove)
-                Remove(key);
+            var toRemove = _entryKeys.Where(e => e.Key.StartsWith(type.ToString())).ToList();
+            foreach (var entry in toRemove)
+                Remove(entry.Key);
         }
 
         public void ResetCache()
         {
-            if (_entries == null)
-                _entries = new List<string>();
-            var toRemove = _entries.ToList();
-            foreach (string key in toRemove)
+            var keys = _entryKeys.Select(e => e.Key);
+            foreach (var key in keys)
                 Remove(key);
+            _entryKeys.Clear();
         }
 
         #region "Events"
-        private void onContentChanged(object sender, EventArgs eventArgs)
+        private void OnContentChanged(object sender, EventArgs eventArgs)
         {
             RemoveByType(typeof(Content));
         }
 
-        private void onPropertiesChanged(object sender, EventArgs e)
+        private void OnPropertiesChanged(object sender, EventArgs e)
         {
             RemoveByType(typeof(PropertyListing));
         }
 
-        private void onOptionsChanged(object sender, EventArgs e)
+        private void OnOptionsChanged(object sender, EventArgs e)
         {
             RemoveByType(typeof(Option));
         }

@@ -1,0 +1,6 @@
+<environment include="Development">
+    <link rel="stylesheet" href="@string.Format("{0}/css/login.css", Engine.LibraryFolder)" asp-append-version="true" />
+</environment>
+<environment exclude="Development">
+    <link rel="stylesheet" href="@string.Format("{0}/css/login.min.css", Engine.LibraryFolder)" asp-append-version="true" />
+</environment>

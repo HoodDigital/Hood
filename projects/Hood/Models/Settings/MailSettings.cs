@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using Hood.Extensions;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -30,11 +31,20 @@ namespace Hood.Models
         public string BackgroundColour { get; set; }
         [Display(Name = "Logo")]
         public string Logo { get; set; }
+        public bool IsSetup
+        {
+            get
+            {
+                return SendGridKey.IsSet() && FromEmail.IsSet();
+            }
+        }
         #endregion
 
         public MailSettings()
         {
             BackgroundColour = "#f6f6f6";
+            FromEmail = "yourwebsite@cms.hooddigital.com";
+            FromName = "Hood CMS Website";
         }
     }
 }

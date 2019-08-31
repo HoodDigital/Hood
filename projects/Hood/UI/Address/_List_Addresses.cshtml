@@ -1,0 +1,96 @@
+@model AddressListModel
+@{
+    Layout = null;
+}
+@if (Model.UserProfile != null)
+{
+    <div class="row">
+        @if (Model.UserProfile.BillingAddress != null)
+        {
+            <div class="col-sm-6">
+                @if (Model.UserProfile.BillingAddress.IsGeoLocated())
+                {
+                    <a class="btn btn-info btn-xs pull-right m-t-xs" title="@Model.UserProfile.BillingAddress.Latitude, @Model.UserProfile.BillingAddress.Longitude" target="_blank"
+                       href="@string.Format("https://www.google.com/maps/@{0},{1},20z", Model.UserProfile.BillingAddress.Latitude, Model.UserProfile.BillingAddress.Longitude)">
+                        View in maps
+                    </a>
+                }
+                <h6>Billing Address</h6>
+                <hr />
+                @Html.FormatAddress(Model.UserProfile.BillingAddress, AddressFormat.MultiLine)
+            </div>
+        }
+        @if (Model.UserProfile.DeliveryAddress != null)
+        {
+            <div class="col-sm-6">
+                @if (Model.UserProfile.DeliveryAddress.IsGeoLocated())
+                {
+                    <a class="btn btn-info btn-xs pull-right m-t-xs" title="@Model.UserProfile.DeliveryAddress.Latitude, @Model.UserProfile.DeliveryAddress.Longitude" target="_blank"
+                       href="@string.Format("https://www.google.com/maps/@{0},{1},20z", Model.UserProfile.DeliveryAddress.Latitude, Model.UserProfile.DeliveryAddress.Longitude)">
+                        View in maps
+                    </a>
+                }
+                <h6>Delivery Address</h6>
+                <hr />
+                @Html.FormatAddress(Model.UserProfile.DeliveryAddress, AddressFormat.MultiLine)
+            </div>
+        }
+    </div>
+    <p>User is @Model.UserProfile.UserName</p>
+}
+<div class="m-t-lg">
+    @if (Model.TotalCount > 0)
+    {
+        @foreach (Address address in Model.List)
+        {
+            <div class="thumbnail p-md">
+                <p class="font-md">
+                    @if (address.IsGeoLocated())
+                    {
+                        <span class="pull-right">
+                            <a class="btn btn-info btn-xs" title="@address.Latitude, @address.Longitude" target="_blank"
+                               href="@string.Format("https://www.google.com/maps/@{0},{1},20z", address.Latitude, address.Longitude)">
+                                Mapped
+                            </a>
+                        </span>
+                    }
+                    @if (address.QuickName.IsSet())
+                    {
+                        @address.QuickName
+                    }
+                    else
+                    {
+                        @address.Address1
+                    }
+                </p>
+                <span class="pull-right">
+                    @if (address.Id == Model.UserProfile?.BillingAddress?.Id)
+                    {
+                        <a class="btn btn-success btn-xs address-set-billing" asp-action="SetBilling" asp-route-id="@address.Id"><i class="fa fa-check m-r-xs"></i>Billing Address</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-default btn-xs address-set-billing" asp-action="SetBilling" asp-route-id="@address.Id">Set Billing</a>
+                    }
+                    @if (address.Id == Model.UserProfile?.DeliveryAddress?.Id)
+                    {
+                        <a class="btn btn-success btn-xs address-set-delivery" asp-action="SetDelivery" asp-route-id="@address.Id"><i class="fa fa-check m-r-xs"></i>Delivery Address</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-default btn-xs address-set-delivery" asp-action="SetDelivery" asp-route-id="@address.Id">Set Delivery</a>
+                    }
+                    <a class="btn btn-warning btn-xs hood-modal" asp-action="Edit" asp-route-id="@address.Id"  data-complete="$.hood.Addresses.CreateOrEdit">Edit</a>
+                    <a class="btn btn-danger btn-xs address-delete" asp-action="Delete" asp-route-id="@address.Id">Delete</a>
+                </span>
+                <p class="no-margin">@address.ToFormat(AddressFormat.SingleLine)</p>
+                <div class="clearfix"></div>
+            </div>
+        }
+        <partial name="_Pagination" />
+    }
+    else
+    {
+        <div class="alert alert-info text-center">No addresses to display.</div>
+    }
+</div>

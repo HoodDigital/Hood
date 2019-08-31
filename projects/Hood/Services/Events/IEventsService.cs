@@ -12,11 +12,11 @@ namespace Hood.Services
         event EventHandler<StripeWebHookTriggerArgs> StripeWebhook;
         event EventHandler<UserSubscriptionChangeEventArgs> UserSubcriptionChanged;
 
-        void triggerContentChanged(object sender);
-        void triggerForumChanged(object sender);
-        void triggerOptionsChanged(object sender);
-        void triggerPropertiesChanged(object sender);
-        void triggerStripeWebhook(object sender, StripeWebHookTriggerArgs e);
-        void triggerUserSubcriptionChanged(object sender, UserSubscriptionChangeEventArgs e);
+        void TriggerContentChanged(object sender);
+        void TriggerForumChanged(object sender);
+        void TriggerOptionsChanged(object sender);
+        void TriggerPropertiesChanged(object sender);
+        void TriggerStripeWebhook(object sender, StripeWebHookTriggerArgs e);
+        void TriggerUserSubcriptionChanged(object sender, UserSubscriptionChangeEventArgs e);
     }
 }

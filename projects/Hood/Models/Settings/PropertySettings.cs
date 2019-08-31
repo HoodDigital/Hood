@@ -10,42 +10,116 @@ namespace Hood.Models
 {
     public class PropertySettings : SaveableModel
     {
+        [Display(Name = "Url Slug", Description = "<strong class=\"text-danger\"><i class='fa fa-exclamation-triangle'></i> Changing this will affect external linking.</strong><br />Use this to change the default URL for your property listings. Default is <code>property</code>. Only use lowercase letters, no spaces.")]
         public string Slug { get; set; }
+        [Display(Name = "Property Listings Name", Description = "Title of your property listing area, e.g. \"Property\" or \"Listing\"")]
         public string Name { get; set; }
+        [Display(Name = "Enable Properties", Description = "Enable the property listing display and management tool on this website.")]
         public bool Enabled { get; set; }
+        [Display(Name = "Show List Page", Description = "Show the listing page, accessible via <code>yourdomain.com/{property-url-slug}</code>")]
         public bool ShowList { get; set; }
+        [Display(Name = "Show List Page", Description = "Show the item page, accessible via <code>yourdomain.com/{property-url-slug}/{id}/{address}</code>")]
         public bool ShowItem { get; set; }
+        [Display(Name = "No Image (Override)", Description = "Override the site default 'No Image' for properties. Leave it blank to use the site default.")]
+        public string NoImage { get; set; }
+        [Display(Name = "Property Listings Title", Description = "Title of your property listing area, e.g. \"Properties\" or \"Our Listings\"")]
         public string Title { get; set; }
+        [Display(Name = "Property Listings Name (Plural)", Description = "Name of your property listing, e.g. \"Properties\" or \"Listings\"")]
         public string Plural { get; set; }
+        [Display(Name = "Listing Types", Description = "Options for types of property listings on the site, Commercial, Student, Short-Term, Sale etc.")]
         public string ListingTypes { get; set; }
+        [Display(Name = "Asking Price Displays", Description = "Options for displaying your asking prices, the {0} signifies the amount value formatted in your currency.")]
         public string PriceDisplays { get; set; }
+        [Display(Name = "Rent Displays", Description = "Options for displaying your rent, the {0} signifies the amount value formatted in your currency.<br />")]
         public string RentDisplays { get; set; }
+        [Display(Name = "Property Type", Description = "Options for property types for the property listings on the site, House, Flat, Land etc.<br />")]
         public string PropertyType { get; set; }
+        [Display(Name = "Planning Type", Description = "Options for planning classes for the property listings on the site.<br />")]
         public string PlanningType { get; set; }
+        [Display(Name = "Fees Display", Description = "Options for displaying your fees, the {0} signifies the amount value formatted in your currency.<br />")]
         public string FeesDisplay { get; set; }
+        [Display(Name = "Lease Statuses", Description = "Options for  statuses for the property listings on the site.<br />")]
         public string LeaseStatuses { get; set; }
+        [Display(Name = "Trigger Authorisation Key", Description = "<span class=\"text-danger\"><i class='fa fa-exclamation-triangle'></i> Do not reveal this key to anyone or publish it anywhere.</span><br />This is used when triggering the importer using a scheduled service. Send a POST request to <code>yourdomain.com/admin/property/import/blm/trigger</code> and set this key value as the \"Auth\" header.")]
         public string TriggerAuthKey { get; set; }
+        [Display(Name = "Show Bedrooms", Description = "Show number of bedrooms on property listings.")]
         public bool ShowBedrooms { get; set; }
+        [Display(Name = "Show Bathrooms", Description = "Show number of batrhooms on property listings.")]
+        public bool ShowBathrooms { get; set; }
+        [Display(Name = "Show Showers", Description = "Show number of showers on property listings.")]
+        public bool ShowShowers { get; set; }
+        [Display(Name = "Show Rent", Description = "Show rent on property listings.")]
         public bool ShowRent { get; set; }
+        [Display(Name = "Show Rent Decimals", Description = "Show decimal numbers for rent.")]
         public bool ShowRentDecimals { get; set; }
+        [Display(Name = "Rent Minimum", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int RentMinimum { get; set; }
+        [Display(Name = "Rent Maximum", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int RentMaximum { get; set; }
+        [Display(Name = "Rent Increment", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int RentIncrement { get; set; }
+        [Display(Name = "Show Asking Price", Description = "Show an asking price or price on sale property listings..")]
         public bool ShowAskingPrice { get; set; }
+        [Display(Name = "Show Asking Price Decimals", Description = "Show decimal numbers for asking prices.")]
         public bool ShowAskingPriceDecimals { get; set; }
+        [Display(Name = "Asking Price Minimum", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int AskingPriceMinimum { get; set; }
+        [Display(Name = "Asking Price Maximum", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int AskingPriceMaximum { get; set; }
+        [Display(Name = "Asking Price Increment", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int AskingPriceIncrement { get; set; }
+        [Display(Name = "Show Premium", Description = "Display premiums on property listings.")]
         public bool ShowPremium { get; set; }
+        [Display(Name = "Show Premium Decimals", Description = "Show decimal numbers for premiums.")]
         public bool ShowPremiumDecimals { get; set; }
+        [Display(Name = "Premium Minimum", Description = "Minimum on searching dropdowns/sliders for premiums.")]
         public int PremiumMinimum { get; set; }
+        [Display(Name = "Premium Maximum", Description = "Maximum on searching dropdowns/sliders for premiums.")]
         public int PremiumMaximum { get; set; }
+        [Display(Name = "Premium Increment", Description = "Increment on searching dropdowns/sliders for premiums.")]
         public int PremiumIncrement { get; set; }
+        [Display(Name = "Show Fees", Description = "Show fees on property listings.")]
         public bool ShowFees { get; set; }
+        [Display(Name = "Show Fees Decimals", Description = "Show decimal numbers for fees.")]
         public bool ShowFeesDecimals { get; set; }
+        [Display(Name = "Default Page Size", Description = "Number of properties displayed per page on the listing pages.")]
         public int DefaultPageSize { get; set; }
 
+        [Display(Name = "FTP Importer Settings", Description = "")]
         public PropertyImporterSettings FTPImporterSettings { get; set; }
+
+        public bool IsBlmImporterEnabled
+        {
+            get
+            {
+                if (FTPImporterSettings == null) return false;
+
+                if (!FTPImporterSettings.Enabled) return false;
+
+                switch (FTPImporterSettings.Method)
+                {
+                    case PropertyImporterMethod.Directory:
+                        if (!FTPImporterSettings.LocalFolder.IsSet() ||
+                            !FTPImporterSettings.Filename.IsSet())
+                            return false;
+                        break;
+                    case PropertyImporterMethod.FtpBlm:
+                        if (!FTPImporterSettings.Server.IsSet() ||
+                            !FTPImporterSettings.Password.IsSet() ||
+                            !FTPImporterSettings.Filename.IsSet())
+                            return false;
+                        break;
+                }
+
+
+                if (FTPImporterSettings.RequireUnzip)
+                {
+                    if (!FTPImporterSettings.ZipFile.IsSet())
+                        return false;
+                }
+                return true;
+            }
+        }
 
         public PropertySettings()
         {
@@ -57,13 +131,14 @@ namespace Hood.Models
             ShowAskingPrice = true;
             ShowItem = true;
             ShowList = true;
+            DefaultPageSize = 24;
             RentMinimum = 0;
-            RentMaximum = 1000000;
+            RentMaximum = 10000;
             AskingPriceMinimum = 0;
             AskingPriceMaximum = 10000000;
             PremiumMinimum = 0;
             PremiumMaximum = 1000000;
-            RentIncrement = 10000;
+            RentIncrement = 100;
             AskingPriceIncrement = 50000;
             PremiumIncrement = 10000;
             Enabled = false;
@@ -123,278 +198,6 @@ namespace Hood.Models
                 return GetPlanningTypes()[type];
             return "Dwellinghouses";
         }
-    }
-
-    public class PropertyImporterSettings
-    {
-        /// <summary>
-        /// This is the type of importer to use, can be BLM File or Web API.
-        /// </summary>
-        public PropertyImporterMethod Method { get; set; }
-
-        /// <summary>
-        /// Whether or not to use the FTP Service to download the BLM & Image files when using BLM Importer.
-        /// </summary>
-        [Display(Name = "Download from Remote FTP Server")]
-        public bool UseFTP { get; set; }
-        /// <summary>
-        /// Whether or not to use the FTP Service to download the BLM & Image files when using BLM Importer.
-        /// </summary>
-        [Display(Name = "Clear Images Before Downloading new Images")]
-        public bool ClearImagesBeforeImport { get; set; }
-        
-        /// <summary>
-        /// The FTP Server address that is used for the FTP Import
-        /// </summary>
-        [Display(Name = "Remote FTP Server Address")]
-        public string Server { get; set; }
-
-        /// <summary>
-        /// The BLM Filename to be used with the BLM File importer
-        /// </summary>
-        [Display(Name = "BLM Filename (On FTP or Local)")]
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// This is the local folder where files are loaded from if FTP is not used.
-        /// </summary>
-        [Display(Name = "Local folder to load files from (When not using FTP)")]
-        public string LocalFolder { get; set; }
-
-        /// <summary>
-        /// Username for accessing FTP Services or Web APIs
-        /// </summary>
-        [Display(Name = "API/FTP Username")]
-        public string Username { get; set; }
-
-        /// <summary>
-        /// Password for accessing FTP Services or Web APIs
-        /// </summary>
-        [Display(Name = "API/FTP Password")]
-        public string Password { get; set; }
-
-        /// <summary>
-        /// Does the service require a file unzip before importing?
-        /// </summary>
-        [Display(Name = "Require Unzip")]
-        public bool RequireUnzip { get; set; }
-
-        /// <summary>
-        /// Name of the zip file which contains the import data
-        /// </summary>
-        [Display(Name = "Unzip File name")]
-        public string ZipFile { get; set; }
-
-    }
-
-    public enum PropertyImporterMethod
-    {
-        BlmFile, 
-        AltoWebApi,
-    }
-
-    public static class PropertyDetails
-    {
-
-        public static Dictionary<string, string> PlanningTypes = new Dictionary<string, string>()
-        {
-            { "A1",  "Shops" },
-            { "A2",  "Financial and professional services" },
-            { "A3",  "Restaurants and cafes" },
-            { "A4",  "Drinking establishments" },
-            { "A5",  "Hot food takeaways" },
-            { "B1",  "Business" },
-            { "B2",  "General industrial" },
-            { "B8",  "Storage or distribution" },
-            { "C1",  "Hotels" },
-            { "C2",  "Residential institutions" },
-            { "C2A", "Secure Residential Institution" },
-            { "C3",  "Dwellinghouses" },
-            { "C4",  "Houses in multiple occupation" },
-            { "D1",  "Non-residential institutions" },
-            { "D2",  "Assembly and leisure" },
-            { "SG",  "Sui Generis" },
-            { "VAR", "Various / Subject to Planning" }
-        };
-
-        public static Dictionary<int, string> RentFrequency = new Dictionary<int, string>()
-        {
-            { 0,  "{0} weekly" },
-            { 1,  "{0} monthly" },
-            { 2,  "{0} quarterly" },
-            { 3,  "{0} annually" },
-            { 5,  "{0} pppw" },
-            { 101,"At a passing rent of {0}" },
-            { 102,"Offers in excess of {0}" },
-            { 103,"Offers in the region of {0}" },
-            { 104,"Offers invited" },
-            { 105,"Upon Application" },
-            { 106,"Not Applicable" }
-        };
-
-        public static Dictionary<int, string> Fees = new Dictionary<int, string>()
-        {
-            { 0,  "{0} weekly" },
-            { 1,  "{0} monthly" },
-            { 2,  "{0} quarterly" },
-            { 3,  "{0} annually" },
-            { 5,  "{0} pppw" },
-            { 6,  "{0} deposit" }
-        };
-
-        public static Dictionary<int, string> PriceQualifiers = new Dictionary<int, string>()
-        {
-            { 0,  "{0}" },
-            { 1,  "POA" },
-            { 2,  "{0} (Guide)" },
-            { 3,  "{0} (Fixed)" },
-            { 4,  "Offers in Excess of {0}" },
-            { 5,  "Offers in the region of {0}" },
-            { 6,  "Sale by Tender" },
-            { 7,  "From {0}" },
-            { 8,  "Shared Ownership" },
-            { 9,  "Offers Over {0}" },
-            { 10, "Part Buy/Part Rent" },
-            { 101, "{0}" },
-            { 104,"Offers invited" },
-            { 105,"Upon Application" },
-            { 106,"Not Applicable" }
-        };
-
-        public static Dictionary<int, string> Furnished = new Dictionary<int, string>()
-        {
-            { 0, "Furnished" },
-            { 1, "Part Furnished" },
-            { 2, "Furnished" },
-            { 3, "Not Specified" },
-            { 4, "Furnished/Un Furnished" }
-        };
-
-        public static Dictionary<int, string> Status = new Dictionary<int, string>()
-        {
-            { 0, "Available" },
-            { 1, "SSTC" },
-            { 2, "SSTCM" },
-            { 3, "Under Offer" },
-            { 4, "Reserved" },
-            { 5, "Let Agreed" },
-            { 6, "Sold" },
-            { 101,  "New instruction" },
-            { 102,  "Price reduction" },
-            { 103,  "Re-available" },
-            { 104,  "Under offer" }
-       };
-
-        public static Dictionary<int, string> Tenures = new Dictionary<int, string>()
-        {
-            { 1,  "Freehold" },
-            { 2,  "Leasehold " },
-            { 3,  "Feudal" },
-            { 4,  "Commonhold" },
-            { 5,  "Share of Freehold" },
-        };
-
-        public static Dictionary<int, string> ListingTypes = new Dictionary<int, string>()
-        {
-            { 0,  "Not Specified" },
-            { 1,  "Long Term" },
-            { 2,  "Short Term" },
-            { 3,  "Student" },
-            { 4,  "Commercial" },
-            { 5,  "Lease for sale" },
-            { 6,  "Sub-lease" },
-            { 7,  "Sale" }
-        };
-
-        public static Dictionary<int, string> LeaseStatuses = new Dictionary<int, string>()
-        {
-            { 0,  "Available" },
-            { 1,  "Sold Subject To Contract" },
-            { 2,  "Sold Subject to Conclusion of Missives" },
-            { 3,  "Under Offer" },
-            { 4,  "Reserved" },
-            { 5,  "Let Agreed" },
-            { 6,  "Sold" },
-            { 7,  "Let" }
-        };
-
-        public static Dictionary<int, string> PropertyTypes = new Dictionary<int, string>()
-        {
-            { 0,  "Not Specified" },
-            { 51, "Garages" },
-            { 1, "Terraced" },
-            { 52, "Farm House" },
-            { 2, "End of Terrace" },
-            { 53, "Equestrian" },
-            { 3, "Semi-Detached" },
-            { 56, "Duplex" },
-            { 4, "Detached" },
-            { 59, "Triplex" },
-            { 5, "Mews" },
-            { 62, "Longere" },
-            { 6, "Cluster House" },
-            { 65, "Gite" },
-            { 7, "Ground Flat" },
-            { 68, "Barn" },
-            { 8, "Flat" },
-            { 71, "Trulli" },
-            { 9, "Studio" },
-            { 74, "Mill" },
-            { 10, "Ground Maisonette" },
-            { 77, "Ruins" },
-            { 11, "Maisonette" },
-            { 80, "Restaurant" },
-            { 12, "Bungalow" },
-            { 83, "Cafe" },
-            { 13, "Terraced Bungalow" },
-            { 86, "Mill" },
-            { 14, "Semi-Detached Bungalow" },
-            { 89, "Trulli" },
-            { 15, "Detached Bungalow" },
-            { 92, "Castle" },
-            { 16, "Mobile Home" },
-            { 95, "Village House" },
-            { 17, "Hotel" },
-            { 101, "Cave House" },
-            { 18, "Guest House" },
-            { 104, "Cortijo" },
-            { 19, "Commercial Property" },
-            { 107, "Farm Land" },
-            { 20, "Land" },
-            { 110, "Plot" },
-            { 21, "Link Detached House" },
-            { 113, "Country House" },
-            { 22, "Town House" },
-            { 116, "Stone House" },
-            { 23, "Cottage" },
-            { 117, "Caravan" },
-            { 24, "Chalet" },
-            { 118, "Lodge" },
-            { 27, "Villa" },
-            { 119, "Log Cabin" },
-            { 28, "Apartment" },
-            { 120, "Manor House" },
-            { 29, "Penthouse" },
-            { 121, "Stately Home" },
-            { 30, "Finca" },
-            { 125, "Off-Plan" },
-            { 43, "Barn Conversion" },
-            { 128, "Semi-detached Villa" },
-            { 44, "Serviced Apartments" },
-            { 131, "Detached Villa" },
-            { 45, "Parking" },
-            { 134, "Bar" },
-            { 46, "Sheltered Housing" },
-            { 137, "Shop" },
-            { 47, "Retirement Property" },
-            { 140, "Riad" },
-            { 48, "House Share" },
-            { 141, "House Boat" },
-            { 49, "Flat Share" },
-            { 142, "Hotel Room" }
-        };
-
-
     }
 
 }
