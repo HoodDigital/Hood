@@ -109,7 +109,7 @@ namespace Hood.Controllers
         }
 
         [Route("hood/version/")]
-        public JsonResult GetVersion()
+        public JsonResult Version()
         {
             return Json(new { version = Engine.Version });
         }

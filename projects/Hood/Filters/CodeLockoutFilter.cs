@@ -44,6 +44,10 @@ namespace Hood.Filters
                     controller.Equals("Hood", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
+                if (action.Equals(nameof(Hood.Controllers.HoodController.Version), StringComparison.InvariantCultureIgnoreCase) &&
+                    controller.Equals("Hood", StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
                 if (action.Equals(nameof(Hood.Controllers.ErrorController.AppError), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Error", StringComparison.InvariantCultureIgnoreCase))
                     return;
