@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Stripe;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hood.Services
@@ -74,7 +75,7 @@ namespace Hood.Services
                 mailObject.AddParagraph($"Webhook received on site: <strong>{stripeEvent.GetEventName()}</strong>");
                 mailObject.AddParagraph($"Message: <strong>{ex.Message}</strong>");
                 if (ex.InnerException != null)
-                mailObject.AddParagraph($"Detail: <strong>{ex.InnerException.Message}</strong>");
+                    mailObject.AddParagraph($"Detail: <strong>{ex.InnerException.Message}</strong>");
                 mailObject.AddParagraph($"<strong>Stripe Event:</strong><br />");
                 mailObject.AddDiv(stripeEvent.ToJson().ToHtml());
                 mailObject.Template = MailSettings.DangerTemplate;
@@ -227,15 +228,57 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         protected async Task InvoicePaymentFailedAsync(Invoice failedInvoice)
         {
-            var user = await _account.GetUserByStripeIdAsync(failedInvoice.CustomerId);
-            if (user != null)
+            var sub = await _stripe.GetSusbcriptionByIdAsync(failedInvoice.SubscriptionId);
+
+            // if sub status is incomplete, then this is being fired by the subscription creation process, ignore it for now.
+            if (sub.Status == SubscriptionStatuses.Incomplete)
+                return;
+
+            failedInvoice.PaymentIntent = await _stripe.PaymentIntentService.GetAsync(failedInvoice.PaymentIntentId);
+            if (failedInvoice.PaymentIntent != null)
             {
-                Stripe.Subscription failedInvoiceSubscription = await _stripe.GetSusbcriptionByIdAsync(failedInvoice.SubscriptionId);
-                throw new AlertedException($"An invoice payment for subscription ({failedInvoice.SubscriptionId}) has failed for user: {user.ToAdminName()}", new Exception($"Invoice URL: {failedInvoice.HostedInvoiceUrl}"));
-            }
-            else
-            {
-                throw new AlertedException($"An invoice payment for subscription ({failedInvoice.SubscriptionId}) has failed for customer (could not match user): {failedInvoice.CustomerId}", new Exception($"Invoice URL: {failedInvoice.HostedInvoiceUrl}"));
+                MailObject message;
+                switch (failedInvoice.PaymentIntent.Status)
+                {
+                    case "succeeded":
+                        break;
+                    case "processing":
+                        break;
+                    case "canceled":
+                        break;
+                    case "requires_payment_method":
+                        var charge = failedInvoice.PaymentIntent.Charges.OrderByDescending(c => c.Created).FirstOrDefault();
+                        message  = new MailObject()
+                        {
+                            To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoice.CustomerEmail),
+                            PreHeader = "Payment method failed...",
+                            Subject = "Your subscription requires further action to complete renewal."
+                        };
+                        message.AddParagraph("The payment method you have saved has not worked.");
+                        if (failedInvoice.SubscriptionId.IsSet())
+                            message.AddParagraph("Click the link below to complete your payment using a new payment method and continue using the service.");
+                        else
+                            message.AddParagraph("Click the link below to complete your payment using a new payment method.");
+                        message.AddCallToAction("Complete payment", failedInvoice.HostedInvoiceUrl);
+                        break;
+                    case "requires_action":
+                        message = new MailObject()
+                        {
+                            To = new SendGrid.Helpers.Mail.EmailAddress(failedInvoice.CustomerEmail),
+                            PreHeader = "Authentication required...",
+                            Subject = "Your subscription requires further action to complete renewal."
+                        };
+                        message.AddParagraph("Your card requires further authentication in order for your payment to be completed.");
+                        if (failedInvoice.SubscriptionId.IsSet())
+                            message.AddParagraph("Click the link below to complete your payment and continue using the service.");
+                        else
+                            message.AddParagraph("Click the link below to complete your payment.");
+                        message.AddCallToAction("Complete payment", failedInvoice.HostedInvoiceUrl);
+                        await _emailSender.SendEmailAsync(message);
+                        break;
+                }
+
+
             }
         }
         /// <summary>

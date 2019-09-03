@@ -147,6 +147,7 @@ namespace Hood.Services
                 .Include(u => u.Content)
                 .Include(u => u.Properties)
                 .Include(u => u.Forums)
+                .Include(u => u.Addresses)
                 .Include(u => u.Topics)
                 .Include(u => u.Posts)
                 .Include(u => u.Posts)
@@ -182,6 +183,8 @@ namespace Hood.Services
                 user.Content.ForEach(c => c.AuthorId = siteOwner.Id);
                 user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
                 user.Forums.ForEach(f => f.AuthorId = siteOwner.Id);
+
+                _db.Logs.Where(l => l.UserId == userId).ForEach(f => f.UserId = siteOwner.Id);
 
                 UserProfile userProfile = await GetUserProfileByIdAsync(user.Id);
                 if (userProfile.ActiveSubscriptions != null)
@@ -1210,13 +1213,23 @@ namespace Hood.Services
         {
             // Load user object and clear cache.
             ApplicationUser user = await GetUserByIdAsync(userId);
-            UserSubscription newUserSub = new UserSubscription();
-            newUserSub = newUserSub.UpdateFromStripe(newSubscription);
-            newUserSub.StripeId = newSubscription.Id;
-            newUserSub.CustomerId = user.StripeId;
-            newUserSub.UserId = user.Id;
-            newUserSub.SubscriptionId = planId;
-            await _db.UserSubscriptions.AddAsync(newUserSub);
+
+            UserSubscription newUserSub = await GetUserSubscriptionByStripeIdAsync(newSubscription.Id);
+            if (newUserSub!= null)
+            {
+                newUserSub = newUserSub.UpdateFromStripe(newSubscription);
+            }
+            else
+            {
+                newUserSub = new UserSubscription();
+                newUserSub = newUserSub.UpdateFromStripe(newSubscription);
+                newUserSub.StripeId = newSubscription.Id;
+                newUserSub.CustomerId = user.StripeId;
+                newUserSub.UserId = user.Id;
+                newUserSub.SubscriptionId = planId;
+                await _db.UserSubscriptions.AddAsync(newUserSub);
+            }
+
             _db.SaveChanges();
             return newUserSub;
         }
@@ -1249,10 +1262,19 @@ namespace Hood.Services
             {
                 throw new Exception("There was a problem loading the subscription object.");
             }
+            Stripe.Subscription sub = await _stripe.GetSusbcriptionByIdAsync(userSub.StripeId);
+            if (sub == null || sub.Status == SubscriptionStatuses.Canceled)
+            {
+                // no matched item found on stripe. mark as cancelled to remove from account.
+                userSub.Status = SubscriptionStatuses.Canceled;
+                await _db.SaveChangesAsync();
+                return userSub;
+            }
 
-            Stripe.Subscription sub = await _stripe.CancelSubscriptionAsync(userSub.StripeId, cancelAtPeriodEnd, invoiceNow, prorate);
+            sub = await _stripe.CancelSubscriptionAsync(userSub.StripeId, cancelAtPeriodEnd, invoiceNow, prorate);
             userSub = userSub.UpdateFromStripe(sub);
             await _db.SaveChangesAsync();
+
             return userSub;
         }
         public async Task<UserSubscription> ReactivateUserSubscriptionAsync(int userSubscriptionId)

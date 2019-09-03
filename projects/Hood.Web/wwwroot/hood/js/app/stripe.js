@@ -122,7 +122,7 @@ $.hood.Stripe = {
         },
         SetDefault: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
             setDefaultCardCallback = function (isConfirm) {
                 if (isConfirm) {
@@ -143,7 +143,7 @@ $.hood.Stripe = {
         },
         Delete: function (e) {
             e.preventDefault();
-            $tag = $(this);
+            let $tag = $(this);
 
             deleteCardCallback = function (isConfirm) {
                 if (isConfirm) {
@@ -247,13 +247,17 @@ $.hood.Stripe = {
         BuyWithExisting: function (e) {
             e.preventDefault();
             if (!$('#buy-plan-submit').hasClass("processing")) {
-                fetch($('#buy-plan-submit').data('url'), {
+                $.hood.Stripe.Subscriptions.ToggleButton(true);
+               fetch($('#buy-plan-submit').data('url'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ PlanId: $('#buy-plan-id').val(), PaymentMethodId: $("input[name='buy-plan-method']:checked").val() })
                 }).then(function (confirmResult) {
                     return confirmResult.json();
                 }).then($.hood.Stripe.Subscriptions.HandleServerResponse);
+            }
+            else {
+                $.hood.Stripe.Subscriptions.ToggleButton(false);
             }
         },
         BuyWithNewCard: function (e) {
@@ -277,6 +281,9 @@ $.hood.Stripe = {
                         }).then($.hood.Stripe.Subscriptions.HandleServerResponse);
                     }
                 });
+            }
+            else {
+                $.hood.Stripe.Subscriptions.ToggleButton(false);
             }
         },
 

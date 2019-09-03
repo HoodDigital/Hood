@@ -37,7 +37,7 @@ To install Hood JS & LESS via LibMan, add the following lines to your libman.jso
 ```
 {
     "destination": "wwwroot/hood",
-    "library": "hoodcms@3.0.0-pre4",
+    "library": "hoodcms@3.0.1",
     "provider": "jsdelivr"
 }
 ```

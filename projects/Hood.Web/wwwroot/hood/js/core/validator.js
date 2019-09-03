@@ -10,7 +10,7 @@ $.hood.FormValidator = function (element, options) {
         submitUrl: null,
         submitFunction: null,
         serializationFunction: function () {
-            rtn = $(this.formTag).serialize();
+            let rtn = $(this.formTag).serialize();
             return rtn;
         }
     }, options || {});

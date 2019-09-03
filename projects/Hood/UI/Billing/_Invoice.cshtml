@@ -3,13 +3,20 @@
     <div class="panel-heading accordion-title">
         <a data-toggle="collapse" href="@string.Format("#collapse-invoice-{0}", Model.Id)">
             <span class="pull-right">
-                @if (Model.Paid)
+                @switch (Model.Status)
                 {
-                    <span class="label label-success">PAID</span>
-                }
-                else
-                {
-                    <span class="label label-warning">UNPAID</span>
+                    case "paid":
+                        <span class="label label-success">@Model.Status.ToTitleCase()</span>
+                        break;
+                    case "draft":
+                        <span class="label label-warning">@Model.Status.ToTitleCase()</span>
+                        break;
+                    case "open":
+                        <span class="label label-danger">@Model.Status.ToTitleCase()</span>
+                        break;
+                    case "void":
+                        <span class="label label-default">@Model.Status.ToTitleCase()</span>
+                        break;
                 }
             </span>
             Invoice
@@ -35,7 +42,7 @@
                     }
                     @if (Model.Tax.HasValue)
                     {
-                       <tr>
+                        <tr>
                             <td class="text-right">Tax:</td>
                             <td><strong>@Model.Tax.Value.ToCurrencyString()</strong></td>
                         </tr>
@@ -48,22 +55,86 @@
                         <td class="text-right">Amount Paid:</td>
                         <td><strong>@Model.AmountPaid.ToCurrencyString()</strong></td>
                     </tr>
-            @if (Model.AmountRemaining > 0)
-            {
-                    <tr>
-                        <td class="text-right">Amount Remaining:</td>
-                        <td><strong>@Model.AmountRemaining.ToCurrencyString()</strong></td>
-                    </tr>
-            }
+                    @if (Model.AmountRemaining > 0)
+                    {
+                        <tr>
+                            <td class="text-right">Amount Remaining:</td>
+                            <td><strong>@Model.AmountRemaining.ToCurrencyString()</strong></td>
+                        </tr>
+                    }
                 </table>
             }
-            @if (Model.AmountRemaining > 0)
+            @if (Model.PaymentIntent != null)
             {
-                <alert icon="fa fa-exlamation-circle">You will be billed @Model.AmountDue.ToCurrencyString() on @Model.PeriodEnd.ToDisplay()</alert>
+                var charge = Model.PaymentIntent.Charges.OrderByDescending(c => c.Created).FirstOrDefault();
+                @switch (Model.PaymentIntent.Status)
+                {
+                    case "succeeded":
+                        <alert>
+                            @if (charge != null)
+                            {
+                                <p>
+                                    Your card has been charged @Model.PaymentIntent.AmountReceived.Value.ToCurrencyString() on
+                                    @charge.Created.ToDisplay()
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    Your card has been charged @Model.PaymentIntent.AmountReceived.Value.ToCurrencyString() on
+                                    @Model.PaymentIntent.Created.Value.ToDisplay()
+                                </p>
+                            }
+                      </alert>
+                        break;
+                    case "processing":
+                        <alert type="Info">
+                            Your card payment is currently processing.
+                        </alert>
+                        break;
+                    case "canceled":
+                        <alert type="Danger">
+                            Your payment has been cancelled.
+                        </alert>
+                        break;
+                    case "requires_payment_method":
+                        <alert type="Warning">
+                            @if (charge != null)
+                            {
+                                <p>Your payment was not completed successfully: @charge.FailureMessage</p>
+                            }
+                            else
+                            {
+                                <p>Your payment was not completed successfully, the payment method provided did not work.</p>
+                            }
+                        </alert>
+                        break;
+                    case "requires_action":
+                        <alert type="Warning">
+                            <p>Your payment was not completed successfully, you will need to authenticate the transaction further.</p>
+                            <p>You will have received an email with further instructions to complete your payment, check your inbox.</p>
+                        </alert>
+                        break;
+                }
             }
-            @if (Model.Total < 0)
+            else
             {
-                <alert icon="fa fa-exlamation-circle">The total amount (@Model.Total.ToCurrencyString()) will be credited to your next invoice.</alert>
+                <p>No charge has been attempted.</p>
+            }
+            @if (Model.Status != "paid")
+            {
+                if (Model.NextPaymentAttempt.HasValue)
+                {
+                    <alert>
+                        Your payment will be re-attempted at @Model.NextPaymentAttempt.Value.ToString()
+                    </alert>
+                }
+                else
+                {
+                    <alert>
+                        Your payment will not be attempted again.
+                    </alert>
+                }
             }
         </div>
     </div>

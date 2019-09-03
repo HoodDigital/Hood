@@ -94,7 +94,8 @@ namespace Hood.Models
                 if (!StripeLiveKey.IsSet() ||
                     !StripeLivePublicKey.IsSet() ||
                     !StripeTestKey.IsSet() ||
-                    !StripeTestPublicKey.IsSet())
+                    !StripeTestPublicKey.IsSet() ||
+                    !StripeWebhookSecret.IsSet())
                     return false;
                 return true;
             }

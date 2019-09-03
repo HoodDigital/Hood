@@ -70,7 +70,9 @@ namespace Hood.Controllers
             };
             if (User.IsSubscribedToProduct(model.Plan.SubscriptionProductId))
             {
-                throw new Exception("You already have an active subscription to this product. You can change to another package from your Manage Subscriptions page");
+                SaveMessage = "You already have an active subscription to this product. You can change to another package from your Manage Subscriptions page";
+                MessageType = AlertType.Warning;
+                return RedirectToAction(nameof(Index));
             }
 
             return View(model);
@@ -83,10 +85,6 @@ namespace Hood.Controllers
             try
             {
                 Models.Subscription plan = await _account.GetSubscriptionPlanByIdAsync(model.PlanId);
-                if (User.IsSubscribedToProduct(plan.SubscriptionProductId))
-                {
-                    throw new Exception("You already have an active subscription to this product. You can change to another package from your Manage Subscriptions page");
-                }
 
                 Customer customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id);
                 if (customer == null)
@@ -119,7 +117,8 @@ namespace Hood.Controllers
                         subscription = await _stripe.AddCustomerToPlan(customer.Id, plan.StripeId, paymentMethodId: model.PaymentMethodId);
                     }
                 }
-                if (subscription.Status == Stripe.SubscriptionStatuses.Trialing || subscription.LatestInvoice.PaymentIntent.Status == "succeeded")
+                if (subscription.Status == Stripe.SubscriptionStatuses.Active ||
+                        (subscription.Status == Stripe.SubscriptionStatuses.Trialing && subscription.LatestInvoice.PaymentIntent.Status == "succeeded"))
                 {
                     Models.UserSubscription userSub = await _account.CreateUserSubscription(plan.Id, Engine.Account.Id, subscription);
                     return Json(new
@@ -368,7 +367,7 @@ namespace Hood.Controllers
                 await _webHooks.ProcessEventAsync(stripeEvent);
                 return new StatusCodeResult(200);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return BadRequest();
             }
