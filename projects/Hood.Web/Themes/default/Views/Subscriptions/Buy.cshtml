@@ -39,7 +39,7 @@
                 </h4>
             </div>
             <form id="buy-plan-form" class="panel-body" data-stripe="@(settings.EnableStripeTestMode ? settings.StripeTestPublicKey : settings.StripeLivePublicKey)">
-                <input id="buy-plan-id" value="@Model.Plan.Id" />
+                <input type="hidden" id="buy-plan-id" value="@Model.Plan.Id" />
                 <div id="payment-method-list" class="hood-inline" data-url="@Url.Action("PaymentMethods", "Billing", new { viewName = "_List_PaymentMethodRadios" })">
                     <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Dark" class="text-center">Loading payment methods...</alert>
                 </div>

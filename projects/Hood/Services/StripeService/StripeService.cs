@@ -332,6 +332,7 @@ namespace Hood.Services
                 StartingAfter = startAfterId,
                 Limit = pageSize
             };
+            options.AddExpand("data.payment_intent");
             return await InvoiceService.ListAsync(options);
         }
         public async Task<Invoice> GetUpcomingInvoiceAsync(string customerId)
@@ -340,8 +341,8 @@ namespace Hood.Services
             {
                 CustomerId = customerId
             };
-            InvoiceService invoiceService = new InvoiceService(Client);
-            return await invoiceService.UpcomingAsync(options);
+            options.AddExpand("data.payment_intent");
+            return await InvoiceService.UpcomingAsync(options);
         }
         #endregion
 

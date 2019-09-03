@@ -112,7 +112,7 @@ $.hood.Stripe = {
     },
     SetDefault: function SetDefault(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
       setDefaultCardCallback = function setDefaultCardCallback(isConfirm) {
         if (isConfirm) {
@@ -127,7 +127,7 @@ $.hood.Stripe = {
     },
     Delete: function Delete(e) {
       e.preventDefault();
-      $tag = $(this);
+      var $tag = $(this);
 
       deleteCardCallback = function deleteCardCallback(isConfirm) {
         if (isConfirm) {
@@ -219,6 +219,7 @@ $.hood.Stripe = {
       e.preventDefault();
 
       if (!$('#buy-plan-submit').hasClass("processing")) {
+        $.hood.Stripe.Subscriptions.ToggleButton(true);
         fetch($('#buy-plan-submit').data('url'), {
           method: 'POST',
           headers: {
@@ -231,6 +232,8 @@ $.hood.Stripe = {
         }).then(function (confirmResult) {
           return confirmResult.json();
         }).then($.hood.Stripe.Subscriptions.HandleServerResponse);
+      } else {
+        $.hood.Stripe.Subscriptions.ToggleButton(false);
       }
     },
     BuyWithNewCard: function BuyWithNewCard(e) {
@@ -258,6 +261,8 @@ $.hood.Stripe = {
             }).then($.hood.Stripe.Subscriptions.HandleServerResponse);
           }
         });
+      } else {
+        $.hood.Stripe.Subscriptions.ToggleButton(false);
       }
     },
     HandleServerResponse: function HandleServerResponse(response) {
