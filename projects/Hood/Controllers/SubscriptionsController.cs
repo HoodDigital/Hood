@@ -367,7 +367,7 @@ namespace Hood.Controllers
                 await _webHooks.ProcessEventAsync(stripeEvent);
                 return new StatusCodeResult(200);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return BadRequest();
             }
