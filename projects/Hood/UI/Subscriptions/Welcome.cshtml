@@ -60,7 +60,7 @@
                 if (Model.CurrentUserSubscription.CancelAtPeriodEnd)
                 {
                     <a class="btn btn-sm btn-success confirm" data-warning="Are you sure you want to reactiveate your subscription? You will be charged again on your next payment date as usual, and no extra charges will be made. Your account will remain active." asp-action="Reactivate" asp-controller="Subscriptions" asp-route-id="@Model.CurrentUserSubscription.Id">Re-Activate</a>
-                    <a class="btn btn-sm btn-danger confirm" data-warning="Are you sure you want to cancel your susbcription? This cannot be undone, however you can buy a new subscription at any time." asp-action="Remove" asp-controller="Subscriptions" asp-route-id="@Model.CurrentUserSubscription.Id">Fully Cancel (Refund remaining charges)</a>
+                    @*<a class="btn btn-sm btn-danger confirm" data-warning="Are you sure you want to cancel your susbcription? This cannot be undone, however you can buy a new subscription at any time." asp-action="Remove" asp-controller="Subscriptions" asp-route-id="@Model.CurrentUserSubscription.Id">Fully Cancel (Refund remaining charges)</a>*@
                 }
                 else
                 {

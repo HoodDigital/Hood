@@ -147,6 +147,7 @@ namespace Hood.Services
                 .Include(u => u.Content)
                 .Include(u => u.Properties)
                 .Include(u => u.Forums)
+                .Include(u => u.Addresses)
                 .Include(u => u.Topics)
                 .Include(u => u.Posts)
                 .Include(u => u.Posts)
@@ -182,6 +183,8 @@ namespace Hood.Services
                 user.Content.ForEach(c => c.AuthorId = siteOwner.Id);
                 user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
                 user.Forums.ForEach(f => f.AuthorId = siteOwner.Id);
+
+                _db.Logs.Where(l => l.UserId == userId).ForEach(f => f.UserId = siteOwner.Id);
 
                 UserProfile userProfile = await GetUserProfileByIdAsync(user.Id);
                 if (userProfile.ActiveSubscriptions != null)
