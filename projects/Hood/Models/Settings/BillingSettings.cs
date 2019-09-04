@@ -72,6 +72,22 @@ namespace Hood.Models
         [Display(Name = "Stripe Currency", Description = "You can choose a single currency for your site's subscriptions and billing.")]
         public string StripeCurrency { get; set; }
 
+        public string StripeCurrencySymbol {
+            get
+            {
+                switch (StripeCurrency)
+                {
+                    case "usd":
+                        return "$";
+                    case "gbp":
+                        return "£";
+                    case "eur":
+                        return "€";
+                }
+                return "";
+            }
+        }
+
         public bool IsCartEnabled
         {
             get

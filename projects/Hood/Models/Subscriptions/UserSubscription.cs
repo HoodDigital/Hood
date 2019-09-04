@@ -1,6 +1,7 @@
 ﻿using Hood.Entities;
 using Microsoft.AspNetCore.Html;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
@@ -26,20 +27,30 @@ namespace Hood.Models
                 switch (Status)
                 {
                     case Stripe.SubscriptionStatuses.Active:
+                        if (CancelAtPeriodEnd)
+                            return new HtmlString("<span class='badge badge-success'><i class='fa fa-check-circle mr-2'></i>Active (Cancelling)</span>");
                         return new HtmlString("<span class='badge badge-success'><i class='fa fa-check-circle mr-2'></i>Active</span>");
                     case Stripe.SubscriptionStatuses.Trialing:
-                        return new HtmlString("<span class='badge badge-warning'><i class='fa fa-info mr-2'></i>Trialing</span>");
+                        if (CancelAtPeriodEnd)
+                            return new HtmlString("<span class='badge badge-warning'><i class='fa fa-check-circle mr-2'></i>Trial (Cancelling)</span>");
+                        return new HtmlString("<span class='badge badge-warning'><i class='fa fa-info mr-2'></i>Trial</span>");
                     case Stripe.SubscriptionStatuses.Canceled:
                         return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Canceled</span>");
                     case Stripe.SubscriptionStatuses.PastDue:
-                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>PastDue</span>");
+                        if (CancelAtPeriodEnd)
+                            return new HtmlString("<span class='badge badge-danger'><i class='fa fa-check-circle mr-2'></i>Past Due (Cancelling)</span>");
+                        return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Past Due</span>");
                     case Stripe.SubscriptionStatuses.Incomplete:
                         return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Incomplete</span>");
                     case Stripe.SubscriptionStatuses.IncompleteExpired:
                         return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Incomplete Expired</span>");
                     case Stripe.SubscriptionStatuses.Unpaid:
+                        if (CancelAtPeriodEnd)
+                            return new HtmlString("<span class='badge badge-success'><i class='fa fa-check-circle mr-2'></i>Unpaid (Cancelling)</span>");
                         return new HtmlString("<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>Unpaid</span>");
                 }
+                if (CancelAtPeriodEnd)
+                    return new HtmlString($"<span class='badge badge-danger'><i class='fa fa-check-circle mr-2'></i>{Status} (Cancelling)</span>");
                 return new HtmlString($"<span class='badge badge-danger'><i class='fa fa-exclamation-triangle mr-2'></i>{Status}</span>");
             }
         }
@@ -63,7 +74,8 @@ namespace Hood.Models
 
         public bool IsActive => Status == "trialing" || Status == "active";
 
-
+        [NotMapped]
+        public Stripe.Subscription StripeSubscription { get; set; }
     }
 
     public static class UserSubscriptionExtensions

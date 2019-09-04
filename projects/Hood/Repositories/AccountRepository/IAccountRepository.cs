@@ -43,7 +43,7 @@ namespace Hood.Services
         #region Stripe customer object
         Task<Stripe.Customer> GetOrCreateStripeCustomerForUser(string userId);
         Task<List<Stripe.Customer>> GetMatchingCustomerObjectsAsync(string email);
-        Task<ApplicationUser> CreateLocalUserForCustomerObject(Customer customer);
+        Task<ApplicationUser> GetOrCreateLocalUserForCustomerObject(Customer customer);
         #endregion
 
         #region Subscription Products

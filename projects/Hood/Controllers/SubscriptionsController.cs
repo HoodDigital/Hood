@@ -117,8 +117,7 @@ namespace Hood.Controllers
                         subscription = await _stripe.AddCustomerToPlan(customer.Id, plan.StripeId, paymentMethodId: model.PaymentMethodId);
                     }
                 }
-                if (subscription.Status == Stripe.SubscriptionStatuses.Active ||
-                        (subscription.Status == Stripe.SubscriptionStatuses.Trialing && subscription.LatestInvoice.PaymentIntent.Status == "succeeded"))
+                if (subscription.Status == Stripe.SubscriptionStatuses.Active || subscription.Status == Stripe.SubscriptionStatuses.Trialing)
                 {
                     Models.UserSubscription userSub = await _account.CreateUserSubscription(plan.Id, Engine.Account.Id, subscription);
                     return Json(new
@@ -169,10 +168,10 @@ namespace Hood.Controllers
                 {
                     throw new Exception("Could not find the subscription.");
                 }
+                sub.StripeSubscription = await _stripe.GetSusbcriptionByIdAsync(sub.StripeId);
                 SubscriptionWelcomeModel model = new SubscriptionWelcomeModel()
                 {
-                    CurrentUserSubscription = sub,
-                    CurrentSubscription = await _stripe.GetSusbcriptionByIdAsync(sub.StripeId),
+                    UserSubscription = sub,
                     Customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id)
                 };
                 return View(model);
@@ -251,7 +250,7 @@ namespace Hood.Controllers
                 }
 
                 await _stripe.SwitchSubscriptionPlanAsync(sub.StripeId, plan.StripeId);
-                await _account.SyncUserSubscriptionAsync(model.SubscriptionId, sub.StripeId);
+                sub = await _account.SyncUserSubscriptionAsync(model.SubscriptionId, sub.StripeId);
 
                 SaveMessage = $"Successfully switched onto the new subscription.";
                 MessageType = AlertType.Success;
@@ -260,15 +259,17 @@ namespace Hood.Controllers
                 {
                     return Redirect(model.ReturnUrl);
                 }
+
+                return RedirectToAction(nameof(Welcome), new { id = sub.Id });
             }
             catch (Exception ex)
             {
                 SaveMessage = $"Error upgrading subscription: {ex.Message}";
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<SubscriptionsController>(SaveMessage, ex);
+                return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
         }
         [Authorize]
         [StripeAccountRequired]
@@ -360,15 +361,36 @@ namespace Hood.Controllers
             {
                 if (!Engine.Settings.Billing.StripeWebhookSecret.IsSet())
                 {
-                    throw new Exception("Cannot process a signed webhook without a Stripe Webhook Secret. Set one in the Billing Settings to fix this.");
+                    Event stripeEvent = EventUtility.ParseEvent(json);
+                    await _webHooks.ProcessEventAsync(stripeEvent);
+                }
+                else
+                {
+                    Event stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], Engine.Settings.Billing.StripeWebhookSecret);
+                    await _webHooks.ProcessEventAsync(stripeEvent);
                 }
 
-                Event stripeEvent = EventUtility.ParseEvent(json);
-                await _webHooks.ProcessEventAsync(stripeEvent);
                 return new StatusCodeResult(200);
             }
             catch (Exception ex)
             {
+                MailObject mailObject = new MailObject()
+                {
+                    PreHeader = "Stripe Webhook Error"
+                };
+                mailObject.Subject = mailObject.PreHeader;
+                mailObject.AddH3("An Stripe WebHook error occurred!");
+                mailObject.AddParagraph($"Message: <strong>{ex.Message}</strong>");
+                if (ex.InnerException != null)
+                    mailObject.AddParagraph($"Detail: <strong>{ex.InnerException.Message}</strong>");
+                mailObject.AddParagraph($"<strong>Stripe Event:</strong><br />");
+                mailObject.AddDiv(json.ToHtml());
+                mailObject.Template = Models.MailSettings.DangerTemplate;
+
+                await _emailSender.NotifyRoleAsync(mailObject, "Admin");
+
+                await _logService.AddExceptionAsync<StripeWebHookService>($"An error occurred processing a stripe webhook.", ex);
+
                 return BadRequest();
             }
         }

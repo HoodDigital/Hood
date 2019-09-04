@@ -1,5 +1,5 @@
 @model Stripe.Invoice
-<div class="panel panel-default no-margin accordion-section">
+<div class="panel panel-default accordion-section m-b-xs">
     <div class="panel-heading accordion-title">
         <a data-toggle="collapse" href="@string.Format("#collapse-invoice-{0}", Model.Id)">
             <span class="pull-right">
@@ -112,7 +112,8 @@
                     case "requires_action":
                         <alert type="Warning">
                             <p>Your payment was not completed successfully, you will need to authenticate the transaction further.</p>
-                            <p>You will have received an email with further instructions to complete your payment, check your inbox.</p>
+                            <p><a class="btn btn-warning" href="@Model.HostedInvoiceUrl">Complete the payment</a></p>
+                            <p>You will also have received an email with further instructions to complete your payment.</p>
                         </alert>
                         break;
                 }

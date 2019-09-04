@@ -1,9 +1,22 @@
-﻿using System;
+﻿using Hood.Extensions;
+using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
     public class UserSubscriptionInfo
     {
+        public UserSubscriptionInfo()
+        {                
+        }
+
+        public UserSubscriptionInfo(UserSubscription userSubscription)
+        {
+            userSubscription.CopyProperties(this);
+            Name = userSubscription.Subscription.Name;
+            Amount = userSubscription.Subscription.Amount;
+        }
+
         public int Id { get; set; }
         public int PlanId { get; set; }
         public string StripeSubscriptionId { get; set; }
@@ -20,6 +33,11 @@ namespace Hood.Models
         public bool CancelAtPeriodEnd { get; set; }
         public string Interval { get; set; }
         public int IntervalCount { get; set; }
+
+        [NotMapped]
+        public DateTime? Created { get; set; }
+        [NotMapped]
+        public Stripe.Subscription StripeSubscription { get; set; }
 
     }
 }

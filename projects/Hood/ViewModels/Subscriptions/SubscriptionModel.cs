@@ -28,8 +28,7 @@ namespace Hood.ViewModels
     }
     public class SubscriptionWelcomeModel : SubscriptionModelBase
     {
-        public UserSubscription CurrentUserSubscription { get; set; }
-        public Stripe.Subscription CurrentSubscription { get; set; }
+        public UserSubscription UserSubscription { get; set; }
     }
     public class ConfirmSubscriptionModel : SubscriptionModelBase
     {

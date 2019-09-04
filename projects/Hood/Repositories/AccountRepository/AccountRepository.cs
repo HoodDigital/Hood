@@ -110,10 +110,14 @@ namespace Hood.Services
                 return null;
             }
         }
-        public async Task<ApplicationUser> CreateLocalUserForCustomerObject(Customer customer)
+        public async Task<ApplicationUser> GetOrCreateLocalUserForCustomerObject(Customer customer)
         {
+            var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == customer.Email);
+            if (user != null)
+                return user;
+
             // a user with this email address does not exist on the site, let's create one so they can access their account.
-            var newUser = new ApplicationUser
+            user = new ApplicationUser
             {
                 UserName = customer.Email,
                 Email = customer.Email,
@@ -124,9 +128,10 @@ namespace Hood.Services
                 CreatedOn = DateTime.Now,
                 StripeId = customer.Id
             };
-            var result = await _userManager.CreateAsync(newUser);
+            var result = await _userManager.CreateAsync(user);
             if (result.Succeeded)
-                return newUser;
+                return user;
+
             return null;
         }
         public async Task UpdateUserAsync(ApplicationUser user)
@@ -989,16 +994,9 @@ namespace Hood.Services
             }
             else
             {
-                product = new SubscriptionProduct()
-                {
-                    DisplayName = subscriptionPlan.Name,
-                    Slug = subscriptionPlan.Name.ToSeoUrl()
-                };
-                _db.SubscriptionProducts.Add(product);
-                await _db.SaveChangesAsync();
+                product = await CreateSubscriptionProductAsync(subscriptionPlan.Name, subscriptionPlan.StripeId);
                 Product stripeProduct = await _stripe.CreateProductAsync(subscriptionPlan.Name);
                 subscriptionPlan.SubscriptionProductId = product.Id;
-                product.StripeId = stripeProduct.Id;
             }
 
             if (!subscriptionPlan.StripeId.IsSet())
@@ -1352,30 +1350,19 @@ namespace Hood.Services
                 userSubscription = await GetUserSubscriptionByStripeIdAsync(stripeSub.Id);
                 if (userSubscription == null)
                 {
-                    // if the sub is active/trialing, and doesn't exist locally it needs to be created.
-                    if (stripeSub.Status == SubscriptionStatuses.Active || stripeSub.Status == SubscriptionStatuses.Trialing)
+                    // find an associated user.
+                    var user = await GetUserByStripeIdAsync(stripeSub.CustomerId);
+                    if (user == null)
                     {
-                        // find an associated user.
-                        var user = await GetUserByStripeIdAsync(stripeSub.CustomerId);
+                        var customer = await _stripe.GetCustomerByIdAsync(stripeSub.CustomerId);
+                        user = await GetOrCreateLocalUserForCustomerObject(customer);
                         if (user == null)
                         {
-                            var customer = await _stripe.GetCustomerByIdAsync(stripeSub.CustomerId);
-                            user = await CreateLocalUserForCustomerObject(customer);
-                            if (user == null)
-                            {
-                                throw new AlertedException($"Stripe customer could not be linked to a local account, and the create user function failed.");
-                            }
+                            throw new AlertedException($"Stripe customer could not be linked to a local account, and the create user function failed.");
                         }
-                        var subscriptionPlan = await SyncSubscriptionPlanAsync(null, stripeSub.Plan.Id);
-
-                        userSubscription = new UserSubscription();
-                        userSubscription.UpdateFromStripe(stripeSub);
-                        userSubscription.StripeId = stripeSub.Id;
-                        userSubscription.CustomerId = stripeSub.CustomerId;
-                        userSubscription.UserId = user.Id;
-                        userSubscription.SubscriptionId = subscriptionPlan.Id;
-                        _db.UserSubscriptions.Add(userSubscription);
                     }
+                    var subscriptionPlan = await SyncSubscriptionPlanAsync(null, stripeSub.Plan.Id);
+                    await CreateUserSubscription(subscriptionPlan.Id, user.Id, stripeSub);
                 }
                 else
                 {
