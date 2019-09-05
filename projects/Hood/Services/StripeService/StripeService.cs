@@ -11,6 +11,8 @@ namespace Hood.Services
 {
     public class StripeService : IStripeService
     {
+        private object getinvoiceoptions;
+
         private string StripeApiKey { get; set; }
         public StripeService()
         {
@@ -312,6 +314,8 @@ namespace Hood.Services
         {
             try
             {
+                var options = new InvoiceGetOptions();
+                options.AddExpand("data.payment_intent");
                 return await InvoiceService.GetAsync(invoiceId);
             }
             catch (StripeException stripeEx)

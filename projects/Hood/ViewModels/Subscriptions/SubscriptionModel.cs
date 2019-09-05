@@ -14,7 +14,7 @@ namespace Hood.ViewModels
     }
     public class SubscriptionProductsModel : SubscriptionModelBase
     {
-      public List<SubscriptionProduct> Products { get; set; }
+        public List<SubscriptionProduct> Products { get; set; }
     }
     public class SubscriptionPlansModel : SubscriptionModelBase
     {
@@ -25,6 +25,11 @@ namespace Hood.ViewModels
     {
         public Models.Subscription Plan { get; set; }
         public string ClientSecret { get; set; }
+    }
+    public class CompleteSubscriptionModel : SubscriptionModelBase
+    {
+        public Invoice Invoice { get; set; }
+        public UserSubscription Subscription { get; set; }
     }
     public class SubscriptionWelcomeModel : SubscriptionModelBase
     {

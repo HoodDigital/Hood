@@ -77,6 +77,34 @@ namespace Hood.Controllers
 
             return View(model);
         }
+        [Authorize]
+        [Route("account/subscriptions/pay/{invoiceId}")]
+        public async Task<IActionResult> Complete(string invoiceId)
+        {
+            var invoice = await _stripe.GetInvoiceByIdAsync(invoiceId);
+            if (invoice == null)
+            {
+                SaveMessage = "Could not load the invoice object.";
+                MessageType = AlertType.Warning;
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (invoice.Status != "open")
+            {
+                SaveMessage = "The invoice is not in an open state, and therefore cannot be completed.";
+                MessageType = AlertType.Warning;
+                return RedirectToAction(nameof(Index));
+            }
+
+            CompleteSubscriptionModel model = new CompleteSubscriptionModel()
+            {
+                Invoice = invoice,
+                Customer = await _account.GetOrCreateStripeCustomerForUser(Engine.Account.Id),
+                Subscription = await _account.GetUserSubscriptionByStripeIdAsync(invoice.SubscriptionId)
+            };
+            return View(model);
+        }
+
         [HttpPost]
         [StripeAccountRequired]
         [Route("account/subscriptions/buy/{id}/{title}")]
