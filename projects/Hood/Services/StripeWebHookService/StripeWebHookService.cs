@@ -50,12 +50,52 @@ namespace Hood.Services
             {
                 StripeWebHookTriggerArgs args = new StripeWebHookTriggerArgs(stripeEvent);
 
-                if (stripeEvent.GetEventName() == "invalid.event.object")
+                switch (stripeEvent.GetEventName())
                 {
-                    throw new Exception("The event object was invalid.");
-                }
+                    case "customer.created":
+                    case "customer.updated":
+                        await CustomerCreatedOrUpdatedAsync(stripeEvent.Data.Object as Customer);
+                        break;
+                    case "customer.deleted":
+                        await CustomerDeletedAsync(stripeEvent.Data.Object as Customer);
+                        break;
 
-                await ProcessEventByTypeAsync(stripeEvent);
+                    case "customer.subscription.created":
+                    case "customer.subscription.updated":
+                    case "customer.subscription.deleted":
+                        await SubscriptionUpdatedAsync(stripeEvent.Data.Object as Stripe.Subscription);
+                        break;
+                    case "customer.subscription.trial_will_end":
+                        await SubscriptionTrialWillEndAsync(stripeEvent.Data.Object as Stripe.Subscription);
+                        break;
+
+                    case "invoice.payment_failed":
+                        await InvoicePaymentFailedAsync(stripeEvent.Data.Object as Invoice);
+                        break;
+                    case "invoice.payment_succeeded":
+                        await InvoicePaymentSucceededAsync(stripeEvent.Data.Object as Invoice);
+                        break;
+
+                    case "plan.created":
+                    case "plan.updated":
+                        await PlanCreatedOrUpdatedAsync(stripeEvent.Data.Object as Plan);
+                        break;
+                    case "plan.deleted":
+                        await PlanDeletedAsync(stripeEvent.Data.Object as Plan);
+                        break;
+
+                    case "product.created":
+                    case "product.updated":
+                        await ProductCreatedOrUpdatedAsync(stripeEvent.Data.Object as Product);
+                        break;
+                    case "product.deleted":
+                        await ProductDeletedAsync(stripeEvent.Data.Object as Product);
+                        break;
+
+                    default:
+                        await _logService.AddLogAsync<StripeWebHookService>($"The event name could not resolve to a web hook handler: {stripeEvent.GetEventName()}", type: LogType.Warning);
+                        break;
+                }
 
                 // Fire the event to allow any other packages to process the webhook.
                 _eventService.TriggerStripeWebhook(this, args);
@@ -68,80 +108,28 @@ namespace Hood.Services
                 BasicSettings info = Engine.Settings.Basic;
                 MailObject mailObject = new MailObject()
                 {
-                    PreHeader = "Stripe Webhook Error"
+                    PreHeader = "Stripe Webhook Alert"
                 };
                 mailObject.Subject = mailObject.PreHeader;
-                mailObject.AddH1("A Stripe Webhook ran into a serious error!");
+                mailObject.AddH3("An alert was created by Stripe WebHook!");
                 mailObject.AddParagraph($"Webhook received on site: <strong>{stripeEvent.GetEventName()}</strong>");
                 mailObject.AddParagraph($"Message: <strong>{ex.Message}</strong>");
                 if (ex.InnerException != null)
                     mailObject.AddParagraph($"Detail: <strong>{ex.InnerException.Message}</strong>");
                 mailObject.AddParagraph($"<strong>Stripe Event:</strong><br />");
                 mailObject.AddDiv(stripeEvent.ToJson().ToHtml());
-                mailObject.Template = MailSettings.DangerTemplate;
-                await _emailSender.NotifyRoleAsync(mailObject, "Admin");
+                mailObject.Template = MailSettings.PlainTemplate;
 
-                await _logService.AddExceptionAsync<StripeWebHookService>($"An error occurred processing a stripe webhook: {stripeEvent.GetEventName()}", ex);
-                throw ex;
+                await _emailSender.NotifyRoleAsync(mailObject, "Admin");
+                await _logService.AddExceptionAsync<StripeWebHookService>($"An alert was created by Stripe WebHook: {stripeEvent.GetEventName()}", ex, ex.LogType);
             }
             catch (LoggedException ex)
             {
-                await _logService.AddExceptionAsync<StripeWebHookService>($"An minor error occurred processing a stripe webhook: {stripeEvent.GetEventName()}", ex, LogType.Warning);
+                await _logService.AddExceptionAsync<StripeWebHookService>($"An minor error occurred processing a stripe webhook: {stripeEvent.GetEventName()}", ex, ex.LogType);
             }
             catch (Exception ex)
             {
-                await _logService.AddExceptionAsync<StripeWebHookService>($"An error occurred processing a stripe webhook: {stripeEvent.GetEventName()}", ex);
                 throw ex;
-            }
-        }
-
-        protected async Task ProcessEventByTypeAsync(Stripe.Event stripeEvent)
-        {
-            switch (stripeEvent.GetEventName())
-            {
-                case "customer.created":
-                case "customer.updated":
-                    await CustomerCreatedOrUpdatedAsync(stripeEvent.Data.Object as Customer);
-                    break;
-                case "customer.deleted":
-                    await CustomerDeletedAsync(stripeEvent.Data.Object as Customer);
-                    break;
-
-                case "customer.subscription.created":
-                case "customer.subscription.updated":
-                case "customer.subscription.deleted":
-                    await SubscriptionUpdatedAsync(stripeEvent.Data.Object as Stripe.Subscription);
-                    break;
-                case "customer.subscription.trial_will_end":
-                    await SubscriptionTrialWillEndAsync(stripeEvent.Data.Object as Stripe.Subscription);
-                    break;
-
-                case "invoice.payment_failed":
-                    await InvoicePaymentFailedAsync(stripeEvent.Data.Object as Invoice);
-                    break;
-                case "invoice.payment_succeeded":
-                    await InvoicePaymentSucceededAsync(stripeEvent.Data.Object as Invoice);
-                    break;
-
-                case "plan.created":
-                case "plan.updated":
-                    await PlanCreatedOrUpdatedAsync(stripeEvent.Data.Object as Plan);
-                    break;
-                case "plan.deleted":
-                    await PlanDeletedAsync(stripeEvent.Data.Object as Plan);
-                    break;
-
-                case "product.created":
-                case "product.updated":
-                    await ProductCreatedOrUpdatedAsync(stripeEvent.Data.Object as Product);
-                    break;
-                case "product.deleted":
-                    await ProductDeletedAsync(stripeEvent.Data.Object as Product);
-                    break;
-
-                default:
-                    await _logService.AddLogAsync<StripeWebHookService>($"The event name could not resolve to a web hook handler: {stripeEvent.GetEventName()}", type: LogType.Warning);
-                    break;
             }
         }
 
@@ -185,7 +173,7 @@ namespace Hood.Services
             }
             else
             {
-                user = await _account.CreateLocalUserForCustomerObject(customer);
+                user = await _account.GetOrCreateLocalUserForCustomerObject(customer);
                 if (user == null)
                 {
                     throw new AlertedException($"Stripe customer {customer.Id} ({customer.Email}) could not be linked to a new local account, the create user function failed.");
@@ -240,12 +228,6 @@ namespace Hood.Services
                 MailObject message;
                 switch (failedInvoice.PaymentIntent.Status)
                 {
-                    case "succeeded":
-                        break;
-                    case "processing":
-                        break;
-                    case "canceled":
-                        break;
                     case "requires_payment_method":
                         var charge = failedInvoice.PaymentIntent.Charges.OrderByDescending(c => c.Created).FirstOrDefault();
                         message  = new MailObject()
@@ -260,6 +242,9 @@ namespace Hood.Services
                         else
                             message.AddParagraph("Click the link below to complete your payment using a new payment method.");
                         message.AddCallToAction("Complete payment", failedInvoice.HostedInvoiceUrl);
+                        message.Template = MailSettings.SuccessTemplate;
+                        await _emailSender.SendEmailAsync(message);
+                        await _logService.AddLogAsync<StripeWebHookService>($"An invoice ({failedInvoice.Id}) '{failedInvoice.Status}' for email {failedInvoice.CustomerEmail} requires further action.  The customer has been emailed with further instructions.");
                         break;
                     case "requires_action":
                         message = new MailObject()
@@ -274,11 +259,13 @@ namespace Hood.Services
                         else
                             message.AddParagraph("Click the link below to complete your payment.");
                         message.AddCallToAction("Complete payment", failedInvoice.HostedInvoiceUrl);
+                        message.Template = MailSettings.SuccessTemplate;
                         await _emailSender.SendEmailAsync(message);
+                        await _logService.AddLogAsync<StripeWebHookService>($"An invoice ({failedInvoice.Id}) '{failedInvoice.Status}' for email {failedInvoice.CustomerEmail} requires further action.  The customer has been emailed with further instructions.");
                         break;
+                    default:
+                        throw new AlertedException($"An invoice ({failedInvoice.Id}) failed with status '{failedInvoice.Status}' for email: {failedInvoice.CustomerEmail}");
                 }
-
-
             }
         }
         /// <summary>
@@ -302,15 +289,28 @@ namespace Hood.Services
                 else
                 {
                     ApplicationUser successfulInvoiceUser = await _account.GetUserByStripeIdAsync(successfulInvoice.CustomerId);
+                    var total = $"{Engine.Settings.Billing.StripeCurrencySymbol}{successfulInvoice.AmountPaid.ToCurrencyString()}";
                     MailObject message = new MailObject()
                     {
                         To = new SendGrid.Helpers.Mail.EmailAddress(successfulInvoiceUser.Email),
-                        PreHeader = "Thank you for your payment on " + Engine.Settings.Basic.FullTitle,
-                        Subject = "Thank you for your payment..."
+                        PreHeader = "Thank you for your payment!",
+                        Subject = $"Thank you for your payment of {total}"
                     };
                     message.AddH1("Thank you!");
-                    message.AddParagraph("Your payment has been received. You will receive a payment receipt from our payment providers, Stripe.");
-                    message.Template = MailSettings.DangerTemplate;
+                    message.AddParagraph("Your payment has been received.");
+                    message.AddHorizontalRule();
+                    message.AddH3("Detailed order information");
+                    foreach (var line in successfulInvoice.Lines)
+                    {
+                        message.AddDiv($"{line.Description}", align: "right");
+                    }
+                    message.AddH4($"Amount paid: {total}", align: "right");
+                    message.AddHorizontalRule();
+                    message.AddDiv("&nbsp;");
+                    message.AddCallToAction("Access your subscription", $"{_context.GetSiteUrl()}account/subscriptions/welcome/{userSub.Id}", align: "center");
+                    message.AddCustomHtml($"<p><a href=\"{successfulInvoice.HostedInvoiceUrl}\">View full receipt</a></p>", successfulInvoice.HostedInvoiceUrl);
+                    message.AddParagraph("You will also receive a payment receipt from our payment providers, Stripe.", align: "center");
+                    message.Template = MailSettings.SuccessTemplate;
                     await _emailSender.SendEmailAsync(message);
                 }
             }

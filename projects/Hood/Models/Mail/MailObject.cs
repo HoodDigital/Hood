@@ -144,7 +144,7 @@ namespace Hood.Services
         {
             _textBody.WriteLine(content);
             _textBody.WriteLine();
-            _body.WriteLine(string.Format(@"<div class='align-{2}' style='color: {1}; font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; font-size: 14px; font-weight: normal; margin-top: 2em; margin-bottom: 1em;  text-align: {2};'>{0}</p>", content, colour, align));
+            _body.WriteLine(string.Format(@"<div class='align-{2}' style='color: {1}; font-family:  Calibri, Helvetica, 'Trebuchet MS', sans-serif; font-size: 14px; font-weight: normal; margin-top: 0.5em; margin-bottom: 0.5em;  text-align: {2};'>{0}</p>", content, colour, align));
         }
         public void AddUnorderedList(List<string> items, string colour = "#222222")
         {

@@ -1,74 +1,47 @@
 @model SubscriptionWelcomeModel
 @{
-    ViewBag.Title = "Welcome to your new subscription!";
+    ViewBag.Title = "Your new subscription!";
+    var currentSub = Model.UserSubscription.Subscription;
 }
 <section class="page-section">
     @if (Model.SaveMessage.IsSet())
     {
-        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+        <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
     }
-    <div class="row">
-        @{ 
-            var currentSub = Model.CurrentUserSubscription.Subscription;
-        }
-        <div class="col-xs-12 col-sm-6">
-            <div class="thumbnail price">
-                <div class="panel-heading  text-center bg-info">
+    <partial name="_Subscriptions_CurrentInfo" model="@new UserSubscriptionInfo(Model.UserSubscription)" />
+    <h4>
+        About your subscription
+    </h4>
+    <hr />
+    <div class="thumbnail">
+        <div class="panel-heading text-center bg-info">
+            @switch (Model.UserSubscription.Status)
+            {
+                case Stripe.SubscriptionStatuses.Active:
                     <p><strong>You have now activated:</strong></p>
-                    <h3>@currentSub.Name</h3>
-                    <p>@currentSub.FullPrice</p>
-                    @if (currentSub.TrialPeriodDays > 0)
-                    {
-                        <p>@currentSub.TrialPeriodDays days free trial</p>
-                    }
-                    else
-                    {
-                        <p>No trial period.</p>
-                    }
-                </div>
-                <div class="p-lg text-center">
-                    @currentSub.Description
-                </div>
-                <div class="panel-footer text-center">
-                    <span class="price">@currentSub.Price</span>
-                    <span>per @currentSub.Interval</span>
-                </div>
-            </div>
+                    break;
+                case Stripe.SubscriptionStatuses.Trialing:
+                    <p><strong>You have now activated your trial:</strong></p>
+                    break;
+            }
+            <h3>@currentSub.Name</h3>
+            <p>@currentSub.FullPrice</p>
+            @if (currentSub.TrialPeriodDays > 0)
+            {
+                <p>@currentSub.TrialPeriodDays days free trial</p>
+            }
+            else
+            {
+                <p>No trial period.</p>
+            }
+        </div>
+        <div class="p-lg text-center">
+            @currentSub.Description
+        </div>
+        <div class="panel-footer text-center">
+            <span class="price">@currentSub.Price</span>
+            <span>per @currentSub.Interval</span>
         </div>
     </div>
-<div class="well current-subscription m-t-lg">
-    <p>
-        @if (!Model.CurrentUserSubscription.CancelAtPeriodEnd)
-        {
-            <span class="text-success">Next Charge:</span>
-            <span class="text-success">@currentSub.Price on @Model.CurrentUserSubscription.CurrentPeriodEnd.Value.ToShortDateString()</span>
-        }
-        else
-        {
-            <span class="text-danger">Cancelling on @Model.CurrentUserSubscription.CurrentPeriodEnd.Value.ToShortDateString()</span>
-        }
-    </p>
-    <p>
-        @if (!Context.Request.Path.ToString().Contains("account/subscriptions/change"))
-        {
-            <a class="btn btn-sm btn-primary" asp-action="Select" asp-route-product="@currentSub.SubscriptionProductId">Change Package</a>
-        }
-        @if (Model.CurrentUserSubscription != null)
-        {
-            @if (Model.CurrentUserSubscription.Status != "canceled")
-            {
-                if (Model.CurrentUserSubscription.CancelAtPeriodEnd)
-                {
-                    <a class="btn btn-sm btn-success confirm" data-warning="Are you sure you want to reactiveate your subscription? You will be charged again on your next payment date as usual, and no extra charges will be made. Your account will remain active." asp-action="Reactivate" asp-controller="Subscriptions" asp-route-id="@Model.CurrentUserSubscription.Id">Re-Activate</a>
-                    @*<a class="btn btn-sm btn-danger confirm" data-warning="Are you sure you want to cancel your susbcription? This cannot be undone, however you can buy a new subscription at any time." asp-action="Remove" asp-controller="Subscriptions" asp-route-id="@Model.CurrentUserSubscription.Id">Fully Cancel (Refund remaining charges)</a>*@
-                }
-                else
-                {
-                    <a class="btn btn-sm btn-danger confirm" data-warning="Are you sure you want to revert to the free package? Your account will remain active until your current period ends, but after that you will be restricted to the free package." asp-action="Cancel" asp-controller="Subscriptions" asp-route-id="@Model.CurrentUserSubscription.Id">Revert to the free package</a>
-                }
-            }
-        }
-        <a class="btn btn-sm btn-default" href="/account/billing">Billing Information</a>
-    </p>
-</div>
+
 </section>

@@ -21,12 +21,12 @@ else
                 @if (!sub.CancelAtPeriodEnd)
                 {
                     <span class="text-success">Next Charge:</span>
-                    <span class="text-success">@Model.Price on @sub.CurrentPeriodEnd.Value.ToShortDateString()</span>
+                    <span class="text-success">@Model.Price on @sub.CurrentPeriodEnd.Value.ToDisplay()</span>
                 }
                 else
                 {
                     <span class="text-danger">Cancelling</span>
-                    <span class="text-danger">Cancelling on @sub.CurrentPeriodEnd.Value.ToShortDateString()</span>
+                    <span class="text-danger">Cancelling on @sub.CurrentPeriodEnd.Value.ToDisplay()</span>
                 }
             </small>
         </div>
