@@ -114,7 +114,7 @@ $.hood.Stripe = {
       e.preventDefault();
       var $tag = $(this);
 
-      setDefaultCardCallback = function setDefaultCardCallback(isConfirm) {
+      var setDefaultCardCallback = function setDefaultCardCallback(isConfirm) {
         if (isConfirm) {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
@@ -129,7 +129,7 @@ $.hood.Stripe = {
       e.preventDefault();
       var $tag = $(this);
 
-      deleteCardCallback = function deleteCardCallback(isConfirm) {
+      var deleteCardCallback = function deleteCardCallback(isConfirm) {
         if (isConfirm) {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);

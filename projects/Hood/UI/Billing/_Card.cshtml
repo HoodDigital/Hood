@@ -2,7 +2,7 @@
 <div class="panel panel-default accordion-section m-b-xs">
     <div class="panel-heading accordion-title">
         <a data-toggle="collapse" href="@string.Format("#collapse-card-{0}", Model.Id)">
-        @if (Model.Id == Model.Customer.InvoiceSettings.DefaultPaymentMethodId)
+        @if (Model.Id == Model.Customer.InvoiceSettings.DefaultPaymentMethodId || Model.Id == Model.Customer.DefaultSourceId)
         {
             <span class="pull-right label label-default">Default</span>
         }

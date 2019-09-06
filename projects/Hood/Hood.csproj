@@ -71,6 +71,7 @@
     <None Remove="Areas\Admin\UI\Forum\_Filters.cshtml" />
     <None Remove="Areas\Admin\UI\Forum\_List_Categories.cshtml" />
     <None Remove="Areas\Admin\UI\Forum\_List_Forums.cshtml" />
+    <None Remove="Areas\Admin\UI\Shared\_PlaceholderInformation.cshtml" />
   </ItemGroup>
 
 </Project>
