@@ -299,26 +299,26 @@ namespace Hood.Services
         #endregion
 
         #region Content Views
-        public async Task<ContentModel> GetRecentAsync(string type, string category = null)
+        public async Task<ContentModel> GetRecentAsync(string type, string category = null, int pageSize = 5)
         {
             string cacheKey = typeof(ContentModel).ToString() + ".Recent." + type;
             if (category.IsSet())
                 cacheKey += "-" + category;
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = int.MaxValue, Order = "DateDesc" });
+                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "DateDesc" });
                 _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
         }
-        public async Task<ContentModel> GetFeaturedAsync(string type, string category = null)
+        public async Task<ContentModel> GetFeaturedAsync(string type, string category = null, int pageSize = 5)
         {
             string cacheKey = typeof(ContentModel).ToString() + ".Featured." + type;
             if (category.IsSet())
                 cacheKey += "." + category;
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = int.MaxValue });
+                content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = pageSize });
                 _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
