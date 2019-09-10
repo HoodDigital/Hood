@@ -112,9 +112,15 @@ namespace Hood.Services
                 {
                     var sortVal = model.Order.Replace("Meta:", "").Replace(":Desc", "");
                     if (model.Order.EndsWith("Desc"))
-                        content = content.OrderByDescending(n => n.Metadata.SingleOrDefault(m => m.Name == sortVal).BaseValue);
+                    {
+                        content = content.Where(n => n.Metadata != null && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null);
+                        content = content.OrderByDescending(n => n.Metadata.Single(m => m.Name == sortVal).BaseValue);
+                    }
                     else
-                        content = content.OrderBy(n => n.Metadata.SingleOrDefault(m => m.Name == sortVal).BaseValue);
+                    {
+                        content = content.Where(n => n.Metadata != null && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null);
+                        content = content.OrderBy(n => n.Metadata.Single(m => m.Name == sortVal).BaseValue);
+                    }
                 }
                 else
                 {
