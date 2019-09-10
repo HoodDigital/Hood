@@ -73,7 +73,7 @@
                     </div>
                     <small asp-for="NotifyNewAccount"></small>
                 </div>
-                <hr />
+                <hr class="mt-4 mb-4" />
                 <div class="form-group floating-label">
                     <label asp-for="WelcomeTitle"></label>
                     <input asp-for="WelcomeTitle" class="form-control">
@@ -89,6 +89,8 @@
                     <textarea asp-for="WelcomeMessage" class="form-control tinymce-simple"></textarea>
                     <small asp-for="WelcomeMessage"></small>
                 </div>
+                <hr class="mt-4 mb-4" />
+                <partial name="_PlaceholderInformation" />
             </div>
         </div>
     </div>

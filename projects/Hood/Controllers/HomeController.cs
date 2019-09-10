@@ -155,7 +155,7 @@ namespace Hood.Controllers
                 }
             }
 
-            model.Recent = await _content.GetContentAsync(new ContentModel() { Type = model.Type, Category = model.Category, PageSize = int.MaxValue, Order = "DateDesc" });
+            model.Recent = await _content.GetRecentAsync(model.Type, model.Category);
 
             foreach (ContentMeta cm in model.Content.Metadata)
             {

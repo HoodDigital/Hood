@@ -30,8 +30,8 @@ namespace Hood.Services
         #endregion
 
         #region Content Views
-        Task<ContentModel> GetRecentAsync(string type, string category = null);
-        Task<ContentModel> GetFeaturedAsync(string type, string category = null);
+        Task<ContentModel> GetRecentAsync(string type, string category = null, int pageSize = 5);
+        Task<ContentModel> GetFeaturedAsync(string type, string category = null, int pageSize = 5);
         Task<ContentNeighbours> GetNeighbourContentAsync(int id, string type, string category = null);
         #endregion
 

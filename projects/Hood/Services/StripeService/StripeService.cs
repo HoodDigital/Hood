@@ -261,7 +261,8 @@ namespace Hood.Services
                 InvoiceSettings = new CustomerInvoiceSettingsOptions()
                 {
                     DefaultPaymentMethodId = paymentMethodId
-                }
+                }, 
+                DefaultSource = paymentMethodId
             };
             return await CustomerService.UpdateAsync(customerId, updateOptions);
         }

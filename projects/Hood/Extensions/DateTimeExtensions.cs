@@ -8,13 +8,17 @@ namespace Hood.Extensions
     {
         public static string ToDisplay(this DateTime value, bool includeTime = true)
         {
-            return value.ToShortDateString() + " at " + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
+            if (includeTime)
+                return value.ToShortDateString() + " at " + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
+            else return value.ToShortDateString();
         }
         public static string ToLongDisplay(this DateTime value, bool includeTime = true)
         {
-            return value.ToLongDateString() + " at " + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
+            if (includeTime)
+                return value.ToLongDateString() + " at " + value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
+            else return value.ToLongDateString();
         }
-        public static string ToTimeDisplay(this DateTime value, bool includeTime = true)
+        public static string ToTimeDisplay(this DateTime value)
         {
             return value.ToString("hh:mmtt", CultureInfo.InvariantCulture).ToLowerInvariant();
         }

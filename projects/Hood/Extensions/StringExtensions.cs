@@ -458,6 +458,7 @@ namespace Hood.Extensions
                 .Replace("{User.Instagram}", user.Instagram)
                 .Replace("{User.WebsiteUrl}", user.WebsiteUrl)
                 .Replace("{User.FullName}", user.ToFullName())
+                .Replace("{FULLNAME}", user.ToFullName())
                 .Replace("{User.FirstName}", user.FirstName)
                 .Replace("{User.LastName}", user.LastName);
         }

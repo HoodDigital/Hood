@@ -99,7 +99,10 @@ $.hood.Inline = {
                 var url = document.createElement('a');
                 url.href = $(this).attr('href');
                 let $list = $(this).parents('.hood-inline-list');
-                $.hood.Inline.DataList.Reload($list, url);
+                var listUrl = document.createElement('a');
+                listUrl.href = $list.data('url');
+                listUrl.search = url.search;
+                $.hood.Inline.DataList.Reload($list, listUrl);
             });
             $('body').on('submit', '.hood-inline-list form', function (e) {
                 e.preventDefault();
