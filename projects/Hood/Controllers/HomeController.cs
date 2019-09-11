@@ -22,7 +22,6 @@ namespace Hood.Controllers
     public abstract class HomeController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
          where TContext : HoodDbContext
     {
-
         public HomeController() : base() { }
 
         [ResponseCache(CacheProfileName = "Day")]

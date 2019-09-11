@@ -153,7 +153,7 @@ namespace Hood.Services
                             break;
 
                         default:
-                            content = content.OrderByDescending(n => n.CreatedOn);
+                            content = content.OrderByDescending(n => n.PublishDate).ThenByDescending(n => n.CreatedOn);
                             break;
                     }
                 }
