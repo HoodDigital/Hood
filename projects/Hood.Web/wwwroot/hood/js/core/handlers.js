@@ -34,13 +34,18 @@ $.hood.Handlers = {
         }
         let target = this.hash;
         let $target = $(target);
+        let $header = $('header.header');
+        let headerOffset = 0;
+        if ($header) {
+            headerOffset = $header.height();
+        }
         if ($(this).data('offset'))
             $('html, body').stop().animate({
                 'scrollTop': $target.offset().top - $(this).data('offset')
             }, 900, 'swing');
         else
             $('html, body').stop().animate({
-                'scrollTop': $target.offset().top
+                'scrollTop': $target.offset().top - headerOffset
             }, 900, 'swing');
     },
     SubmitOnChange: function (e) {
