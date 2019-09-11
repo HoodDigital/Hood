@@ -35,28 +35,23 @@ namespace Hood.Services
             _bundleFileProcessor = new BundleFileProcessor();
         }
 
-        public virtual void AddScriptParts(ResourceLocation location, string src, string debugSrc, bool excludeFromBundle, bool isAsync, bool isDefer)
+        public virtual void AddScriptParts(ResourceLocation location, string src, bool excludeFromBundle, bool isAsync, bool isDefer)
         {
             if (!_scripts.ContainsKey(location))
                 _scripts.Add(location, new List<FileReferenceMetadata>());
 
             if (string.IsNullOrEmpty(src))
                 return;
-
-            if (string.IsNullOrEmpty(debugSrc))
-                debugSrc = src;
 
             _scripts[location].Add(new FileReferenceMetadata
             {
                 ExcludeFromBundle = excludeFromBundle,
                 IsAsync = isAsync,
                 IsDefer = isDefer,
-                Src = src,
-                DebugSrc = debugSrc
+                Src = src
             });
         }
-
-        public virtual void AppendScriptParts(ResourceLocation location, string src, string debugSrc, bool excludeFromBundle, bool isAsync, bool isDefer)
+        public virtual void AppendScriptParts(ResourceLocation location, string src, bool excludeFromBundle, bool isAsync, bool isDefer)
         {
             if (!_scripts.ContainsKey(location))
                 _scripts.Add(location, new List<FileReferenceMetadata>());
@@ -64,17 +59,33 @@ namespace Hood.Services
             if (string.IsNullOrEmpty(src))
                 return;
 
-            if (string.IsNullOrEmpty(debugSrc))
-                debugSrc = src;
-
             _scripts[location].Insert(0, new FileReferenceMetadata
             {
                 ExcludeFromBundle = excludeFromBundle,
                 IsAsync = isAsync,
                 IsDefer = isDefer,
-                Src = src,
-                DebugSrc = debugSrc
+                Src = src
             });
+        }
+        public virtual void AddInlineScriptParts(ResourceLocation location, string script)
+        {
+            if (!_inlineScripts.ContainsKey(location))
+                _inlineScripts.Add(location, new List<string>());
+
+            if (string.IsNullOrEmpty(script))
+                return;
+
+            _inlineScripts[location].Add(script);
+        }
+        public virtual void AppendInlineScriptParts(ResourceLocation location, string script)
+        {
+            if (!_inlineScripts.ContainsKey(location))
+                _inlineScripts.Add(location, new List<string>());
+
+            if (string.IsNullOrEmpty(script))
+                return;
+
+            _inlineScripts[location].Insert(0, script);
         }
 
         private static readonly object accessLock = new object();
@@ -113,7 +124,7 @@ namespace Hood.Services
                     var bundle = new Bundle();
                     foreach (var item in partsToBundle)
                     {
-                        new PathString(urlHelper.Content(debugModel ? item.DebugSrc : item.Src))
+                        new PathString(urlHelper.Content(item.Src))
                             .StartsWithSegments(urlHelper.ActionContext.HttpContext.Request.PathBase, out PathString path);
                         var src = path.Value.TrimStart('/');
 
@@ -124,7 +135,7 @@ namespace Hood.Services
                         bundle.InputFiles.Add(src);
                     }
                     //output file
-                    var outputFileName = GetBundleFileName(partsToBundle.Select(x => debugModel ? x.DebugSrc : x.Src).ToArray());
+                    var outputFileName = GetBundleFileName(partsToBundle.Select(x => x.Src).ToArray());
                     bundle.OutputFileName = "wwwroot/bundles/" + outputFileName + ".js";
                     //save
                     var configFilePath = _hostingEnvironment.ContentRootPath + "\\" + outputFileName + ".json";
@@ -132,20 +143,19 @@ namespace Hood.Services
                     lock (accessLock)
                     {
                         var cacheKey = $"Hood.Bundling.ShouldRebuild.{outputFileName}";
-                        bool shouldRebuild = _cache.TryGetValue(cacheKey, out shouldRebuild);
+                        bool shouldRebuild = !_cache.TryGetValue(cacheKey, out shouldRebuild);
                         if (shouldRebuild)
                         {
                             _bundleFileProcessor.Process(configFilePath, new List<Bundle> { bundle });
                             _cache.Add(cacheKey, false, new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = new TimeSpan(2, 0, 0) });
                         }
                     }
-                    result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + outputFileName + ".min.js"));
+                    result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + outputFileName + ".js"));
                     result.Append(Environment.NewLine);
                 }
                 foreach (var item in partsToDontBundle)
                 {
-                    var src = debugModel ? item.DebugSrc : item.Src;
-                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
+                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(item.Src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
                     result.Append(Environment.NewLine);
                 }
                 return result.ToString();
@@ -156,44 +166,13 @@ namespace Hood.Services
                 var result = new StringBuilder();
                 foreach (var item in _scripts[location].Distinct())
                 {
-                    var src = debugModel ? item.DebugSrc : item.Src;
-                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
+                    result.AppendFormat("<script {1}{2}src=\"{0}\"></script>", urlHelper.Content(item.Src), item.IsAsync ? "async " : "", item.IsDefer ? "defer " : "");
                     result.Append(Environment.NewLine);
                 }
                 return result.ToString();
             }
         }
 
-        /// <summary>
-        /// Add inline script element
-        /// </summary>
-        /// <param name="location">A location of the script element</param>
-        /// <param name="script">Script</param>
-        public virtual void AddInlineScriptParts(ResourceLocation location, string script)
-        {
-            if (!_inlineScripts.ContainsKey(location))
-                _inlineScripts.Add(location, new List<string>());
-
-            if (string.IsNullOrEmpty(script))
-                return;
-
-            _inlineScripts[location].Add(script);
-        }
-        /// <summary>
-        /// Append inline script element
-        /// </summary>
-        /// <param name="location">A location of the script element</param>
-        /// <param name="script">Script</param>
-        public virtual void AppendInlineScriptParts(ResourceLocation location, string script)
-        {
-            if (!_inlineScripts.ContainsKey(location))
-                _inlineScripts.Add(location, new List<string>());
-
-            if (string.IsNullOrEmpty(script))
-                return;
-
-            _inlineScripts[location].Insert(0, script);
-        }
         /// <summary>
         /// Generate all inline script parts
         /// </summary>
@@ -235,8 +214,6 @@ namespace Hood.Services
             }
             return hash.ToSeoUrl();
         }
-
-
     }
 
 }

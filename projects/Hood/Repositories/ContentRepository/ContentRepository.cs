@@ -153,10 +153,14 @@ namespace Hood.Services
                             break;
 
                         default:
-                            content = content.OrderByDescending(n => n.CreatedOn);
+                            content = content.OrderByDescending(n => n.PublishDate).ThenByDescending(n => n.CreatedOn);
                             break;
                     }
                 }
+            }
+            else
+            {
+                content = content.OrderByDescending(n => n.PublishDate).ThenByDescending(n => n.CreatedOn);
             }
             await model.ReloadAsync(content);
             return model;
@@ -288,7 +292,7 @@ namespace Hood.Services
         }
         #endregion
 
-        #region Images
+        #region Images3
         public async Task AddImageAsync(Content content, ContentMedia media)
         {
             if (content.Media == null)

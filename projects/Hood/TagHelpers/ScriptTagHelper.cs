@@ -9,18 +9,22 @@ using System;
 
 namespace Hood.TagHelpers
 {
-    [HtmlTargetElement("script", Attributes = LocationAttributeName)]
+    [HtmlTargetElement("script", Attributes = "asp-location")]
     public class ScriptTagHelper : TagHelper
     {
-        private const string LocationAttributeName = "asp-location";
         private readonly IHtmlHelper _htmlHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Indicates where the script should be rendered
         /// </summary>
-        [HtmlAttributeName(LocationAttributeName)]
+        [HtmlAttributeName("asp-location")]
         public ResourceLocation Location { set; get; }
+        /// <summary>
+        /// Indicates where the script should be rendered
+        /// </summary>
+        [HtmlAttributeName("asp-bundle")]
+        public bool Bundle { set; get; } = false;
 
         /// <summary>
         /// ViewContext
@@ -57,12 +61,6 @@ namespace Hood.TagHelpers
                 throw new ArgumentNullException(nameof(output));
             }
 
-            //allow developers to ignore this parameter
-            //for example, when a request is made using AJAX and is rendered without head and footer
-            if (_httpContextAccessor.HttpContext.Items["nop.IgnoreScriptTagLocation"] != null &&
-                Convert.ToBoolean(_httpContextAccessor.HttpContext.Items["nop.IgnoreScriptTagLocation"]))
-                return;
-
             //contextualize IHtmlHelper
             var viewContextAware = _htmlHelper as IViewContextAware;
             viewContextAware?.Contextualize(ViewContext);
@@ -79,7 +77,15 @@ namespace Hood.TagHelpers
                 if (!attribute.Name.StartsWith("asp-"))
                     scriptTag.Attributes.Add(attribute.Name, attribute.Value.ToString());
 
-            _htmlHelper.AddInlineScriptParts(Location, scriptTag.RenderHtmlContent());
+            if (context.AllAttributes.ContainsName("src"))
+            {
+                var src = context.AllAttributes["src"].Value.ToString();
+                _htmlHelper.AddScriptParts(Location, src, !Bundle, context.AllAttributes.ContainsName("async"), context.AllAttributes.ContainsName("defer"));
+            }
+            else
+            {
+                _htmlHelper.AddInlineScriptParts(Location, scriptTag.RenderHtmlContent());
+            }
 
             //generate nothing
             output.SuppressOutput();

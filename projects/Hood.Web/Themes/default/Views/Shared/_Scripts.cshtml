@@ -1,21 +1,25 @@
 @inject IThemesService _themes
-@Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment _env
+@{ 
+    bool bundle = _env.EnvironmentName != "Development";
+}
+@Html.RenderScripts(Url, ResourceLocation.BeforeJquery, bundle)
 @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
 
 <partial name="_Scripts_JQuery" />
 
-@Html.RenderScripts(Url, ResourceLocation.BeforeVendors)
+@Html.RenderScripts(Url, ResourceLocation.BeforeVendors, bundle)
 @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
 
 <partial name="_Scripts_Bootstrap" />
 <partial name="_Scripts_Validation" />
 <partial name="_Scripts_Vendors" />
 
-@Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
+@Html.RenderScripts(Url, ResourceLocation.BeforeScripts, bundle)
 @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
 <partial name="_Scripts_Hood" />
 <partial name="_Scripts_Google" />
 
-@Html.RenderScripts(Url, ResourceLocation.AfterScripts)
+@Html.RenderScripts(Url, ResourceLocation.AfterScripts, bundle)
 @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
