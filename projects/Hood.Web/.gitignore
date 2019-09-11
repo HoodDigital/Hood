@@ -13,6 +13,7 @@ package-lock.json
 
 # Ignore Site Compiled Client Files
 /wwwroot/css
+/wwwroot/bundles
 /wwwroot/js/**/*.min.js
 /wwwroot/js/**/*.packaged.js
 
