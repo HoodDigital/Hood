@@ -37,7 +37,7 @@ namespace Hood.Services
             _db = db;
             _cache = cache;
             _eventService = eventService;
-            _env = env;3
+            _env = env;
         }
 
         #region Content CRUD
@@ -292,7 +292,7 @@ namespace Hood.Services
         }
         #endregion
 
-        #region Images
+        #region Images3
         public async Task AddImageAsync(Content content, ContentMedia media)
         {
             if (content.Media == null)
