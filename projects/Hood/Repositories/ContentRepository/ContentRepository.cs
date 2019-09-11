@@ -37,7 +37,7 @@ namespace Hood.Services
             _db = db;
             _cache = cache;
             _eventService = eventService;
-            _env = env;
+            _env = env;3
         }
 
         #region Content CRUD
@@ -157,6 +157,10 @@ namespace Hood.Services
                             break;
                     }
                 }
+            }
+            else
+            {
+                content = content.OrderByDescending(n => n.PublishDate).ThenByDescending(n => n.CreatedOn);
             }
             await model.ReloadAsync(content);
             return model;
