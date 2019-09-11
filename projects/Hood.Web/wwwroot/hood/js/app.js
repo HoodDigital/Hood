@@ -141,7 +141,7 @@ $.hood.App = {
             var highlight = $.getUrlVars()['highlight'];
             if ($.isNumeric(highlight)) {
                 let $post = $('#post-' + highlight);
-                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
+                $('html,body').animate({ scrollTop: $post.offset().top }, 'slow');
                 $post.addClass('highlight');
                 if ($.getUrlVars()['message'] === "Created")
                     $post.addClass('created');
@@ -150,7 +150,7 @@ $.hood.App = {
             var reply = $.getUrlVars()['reply'];
             if ($.isNumeric(reply)) {
                 let $post = $('#forum-post-form');
-                $('html,body').animate({ scrollTop: $post.offset().top - $.hood.App.Options.Scroll.Offset }, 'slow');
+                $('html,body').animate({ scrollTop: $post.offset().top }, 'slow');
             }
 
             // toggle editors

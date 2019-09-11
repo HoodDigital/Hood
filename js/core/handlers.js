@@ -34,8 +34,10 @@ $.hood.Handlers = {
 
     var target = this.hash;
     var $target = $(target);
-    $('html, body').stop().animate({
-      'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
+    if ($(this).data('offset')) $('html, body').stop().animate({
+      'scrollTop': $target.offset().top - $(this).data('offset')
+    }, 900, 'swing');else $('html, body').stop().animate({
+      'scrollTop': $target.offset().top
     }, 900, 'swing');
   },
   SubmitOnChange: function SubmitOnChange(e) {

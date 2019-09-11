@@ -21,12 +21,12 @@ $.hood.Handlers = {
 
         $.hood.Handlers.Uploaders.Init();
     },
-    ScrollToTop: function(e) {
+    ScrollToTop: function (e) {
         if (e) e.preventDefault();
         $('html, body').animate({ scrollTop: 0 }, 800);
         return false;
     },
-    ScrollToTarget: function(e) {
+    ScrollToTarget: function (e) {
         if (e) e.preventDefault();
         let url = $(this).attr('href').split('#')[0];
         if (url !== window.location.pathname && url !== "") {
@@ -34,9 +34,14 @@ $.hood.Handlers = {
         }
         let target = this.hash;
         let $target = $(target);
-        $('html, body').stop().animate({
-            'scrollTop': $target.offset().top - $.hood.App.Options.Scroll.Offset
-        }, 900, 'swing');
+        if ($(this).data('offset'))
+            $('html, body').stop().animate({
+                'scrollTop': $target.offset().top - $(this).data('offset')
+            }, 900, 'swing');
+        else
+            $('html, body').stop().animate({
+                'scrollTop': $target.offset().top
+            }, 900, 'swing');
     },
     SubmitOnChange: function (e) {
         if (e) e.preventDefault();
@@ -44,7 +49,7 @@ $.hood.Handlers = {
     },
     DateChange: function (e) {
         if (e) e.preventDefault();
-       // update the date element attached to the field's attach
+        // update the date element attached to the field's attach
         let $field = $(this).parents('.hood-date').find('.date-output');
         let date = $field.parents('.hood-date').find('.date-value').val();
         let pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
