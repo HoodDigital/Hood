@@ -153,7 +153,7 @@ namespace Hood.Areas.Admin.Controllers
                 model.LastEditedBy = user.UserName;
                 model.LastEditedOn = DateTime.Now;
                 model.Amount = (int)Math.Floor(model.CreatePrice * 100);
-                model.LiveMode = billingSettings.EnableStripeTestMode;
+                model.LiveMode = !billingSettings.EnableStripeTestMode;
 
                 model = await _account.CreateSubscriptionPlanAsync(model);
                 await _logService.AddLogAsync<SubscriptionsController>(
