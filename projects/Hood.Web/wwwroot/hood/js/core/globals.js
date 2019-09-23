@@ -95,11 +95,11 @@ $('.restrict-to-meta-slug').restrictToMetaSlug();
 $.fn.characterCounter = function (val) {
     let targets = $(this);
     let characterCounterHandler = function () {
-        counter = $(this).data('counter');
-        max = Number($(this).attr('maxlength'));
-        len = $(this).val().length;
+        let counter = $(this).data('counter');
+        let max = Number($(this).attr('maxlength'));
+        let len = $(this).val().length; 
         $(counter).text(max - len);
-        cls = "text-success";
+        let cls = "text-success";
         if (max - len < max / 10)
             cls = "text-danger";
         $(counter).parent().removeClass('text-success').removeClass('text-danger').addClass(cls);
