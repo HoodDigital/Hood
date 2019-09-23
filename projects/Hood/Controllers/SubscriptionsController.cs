@@ -389,12 +389,12 @@ namespace Hood.Controllers
             {
                 if (!Engine.Settings.Billing.StripeWebhookSecret.IsSet())
                 {
-                    Event stripeEvent = EventUtility.ParseEvent(json);
+                    Event stripeEvent = EventUtility.ParseEvent(json, false);
                     await _webHooks.ProcessEventAsync(stripeEvent);
                 }
                 else
                 {
-                    Event stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], Engine.Settings.Billing.StripeWebhookSecret);
+                    Event stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], Engine.Settings.Billing.StripeWebhookSecret, throwOnApiVersionMismatch: false);
                     await _webHooks.ProcessEventAsync(stripeEvent);
                 }
 

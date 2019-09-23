@@ -26,19 +26,6 @@ namespace Hood.Extensions
                 {
                     try
                     {
-
-                        // Migrate the database
-                        db.Database.Migrate();
-                    }
-                    catch (Exception ex)
-                    {
-                        var logService = scope.ServiceProvider.GetService<ILogService>();
-                        logService.AddExceptionAsync<IWebHost>("An error occurred while installing or updating the database.", ex);
-                        Engine.Services.DatabaseMigrationFailed = true;
-                    }
-
-                    try
-                    {
                         // Seed the database
                         var userManager = services.GetService<UserManager<ApplicationUser>>();
                         var roleManager = services.GetService<RoleManager<IdentityRole>>();
@@ -60,17 +47,17 @@ namespace Hood.Extensions
                             Engine.Services.DatabaseSeedFailed = true;
                         }
                     }
+                }
 
-                    try
-                    {
-                        // Configure any event listeners. TODO: Make this a TypeFinder iteration.
-                        services.GetService<SubscriptionsEventListener>().Configure();
-                    }
-                    catch (Exception ex)
-                    {
-                        var logService = scope.ServiceProvider.GetService<ILogService>();
-                        logService.AddExceptionAsync<IWebHost>("An error occurred while configuring event listeners.", ex);
-                    }
+                try
+                {
+                    // Configure any event listeners. TODO: Make this a TypeFinder iteration.
+                    services.GetService<SubscriptionsEventListener>().Configure();
+                }
+                catch (Exception ex)
+                {
+                    var logService = scope.ServiceProvider.GetService<ILogService>();
+                    logService.AddExceptionAsync<IWebHost>("An error occurred while configuring event listeners.", ex);
                 }
             }
             return host;
