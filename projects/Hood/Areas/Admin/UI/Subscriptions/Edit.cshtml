@@ -49,7 +49,14 @@
                         @if (Model.StripePlan != null)
                         {
                             <alert type="Info" icon="fa fa-info" size="Medium">
-                                <a class="float-right" href="@($"https://dashboard.stripe.com/plans/{Model.StripePlan.Id}")" target="_blank">View on Stripe<i class="ml-2 fa fa-external-link-alt"></i></a>
+                                @if (!Model.LiveMode)
+                                {
+                                    <a class="float-right" href="@($"https://dashboard.stripe.com/test/plans/{Model.StripePlan.Id}")" target="_blank">View on Stripe<i class="ml-2 fa fa-external-link-alt"></i></a>
+                                }
+                                else
+                                { 
+                                    <a class="float-right" href="@($"https://dashboard.stripe.com/plans/{Model.StripePlan.Id}")" target="_blank">View on Stripe<i class="ml-2 fa fa-external-link-alt"></i></a>
+                                }
                                 <p class="m-0">This is linked to stripe, with stripe Id: <strong>@Model.StripePlan.Id</strong></p>
                             </alert>
                         }
