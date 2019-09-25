@@ -144,7 +144,7 @@ namespace Hood.Core
         }
         /// <summary>
         /// <para>Gets the location for the Hood Client Side library folder containing all CSS/JS for the app.</para>
-        /// <para>Default is "/lib/hood/".</para>
+        /// <para>Default is "/hood/".</para>
         /// <para>Should always start with '/' and end with '/'.</para>
         /// <para>Config section Hood:LibraryFolder</para>
         /// </summary>
@@ -157,7 +157,25 @@ namespace Hood.Core
                 {
                     return config["Hood:LibraryFolder"].ToString();
                 }
-                return "/lib/hood/";
+                return "/hood/";
+            }
+        }
+        /// <summary>
+        /// <para>Gets the location for the Hood Client Side library folder containing all CSS/JS for the app.</para>
+        /// <para>Default is "/hood/".</para>
+        /// <para>Should always start with '/' and end with '/'.</para>
+        /// <para>Config section Hood:LibraryFolder</para>
+        /// </summary>
+        public static string SiteOwnerEmail
+        {
+            get
+            {
+                var config = Services.Resolve<IConfiguration>();
+                if (config["Hood:SuperAdminEmail"] != null)
+                {
+                    return config["Hood:SuperAdminEmail"].ToString();
+                }
+                return "/hood/";
             }
         }
         public static string Version

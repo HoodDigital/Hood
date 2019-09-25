@@ -22,30 +22,27 @@ namespace Hood.Extensions
                 // Get the database from the services provider
                 var db = scope.ServiceProvider.GetService<TDbContext>();
 
-                if (db.RequiresUpdate)
+                try
                 {
-                    try
+                    // Seed the database
+                    var userManager = services.GetService<UserManager<ApplicationUser>>();
+                    var roleManager = services.GetService<RoleManager<IdentityRole>>();
+                    db.Seed(userManager, roleManager);
+                }
+                catch (Exception ex)
+                {
+                    var logService = scope.ServiceProvider.GetService<ILogService>();
+                    if (ex.Message.Contains("Invalid object name"))
                     {
-                        // Seed the database
-                        var userManager = services.GetService<UserManager<ApplicationUser>>();
-                        var roleManager = services.GetService<RoleManager<IdentityRole>>();
-                        db.Seed(userManager, roleManager);
+                        // migrations have failed, suggest adding migrations.
+                        logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings due to an invalid database object, perhaps migrations are missing.", ex);
+                        Engine.Services.DatabaseSeedFailed = true;
+                        Engine.Services.DatabaseMigrationsMissing = true;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        var logService = scope.ServiceProvider.GetService<ILogService>();
-                        if (ex.Message.Contains("Invalid object name"))
-                        {
-                            // migrations have failed, suggest adding migrations.
-                            logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings due to an invalid database object, perhaps migrations are missing.", ex);
-                            Engine.Services.DatabaseSeedFailed = true;
-                            Engine.Services.DatabaseMigrationsMissing = true;
-                        }
-                        else
-                        {
-                            logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings.", ex);
-                            Engine.Services.DatabaseSeedFailed = true;
-                        }
+                        logService.AddExceptionAsync<IWebHost>("An error occurred while seeding the database with base settings.", ex);
+                        Engine.Services.DatabaseSeedFailed = true;
                     }
                 }
 
