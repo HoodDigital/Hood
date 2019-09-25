@@ -1,6 +1,6 @@
 {
   "name": "hoodcms",
-  "version": "3.0.7-pre1",
+  "version": "3.0.7",
   "description": "Hood Digital's own content management system, built in ASP.NET Core 2.2, with JS and SCSS.",
   "dependencies": {},
   "devDependencies": {},
