@@ -89,24 +89,6 @@ namespace Hood.Models
             return !total.Except(applied).Any();
         }
 
-        public bool RequiresUpdate
-        {
-            get
-            {
-                try
-                {
-                    var version = Options.SingleOrDefault(o => o.Id == "Hood.Version");
-                    if (version != null && version.Value == Engine.Version)
-                        return false;
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return true;
-                }              
-            }
-        }
-
         public virtual void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
 
@@ -120,43 +102,44 @@ namespace Hood.Models
                     IdentityResult irAdmin = roleManager.CreateAsync(new IdentityRole(role)).Result;
                 }
             }
-            if (!Users.Any(u => u.UserName == "admin@hooddigital.com"))
+            string ownerEmail = Engine.SiteOwnerEmail;
+            if (!Users.Any(u => u.UserName == ownerEmail))
             {
                 ApplicationUser userToInsert = new ApplicationUser
                 {
-                    CompanyName = "Hood",
+                    CompanyName = "",
                     CreatedOn = DateTime.Now,
-                    FirstName = "Hood",
-                    LastName = "Digital",
+                    FirstName = "Website",
+                    LastName = "Administrator",
                     EmailConfirmed = true,
                     Anonymous = false,
-                    PhoneNumber = "03309001900",
+                    PhoneNumber = "",
                     JobTitle = "Website Administrator",
                     LastLogOn = DateTime.Now,
                     LastLoginIP = "127.0.0.1",
-                    LastLoginLocation = "Nottingham, UK",
-                    Email = "admin@hooddigital.com",
-                    UserName = "admin@hooddigital.com",
+                    LastLoginLocation = "UK",
+                    Email = ownerEmail,
+                    UserName = ownerEmail,
                     Active = true
                 };
                 IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
-                if (ir.Succeeded)
+                if (!ir.Succeeded)
                 {
-                    ApplicationUser user = userManager.FindByEmailAsync(userToInsert.UserName).Result;
-                    if (userManager.SupportsUserRole)
-                    {
-                        foreach (string role in Models.Roles.All)
-                        {
-                            if (!userManager.IsInRoleAsync(user, role.ToUpper()).Result)
-                            {
-                                IdentityResult addToRole = userManager.AddToRoleAsync(user, role).Result;
-                            }
-                        }
-                    }
+                    throw new Exception("Could not create super admin user.");
                 }
             }
 
-            var siteAdmin = Users.SingleOrDefault(u => u.UserName == "admin@hooddigital.com");
+            ApplicationUser siteAdmin = userManager.FindByEmailAsync(Engine.SiteOwnerEmail).Result;
+            if (userManager.SupportsUserRole)
+            {
+                foreach (string role in Models.Roles.All)
+                {
+                    if (!userManager.IsInRoleAsync(siteAdmin, role.ToUpper()).Result)
+                    {
+                        IdentityResult addToRole = userManager.AddToRoleAsync(siteAdmin, role).Result;
+                    }
+                }
+            }
 
             if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
             {

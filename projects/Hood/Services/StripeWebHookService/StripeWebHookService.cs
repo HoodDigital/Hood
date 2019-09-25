@@ -324,7 +324,7 @@ namespace Hood.Services
         /// <param name="stripeEvent"></param>
         protected async Task PlanCreatedOrUpdatedAsync(Plan plan)
         {
-            await _account.SyncSubscriptionProductAsync(null, plan.Id);
+            await _account.SyncSubscriptionPlanAsync(null, plan.Id);
         }
         /// <summary>
         /// Occurs whenever a plan is deleted.

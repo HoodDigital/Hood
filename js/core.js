@@ -111,11 +111,11 @@ $.fn.characterCounter = function (val) {
   var targets = $(this);
 
   var characterCounterHandler = function characterCounterHandler() {
-    counter = $(this).data('counter');
-    max = Number($(this).attr('maxlength'));
-    len = $(this).val().length;
+    var counter = $(this).data('counter');
+    var max = Number($(this).attr('maxlength'));
+    var len = $(this).val().length;
     $(counter).text(max - len);
-    cls = "text-success";
+    var cls = "text-success";
     if (max - len < max / 10) cls = "text-danger";
     $(counter).parent().removeClass('text-success').removeClass('text-danger').addClass(cls);
   };

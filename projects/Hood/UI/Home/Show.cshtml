@@ -11,11 +11,11 @@
     string seoDescription = Model.Content.GetMetaValue<string>("SEO.Meta.Description");
     string title = Model.Content.Title + " - " + _basicSettings.FullTitle;
     string description = Model.Content.Excerpt;
-    if (!seoTitle.IsSet())
+    if (seoTitle.IsSet())
     {
         title = seoTitle;
     }
-    if (!seoDescription.IsSet())
+    if (seoDescription.IsSet())
     {
         description = seoDescription;
     }

@@ -43,7 +43,7 @@ namespace Hood.TagHelpers
             output.TagName = "div";
             output.TagMode = TagMode.StartTagAndEndTag;
             string recaptchaId = Guid.NewGuid().ToString();
-            _htmlHelper.AddScriptParts($"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}");
+            _htmlHelper.AddScriptParts($"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}", true);
             var scriptTemplate = $@"<script>
 	if (typeof grecaptcha !== 'undefined') {{
 		grecaptcha.ready(function () {{
