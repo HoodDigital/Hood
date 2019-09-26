@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Hood.Models
@@ -92,6 +93,21 @@ namespace Hood.Models
 
         public virtual void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            try
+            {
+                var option = Options.FirstOrDefault();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Message.Contains("Login failed for user") || ex.Message.Contains("permission was denied"))
+                {
+                    throw new StartupException("There was a problem connecting to the database.", StartupError.DatabaseConnectionFailed);
+                }
+                else if (ex.Message.Contains("Invalid object name"))
+                {
+                    throw new StartupException("There was a problem connecting to the database.", StartupError.MigrationMissing);
+                }
+            }
 
             if (!AllMigrationsApplied())
             {
@@ -365,7 +381,7 @@ namespace Hood.Models
                 var key = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(guid));
                 Options.Add(new Option { Id = "Hood.Api.SystemPrivateKey", Value = JsonConvert.SerializeObject(key) });
             }
-            
+
             // Mark the database with the current version of Hood.
             if (!Options.Any(o => o.Id == "Hood.Version"))
             {

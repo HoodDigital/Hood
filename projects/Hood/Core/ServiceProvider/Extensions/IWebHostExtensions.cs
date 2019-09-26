@@ -49,24 +49,10 @@ namespace Hood.Extensions
                     }
                     Engine.Services.DatabaseSeedFailed = true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    if (ex.Message.Contains("Login failed for user"))
-                    {
-                        Engine.Services.DatabaseConnectionFailed = true;
-                        Engine.Services.DatabaseMigrationsMissing = true;
-                        Engine.Services.MigrationNotApplied = true;
-                        Engine.Services.AdminUserSetupError = true;
-                    }
-                    else if (ex.Message.Contains("Invalid object name"))
-                    {
-                        Engine.Services.DatabaseMigrationsMissing = true;
-                        Engine.Services.MigrationNotApplied = true;
-                        Engine.Services.AdminUserSetupError = true;
-                    }
                     Engine.Services.DatabaseSeedFailed = true;
                 }
-
 
                 try
                 {
