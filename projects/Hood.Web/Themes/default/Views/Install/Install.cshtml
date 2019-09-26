@@ -33,13 +33,13 @@
                 </p>
                 <p class="m-0">
                     If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
-                    <a href="https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
+                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-common#configure-connection-strings" target="_blank">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
                 </p>
             </alert>
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 Database connection string is set.
             </alert>
         }
@@ -55,20 +55,20 @@
                 </p>
                 <p class="m-0">
                     If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
-                    <a href="https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
+                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-common#configure-connection-strings" target="_blank">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
                 </p>
             </alert>
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 Database connection established.
             </alert>
         }
 
         @if (Model.DatabaseMigrationsMissing)
         {
-            <alert type="Danger" size="Epic">
+            <alert type="Danger" size="Medium">
                 <h6>
                     Database migrations are missing
                 </h6>
@@ -76,6 +76,11 @@
                     The database seed has failed, this usually means that migrations have not been created or applied to the database yet. You will need to add a migration to your project
                     if you have upgraded from an existing project or added the Hood Framework to a standard ASP.NET Core Web project.
                 </p>
+                <p>To add an up to date migration to your code use the following CLI command:</p>
+                <p>
+                    <code>dotnet ef migrations add NewMigrationName --context ApplicationDbContext</code><br />
+                    <code>dotnet ef database update --context ApplicationDbContext</code>
+                </p>
                 <p class="m-0">
                     If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide to create and apply a database migration here:
                     <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
@@ -84,24 +89,24 @@
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 Database migrations found.
             </alert>
         }
 
         @if (Model.MigrationNotApplied)
         {
-            <alert type="Danger" size="Epic">
+            <alert type="Danger" size="Medium">
                 <h6>
                     Database migrations have not been applied
                 </h6>
                 <p>
-                    The database seed has failed because migrations have not been applied to the database yet. You will need to run the command
+                    The database seed has failed because migrations have not been applied to the database yet.
+                </p>
+                <p>
+                    You will need to run the following CLI command to apply all the migrations to the database:
                 </p>
                 <p><code>dotnet ef database update --context ApplicationDbContext</code></p>
-                <p>
-                    to apply all the migrations to the database.
-                </p>
                 <p class="m-0">
                     If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide to create and apply a database migration here:
                     <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
@@ -110,14 +115,14 @@
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 Database migrations applied.
             </alert>
         }
 
         @if (Model.DatabaseSeedFailed)
         {
-            <alert type="Danger" size="Epic">
+            <alert type="Danger" size="Medium">
                 <h6>
                     Database not migrated/seeded correctly
                 </h6>
@@ -132,14 +137,14 @@
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 Database successfully seeded.
             </alert>
         }
 
         @if (!Model.ViewsInstalled)
         {
-            <alert type="Danger" size="Epic">
+            <alert type="Danger" size="Medium">
                 <h6>
                     Database SQL Views not setup
                 </h6>
@@ -153,16 +158,16 @@
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 SQL Views installed.
             </alert>
         }
 
         @if (Model.AdminUserSetupError)
         {
-            <alert type="Danger" size="Epic">
+            <alert type="Danger" size="Medium">
                 <h6>
-                     Admin user could not be created/loaded
+                    Admin user could not be created/loaded
                 </h6>
                 <p class="m-0">
                     There is an issue creating the admin user account set in your appSettings.json. Please ensure the setting Hood:SuperAdminEmail is set to a valid email address.
@@ -171,14 +176,14 @@
         }
         else
         {
-            <alert type="Success" size="Small">
+            <alert type="Success" size="Medium">
                 Admin user created and loaded.
             </alert>
         }
 
         @if (Model.Installed)
         {
-            <alert type="Success" size="Epic">
+            <alert type="Success" size="Medium">
                 <h6>
                     Your database and site is ready to roll!
                 </h6>

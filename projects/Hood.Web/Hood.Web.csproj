@@ -11,6 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <Content Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
   </ItemGroup>
   
@@ -20,10 +27,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
   </ItemGroup>
   
 </Project>
