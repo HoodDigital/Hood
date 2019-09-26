@@ -8,18 +8,18 @@
     }
   },
   "profiles": {
-    "IIS Express": {
+    "IIS Development": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "IIS Production": {
+    "IIS Staging": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "ProductionTesting"
+        "ASPNETCORE_ENVIRONMENT": "Staging"
       }
     },
     "Hood.Web": {

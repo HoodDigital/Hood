@@ -53,6 +53,7 @@ namespace Hood.Services
         Task<Customer> UpdateCustomerAsync(string customerId, ApplicationUser user);
         Task<Customer> DeleteCustomerAsync(string customerId);
         Task<Customer> GetCustomerByIdAsync(string customerId);
+        Task<Customer> GetCustomerByEmailAsync(string email);
         Task<List<Customer>> GetCustomersByEmailAsync(string email);
         #endregion
 

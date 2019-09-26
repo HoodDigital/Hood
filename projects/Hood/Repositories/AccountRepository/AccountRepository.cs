@@ -1070,8 +1070,24 @@ namespace Hood.Services
             if (user.StripeId.IsSet())
             {
                 customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
-                if (customer != null)
-                    return customer;
+
+                if (customer == null)
+                    customer = await _stripe.GetCustomerByEmailAsync(user.Email);
+
+                if (customer == null)
+                    customer = await _stripe.CreateCustomerAsync(user);
+
+                user.StripeId = customer.Id;
+            }
+            else
+            {
+                // try to get customer from email.
+                customer = await _stripe.GetCustomerByEmailAsync(user.Email);
+
+                if (customer == null)
+                    customer = await _stripe.CreateCustomerAsync(user);
+
+                user.StripeId = customer.Id;
             }
             customer = await _stripe.CreateCustomerAsync(user);
             user.StripeId = customer.Id;

@@ -13,6 +13,7 @@ namespace Hood.Core
 {
     class HoodServiceProvider : IHoodServiceProvider
     {
+        public bool DatabaseConnectionFailed { get; set; }
         public bool DatabaseMigrationFailed { get; set; }
         public bool DatabaseMigrationsMissing { get; set; }
         public bool DatabaseSeedFailed { get; set; }

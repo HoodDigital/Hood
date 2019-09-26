@@ -93,7 +93,9 @@ namespace Hood.Models
         {
 
             if (!AllMigrationsApplied())
-                return;
+            {
+                throw new Exception("Invalid object name");
+            }
 
             foreach (string role in Models.Roles.All)
             {

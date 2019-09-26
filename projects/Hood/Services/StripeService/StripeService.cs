@@ -246,6 +246,17 @@ namespace Hood.Services
                 throw stripeEx;
             }
         }
+        public async Task<Customer> GetCustomerByEmailAsync(string email)
+        {
+            StripeList<Customer> customers = await CustomerService.ListAsync(new CustomerListOptions() { Email = email });
+            if (customers != null && customers.Data != null && customers.Data.Count > 0)
+            {
+                var customer = customers.First();
+                if (customer.Email == email)
+                    return customer;
+            }
+            return null;
+        }
         public async Task<List<Customer>> GetCustomersByEmailAsync(string email)
         {
             StripeList<Customer> customers = await CustomerService.ListAsync(new CustomerListOptions() { Email = email });

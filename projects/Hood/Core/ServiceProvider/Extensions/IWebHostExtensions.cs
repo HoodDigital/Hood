@@ -21,6 +21,10 @@ namespace Hood.Extensions
                 var services = scope.ServiceProvider;
                 // Get the database from the services provider
                 var db = scope.ServiceProvider.GetService<TDbContext>();
+                if (db == null)
+                {
+                    Engine.Services.DatabaseConnectionFailed = true;
+                }
 
                 try
                 {
