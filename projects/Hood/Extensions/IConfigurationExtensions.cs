@@ -14,7 +14,9 @@ namespace Hood.Extensions
         {
             if (Engine.Services.DatabaseConnectionFailed)
                 return false;
-            if (Engine.Services.DatabaseMigrationFailed)
+            if (Engine.Services.DatabaseMigrationsMissing)
+                return false;
+            if (Engine.Services.MigrationNotApplied)
                 return false;
             if (Engine.Services.DatabaseSeedFailed)
                 return false;

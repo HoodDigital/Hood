@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Hood.Extensions
@@ -38,5 +39,36 @@ namespace Hood.Extensions
 
             return error;
         }
+    }
+    [Serializable]
+    internal class StartupException : Exception
+    {
+        public StartupError Error { get; set; }
+        
+        public StartupException()
+        {
+        }
+
+        public StartupException(string message, StartupError error) : base(message)
+        {
+            Error = error;
+        }
+
+        public StartupException(string message, Exception innerException, StartupError error) : base(message, innerException)
+        {
+            Error = error;
+        }
+
+        protected StartupException(SerializationInfo info, StreamingContext context, StartupError error) : base(info, context)
+        {
+            Error = error;
+        }
+    }
+    public enum StartupError
+    {
+        MigrationMissing, 
+        MigrationNotApplied,
+        DatabaseConnectionFailed,
+        AdminUserSetupError
     }
 }

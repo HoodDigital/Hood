@@ -24,21 +24,28 @@ namespace Hood.Controllers
         {
             var model = new InstallModel()
             {
-                DatabaseSeeded = !Engine.Services.DatabaseSeedFailed,
-                DatabaseMigrated = !Engine.Services.DatabaseMigrationFailed,
-                DatabaseMigrationMissing = Engine.Services.DatabaseMigrationsMissing
+                DatabaseConfigured = _config.IsDatabaseConnected(),
+                DatabaseConnectionFailed = Engine.Services.DatabaseConnectionFailed,
+                DatabaseSeedFailed = Engine.Services.DatabaseSeedFailed,
+                DatabaseMigrationsMissing = Engine.Services.DatabaseMigrationsMissing,
+                MigrationNotApplied = Engine.Services.MigrationNotApplied,
+                AdminUserSetupError = Engine.Services.AdminUserSetupError
             };
-            var context = Engine.Services.Resolve<HoodDbContext>();
-            model.DatabaseConfigured = _config.IsDatabaseConnected();
-            try
+            if (model.Installed)
             {
-                var profile = context.UserProfiles.FirstOrDefault();
-                model.ViewsInstalled = true;
+                try
+                {
+                    var context = Engine.Services.Resolve<HoodDbContext>();
+                    var profile = context.UserProfiles.FirstOrDefault();
+                    model.ViewsInstalled = true;
+                }
+                catch (Exception)
+                {
+                    model.ViewsInstalled = false;
+                }
             }
-            catch (Exception)
-            {
+            else
                 model.ViewsInstalled = false;
-            }
             return View(model);
         }
 

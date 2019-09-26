@@ -16,9 +16,8 @@ namespace Hood.Services
 
         public void PopulateValues(ViewLocationExpanderContext context)
         {
-            string theme = Engine.Settings != null ? Engine.Settings["Hood.Settings.Theme"] : null;
+            string theme = Engine.Services.Installed && Engine.Settings != null ? Engine.Settings["Hood.Settings.Theme"] : null;
             var temp = new List<string>();
-
             // Add Themed Area views first.
             if (theme.IsSet())
                 temp.AddRange(GetLocations("/Themes/" + theme + "/Areas/{2}/Views"));

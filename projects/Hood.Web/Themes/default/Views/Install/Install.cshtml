@@ -26,24 +26,54 @@
         {
             <alert type="Danger" size="Medium">
                 <h6>
-                    Database connected
+                    Database not configured
                 </h6>
-                <p>No database connection has been detected. Please ensure you have set set the database connecion string inside your appsettings.json file, or your ConnectionStrings in your environment variables.</p>
+                <p>
+                    No database connection has been detected. Please ensure you have set set the database connecion string inside your appsettings.json file, or your ConnectionStrings in your environment variables.
+                </p>
                 <p class="m-0">
                     If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
                     <a href="https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
                 </p>
             </alert>
         }
+        else
+        {
+            <alert type="Success" size="Small">
+                Database connection string is set.
+            </alert>
+        }
 
-        @if  (Model.DatabaseMigrationMissing)
+        @if (Model.DatabaseConnectionFailed)
+        {
+            <alert type="Danger" size="Medium">
+                <h6>
+                    Could not connect to the database
+                </h6>
+                <p>
+                    No database connection has been established. Please ensure you have set set the database connecion string correctly inside your appsettings.json file, or your ConnectionStrings in your environment variables. Also ensure that the SQL server allows connections to this site and the user has appropriate access to modify the database.
+                </p>
+                <p class="m-0">
+                    If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
+                    <a href="https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure">https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure</a>
+                </p>
+            </alert>
+        }
+        else
+        {
+            <alert type="Success" size="Small">
+                Database connection established.
+            </alert>
+        }
+
+        @if (Model.DatabaseMigrationsMissing)
         {
             <alert type="Danger" size="Epic">
                 <h6>
-                    Database migrations missing
+                    Database migrations are missing
                 </h6>
                 <p>
-                    The database seed has failed due to an invalid object, this usually means that migrations have not been applied to the database yet. You will need to add a migration to your project
+                    The database seed has failed, this usually means that migrations have not been created or applied to the database yet. You will need to add a migration to your project
                     if you have upgraded from an existing project or added the Hood Framework to a standard ASP.NET Core Web project.
                 </p>
                 <p class="m-0">
@@ -52,8 +82,40 @@
                 </p>
             </alert>
         }
+        else
+        {
+            <alert type="Success" size="Small">
+                Database migrations found.
+            </alert>
+        }
 
-        @if (!Model.DatabaseMigrated || !Model.DatabaseSeeded)
+        @if (Model.MigrationNotApplied)
+        {
+            <alert type="Danger" size="Epic">
+                <h6>
+                    Database migrations have not been applied
+                </h6>
+                <p>
+                    The database seed has failed because migrations have not been applied to the database yet. You will need to run the command
+                </p>
+                <p><code>dotnet ef database update --context ApplicationDbContext</code></p>
+                <p>
+                    to apply all the migrations to the database.
+                </p>
+                <p class="m-0">
+                    If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide to create and apply a database migration here:
+                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
+                </p>
+            </alert>
+        }
+        else
+        {
+            <alert type="Success" size="Small">
+                Database migrations applied.
+            </alert>
+        }
+
+        @if (Model.DatabaseSeedFailed)
         {
             <alert type="Danger" size="Epic">
                 <h6>
@@ -66,6 +128,12 @@
                     If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide here:
                     <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
                 </p>
+            </alert>
+        }
+        else
+        {
+            <alert type="Success" size="Small">
+                Database successfully seeded.
             </alert>
         }
 
@@ -83,14 +151,32 @@
                 </p>
             </alert>
         }
+        else
+        {
+            <alert type="Success" size="Small">
+                SQL Views installed.
+            </alert>
+        }
 
-        @if (
-          Model.DatabaseConfigured &&
-          !Model.DatabaseMigrationMissing &&
-          Model.DatabaseConfigured &&
-          Model.DatabaseMigrated &&
-          Model.DatabaseSeeded
-          )
+        @if (Model.AdminUserSetupError)
+        {
+            <alert type="Danger" size="Epic">
+                <h6>
+                     Admin user could not be created/loaded
+                </h6>
+                <p class="m-0">
+                    There is an issue creating the admin user account set in your appSettings.json. Please ensure the setting Hood:SuperAdminEmail is set to a valid email address.
+                </p>
+            </alert>
+        }
+        else
+        {
+            <alert type="Success" size="Small">
+                Admin user created and loaded.
+            </alert>
+        }
+
+        @if (Model.Installed)
         {
             <alert type="Success" size="Epic">
                 <h6>
