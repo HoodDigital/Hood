@@ -412,7 +412,7 @@ namespace Hood.Services
 
             if (paymentMethodId != null)
             {
-                options.DefaultPaymentMethodId = paymentMethodId;
+                options.DefaultSource = paymentMethodId;
             }
 
             options.AddExpand("latest_invoice.payment_intent");

@@ -5,43 +5,43 @@ GO
 
 CREATE VIEW HoodSubscriptionPlans AS
 SELECT        
-	dbo.HoodSubscriptions.Id, 
-	dbo.HoodSubscriptions.Addon, 
-	dbo.HoodSubscriptions.Amount, 
-	dbo.HoodSubscriptions.Colour, 
-	dbo.HoodSubscriptions.Created, 
-	dbo.HoodSubscriptions.CreatedBy, 
-	dbo.HoodSubscriptions.Currency,
-	dbo.HoodSubscriptions.Description, 
-	dbo.HoodSubscriptions.Interval, 
-	dbo.HoodSubscriptions.IntervalCount, 
-	dbo.HoodSubscriptions.LastEditedBy, 
-	dbo.HoodSubscriptions.LastEditedOn, 
-	dbo.HoodSubscriptions.[Level], 
-	dbo.HoodSubscriptions.LiveMode, 
-	dbo.HoodSubscriptions.Name, 
-	dbo.HoodSubscriptions.NumberAllowed, 
-	dbo.HoodSubscriptions.[Public], 
-	dbo.HoodSubscriptions.StatementDescriptor, 
-	dbo.HoodSubscriptions.StripeId, 
-	dbo.HoodSubscriptions.TrialPeriodDays, 
-	dbo.HoodSubscriptions.SubscriptionProductId, 
-	dbo.HoodSubscriptions.FeaturedImageJson, 
-	dbo.HoodSubscriptions.FeaturesJson, 
-	COUNT(dbo.HoodUserSubscriptions.UserSubscriptionId) AS TotalCount,
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'active' THEN 1 ELSE NULL END) AS ActiveCount, 
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'trialing' THEN 1 ELSE NULL END) AS TrialCount, 
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'canceled' THEN 1 ELSE NULL END) AS InactiveCount
+	HoodSubscriptions.Id, 
+	HoodSubscriptions.Addon, 
+	HoodSubscriptions.Amount, 
+	HoodSubscriptions.Colour, 
+	HoodSubscriptions.Created, 
+	HoodSubscriptions.CreatedBy, 
+	HoodSubscriptions.Currency,
+	HoodSubscriptions.Description, 
+	HoodSubscriptions.Interval, 
+	HoodSubscriptions.IntervalCount, 
+	HoodSubscriptions.LastEditedBy, 
+	HoodSubscriptions.LastEditedOn, 
+	HoodSubscriptions.[Level], 
+	HoodSubscriptions.LiveMode, 
+	HoodSubscriptions.Name, 
+	HoodSubscriptions.NumberAllowed, 
+	HoodSubscriptions.[Public], 
+	HoodSubscriptions.StatementDescriptor, 
+	HoodSubscriptions.StripeId, 
+	HoodSubscriptions.TrialPeriodDays, 
+	HoodSubscriptions.SubscriptionProductId, 
+	HoodSubscriptions.FeaturedImageJson, 
+	HoodSubscriptions.FeaturesJson, 
+	COUNT(HoodUserSubscriptions.UserSubscriptionId) AS TotalCount,
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'active' THEN 1 ELSE NULL END) AS ActiveCount, 
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'trialing' THEN 1 ELSE NULL END) AS TrialCount, 
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'canceled' THEN 1 ELSE NULL END) AS InactiveCount
 FROM            
-	dbo.HoodSubscriptions 
+	HoodSubscriptions 
 LEFT JOIN
-	dbo.HoodUserSubscriptions ON dbo.HoodUserSubscriptions.SubscriptionId = dbo.HoodSubscriptions.Id
+	HoodUserSubscriptions ON HoodUserSubscriptions.SubscriptionId = HoodSubscriptions.Id
 GROUP BY 
-	dbo.HoodSubscriptions.Id, dbo.HoodSubscriptions.Amount, dbo.HoodSubscriptions.Colour, dbo.HoodSubscriptions.Created, dbo.HoodSubscriptions.CreatedBy, dbo.HoodSubscriptions.Currency, 
-    dbo.HoodSubscriptions.Description, dbo.HoodSubscriptions.Interval, dbo.HoodSubscriptions.IntervalCount, dbo.HoodSubscriptions.LastEditedBy, 
-    dbo.HoodSubscriptions.LastEditedOn, dbo.HoodSubscriptions.[Level], dbo.HoodSubscriptions.Name, dbo.HoodSubscriptions.NumberAllowed, dbo.HoodSubscriptions.StatementDescriptor, dbo.HoodSubscriptions.StripeId, 
-    dbo.HoodSubscriptions.TrialPeriodDays, dbo.HoodSubscriptions.SubscriptionProductId, dbo.HoodSubscriptions.FeaturedImageJson, dbo.HoodSubscriptions.FeaturesJson, dbo.HoodSubscriptions.Addon, 
-	dbo.HoodSubscriptions.LiveMode, dbo.HoodSubscriptions.[Public]
+	HoodSubscriptions.Id, HoodSubscriptions.Amount, HoodSubscriptions.Colour, HoodSubscriptions.Created, HoodSubscriptions.CreatedBy, HoodSubscriptions.Currency, 
+    HoodSubscriptions.Description, HoodSubscriptions.Interval, HoodSubscriptions.IntervalCount, HoodSubscriptions.LastEditedBy, 
+    HoodSubscriptions.LastEditedOn, HoodSubscriptions.[Level], HoodSubscriptions.Name, HoodSubscriptions.NumberAllowed, HoodSubscriptions.StatementDescriptor, HoodSubscriptions.StripeId, 
+    HoodSubscriptions.TrialPeriodDays, HoodSubscriptions.SubscriptionProductId, HoodSubscriptions.FeaturedImageJson, HoodSubscriptions.FeaturesJson, HoodSubscriptions.Addon, 
+	HoodSubscriptions.LiveMode, HoodSubscriptions.[Public]
 GO
 
 /* UserSubscriptions - Used by HoodUserProfiles View */
@@ -50,35 +50,35 @@ IF EXISTS(select * FROM sys.views where name = 'HoodUserSubscriptionsView') DROP
 GO
 CREATE VIEW HoodUserSubscriptionsView AS
 SELECT        
-	dbo.AspNetUsers.Id, 
-	dbo.AspNetUsers.UserName, 
-	dbo.AspNetUsers.Email, 
-	dbo.AspNetUsers.EmailConfirmed, 
-	dbo.AspNetUsers.PhoneNumber, 
-	dbo.AspNetUsers.PhoneNumberConfirmed, 
-	dbo.AspNetUsers.FirstName, 
-	dbo.AspNetUsers.LastName, 
-	dbo.AspNetUsers.DisplayName, 
-	dbo.AspNetUsers.Active, 
-	dbo.AspNetUsers.Anonymous, 
-	dbo.AspNetUsers.AvatarJson, 
-	dbo.AspNetUsers.LastLoginIP, 
-	dbo.AspNetUsers.LastLoginLocation, 
-	dbo.AspNetUsers.LastLogOn, 
-	dbo.AspNetUsers.LockoutEnabled, 
-	dbo.AspNetUsers.TwoFactorEnabled, 
-	dbo.AspNetUsers.BillingAddressJson,	
-	dbo.AspNetUsers.DeliveryAddressJson,	
-	dbo.AspNetUsers.CreatedOn,	
-	dbo.AspNetUsers.Latitude,	
-	dbo.AspNetUsers.Longitude,	
-	dbo.AspNetUsers.StripeId,	
-	dbo.AspNetUsers.UserVars,
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'active' THEN 1 ELSE NULL END) AS ActiveCount, 
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'trialing' THEN 1 ELSE NULL END) AS TrialCount, 
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'canceled' THEN 1 ELSE NULL END) AS InactiveCount, 
-	COUNT(CASE dbo.HoodUserSubscriptions.Status WHEN 'past_due' THEN 1 WHEN 'unpaid' THEN 1 ELSE NULL END) AS OverDueCount, 
-	COUNT(dbo.HoodUserSubscriptions.UserSubscriptionId) AS TotalSubscriptions, 
+	AspNetUsers.Id, 
+	AspNetUsers.UserName, 
+	AspNetUsers.Email, 
+	AspNetUsers.EmailConfirmed, 
+	AspNetUsers.PhoneNumber, 
+	AspNetUsers.PhoneNumberConfirmed, 
+	AspNetUsers.FirstName, 
+	AspNetUsers.LastName, 
+	AspNetUsers.DisplayName, 
+	AspNetUsers.Active, 
+	AspNetUsers.Anonymous, 
+	AspNetUsers.AvatarJson, 
+	AspNetUsers.LastLoginIP, 
+	AspNetUsers.LastLoginLocation, 
+	AspNetUsers.LastLogOn, 
+	AspNetUsers.LockoutEnabled, 
+	AspNetUsers.TwoFactorEnabled, 
+	AspNetUsers.BillingAddressJson,	
+	AspNetUsers.DeliveryAddressJson,	
+	AspNetUsers.CreatedOn,	
+	AspNetUsers.Latitude,	
+	AspNetUsers.Longitude,	
+	AspNetUsers.StripeId,	
+	AspNetUsers.UserVars,
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'active' THEN 1 ELSE NULL END) AS ActiveCount, 
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'trialing' THEN 1 ELSE NULL END) AS TrialCount, 
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'canceled' THEN 1 ELSE NULL END) AS InactiveCount, 
+	COUNT(CASE HoodUserSubscriptions.Status WHEN 'past_due' THEN 1 WHEN 'unpaid' THEN 1 ELSE NULL END) AS OverDueCount, 
+	COUNT(HoodUserSubscriptions.UserSubscriptionId) AS TotalSubscriptions, 
 	CONCAT
 	(
 		'[',
@@ -88,27 +88,27 @@ SELECT
 			(
 				CASE 
 				WHEN 
-					dbo.HoodUserSubscriptions.UserSubscriptionId IS NOT NULL
+					HoodUserSubscriptions.UserSubscriptionId IS NOT NULL
 				THEN 
 					CONCAT
 					(
 						'{', 
-							'Id:', '', dbo.HoodUserSubscriptions.UserSubscriptionId, ',', 
-							'PlanId:', '"', dbo.HoodSubscriptions.Id, '",', 
-							'StripeSubscriptionId:', '"', dbo.HoodUserSubscriptions.StripeId, '",', 
-							'StripeId:', '"', dbo.HoodSubscriptions.StripeId, '",', 
-							'SubscriptionProductId:', '"', dbo.HoodSubscriptions.SubscriptionProductId, '",', 
-							'Status:', '"', dbo.HoodUserSubscriptions.Status, '",',
-							'Name:', '"', dbo.HoodSubscriptions.Name, '",',
-							'Category:', '"', dbo.HoodSubscriptions.Colour, '",',
-							'Public:', '', dbo.HoodSubscriptions.[Public], ',',
-							'Level:', '', dbo.HoodSubscriptions.Level, ',',
-							'Addon:', '', dbo.HoodSubscriptions.Addon, ',',
-							'Amount:', '', dbo.HoodSubscriptions.Amount, ',',
-							'Interval:', '"', dbo.HoodSubscriptions.Interval, '",',
-							'IntervalCount:', '', dbo.HoodSubscriptions.IntervalCount, ',',
-							'CurrentPeriodEnd:', '"', dbo.HoodUserSubscriptions.CurrentPeriodEnd, '",',
-							'CancelAtPeriodEnd:', '', dbo.HoodUserSubscriptions.CancelAtPeriodEnd, ',',
+							'Id:', '', HoodUserSubscriptions.UserSubscriptionId, ',', 
+							'PlanId:', '"', HoodSubscriptions.Id, '",', 
+							'StripeSubscriptionId:', '"', HoodUserSubscriptions.StripeId, '",', 
+							'StripeId:', '"', HoodSubscriptions.StripeId, '",', 
+							'SubscriptionProductId:', '"', HoodSubscriptions.SubscriptionProductId, '",', 
+							'Status:', '"', HoodUserSubscriptions.Status, '",',
+							'Name:', '"', HoodSubscriptions.Name, '",',
+							'Category:', '"', HoodSubscriptions.Colour, '",',
+							'Public:', '', HoodSubscriptions.[Public], ',',
+							'Level:', '', HoodSubscriptions.Level, ',',
+							'Addon:', '', HoodSubscriptions.Addon, ',',
+							'Amount:', '', HoodSubscriptions.Amount, ',',
+							'Interval:', '"', HoodSubscriptions.Interval, '",',
+							'IntervalCount:', '', HoodSubscriptions.IntervalCount, ',',
+							'CurrentPeriodEnd:', '"', HoodUserSubscriptions.CurrentPeriodEnd, '",',
+							'CancelAtPeriodEnd:', '', HoodUserSubscriptions.CancelAtPeriodEnd, ',',
 						'}'
 					)
 				ELSE 
@@ -126,15 +126,15 @@ SELECT
 			ISNULL
 			(
 				CASE 
-					dbo.HoodUserSubscriptions.Status
+					HoodUserSubscriptions.Status
 				WHEN 
 					'active'
 				THEN 
-					dbo.HoodSubscriptions.Id
+					HoodSubscriptions.Id
 				WHEN 
 					'trialing'
 				THEN 
-					dbo.HoodSubscriptions.Id
+					HoodSubscriptions.Id
 				ELSE 
 					NULL 
 				END,
@@ -146,72 +146,72 @@ SELECT
 
 
 FROM            
-	dbo.HoodUserSubscriptions INNER JOIN
-    dbo.HoodSubscriptions ON dbo.HoodUserSubscriptions.SubscriptionId = dbo.HoodSubscriptions.Id RIGHT OUTER JOIN
-    dbo.AspNetUsers ON dbo.HoodUserSubscriptions.UserId = dbo.AspNetUsers.Id
+	HoodUserSubscriptions INNER JOIN
+    HoodSubscriptions ON HoodUserSubscriptions.SubscriptionId = HoodSubscriptions.Id RIGHT OUTER JOIN
+    AspNetUsers ON HoodUserSubscriptions.UserId = AspNetUsers.Id
 GROUP BY 
-	dbo.AspNetUsers.Id, 
-	dbo.AspNetUsers.UserName, 
-	dbo.AspNetUsers.Email, 
-	dbo.AspNetUsers.EmailConfirmed, 
-	dbo.AspNetUsers.PhoneNumber, 
-	dbo.AspNetUsers.PhoneNumberConfirmed, 
-	dbo.AspNetUsers.FirstName, 
-	dbo.AspNetUsers.LastName, 
-	dbo.AspNetUsers.DisplayName, 
-	dbo.AspNetUsers.Active, 
-	dbo.AspNetUsers.Anonymous, 
-	dbo.AspNetUsers.AvatarJson, 
-	dbo.AspNetUsers.LastLoginIP, 
-	dbo.AspNetUsers.LastLoginLocation, 
-	dbo.AspNetUsers.LastLogOn, 
-	dbo.AspNetUsers.LockoutEnabled, 
-	dbo.AspNetUsers.TwoFactorEnabled, 
-	dbo.AspNetUsers.BillingAddressJson,	
-	dbo.AspNetUsers.DeliveryAddressJson,	
-	dbo.AspNetUsers.CreatedOn,	
-	dbo.AspNetUsers.Latitude,	
-	dbo.AspNetUsers.Longitude,	
-	dbo.AspNetUsers.StripeId,	
-	dbo.AspNetUsers.UserVars
+	AspNetUsers.Id, 
+	AspNetUsers.UserName, 
+	AspNetUsers.Email, 
+	AspNetUsers.EmailConfirmed, 
+	AspNetUsers.PhoneNumber, 
+	AspNetUsers.PhoneNumberConfirmed, 
+	AspNetUsers.FirstName, 
+	AspNetUsers.LastName, 
+	AspNetUsers.DisplayName, 
+	AspNetUsers.Active, 
+	AspNetUsers.Anonymous, 
+	AspNetUsers.AvatarJson, 
+	AspNetUsers.LastLoginIP, 
+	AspNetUsers.LastLoginLocation, 
+	AspNetUsers.LastLogOn, 
+	AspNetUsers.LockoutEnabled, 
+	AspNetUsers.TwoFactorEnabled, 
+	AspNetUsers.BillingAddressJson,	
+	AspNetUsers.DeliveryAddressJson,	
+	AspNetUsers.CreatedOn,	
+	AspNetUsers.Latitude,	
+	AspNetUsers.Longitude,	
+	AspNetUsers.StripeId,	
+	AspNetUsers.UserVars
 GO
 
 IF EXISTS(select * FROM sys.views where name = 'HoodUserProfiles') DROP VIEW HoodUserProfiles
 GO
 CREATE VIEW HoodUserProfiles AS
 SELECT 
-	dbo.HoodUserSubscriptionsView.Id, 
-	dbo.HoodUserSubscriptionsView.UserName, 
-	dbo.HoodUserSubscriptionsView.Email, 
-	dbo.HoodUserSubscriptionsView.EmailConfirmed, 
-	dbo.HoodUserSubscriptionsView.PhoneNumber, 
-	dbo.HoodUserSubscriptionsView.PhoneNumberConfirmed, 
-	dbo.HoodUserSubscriptionsView.FirstName, 
-	dbo.HoodUserSubscriptionsView.LastName, 
-	dbo.HoodUserSubscriptionsView.DisplayName, 
-	dbo.HoodUserSubscriptionsView.Active, 
-	dbo.HoodUserSubscriptionsView.Anonymous, 
-	dbo.HoodUserSubscriptionsView.AvatarJson, 
-	dbo.HoodUserSubscriptionsView.LastLoginIP, 
-	dbo.HoodUserSubscriptionsView.LastLoginLocation, 
-	dbo.HoodUserSubscriptionsView.LastLogOn, 
-	dbo.HoodUserSubscriptionsView.LockoutEnabled, 
-	dbo.HoodUserSubscriptionsView.TwoFactorEnabled, 
-	dbo.HoodUserSubscriptionsView.BillingAddressJson,
-	dbo.HoodUserSubscriptionsView.DeliveryAddressJson,
-	dbo.HoodUserSubscriptionsView.CreatedOn,
-	dbo.HoodUserSubscriptionsView.Latitude,
-	dbo.HoodUserSubscriptionsView.Longitude,
-	dbo.HoodUserSubscriptionsView.StripeId,
-	dbo.HoodUserSubscriptionsView.UserVars,
-	dbo.HoodUserSubscriptionsView.ActiveCount, 
-	dbo.HoodUserSubscriptionsView.TrialCount, 
-	dbo.HoodUserSubscriptionsView.InactiveCount, 
-	dbo.HoodUserSubscriptionsView.OverDueCount, 
-	dbo.HoodUserSubscriptionsView.TotalSubscriptions, 
-	dbo.HoodUserSubscriptionsView.Subscriptions,
-	dbo.HoodUserSubscriptionsView.ActiveSubscriptionIds,
-	COUNT(dbo.AspNetRoles.Name) AS RoleCount,
+	HoodUserSubscriptionsView.Id, 
+	HoodUserSubscriptionsView.UserName, 
+	HoodUserSubscriptionsView.Email, 
+	HoodUserSubscriptionsView.EmailConfirmed, 
+	HoodUserSubscriptionsView.PhoneNumber, 
+	HoodUserSubscriptionsView.PhoneNumberConfirmed, 
+	HoodUserSubscriptionsView.FirstName, 
+	HoodUserSubscriptionsView.LastName, 
+	HoodUserSubscriptionsView.DisplayName, 
+	HoodUserSubscriptionsView.Active, 
+	HoodUserSubscriptionsView.Anonymous, 
+	HoodUserSubscriptionsView.AvatarJson, 
+	HoodUserSubscriptionsView.LastLoginIP, 
+	HoodUserSubscriptionsView.LastLoginLocation, 
+	HoodUserSubscriptionsView.LastLogOn, 
+	HoodUserSubscriptionsView.LockoutEnabled, 
+	HoodUserSubscriptionsView.TwoFactorEnabled, 
+	HoodUserSubscriptionsView.BillingAddressJson,
+	HoodUserSubscriptionsView.DeliveryAddressJson,
+	HoodUserSubscriptionsView.CreatedOn,
+	HoodUserSubscriptionsView.Latitude,
+	HoodUserSubscriptionsView.Longitude,
+	HoodUserSubscriptionsView.StripeId,
+	HoodUserSubscriptionsView.UserVars,
+	HoodUserSubscriptionsView.ActiveCount, 
+	HoodUserSubscriptionsView.TrialCount, 
+	HoodUserSubscriptionsView.InactiveCount, 
+	HoodUserSubscriptionsView.OverDueCount, 
+	HoodUserSubscriptionsView.TotalSubscriptions, 
+	HoodUserSubscriptionsView.Subscriptions,
+	HoodUserSubscriptionsView.ActiveSubscriptionIds,
+	COUNT(AspNetRoles.Name) AS RoleCount,
 	CONCAT
 	(
 		'[',
@@ -221,14 +221,14 @@ SELECT
 			(
 				CASE 
 				WHEN 
-					dbo.AspNetRoles.Id IS NOT NULL
+					AspNetRoles.Id IS NOT NULL
 				THEN 
 					CONCAT
 					(
 						'{', 
-							'Id:', '"', dbo.AspNetRoles.Id, '",', 
-							'Name:', '"', dbo.AspNetRoles.Name, '",', 
-							'NormalizedName:', '"', dbo.AspNetRoles.NormalizedName, '"', 
+							'Id:', '"', AspNetRoles.Id, '",', 
+							'Name:', '"', AspNetRoles.Name, '",', 
+							'NormalizedName:', '"', AspNetRoles.NormalizedName, '"', 
 						'}'
 					)
 				ELSE 
@@ -246,9 +246,9 @@ SELECT
 			(
 				CASE 
 				WHEN 
-					dbo.AspNetRoles.Id IS NOT NULL
+					AspNetRoles.Id IS NOT NULL
 				THEN 
-					dbo.AspNetRoles.Id
+					AspNetRoles.Id
 				ELSE 
 					NULL 
 				END,
@@ -258,39 +258,39 @@ SELECT
 		)
 	AS RoleIds
 FROM            
-	dbo.AspNetUserRoles INNER JOIN
-	dbo.AspNetRoles ON dbo.AspNetUserRoles.RoleId = dbo.AspNetRoles.Id RIGHT OUTER JOIN
-	dbo.HoodUserSubscriptionsView ON dbo.AspNetUserRoles.UserId = dbo.HoodUserSubscriptionsView.Id
+	AspNetUserRoles INNER JOIN
+	AspNetRoles ON AspNetUserRoles.RoleId = AspNetRoles.Id RIGHT OUTER JOIN
+	HoodUserSubscriptionsView ON AspNetUserRoles.UserId = HoodUserSubscriptionsView.Id
 GROUP BY
-	dbo.HoodUserSubscriptionsView.Id, 
-	dbo.HoodUserSubscriptionsView.UserName, 
-	dbo.HoodUserSubscriptionsView.Email, 
-	dbo.HoodUserSubscriptionsView.EmailConfirmed, 
-	dbo.HoodUserSubscriptionsView.PhoneNumber, 
-	dbo.HoodUserSubscriptionsView.PhoneNumberConfirmed, 
-	dbo.HoodUserSubscriptionsView.FirstName, 
-	dbo.HoodUserSubscriptionsView.LastName, 
-	dbo.HoodUserSubscriptionsView.DisplayName, 
-	dbo.HoodUserSubscriptionsView.Active, 
-	dbo.HoodUserSubscriptionsView.Anonymous, 
-	dbo.HoodUserSubscriptionsView.AvatarJson, 
-	dbo.HoodUserSubscriptionsView.LastLoginIP, 
-	dbo.HoodUserSubscriptionsView.LastLoginLocation, 
-	dbo.HoodUserSubscriptionsView.LastLogOn, 
-	dbo.HoodUserSubscriptionsView.LockoutEnabled, 
-	dbo.HoodUserSubscriptionsView.TwoFactorEnabled, 
-	dbo.HoodUserSubscriptionsView.BillingAddressJson,
-	dbo.HoodUserSubscriptionsView.DeliveryAddressJson,
-	dbo.HoodUserSubscriptionsView.CreatedOn,
-	dbo.HoodUserSubscriptionsView.Latitude,
-	dbo.HoodUserSubscriptionsView.Longitude,
-	dbo.HoodUserSubscriptionsView.StripeId,
-	dbo.HoodUserSubscriptionsView.UserVars,
-	dbo.HoodUserSubscriptionsView.ActiveCount, 
-	dbo.HoodUserSubscriptionsView.TrialCount, 
-	dbo.HoodUserSubscriptionsView.InactiveCount, 
-	dbo.HoodUserSubscriptionsView.OverDueCount, 
-	dbo.HoodUserSubscriptionsView.TotalSubscriptions, 
-	dbo.HoodUserSubscriptionsView.Subscriptions, 
-	dbo.HoodUserSubscriptionsView.ActiveSubscriptionIds
+	HoodUserSubscriptionsView.Id, 
+	HoodUserSubscriptionsView.UserName, 
+	HoodUserSubscriptionsView.Email, 
+	HoodUserSubscriptionsView.EmailConfirmed, 
+	HoodUserSubscriptionsView.PhoneNumber, 
+	HoodUserSubscriptionsView.PhoneNumberConfirmed, 
+	HoodUserSubscriptionsView.FirstName, 
+	HoodUserSubscriptionsView.LastName, 
+	HoodUserSubscriptionsView.DisplayName, 
+	HoodUserSubscriptionsView.Active, 
+	HoodUserSubscriptionsView.Anonymous, 
+	HoodUserSubscriptionsView.AvatarJson, 
+	HoodUserSubscriptionsView.LastLoginIP, 
+	HoodUserSubscriptionsView.LastLoginLocation, 
+	HoodUserSubscriptionsView.LastLogOn, 
+	HoodUserSubscriptionsView.LockoutEnabled, 
+	HoodUserSubscriptionsView.TwoFactorEnabled, 
+	HoodUserSubscriptionsView.BillingAddressJson,
+	HoodUserSubscriptionsView.DeliveryAddressJson,
+	HoodUserSubscriptionsView.CreatedOn,
+	HoodUserSubscriptionsView.Latitude,
+	HoodUserSubscriptionsView.Longitude,
+	HoodUserSubscriptionsView.StripeId,
+	HoodUserSubscriptionsView.UserVars,
+	HoodUserSubscriptionsView.ActiveCount, 
+	HoodUserSubscriptionsView.TrialCount, 
+	HoodUserSubscriptionsView.InactiveCount, 
+	HoodUserSubscriptionsView.OverDueCount, 
+	HoodUserSubscriptionsView.TotalSubscriptions, 
+	HoodUserSubscriptionsView.Subscriptions, 
+	HoodUserSubscriptionsView.ActiveSubscriptionIds
 GO
