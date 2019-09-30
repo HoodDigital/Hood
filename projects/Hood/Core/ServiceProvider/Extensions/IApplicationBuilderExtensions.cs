@@ -121,11 +121,11 @@ namespace Hood.Extensions
             try
             {
                 if (!config.IsDatabaseConfigured())
-                    throw new Exception();
+                    throw new StartupException();
                 var context = Engine.Services.Resolve<HoodDbContext>();
                 var profile = context.UserProfiles.FirstOrDefault();
             }
-            catch (Exception)
+            catch (StartupException)
             {
                 app.UseMvc(routes =>
                 {

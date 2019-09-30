@@ -13,12 +13,10 @@ namespace Hood.Filters
     /// </summary>
     public class LockoutModeFilter : IActionFilter
     {
-        private readonly ILogService _logService;
         private readonly IConfiguration _config;
 
         public LockoutModeFilter()
         {
-            _logService = Engine.Services.Resolve<ILogService>();
             _config = Engine.Services.Resolve<IConfiguration>();
         }
 
@@ -77,13 +75,21 @@ namespace Hood.Filters
                 // If they are in an override role, let them through.
                 if (context.HttpContext.User.IsAdminOrBetter())
                 {
-                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User.Identity.Name}, accessed the site through the code lockout, as they are an administrator.");
+                    if (Engine.Services.Installed)
+                    {
+                        var logService = Engine.Services.Resolve<ILogService>();
+                        logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User.Identity.Name}, accessed the site through the code lockout, as they are an administrator.");
+                    }
                     return;
                 }
 
                 if (context.HttpContext.User.Identity.IsAuthenticated && context.HttpContext.IsLockedOut(Engine.Settings.LockoutAccessCodes))
                 {
-                    _logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User}, was blocked from using the site due to lockout.");
+                    if (Engine.Services.Installed)
+                    {
+                        var logService = Engine.Services.Resolve<ILogService>();
+                        logService.AddLogAsync<LockoutModeFilter>($"User, {context.HttpContext.User}, was blocked from using the site due to lockout.");
+                    }
                     context.Result = result;
                     return;
                 }

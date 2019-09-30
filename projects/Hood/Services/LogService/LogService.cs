@@ -32,6 +32,9 @@ namespace Hood.Services
 
         private async Task AddLogAsync(string message, string detail = "", LogType type = LogType.Info, string source = "")
         {
+            if (!Engine.Services.Installed)
+                return;
+
             string userId = null;
             if (Engine.Account != null)
             {

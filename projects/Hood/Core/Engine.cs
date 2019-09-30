@@ -175,7 +175,7 @@ namespace Hood.Core
                 {
                     return config["Hood:SuperAdminEmail"].ToString();
                 }
-                return "/hood/";
+                return "admin@hooddigital.com";
             }
         }
         public static string Version

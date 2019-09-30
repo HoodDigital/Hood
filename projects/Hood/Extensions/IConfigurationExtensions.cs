@@ -12,7 +12,11 @@ namespace Hood.Extensions
         /// <param name="config"></param>
         public static bool IsDatabaseConfigured(this IConfiguration config)
         {
-            if (Engine.Services.DatabaseMigrationFailed)
+            if (Engine.Services.DatabaseConnectionFailed)
+                return false;
+            if (Engine.Services.DatabaseMigrationsMissing)
+                return false;
+            if (Engine.Services.MigrationNotApplied)
                 return false;
             if (Engine.Services.DatabaseSeedFailed)
                 return false;

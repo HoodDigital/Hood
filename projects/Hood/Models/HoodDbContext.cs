@@ -1,5 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Entities;
+using Hood.Extensions;
 using Hood.Infrastructure;
 using Hood.Services;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace Hood.Models
@@ -91,9 +93,26 @@ namespace Hood.Models
 
         public virtual void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            try
+            {
+                var option = Options.FirstOrDefault();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Message.Contains("Login failed for user") || ex.Message.Contains("permission was denied"))
+                {
+                    throw new StartupException("There was a problem connecting to the database.", StartupError.DatabaseConnectionFailed);
+                }
+                else if (ex.Message.Contains("Invalid object name"))
+                {
+                    throw new StartupException("There was a problem connecting to the database.", StartupError.MigrationMissing);
+                }
+            }
 
             if (!AllMigrationsApplied())
-                return;
+            {
+                throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
+            }
 
             foreach (string role in Models.Roles.All)
             {
@@ -102,31 +121,40 @@ namespace Hood.Models
                     IdentityResult irAdmin = roleManager.CreateAsync(new IdentityRole(role)).Result;
                 }
             }
-            string ownerEmail = Engine.SiteOwnerEmail;
-            if (!Users.Any(u => u.UserName == ownerEmail))
+
+            try
             {
-                ApplicationUser userToInsert = new ApplicationUser
+                string ownerEmail = Engine.SiteOwnerEmail;
+                if (!Users.Any(u => u.UserName == ownerEmail))
                 {
-                    CompanyName = "",
-                    CreatedOn = DateTime.Now,
-                    FirstName = "Website",
-                    LastName = "Administrator",
-                    EmailConfirmed = true,
-                    Anonymous = false,
-                    PhoneNumber = "",
-                    JobTitle = "Website Administrator",
-                    LastLogOn = DateTime.Now,
-                    LastLoginIP = "127.0.0.1",
-                    LastLoginLocation = "UK",
-                    Email = ownerEmail,
-                    UserName = ownerEmail,
-                    Active = true
-                };
-                IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
-                if (!ir.Succeeded)
-                {
-                    throw new Exception("Could not create super admin user.");
+                    ApplicationUser userToInsert = new ApplicationUser
+                    {
+                        CompanyName = "",
+                        CreatedOn = DateTime.Now,
+                        FirstName = "Website",
+                        LastName = "Administrator",
+                        EmailConfirmed = true,
+                        Anonymous = false,
+                        PhoneNumber = "",
+                        JobTitle = "Website Administrator",
+                        LastLogOn = DateTime.Now,
+                        LastLoginIP = "127.0.0.1",
+                        LastLoginLocation = "UK",
+                        Email = ownerEmail,
+                        UserName = ownerEmail,
+                        Active = true
+                    };
+                    IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
+                    if (!ir.Succeeded)
+                    {
+                        throw new StartupException("Could not create the admin user.", StartupError.AdminUserSetupError);
+                    }
                 }
+
+            }
+            catch (Exception ex)
+            {
+                throw new StartupException("An error occurred while loading or creating the admin user.", StartupError.AdminUserSetupError);
             }
 
             ApplicationUser siteAdmin = userManager.FindByEmailAsync(Engine.SiteOwnerEmail).Result;
@@ -353,7 +381,7 @@ namespace Hood.Models
                 var key = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(guid));
                 Options.Add(new Option { Id = "Hood.Api.SystemPrivateKey", Value = JsonConvert.SerializeObject(key) });
             }
-            
+
             // Mark the database with the current version of Hood.
             if (!Options.Any(o => o.Id == "Hood.Version"))
             {

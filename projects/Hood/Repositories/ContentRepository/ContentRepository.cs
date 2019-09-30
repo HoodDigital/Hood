@@ -310,7 +310,7 @@ namespace Hood.Services
                 cacheKey += "-" + category;
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "DateDesc" });
+                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "DateDesc", Status = ContentStatus.Published });
                 _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;
@@ -322,7 +322,7 @@ namespace Hood.Services
                 cacheKey += "." + category;
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = pageSize });
+                content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = pageSize, Status = ContentStatus.Published });
                 _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return content;

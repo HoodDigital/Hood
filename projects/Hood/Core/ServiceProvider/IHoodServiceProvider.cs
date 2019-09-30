@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Hood.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,11 +10,8 @@ namespace Hood.Core
     /// Classes implementing this interface can serve as a portal for the various services composing the Nop engine. 
     /// Edit functionality, modules and implementations access most Nop functionality through this interface.
     /// </summary>
-    public interface IHoodServiceProvider
+    public interface IHoodServiceProvider : IInstallSettings
     {
-        bool DatabaseMigrationFailed { get; set; }
-        bool DatabaseMigrationsMissing { get; set; }
-        bool DatabaseSeedFailed { get; set;  }
 
         /// <summary>
         /// Initialize engine

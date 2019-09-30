@@ -1,15 +1,31 @@
-﻿namespace Hood.ViewModels
+﻿using Hood.Interfaces;
+
+namespace Hood.ViewModels
 {
-    public class InstallModel
+    public class InstallModel : IInstallSettings
     {
         public InstallModel()
         {
         }
 
-        public bool ViewsInstalled { get; internal set; }
-        public bool DatabaseConfigured { get; internal set; }
-        public bool DatabaseSeeded { get; internal set; }
-        public bool DatabaseMigrated { get; internal set; }
-        public bool DatabaseMigrationMissing { get; internal set; }
+        public bool ViewsInstalled { get; set; } = true;
+        public bool DatabaseConfigured { get; set; } = true;
+        public bool DatabaseConnectionFailed { get; set; } = false;
+        public bool DatabaseMigrationsMissing { get; set; } = false;
+        public bool DatabaseSeedFailed { get; set; } = false;
+        public bool MigrationNotApplied { get; set; } = false;
+        public bool AdminUserSetupError { get; set; } = false;
+        public bool Installed {
+            get
+            {
+                return ViewsInstalled &&
+                    DatabaseConfigured &&
+                    !DatabaseConnectionFailed &&
+                    !DatabaseMigrationsMissing &&
+                    !DatabaseSeedFailed &&
+                    !MigrationNotApplied &&
+                    !AdminUserSetupError;
+            }
+        }
     }
 }
