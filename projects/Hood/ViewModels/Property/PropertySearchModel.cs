@@ -9,14 +9,15 @@ namespace Hood.ViewModels
 {
     public class PropertyListModel : PagedList<PropertyListing>, IPageableModel
     {
-        public PropertyListModel()
+        public PropertyListModel() : base()
         {
             PageSize = Engine.Settings.Property.DefaultPageSize;
             if (PageSize <= 0)
                 PageSize = 20;
             PageIndex = 1;
-        }
 
+            PublishStatus = ContentStatus.Published;
+        }
         /// <summary>
         /// Specify the exact filter term for listing type - cannot be used in conjunction with Transaction, which specifies generally. 
         /// </summary>

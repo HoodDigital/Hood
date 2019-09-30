@@ -10,6 +10,11 @@ namespace Hood.ViewModels
 {
     public class ContentModel : PagedList<Content>, IPageableModel
     {
+        public ContentModel() : base()
+        {
+            Status = ContentStatus.Published;
+        }
+
         // Params
         [FromQuery(Name = "category")]
         public string Category { get; set; }

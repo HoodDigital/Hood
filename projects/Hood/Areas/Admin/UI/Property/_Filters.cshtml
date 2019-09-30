@@ -21,6 +21,11 @@
             <small asp-for="Search"></small>
         </div>
         <div class="form-group floating-label">
+            <select class="form-control submit-on-change" asp-items="Html.GetEnumSelectList<ContentStatus>()" asp-for="PublishStatus"></select>
+            <label asp-for="Status"></label>
+            <small asp-for="Status"></small>
+        </div>
+        <div class="form-group floating-label">
             <select class="form-control submit-on-change" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
                 <option value="">Show All</option>
             </select>
