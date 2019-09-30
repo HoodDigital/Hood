@@ -320,16 +320,20 @@ namespace Hood.Services
                             case ExtraneousPropertyProcess.Delete:
                                 property.Media.ForEach(async m =>
                                 {
-                                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                        try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
                                     _db.Entry(m).State = EntityState.Deleted;
 
                                 });
+                                await _db.SaveChangesAsync();
                                 property.FloorPlans.ForEach(async m =>
                                 {
-                                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                        try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
                                     _db.Entry(m).State = EntityState.Deleted;
 
                                 });
+                                await _db.SaveChangesAsync();
                                 property.Metadata.ForEach(m =>
                                 {
                                     _db.Entry(m).State = EntityState.Deleted;
@@ -612,7 +616,8 @@ namespace Hood.Services
                             PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
-                                await _media.DeleteStoredMedia(fp);
+                                if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                    await _media.DeleteStoredMedia(fp);
                                 _db.Entry(fp).State = EntityState.Deleted;
                                 await _db.SaveChangesAsync();
                             }
@@ -680,7 +685,8 @@ namespace Hood.Services
                             PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
-                                await _media.DeleteStoredMedia(fp);
+                                if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                    await _media.DeleteStoredMedia(fp);
                                 property.Media.Remove(fp);
                                 _db.Entry(fp).State = EntityState.Deleted;
                                 await _db.SaveChangesAsync();

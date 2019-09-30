@@ -69,6 +69,12 @@ namespace Hood.Models
         /// </summary>
         [Display(Name = "Removal of Extraneous Properties", Description = "How do you want extraneous properties to be handled by the property importer.")]
         public ExtraneousPropertyProcess ExtraneousPropertyProcess { get; set; }
+
+        /// <summary>
+        /// Delete physical image files? - these can be retained permanently in case they have been shared etc.
+        /// </summary>
+        [Display(Name = "Delete physical image files?", Description = "These can be retained permanently in case they have been shared etc.")]
+        public bool DeletePhysicalImageFiles { get; set; }
     }
 
 }
