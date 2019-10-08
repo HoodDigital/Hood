@@ -227,8 +227,18 @@ namespace Hood.Services
 
                 // Now we have a list of properties, in the feed
                 IEnumerable<PropertyListing> newProperties = feedProperties.Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference));
-                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));
+                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));                
                 IEnumerable<PropertyListing> extraneous = siteProperties.Where(p => !feedProperties.Any(p2 => p2.Reference == p.Reference));
+
+                switch (_propertySettings.FTPImporterSettings.ExtraneousPropertyProcess)
+                {
+                    case ExtraneousPropertyProcess.StatusArchive:
+                        extraneous = extraneous.Where(p => p.Status != ContentStatus.Archived);
+                        break;
+                    case ExtraneousPropertyProcess.StatusDelete:
+                        extraneous = extraneous.Where(p => p.Status != ContentStatus.Deleted);
+                        break;
+                }
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 ToAdd = newProperties.Count();

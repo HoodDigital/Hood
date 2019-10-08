@@ -65,7 +65,7 @@ namespace Hood.Models
         public string ZipFile { get; set; }
 
         /// <summary>
-        /// Name of the zip file which contains the import data
+        /// What happens with Removal of Extraneous Properties
         /// </summary>
         [Display(Name = "Removal of Extraneous Properties", Description = "How do you want extraneous properties to be handled by the property importer.")]
         public ExtraneousPropertyProcess ExtraneousPropertyProcess { get; set; }
