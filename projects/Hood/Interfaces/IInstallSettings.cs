@@ -6,6 +6,7 @@
         bool DatabaseMigrationsMissing { get; set; }
         bool DatabaseSeedFailed { get; set; }
         bool MigrationNotApplied { get; set; }
+        bool ViewsInstalled { get; set; }
         bool AdminUserSetupError { get; set; }
         bool Installed { get; }
     }

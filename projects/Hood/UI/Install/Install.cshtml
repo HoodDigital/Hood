@@ -158,27 +158,6 @@
             </alert>
         }
 
-        @if (!Model.ViewsInstalled)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Database SQL Views not setup
-                </h6>
-                <p class="m-0">
-                    You have not correctly installed the views for the database.
-                    You need to run the file <code>InstallHoodViews.sql</code> from the SQL folder in the Hood CMS package, while connected to your database using a suitable SQL editor,
-                    such as <a href="https://visualstudio.microsoft.com/" target="_blank">Microsoft Visual Studio</a> or
-                    <a href="https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms" target="_blank">Microsoft SSMS</a>.
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                SQL Views installed.
-            </alert>
-        }
-
         @if (Model.AdminUserSetupError)
         {
             <alert type="Danger" size="Medium">
@@ -194,6 +173,28 @@
         {
             <alert type="Success" size="Medium">
                 Admin user created and loaded.
+            </alert>
+        }
+        
+        @if (!Model.ViewsInstalled)
+        {
+            <alert type="Danger" size="Medium">
+                <h6>
+                    Database SQL Views not setup
+                </h6>
+                <p>
+                    You have not correctly installed the views for the database.
+                </p>
+                <p class="m-0">
+                    In order to install the custom view required for Hood CMS, you need to run the SQL script <code>InstallViews.sql</code> which can be found here:
+                    <a href="https://github.com/HoodDigital/Hood/blob/master/sql/InstallViews.sql" target="_blank">Get Installation Script</a>.
+                </p>
+            </alert>
+        }
+        else
+        {
+            <alert type="Success" size="Medium">
+                Database SQL Views installed.
             </alert>
         }
 
