@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 
@@ -113,7 +114,7 @@ namespace Hood.Extensions
                     Cookie = builder
                 });
             }
-            
+
             return app;
         }
         public static IApplicationBuilder UseHoodDefaultRoutes(this IApplicationBuilder app, IConfiguration config)
@@ -123,7 +124,19 @@ namespace Hood.Extensions
                 if (!config.IsDatabaseConfigured())
                     throw new StartupException();
                 var context = Engine.Services.Resolve<HoodDbContext>();
-                var profile = context.UserProfiles.FirstOrDefault();
+                try
+                {
+                    var profile = context.UserProfiles.FirstOrDefault();
+                    Engine.Services.ViewsInstalled = true;
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Message.Contains("Invalid object name 'HoodUserProfiles'"))
+                    {
+                        Engine.Services.ViewsInstalled = false;
+                    }
+                    throw new StartupException();
+                }
             }
             catch (StartupException)
             {

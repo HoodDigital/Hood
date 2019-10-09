@@ -13,11 +13,12 @@ namespace Hood.Core
 {
     class HoodServiceProvider : IHoodServiceProvider
     {
-        public bool DatabaseConnectionFailed { get; set; } = false;
-        public bool DatabaseMigrationsMissing { get; set; } = false;
-        public bool DatabaseSeedFailed { get; set;  } = false;
-        public bool MigrationNotApplied { get; set; } = false;
-        public bool AdminUserSetupError { get; set; } = false;
+        public bool DatabaseConnectionFailed { get; set; } = true;
+        public bool DatabaseMigrationsMissing { get; set; } = true;
+        public bool DatabaseSeedFailed { get; set;  } = true;
+        public bool MigrationNotApplied { get; set; } = true;
+        public bool ViewsInstalled { get; set; } = false;
+        public bool AdminUserSetupError { get; set; } = true;
         public bool Installed
         {
             get
@@ -31,6 +32,7 @@ namespace Hood.Core
         }
         private IServiceProvider _serviceProvider { get; set; }
         public virtual IServiceProvider ServiceProvider => _serviceProvider;
+
         protected IServiceProvider GetServiceProvider()
         {
             var accessor = ServiceProvider.GetService<IHttpContextAccessor>();

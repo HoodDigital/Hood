@@ -29,6 +29,13 @@ namespace Hood.Extensions
                     UserManager<ApplicationUser> userManager = services.GetService<UserManager<ApplicationUser>>();
                     RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
                     db.Seed(userManager, roleManager);
+
+                    Engine.Services.DatabaseSeedFailed = false;
+                    Engine.Services.DatabaseConnectionFailed = false;
+                    Engine.Services.DatabaseMigrationsMissing = false;
+                    Engine.Services.MigrationNotApplied = false;
+                    Engine.Services.AdminUserSetupError = false;
+
                 }
                 catch (StartupException startupException)
                 {
