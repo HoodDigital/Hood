@@ -46,7 +46,6 @@ namespace Hood.Services
             _config = config;
             _directoryManager = directoryManager;
             Lock = new ReaderWriterLock();
-            Total = 0;
             Tasks = 0;
             Processed = 0;
             Updated = 0;
@@ -55,7 +54,6 @@ namespace Hood.Services
             ToAdd = 0;
             ToDelete = 0;
             ToUpdate = 0;
-            PercentComplete = 0.0;
             Running = false;
             Cancelled = false;
             Succeeded = false;
@@ -76,10 +74,8 @@ namespace Hood.Services
         private ReaderWriterLock Lock { get; set; }
         private bool Running { get; set; }
         private bool Succeeded { get; set; }
-        private double PercentComplete { get; set; }
         private List<string> Errors { get; set; }
         private List<string> Warnings { get; set; }
-        private int Total { get; set; }
         private int Tasks { get; set; }
         private int CompletedTasks { get; set; }
         private int Processed { get; set; }
@@ -107,7 +103,6 @@ namespace Hood.Services
             try
             {
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                Total = 0;
                 Tasks = 0;
                 CompletedTasks = 0;
                 Processed = 0;
@@ -117,7 +112,6 @@ namespace Hood.Services
                 ToAdd = 0;
                 ToDelete = 0;
                 ToUpdate = 0;
-                PercentComplete = 0.0;
                 Running = true;
                 Cancelled = false;
                 Succeeded = false;
@@ -233,13 +227,24 @@ namespace Hood.Services
 
                 // Now we have a list of properties, in the feed
                 IEnumerable<PropertyListing> newProperties = feedProperties.Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference));
-                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));
+                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));                
                 IEnumerable<PropertyListing> extraneous = siteProperties.Where(p => !feedProperties.Any(p2 => p2.Reference == p.Reference));
+
+                switch (_propertySettings.FTPImporterSettings.ExtraneousPropertyProcess)
+                {
+                    case ExtraneousPropertyProcess.StatusArchive:
+                        extraneous = extraneous.Where(p => p.Status != ContentStatus.Archived);
+                        break;
+                    case ExtraneousPropertyProcess.StatusDelete:
+                        extraneous = extraneous.Where(p => p.Status != ContentStatus.Deleted);
+                        break;
+                }
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 ToAdd = newProperties.Count();
                 ToDelete = extraneous.Count();
                 ToUpdate = existingProperties.Count();
+                Tasks = ToAdd + ToDelete + ToUpdate;
                 Lock.ReleaseWriterLock();
 
                 foreach (PropertyListing propertyRef in newProperties)
@@ -320,16 +325,20 @@ namespace Hood.Services
                             case ExtraneousPropertyProcess.Delete:
                                 property.Media.ForEach(async m =>
                                 {
-                                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                        try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
                                     _db.Entry(m).State = EntityState.Deleted;
 
                                 });
+                                await _db.SaveChangesAsync();
                                 property.FloorPlans.ForEach(async m =>
                                 {
-                                    try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
+                                    if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                        try { await _media.DeleteStoredMedia(m); } catch (Exception) { }
                                     _db.Entry(m).State = EntityState.Deleted;
 
                                 });
+                                await _db.SaveChangesAsync();
                                 property.Metadata.ForEach(m =>
                                 {
                                     _db.Entry(m).State = EntityState.Deleted;
@@ -390,7 +399,6 @@ namespace Hood.Services
                 CleanTempFolder();
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                PercentComplete = 100;
                 Succeeded = true;
                 Running = false;
                 StatusMessage = "Update completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
@@ -565,9 +573,7 @@ namespace Hood.Services
                             }
                         }
                     }
-                    MarkCompleteTask("Attached document successfully.");
                 }
-                else { MarkCompleteTask(); }
             }
             return property;
         }
@@ -612,7 +618,8 @@ namespace Hood.Services
                             PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
-                                await _media.DeleteStoredMedia(fp);
+                                if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                    await _media.DeleteStoredMedia(fp);
                                 _db.Entry(fp).State = EntityState.Deleted;
                                 await _db.SaveChangesAsync();
                             }
@@ -621,9 +628,7 @@ namespace Hood.Services
                             await _db.SaveChangesAsync();
                         }
                     }
-                    MarkCompleteTask("Attached floor plan successfully.");
                 }
-                else { MarkCompleteTask(); }
             }
             return property;
         }
@@ -634,8 +639,10 @@ namespace Hood.Services
             {
                 if (property.Media != null)
                 {
-                    property.Media.ForEach(m =>
+                    property.Media.ForEach(async m =>
                     {
+                        if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                            await _media.DeleteStoredMedia(m);
                         _db.Entry(m).State = EntityState.Deleted;
                     });
                     await _db.SaveChangesAsync();
@@ -680,7 +687,8 @@ namespace Hood.Services
                             PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == fi.Name);
                             if (fp != null)
                             {
-                                await _media.DeleteStoredMedia(fp);
+                                if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                                    await _media.DeleteStoredMedia(fp);
                                 property.Media.Remove(fp);
                                 _db.Entry(fp).State = EntityState.Deleted;
                                 await _db.SaveChangesAsync();
@@ -703,7 +711,6 @@ namespace Hood.Services
                             await _db.SaveChangesAsync();
                         }
                     }
-                    MarkCompleteTask("Attached image successfully.");
                 }
                 else if (data[key].IsSet() && key.Contains("60"))
                 {
@@ -758,9 +765,7 @@ namespace Hood.Services
                             await _db.SaveChangesAsync();
                         }
                     }
-                    MarkCompleteTask("Attached image successfully.");
                 }
-                else { MarkCompleteTask(); }
             }
             return property;
         }
@@ -908,7 +913,7 @@ namespace Hood.Services
                 CheckForCancel();
 
                 Lock.AcquireWriterLock(Timeout.Infinite);
-                StatusMessage = "Processing raw property data from FTP BLM feed file (" + counter + " of " + Total + ")...";
+                StatusMessage = "Processing raw property data from FTP BLM feed file (" + counter + ")...";
                 Lock.ReleaseWriterLock();
 
                 Dictionary<string, string> propertyDetails = GetPropertyDetails(currentProperty.Split('^'), definitions);
@@ -921,14 +926,11 @@ namespace Hood.Services
                     allProperties.Add(propertyDetails);
                 }
 
-                MarkCompleteTask();
                 counter++;
             }
 
             Lock.AcquireWriterLock(Timeout.Infinite);
             StatusMessage = "Downloaded the properties file, setting up the update process...";
-            Total = allProperties.Count();
-            Tasks = Total * (imageTasks + docTasks + fpTasks + 2) + 5;
             Lock.ReleaseWriterLock();
 
             return allProperties;
@@ -1291,7 +1293,7 @@ namespace Hood.Services
                 Processed = Processed,
                 Running = Running,
                 StatusMessage = StatusMessage,
-                Total = Total,
+                Total = Tasks,
                 Updated = Updated,
                 ToAdd = ToAdd,
                 ToDelete = ToDelete,
