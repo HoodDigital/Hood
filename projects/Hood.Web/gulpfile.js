@@ -79,14 +79,18 @@ gulp.task('cssnano', function () {
 
 // Copies working views from default theme to be embedded in main assembly.
 gulp.task('views:clean', function (cb) {
-    return gulp.src('./../Hood/UI/**/*.*', { read: false, allowEmpty: true })
+    return gulp.src(['./../Hood.UI.Bootstrap3/UI/**/*.*', './../Hood.UI.Bootstrap4/UI/**/*.*'], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });
 gulp.task('views:copy', function () {
     return gulp.src('./Themes/default/Views/**/*.*')
-        .pipe(gulp.dest('./../Hood/UI/'));
+        .pipe(gulp.dest('./../Hood.UI.Bootstrap3/UI/'));
 });
-gulp.task('views', gulp.series('views:clean', 'views:copy'));
+gulp.task('views:copy:new', function () {
+    return gulp.src('./Themes/hood2019/Views/**/*.*')
+        .pipe(gulp.dest('./../Hood.UI.Bootstrap4/UI/'));
+});
+gulp.task('views', gulp.series('views:clean', 'views:copy', 'views:copy:new'));
 
 // Copies any image files from the images directories to the distribution images directory.
 gulp.task('images', function () {

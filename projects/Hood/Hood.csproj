@@ -52,9 +52,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
-    <EmbeddedResource Include="UI\**\*.cshtml" />
-    <EmbeddedResource Include="UI\**\*.json" />
-    <EmbeddedResource Include="SQL\**\*.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,14 +61,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Areas\Admin\UI\Forum\_Blade_Category.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_Blade_Forum.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_Editor_Images.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_Editor_Sidebar.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_Filters.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_List_Categories.cshtml" />
-    <None Remove="Areas\Admin\UI\Forum\_List_Forums.cshtml" />
-    <None Remove="Areas\Admin\UI\Shared\_PlaceholderInformation.cshtml" />
+    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+    <ProjectReference Include="..\Hood.UI.Bootstrap3\Hood.UI.Bootstrap3.csproj" />
+    <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,9 +2,8 @@ using Hood.Controllers;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
-using Hood.Infrastructure;
-using Hood.IO;
 using Hood.Models;
+using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -547,7 +546,7 @@ namespace Hood.Areas.Admin.Controllers
             Dictionary<string, string> templates = new Dictionary<string, string>();
 
             // Add the base templates:
-            string[] files = EmbeddedFiles.GetFiles("~/UI/" + templateDirectory + "/");
+            string[] files = UserInterfaceProvider.GetFiles("~/UI/" + templateDirectory + "/");
             foreach (string temp in files)
             {
                 if (temp.EndsWith(".cshtml"))
@@ -594,149 +593,6 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #endregion
-
-        #region Designer (Beta)
-        [HttpPost()]
-        [Route("admin/content/designer/save/")]
-        public async Task<Response> SaveDesigner(DesignContentModel post)
-        {
-            try
-            {
-                Content content = await _content.GetContentByIdAsync(post.Id, true);
-                content.Body = post.Body;
-                content.Body = Regex.Replace(content.Body, @"contenteditable=""true""", "", RegexOptions.IgnoreCase);
-                content.Body = Regex.Replace(content.Body, @"id=""mce_[^;]+""", "", RegexOptions.IgnoreCase);
-                content.Body = Regex.Replace(content.Body, @"mce-content-body", "", RegexOptions.IgnoreCase);
-                await _content.UpdateAsync(content);
-                return new Response(true, $"The designer view has been saved.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<ContentController>($"Error saving the designer view.", ex);
-            }
-        }
-        [Route("admin/content/choose/")]
-        public IActionResult Choose()
-        {
-            return View();
-        }
-        [Route("admin/content/blocks/")]
-        public IActionResult Blocks(ListFilters request)
-        {
-            string[] templateDirs = {
-                    _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
-                    _env.ContentRootPath + "\\Views\\Blocks\\"
-                };
-            List<BlockContent> templates = new List<BlockContent>();
-            foreach (string str in templateDirs)
-            {
-                if (Directory.Exists(str))
-                {
-                    foreach (string temp in Directory.GetFiles(str).Where(s => s.Contains(".cshtml")))
-                    {
-                        string name = temp.Replace(str, "").Replace(".cshtml", "").ToSentenceCase().ToTitleCase();
-                        try
-                        {
-                            string jsonFile = temp.Replace(".cshtml", ".json");
-                            string json = System.IO.File.ReadAllText(jsonFile);
-                            ContentBlockSettings settings = JsonConvert.DeserializeObject<ContentBlockSettings>(json);
-                            if (!templates.Select(t => t.Name).Contains(name))
-                            {
-                                templates.Add(new BlockContent()
-                                {
-                                    Name = settings.Name,
-                                    Description = settings.Description,
-                                    Variables = settings.Variables,
-                                    Url = temp.Replace(str, "")
-                                });
-                            }
-                        }
-                        catch
-                        {
-                            if (!templates.Select(t => t.Name).Contains(name))
-                            {
-                                templates.Add(new BlockContent()
-                                {
-                                    Name = name,
-                                    Description = "No description added...",
-                                    Url = temp.Replace(str, "")
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Add the base templates:
-            foreach (string temp in EmbeddedFiles.GetFiles("~/Views/Blocks/").Where(s => s.Contains(".cshtml")))
-            {
-                string name = temp.Replace(".cshtml", "").ToSentenceCase().ToTitleCase();
-                try
-                {
-                    string jsonFile = temp.Replace(".cshtml", ".json");
-                    string json = EmbeddedFiles.ReadAllText("~/Views/Blocks/" + jsonFile);
-                    ContentBlockSettings settings = JsonConvert.DeserializeObject<ContentBlockSettings>(json);
-                    if (!templates.Select(t => t.Name).Contains(name))
-                    {
-                        templates.Add(new BlockContent()
-                        {
-                            Name = settings.Name,
-                            Description = settings.Description,
-                            Variables = settings.Variables,
-                            Url = temp
-                        });
-                    }
-                }
-                catch
-                {
-                    if (!templates.Select(t => t.Name).Contains(name))
-                    {
-                        templates.Add(new BlockContent()
-                        {
-                            Name = name,
-                            Description = "No description added...",
-                            Url = temp
-                        });
-                    }
-                }
-            }
-
-            Response response = new Response(templates.OrderBy(t => t.Name).Skip(request.skip).Take(request.take).ToArray(), templates.Count());
-            return Json(response);
-        }
-        [Route("admin/content/block/")]
-        public IActionResult Block(string url)
-        {
-            string[] templateDirs = {
-                _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\Blocks\\",
-                _env.ContentRootPath + "\\Views\\Blocks\\"
-            };
-            string[] templateVirtualDirs = {
-                "~/Themes/" + Engine.Settings["Hood.Settings.Theme"] + "/Views/Blocks/",
-                "~/Views/Blocks/"
-            };
-            for (int i = 0; i < templateDirs.Length; i++)
-            {
-                try
-                {
-                    string view = templateDirs[i] + url;
-                    if (System.IO.File.Exists(view))
-                    {
-                        return View(templateVirtualDirs[i] + url);
-                    }
-
-                    view = templateVirtualDirs[i] + url;
-                    if (EmbeddedFiles.GetFiles(view).Count() == 1)
-                    {
-                        return View(templateVirtualDirs[i] + url);
-                    }
-                }
-                catch { }
-            }
-            return NotFound();
-        }
-        #endregion
-
     }
 }
 

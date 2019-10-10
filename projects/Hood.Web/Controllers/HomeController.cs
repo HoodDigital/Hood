@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Hood.ViewModels;
 
 namespace Hood.Web.Controllers
 {
