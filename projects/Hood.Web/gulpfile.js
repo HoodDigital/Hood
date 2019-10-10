@@ -83,11 +83,11 @@ gulp.task('views:clean', function (cb) {
         .pipe(rimraf({ force: true }));
 });
 gulp.task('views:copy', function () {
-    return gulp.src('./Themes/default/Views/**/*.*')
+    return gulp.src('./Themes/bootstrap3/Views/**/*.*')
         .pipe(gulp.dest('./../Hood.UI.Bootstrap3/UI/'));
 });
 gulp.task('views:copy:new', function () {
-    return gulp.src('./Themes/hood2019/Views/**/*.*')
+    return gulp.src('./Themes/bootstrap4/Views/**/*.*')
         .pipe(gulp.dest('./../Hood.UI.Bootstrap4/UI/'));
 });
 gulp.task('views', gulp.series('views:clean', 'views:copy', 'views:copy:new'));

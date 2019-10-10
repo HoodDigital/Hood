@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Hood.UI.Bootstrap4</AssemblyName>
+    <AssemblyName>Hood.UI.Account</AssemblyName>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <OutputType>Library</OutputType>
-    <PackageId>Hood.UI.Bootstrap4</PackageId>
+    <PackageId>Hood.UI.Account</PackageId>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
 
@@ -21,12 +21,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
     <EmbeddedResource Include="UI\**\*.cshtml" />
     <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
-  
+
 </Project>

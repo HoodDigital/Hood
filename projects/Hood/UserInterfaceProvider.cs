@@ -27,13 +27,13 @@ namespace Hood
 
         public static EmbeddedFileProvider GetProvider(IConfiguration config)
         {
-            Assembly assembly = typeof(Hood.UI.Bootstrap3.Component).Assembly;
-            string assemblyName = "Hood.UI.Bootstrap3";
-            switch (config["Hood.UI"])
+            Assembly assembly = typeof(Hood.UI.Bootstrap4.Component).Assembly;
+            string assemblyName = "Hood.UI.Bootstrap4";
+            switch (config["Hood:UI"])
             {
-                case "Bootstrap4":
-                    assembly = typeof(Hood.UI.Bootstrap4.Component).Assembly;
-                    assemblyName = "Hood.UI.Bootstrap4";
+                case "Bootstrap3":
+                    assembly = typeof(Hood.UI.Bootstrap3.Component).Assembly;
+                    assemblyName = "Hood.UI.Bootstrap3";
                     break;
             }
             // Get a reference to the assembly that contains the view components
@@ -54,6 +54,19 @@ namespace Hood
             var embeddedFileProvider = new EmbeddedFileProvider(
                 assembly,
                 "Hood"
+            );
+            return embeddedFileProvider;
+        }
+
+        public static EmbeddedFileProvider GetAccountProvider()
+        {
+
+            // Get a reference to the assembly that contains the view components
+            Assembly assembly = typeof(Hood.UI.Account.Component).Assembly;
+            // Create an EmbeddedFileProvider for that assembly
+            var embeddedFileProvider = new EmbeddedFileProvider(
+                assembly,
+                "Hood.UI.Account"
             );
             return embeddedFileProvider;
         }

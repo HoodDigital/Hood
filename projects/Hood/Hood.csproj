@@ -62,6 +62,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+    <ProjectReference Include="..\Hood.UI.Account\Hood.UI.Account.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap3\Hood.UI.Bootstrap3.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>

@@ -389,6 +389,7 @@ namespace Hood.Startup
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib"));
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(IServiceCollectionExtensions).Assembly, "ComponentLib"));
                 options.FileProviders.Add(UserInterfaceProvider.GetAdminProvider());
+                options.FileProviders.Add(UserInterfaceProvider.GetAccountProvider());
                 options.FileProviders.Add(UserInterfaceProvider.GetProvider(config));
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
