@@ -160,6 +160,7 @@ namespace Hood.Services
         public ContactSettings Contact => Get<ContactSettings>();
         public SeoSettings Seo => Get<SeoSettings>();
         public ContentSettings Content => Get<ContentSettings>();
+        public SheduledTaskSettings SheduledTasks => Get<SheduledTaskSettings>();
         public PropertySettings Property => Get<PropertySettings>();
         public BillingSettings Billing => Get<BillingSettings>();
         public AccountSettings Account => Get<AccountSettings>();

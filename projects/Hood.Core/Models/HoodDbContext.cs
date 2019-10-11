@@ -100,7 +100,7 @@ namespace Hood.Models
         {
             try
             {
-                var option = Options.FirstOrDefault();
+                Option option = Options.FirstOrDefault();
             }
             catch (SqlException ex)
             {
@@ -211,7 +211,7 @@ namespace Hood.Models
                 SaveChanges();
 
                 // Translate any un directoried images.
-                var defaultDir = MediaDirectories.SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
+                MediaDirectory defaultDir = MediaDirectories.SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
                 Media.Where(o => o.DirectoryId == null).ToList().ForEach(a => a.DirectoryId = defaultDir.Id);
                 Media.Where(o => o.FileType == "directory/dir").ToList().ForEach(a => Entry(a).State = EntityState.Deleted);
             }
@@ -219,6 +219,18 @@ namespace Hood.Models
             if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
             {
                 Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
+            }
+
+            if (!Options.Any(o => o.Id == typeof(SheduledTaskSettings).ToString()))
+            {
+                Options.Add(new Option { Id = typeof(SheduledTaskSettings).ToString(), Value = JsonConvert.SerializeObject(new SheduledTaskSettings()) });
+            }
+            else
+            {
+                // Check all system tasks exist.
+                Option option = Options.First(o => o.Id == typeof(SheduledTaskSettings).ToString());
+                SheduledTaskSettings sheduledTaskSettings = JsonConvert.DeserializeObject<SheduledTaskSettings>(option.Value);
+                sheduledTaskSettings.CheckTasks();
             }
 
             if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))
@@ -387,8 +399,8 @@ namespace Hood.Models
             }
             if (!Options.Any(o => o.Id == "Hood.Api.SystemPrivateKey"))
             {
-                var guid = Guid.NewGuid().ToString();
-                var key = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(guid));
+                string guid = Guid.NewGuid().ToString();
+                string key = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(guid));
                 Options.Add(new Option { Id = "Hood.Api.SystemPrivateKey", Value = JsonConvert.SerializeObject(key) });
             }
 
@@ -399,7 +411,7 @@ namespace Hood.Models
             }
             else
             {
-                var option = Options.SingleOrDefault(o => o.Id == "Hood.Version");
+                Option option = Options.SingleOrDefault(o => o.Id == "Hood.Version");
                 option.Value = Engine.Version;
             }
 

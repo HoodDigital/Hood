@@ -334,6 +334,7 @@ namespace Hood.Startup
         {
             services.Configure<MvcOptions>(options =>
             {
+                options.Filters.Add(typeof(UrlFilter));
                 options.Filters.Add(typeof(LockoutModeFilter));
             });
 

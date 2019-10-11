@@ -183,14 +183,27 @@ namespace Hood.Core
                 var version = typeof(Engine).Assembly.GetName().Version;
                 if (version.Revision != 0)
                 {
-                    return $"{version.Major}.{version.MajorRevision}.{version.Build}-pre{version.Revision}";
+                    return $"{version.Major}.{version.Minor}.{version.Build}-pre{version.Revision}";
                 }
                 else
                 {
-                    return $"{version.Major}.{version.MajorRevision}.{version.Build}";
+                    return $"{version.Major}.{version.Minor}.{version.Build}";
                 }
             }
         }
+
+        public static string Url
+        {
+            get
+            {
+                if (Settings["Hood:SiteUrl"] != null)
+                {
+                    return Settings["Hood:SiteUrl"].ToString();
+                }
+                return null;
+            }
+        }
+
         #endregion
     }
 }

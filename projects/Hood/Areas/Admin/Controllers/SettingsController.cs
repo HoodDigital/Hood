@@ -107,6 +107,34 @@ namespace Hood.Areas.Admin.Controllers
         }
 
 
+        [Route("admin/settings/sheduled-tasks/")]
+        public IActionResult SheduledTasks()
+        {
+            _cache.Remove(typeof(SheduledTaskSettings).ToString());
+            SheduledTaskSettings model = Engine.Settings.SheduledTasks;
+            if (model == null)
+                model = new SheduledTaskSettings();
+            return View(model);
+        }
+
+        [HttpPost]
+        [Route("admin/settings/sheduled-tasks/")]
+        public IActionResult SheduledTasks(SheduledTaskSettings model)
+        {
+            try
+            {
+                Engine.Settings.Set(model);
+
+                SaveMessage = "Settings saved!";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Error saving: " + ex.Message;
+                MessageType = AlertType.Danger;
+            }
+            return View(model);
+        }
 
         [Route("admin/integrations/")]
         public IActionResult Integrations()
