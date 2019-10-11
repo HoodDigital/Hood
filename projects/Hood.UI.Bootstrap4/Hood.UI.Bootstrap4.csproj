@@ -29,4 +29,8 @@
     <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
   
+  <ItemGroup>
+    <None Remove="UI\Shared\_Styles.cshtml" />
+  </ItemGroup>
+  
 </Project>

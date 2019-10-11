@@ -110,7 +110,12 @@ namespace Hood.Models
                 }
                 else if (ex.Message.Contains("Invalid object name"))
                 {
-                    throw new StartupException("There was a problem connecting to the database.", StartupError.MigrationMissing);
+                    if (!AllMigrationsApplied())
+                    {
+                        throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
+                    }
+
+                    throw new StartupException("There are migrations missing.", StartupError.MigrationMissing);
                 }
             }
 

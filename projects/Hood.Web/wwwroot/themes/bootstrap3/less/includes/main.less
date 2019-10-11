@@ -1,0 +1,128 @@
+﻿﻿body {
+    min-width: 380px;
+
+    h1, h2, h3, h4, h5, h6 {
+        color: @theme-color;
+    }
+
+    .jumbotron {
+        background-color: @dark-color;
+        color: white;
+        margin-bottom: 0px;
+        padding: 25px 0;
+
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+    }
+
+    section.container {
+        padding: 25px 0;
+    }
+
+    section {
+        &.padded {
+            padding: 50px 0;
+        }
+
+        &.grey {
+            background-color: @theme-light;
+        }
+    }
+
+    .text-red {
+        font-weight: bold;
+        color: @theme-color;
+    }
+
+    .contact-form.loading:after {
+        content: 'Sending your enquiry...';
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: fade(@theme-light, 50%);
+        z-index: 2;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 45%;
+    }
+
+    .google-map {
+        height: 300px;
+    }
+
+    div#cookieConsent {
+        background: #2b2b2b;
+        border: 0;
+        border-radius: 0;
+        margin: 0;
+        padding: 20px 20px 15px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+
+        &:after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+
+        p {
+            @media (min-width:@screen-sm) {
+                float: left;
+            }
+
+            a {
+                color: white;
+
+                &:hover {
+                    color: #cbcbcb;
+                }
+            }
+        }
+
+        .btn {
+            font-size: 12px;
+            margin-top: 15px;
+
+            @media (min-width:@screen-sm) {
+                margin: 0;
+                float: right;
+            }
+        }
+    }
+
+    .swal2-popup {
+        font-size: 1em;
+
+        .btn {
+            margin: 5px;
+        }
+
+        .swal2-content {
+            font-size: 1em;
+        }
+    }
+
+    .swal2-popup.swal2-toast {
+        padding: @grid-gutter-width;
+
+        .swal2-content {
+            justify-content: flex-start;
+            font-weight: normal;
+            max-width: 400px;
+            text-align: left;
+            padding-left: @grid-gutter-width / 2;
+            padding-right: @grid-gutter-width / 2;
+        }
+
+        .swal2-actions {
+            width: auto;
+        }
+    }
+}

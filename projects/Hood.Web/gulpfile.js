@@ -57,8 +57,34 @@ gulp.task('scss:copy', function () {
     return gulp.src(hood.scss + "**/*.scss")
         .pipe(gulp.dest(output.scss));
 });
+// Compiles, compresses and copies all scss files to the output directories.
+gulp.task('theme:bootstrap4', function () {
+    return gulp.src('./wwwroot/themes/bootstrap4/scss/styles.scss')
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
+        .pipe(sourcemaps.write())
+        .pipe(rename('bootstrap4.css'))
+        .pipe(gulp.dest('./wwwroot/hood/css/'));
+});
 
-// copy legacy less for working with older theme styles.
+// create less for working with bootstrap3 styles.
+gulp.task('theme:bootstrap3', function () {
+    lss = less({ relativeUrls: true });
+    lss.on('error', function (e) {
+        console.log(e);
+        lss.end();
+    });
+
+    return gulp.src([
+        './wwwroot/themes/bootstrap3/less/styles.less'
+    ])
+        .pipe(sourcemaps.init())
+        .pipe(lss)
+        .pipe(sourcemaps.write())
+        .pipe(rename('bootstrap3.css'))
+        .pipe(gulp.dest('./wwwroot/hood/css/'));
+});
+
 gulp.task('less:copy', function () {
     return gulp.src(hood.less + "**/*.less")
         .pipe(gulp.dest(output.less));
@@ -97,12 +123,6 @@ gulp.task('images', function () {
     return gulp.src(hood.images + '**/*.+(png|jpg|gif|svg)')
         .pipe(imagemin())
         .pipe(gulp.dest(output.images));
-});
-
-// Copies any sql files from the images directories to the distribution sql directory.
-gulp.task('sql', function () {
-    return gulp.src('./../Hood/SQL/**/*.+(sql)')
-        .pipe(gulp.dest(output.sql));
 });
 
 // Minifies javascript and copies the output to the output directories.
@@ -253,7 +273,7 @@ gulp.task('js:package:admin', function () {
 });
 
 gulp.task('package', gulp.series('js', 'js:core', gulp.parallel('js:package:admin', 'js:package:app', 'js:package:login')));
-gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images', 'sql'), gulp.parallel('scss:copy', 'less:copy', 'cssnano', 'package')));
+gulp.task('build', gulp.series(gulp.parallel('scss', 'js', 'images'), gulp.parallel('theme:bootstrap3', 'theme:bootstrap4'), gulp.parallel('scss:copy', 'less:copy', 'cssnano', 'package')));
 
 // Site workload, to compile theme less/scss and JS.
 gulp.task('themes:scss', function () {

@@ -1,7 +1,7 @@
 @inject IThemesService _themes
 <environment include="Development">
-    <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/styles.css", _themes.CurrentTheme)" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms@3.1.0-preview1/css/bootstrap3.css" asp-append-version="true" />
 </environment>
 <environment exclude="Development">
-    <link rel="stylesheet" href="@string.Format("~/themes/{0}/css/styles.min.css", _themes.CurrentTheme)" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms@3.1.0-preview1/css/bootstrap3.min.css" asp-append-version="true" />
 </environment>

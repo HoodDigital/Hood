@@ -31,21 +31,30 @@ namespace Hood.Startup
                     RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
                     db.Seed(userManager, roleManager);
 
-                    Engine.Services.DatabaseSeedFailed = false;
                     Engine.Services.DatabaseConnectionFailed = false;
                     Engine.Services.DatabaseMigrationsMissing = false;
                     Engine.Services.MigrationNotApplied = false;
                     Engine.Services.AdminUserSetupError = false;
+                    Engine.Services.DatabaseSeedFailed = false;
 
                 }
                 catch (StartupException startupException)
                 {
                     switch (startupException.Error)
                     {
+                        case StartupError.MigrationMissing:
+                            Engine.Services.DatabaseConnectionFailed = false;
+                            Engine.Services.DatabaseMigrationsMissing = true;
+                            break;
                         case StartupError.MigrationNotApplied:
+                            Engine.Services.DatabaseMigrationsMissing = false;
+                            Engine.Services.DatabaseConnectionFailed = false;
                             Engine.Services.MigrationNotApplied = true;
                             break;
                         case StartupError.AdminUserSetupError:
+                            Engine.Services.DatabaseConnectionFailed = false;
+                            Engine.Services.DatabaseMigrationsMissing = false;
+                            Engine.Services.MigrationNotApplied = false;
                             Engine.Services.AdminUserSetupError = true;
                             break;
                         case StartupError.DatabaseConnectionFailed:

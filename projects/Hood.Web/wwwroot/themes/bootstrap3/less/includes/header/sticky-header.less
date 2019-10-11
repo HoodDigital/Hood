@@ -1,0 +1,27 @@
+﻿// inside header.sticky-header
+.wrap {
+    box-shadow: 0 0 20px 0px fade(black, 30%);
+    width: 100%;
+    position: fixed;
+    top: 0px;
+    z-index: 9;
+
+    @media (min-width:768px) {
+        .top-bar {
+            height: 0;
+            opacity: 0;
+            border-bottom: 0;
+        }
+
+        nav.main {
+            ul.nav.main {
+            }
+        }
+
+        .contact-slim {
+            height: auto;
+            opacity: 1;
+            padding: 5px;
+        }
+    }
+}
