@@ -1,0 +1,14 @@
+{
+  "name": "hood.ui.bootstrap3",
+  "description": "Client side views for theme.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HoodDigital/Hood"
+  },
+  "license": "GPL-3.0",
+  "version": "3.1.0",
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-rimraf": "0.2.1"
+  }
+}

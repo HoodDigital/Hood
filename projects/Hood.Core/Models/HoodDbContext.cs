@@ -221,15 +221,15 @@ namespace Hood.Models
                 Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
             }
 
-            if (!Options.Any(o => o.Id == typeof(SheduledTaskSettings).ToString()))
+            if (!Options.Any(o => o.Id == typeof(ScheduledTaskSettings).ToString()))
             {
-                Options.Add(new Option { Id = typeof(SheduledTaskSettings).ToString(), Value = JsonConvert.SerializeObject(new SheduledTaskSettings()) });
+                Options.Add(new Option { Id = typeof(ScheduledTaskSettings).ToString(), Value = JsonConvert.SerializeObject(new ScheduledTaskSettings()) });
             }
             else
             {
                 // Check all system tasks exist.
-                Option option = Options.First(o => o.Id == typeof(SheduledTaskSettings).ToString());
-                SheduledTaskSettings sheduledTaskSettings = JsonConvert.DeserializeObject<SheduledTaskSettings>(option.Value);
+                Option option = Options.First(o => o.Id == typeof(ScheduledTaskSettings).ToString());
+                ScheduledTaskSettings sheduledTaskSettings = JsonConvert.DeserializeObject<ScheduledTaskSettings>(option.Value);
                 sheduledTaskSettings.CheckTasks();
             }
 

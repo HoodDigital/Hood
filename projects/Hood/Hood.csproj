@@ -61,10 +61,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Areas\Admin\UI\Settings\SheduledTasks.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
     <ProjectReference Include="..\Hood.UI.Account\Hood.UI.Account.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap3\Hood.UI.Bootstrap3.csproj" />

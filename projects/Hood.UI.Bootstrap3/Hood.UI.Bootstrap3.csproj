@@ -29,4 +29,20 @@
     <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="node_modules\**" />
+    <EmbeddedResource Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="package.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="package.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

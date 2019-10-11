@@ -19,7 +19,7 @@ namespace Hood.Services
         BillingSettings Billing { get; }
         ContactSettings Contact { get; }
         ContentSettings Content { get; }
-        SheduledTaskSettings SheduledTasks { get; }
+        ScheduledTaskSettings ScheduledTasks { get; }
         ForumSettings Forum { get; }
         IntegrationSettings Integrations { get; }
         MailSettings Mail { get; }

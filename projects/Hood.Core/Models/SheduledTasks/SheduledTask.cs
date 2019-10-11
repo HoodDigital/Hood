@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Hood.Models
 {
-    public class SheduledTask
+    public class ScheduledTask
     {
 
         /// <summary>

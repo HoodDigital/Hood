@@ -7,34 +7,34 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public class SheduledTaskSettings : SaveableModel
+    public class ScheduledTaskSettings : SaveableModel
     {
-        public SheduledTask[] Tasks { get; set; }
+        public ScheduledTask[] Tasks { get; set; }
 
         [JsonIgnore]
-        public List<SheduledTask> System
+        public List<ScheduledTask> System
         {
             get
             {
                 DateTime startTime = DateTime.Now.Date.AddHours(3);
-                return new List<SheduledTask>()
+                return new List<ScheduledTask>()
                 {
-                    new SheduledTask() { Enabled = true, FailOnError = false, Interval = 600, Type = nameof(KeepAliveTask), Name = "Keep Alive" },
-                    new SheduledTask() { Enabled = true, FailOnError = false, Interval = 86400, Type = nameof(RunPropertyImporterTask), Name = "Auto Property Import", LatestStart = startTime, LatestEnd = startTime  },
+                    new ScheduledTask() { Enabled = true, FailOnError = false, Interval = 600, Type = nameof(KeepAliveTask), Name = "Keep Alive" },
+                    new ScheduledTask() { Enabled = true, FailOnError = false, Interval = 86400, Type = nameof(RunPropertyImporterTask), Name = "Auto Property Import", LatestStart = startTime, LatestEnd = startTime  },
                 };
             }
         }
 
-        public SheduledTaskSettings()
+        public ScheduledTaskSettings()
         {
             Tasks = System.ToArray();
         }
 
         internal void CheckTasks()
         {
-            List<SheduledTask> safePendingList = Tasks.ToList();
+            List<ScheduledTask> safePendingList = Tasks.ToList();
             safePendingList.RemoveAll(task => System.Any(st => task.Type == st.Type));
-            foreach (SheduledTask systemTask in System)
+            foreach (ScheduledTask systemTask in System)
             {
                 if (!safePendingList.Any(task => task.Type == systemTask.Type))
                 {

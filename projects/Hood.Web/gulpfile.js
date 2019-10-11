@@ -1,4 +1,3 @@
-/// <binding BeforeBuild='views' Clean='views' />
 // Useful gulp functions for the development of HoodCMS.
 // Note this is a demo project and should not be used for production HoodCMS projects.
 // In production, you should install the nuget and bower packages to your HoodCMS project.
@@ -102,21 +101,6 @@ gulp.task('cssnano', function () {
         .pipe(gulp.dest(hood.css))
         .pipe(gulp.dest(output.css));
 });
-
-// Copies working views from default theme to be embedded in main assembly.
-gulp.task('views:clean', function (cb) {
-    return gulp.src(['./../Hood.UI.Bootstrap3/UI/**/*.*', './../Hood.UI.Bootstrap4/UI/**/*.*'], { read: false, allowEmpty: true })
-        .pipe(rimraf({ force: true }));
-});
-gulp.task('views:copy', function () {
-    return gulp.src('./Themes/bootstrap3/Views/**/*.*')
-        .pipe(gulp.dest('./../Hood.UI.Bootstrap3/UI/'));
-});
-gulp.task('views:copy:new', function () {
-    return gulp.src('./Themes/bootstrap4/Views/**/*.*')
-        .pipe(gulp.dest('./../Hood.UI.Bootstrap4/UI/'));
-});
-gulp.task('views', gulp.series('views:clean', 'views:copy', 'views:copy:new'));
 
 // Copies any image files from the images directories to the distribution images directory.
 gulp.task('images', function () {

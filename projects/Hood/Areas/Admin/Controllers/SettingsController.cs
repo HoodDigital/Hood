@@ -107,19 +107,19 @@ namespace Hood.Areas.Admin.Controllers
         }
 
 
-        [Route("admin/settings/sheduled-tasks/")]
-        public IActionResult SheduledTasks()
+        [Route("admin/settings/scheduled-tasks/")]
+        public IActionResult ScheduledTasks()
         {
-            _cache.Remove(typeof(SheduledTaskSettings).ToString());
-            SheduledTaskSettings model = Engine.Settings.SheduledTasks;
+            _cache.Remove(typeof(ScheduledTaskSettings).ToString());
+            ScheduledTaskSettings model = Engine.Settings.ScheduledTasks;
             if (model == null)
-                model = new SheduledTaskSettings();
+                model = new ScheduledTaskSettings();
             return View(model);
         }
 
         [HttpPost]
-        [Route("admin/settings/sheduled-tasks/")]
-        public IActionResult SheduledTasks(SheduledTaskSettings model)
+        [Route("admin/settings/scheduled-tasks/")]
+        public IActionResult ScheduledTasks(ScheduledTaskSettings model)
         {
             try
             {

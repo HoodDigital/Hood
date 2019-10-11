@@ -1,0 +1,159 @@
+@model ScheduledTaskSettings
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Scheduled Task Settings";
+}
+@section buttons {
+    <a href="javascript:document.getElementById('settings-form').submit()" class="btn btn-success">
+        <i class="fa fa-save"></i> Save
+    </a>
+}
+<form method="post" id="settings-form">
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+    <div class="row">
+        <div class="col-12 col-lg-4 col-xl-3">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="sheduled-task-filter-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#sheduled-task-filter-panel" href="#sheduled-task-filter-panel" aria-expanded="true" aria-controls="sheduled-task-filter-panel">
+                            Choose a Task to Edit
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body collapse show" aria-labelledby="sheduled-task-filter-panel-heading" id="sheduled-task-filter-panel">
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        @for (int i = 0; i < Model.Tasks.Count(); i++)
+                        {
+                            <a class="nav-link d-flex justify-content-between align-items-center" href="@string.Format("#collapse_{0}", i.ToString())" aria-controls="@string.Format("collapse_{0}", i.ToString())" role="tab" data-toggle="pill" aria-selected="false">
+                                @Model.Tasks[i].Name
+                                @if (Model.Tasks[i].Enabled)
+                                {
+                                    <span class="badge badge-success badge-pill">Enabled</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-dark badge-pill">Disabled</span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8 col-xl-9">
+            <div class="container ml-md-0 p-0">
+                <div class="tab-content">
+                    @for (int i = 0; i < Model.Tasks.Count(); i++)
+                    {
+                        <div role="tabpanel" class="tab-pane" id="@string.Format("collapse_{0}", i.ToString())">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" id="@string.Format("fields-tab-{0}", i.ToString())" data-toggle="tab" href="@string.Format("#type-{0}", i.ToString())" role="tab" aria-controls="@string.Format("fields-{0}", i.ToString())" aria-selected="false">
+                                                    Type Settings
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="tab-content">
+                                        <div id="@string.Format("type-{0}", i.ToString())" class="tab-pane active" role="tabpanel" aria-labelledby="@string.Format("fields-tab-{0}", i.ToString())">
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Tasks[i].Name"></label>
+                                                <input asp-for="Tasks[i].Name" class="form-control">
+                                                <small asp-for="Tasks[i].Name"></small>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Tasks[i].Enabled" class="custom-control-input">
+                                                    <label asp-for="Tasks[i].Enabled" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Tasks[i].Enabled"></small>
+                                            </div>
+                                            <div class="form-group floating-label">
+                                                <label asp-for="Tasks[i].Interval"></label>
+                                                <input asp-for="Tasks[i].Interval" class="form-control" type="number" step="1" min="60">
+                                                <small asp-for="Tasks[i].Interval"></small>
+                                            </div>
+                                            <hr class="mt-4 mb-4" />
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Tasks[i].FailOnError" class="custom-control-input">
+                                                    <label asp-for="Tasks[i].FailOnError" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Tasks[i].FailOnError"></small>
+                                            </div>
+                                            <input asp-for="Tasks[i].LatestStart" class="form-control" type="hidden" />
+                                            <input asp-for="Tasks[i].LatestEnd" class="form-control" type="hidden" />
+                                            <input asp-for="Tasks[i].LatestSuccess" class="form-control" type="hidden" />
+                                            <input asp-for="Tasks[i].Type" class="form-control" type="hidden" />
+                                            <table class="table table-hover mt-4">
+                                                <tbody>
+                                                    <tr>
+                                                        <th scope="row" style="width:50%;">Latest Start</th>
+                                                        <td>
+                                                            @if (Model.Tasks[i].LatestStart.HasValue)
+                                                            {
+                                                                <span>@Model.Tasks[i].LatestStart.Value.ToDisplay()</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Has not run yet.</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" style="width:50%;">Latest End</th>
+                                                        <td>
+                                                            @if (Model.Tasks[i].LatestEnd.HasValue)
+                                                            {
+                                                                <span>@Model.Tasks[i].LatestEnd.Value.ToDisplay()</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Has not run yet.</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" style="width:50%;">Latest Success</th>
+                                                        <td>
+                                                            @if (Model.Tasks[i].LatestSuccess.HasValue)
+                                                            {
+                                                                <span>@Model.Tasks[i].LatestSuccess.Value.ToDisplay()</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>Has not run yet.</span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" style="width:50%;">Task Type</th>
+                                                        <td>
+                                                            <span>@Model.Tasks[i].Type</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div role="tabpanel" class="tab-pane active" id="#types-home">
+                        <div class="alert alert-info text-center">
+                            <p class="m-2"><i class="fa fa-info-circle fa-2x"></i></p>
+                            <p class="h5 m-0">Choose a task to edit.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
