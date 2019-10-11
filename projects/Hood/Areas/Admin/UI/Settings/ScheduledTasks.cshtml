@@ -64,19 +64,19 @@
                                         <div id="@string.Format("type-{0}", i.ToString())" class="tab-pane active" role="tabpanel" aria-labelledby="@string.Format("fields-tab-{0}", i.ToString())">
                                             <div class="form-group floating-label">
                                                 <label asp-for="Tasks[i].Name"></label>
-                                                <input asp-for="Tasks[i].Name" class="form-control">
+                                                <input asp-for="Tasks[i].Name" class="form-control" />
                                                 <small asp-for="Tasks[i].Name"></small>
                                             </div>
                                             <div class="form-group">
                                                 <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Tasks[i].Enabled" class="custom-control-input">
+                                                    <input asp-for="Tasks[i].Enabled" class="custom-control-input" />
                                                     <label asp-for="Tasks[i].Enabled" class="custom-control-label"></label>
                                                 </div>
                                                 <small asp-for="Tasks[i].Enabled"></small>
                                             </div>
                                             <div class="form-group floating-label">
                                                 <label asp-for="Tasks[i].Interval"></label>
-                                                <input asp-for="Tasks[i].Interval" class="form-control" type="number" step="1" min="60">
+                                                <input asp-for="Tasks[i].Interval" class="form-control" type="number" step="1" min="10" />
                                                 <small asp-for="Tasks[i].Interval"></small>
                                             </div>
                                             <hr class="mt-4 mb-4" />

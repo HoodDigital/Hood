@@ -196,9 +196,21 @@ namespace Hood.Core
         {
             get
             {
-                if (Settings["Hood:SiteUrl"] != null)
+                if (Settings["Hood.SiteUrl"] != null)
                 {
-                    return Settings["Hood:SiteUrl"].ToString();
+                    return Settings["Hood.SiteUrl"].ToString();
+                }
+                return null;
+            }
+        }
+
+        public static string ApplicationKey
+        {
+            get
+            {
+                if (Settings["Hood.Api.SystemPrivateKey"] != null)
+                {
+                    return Settings["Hood.Api.SystemPrivateKey"].ToString();
                 }
                 return null;
             }

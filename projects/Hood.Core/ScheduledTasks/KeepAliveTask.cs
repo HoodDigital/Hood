@@ -17,11 +17,6 @@ namespace Hood.Core.ScheduledTasks
         /// </summary>
         public void Execute()
         {
-            var url = Engine.Url + "keepalive/index";
-            using (var wc = new WebClient())
-            {
-                wc.DownloadString(url);
-            }
         }
     }
 }

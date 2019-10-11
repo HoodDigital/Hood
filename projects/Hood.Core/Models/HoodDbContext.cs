@@ -231,6 +231,7 @@ namespace Hood.Models
                 Option option = Options.First(o => o.Id == typeof(ScheduledTaskSettings).ToString());
                 ScheduledTaskSettings sheduledTaskSettings = JsonConvert.DeserializeObject<ScheduledTaskSettings>(option.Value);
                 sheduledTaskSettings.CheckTasks();
+                option.Value = JsonConvert.SerializeObject(sheduledTaskSettings);
             }
 
             if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))

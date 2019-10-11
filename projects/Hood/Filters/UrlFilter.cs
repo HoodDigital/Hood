@@ -1,10 +1,7 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
-using Hood.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
-using System;
 
 namespace Hood.Filters
 {
@@ -24,13 +21,20 @@ namespace Hood.Filters
         {
             if (Engine.Url == null)
             {
-                if (_config["Hood:SiteUrl"] == null)
+                if (_config["Hood.SiteUrl"] == null)
                 {
-                    Engine.Settings["Hood:SiteUrl"] = context.HttpContext.GetSiteUrl();
+                    Engine.Settings["Hood.SiteUrl"] = context.HttpContext.GetSiteUrl();
                 }
                 else
                 {
-                    Engine.Settings["Hood:SiteUrl"] = _config["Hood:SiteUrl"];
+                    Engine.Settings["Hood.SiteUrl"] = _config["Hood.SiteUrl"];
+                }
+            }
+            else
+            {
+                if (Engine.Url != context.HttpContext.GetSiteUrl())
+                {
+                    Engine.Settings["Hood.SiteUrl"] = context.HttpContext.GetSiteUrl();
                 }
             }
         }
