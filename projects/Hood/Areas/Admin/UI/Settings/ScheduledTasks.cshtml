@@ -38,6 +38,24 @@
                             </a>
                         }
                     </div>
+                    <hr class="mt-4 mb-4" />
+                    <label>Choose a time to run system tasks</label>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group floating-label">
+                                <label asp-for="FixedStartTimeHours"></label>
+                                <input asp-for="FixedStartTimeHours" class="form-control" />
+                                <small asp-for="FixedStartTimeHours"></small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group floating-label">
+                                <label asp-for="FixedStartTimeMinutes"></label>
+                                <input asp-for="FixedStartTimeMinutes" class="form-control" />
+                                <small asp-for="FixedStartTimeMinutes"></small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,11 +100,20 @@
                                             <hr class="mt-4 mb-4" />
                                             <div class="form-group">
                                                 <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Tasks[i].FailOnError" class="custom-control-input">
+                                                    <input asp-for="Tasks[i].FailOnError" class="custom-control-input" disabled />
                                                     <label asp-for="Tasks[i].FailOnError" class="custom-control-label"></label>
                                                 </div>
                                                 <small asp-for="Tasks[i].FailOnError"></small>
                                             </div>
+                                            <div class="form-group">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input asp-for="Tasks[i].FixedTime" class="custom-control-input" disabled />
+                                                    <label asp-for="Tasks[i].FixedTime" class="custom-control-label"></label>
+                                                </div>
+                                                <small asp-for="Tasks[i].FixedTime"></small>
+                                            </div>
+                                            <input asp-for="Tasks[i].FailOnError" class="form-control" type="hidden" />
+                                            <input asp-for="Tasks[i].FixedTime" class="form-control" type="hidden" />
                                             <input asp-for="Tasks[i].LatestStart" class="form-control" type="hidden" />
                                             <input asp-for="Tasks[i].LatestEnd" class="form-control" type="hidden" />
                                             <input asp-for="Tasks[i].LatestSuccess" class="form-control" type="hidden" />

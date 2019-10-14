@@ -11,12 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Themes\bootstrap3\Views\Shared\_Styles.cshtml" />
-    <Content Remove="Themes\bootstrap4\Views\Shared\_Scripts_Bootstrap.cshtml" />
-    <Content Remove="Themes\bootstrap4\Views\Shared\_Styles.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
   </ItemGroup>
   
@@ -25,17 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <EmbeddedResource Include="Themes\bootstrap3\Views\Shared\_Styles.cshtml" />
-    <EmbeddedResource Include="Themes\bootstrap4\Views\Shared\_Scripts_Bootstrap.cshtml" />
-    <EmbeddedResource Include="Themes\bootstrap4\Views\Shared\_Styles.cshtml" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="wwwroot\hood\css\" />
   </ItemGroup>
   
 </Project>

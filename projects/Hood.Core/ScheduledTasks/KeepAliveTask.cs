@@ -17,6 +17,7 @@ namespace Hood.Core.ScheduledTasks
         /// </summary>
         public void Execute()
         {
+            // This task does not need to do anything, the server has been hit by the task executor, so it will keep the system alive anyway.
         }
     }
 }

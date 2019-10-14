@@ -2,6 +2,7 @@
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +48,9 @@ namespace Hood.Startup
 
             foreach (var dependency in instances)
                 dependency.Configure(app, env, config);
+
+            ScheduledTaskManager.Instance.Initialize();
+            ScheduledTaskManager.Instance.Start();
 
             return app;
         }

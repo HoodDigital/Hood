@@ -33,11 +33,16 @@ namespace Hood.Models
         public bool Enabled { get; set; }
 
         /// <summary>
+        /// Gets or sets the value indicating whether a task is enabled
+        /// </summary>
+        [Display(Name = "Fixed Time?", Description = "This task should only run at the designated system task time (set in Sheduled Task settings).")]
+        public bool FixedTime { get; set; }
+
+        /// <summary>
         /// Whether or not an error should cause the task to fail.
         /// </summary>
         [Display(Name = "Fail On Error?", Description = "Whether or not an error should cause the task to fail.")]
         public bool FailOnError { get; set; }
-
         /// <summary>
         /// The last time the task was sucessfully started.
         /// </summary>

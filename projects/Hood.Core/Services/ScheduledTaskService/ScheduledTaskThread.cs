@@ -34,6 +34,7 @@ namespace Hood.Services
             }
         }
         public bool RunOnlyOnce { get; set; }
+        public DateTime? FixedStartTime { get; set; }
 
         internal ScheduledTaskThread()
         {
@@ -86,7 +87,23 @@ namespace Hood.Services
             }
             else
             {
-                _timer.Change(Interval, Interval);
+                if (FixedStartTime.HasValue)
+                {
+                    // Make sure the next run is in the future, but is a multiple of the interval after the last start.
+                    var nextRun = FixedStartTime.Value.AddSeconds(Seconds);
+                    while (nextRun <= DateTime.UtcNow)
+                    {
+                        nextRun = nextRun.AddSeconds(Seconds);
+                    }
+
+                    // Get the number of seconds until the next scheduled interval.
+                    var timeToNext = FixedStartTime.Value.AddSeconds(Seconds) - DateTime.UtcNow;
+                    _timer.Change(timeToNext, new TimeSpan(0, 0, 0, Seconds));
+                }
+                else
+                {
+                    _timer.Change(new TimeSpan(0, 0, 0, Seconds), new TimeSpan(0, 0, 0, Seconds));
+                }
             }
         }
 
@@ -107,7 +124,23 @@ namespace Hood.Services
         {
             if (_timer == null)
             {
-                _timer = new Timer(TimerHandler, null, Interval, Interval);
+                if (FixedStartTime.HasValue)
+                {
+                    // Make sure the next run is in the future, but is a multiple of the interval after the last start.
+                    var nextRun = FixedStartTime.Value.AddSeconds(Seconds);
+                    while (nextRun <= DateTime.UtcNow)
+                    {
+                        nextRun = nextRun.AddSeconds(Seconds);
+                    }
+
+                    // Get the number of seconds until the next scheduled interval.
+                    var timeToNext = FixedStartTime.Value.AddSeconds(Seconds) - DateTime.UtcNow;
+                    _timer = new Timer(TimerHandler, null, timeToNext, new TimeSpan(0, 0, 0, Seconds));
+                }
+                else
+                {
+                    _timer = new Timer(TimerHandler, null, new TimeSpan(0, 0, 0, Seconds), new TimeSpan(0, 0, 0, Seconds));
+                }
             }
         }
 

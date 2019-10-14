@@ -59,13 +59,16 @@ namespace Hood.Services
             if (task == null)
                 return;
 
+            var settings = Engine.Settings.ScheduledTasks;
             ScheduledTask.LatestStart = DateTime.UtcNow;
             //update appropriate datetime properties
-            Engine.Settings.ScheduledTasks.Update(ScheduledTask);
+            settings.Update(ScheduledTask);
+            Engine.Settings.Set<ScheduledTaskSettings>(settings);
             task.Execute();
             ScheduledTask.LatestEnd = ScheduledTask.LatestSuccess = DateTime.UtcNow;
             //update appropriate datetime properties
-            Engine.Settings.ScheduledTasks.Update(ScheduledTask);
+            settings.Update(ScheduledTask);
+            Engine.Settings.Set<ScheduledTaskSettings>(settings);
         }
 
         protected virtual bool IsRunning(ScheduledTask task)
@@ -103,7 +106,10 @@ namespace Hood.Services
             {
                 ScheduledTask.Enabled = !ScheduledTask.FailOnError;
                 ScheduledTask.LatestEnd = DateTime.UtcNow;
-                Engine.Settings.ScheduledTasks.Update(ScheduledTask);
+
+                var settings = Engine.Settings.ScheduledTasks;
+                settings.Update(ScheduledTask);
+                Engine.Settings.Set<ScheduledTaskSettings>(settings);
 
                 var logService = Engine.Services.Resolve<ILogService>();
                 await logService.AddExceptionAsync<TaskExecutor>("An error occured during a scheduled task.", ex);

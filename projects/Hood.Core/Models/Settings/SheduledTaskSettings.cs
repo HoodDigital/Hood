@@ -3,6 +3,7 @@ using Hood.Core.ScheduledTasks;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace Hood.Models
@@ -16,14 +17,31 @@ namespace Hood.Models
         {
             get
             {
-                DateTime startTime = DateTime.Now.Date.AddHours(3);
                 return new List<ScheduledTask>()
                 {
-                    new ScheduledTask() { Enabled = true, FailOnError = false, Interval = 600, Type = typeof(KeepAliveTask).ToString(), Name = "Keep Alive" },
-                    new ScheduledTask() { Enabled = true, FailOnError = false, Interval = 86400, Type = typeof(RunPropertyImporterTask).ToString(), Name = "Auto Property Import", LatestStart = startTime, LatestEnd = startTime  },
+                    new ScheduledTask() {
+                        Name = "Keep Alive",
+                        Interval = 600,
+                        Type = typeof(KeepAliveTask).ToString(),
+                        Enabled = true,
+                        FailOnError = false
+                    },
+                    new ScheduledTask() {
+                        Name = "Auto Property Import",
+                        Interval = 86400,
+                        Type = typeof(RunPropertyImporterTask).ToString(),
+                        FixedTime = true,
+                        Enabled = true,
+                        FailOnError = false
+                    }
                 };
             }
         }
+
+        [Display(Name = "Start Time (Hours)")]
+        public int FixedStartTimeHours { get; set; }
+        [Display(Name = "Start Time (Minutes)")]
+        public int FixedStartTimeMinutes { get; set; }
 
         public ScheduledTask GetByType(string type)
         {
@@ -36,16 +54,21 @@ namespace Hood.Models
             {
                 if (t.Type == task.Type)
                 {
+                    t.FixedTime = task.FixedTime;
+                    t.FailOnError = task.FailOnError;
                     t.LatestEnd = task.LatestEnd;
                     t.LatestStart = task.LatestStart;
                     t.LatestSuccess = task.LatestSuccess;
                 }
             });
+            Tasks = tasks.ToArray();
         }
 
         public ScheduledTaskSettings()
         {
             Tasks = System.ToArray();
+            FixedStartTimeHours = 3;
+            FixedStartTimeMinutes = 0;
         }
 
         internal void CheckTasks()

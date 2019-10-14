@@ -114,9 +114,6 @@ namespace Hood.Startup
             engine.Initialize(services);
             var serviceProvider = engine.ConfigureServices(services, configuration);
 
-            ScheduledTaskManager.Instance.Initialize();
-            ScheduledTaskManager.Instance.Start();
-
             return serviceProvider;
         }
 

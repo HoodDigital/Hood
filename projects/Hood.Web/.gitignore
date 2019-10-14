@@ -1,8 +1,8 @@
 # Project Ignores
 package-lock.json
 /Properties/PublishProfiles
+/Feed
 /Temporary
-/Temporary/*
 
 /Areas/Admin/Views
 /Views
