@@ -72,7 +72,7 @@ namespace Hood.Services
             Engine.Settings.Set(settings);
             try
             {
-                task.Execute();
+                await task.ExecuteAsync();
                 ScheduledTask.LatestEnd = ScheduledTask.LatestSuccess = DateTime.UtcNow;
             }
             catch (Exception ex)
