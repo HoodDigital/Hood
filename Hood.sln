@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{5CF84357-EA5D-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.UI.Bootstrap4", "projects\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj", "{3BB955FE-2B25-45EB-9EE7-6419F3436EE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hood.Core", "projects\Hood.Core\Hood.Core.csproj", "{11923D82-CAA1-4239-A4BC-A365C5D49017}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.Core", "projects\Hood.Core\Hood.Core.csproj", "{11923D82-CAA1-4239-A4BC-A365C5D49017}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{ADC931CD-87DA-406A-ADCD-7BB44329F75E}"
 	ProjectSection(SolutionItems) = preProject
@@ -39,6 +39,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.UI.Account", "projects\Hood.UI.Account\Hood.UI.Account.csproj", "{53FBB2D2-56DB-4A27-9D5F-CC90843E8A37}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.Demo", "projects\Hood.Demo\Hood.Demo.csproj", "{C2E726E7-B3F7-4DD7-BC90-ECBAC11DB907}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{831CFB70-33ED-4134-B26A-8595C1791C74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
