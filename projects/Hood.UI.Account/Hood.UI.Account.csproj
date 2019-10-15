@@ -28,5 +28,11 @@
     <EmbeddedResource Include="UI\**\*.cshtml" />
     <EmbeddedResource Include="UI\**\*.json" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="node_modules\**" />
+    <EmbeddedResource Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
+  </ItemGroup>
 
 </Project>

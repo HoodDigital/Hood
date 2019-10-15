@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Hood.Core.ScheduledTasks
 {
@@ -15,13 +16,20 @@ namespace Hood.Core.ScheduledTasks
         /// <summary>
         /// Executes the task
         /// </summary>
-        public void Execute()
+        public async Task ExecuteAsync()
         {
-            var url = Engine.Url + "admin/property/import/blm/trigger";
-            using (var wc = new WebClient())
+            try
             {
-                wc.Headers.Add("Auth", Engine.Settings.Property.TriggerAuthKey);
-                wc.DownloadString(url);
+                var url = Engine.Url + "admin/property/import/blm/trigger";
+                using (var wc = new WebClient())
+                {
+                    wc.Headers.Add("Auth", Engine.Settings.Property.TriggerAuthKey);
+                    wc.DownloadString(url);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while processing the RunPropertyImporterTask, see InnerException for more information.", ex);
             }
         }
     }

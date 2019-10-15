@@ -2,8 +2,6 @@
 using Hood.Core.Interfaces;
 using Hood.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Hood.Services
@@ -24,21 +22,27 @@ namespace Hood.Services
             get
             {
                 if (!_enabled.HasValue)
+                {
                     _enabled = ScheduledTask?.Enabled;
+                }
 
                 return _enabled.HasValue && _enabled.Value;
             }
             set => _enabled = value;
         }
 
-        private void ExecuteTask()
+        private async Task ExecuteTaskAsync()
         {
             if (!Enabled)
+            {
                 return;
+            }
 
-            var type = Type.GetType(ScheduledTask.Type);
+            Type type = Type.GetType(ScheduledTask.Type);
             if (type == null)
+            {
                 throw new Exception($"The scheduled task ({ScheduledTask.Type}) could not be loaded.");
+            }
 
             object instance = null;
             try
@@ -55,34 +59,52 @@ namespace Hood.Services
                 instance = Engine.Services.ResolveUnregistered(type);
             }
 
-            var task = instance as IScheduledTask;
+            IScheduledTask task = instance as IScheduledTask;
             if (task == null)
+            {
                 return;
+            }
 
-            var settings = Engine.Settings.ScheduledTasks;
+            ScheduledTaskSettings settings = Engine.Settings.ScheduledTasks;
             ScheduledTask.LatestStart = DateTime.UtcNow;
             //update appropriate datetime properties
             settings.Update(ScheduledTask);
-            Engine.Settings.Set<ScheduledTaskSettings>(settings);
-            task.Execute();
-            ScheduledTask.LatestEnd = ScheduledTask.LatestSuccess = DateTime.UtcNow;
+            Engine.Settings.Set(settings);
+            try
+            {
+                task.Execute();
+                ScheduledTask.LatestEnd = ScheduledTask.LatestSuccess = DateTime.UtcNow;
+            }
+            catch (Exception ex)
+            {
+                ScheduledTask.LatestEnd = DateTime.UtcNow;
+
+                ILogService logService = Engine.Services.Resolve<ILogService>();
+                await logService.AddExceptionAsync<TaskExecutor>("An error occured during a scheduled task.", ex);
+            }
             //update appropriate datetime properties
             settings.Update(ScheduledTask);
-            Engine.Settings.Set<ScheduledTaskSettings>(settings);
+            Engine.Settings.Set(settings);
         }
 
         protected virtual bool IsRunning(ScheduledTask task)
         {
             if (!task.LatestStart.HasValue && !task.LatestEnd.HasValue)
+            {
                 return false;
+            }
 
-            var latest = task.LatestStart ?? DateTime.UtcNow;
+            DateTime latest = task.LatestStart ?? DateTime.UtcNow;
 
             if (task.LatestEnd.HasValue && latest < task.LatestEnd)
+            {
                 return false;
+            }
 
             if (latest.AddSeconds(task.Interval) <= DateTime.UtcNow)
+            {
                 return false;
+            }
 
             return true;
         }
@@ -90,28 +112,34 @@ namespace Hood.Services
         public async Task ExecuteAsync()
         {
             if (ScheduledTask == null || !Enabled)
+            {
                 return;
+            }
 
             if (IsRunning(ScheduledTask))
+            {
                 return;
+            }
 
-            if (ScheduledTask.LatestEnd.HasValue && (DateTime.UtcNow - ScheduledTask.LatestEnd).Value.TotalSeconds < ScheduledTask.Interval)
+            if (ScheduledTask.LatestSuccess.HasValue && (DateTime.UtcNow - ScheduledTask.LatestSuccess).Value.TotalSeconds < ScheduledTask.Interval)
+            {
                 return;
+            }
 
             try
             {
-                ExecuteTask();
+                await ExecuteTaskAsync();
             }
             catch (Exception ex)
             {
                 ScheduledTask.Enabled = !ScheduledTask.FailOnError;
                 ScheduledTask.LatestEnd = DateTime.UtcNow;
 
-                var settings = Engine.Settings.ScheduledTasks;
+                ScheduledTaskSettings settings = Engine.Settings.ScheduledTasks;
                 settings.Update(ScheduledTask);
                 Engine.Settings.Set<ScheduledTaskSettings>(settings);
 
-                var logService = Engine.Services.Resolve<ILogService>();
+                ILogService logService = Engine.Services.Resolve<ILogService>();
                 await logService.AddExceptionAsync<TaskExecutor>("An error occured during a scheduled task.", ex);
             }
         }

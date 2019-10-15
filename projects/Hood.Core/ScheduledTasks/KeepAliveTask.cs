@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Hood.Core.ScheduledTasks
 {
@@ -15,7 +16,7 @@ namespace Hood.Core.ScheduledTasks
         /// <summary>
         /// Executes the keep alive task
         /// </summary>
-        public void Execute()
+        public async Task ExecuteAsync()
         {
             // This task does not need to do anything, the server has been hit by the task executor, so it will keep the system alive anyway.
         }

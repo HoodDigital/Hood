@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Hood.Core.Interfaces
 {
@@ -9,6 +10,6 @@ namespace Hood.Core.Interfaces
         /// <summary>
         /// Executes the task, this will be called by task handlers.
         /// </summary>
-        void Execute();
+        Task ExecuteAsync();
     }
 }

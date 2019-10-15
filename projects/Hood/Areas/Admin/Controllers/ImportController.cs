@@ -37,7 +37,6 @@ namespace Hood.Areas.Admin.Controllers
 
         #region "BlmPropertyImporter"
 
-        [HttpPost]
         [Route("admin/property/import/blm/trigger")]
         [AllowAnonymous]
         public async Task<IActionResult> BlmPropertyImporterTrigger()

@@ -44,7 +44,7 @@ namespace Hood.Services
             }
 
             List<Models.ScheduledTask> notRunTasks = scheduleTasks
-                .Where(x => !x.LatestStart.HasValue || x.LatestStart.Value.AddSeconds(x.Interval) < DateTime.UtcNow)
+                .Where(x => !x.LatestSuccess.HasValue || x.LatestStart.Value.AddSeconds(x.Interval) < DateTime.UtcNow)
                 .ToList();
 
             if (notRunTasks.Any())

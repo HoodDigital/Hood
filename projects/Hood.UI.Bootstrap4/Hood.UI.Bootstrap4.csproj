@@ -30,22 +30,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Compile Remove="%2a%2a\**" />
     <Compile Remove="node_modules\**" />
-    <EmbeddedResource Remove="%2a%2a\**" />
     <EmbeddedResource Remove="node_modules\**" />
-    <None Remove="%2a%2a\**" />
     <None Remove="node_modules\**" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <None Remove="package.json" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="package.json">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-  
+
 </Project>

@@ -44,11 +44,6 @@ namespace Hood.Services
 
         private void Run()
         {
-            if (Seconds <= 0)
-            {
-                return;
-            }
-
             StartedUtc = DateTime.UtcNow;
             IsRunning = true;
             foreach (string type in _tasks.Values)
@@ -89,15 +84,15 @@ namespace Hood.Services
             {
                 if (FixedStartTime.HasValue)
                 {
-                    // Make sure the next run is in the future, but is a multiple of the interval after the last start.
-                    var nextRun = FixedStartTime.Value.AddSeconds(Seconds);
+                    // Make sure the next run is in the future, but is a multiple of the interval after the fixed start time.
+                    var nextRun = FixedStartTime.Value;
                     while (nextRun <= DateTime.UtcNow)
                     {
                         nextRun = nextRun.AddSeconds(Seconds);
                     }
 
                     // Get the number of seconds until the next scheduled interval.
-                    var timeToNext = FixedStartTime.Value.AddSeconds(Seconds) - DateTime.UtcNow;
+                    var timeToNext = nextRun - DateTime.UtcNow;
                     _timer.Change(timeToNext, new TimeSpan(0, 0, 0, Seconds));
                 }
                 else
@@ -127,14 +122,14 @@ namespace Hood.Services
                 if (FixedStartTime.HasValue)
                 {
                     // Make sure the next run is in the future, but is a multiple of the interval after the last start.
-                    var nextRun = FixedStartTime.Value.AddSeconds(Seconds);
+                    var nextRun = FixedStartTime.Value;
                     while (nextRun <= DateTime.UtcNow)
                     {
                         nextRun = nextRun.AddSeconds(Seconds);
                     }
 
                     // Get the number of seconds until the next scheduled interval.
-                    var timeToNext = FixedStartTime.Value.AddSeconds(Seconds) - DateTime.UtcNow;
+                    var timeToNext = nextRun - DateTime.UtcNow;
                     _timer = new Timer(TimerHandler, null, timeToNext, new TimeSpan(0, 0, 0, Seconds));
                 }
                 else
