@@ -214,6 +214,18 @@ namespace Hood.Models
                 MediaDirectory defaultDir = MediaDirectories.SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
                 Media.Where(o => o.DirectoryId == null).ToList().ForEach(a => a.DirectoryId = defaultDir.Id);
                 Media.Where(o => o.FileType == "directory/dir").ToList().ForEach(a => Entry(a).State = EntityState.Deleted);
+                try
+                {
+                    // Save any existing seeding, in case directories needed creating.
+                    SaveChanges();
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    if (dbEx.InnerException != null && dbEx.InnerException.Message.Contains("Timeout"))
+                    {
+                        throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaTimeout);
+                    }
+                }
             }
 
             if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))

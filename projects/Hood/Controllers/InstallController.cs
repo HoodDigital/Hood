@@ -29,6 +29,7 @@ namespace Hood.Controllers
                 DatabaseSeedFailed = Engine.Services.DatabaseSeedFailed,
                 DatabaseMigrationsMissing = Engine.Services.DatabaseMigrationsMissing,
                 MigrationNotApplied = Engine.Services.MigrationNotApplied,
+                DatabaseMediaTimeout = Engine.Services.MigrationNotApplied,
                 ViewsInstalled = Engine.Services.ViewsInstalled,
                 AdminUserSetupError = Engine.Services.AdminUserSetupError
             };

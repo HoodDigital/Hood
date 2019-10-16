@@ -68,6 +68,7 @@ namespace Hood.Extensions
         MigrationMissing, 
         MigrationNotApplied,
         DatabaseConnectionFailed,
-        AdminUserSetupError
+        AdminUserSetupError,
+        DatabaseMediaTimeout
     }
 }

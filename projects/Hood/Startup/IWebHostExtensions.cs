@@ -35,6 +35,7 @@ namespace Hood.Startup
                     Engine.Services.DatabaseMigrationsMissing = false;
                     Engine.Services.MigrationNotApplied = false;
                     Engine.Services.AdminUserSetupError = false;
+                    Engine.Services.DatabaseMediaTimeout = false;
                     Engine.Services.DatabaseSeedFailed = false;
 
                 }
@@ -62,6 +63,13 @@ namespace Hood.Startup
                             Engine.Services.DatabaseMigrationsMissing = true;
                             Engine.Services.MigrationNotApplied = true;
                             Engine.Services.AdminUserSetupError = true;
+                            break;
+                        case StartupError.DatabaseMediaTimeout:
+                            Engine.Services.DatabaseConnectionFailed = false;
+                            Engine.Services.DatabaseMigrationsMissing = false;
+                            Engine.Services.MigrationNotApplied = false;
+                            Engine.Services.AdminUserSetupError = false;
+                            Engine.Services.DatabaseMediaTimeout = true;
                             break;
                     }
                     Engine.Services.DatabaseSeedFailed = true;

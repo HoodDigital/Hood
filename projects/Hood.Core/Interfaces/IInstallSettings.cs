@@ -8,6 +8,7 @@
         bool MigrationNotApplied { get; set; }
         bool ViewsInstalled { get; set; }
         bool AdminUserSetupError { get; set; }
+        bool DatabaseMediaTimeout { get; set; }
         bool Installed { get; }
     }
 }

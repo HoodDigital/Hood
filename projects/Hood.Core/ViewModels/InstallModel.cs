@@ -14,6 +14,7 @@ namespace Hood.ViewModels
         public bool DatabaseMigrationsMissing { get; set; } = false;
         public bool DatabaseSeedFailed { get; set; } = false;
         public bool MigrationNotApplied { get; set; } = false;
+        public bool DatabaseMediaTimeout { get; set; } = false;
         public bool SqlNotInstalled { get; set; } = false;
         public bool AdminUserSetupError { get; set; } = false;
         public bool Installed {

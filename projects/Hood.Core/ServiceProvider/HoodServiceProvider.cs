@@ -19,6 +19,7 @@ namespace Hood.Core
         public bool MigrationNotApplied { get; set; } = true;
         public bool ViewsInstalled { get; set; } = false;
         public bool AdminUserSetupError { get; set; } = true;
+        public bool DatabaseMediaTimeout { get; set; } = false;
         public bool Installed
         {
             get
