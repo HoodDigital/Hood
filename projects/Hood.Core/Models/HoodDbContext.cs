@@ -204,30 +204,6 @@ namespace Hood.Models
                 MediaDirectories.Add(new MediaDirectory { DisplayName = "Property", Slug = MediaManager.PropertyDirectorySlug, OwnerId = siteAdmin.Id, Type = DirectoryType.System });
             }
 
-
-            if (Media.Any(o => o.DirectoryId == null))
-            {
-                // Save any existing seeding, in case directories needed creating.
-                SaveChanges();
-
-                // Translate any un directoried images.
-                MediaDirectory defaultDir = MediaDirectories.SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
-                Media.Where(o => o.DirectoryId == null).ToList().ForEach(a => a.DirectoryId = defaultDir.Id);
-                Media.Where(o => o.FileType == "directory/dir").ToList().ForEach(a => Entry(a).State = EntityState.Deleted);
-                try
-                {
-                    // Save any existing seeding, in case directories needed creating.
-                    SaveChanges();
-                }
-                catch (DbUpdateException dbEx)
-                {
-                    if (dbEx.InnerException != null && dbEx.InnerException.Message.Contains("Timeout"))
-                    {
-                        throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaTimeout);
-                    }
-                }
-            }
-
             if (!Options.Any(o => o.Id == "Hood.Settings.Theme"))
             {
                 Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
@@ -410,6 +386,57 @@ namespace Hood.Models
                     Options.Add(new Option { Id = typeof(SeoSettings).ToString(), Value = JsonConvert.SerializeObject(new SeoSettings()) });
                 }
             }
+
+
+            if (Media.Any(o => o.DirectoryId == null))
+            {
+                // Save any existing seeding, in case directories needed creating.
+                SaveChanges();
+
+                // Translate any un directoried images.
+                MediaDirectory defaultDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
+                MediaDirectory contentDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.ContentDirectorySlug && o.Type == DirectoryType.System);
+                MediaDirectory propertyDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.PropertyDirectorySlug && o.Type == DirectoryType.System);
+                Media.Where(o => o.FileType == "directory/dir").ToList().ForEach(a => Entry(a).State = EntityState.Deleted);
+                try
+                {
+                    if (Media.Any(o => o.DirectoryId == null))
+                    {
+                        SaveChanges();
+
+                        string commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL AND Directory = 'Property'";
+                        SqlParameter sqlParameter = new SqlParameter("@DirectoryId", propertyDir.Id);
+                        int affectedRows = Database.ExecuteSqlCommand(commandText, sqlParameter);
+
+                        Option option = Options.Find(typeof(ContentSettings).ToString());
+                        var contentSettings = JsonConvert.DeserializeObject<ContentSettings>(option.Value);
+                        foreach (var type in contentSettings.Types)
+                        {
+                            commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL AND Directory = '@Directory'";
+                            sqlParameter = new SqlParameter("@DirectoryId", contentDir.Id);
+                            SqlParameter sqlParameterType = new SqlParameter("@Directory", type.TypeName);
+                            affectedRows = Database.ExecuteSqlCommand(commandText, sqlParameter, sqlParameterType);
+                        }
+
+                        commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL";
+                        sqlParameter = new SqlParameter("@DirectoryId", defaultDir.Id);
+                        affectedRows = Database.ExecuteSqlCommand(commandText, sqlParameter);
+
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaTimeout);
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    if (dbEx.InnerException != null && dbEx.InnerException.Message.Contains("Timeout"))
+                    {
+                        throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaTimeout);
+                    }
+                }
+            }
+
             if (!Options.Any(o => o.Id == "Hood.Api.SystemPrivateKey"))
             {
                 string guid = Guid.NewGuid().ToString();

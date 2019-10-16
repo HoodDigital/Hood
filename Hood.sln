@@ -34,7 +34,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{ADC931CD-87DA-406A-ADCD-7BB44329F75E}"
 	ProjectSection(SolutionItems) = preProject
 		sql\InstallViews.sql = sql\InstallViews.sql
-		sql\UpdateMediaTables-2.x-3.x.sql = sql\UpdateMediaTables-2.x-3.x.sql
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.UI.Account", "projects\Hood.UI.Account\Hood.UI.Account.csproj", "{53FBB2D2-56DB-4A27-9D5F-CC90843E8A37}"
