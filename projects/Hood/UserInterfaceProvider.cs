@@ -62,11 +62,11 @@ namespace Hood
         {
 
             // Get a reference to the assembly that contains the view components
-            Assembly assembly = typeof(Hood.UI.Account.Component).Assembly;
+            Assembly assembly = typeof(Hood.UI.Core.Component).Assembly;
             // Create an EmbeddedFileProvider for that assembly
             var embeddedFileProvider = new EmbeddedFileProvider(
                 assembly,
-                "Hood.UI.Account"
+                "Hood.UI.Core"
             );
             return embeddedFileProvider;
         }

@@ -6,7 +6,9 @@
         AfterCss,
         BeforeJquery,
         BeforeVendors,
+        Vendors,
         BeforeScripts,
+        Scripts,
         AfterScripts
     }
 

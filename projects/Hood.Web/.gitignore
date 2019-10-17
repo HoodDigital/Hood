@@ -22,3 +22,5 @@ package-lock.json
 /wwwroot/themes/**/*.min.js
 /wwwroot/themes/**/*.packaged.js
 /wwwroot/themes/**/lib
+
+appsettings.*.json

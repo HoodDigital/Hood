@@ -24,7 +24,7 @@ namespace Hood.TagHelpers
         /// Indicates where the script should be rendered
         /// </summary>
         [HtmlAttributeName("asp-bundle")]
-        public bool Bundle { set; get; } = false;
+        public bool Bundle { set; get; } = true;
 
         /// <summary>
         /// ViewContext
@@ -80,11 +80,11 @@ namespace Hood.TagHelpers
             if (context.AllAttributes.ContainsName("src"))
             {
                 var src = context.AllAttributes["src"].Value.ToString();
-                _htmlHelper.AddScriptParts(Location, src, !Bundle, context.AllAttributes.ContainsName("async"), context.AllAttributes.ContainsName("defer"));
+                _htmlHelper.AddScript(Location, src, Bundle, context.AllAttributes.ContainsName("async"), context.AllAttributes.ContainsName("defer"));
             }
             else
             {
-                _htmlHelper.AddInlineScriptParts(Location, scriptTag.RenderHtmlContent());
+                _htmlHelper.AddInlineScript(Location, scriptTag.RenderHtmlContent());
             }
 
             //generate nothing

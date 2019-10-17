@@ -2,7 +2,7 @@
 {
     public class FileReferenceMetadata
     {
-        public bool ExcludeFromBundle { get; set; }
+        public bool Bundle { get; set; }
         public bool IsAsync { get; set; }
         public string Src { get; set; }
         public bool IsDefer { get; set; }

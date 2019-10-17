@@ -209,7 +209,7 @@ namespace Hood.Services
             // stop any threads belonging to this
             Lock.AcquireWriterLock(Timeout.Infinite);
             Cancelled = true;
-            StatusMessage = "Cancelling...";
+            StatusMessage = "Not running...";
             Lock.ReleaseWriterLock();
         }
 

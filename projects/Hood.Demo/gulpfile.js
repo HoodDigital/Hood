@@ -1,45 +1,42 @@
-/// <binding BeforeBuild='views' />
-// Useful gulp functions for the development of HoodCMS.
-// Note this is a demo project and should not be used for production HoodCMS projects.
-// In production, you should install the nuget and bower packages to your HoodCMS project.
+/*
+ *
+ *   Includes
+ *
+ */
 
-var gulp = require('gulp'),
-    sass = require('gulp-sass'),
-    less = require('gulp-less'),
-    rimraf = require('gulp-rimraf'),
-    cssnano = require('gulp-cssnano'),
-    rename = require('gulp-rename'),
-    path = require('path'),
-    sourcemaps = require('gulp-sourcemaps'),
-    hood = {
-        js: './wwwroot/hood/js/',
-        css: './wwwroot/hood/css/',
-        scss: './wwwroot/hood/scss/',
-        images: './wwwroot/hood/images/'
-    },
-    output = {
-        js: './../../js/',
-        css: './../../css/',
-        scss: './../../scss/',
-        images: './../../images/',
-        sql: './../../sql/'
-    };
+var gulp = require('gulp');
+var sass = require('gulp-sass');
+var less = require('gulp-less');
+var rimraf = require('gulp-rimraf');
+var cssnano = require('gulp-cssnano');
+var rename = require('gulp-rename');
+var path = require('path');
+var sourcemaps = require('gulp-sourcemaps');
 
-// Cleans all dist/src/images output folders, as well as the hood folders.
+/*
+ * 
+ *   Site functions, to compile theme less / scss and JS
+ * 
+ */
+
 gulp.task('themes:clean', function (cb) {
     return gulp.src([
         './wwwroot/themes/*/css/'
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });
-
-// Site workload, to compile theme less/scss and JS.
 gulp.task('themes:scss', function () {
     return gulp.src([
         './wwwroot/themes/*/scss/*.scss'
     ])
         .pipe(sourcemaps.init())
-        .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
+        .pipe(
+            sass({
+                outputStyle: 'expanded',
+                indentType: 'tab',
+                indentWidth: 1
+            }).on('error', sass.logError)
+        )
         .pipe(sourcemaps.write())
         .pipe(rename(function (filePath) {
             let parentFolder = path.dirname(filePath.dirname);
@@ -78,6 +75,15 @@ gulp.task('themes:cssnano', function () {
         .pipe(gulp.dest('./wwwroot/themes/'));
 });
 
-gulp.task('themes:build', gulp.parallel('themes:scss', 'themes:less'));
-
-gulp.task('themes', gulp.series('themes:clean', 'themes:build', 'themes:cssnano'));
+gulp.task('themes:build',
+    gulp.parallel(
+        'themes:scss',
+        'themes:less'
+    )
+);
+gulp.task('themes',
+    gulp.series('themes:clean',
+        'themes:build',
+        'themes:cssnano'
+    )
+);

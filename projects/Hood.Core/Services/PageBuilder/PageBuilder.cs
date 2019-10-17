@@ -35,7 +35,7 @@ namespace Hood.Services
             _bundleFileProcessor = new BundleFileProcessor();
         }
 
-        public virtual void AddScriptParts(ResourceLocation location, string src, bool excludeFromBundle, bool isAsync, bool isDefer)
+        public virtual void AddScript(ResourceLocation location, string src, bool bundle, bool isAsync, bool isDefer)
         {
             if (!_scripts.ContainsKey(location))
                 _scripts.Add(location, new List<FileReferenceMetadata>());
@@ -45,29 +45,13 @@ namespace Hood.Services
 
             _scripts[location].Add(new FileReferenceMetadata
             {
-                ExcludeFromBundle = excludeFromBundle,
+                Bundle = bundle,
                 IsAsync = isAsync,
                 IsDefer = isDefer,
                 Src = src
             });
         }
-        public virtual void AppendScriptParts(ResourceLocation location, string src, bool excludeFromBundle, bool isAsync, bool isDefer)
-        {
-            if (!_scripts.ContainsKey(location))
-                _scripts.Add(location, new List<FileReferenceMetadata>());
-
-            if (string.IsNullOrEmpty(src))
-                return;
-
-            _scripts[location].Insert(0, new FileReferenceMetadata
-            {
-                ExcludeFromBundle = excludeFromBundle,
-                IsAsync = isAsync,
-                IsDefer = isDefer,
-                Src = src
-            });
-        }
-        public virtual void AddInlineScriptParts(ResourceLocation location, string script)
+        public virtual void AddInlineScript(ResourceLocation location, string script)
         {
             if (!_inlineScripts.ContainsKey(location))
                 _inlineScripts.Add(location, new List<string>());
@@ -77,17 +61,6 @@ namespace Hood.Services
 
             _inlineScripts[location].Add(script);
         }
-        public virtual void AppendInlineScriptParts(ResourceLocation location, string script)
-        {
-            if (!_inlineScripts.ContainsKey(location))
-                _inlineScripts.Add(location, new List<string>());
-
-            if (string.IsNullOrEmpty(script))
-                return;
-
-            _inlineScripts[location].Insert(0, script);
-        }
-
         private static readonly object accessLock = new object();
 
         public virtual string GenerateScripts(IUrlHelper urlHelper, ResourceLocation location, bool bundleScripts = false)
@@ -98,25 +71,21 @@ namespace Hood.Services
             if (!_scripts.Any())
                 return "";
 
-            var debugModel = _hostingEnvironment.IsDevelopment();
-
             if (bundleScripts)
             {
                 var partsToBundle = _scripts[location]
-                    .Where(x => !x.ExcludeFromBundle)
+                    .Where(x => x.Bundle)
                     .Distinct()
                     .ToArray();
                 var partsToDontBundle = _scripts[location]
-                    .Where(x => x.ExcludeFromBundle)
+                    .Where(x => !x.Bundle)
                     .Distinct()
                     .ToArray();
 
                 var result = new StringBuilder();
 
-                //parts to  bundle
                 if (partsToBundle.Any())
                 {
-                    //ensure \bundles directory exists
                     var bundlesDirectory = _hostingEnvironment.WebRootPath + "bundles";
                     if (!Directory.Exists(bundlesDirectory))
                         Directory.CreateDirectory(bundlesDirectory);
@@ -124,33 +93,40 @@ namespace Hood.Services
                     var bundle = new Bundle();
                     foreach (var item in partsToBundle)
                     {
-                        new PathString(urlHelper.Content(item.Src))
-                            .StartsWithSegments(urlHelper.ActionContext.HttpContext.Request.PathBase, out PathString path);
-                        var src = path.Value.TrimStart('/');
+                        if (item.Src.IsAbsoluteUrl())
+                        {
+                            partsToDontBundle.Append(item);
+                            continue;
+                        }
 
-                        //check whether this file exists, if not it should be stored into /wwwroot directory
+                        new PathString(urlHelper.Content(item.Src)).StartsWithSegments(urlHelper.ActionContext.HttpContext.Request.PathBase, out PathString path);
+                        
+                        var src = path.Value.TrimStart('/');
                         if (!File.Exists(_hostingEnvironment.WebRootPath + src))
                             src = $"wwwroot/{src}";
 
                         bundle.InputFiles.Add(src);
                     }
-                    //output file
-                    var outputFileName = GetBundleFileName(partsToBundle.Select(x => x.Src).ToArray());
-                    bundle.OutputFileName = "wwwroot/bundles/" + outputFileName + ".js";
-                    //save
-                    var configFilePath = _hostingEnvironment.ContentRootPath + "\\" + outputFileName + ".json";
-                    bundle.FileName = configFilePath;
+
+                    var bundleSha256 = GetBundleSha256(partsToBundle.Select(x => x.Src).ToArray());
+                    bundle.OutputFileName = "wwwroot/bundles/" + location.ToString().ToLower() + ".js";
+
+                    bundle.FileName = _hostingEnvironment.ContentRootPath + "\\" + bundleSha256 + ".json"; ;
                     lock (accessLock)
                     {
-                        var cacheKey = $"Hood.Bundling.ShouldRebuild.{outputFileName}";
+                        var cacheKey = $"Hood.Bundling.ShouldRebuild.{bundleSha256}";
                         bool shouldRebuild = !_cache.TryGetValue(cacheKey, out shouldRebuild);
                         if (shouldRebuild)
                         {
-                            _bundleFileProcessor.Process(configFilePath, new List<Bundle> { bundle });
+                            _bundleFileProcessor.Process(bundle.FileName, new List<Bundle> { bundle });
                             _cache.Add(cacheKey, false, new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = new TimeSpan(2, 0, 0) });
                         }
                     }
-                    result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + outputFileName + ".js"));
+
+                    if (_hostingEnvironment.IsDevelopment())
+                        result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + location.ToString().ToLower() + ".js"));
+                    else
+                        result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + location.ToString().ToLower() + ".min.js"));
                     result.Append(Environment.NewLine);
                 }
                 foreach (var item in partsToDontBundle)
@@ -173,12 +149,6 @@ namespace Hood.Services
             }
         }
 
-        /// <summary>
-        /// Generate all inline script parts
-        /// </summary>
-        /// <param name="urlHelper">URL Helper</param>
-        /// <param name="location">A location of the script element</param>
-        /// <returns>Generated string</returns>
         public virtual string GenerateInlineScripts(IUrlHelper urlHelper, ResourceLocation location)
         {
             if (!_inlineScripts.ContainsKey(location) || _inlineScripts[location] == null)
@@ -196,7 +166,7 @@ namespace Hood.Services
             return result.ToString();
         }
 
-        protected virtual string GetBundleFileName(string[] parts)
+        protected virtual string GetBundleSha256(string[] parts)
         {
             if (parts == null || parts.Length == 0)
                 throw new ArgumentException("parts");

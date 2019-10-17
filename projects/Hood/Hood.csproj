@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Hood</AssemblyName>
-    <Version>3.1.0.4</Version>
+    <Version>3.1.0.5</Version>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <Description>Hood Digital's own content management system, built entirely in ASP.NET Core 2.2.</Description>
     <Authors>Hood Digital;George Whysall;</Authors>
@@ -60,7 +60,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
-    <ProjectReference Include="..\Hood.UI.Account\Hood.UI.Account.csproj" />
+    <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap3\Hood.UI.Bootstrap3.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>

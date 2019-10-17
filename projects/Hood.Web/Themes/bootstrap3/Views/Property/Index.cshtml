@@ -32,7 +32,7 @@
     </div>
 </div>
 <section id="search-rental-box">
-    <partial name="_PropertySearch" />
+    <partial name="_Form_Property" />
 </section>
 <div id="clustered-map" class="google-map" style="height:300px;"
      data-lat="@Model.CentrePoint.Latitude"
@@ -120,7 +120,7 @@
             @foreach (var property in Model.List)
             {
                 <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
-                     <partial name="_PropertyCard" model="property" />
+                     <partial name="_Template_Property" model="property" />
                 </div>
             }
         </div>

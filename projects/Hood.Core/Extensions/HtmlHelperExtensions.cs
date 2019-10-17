@@ -27,33 +27,15 @@ namespace Hood.Extensions
             }
         }
 
-        public static void AddInlineScriptParts(this IHtmlHelper html, ResourceLocation location, string script)
+        public static void AddInlineScript(this IHtmlHelper html, ResourceLocation location, string script)
         {
             var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
-            pageBuilder.AddInlineScriptParts(location, script);
+            pageBuilder.AddInlineScript(location, script);
         }
-        public static void AppendInlineScriptParts(this IHtmlHelper html, ResourceLocation location, string script)
+        public static void AddScript(this IHtmlHelper html, ResourceLocation location, string src, bool bundle = false, bool isAsync = false, bool isDefer = false)
         {
             var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
-            pageBuilder.AppendInlineScriptParts(location, script);
-        }
-        public static void AddScriptParts(this IHtmlHelper html, string src, bool excludeFromBundle = false, bool isAsync = false, bool isDefer = false)
-        {
-            AddScriptParts(html, ResourceLocation.AfterScripts, src, excludeFromBundle, isAsync, isDefer);
-        }
-        public static void AddScriptParts(this IHtmlHelper html, ResourceLocation location, string src, bool excludeFromBundle = false, bool isAsync = false, bool isDefer = false)
-        {
-            var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
-            pageBuilder.AddScriptParts(location, src, excludeFromBundle, isAsync, isDefer);
-        }
-        public static void AppendScriptParts(this IHtmlHelper html, string src, bool excludeFromBundle = false, bool isAsync = false, bool isDefer = false)
-        {
-            AppendScriptParts(html, ResourceLocation.AfterScripts, src, excludeFromBundle, isAsync, isDefer);
-        }
-        public static void AppendScriptParts(this IHtmlHelper html, ResourceLocation location, string src, bool excludeFromBundle = false, bool isAsync = false, bool isDefer = false)
-        {
-            var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
-            pageBuilder.AppendScriptParts(location, src, excludeFromBundle, isAsync, isDefer);
+            pageBuilder.AddScript(location, src, bundle, isAsync, isDefer);
         }
         public static IHtmlContent RenderScripts(this IHtmlHelper html, IUrlHelper urlHelper, ResourceLocation location, bool bundleFiles = false)
         {

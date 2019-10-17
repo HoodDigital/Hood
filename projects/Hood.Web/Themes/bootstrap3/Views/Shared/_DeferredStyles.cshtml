@@ -1,10 +1,9 @@
 @inject IThemesService _themes
-<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" />
 <environment include="Development">
-    <link rel="stylesheet" href="~/css/preload.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@($"https://cdn.jsdelivr.net/npm/hoodcms@{Engine.Version}/css/preload.bs3.css")" />
 </environment>
 <environment exclude="Development">
-    <link rel="stylesheet" href="~/css/preload.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="@($"https://cdn.jsdelivr.net/npm/hoodcms@{Engine.Version}/css/preload.bs3.min.css")" />
 </environment>
 <!--[if lte IE 9]>
     <partial name="_Styles" />

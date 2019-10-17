@@ -11,6 +11,57 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Feed\1.jpg" />
+    <None Remove="Feed\2.jpg" />
+    <None Remove="Feed\3.jpg" />
+    <None Remove="Feed\4.jpg" />
+    <None Remove="Feed\5.jpg" />
+    <None Remove="Feed\6.jpg" />
+    <None Remove="Feed\7.jpg" />
+    <None Remove="Feed\8.jpg" />
+    <None Remove="Feed\9.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Feed\1.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\2.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\3.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\4.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\5.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\6.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\7.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\8.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Feed\9.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
   </ItemGroup>
   
@@ -20,6 +71,17 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Update="Themes\bootstrap4\Views\Shared\_Scripts.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Themes\bootstrap4\Views\Shared\_Styles.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
   
 </Project>
