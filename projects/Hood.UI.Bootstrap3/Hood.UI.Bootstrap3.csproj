@@ -35,9 +35,4 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="UI\Shared\_Nav_Manage.cshtml" />
-    <None Remove="UI\Shared\_Pagination.cshtml" />
-  </ItemGroup>
-
 </Project>
