@@ -4,6 +4,7 @@ package-lock.json
 /Feed
 /Temporary
 
+# Ignore Development Views & Migrations
 /Areas/Admin/Views
 /Views
 /Migrations
@@ -23,4 +24,5 @@ package-lock.json
 /wwwroot/themes/**/*.packaged.js
 /wwwroot/themes/**/lib
 
+# Ignore local settings files, apart from the base settings
 appsettings.*.json
