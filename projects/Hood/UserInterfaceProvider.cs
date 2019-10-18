@@ -1,6 +1,10 @@
 ﻿using Hood.Core;
+using Hood.Models;
+using Hood.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,39 +23,47 @@ namespace Hood
         public static string[] GetFiles(string basePath)
         {
             basePath = ReWritePath(basePath);
-            var provider = GetProvider(Engine.Services.Resolve<IConfiguration>());
-            var contents = provider.GetDirectoryContents("");
-            var dir = contents.Where(p => p.Name.StartsWith(basePath));
+            EmbeddedFileProvider provider = GetProvider(Engine.Services.Resolve<IConfiguration>());
+            IDirectoryContents contents = provider.GetDirectoryContents("");
+            System.Collections.Generic.IEnumerable<IFileInfo> dir = contents.Where(p => p.Name.StartsWith(basePath));
             return dir.Select(f => f.Name.Replace(basePath, "")).ToArray();
         }
 
         public static EmbeddedFileProvider GetProvider(IConfiguration config)
         {
-            Assembly assembly = typeof(Hood.UI.Bootstrap4.Component).Assembly;
-            string assemblyName = "Hood.UI.Bootstrap4";
-            switch (config["Hood:UI"])
+            // load the theme from the options.
+            string ui = config["Hood:UI"];
+
+            IThemesService themeService = Engine.Services.Resolve<IThemesService>();
+            Theme theme = themeService.Current;
+            if (theme != null)
+            {
+                ui = theme.UI;
+            }
+
+            switch (ui)
             {
                 case "Bootstrap3":
-                    assembly = typeof(Hood.UI.Bootstrap3.Component).Assembly;
-                    assemblyName = "Hood.UI.Bootstrap3";
-                    break;
+                    return new EmbeddedFileProvider(
+                      typeof(Hood.UI.Bootstrap3.Component).Assembly,
+                      "Hood.UI.Bootstrap3"
+                  );
+                case "Bootstrap4":
+                    return new EmbeddedFileProvider(
+                      typeof(Hood.UI.Bootstrap4.Component).Assembly,
+                      "Hood.UI.Bootstrap4"
+                  );
             }
-            // Get a reference to the assembly that contains the view components
-            // Create an EmbeddedFileProvider for that assembly
-            var embeddedFileProvider = new EmbeddedFileProvider(
-                assembly,
-                assemblyName
-            );
-            return embeddedFileProvider;
+            return null;
         }
 
         public static EmbeddedFileProvider GetAdminProvider()
         {
 
             // Get a reference to the assembly that contains the view components
-            var assembly = typeof(UserInterfaceProvider).Assembly;
+            Assembly assembly = typeof(UserInterfaceProvider).Assembly;
             // Create an EmbeddedFileProvider for that assembly
-            var embeddedFileProvider = new EmbeddedFileProvider(
+            EmbeddedFileProvider embeddedFileProvider = new EmbeddedFileProvider(
                 assembly,
                 "Hood"
             );
@@ -64,7 +76,7 @@ namespace Hood
             // Get a reference to the assembly that contains the view components
             Assembly assembly = typeof(Hood.UI.Core.Component).Assembly;
             // Create an EmbeddedFileProvider for that assembly
-            var embeddedFileProvider = new EmbeddedFileProvider(
+            EmbeddedFileProvider embeddedFileProvider = new EmbeddedFileProvider(
                 assembly,
                 "Hood.UI.Core"
             );
@@ -74,15 +86,22 @@ namespace Hood
         public static string ReWritePath(string basePath, bool isDirectory = false)
         {
             if (basePath.StartsWith("~"))
+            {
                 basePath = basePath.TrimStart('~');
+            }
+
             if (!basePath.EndsWith("/") && isDirectory)
+            {
                 basePath = basePath + "/";
+            }
 
             basePath = basePath.Replace("/", ".");
             basePath = basePath.Replace("-", "_");
 
             if (basePath.StartsWith("."))
+            {
                 basePath = basePath.TrimStart('.');
+            }
 
             return basePath;
         }
@@ -90,9 +109,9 @@ namespace Hood
         public static string ReadAllText(string path)
         {
             path = ReWritePath(path);
-            var provider = GetProvider(Engine.Services.Resolve<IConfiguration>());
-            var file = provider.GetFileInfo(path);
-            var contents = file.CreateReadStream();
+            EmbeddedFileProvider provider = GetProvider(Engine.Services.Resolve<IConfiguration>());
+            IFileInfo file = provider.GetFileInfo(path);
+            Stream contents = file.CreateReadStream();
             StreamReader s = new StreamReader(contents);
             return s.ReadToEnd();
         }

@@ -4,5 +4,6 @@
   "BaseColour": "#C33610",
   "Author": "Hood Digital",
   "Description": "Default Hood CMS site theme. Built on the Bootstrap 4 framework.",
-  "PreviewImage": "https://hood.blob.core.windows.net/hood/hood-bg.jpg"
+  "PreviewImage": "https://hood.blob.core.windows.net/hood/hood-bg.jpg",
+  "UI": "Bootstrap4"
 }

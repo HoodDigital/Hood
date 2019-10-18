@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Hood.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Hood.Areas.Admin.Controllers
 {
@@ -33,8 +34,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                var applicationLifetime = Engine.Services.Resolve<IApplicationLifetime>();
                 Engine.Settings.Set(name, "Hood.Settings.Theme");
-                return new Response(true, $"The theme, {name}, has been activated successfully.");
+                applicationLifetime.StopApplication();
+                return new Response(true, $"The theme, {name}, has been activated successfully, the app will now restart, this may take a few seconds.");
             }
             catch (Exception ex)
             {

@@ -1,4 +1,4 @@
-﻿div.hood-inline, div.hood-inline-list {
+﻿﻿div.hood-inline, div.hood-inline-list {
     position: relative;
 
     &.loading {
@@ -14,6 +14,19 @@
         bottom: 0;
         background: rgba(255, 255, 255, .5);
         z-index: 2;
+    }
+
+    &.loading:before {
+        display: block;
+        width: 100px;
+        height: 100px;
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-image: url(/hood/images/loading.svg);
+        z-index: 99;
     }
 
     &.loading i.fa.fa-refresh.fa-adjust-hue {

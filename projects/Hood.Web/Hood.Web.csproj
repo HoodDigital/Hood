@@ -11,15 +11,143 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Themes\base\Views\Account\AccessDenied.cshtml" />
+    <Content Remove="Themes\base\Views\Account\Code.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ConfirmEmail.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ConfirmRequired.cshtml" />
+    <Content Remove="Themes\base\Views\Account\Create.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ExternalLogin.cshtml" />
+    <Content Remove="Themes\base\Views\Account\Finish.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ForgotPassword.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <Content Remove="Themes\base\Views\Account\Lockout.cshtml" />
+    <Content Remove="Themes\base\Views\Account\Login.cshtml" />
+    <Content Remove="Themes\base\Views\Account\LoginWith2fa.cshtml" />
+    <Content Remove="Themes\base\Views\Account\LoginWithRecoveryCode.cshtml" />
+    <Content Remove="Themes\base\Views\Account\Register.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ResetPassword.cshtml" />
+    <Content Remove="Themes\base\Views\Account\ResetPasswordConfirmation.cshtml" />
+    <Content Remove="Themes\base\Views\Account\SendCode.cshtml" />
+    <Content Remove="Themes\base\Views\Account\SignedOut.cshtml" />
+    <Content Remove="Themes\base\Views\Account\VerifyCode.cshtml" />
+    <Content Remove="Themes\base\Views\Account\_ViewStart.cshtml" />
+    <Content Remove="Themes\base\Views\Install\Install.cshtml" />
+    <Content Remove="Themes\base\Views\Layouts\_Layout.cshtml" />
+    <Content Remove="Themes\base\Views\Layouts\_Layout_Account.cshtml" />
+    <Content Remove="Themes\base\Views\Layouts\_Layout_Basic.cshtml" />
+    <Content Remove="Themes\base\Views\Layouts\_Layout_Login.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\ChangePassword.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\Delete.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\Deleted.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\Disable2fa.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\EnableAuthenticator.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\ExternalLogins.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\GenerateRecoveryCodes.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\Index.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\ResetAuthenticator.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\SetPassword.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\TwoFactorAuthentication.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\_StatusMessage.cshtml" />
+    <Content Remove="Themes\base\Views\Manage\_ViewStart.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_AdminEditor.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_CookieConsentPartial.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_DeferredStyles.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_DeferredStylesLoader.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Email_Header.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Email_Layout.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Email_PreHeader.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_LoginSocials.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Metas_Base.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Nav_Manage.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Pagination.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Scripts_Bootstrap.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Scripts_Google.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Scripts_Hood.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Scripts_JQuery.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Scripts_Login.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Scripts_Validation.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Styles.cshtml" />
+    <Content Remove="Themes\base\Views\Shared\_Styles_Login.cshtml" />
+    <Content Remove="Themes\base\Views\_ViewImports.cshtml" />
+    <Content Remove="Themes\base\Views\_ViewStart.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
   </ItemGroup>
   
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="Themes\base\Views\Account\AccessDenied.cshtml" />
+    <None Include="Themes\base\Views\Account\Code.cshtml" />
+    <None Include="Themes\base\Views\Account\ConfirmEmail.cshtml" />
+    <None Include="Themes\base\Views\Account\ConfirmRequired.cshtml" />
+    <None Include="Themes\base\Views\Account\Create.cshtml" />
+    <None Include="Themes\base\Views\Account\ExternalLogin.cshtml" />
+    <None Include="Themes\base\Views\Account\Finish.cshtml" />
+    <None Include="Themes\base\Views\Account\ForgotPassword.cshtml" />
+    <None Include="Themes\base\Views\Account\ForgotPasswordConfirmation.cshtml" />
+    <None Include="Themes\base\Views\Account\Lockout.cshtml" />
+    <None Include="Themes\base\Views\Account\Login.cshtml" />
+    <None Include="Themes\base\Views\Account\LoginWith2fa.cshtml" />
+    <None Include="Themes\base\Views\Account\LoginWithRecoveryCode.cshtml" />
+    <None Include="Themes\base\Views\Account\Register.cshtml" />
+    <None Include="Themes\base\Views\Account\ResetPassword.cshtml" />
+    <None Include="Themes\base\Views\Account\ResetPasswordConfirmation.cshtml" />
+    <None Include="Themes\base\Views\Account\SendCode.cshtml" />
+    <None Include="Themes\base\Views\Account\SignedOut.cshtml" />
+    <None Include="Themes\base\Views\Account\VerifyCode.cshtml" />
+    <None Include="Themes\base\Views\Account\_ViewStart.cshtml" />
+    <None Include="Themes\base\Views\Install\Install.cshtml" />
+    <None Include="Themes\base\Views\Layouts\_Layout.cshtml" />
+    <None Include="Themes\base\Views\Layouts\_Layout_Account.cshtml" />
+    <None Include="Themes\base\Views\Layouts\_Layout_Basic.cshtml" />
+    <None Include="Themes\base\Views\Layouts\_Layout_Login.cshtml" />
+    <None Include="Themes\base\Views\Manage\ChangePassword.cshtml" />
+    <None Include="Themes\base\Views\Manage\Delete.cshtml" />
+    <None Include="Themes\base\Views\Manage\Deleted.cshtml" />
+    <None Include="Themes\base\Views\Manage\Disable2fa.cshtml" />
+    <None Include="Themes\base\Views\Manage\EnableAuthenticator.cshtml" />
+    <None Include="Themes\base\Views\Manage\ExternalLogins.cshtml" />
+    <None Include="Themes\base\Views\Manage\GenerateRecoveryCodes.cshtml" />
+    <None Include="Themes\base\Views\Manage\Index.cshtml" />
+    <None Include="Themes\base\Views\Manage\ResetAuthenticator.cshtml" />
+    <None Include="Themes\base\Views\Manage\SetPassword.cshtml" />
+    <None Include="Themes\base\Views\Manage\TwoFactorAuthentication.cshtml" />
+    <None Include="Themes\base\Views\Manage\_StatusMessage.cshtml" />
+    <None Include="Themes\base\Views\Manage\_ViewStart.cshtml" />
+    <None Include="Themes\base\Views\Shared\_AdminEditor.cshtml" />
+    <None Include="Themes\base\Views\Shared\_CookieConsentPartial.cshtml" />
+    <None Include="Themes\base\Views\Shared\_DeferredStyles.cshtml" />
+    <None Include="Themes\base\Views\Shared\_DeferredStylesLoader.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Email_Header.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Email_Layout.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Email_PreHeader.cshtml" />
+    <None Include="Themes\base\Views\Shared\_LoginSocials.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Metas_Base.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Nav_Manage.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Pagination.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Scripts_Bootstrap.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Scripts_Google.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Scripts_Hood.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Scripts_JQuery.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Scripts_Login.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Scripts_Validation.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Styles.cshtml" />
+    <None Include="Themes\base\Views\Shared\_Styles_Login.cshtml" />
+    <None Include="Themes\base\Views\_ViewImports.cshtml" />
+    <None Include="Themes\base\Views\_ViewStart.cshtml" />
+  </ItemGroup>
     
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Folder Include="Themes\default\" />
   </ItemGroup>
   
 </Project>

@@ -1,4 +1,6 @@
-﻿if (!$.hood)
+﻿import { setTimeout } from "core-js";
+
+if (!$.hood)
     $.hood = {}
 $.hood.Themes = {
     Init: function () {
@@ -21,7 +23,7 @@ $.hood.Themes = {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
-                    $.hood.Themes.Reload();
+                    setTimeout(function () { $.hood.Themes.Reload(); }, 2000);
                 });
             }
         };

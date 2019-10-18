@@ -10,5 +10,7 @@ namespace Hood.Services
 
         bool SetTheme(string themeName);
         bool IsDefault { get; }
+
+        Theme Get(string theme);
     }
 }

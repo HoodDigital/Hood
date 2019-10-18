@@ -35,8 +35,11 @@ namespace Hood.Services
             // Add Local Area front end views.
             temp.AddRange(GetLocations("/Views"));
 
-            // Finally Hood Packaged  front end views.
+            // Hood Packaged UI front end views.
             temp.AddRange(GetLocations("/UI"));
+
+            // Finally Hood Core front end views.
+            temp.AddRange(GetLocations("/BaseUI"));
 
             locs = temp.AsEnumerable();
             context.Values["Hood.Settings.Theme"] = theme;

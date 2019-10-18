@@ -26,5 +26,7 @@ namespace Hood.Web
         {
             app.UseHood(env, config);
         }
+
+
     }
 }

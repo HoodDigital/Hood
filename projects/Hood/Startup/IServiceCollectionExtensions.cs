@@ -117,75 +117,6 @@ namespace Hood.Startup
             return serviceProvider;
         }
 
-        private static readonly IDictionary<UIFramework, string> _assemblyMap =
-            new Dictionary<UIFramework, string>()
-            {
-                [UIFramework.Bootstrap3] = "Hood.UI.Bootstrap3",
-                [UIFramework.Bootstrap4] = "Hood.UI.Bootstrap4",
-            };
-        public static IServiceCollection AddHoodUI(this IServiceCollection services, UIFramework framework)
-        {
-            var mvcBuilder = services
-                .AddMvcCore()
-                .ConfigureApplicationPartManager(partManager =>
-                {
-                    // Get a reference to the assembly that contains the view components
-                    var thisAssembly = typeof(UserInterfaceProvider).Assembly;
-
-                    var relatedAssemblies = RelatedAssemblyAttribute.GetRelatedAssemblies(thisAssembly, throwOnError: true);
-                    var relatedParts = relatedAssemblies.ToDictionary(
-                        ra => ra,
-                        CompiledRazorAssemblyApplicationPartFactory.GetDefaultApplicationParts);
-
-                    var selectedFrameworkAssembly = _assemblyMap[framework];
-
-                    foreach (var kvp in relatedParts)
-                    {
-                        var assemblyName = kvp.Key.GetName().Name;
-                        if (!string.Equals(assemblyName, selectedFrameworkAssembly, StringComparison.OrdinalIgnoreCase))
-                        {
-                            RemoveParts(partManager, kvp.Value);
-                        }
-                        else
-                        {
-                            AddParts(partManager, kvp.Value);
-                        }
-                    }
-
-                    void RemoveParts(
-                                ApplicationPartManager manager,
-                                IEnumerable<ApplicationPart> partsToRemove)
-                    {
-                        for (var i = 0; i < manager.ApplicationParts.Count; i++)
-                        {
-                            var part = manager.ApplicationParts[i];
-                            if (partsToRemove.Any(p => string.Equals(
-                                    p.Name,
-                                    part.Name,
-                                    StringComparison.OrdinalIgnoreCase)))
-                            {
-                                manager.ApplicationParts.Remove(part);
-                            }
-                        }
-                    }
-
-                    void AddParts(
-                        ApplicationPartManager manager,
-                        IEnumerable<ApplicationPart> partsToAdd)
-                    {
-                        foreach (var part in partsToAdd)
-                        {
-                            if (!manager.ApplicationParts.Any(p => p.GetType() == part.GetType() &&
-                                string.Equals(p.Name, part.Name, StringComparison.OrdinalIgnoreCase)))
-                            {
-                                manager.ApplicationParts.Add(part);
-                            }
-                        }
-                    }
-                });
-            return services;
-        }
-
         public static IServiceCollection ConfigureHoodDatabase<TContext>(this IServiceCollection services, IConfiguration config)
             where TContext : HoodDbContext
         {
@@ -391,7 +322,9 @@ namespace Hood.Startup
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(IServiceCollectionExtensions).Assembly, "ComponentLib"));
                 options.FileProviders.Add(UserInterfaceProvider.GetAdminProvider());
                 options.FileProviders.Add(UserInterfaceProvider.GetAccountProvider());
-                options.FileProviders.Add(UserInterfaceProvider.GetProvider(config));
+                var defaultUI = UserInterfaceProvider.GetProvider(config);
+                if (defaultUI != null)
+                    options.FileProviders.Add(defaultUI);
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
             return services;

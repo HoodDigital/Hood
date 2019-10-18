@@ -25,8 +25,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
-    <EmbeddedResource Include="UI\**\*.cshtml" />
-    <EmbeddedResource Include="UI\**\*.json" />
+    <EmbeddedResource Include="BaseUI\**\*.cshtml" />
+    <EmbeddedResource Include="BaseUI\**\*.json" />
   </ItemGroup>
   
   <ItemGroup>

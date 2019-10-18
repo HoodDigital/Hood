@@ -109,6 +109,11 @@ namespace Hood.Services
             }
         }
 
+        public Theme Get(string themeName)
+        {
+            return Themes.SingleOrDefault(t => t.Name == themeName);
+        }
+
         public List<Theme> Themes
         {
             get
