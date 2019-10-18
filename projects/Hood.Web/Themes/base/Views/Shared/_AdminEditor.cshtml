@@ -1,66 +1,39 @@
 @if (User.IsEditorOrBetter())
 {
+    <link href="~/hood/css/button.bs4.min.css" rel="stylesheet" />
     <div class="hood-admin-editor dropup">
-        <button type="button" id="dropdownMenu2" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <img src="~/hood/images/site-icon.png" />
+        <button type="button" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <img src="~/hood/images/hood-square.png" />
         </button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-            <li class="active">
-                <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="admin">
-                    <i class="fa fa-desktop m-r-xs"></i>HoodCMS Dashboard
-                </a>
-            </li>
-            <li class="divider"></li>
+        <div class="dropdown-menu">
+            <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="dropdown-item active">
+                <i class="fa fa-desktop m-r-xs"></i>HoodCMS Dashboard
+            </a>
+            <div class="dropdown-divider"></div>
+            <div class="divider"></div>
             @if (ViewData["EditUrl"] != null)
             {
-                <li>
-                    <a href="@ViewData["EditUrl"]" class="admin">
-                        <i class="fa fa-edit m-r-xs"></i>Edit...
-                    </a>
-                </li>
-            }
-            @if (ViewData["DesignerUrl"] != null)
-            {
-                <li>
-                    <a href="@ViewData["DesignerUrl"]" class="admin">
-                        <i class="fa fa-paint-brush m-r-xs"></i>Designer
-                    </a>
-                </li>
-            }
-            @if (ViewData["ExitDesignerUrl"] != null)
-            {
-                <li>
-                    <a href="@ViewData["ExitDesignerUrl"]" class="admin">
-                        <i class="fa fa-desktop m-r-xs"></i>Back to Preview
-                    </a>
-                </li>
-            }
-            <li>
-                <a asp-action="Index" asp-controller="Manage" class="admin">
-                    <i class="fa fa-cogs"></i>Manage Account
+                <a href="@ViewData["EditUrl"]" class="dropdown-item">
+                    <i class="fa fa-edit m-r-xs"></i>Edit...
                 </a>
-            </li>
-            <li>
-                <a asp-action="ChangePassword" asp-controller="Manage" class="admin">
-                    <i class="fa fa-lock"></i>Change Password
-                </a>
-            </li>
-            <li class="divider"></li>
+            }
+            <a asp-action="Index" asp-controller="Manage" class="dropdown-item">
+                <i class="fa fa-cogs"></i>Manage Account
+            </a>
+            <a asp-action="ChangePassword" asp-controller="Manage" class="dropdown-item">
+                <i class="fa fa-user-lock"></i>Change Password
+            </a>
             @if (User.IsImpersonating())
             {
-                <li>
-                    <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin" class="admin">
-                        <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
-                    </a>
-                </li>
-                <li class="divider"></li>
-            }
-            <li>
-                <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="adminLogoutForm" class="navbar-right"></form>
-                <a href="javascript:document.getElementById('adminLogoutForm').submit()">
-                    <i class="fa fa-sign-out"></i>Log out
+                <a asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin" class="dropdown-item">
+                    <i class="fa fa-desktop m-r-xs"></i>Stop Impersonating
                 </a>
-            </li>
-        </ul>
+            }
+            <div class="dropdown-divider"></div>
+            <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="adminLogoutForm"></form>
+            <a class="dropdown-item" href="javascript:document.getElementById('adminLogoutForm').submit()">
+                <i class="fa fa-sign-out-alt"></i>Log out
+            </a>
+        </div>
     </div>
 }

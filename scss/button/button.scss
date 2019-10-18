@@ -1,0 +1,84 @@
+.hood-admin-editor.dropup {
+    position: fixed;
+    bottom: 15px;
+    left: 25px;
+    z-index: 99998;
+
+    button.dropdown-toggle {
+        height: 65px;
+        width: 65px;
+        text-indent: 10000px;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 50%;
+        border: 1px solid #dcd8d8;
+        background: #f0f0f0;
+        background: -moz-radial-gradient(center, ellipse cover, #f0f0f0 13%, #dcd8d8 100%);
+        background: -webkit-radial-gradient(center, ellipse cover, #f0f0f0 13%,#dcd8d8 100%);
+        background: radial-gradient(ellipse at center, #f0f0f0 13%,#dcd8d8 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f0f0', endColorstr='#dcd8d8',GradientType=1 );
+        text-align: center;
+        -webkit-box-shadow: 2px 3px 25px rgba(0,0,0,0.2);
+        box-shadow: 2px 3px 25px rgba(0,0,0,0.2);
+
+        &::after {
+            display: none;
+        }
+
+        img {
+            width: 35px;
+            height: 35px;
+            display: block;
+            margin: auto;
+        }
+    }
+
+    .dropdown-menu {
+        margin-bottom: 10px;
+
+        a {
+            padding: 8px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+            font-size: 13px;
+
+            &:hover {
+                background-color: #ececec;
+            }
+
+            &.active {
+                color: white;
+                text-decoration: none;
+                background-color: #ababab;
+            }
+
+            i {
+                width: 10px;
+                text-align: center;
+                margin-right: 25px;
+            }
+        }
+
+        &::before {
+            position: absolute;
+            bottom: -7px;
+            left: 24px;
+            display: inline-block;
+            border-right: 7px solid transparent;
+            border-top: 7px solid #CCC;
+            border-left: 7px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.2);
+            content: '';
+        }
+
+        &::after {
+            position: absolute;
+            bottom: -6px;
+            left: 25px;
+            display: inline-block;
+            border-right: 6px solid transparent;
+            border-top: 6px solid white;
+            border-left: 6px solid transparent;
+            content: '';
+        }
+    }
+}

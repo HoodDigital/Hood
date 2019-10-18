@@ -136,6 +136,33 @@ gulp.task('hood:theme:js:bootstrap4', function () {
         .pipe(gulp.dest(output.js));
 });
 
+gulp.task('hood:button:bootstrap4', function () {
+    return gulp.src([
+        './wwwroot/hood/scss/button/button.scss'
+    ])
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
+        .pipe(sourcemaps.write())
+        .pipe(rename({ suffix: '.bs4' }))
+        .pipe(gulp.dest('./wwwroot/hood/css/'));
+});
+gulp.task('hood:button:bootstrap3', function () {
+    lss = less({ relativeUrls: true });
+    lss.on('error', function (e) {
+        console.log(e);
+        lss.end();
+    });
+
+    return gulp.src([
+        './wwwroot/hood/less/button/button.less'
+    ])
+        .pipe(sourcemaps.init())
+        .pipe(lss)
+        .pipe(sourcemaps.write())
+        .pipe(rename({ suffix: '.bs3' }))
+        .pipe(gulp.dest('./wwwroot/hood/css/'));
+});
+
 
 gulp.task('hood:less:copy', function () {
     return gulp.src(hood.less + "**/*.less")
@@ -320,9 +347,11 @@ gulp.task('hood',
             'hood:images'
         ),
         gulp.parallel(
+            'hood:button:bootstrap3',
+            'hood:button:bootstrap4',
             'hood:theme:js:bootstrap3',
-            'hood:theme:bootstrap3',
             'hood:theme:js:bootstrap4',
+            'hood:theme:bootstrap3',
             'hood:theme:bootstrap4'
         ),
         gulp.parallel(

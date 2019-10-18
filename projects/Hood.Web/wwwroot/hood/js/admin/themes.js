@@ -1,7 +1,5 @@
-﻿import { setTimeout } from "core-js";
-
-if (!$.hood)
-    $.hood = {}
+﻿if (!$.hood)
+    $.hood = {};
 $.hood.Themes = {
     Init: function () {
         $('body').on('click', '.activate-theme', $.hood.Themes.Activate);

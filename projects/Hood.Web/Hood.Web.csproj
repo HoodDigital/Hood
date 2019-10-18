@@ -70,6 +70,7 @@
     <Content Remove="Themes\base\Views\Shared\_Styles_Login.cshtml" />
     <Content Remove="Themes\base\Views\_ViewImports.cshtml" />
     <Content Remove="Themes\base\Views\_ViewStart.cshtml" />
+    <Content Remove="Themes\bootstrap3\Views\Shared\_AdminEditor.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -140,6 +141,7 @@
     <None Include="Themes\base\Views\Shared\_Styles_Login.cshtml" />
     <None Include="Themes\base\Views\_ViewImports.cshtml" />
     <None Include="Themes\base\Views\_ViewStart.cshtml" />
+    <None Include="Themes\bootstrap3\Views\Shared\_AdminEditor.cshtml" />
   </ItemGroup>
     
   <ItemGroup>

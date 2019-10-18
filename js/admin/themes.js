@@ -1,7 +1,5 @@
 "use strict";
 
-var _coreJs = require("core-js");
-
 if (!$.hood) $.hood = {};
 $.hood.Themes = {
   Init: function Init() {
@@ -21,7 +19,7 @@ $.hood.Themes = {
       if (isConfirm) {
         $.post($tag.attr('href'), function (data) {
           $.hood.Helpers.ProcessResponse(data);
-          (0, _coreJs.setTimeout)(function () {
+          setTimeout(function () {
             $.hood.Themes.Reload();
           }, 2000);
         });
