@@ -35,4 +35,8 @@
     <None Remove="node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="UI\Layouts\_Layout.cshtml" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,87 @@
+@model Address
+@inject IContentRepository _data
+@{
+    var integrations = Engine.Settings.Integrations;
+    Layout = null;
+}
+<div class="modal fade modal-right" id="address-edit-menu" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add a new Address</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="address-form" asp-action="Create">
+                    <div class="form-horizontal">
+                        <input type="hidden" asp-for="UserId" value="@Model.UserId" />
+                        <input type="hidden" asp-for="Latitude" />
+                        <input type="hidden" asp-for="Longitude" />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        @*@if (integrations.EnableGoogleGeocoding && integrations.GoogleMapsApiKey.IsSet())
+                            {
+                                <div class="form-group">
+                                    <div class="col-xs-12">
+                                        <input id="address-autocomplete" onfocus="$.hood.Google.Addresses.GeoLocate()" type="text" class="form-control" value="" placeholder="Try typing in an address..." />
+                                    </div>
+                                </div>
+                            }*@
+                        <div class="form-group">
+                            <label asp-for="QuickName"></label>
+                            <input asp-for="QuickName" class="form-control" />
+                            <span asp-validation-for="QuickName" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Number"></label>
+                            <input asp-for="Number" class="form-control" />
+                            <span asp-validation-for="Number" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Address1"></label>
+                            <input asp-for="Address1" class="form-control" />
+                            <span asp-validation-for="Address1" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Address2"></label>
+                            <input asp-for="Address2" class="form-control" />
+                            <span asp-validation-for="Address2" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="City"></label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="County"></label>
+                            <input asp-for="County" class="form-control" />
+                            <span asp-validation-for="County" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Country"></label>
+                            <select class="form-control" asp-for="Country">
+                                <option value="">-- Choose a country --</option>
+                                @foreach (var itm in Countries.All)
+                                {
+                                    <option value="@itm.Name">@itm.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Country" class="text-danger" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Postcode"></label>
+                            <input asp-for="Postcode" class="form-control" />
+                            <span asp-validation-for="Postcode" class="text-danger" />
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="address-form-submit">Add Address</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

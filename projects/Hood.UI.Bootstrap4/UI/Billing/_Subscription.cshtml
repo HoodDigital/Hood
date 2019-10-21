@@ -1,0 +1,16 @@
+@model UserSubscription
+<div class="panel panel-default accordion-section m-b-xs">
+    <div class="panel-heading accordion-title" role="tab" id="@string.Format("#heading-us-{0}", Model.Id)">
+        <a data-toggle="collapse" href="@string.Format("#collapse-subscription-{0}", Model.Id)">
+            <span class="pull-right">
+                @Model.StatusBadge
+            </span>
+            Subscription - @Model.Subscription.Name
+        </a>
+    </div>
+    <div id="@string.Format("collapse-subscription-{0}", Model.Id)" class="panel-collapse collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-us-{0}", Model.Id)">
+        <div class="panel-body">
+            <partial name="_Subscriptions_CurrentInfo" model="@new UserSubscriptionInfo(Model)" />
+        </div>
+    </div>
+</div>

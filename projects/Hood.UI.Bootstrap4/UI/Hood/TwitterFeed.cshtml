@@ -1,0 +1,34 @@
+@inject IContentRepository _content
+@{
+    Layout = null;
+    IntegrationSettings _integrations = Engine.Settings.Integrations;
+    var tweets = (await _content.GetTweets(_integrations.TwitterId, 6)).Select(t => new TwitterStatus(t));
+}
+<div class="card-columns">
+    @foreach (var tweet in tweets)
+    {
+        <div class="card">
+            <fixedImage src="@tweet.AvatarUrl" style="height:250px;" class="card-img-top"></fixedImage>
+            <div class="card-body">
+                <p>@Html.Raw(tweet.Html)</p>
+                <p class="text-muted mb-0">
+                    <small><i class="fa fa-calendar mr-2"></i>@tweet.CreatedAt.ToShortDateString() via Twitter</small>
+                </p>
+            </div>
+            <div class="card-footer p-1">
+                <div class="d-flex bd-highlight align-items-center">
+                    <div class="p-2 flex-grow-1">
+                        <a href="https://twitter.com/intent/retweet?tweet_id=@tweet.StatusId" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-retweet"></i></a>
+                        <a href="https://twitter.com/intent/tweet?in_reply_to=@tweet.StatusId" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-reply"></i></a>
+                        <a href="https://twitter.com/intent/favorite?tweet_id=@tweet.StatusId" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-star"></i></a>
+                    </div>
+                    <div class="p-2 text-right">
+                        <a href="https://twitter.com/@tweet.Handle" target="_blank" class="twitter-user pull-right">
+                            <img src="@tweet.ProfileImageUrl" alt="" title="@tweet.DisplayName" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

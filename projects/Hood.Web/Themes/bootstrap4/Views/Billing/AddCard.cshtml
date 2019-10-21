@@ -1,0 +1,48 @@
+@{
+    Layout = null;
+    BillingSettings settings = Engine.Settings.Billing;
+}
+<div class="modal fade modal-right" id="add-card-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add card to your wallet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <alert type="Info">
+                    Add a card that you can use for upcoming subscription payments. This card will be saved to your account so you can use it to pay for subscriptions or other items on the site.
+                </alert>
+                <alert type="Warning">Note: Card details are NOT stored on our site, they are saved by our payment providers Stripe. You can view their privacy policy and security information on their website here: <a href="https://stripe.com/">https://stripe.com/</a></alert>
+                <form id="card-add-form" data-stripe="@(settings.EnableStripeTestMode ? settings.StripeTestPublicKey : settings.StripeLivePublicKey)">
+                    <div class="form-group">
+                        <label class="control-label">Cardholder's Name</label>
+                        <input id="card-add-cardholdername" name="CardholderName" type="text" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Card details</label>
+                        <div id="card-add-element" class="form-control"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input id="card-add-consent" name="card-add-consent" class="custom-control-input"/> 
+                            <label for="card-add-consent" class="custom-control-label">Check here to agree to the @Engine.Settings.Basic.CompanyName customer agreement.</label>
+                        </div>
+                        <small>I authorise @Engine.Settings.Basic.CompanyName to send instructions to the financial institution that issued my card to take payments from my card account in accordance with the terms of my agreement with you. [Include terms link here]</small>
+                    </div>
+                    <p class="text-danger" id="card-add-errors"></p>
+                    <p class="text-success" id="card-add-success"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                <button id="card-add-submit" data-secret='@ViewData["ClientSecret"]' data-url="@Url.Action("AddCard")" class="btn btn-success">
+                    Add card to wallet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -3,7 +3,7 @@
     var _integrations = Engine.Settings.Integrations;
     var _seoSettings = Engine.Settings.Seo;
     string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-    string title = _basicSettings.CompanyName.IsSet() ? "Home - " + _basicSettings.CompanyName : _basicSettings.SiteTitle.IsSet() ? "Home - " + _basicSettings.SiteTitle : "Home";
+    string title = "Home - " +  _basicSettings.FullTitle;
     if (_seoSettings.Home != null)
     {
         description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
@@ -27,7 +27,6 @@
 @if (_integrations.EnableTwitter)
 {
     <div class="bg-color-white">
-        <h3>Latest from our news & twitter</h3>
         <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")"></div>
     </div>
 }

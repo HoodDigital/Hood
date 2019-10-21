@@ -37,7 +37,7 @@ namespace Hood.Extensions
             var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
             pageBuilder.AddScript(location, src, bundle, isAsync, isDefer);
         }
-        public static IHtmlContent RenderScripts(this IHtmlHelper html, IUrlHelper urlHelper, ResourceLocation location, bool bundleFiles = false)
+        public static IHtmlContent RenderScripts(this IHtmlHelper html, IUrlHelper urlHelper, ResourceLocation location, bool bundleFiles = true)
         {
             var pageBuilder = Engine.Services.Resolve<IPageBuilder>();
             return new HtmlString(pageBuilder.GenerateScripts(urlHelper, location, bundleFiles));

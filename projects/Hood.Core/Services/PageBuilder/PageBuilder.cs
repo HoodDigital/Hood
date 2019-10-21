@@ -63,7 +63,7 @@ namespace Hood.Services
         }
         private static readonly object accessLock = new object();
 
-        public virtual string GenerateScripts(IUrlHelper urlHelper, ResourceLocation location, bool bundleScripts = false)
+        public virtual string GenerateScripts(IUrlHelper urlHelper, ResourceLocation location, bool bundleScripts = true)
         {
             if (!_scripts.ContainsKey(location) || _scripts[location] == null)
                 return "";
@@ -71,7 +71,7 @@ namespace Hood.Services
             if (!_scripts.Any())
                 return "";
 
-            if (bundleScripts)
+            if (bundleScripts && !_hostingEnvironment.IsDevelopment())
             {
                 var partsToBundle = _scripts[location]
                     .Where(x => x.Bundle)
@@ -123,10 +123,7 @@ namespace Hood.Services
                         }
                     }
 
-                    if (_hostingEnvironment.IsDevelopment())
-                        result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + location.ToString().ToLower() + ".js"));
-                    else
-                        result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + location.ToString().ToLower() + ".min.js"));
+                    result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + location.ToString().ToLower() + ".min.js"));
                     result.Append(Environment.NewLine);
                 }
                 foreach (var item in partsToDontBundle)

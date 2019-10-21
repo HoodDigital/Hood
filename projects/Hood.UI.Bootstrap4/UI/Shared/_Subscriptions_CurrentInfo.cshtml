@@ -1,0 +1,164 @@
+@model UserSubscriptionInfo
+<div class="current-subscription">
+    <h4>
+        Your current subscription:
+        <strong>
+            <a asp-controller="Subscriptions" asp-action="Welcome" asp-route-id="@Model.Id">
+                @Model.Name
+            </a>
+        </strong>
+    </h4>
+    <hr />
+    @switch (Model.Status)
+    {
+        case Stripe.SubscriptionStatuses.Active:
+            if (Model.CancelAtPeriodEnd)
+            {
+                <alert type="Success">
+                    Your subscription is active, but will cancel on @Model.CurrentPeriodEnd.Value.ToDisplay()
+                </alert>
+            }
+            else
+            {
+                <alert type="Success">
+                    Your subscription is active and ready!
+                </alert>
+            }
+
+            break;
+        case Stripe.SubscriptionStatuses.Trialing:
+            if (Model.CancelAtPeriodEnd)
+            {
+                <alert type="Info">
+                    Your subscription is trialing, but will cancel on @Model.CurrentPeriodEnd.Value.ToDisplay()
+                </alert>
+            }
+            else
+            {
+                <alert type="Info">
+                    Your subscription is currently trialing! Your trial will end @Model.CurrentPeriodEnd.Value.ToDisplay()
+                </alert>
+            }
+            break;
+        case Stripe.SubscriptionStatuses.Unpaid:
+        case Stripe.SubscriptionStatuses.Incomplete:
+        case Stripe.SubscriptionStatuses.PastDue:
+            <alert type="Danger" size="Medium">
+                This subscription is currently unpaid, and therefore not fully activated. In order to fully activate your new subscription, you will need to authenticate your card, please check your email inbox, you have been sent instructions to complete this.
+            </alert>
+            break;
+        case Stripe.SubscriptionStatuses.Canceled:
+            <alert type="Danger">
+                This subscription has been canceled.
+            </alert>
+            break;
+        case Stripe.SubscriptionStatuses.IncompleteExpired:
+            <alert type="Danger">
+                Unfortunately you did not authenticate your card in time for this subscription to be created and your order was canceled. You must create a new order in order to activate a subscription.
+            </alert>
+            break;
+        default:
+            <alert type="Danger">
+                Subscription not active: @Model.Status
+            </alert>
+            break;
+    }
+
+    @if (Model.StripeSubscription?.LatestInvoice != null)
+    {
+        var latest = Model.StripeSubscription.LatestInvoice;
+        if (latest.PaymentIntent != null)
+        {
+            switch (latest.PaymentIntent.Status)
+            {
+                case "succeeded":
+                    <alert>
+                        Your card has been charged @latest.PaymentIntent.Amount.Value.ToCurrencyString() on @latest.PaymentIntent.Created.Value.ToDisplay()
+                    </alert>
+                    break;
+                case "processing":
+                    <alert type="Info">
+                        Your card payment is currently processing. Refresh this page to see if your transaction has completed.
+                    </alert>
+                    break;
+                case "canceled":
+                    <alert type="Danger">
+                        Your payment has been cancelled.
+                    </alert>
+                    break;
+                case "requires_payment_method":
+                    <alert type="Warning">
+                        <p>Your payment was not completed successfully, your stored payment method failed.</p>
+                        <p><a class="btn btn-warning" target="_blank" href="@Model.StripeSubscription.LatestInvoice.HostedInvoiceUrl">Complete the payment</a></p>
+                        <p>You will also have received an email with further instructions to complete your payment.</p>
+                    </alert>
+                    break;
+                case "requires_action":
+                    <alert type="Warning">
+                        <p>Your payment was not completed successfully, you will need to authenticate the transaction further.</p>
+                        <p><a class="btn btn-warning" target="_blank" href="@Model.StripeSubscription.LatestInvoice.HostedInvoiceUrl">Complete the payment</a></p>
+                        <p>You will also have received an email with further instructions to complete your payment.</p>
+                    </alert>
+                    break;
+            }
+        }
+    }
+    else
+    {
+        <p>No charge has been attempted.</p>
+    }
+
+    <p>
+        @if (!Model.CancelAtPeriodEnd)
+        {
+            <span class="text-success">Next Charge:</span>
+            <span class="text-success">@Model.Amount.ToCurrencyFormat() on @Model.CurrentPeriodEnd.Value.ToDisplay()</span>
+        }
+        else
+        {
+            <span class="text-danger">Cancelling on @Model.CurrentPeriodEnd.Value.ToDisplay()</span>
+        }
+    </p>
+    <p>
+        @if (!Context.Request.Path.ToString().Contains("account/subscriptions/change"))
+        {
+            <a class="btn btn-sm btn-primary" asp-controller="Subscriptions" asp-action="Select">Change Package</a>
+        }
+        @if (Model != null)
+        {
+            @if (Model.Status != Stripe.SubscriptionStatuses.Canceled &&
+           Model.Status != Stripe.SubscriptionStatuses.Incomplete &&
+           Model.Status != Stripe.SubscriptionStatuses.IncompleteExpired)
+            {
+                if (Model.CancelAtPeriodEnd)
+                {
+                    <a class="btn btn-sm btn-success confirm"
+                       data-warning="Are you sure you want to reactiveate your subscription? You will be charged again on your next payment date as usual, and no extra charges will be made. Your account will remain active."
+                       asp-action="Reactivate"
+                       asp-controller="Subscriptions"
+                       asp-route-id="@Model.Id">
+                        Re-Activate
+                    </a>
+                    @*<a class="btn btn-sm btn-danger confirm"
+                            data-warning="Are you sure you want to cancel your susbcription? This cannot be undone, however you can buy a new subscription at any time."
+                            asp-action="Remove"
+                            asp-controller="Subscriptions"
+                            asp-route-id="@Model.Id">
+                            Fully Cancel (Refund remaining charges)
+                        </a>*@
+                }
+                else
+                {
+                    <a class="btn btn-sm btn-danger confirm"
+                       data-warning="Are you sure you want to cancel this subscription? Your account will remain active until your current period ends, but after that you will be restricted to the free package."
+                       asp-action="Cancel"
+                       asp-controller="Subscriptions"
+                       asp-route-id="@Model.Id">
+                        Cancel Subscription
+                    </a>
+                }
+            }
+        }
+        <a class="btn btn-sm btn-default" asp-controller="Billing" asp-action="Index">Billing Information</a>
+    </p>
+</div>
