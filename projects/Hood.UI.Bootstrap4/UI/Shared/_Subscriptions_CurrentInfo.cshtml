@@ -1,14 +1,5 @@
 @model UserSubscriptionInfo
 <div class="current-subscription">
-    <h4>
-        Your current subscription:
-        <strong>
-            <a asp-controller="Subscriptions" asp-action="Welcome" asp-route-id="@Model.Id">
-                @Model.Name
-            </a>
-        </strong>
-    </h4>
-    <hr />
     @switch (Model.Status)
     {
         case Stripe.SubscriptionStatuses.Active:
@@ -105,21 +96,19 @@
     }
     else
     {
-        <p>No charge has been attempted.</p>
+        <alert type="Info">No charge has been attempted.</alert>
     }
 
-    <p>
-        @if (!Model.CancelAtPeriodEnd)
-        {
-            <span class="text-success">Next Charge:</span>
-            <span class="text-success">@Model.Amount.ToCurrencyFormat() on @Model.CurrentPeriodEnd.Value.ToDisplay()</span>
-        }
-        else
-        {
-            <span class="text-danger">Cancelling on @Model.CurrentPeriodEnd.Value.ToDisplay()</span>
-        }
-    </p>
-    <p>
+    @if (!Model.CancelAtPeriodEnd)
+    {
+        <alert type="Success">Next Charge:<br />@Model.Amount.ToCurrencyFormat() on @Model.CurrentPeriodEnd.Value.ToDisplay()</alert>
+    }
+    else
+    {
+        <alert type="Danger">Cancelling on @Model.CurrentPeriodEnd.Value.ToDisplay()</alert>
+    }
+
+    <div>
         @if (!Context.Request.Path.ToString().Contains("account/subscriptions/change"))
         {
             <a class="btn btn-sm btn-primary" asp-controller="Subscriptions" asp-action="Select">Change Package</a>
@@ -159,6 +148,6 @@
                 }
             }
         }
-        <a class="btn btn-sm btn-default" asp-controller="Billing" asp-action="Index">Billing Information</a>
-    </p>
+        <a class="btn btn-sm btn-outline-dark" asp-controller="Billing" asp-action="Index">Billing Information</a>
+    </div>
 </div>

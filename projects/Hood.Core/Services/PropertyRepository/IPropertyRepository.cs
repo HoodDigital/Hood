@@ -14,6 +14,7 @@ namespace Hood.Services
         Task<PropertyListModel> GetFeaturedAsync();
         Task<PropertyListModel> GetRecentAsync();
         Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false);
+        Task<PropertyListing> ReloadReferences(PropertyListing property);
         Task<PropertyListing> AddAsync(PropertyListing property);
         Task UpdateAsync(PropertyListing property);
         Task SetStatusAsync(int id, ContentStatus status);

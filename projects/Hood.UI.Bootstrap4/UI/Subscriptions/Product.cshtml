@@ -1,0 +1,21 @@
+@model SubscriptionPlansModel
+@{
+    ViewBag.Title = Model.Product.DisplayName;
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+}
+@if (Model.Plans.Count > 0)
+{
+    <div class="card-deck mb-3 text-center">
+        @foreach (Subscription plan in Model.Product.Subscriptions.OrderBy(s => s.Level))
+        {
+            <partial name="_Template_Plan" model="plan" />
+        }
+    </div>
+}
+else
+{
+    <p>No plans are available in this package yet.</p>
+}

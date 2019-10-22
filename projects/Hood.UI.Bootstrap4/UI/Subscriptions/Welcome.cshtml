@@ -1,0 +1,47 @@
+@model SubscriptionWelcomeModel
+@{
+    ViewBag.Title = "Your new subscription!";
+    var currentSub = Model.UserSubscription.Subscription;
+}
+<section class="page-section">
+    @if (Model.SaveMessage.IsSet())
+    {
+        <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
+    }
+    <partial name="_Subscriptions_CurrentInfo" model="@new UserSubscriptionInfo(Model.UserSubscription)" />
+    <h4>
+        About your subscription
+    </h4>
+    <hr />
+    <div class="thumbnail">
+        <div class="panel-heading text-center bg-info">
+            @switch (Model.UserSubscription.Status)
+            {
+                case Stripe.SubscriptionStatuses.Active:
+                    <p><strong>You have now activated:</strong></p>
+                    break;
+                case Stripe.SubscriptionStatuses.Trialing:
+                    <p><strong>You have now activated your trial:</strong></p>
+                    break;
+            }
+            <h3>@currentSub.Name</h3>
+            <p>@currentSub.FullPrice</p>
+            @if (currentSub.TrialPeriodDays > 0)
+            {
+                <p>@currentSub.TrialPeriodDays days free trial</p>
+            }
+            else
+            {
+                <p>No trial period.</p>
+            }
+        </div>
+        <div class="p-lg text-center">
+            @currentSub.Description
+        </div>
+        <div class="panel-footer text-center">
+            <span class="price">@currentSub.Price</span>
+            <span>per @currentSub.Interval</span>
+        </div>
+    </div>
+
+</section>

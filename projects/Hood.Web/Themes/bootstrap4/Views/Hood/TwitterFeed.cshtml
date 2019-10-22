@@ -7,7 +7,7 @@
 <div class="card-columns">
     @foreach (var tweet in tweets)
     {
-        <div class="card">
+        <div class="card shadow-sm">
             <fixedImage src="@tweet.AvatarUrl" style="height:250px;" class="card-img-top"></fixedImage>
             <div class="card-body">
                 <p>@Html.Raw(tweet.Html)</p>

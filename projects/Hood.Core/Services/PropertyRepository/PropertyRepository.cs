@@ -213,12 +213,23 @@ namespace Hood.Services
         }
         public async Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false)
         {
-            string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
-            if (_cache.TryGetValue(cacheKey, out PropertyListing property) && !nocache)
-                return property;
-            else
-            {
-                property = await _db.Properties
+            //string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
+            //if (_cache.TryGetValue(cacheKey, out PropertyListing property) && !nocache)
+            //    return property;
+            //else
+            //{
+            //    property = await _db.Properties
+            //        .Include(p => p.Media)
+            //        .Include(p => p.FloorPlans)
+            //        .Include(p => p.Agent)
+            //        .Include(p => p.Metadata)
+            //        .AsNoTracking()
+            //        .FirstOrDefaultAsync(c => c.Id == id);
+
+            //    _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+            //    return property;
+            //}
+            var property = await _db.Properties
                     .Include(p => p.Media)
                     .Include(p => p.FloorPlans)
                     .Include(p => p.Agent)
@@ -226,9 +237,16 @@ namespace Hood.Services
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
-                return property;
-            }
+            return property;
+        }
+        public async Task<PropertyListing> ReloadReferences(PropertyListing property)
+        {
+            _db.Entry(property).State = EntityState.Added;
+            await _db.Entry(property).Collection(s => s.Media).LoadAsync();
+            await _db.Entry(property).Collection(s => s.FloorPlans).LoadAsync();
+            await _db.Entry(property).Reference(s => s.Agent).LoadAsync();
+            await _db.Entry(property).Collection(s => s.Metadata).LoadAsync();
+            return property;
         }
         public async Task<PropertyListing> AddAsync(PropertyListing property)
         {
@@ -238,9 +256,8 @@ namespace Hood.Services
         }
         public async Task UpdateAsync(PropertyListing property)
         {
-            _db.Update(property);
+            _db.Entry(property).State = EntityState.Modified;
             await _db.SaveChangesAsync();
-            _db.Entry(property).State = EntityState.Detached;
             ClearPropertyCache(property.Id);
         }
         public async Task SetStatusAsync(int id, ContentStatus status)

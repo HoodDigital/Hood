@@ -72,6 +72,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                model = await _property.ReloadReferences(model);
+
                 model.PublishDate = model.PublishDate.AddHours(model.PublishHour);
                 model.PublishDate = model.PublishDate.AddMinutes(model.PublishMinute);
                 model.LastEditedBy = User.Identity.Name;
@@ -86,36 +88,32 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
-                await _property.UpdateAsync(model);
-
-                PropertyListing dbProperty = await _property.GetPropertyByIdAsync(model.Id);
-
                 string type = Engine.Settings.Property.GetPlanningFromType(model.Planning);
-                if (dbProperty.HasMeta("PlanningDescription"))
+                if (model.HasMeta("PlanningDescription"))
                 {
-                    dbProperty.UpdateMeta("PlanningDescription", type);
+                    model.UpdateMeta("PlanningDescription", type);
                 }
                 else
                 {
-                    if (dbProperty.Metadata == null)
+                    if (model.Metadata == null)
                     {
-                        dbProperty.Metadata = new List<PropertyMeta>();
+                        model.Metadata = new List<PropertyMeta>();
                     }
 
-                    dbProperty.AddMeta(new PropertyMeta("PlanningDescription", type));
+                    model.AddMeta(new PropertyMeta("PlanningDescription", type));
                 }
 
                 foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
-                        if (dbProperty.HasMeta(val.Key.Replace("Meta:", "")))
+                        if (model.HasMeta(val.Key.Replace("Meta:", "")))
                         {
-                            dbProperty.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            model.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                         else
                         {
-                            dbProperty.AddMeta(new PropertyMeta()
+                            model.AddMeta(new PropertyMeta()
                             {
                                 PropertyId = model.Id,
                                 Name = val.Key.Replace("Meta:", ""),
@@ -126,10 +124,7 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
-                await _property.UpdateAsync(dbProperty);
-
-                // All good, reload
-                model = await _property.GetPropertyByIdAsync(model.Id, true);
+                await _property.UpdateAsync(model);
 
                 SaveMessage = "Saved";
                 MessageType = AlertType.Success;
@@ -522,7 +517,7 @@ namespace Hood.Areas.Admin.Controllers
                     property.FloorAreas = fa;
                 }
 
-                await _property.UpdateAsync(property);                
+                await _property.UpdateAsync(property);
                 return new Response(true, "Floor area added successfully.");
             }
             catch (Exception ex)

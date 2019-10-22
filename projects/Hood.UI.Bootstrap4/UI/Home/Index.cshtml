@@ -3,7 +3,7 @@
     var _integrations = Engine.Settings.Integrations;
     var _seoSettings = Engine.Settings.Seo;
     string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-    string title = "Home - " +  _basicSettings.FullTitle;
+    string title = "Home - " + _basicSettings.FullTitle;
     if (_seoSettings.Home != null)
     {
         description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
@@ -26,7 +26,7 @@
 }
 @if (_integrations.EnableTwitter)
 {
-    <div class="bg-color-white">
-        <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")"></div>
+    <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")">
+        <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Light" class="text-center mb-0">Loading tweets...</alert>
     </div>
 }

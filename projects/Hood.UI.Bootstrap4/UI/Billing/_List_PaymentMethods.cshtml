@@ -2,7 +2,7 @@
 @{
     Layout = null;
 }
-@if (Model.PaymentMethods != null || Model.PaymentMethods.Count == 0)
+@if (Model.PaymentMethods != null && Model.PaymentMethods.Count > 0)
 {
     <div class="accordion">
         @foreach (var itm in Model.PaymentMethods)
@@ -18,7 +18,7 @@
 }
 else
 {
-    <alert icon="fa fa-exclamation-triangle" type="Warning">
+    <alert icon="fa fa-exclamation-triangle" type="Warning" class="mb-0">
         You do not have any saved cards.
     </alert>
 }

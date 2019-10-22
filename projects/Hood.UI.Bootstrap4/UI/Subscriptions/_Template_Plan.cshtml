@@ -1,0 +1,21 @@
+@model Subscription
+<div class="card mb-4 shadow-sm">
+    <div class="card-header text-center">
+        <h6 class="mb-0">@Model.Name</h6>
+    </div>
+    <div class="card-body">
+        <p class="h3 card-title text-center">@Model.Price <small class="text-muted">/ @Model.Interval</small></p>
+        @if (Model.TrialPeriodDays > 0)
+        {
+            <div class="text-info text-center">@Model.TrialPeriodDays days free trial</div>
+        }
+        else
+        {
+            <div class="text-info text-center">No trial period.</div>
+        }
+        <div class="mt-4 mb-4">
+            @Html.Raw(Model.Description)
+        </div>
+        <partial name="_Button_Subscribe" model="Model" />
+    </div>
+</div>
