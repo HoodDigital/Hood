@@ -8,9 +8,15 @@
     <div class="col-md-7">
         @if (Model.NextInvoice != null)
         {
-            <div class="panel panel-default">
-                <div class="panel-heading">Your next payment</div>
-                <div class="panel-body">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="m-0">Your next payment</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
                     <partial name="_Invoice" model="Model.NextInvoice" />
                 </div>
             </div>
@@ -23,15 +29,19 @@
         }
         @if (Model.Invoices != null && Model.Invoices.Count() != 0)
         {
-            <div class="panel panel-default">
-                <div class="panel-heading">Your previous invoices</div>
-                <div class="panel-body">
-                    <div class="accordion">
-                        @foreach (Stripe.Invoice invoice in Model.Invoices)
-                        {
-                            <partial name="_Invoice" model="invoice" />
-                        }
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="m-0">Your previous invoices</h6>
+                        </div>
                     </div>
+                </div>
+                <div class="card-body">
+                    @foreach (Stripe.Invoice invoice in Model.Invoices)
+                    {
+                        <partial name="_Invoice" model="invoice" />
+                    }
                 </div>
             </div>
         }
@@ -54,10 +64,10 @@
                     </div>
                 </div>
                 <div class="card-body">
-                        @foreach (var subscription in Model.Subscriptions)
-                        {
-                            <partial name="_Subscription" model="subscription" />
-                        }
+                    @foreach (var subscription in Model.Subscriptions)
+                    {
+                        <partial name="_Subscription" model="subscription" />
+                    }
                 </div>
             </div>
         }
