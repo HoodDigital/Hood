@@ -1,46 +1,73 @@
 @model BuySubscriptionModel
 @{
-    ViewBag.Title = $"Complete your purchase: {Model.Plan.Name}";
+    ViewBag.Title = $"Complete your purchase";
     BillingSettings settings = Engine.Settings.Billing;
 }
 @if (Model.SaveMessage.IsSet())
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
-
-<form id="buy-plan-form" class="panel-body" data-stripe="@(settings.EnableStripeTestMode ? settings.StripeTestPublicKey : settings.StripeLivePublicKey)">
-    <input type="hidden" id="buy-plan-id" value="@Model.Plan.Id" />
-    <div id="payment-method-list" class="hood-inline" data-url="@Url.Action("PaymentMethods", "Billing", new { viewName = "_List_PaymentMethodRadios" })">
-        <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Light" class="text-center">Loading any saved payment methods...</alert>
-    </div>
-    <div class="form-group">
-        <div class="custom-control custom-radio">
-            <input id="buy-plan-method-new" name="buy-plan-method" class="buy-plan-method custom-control-input" type="radio" value="new-card" />
-            <label for="buy-plan-method-new" class="custom-control-label">Add a <strong>new card</strong> and pay with that</label>
+<div class="row">
+    <div class="col-md-4 order-md-last">
+        <div class="card">
+            <div class="card-header">
+                Your package
+            </div>
+            <div class="card-body">
+                Subscription to @Model.Plan.Name
+            </div>
+            <div class="card-footer">
+                <small class="d-block">You will pay</small>
+                <strong class="h5">@Model.Plan.FullPrice</strong>
+            </div>
         </div>
     </div>
-    <div class="collapse" id="buy-plan-add-card-form">
-        <div class="form-group">
-            <label class="control-label">Cardholder's Name</label>
-            <input id="buy-plan-cardholdername" name="CardholderName" type="text" class="form-control" />
-        </div>
-        <div class="form-group">
-            <label class="control-label">Card details</label>
-            <div id="buy-plan-element" class="form-control"></div>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="custom-control custom-checkbox">
-            <input id="buy-plan-consent" name="buy-plan-consent" class="custom-control-input" type="checkbox" />
-            <label for="buy-plan-consent" class="custom-control-label">Check here to agree to the @Engine.Settings.Basic.CompanyName customer agreement.</label>
-        </div>
-        <small>I authorise @Engine.Settings.Basic.CompanyName to send instructions to the financial institution that issued my card to take payments from my card account in accordance with the terms of my agreement with you. [Include terms link here]</small>
-    </div>
-</form>
-<p class="text-danger" id="buy-plan-errors"></p>
-<p class="text-success" id="buy-plan-success"></p>
+    <div class="col-md-8 order-md-first">
+        <div class="card">
+            <div class="card-header">
+                Confirm & Pay
+            </div>
+            <div class="card-body">
+                <form id="buy-plan-form" class="panel-body" data-stripe="@(settings.EnableStripeTestMode ? settings.StripeTestPublicKey : settings.StripeLivePublicKey)">
+                    <input type="hidden" id="buy-plan-id" value="@Model.Plan.Id" />
+                    <div id="payment-method-list" class="hood-inline" data-url="@Url.Action("PaymentMethods", "Billing", new { viewName = "_List_PaymentMethodRadios" })">
+                        <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Light" class="text-center">Loading any saved payment methods...</alert>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input id="buy-plan-method-new" name="buy-plan-method" class="buy-plan-method custom-control-input" type="radio" value="new-card" />
+                            <label for="buy-plan-method-new" class="custom-control-label">Add a <strong>new card</strong> and pay with that</label>
+                        </div>
+                    </div>
+                    <div class="collapse" id="buy-plan-add-card-form">
+                        <div class="form-group">
+                            <label class="control-label">Cardholder's Name</label>
+                            <input id="buy-plan-cardholdername" name="CardholderName" type="text" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Card details</label>
+                            <div id="buy-plan-element" class="form-control"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input id="buy-plan-consent" name="buy-plan-consent" class="custom-control-input" type="checkbox" />
+                            <label for="buy-plan-consent" class="custom-control-label">Check here to agree to the @Engine.Settings.Basic.CompanyName customer agreement.</label>
+                        </div>
+                        <small>I authorise @Engine.Settings.Basic.CompanyName to send instructions to the financial institution that issued my card to take payments from my card account in accordance with the terms of my agreement with you. [Include terms link here]</small>
+                    </div>
+                </form>
+                <p class="text-danger" id="buy-plan-errors"></p>
+                <p class="text-success" id="buy-plan-success"></p>
+            </div>
+            <div class="card-footer">
 <div class="text-center">
     <button id="buy-plan-submit" data-url="@Url.Action("Buy")" class="btn btn-lg btn-success">
         Confirm &amp; Pay
     </button>
+</div>
+            </div>
+        </div>
+
+    </div>
 </div>

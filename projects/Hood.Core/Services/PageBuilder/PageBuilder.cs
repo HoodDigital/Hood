@@ -71,7 +71,7 @@ namespace Hood.Services
             if (!_scripts.Any())
                 return "";
 
-            if (bundleScripts && !_hostingEnvironment.IsDevelopment())
+            if (bundleScripts && location.Bundleable() && !_hostingEnvironment.IsDevelopment())
             {
                 var partsToBundle = _scripts[location]
                     .Where(x => x.Bundle)

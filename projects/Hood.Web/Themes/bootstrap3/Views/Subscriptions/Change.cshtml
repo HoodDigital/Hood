@@ -6,7 +6,7 @@
 <section class="page-section">
     @if (Model.SaveMessage.IsSet())
     {
-        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
     }
     @if (Model.Customer?.Sources?.Data?.Count == 0)
     {

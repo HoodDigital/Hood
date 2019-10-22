@@ -183,7 +183,7 @@ namespace Hood.Services
         {
             PlanUpdateOptions updateOptions = new PlanUpdateOptions()
             {
-                ProductId = productId
+                Product = productId
             };
             return await PlanService.UpdateAsync(planId, updateOptions);
         }
@@ -265,13 +265,14 @@ namespace Hood.Services
         #region Payment Methods
         public async Task<Customer> SetDefaultPaymentMethodAsync(string customerId, string paymentMethodId)
         {
+            var source = await PaymentMethodService.GetAsync(paymentMethodId);
+
             CustomerUpdateOptions updateOptions = new CustomerUpdateOptions()
             {
                 InvoiceSettings = new CustomerInvoiceSettingsOptions()
                 {
-                    DefaultPaymentMethodId = paymentMethodId
-                }, 
-                DefaultSource = paymentMethodId
+                    DefaultPaymentMethod = source.Id
+                }
             };
             return await CustomerService.UpdateAsync(customerId, updateOptions);
         }
@@ -311,7 +312,7 @@ namespace Hood.Services
         {
             StripeList<PaymentMethod> pms = await PaymentMethodService.ListAsync(new PaymentMethodListOptions()
             {
-                CustomerId = customerId,
+                Customer = customerId,
                 Type = type,
                 Expand = new List<string>() { "data.customer" }
             });
@@ -342,7 +343,7 @@ namespace Hood.Services
         {
             InvoiceListOptions options = new InvoiceListOptions()
             {
-                CustomerId = customerId,
+                Customer = customerId,
                 StartingAfter = startAfterId,
                 Limit = pageSize
             };
@@ -353,7 +354,7 @@ namespace Hood.Services
         {
             UpcomingInvoiceOptions options = new UpcomingInvoiceOptions()
             {
-                CustomerId = customerId
+                Customer = customerId
             };
             options.AddExpand("data.payment_intent");
             return await InvoiceService.UpcomingAsync(options);
@@ -365,8 +366,8 @@ namespace Hood.Services
         {
             SubscriptionListOptions options = new Stripe.SubscriptionListOptions()
             {
-                CustomerId = customerId,
-                PlanId = planId
+                Customer = customerId,
+                Plan = planId
             };
             return await SubscriptionService.ListAsync(options);
         }
@@ -396,21 +397,21 @@ namespace Hood.Services
 
             List<SubscriptionItemOption> items = new List<SubscriptionItemOption> {
                     new SubscriptionItemOption {
-                        PlanId = plan.Id,
+                        Plan = plan.Id,
                         Quantity = quantity
                     }
                 };
 
             SubscriptionCreateOptions options = new SubscriptionCreateOptions
             {
-                CustomerId = customerId,
+                Customer = customerId,
                 Items = items,
                 TrialFromPlan = true
             };            
 
             if (paymentMethodId != null)
             {
-                options.DefaultSource = paymentMethodId;
+                options.DefaultPaymentMethod = paymentMethodId;
             }
 
             options.AddExpand("latest_invoice.payment_intent");
@@ -444,7 +445,7 @@ namespace Hood.Services
             subscription.Items.ForEach(i => items.Add(new SubscriptionItemUpdateOption
             {
                 Id = i.Id,
-                PlanId = i.Plan.Id
+                Plan = i.Plan.Id
             }));
             SubscriptionUpdateOptions options = new SubscriptionUpdateOptions
             {
@@ -478,7 +479,7 @@ namespace Hood.Services
                 new SubscriptionItemUpdateOption()
                 {
                     Id = oldPlanItem.Id,
-                    PlanId = newPlan.Id                    
+                    Plan = newPlan.Id                    
                 }
             };
             SubscriptionUpdateOptions options = new SubscriptionUpdateOptions

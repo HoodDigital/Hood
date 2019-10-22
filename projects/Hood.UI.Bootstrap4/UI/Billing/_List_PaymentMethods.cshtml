@@ -4,7 +4,6 @@
 }
 @if (Model.PaymentMethods != null && Model.PaymentMethods.Count > 0)
 {
-    <div class="accordion">
         @foreach (var itm in Model.PaymentMethods)
         {
             switch (itm.Type)
@@ -14,7 +13,6 @@
                     break;
             }
         }
-    </div>
 }
 else
 {

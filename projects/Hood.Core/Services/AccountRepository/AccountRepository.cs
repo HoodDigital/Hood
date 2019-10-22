@@ -579,7 +579,7 @@ namespace Hood.Services
             Product stripePlan = await _stripe.GetProductByIdAsync(subscriptionProduct.StripeId);
             if (stripePlan != null)
             {
-                StripeList<Plan> subcount = await _stripe.PlanService.ListAsync(new PlanListOptions() { Limit = 1, ProductId = subscriptionProduct.StripeId });
+                StripeList<Plan> subcount = await _stripe.PlanService.ListAsync(new PlanListOptions() { Limit = 1, Product = subscriptionProduct.StripeId });
                 if (subcount != null && subcount.Count() > 0)
                 {
                     throw new Exception("You cannot remove a subscription product group which contains plans (on Stripe). Move them to a new product group or delete them before you remove the product group.");
@@ -647,7 +647,7 @@ namespace Hood.Services
                 }
             }
 
-            IEnumerable<Plan> plans = await _stripe.GetAllPlansAsync(new PlanListOptions() { ProductId = product.StripeId });
+            IEnumerable<Plan> plans = await _stripe.GetAllPlansAsync(new PlanListOptions() { Product = product.StripeId });
             foreach (Plan p in plans)
             {
                 await SyncSubscriptionPlanAsync(null, p.Id);
@@ -856,13 +856,13 @@ namespace Hood.Services
             Plan stripePlan = await _stripe.GetPlanByIdAsync(subscription.StripeId);
             if (stripePlan != null)
             {
-                StripeList<Stripe.Subscription> subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, PlanId = subscription.StripeId, Status = SubscriptionStatuses.Active });
+                StripeList<Stripe.Subscription> subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, Plan = subscription.StripeId, Status = SubscriptionStatuses.Active });
                 if (subcount != null && subcount.Count() > 0)
                 {
                     throw new Exception("You cannot remove a subscription with active subscribers. Move them to a new subscription on Stripe or cancel them before you remove the plan.");
                 }
 
-                subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, PlanId = subscription.StripeId, Status = SubscriptionStatuses.Trialing });
+                subcount = await _stripe.SubscriptionService.ListAsync(new SubscriptionListOptions() { Limit = 1, Plan = subscription.StripeId, Status = SubscriptionStatuses.Trialing });
                 if (subcount != null && subcount.Count() > 0)
                 {
                     throw new Exception("You cannot remove a subscription with trial subscribers. Move them to a new subscription on Stripe or cancel them before you remove the plan.");
@@ -1089,7 +1089,6 @@ namespace Hood.Services
 
                 user.StripeId = customer.Id;
             }
-            customer = await _stripe.CreateCustomerAsync(user);
             user.StripeId = customer.Id;
             await UpdateUserAsync(user);
             return customer;

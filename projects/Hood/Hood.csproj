@@ -30,17 +30,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
-    <PackageReference Include="linqtotwitter" Version="5.0.0" />
-    <PackageReference Include="SharpZipLib" Version="1.2.0" />
-    <PackageReference Include="Stripe.net" Version="28.8.0" />
-    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
-    <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
-    <PackageReference Include="Geocoding.Core" Version="4.0.1" />
-    <PackageReference Include="Geocoding.Google" Version="4.0.1" />
-    <PackageReference Include="BundlerMinifier.Core" Version="3.0.415" />
-    <PackageReference Include="Sendgrid" Version="9.12.0" />
-    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
-
   </ItemGroup>
 
   <ItemGroup>

@@ -20,11 +20,17 @@
         <a class="dropdown-item" asp-action="Select" asp-controller="Subscriptions" asp-area="" target="_blank">
             <i class="fa fa-shopping-bag mr-2"></i>Pricing Page
         </a>
+        @if (User.IsSuperUser()) { 
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item warning-alert" asp-action="ClearAllLocalData" data-title="Are you sure?" data-warning="This will clear ALL the LOCAL subscription data from the database, this does not delete any Stripe data. Local products, plans and subscriptions will need to be resynced from Stripe.">
+                <i class="fa fa-trash mr-2"></i>Delete Local Data
+            </a>
+        }
     </div>
 }
 @if (Model.SaveMessage.IsSet())
 {
-    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>;
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
 <form class="inline" data-target="#subscriptions-stripe-list">
     <div class="row">

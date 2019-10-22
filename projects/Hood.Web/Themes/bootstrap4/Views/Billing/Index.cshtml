@@ -63,9 +63,9 @@
         }
         else
         {
-            <alert type="Success" icon="fa fa-info-circle">
-                You do not have any active subscriptions.<br />
-                <a asp-action="Select" asp-controller="Subscriptions" class="btn btn-xs btn-success"><i class="fa fa-user-plus m-r-xs"></i>Get a package</a>
+            <alert type="Success" icon="fa fa-info-circle" size="Epic" class="text-center">
+                <p>You do not have any active subscriptions.</p>
+                <a asp-action="Select" asp-controller="Subscriptions" class="btn btn-xs btn-success"><i class="fa fa-user-plus mr-2"></i>Get a package</a>
             </alert>
         }
         <div class="card">

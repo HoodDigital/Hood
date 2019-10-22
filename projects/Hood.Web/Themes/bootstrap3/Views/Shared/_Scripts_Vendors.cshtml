@@ -6,5 +6,5 @@
 <script src="~/lib/selectize/js/standalone/selectize.min.js" asp-location="Vendors"></script>
 @if (Engine.Settings.Billing.IsStripeEnabled)
 {
-    <script src="https://js.stripe.com/v3/" asp-location="Vendors" asp-bundle="false"></script>
+    <script src="https://js.stripe.com/v3/" asp-location="BeforeVendors" asp-bundle="false"></script>
 }
