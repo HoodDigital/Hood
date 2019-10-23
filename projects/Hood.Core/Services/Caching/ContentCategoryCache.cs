@@ -141,19 +141,19 @@ namespace Hood.Caching
         }
 
         // Html
-        public IHtmlContent ContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentSlug)
+        public IHtmlContent ContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentSlug, string listClass = "list-unstyled", string itemClass = "")
         {
             string htmlOutput = string.Empty;
 
             if (startLevel != null && startLevel.Count() > 0)
             {
-                htmlOutput += "<ul>";
+                htmlOutput += $"<ul class='{listClass}'>";
                 foreach (var key in startLevel.Select(c => c.Id))
                 {
                     // Have to reload from the cache to use the count.
                     var category = FromKey(key);
 
-                    htmlOutput += "<li>";
+                    htmlOutput += $"<li class='{itemClass}'>";
                     htmlOutput += string.Format("<a href=\"/{0}/category/{1}/\" class=\"content-categories\">", contentSlug, category.Slug);
                     htmlOutput += string.Format("{0} <span>{1}</span>", category.DisplayName, category.Count);
                     htmlOutput += "</a>";

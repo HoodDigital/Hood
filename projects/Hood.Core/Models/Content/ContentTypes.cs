@@ -266,7 +266,7 @@ namespace Hood.Models
             {
                 new CustomField() {Name="DisplayOrder", Default="0", System=true, Type="System.Int32" },
 
-                new CustomField() {Name="Settings.Template", Default = "_Blank", System = true, Type = "System.String" },
+                new CustomField() {Name="Settings.Template", Default = "", System = true, Type = "System.String" },
 
                 new CustomField() {Name="Settings.SubType", Default = "", System = true, Type = "System.String" },
 

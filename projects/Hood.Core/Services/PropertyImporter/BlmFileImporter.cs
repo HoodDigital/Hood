@@ -25,10 +25,9 @@ namespace Hood.Services
     public class BlmFileImporter : IPropertyImporter
     {
         private readonly IFTPService _ftp;
+        private readonly IHostingEnvironment _env;
         private readonly IConfiguration _config;
         private readonly IDirectoryManager _directoryManager;
-        private readonly IMediaManager _media;
-        private PropertySettings _propertySettings;
         private readonly IHttpContextAccessor _context;
 
         public BlmFileImporter(
@@ -36,13 +35,13 @@ namespace Hood.Services
             IHostingEnvironment env,
             IHttpContextAccessor context,
             IConfiguration config,
-            IMediaManager media,
             IAddressService address,
             ILogService logService,
             IDirectoryManager directoryManager
             )
         {
             _ftp = ftp;
+            _env = env;
             _config = config;
             _directoryManager = directoryManager;
             Lock = new ReaderWriterLock();
@@ -65,7 +64,6 @@ namespace Hood.Services
             _propertySettings = Engine.Settings.Property;
 
             LocalFolder = env.ContentRootPath + "\\" + _propertySettings.FTPImporterSettings.LocalFolder;
-            _media = media;
             _context = context;
             _address = address;
             _logService = logService;
@@ -92,6 +90,8 @@ namespace Hood.Services
         private bool FileError { get; set; }
         private List<string> RemoteList { get; set; }
         private ApplicationUser User { get; set; }
+        private IMediaManager _media;
+        private PropertySettings _propertySettings;
         private HoodDbContext _db { get; set; }
         private bool _killFlag;
         private readonly IAddressService _address;
@@ -125,6 +125,8 @@ namespace Hood.Services
                 DbContextOptionsBuilder<HoodDbContext> options = new DbContextOptionsBuilder<HoodDbContext>();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 _db = new HoodDbContext(options.Options);
+
+                _media = new MediaManager(_env, _config);
 
                 UserManager<ApplicationUser> userManager = context.RequestServices.GetService<UserManager<ApplicationUser>>();
                 User = userManager.FindByNameAsync("PropertyImporter").Result;
@@ -227,7 +229,7 @@ namespace Hood.Services
 
                 // Now we have a list of properties, in the feed
                 IEnumerable<PropertyListing> newProperties = feedProperties.Where(p => !siteProperties.Any(p2 => p2.Reference == p.Reference));
-                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));                
+                IEnumerable<PropertyListing> existingProperties = siteProperties.Where(site => feedProperties.Any(feed => feed.Reference == site.Reference));
                 IEnumerable<PropertyListing> extraneous = siteProperties.Where(p => !feedProperties.Any(p2 => p2.Reference == p.Reference));
 
                 switch (_propertySettings.FTPImporterSettings.ExtraneousPropertyProcess)
@@ -258,7 +260,7 @@ namespace Hood.Services
                         PropertyListing property = await ProcessAsync(new PropertyListing(), data);
 
                         _db.Properties.Add(property);
-                        await _db.SaveChangesAsync();
+                        await SaveChangesToDatabaseAsync();
 
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
@@ -277,7 +279,7 @@ namespace Hood.Services
                         MarkCompleteTask("Adding property failed: " + addPropertyException.Message);
                     }
                 }
-                await _db.SaveChangesAsync();
+                await SaveChangesToDatabaseAsync();
 
                 foreach (PropertyListing propertyRef in existingProperties)
                 {
@@ -293,7 +295,7 @@ namespace Hood.Services
                             .FirstOrDefault(p => p.Id == propertyRef.Id);
                         property = await ProcessAsync(property, data);
                         _db.Properties.Update(property);
-                        await _db.SaveChangesAsync();
+                        await SaveChangesToDatabaseAsync();
 
                         Lock.AcquireWriterLock(Timeout.Infinite);
                         Processed++;
@@ -311,7 +313,7 @@ namespace Hood.Services
                         MarkCompleteTask("Updating property failed: " + updatePropertyException.Message);
                     }
                 }
-                await _db.SaveChangesAsync();
+                await SaveChangesToDatabaseAsync();
 
 
                 // Clean any from the DB that have been removed from the BLM file.
@@ -330,7 +332,7 @@ namespace Hood.Services
                                     _db.Entry(m).State = EntityState.Deleted;
 
                                 });
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
                                 property.FloorPlans.ForEach(async m =>
                                 {
                                     if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
@@ -338,27 +340,27 @@ namespace Hood.Services
                                     _db.Entry(m).State = EntityState.Deleted;
 
                                 });
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
                                 property.Metadata.ForEach(m =>
                                 {
                                     _db.Entry(m).State = EntityState.Deleted;
                                 });
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
 
                                 _db.Entry(property).State = EntityState.Deleted;
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
                                 break;
 
                             case ExtraneousPropertyProcess.StatusDelete:
                                 property.Status = ContentStatus.Deleted;
                                 _db.Properties.Update(property);
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
                                 break;
 
                             case ExtraneousPropertyProcess.StatusArchive:
                                 property.Status = ContentStatus.Archived;
                                 _db.Properties.Update(property);
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
                                 break;
 
                             case ExtraneousPropertyProcess.LeaseStatusLetSold:
@@ -371,7 +373,7 @@ namespace Hood.Services
                                     property.LeaseStatus = "Let";
                                 }
                                 _db.Properties.Update(property);
-                                await _db.SaveChangesAsync();
+                                await SaveChangesToDatabaseAsync();
                                 break;
                         }
 
@@ -393,7 +395,7 @@ namespace Hood.Services
                         MarkCompleteTask("Removing property failed: " + removePropertyException.Message);
                     }
                 }
-                await _db.SaveChangesAsync();
+                await SaveChangesToDatabaseAsync();
 
                 // Clean the temp directory...
                 CleanTempFolder();
@@ -492,10 +494,10 @@ namespace Hood.Services
                 {
                     property = await ProcessImagesAsync(property, data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the images.";
+                    StatusMessage = $"There was an error processing the images: {ex.Message}";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -504,10 +506,10 @@ namespace Hood.Services
                 {
                     property = await ProcessFloorPlansAsync(property, data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the floor plans.";
+                    StatusMessage = $"There was an error processing the floor plans. {ex.Message}";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -516,10 +518,10 @@ namespace Hood.Services
                 {
                     property = await ProcessDocumentsAsync(property, data);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = "There was an error processing the info document.";
+                    StatusMessage = $"There was an error processing the info document. {ex.Message}";
                     Errors.Add(FormatLog(StatusMessage, property));
                     Lock.ReleaseWriterLock();
                 }
@@ -580,52 +582,65 @@ namespace Hood.Services
         private async Task<PropertyListing> ProcessFloorPlansAsync(PropertyListing property, Dictionary<string, string> data)
         {
             // Floor plans
+            if (_propertySettings.FTPImporterSettings.ClearImagesBeforeImport)
+            {
+                if (property.FloorPlans != null)
+                {
+                    property.FloorPlans.ForEach(async m =>
+                    {
+                        if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
+                            await _media.DeleteStoredMedia(m);
+                        _db.Entry(m).State = EntityState.Deleted;
+                    });
+                    await SaveChangesToDatabaseAsync();
+                }
+            }
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_FLOOR_PLAN") && !k.Contains("TEXT")))
             {
                 if (data[key].IsSet())
                 {
                     // We have a floor plan reference, download it with the FTPService
-                    switch (_propertySettings.FTPImporterSettings.Method)
+
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = "Thumbnailing and processing floorplan...";
+                    Lock.ReleaseWriterLock();
+
+                    if (property.FloorPlans == null)
                     {
-                        case PropertyImporterMethod.Directory:
-                            await GetFileFromLocalAsync(data[key]);
-                            break;
-                        case PropertyImporterMethod.FtpBlm:
-                            GetFileFromFtp(data[key]);
-                            break;
+                        property.FloorPlans = new List<PropertyFloorplan>();
                     }
 
-                    if (!HasFileError())
+                    // if the photo exists, overwrite it.
+                    PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f => f.Filename == data[key]);
+                    if (fp == null)
                     {
-                        Lock.AcquireWriterLock(Timeout.Infinite);
-                        StatusMessage = "Thumbnailing and processing floorplan...";
-                        Lock.ReleaseWriterLock();
+                        // This image filename is not added to the property yet.
 
-                        string imageFile = TempFolder + data[key];
-                        IMediaObject mediaResult = null;
-                        FileInfo fi = new FileInfo(imageFile);
-                        using (FileStream s = File.OpenRead(imageFile))
+                        switch (_propertySettings.FTPImporterSettings.Method)
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath);
+                            case PropertyImporterMethod.Directory:
+                                await GetFileFromLocalAsync(data[key]);
+                                break;
+                            case PropertyImporterMethod.FtpBlm:
+                                GetFileFromFtp(data[key]);
+                                break;
                         }
-                        if (mediaResult != null)
+
+                        if (!HasFileError())
                         {
-                            if (property.FloorPlans == null)
+                            string imageFile = TempFolder + data[key];
+                            MediaObject mediaResult = null;
+                            FileInfo fi = new FileInfo(imageFile);
+                            using (FileStream s = File.OpenRead(imageFile))
                             {
-                                property.FloorPlans = new List<PropertyFloorplan>();
+                                mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
                             }
-
-                            PropertyFloorplan fp = property.FloorPlans.FirstOrDefault(f => f.Filename == fi.Name);
-                            if (fp != null)
+                            if (mediaResult != null)
                             {
-                                if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
-                                    await _media.DeleteStoredMedia(fp);
-                                _db.Entry(fp).State = EntityState.Deleted;
-                                await _db.SaveChangesAsync();
+                                fp = new PropertyFloorplan(mediaResult);
+                                property.FloorPlans.Add(fp);
+                                await SaveChangesToDatabaseAsync();
                             }
-
-                            property.FloorPlans.Add(new PropertyFloorplan(mediaResult));
-                            await _db.SaveChangesAsync();
                         }
                     }
                 }
@@ -635,6 +650,11 @@ namespace Hood.Services
         private async Task<PropertyListing> ProcessImagesAsync(PropertyListing property, Dictionary<string, string> data)
         {
             // Images
+            if (property.Media == null)
+            {
+                property.Media = new List<PropertyMedia>();
+            }
+
             if (_propertySettings.FTPImporterSettings.ClearImagesBeforeImport)
             {
                 if (property.Media != null)
@@ -645,71 +665,72 @@ namespace Hood.Services
                             await _media.DeleteStoredMedia(m);
                         _db.Entry(m).State = EntityState.Deleted;
                     });
-                    await _db.SaveChangesAsync();
+                    await SaveChangesToDatabaseAsync();
                 }
             }
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")).OrderBy(k => k))
             {
                 if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
                 {
-                    // We have an image, download it with the FTPService
-                    switch (_propertySettings.FTPImporterSettings.Method)
-                    {
-                        case PropertyImporterMethod.Directory:
-                            await GetFileFromLocalAsync(data[key]);
-                            break;
-                        case PropertyImporterMethod.FtpBlm:
-                            GetFileFromFtp(data[key]);
-                            break;
-                    }
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = $"Checking image ({data[key]})...";
+                    Lock.ReleaseWriterLock();
 
-                    if (!HasFileError())
+                    // if the photo exists, overwrite it.
+                    PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == data[key]);
+                    if (fp == null)
+                    {
+                        // This image filename is not added to the property yet.
+
+                        switch (_propertySettings.FTPImporterSettings.Method)
+                        {
+                            case PropertyImporterMethod.Directory:
+                                await GetFileFromLocalAsync(data[key]);
+                                break;
+                            case PropertyImporterMethod.FtpBlm:
+                                GetFileFromFtp(data[key]);
+                                break;
+                        }
+
+                        if (!HasFileError())
+                        {
+
+                            string imageFile = TempFolder + data[key];
+                            Lock.AcquireWriterLock(Timeout.Infinite);
+                            StatusMessage = $"Thumbnailing and processing image ({data[key]})...";
+                            Lock.ReleaseWriterLock();
+                            MediaObject mediaResult = null;
+                            FileInfo fi = new FileInfo(imageFile);
+                            using (FileStream s = File.OpenRead(imageFile))
+                            {
+                                mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
+                            }
+                            if (mediaResult != null)
+                            {
+                                fp = new PropertyMedia(mediaResult);
+                                property.Media.Add(fp);
+                                await SaveChangesToDatabaseAsync();
+                            }
+                        }
+                    } 
+                    else
                     {
                         Lock.AcquireWriterLock(Timeout.Infinite);
-                        StatusMessage = "Thumbnailing and processing image...";
+                        StatusMessage = $"The image ({data[key]}) has already been added to property {property.Title} ({property.Id}), skipping upload & processing...";
+                        Warnings.Add(FormatLog(StatusMessage));
                         Lock.ReleaseWriterLock();
-
-                        string imageFile = TempFolder + data[key];
-                        MediaObject mediaResult = null;
-                        FileInfo fi = new FileInfo(imageFile);
-                        using (FileStream s = File.OpenRead(imageFile))
+                    }
+                    if (property.FeaturedImageJson != null)
+                    {
+                        if (data[key] == property.FeaturedImage?.Filename)
                         {
-                            mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
+                            property.FeaturedImage = property.FeaturedImage.UpdateUrls(fp) as MediaObject;
                         }
-                        if (mediaResult != null)
-                        {
-                            if (property.Media == null)
-                            {
-                                property.Media = new List<PropertyMedia>();
-                            }
-
-                            // if the photo exists, overwrite it.
-                            PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == fi.Name);
-                            if (fp != null)
-                            {
-                                if (_propertySettings.FTPImporterSettings.DeletePhysicalImageFiles)
-                                    await _media.DeleteStoredMedia(fp);
-                                property.Media.Remove(fp);
-                                _db.Entry(fp).State = EntityState.Deleted;
-                                await _db.SaveChangesAsync();
-                            }
-
-                            property.Media.Add(new PropertyMedia(mediaResult));
-
-                            if (property.FeaturedImageJson != null)
-                            {
-                                if (data[key] == property.FeaturedImage?.Filename)
-                                {
-                                    property.FeaturedImage = property.FeaturedImage.UpdateUrls(mediaResult) as MediaObject;
-                                }
-                            }
-                            else
-                            {
-                                // add it.
-                                property.FeaturedImage = mediaResult;
-                            }
-                            await _db.SaveChangesAsync();
-                        }
+                    }
+                    else
+                    {
+                        // add it.
+                        property.FeaturedImage = fp;
                     }
                 }
                 else if (data[key].IsSet() && key.Contains("60"))
@@ -750,23 +771,11 @@ namespace Hood.Services
                             {
                                 property.UpdateMeta("EnergyPerformanceCertificate", url);
                             }
-
-                            MediaObject existing = _db.Media.SingleOrDefault(m => m.Filename == fileName);
-                            if (existing == null)
-                            {
-                                _db.Media.Add(mediaResult);
-                            }
-                            else
-                            {
-                                _db.Media.Remove(existing);
-                                _db.Media.Add(mediaResult);
-                            }
-
-                            await _db.SaveChangesAsync();
                         }
                     }
                 }
             }
+            await SaveChangesToDatabaseAsync();
             return property;
         }
 
@@ -1343,6 +1352,53 @@ namespace Hood.Services
             fileError = FileError;
             Lock.ReleaseWriterLock();
             return fileError;
+        }
+        private async Task<bool> SaveChangesToDatabaseAsync()
+        {
+            var saved = false;
+            while (!saved)
+            {
+                try
+                {
+                    // Attempt to save changes to the database
+                    await _db.SaveChangesAsync();
+                    saved = true;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    foreach (var entry in ex.Entries)
+                    {
+                        if (entry.Entity is PropertyListing || entry.Entity is PropertyMedia)
+                        {
+                            var proposedValues = entry.CurrentValues;
+                            var databaseValues = entry.GetDatabaseValues();
+
+                            foreach (var property in proposedValues.Properties)
+                            {
+                                var proposedValue = proposedValues[property];
+                                var databaseValue = databaseValues[property];
+
+                                if (proposedValue != databaseValue)
+                                {
+
+                                }
+                                // TODO: decide which value should be written to database
+                                // proposedValues[property] = <value to be saved>;
+                            }
+
+                            // Refresh original values to bypass next concurrency check
+                            entry.OriginalValues.SetValues(databaseValues);
+                        }
+                        else
+                        {
+                            throw new NotSupportedException(
+                                "Don't know how to handle concurrency conflicts for "
+                                + entry.Metadata.Name);
+                        }
+                    }
+                }
+            }
+            return saved;
         }
         #endregion
 

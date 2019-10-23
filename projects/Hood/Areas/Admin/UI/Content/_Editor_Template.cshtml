@@ -6,6 +6,7 @@
         Template
     </label>
     <select class="form-control" data-selected="@Model.GetMeta("Settings.Template").GetStringValue()" id="Meta:Settings.Template" name="Meta:Settings.Template">
+        <option value="">Default Template</option>
         @foreach (var template in Model.Templates)
         {
             <option value="@template.Key">@template.Value</option>

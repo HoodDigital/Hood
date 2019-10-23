@@ -5,10 +5,14 @@ using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -17,13 +21,16 @@ namespace Hood.Services
     public class MediaManager : IMediaManager
     {
         private CloudStorageAccount _storageAccount;
+        private MediaSettings _mediaSettings;
         private string _container;
         private string _key;
         private readonly IHostingEnvironment _env;
+        private readonly IConfiguration _config;
 
-        public MediaManager(IHostingEnvironment env)
+        public MediaManager(IHostingEnvironment env, IConfiguration config)
         {
             _env = env;
+            _config = config;
             Initialise();
         }
 
@@ -38,7 +45,15 @@ namespace Hood.Services
 
         private void Initialise()
         {
-            MediaSettings _mediaSettings = Engine.Settings.Media;
+            if (_mediaSettings == null)
+            {
+                DbContextOptionsBuilder<HoodDbContext> options = new DbContextOptionsBuilder<HoodDbContext>();
+                options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+                var db = new HoodDbContext(options.Options);
+                var msOption = db.Options.SingleOrDefault(o => o.Id == typeof(MediaSettings).ToString());
+                _mediaSettings = JsonConvert.DeserializeObject<MediaSettings>(msOption.Value);                
+            }
+
             _container = _mediaSettings.ContainerName.ToSeoUrl();
             _key = _mediaSettings.AzureKey;
             try

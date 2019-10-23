@@ -40,7 +40,7 @@ namespace Hood.Services
             StatusMessage = "Not running...";
             _env = env;
             _directoryManager = directoryManager;
-            _media = new MediaManager(env);
+            _media = new MediaManager(env, config);
             TempFolder = env.ContentRootPath + "\\Temporary\\" + typeof(MediaRefreshService) + "\\";
         }
 
@@ -80,7 +80,7 @@ namespace Hood.Services
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
                 Database = new HoodDbContext(options.Options);
 
-                _media = new MediaManager(_env);
+                _media = new MediaManager(_env, _config);
 
                 Lock.ReleaseWriterLock();
 
