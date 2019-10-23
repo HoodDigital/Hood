@@ -1,6 +1,6 @@
 @model ContentModel
 @{
-    Layout = "_Blank";
+    Layout = "_Layout_Basic";
 
     ViewData["Content"] = Model.Content;
 
@@ -85,3 +85,5 @@ else
 {
     <partial name="@View" />
 }
+@View
+@Layout

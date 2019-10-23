@@ -30,11 +30,11 @@
             <div class="mt-4 mb-4">
                 @Html.Raw(currentSub.Description)
             </div>
-    @if (Model.SaveMessage.IsSet())
-    {
-        <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
-    }
-    <partial name="_Subscriptions_CurrentInfo" model="@new UserSubscriptionInfo(Model.UserSubscription)" />
+            @if (Model.SaveMessage.IsSet())
+            {
+                <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
+            }
+            <partial name="_Subscriptions_CurrentInfo" model="@new UserSubscriptionInfo(Model.UserSubscription)" />
         </div>
     </div>
 </section>

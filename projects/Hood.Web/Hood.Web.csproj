@@ -11,30 +11,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Themes\bootstrap4\Views\Shared\_Pagination.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" />
   </ItemGroup>
   
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Include="Themes\bootstrap4\Views\Shared\_Pagination.cshtml" />
-  </ItemGroup>
-      
+        
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
-  </ItemGroup>
-      
-  <ItemGroup>
-    <Content Update="Themes\bootstrap3\Views\Shared\_Nav_Manage.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
       
 </Project>

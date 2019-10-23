@@ -3,7 +3,7 @@
     <a class="nav-link nav-item bg-light" data-toggle="modal" href="@string.Format("#card-modal-{0}", Model.Id)">
         @if (Model.Id == Model.Customer.InvoiceSettings.DefaultPaymentMethodId || Model.Id == Model.Customer.DefaultSourceId)
         {
-            <span class="pull-right badge badge-success">Default</span>
+            <span class="float-right badge badge-success">Default</span>
         }
         <img class="mr-2" src="@string.Format("/hood/images/cards/{0}.png", Model.Card.Brand.StripSpaces())" style="width:30px;" />
         <span>Card ending in <strong>@Model.Card.Last4</strong></span>

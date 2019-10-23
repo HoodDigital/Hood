@@ -1,35 +1,40 @@
 @model Stripe.Invoice
-<div class="panel panel-default accordion-section m-b-xs">
-    <div class="panel-heading accordion-title">
-        <a data-toggle="collapse" href="@string.Format("#collapse-invoice-{0}", Model.Id)">
-            <span class="pull-right">
-                @switch (Model.Status)
-                {
-                    case "paid":
-                        <span class="label label-success">@Model.Status.ToTitleCase()</span>
-                        break;
-                    case "draft":
-                        <span class="label label-warning">@Model.Status.ToTitleCase()</span>
-                        break;
-                    case "open":
-                        <span class="label label-danger">@Model.Status.ToTitleCase()</span>
-                        break;
-                    case "void":
-                        <span class="label label-default">@Model.Status.ToTitleCase()</span>
-                        break;
-                }
-            </span>
-            Invoice
-            <span>@Model.PeriodEnd.ToDisplay()</span>
-        </a>
-    </div>
-    <div id="@string.Format("collapse-invoice-{0}", Model.Id)" class="panel-collapse accordion-content collapse" role="tabpanel" aria-labelledby="@string.Format("#heading-{0}", Model.Id)">
-        <div class="panel-body">
-            <p>@Model.Description</p>
+<div class="nav nav-pills flex-column">
+    <a class="nav-link nav-item bg-light" data-toggle="modal" href="@string.Format("#invoice-modal-{0}", Model.Id)">
+        <span class="float-right">
+            @switch (Model.Status)
+            {
+                case "paid":
+                    <span class="label label-success">@Model.Status.ToTitleCase()</span>
+                    break;
+                case "draft":
+                    <span class="label label-warning">@Model.Status.ToTitleCase()</span>
+                    break;
+                case "open":
+                    <span class="label label-danger">@Model.Status.ToTitleCase()</span>
+                    break;
+                case "void":
+                    <span class="label label-default">@Model.Status.ToTitleCase()</span>
+                    break;
+            }
+        </span>
+        Invoice
+        <span>@Model.PeriodEnd.ToDisplay()</span>
+    </a>
+</div>
+<div class="modal fade modal-right invoice-modal" id="@string.Format("invoice-modal-{0}", Model.Id)" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Invoice <span>@Model.PeriodEnd.ToDisplay()</span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             @if (Model.Lines != null && Model.Lines.Data.Count() != 0)
             {
-                <table class="table">
-                    <tr>
+                <table class="table border-top-0">
+                    <tr class="border-top-0">
                         <th style="width:80%">Description / Period</th>
                         <th style="width:20%">Amount</th>
                     </tr>
@@ -64,79 +69,83 @@
                     }
                 </table>
             }
-            @if (Model.PaymentIntent != null)
-            {
-                var charge = Model.PaymentIntent.Charges.OrderByDescending(c => c.Created).FirstOrDefault();
-                @switch (Model.PaymentIntent.Status)
+            <div class="modal-body text-center">
+                @if (Model.PaymentIntent != null)
                 {
-                    case "succeeded":
-                        <alert>
-                            @if (charge != null)
-                            {
-                                <p>
-                                    Your card has been charged @Model.PaymentIntent.AmountReceived.Value.ToCurrencyString() on
-                                    @charge.Created.ToDisplay()
-                                </p>
-                            }
-                            else
-                            {
-                                <p>
-                                    Your card has been charged @Model.PaymentIntent.AmountReceived.Value.ToCurrencyString() on
-                                    @Model.PaymentIntent.Created.Value.ToDisplay()
-                                </p>
-                            }
-                      </alert>
-                        break;
-                    case "processing":
-                        <alert type="Info">
-                            Your card payment is currently processing.
-                        </alert>
-                        break;
-                    case "canceled":
-                        <alert type="Danger">
-                            Your payment has been cancelled.
-                        </alert>
-                        break;
-                    case "requires_payment_method":
-                        <alert type="Warning">
-                            @if (charge != null)
-                            {
-                                <p>Your payment was not completed successfully: @charge.FailureMessage</p>
-                            }
-                            else
-                            {
-                                <p>Your payment was not completed successfully, the payment method provided did not work.</p>
-                            }
-                        </alert>
-                        break;
-                    case "requires_action":
-                        <alert type="Warning">
-                            <p>Your payment was not completed successfully, you will need to authenticate the transaction further.</p>
-                            <p><a class="btn btn-warning" href="@Model.HostedInvoiceUrl">Complete the payment</a></p>
-                            <p>You will also have received an email with further instructions to complete your payment.</p>
-                        </alert>
-                        break;
-                }
-            }
-            else
-            {
-                <p>No charge has been attempted.</p>
-            }
-            @if (Model.Status != "paid")
-            {
-                if (Model.NextPaymentAttempt.HasValue)
-                {
-                    <alert>
-                        Your payment will be re-attempted at @Model.NextPaymentAttempt.Value.ToString()
-                    </alert>
+                    var charge = Model.PaymentIntent.Charges.OrderByDescending(c => c.Created).FirstOrDefault();
+                    @switch (Model.PaymentIntent.Status)
+                    {
+                        case "succeeded":
+                            <alert>
+                                @if (charge != null)
+                                {
+                                    <span>
+                                        Your card has been charged @Model.PaymentIntent.AmountReceived.Value.ToCurrencyString() on
+                                        @charge.Created.ToDisplay()
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        Your card has been charged @Model.PaymentIntent.AmountReceived.Value.ToCurrencyString() on
+                                        @Model.PaymentIntent.Created.Value.ToDisplay()
+                                    </span>
+                                }
+                            </alert>
+                            break;
+                        case "processing":
+                            <alert type="Info">
+                                Your card payment is currently processing.
+                            </alert>
+                            break;
+                        case "canceled":
+                            <alert type="Danger">
+                                Your payment has been cancelled.
+                            </alert>
+                            break;
+                        case "requires_payment_method":
+                            <alert type="Warning">
+                                @if (charge != null)
+                                {
+                                    <span>Your payment was not completed successfully: @charge.FailureMessage</span>
+                                }
+                                else
+                                {
+                                    <span>Your payment was not completed successfully, the payment method provided did not work.</span>
+                                }
+                            </alert>
+                            break;
+                        case "requires_action":
+                            <alert type="Warning">
+                                <p>Your payment was not completed successfully, you will need to authenticate the transaction further.</p>
+                                <p><a class="btn btn-warning" href="@Model.HostedInvoiceUrl">Complete the payment</a></p>
+                                <p class="mb-0">You will also have received an email with further instructions to complete your payment.</p>
+                            </alert>
+                            break;
+                    }
                 }
                 else
                 {
                     <alert>
-                        Your payment will not be attempted again.
+                        No charge has been attempted.
                     </alert>
                 }
-            }
+                @if (Model.Status != "paid")
+                {
+                    if (Model.NextPaymentAttempt.HasValue)
+                    {
+                        <alert>
+                            Your payment will be re-attempted at @Model.NextPaymentAttempt.Value.ToString()
+                        </alert>
+                    }
+                    else
+                    {
+                        <alert>
+                            Your payment will not be attempted again.
+                        </alert>
+                    }
+                }
+            </div>
         </div>
     </div>
 </div>
