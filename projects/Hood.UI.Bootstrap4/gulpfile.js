@@ -1,4 +1,3 @@
-/// <binding BeforeBuild='build' />
 // Copies view files in from Hood.Web dev project on build.
 var gulp = require('gulp'),
     rimraf = require('gulp-rimraf');
