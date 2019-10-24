@@ -18,15 +18,10 @@
         metaDesc = cmDesc.GetStringValue();
     }
     ViewBag.Title = metaTitle;
+    ViewBag.PageTitle = Model.Property.Title;
     ViewData["EditUrl"] = Url.Action("Edit", "Property", new { area = "Admin", id = Model.Property.Id });
 
-    Layout = "_Layout";
-
-    string url = Context.GetSiteUrl(true, true);
-    if (_seoSettings.CanonicalUrl.IsSet())
-    {
-        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
-    }
+    Layout = "_Layout_Property";
 }
 @section metas {
     <meta name="description" content="@Model.Property.ShortDescription" />
@@ -48,108 +43,75 @@
     <meta name="twitter:title" content="@Model.Property.Title - @_basicSettings.FullTitle" />
     <meta name="twitter:description" content="@Model.Property.ShortDescription" />
 }
-<section class="hero">
-    <fixedImage src="@Model.Property.FeaturedImage.LargeUrl" class="background-image hood-image"></fixedImage>
-    <div class="intro">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-7 col-md-offset-1">
-                    <h1>@Model.Property.Title<br /><small>@Model.Property.ListingType</small></h1>
-                    <p class="lead">@Html.Raw(Model.Property.ShortDescription)</p>
-                    <p>
-                        @if (Model.Property.InfoDownloadJson.IsSet())
-                        {
-                            <a class="btn btn-default" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
-                        }
-                        <a class="btn btn-default" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 <div class="container m-t-lg">
     <div class="row">
         <div class="col-sm-4">
             <a href="@Model.Property.FeaturedImage.LargeUrl" class="colorbox"><img src="@Model.Property.FeaturedImage.MediumUrl" class="img img-full content-feature-@Model.Property.Id m-b-xs" /></a>
-            <div class="gallery">
+            <div class="card-deck card-deck-3 no-gutters mt-4">
                 @foreach (var media in Model.Property.Media)
                 {
-                    <a href="@media.LargeUrl" class="colorbox"><fixedImage src="@media.SmallUrl" class="img-xs content-feature-@media.Id m-b-xs"></fixedImage></a>
+                    <div class="card border-0 rounded-0">
+                        <a href="@media.LargeUrl" class="colorbox">
+                            <fixedImage src="@media.SmallUrl" class="img img-full img-square m-0"></fixedImage>
+                        </a>
+                    </div>
                 }
             </div>
-            <div class="p-md bg-color-lighten text-center">
+            <table class="table border-top-0 m-0">
+                @if (_propertySettings.ShowAskingPrice)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Asking Price
+                        </th>
+                        <td>
+                            @Model.Property.FormattedAskingPrice
+                        </td>
+                    </tr>
+                }
+                @if (_propertySettings.ShowRent)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Rent
+                        </th>
+                        <td>
+                            @Model.Property.FormattedRent
+                        </td>
+                    </tr>
+                }
+                @if (_propertySettings.ShowPremium)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Premium
+                        </th>
+                        <td>
+                            @Model.Property.FormattedPremium
+                        </td>
+                    </tr>
+                }
+                @if (_propertySettings.ShowFees)
+                {
+                    <tr class="ratings text-left">
+                        <th>
+                            Fees
+                        </th>
+                        <td>
+                            @Model.Property.FormattedFees
+                        </td>
+                    </tr>
+                }
+            </table>
+            <p>
+                <a class="btn btn-primary btn-block" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+            </p>                
+            @if (Model.Property.InfoDownloadJson.IsSet())
+            {
                 <p>
-                    @Html.Raw(Model.Property.ToFormat(AddressFormat.MultiLine))
+                    <a class="btn btn-block btn-primary" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
                 </p>
-                <a class="btn btn-block m-t-lg btn-default" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
-                @if (Model.Property.InfoDownloadJson.IsSet())
-                {
-                    <a class="btn btn-block btn-default m-t-lg" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
-                }
-            </div>
-            <div class="p-md bg-color-lighten m-t-xs">
-                <ul class="media-list no-margin">
-                    @if (Model.Property.Rent.HasValue)
-                    {
-                        <li class="media">
-                            <div class="media-left">
-                                <i class="fa fa-money fa-2x"></i>
-                            </div>
-                            <div class="media-body">
-                                <h4 class="no-margin">Rent</h4>
-                                <p>@string.Format(Model.Property.RentDisplay, Model.Property.FormattedRent)</p>
-                            </div>
-                        </li>
-
-                    }
-                    @if (Model.Property.AskingPrice.HasValue)
-                    {
-                        <li class="media">
-                            <div class="media-left">
-                                <i class="fa fa-money fa-2x"></i>
-                            </div>
-                            <div class="media-body">
-                                <h4 class="no-margin">Asking Price</h4>
-                                <p>@string.Format(Model.Property.AskingPriceDisplay, Model.Property.FormattedAskingPrice)</p>
-                            </div>
-                        </li>
-                    }
-                    @if (Model.Property.Premium.HasValue)
-                    {
-                        <li class="media">
-                            <div class="media-left">
-                                <i class="fa fa-money fa-2x"></i>
-                            </div>
-                            <div class="media-body">
-                                <h4 class="no-margin">Premium</h4>
-                                <p>@string.Format(Model.Property.PremiumDisplay, Model.Property.FormattedPremium)</p>
-                            </div>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <div class="p-md bg-color-lighten m-t-xs">
-                <h4 class="no-margin">Areas</h4>
-                <hr />
-                @if (Model.Property.FloorAreas?.Count > 0)
-                {
-                    @foreach (var floor in Model.Property.FloorAreas)
-                    {
-                        <div class="row m-b-xs">
-                            <div class="col-xs-4"><strong>@floor.Name</strong></div>
-                            <div class="col-xs-8">
-                                @floor.SquareMetres.ToString("N0") m<sup>2</sup>
-                                [@floor.SquareFeet.ToString("N0") sq. ft.]
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <p class="no-margin">There are no floor areas added yet...</p>
-                }
-            </div>
+            }
         </div>
         <div class="col-sm-8">
             <div class="m-b-md">
@@ -161,9 +123,9 @@
                 <p class="m-t-sm">
                     @if (Model.Property.InfoDownloadJson.IsSet())
                     {
-                        <a class="btn btn-default" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
+                        <a class="btn btn-primary" href="@Model.Property.InfoDownload.DownloadUrl"><i class="fa fa-file-pdf-o"></i> Download info pack</a>
                     }
-                    <a class="btn  btn-default" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
+                    <a class="btn btn-primary" href="@string.Format("/contact?subject={0}", Model.Property.ToFormat(AddressFormat.SingleLine))">Enquire <i class="fa fa-long-arrow-right"></i></a>
                 </p>
             </blockquote>
             <h5>Description</h5>
@@ -204,18 +166,4 @@
             }
         </div>
     </div>
-    @if (Model.Similar != null && Model.Similar.Count > 0)
-    {
-        <div class="row">
-            <h4>Some of our other properties</h4>
-            <div class="portfolio-carousel owl-carousel owl-theme">
-                <div class="col-md-4 col-sm-6 col-xs-12 mb-30">
-                    @foreach (var similar in Model.Similar)
-                    {
-                        <partial name="_PropertyView" model="similar" />
-                    }
-                </div>
-            </div>
-        </div>
-    }
 </div>

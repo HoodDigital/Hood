@@ -1,24 +1,16 @@
 @model TopicModel
 <form method="post">
-    <fieldset class="form-horizontal">
-        <div class="form-group">
-            <label class="col-sm-3 control-label">Title</label>
-            <div class="col-sm-8">
-                <input asp-for="Topic.Title" type="text" class="form-control" />
-                <span asp-validation-for="Topic.Title"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">Description</label>
-            <div class="col-sm-8">
-                <textarea asp-for="Topic.Description" type="text" class="form-control"></textarea>
-                <span asp-validation-for="Topic.Description"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-sm-8 col-sm-offset-3">
-                <button type="submit" class="btn btn-primary"><span>Create Topic</span></button>
-            </div>
-        </div>
-    </fieldset>
+    <div class="form-group">
+        <label>Title</label>
+        <input asp-for="Topic.Title" type="text" class="form-control" placeholder="Enter the title of the topic..." />
+        <span asp-validation-for="Topic.Title"></span>
+    </div>
+    <div class="form-group">
+        <label>Description</label>
+        <textarea asp-for="Topic.Description" type="text" class="form-control" placeholder="Enter a description of the topic..."></textarea>
+        <span asp-validation-for="Topic.Description"></span>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary"><span>Create Topic</span></button>
+    </div>
 </form>

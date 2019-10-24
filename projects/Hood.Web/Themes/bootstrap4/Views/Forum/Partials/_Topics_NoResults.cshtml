@@ -1,17 +1,13 @@
 @model TopicModel
 @if (string.IsNullOrEmpty(Model.Search))
 {
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            @Html.BootstrapAlert("No one has said anything about this just yet, start your discussion now!", AlertType.Info, false, "text-center m-t-lg")
-        </div>
-    </div>
+    <alert type="Info">
+        No one has said anything about this just yet, start your discussion now!
+    </alert>
 }
 else
 {
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            @Html.BootstrapAlert("Your search '" + Model.Search + "' did not return any results. Please try searching for something else.", AlertType.Info, false, "text-center m-t-lg")
-        </div>
-    </div>
+    <alert type="Info">
+        Your search '@Model.Search' did not return any results. Please try searching for something else.
+    </alert>
 }

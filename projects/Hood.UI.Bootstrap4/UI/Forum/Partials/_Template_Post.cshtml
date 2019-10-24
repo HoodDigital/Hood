@@ -1,39 +1,40 @@
 @model Post
 @{
-    bool moderator = User.Identity.IsAuthenticated &&
-        (Model.AuthorId == Engine.Account.Id || User.IsForumModerator() || User.IsAdminOrBetter());
+    bool moderator = User.Identity.IsAuthenticated && (Model.AuthorId == Engine.Account.Id || User.IsForumModerator() || User.IsAdminOrBetter());
 }
-<div class="post" id="@string.Format("post-{0}", Model.Id)">
-    <div class="row">
-        <div class="col-md-10">
+<div class="post card mb-4" id="@string.Format("post-{0}", Model.Id)">
+    <div class="card-body row">
+        <div class="col">
             <div class="post-view">
-                <div class="post-content">
-                    @if (Model.ReplyId.HasValue)
-                    {
-                        <p class="reply">
-                            This is a reply to
-                            <a asp-action="ShowTopic" asp-route-topicId="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-highlight="@Model.ReplyId">Original Post</a>.
-                        </p>
-                    }
-                    @Html.Raw(Model.Body)
-                    @if (Model.Edited && Model.EditedTime.HasValue)
-                    {
-                        <p class="stats">
-                            <span><i class="fa fa-pencil m-r-xs"></i> This was last edited @Model.EditedTime.Value.ToHumaneDate() by @Model.EditedBy.ToDisplayName()</span>
-                        </p>
-                    }
-                </div>
+                @if (Model.ReplyId.HasValue)
+                {
+                    <small class="d-block text-info">
+                        This is a reply to
+                        <a asp-action="ShowTopic" asp-route-topicId="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-highlight="@Model.ReplyId">this post</a>.
+                    </small>
+                }
+                @Html.Raw(Model.Body)
+                @if (Model.Edited && Model.EditedTime.HasValue)
+                {
+                    <small class="d-block text-muted"><i class="fa fa-pencil m-r-xs"></i> This was last edited @Model.EditedTime.Value.ToHumaneDate() by @Model.EditedBy.ToDisplayName()</small>
+                }
             </div>
-            @if (moderator)
-            {
-                <div class="edit-view">
-                    <form method="post" class="edit-post-form" asp-action="EditPost" asp-route-postId="@Model.Id">
+        </div>
+        <div class="col-auto text-right">
+            <a class="btn btn-sm btn-success mb-2" asp-action="ShowTopic" asp-route-topicId="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-reply="@Model.Id">Reply</a><br />
+            <a class="btn btn-sm btn-info warning-alert" asp-action="ReportPost" asp-route-postId="@Model.Id" data-warning="This will alert administrators to look into this post for abuse, are you sure you want to send the report?">Report</a>
+        </div>
+        @if (moderator)
+        {
+            <div class="card-body collapse" id="@string.Format("edit-post-{0}", Model.Id)">
+                <div class="edit-view card">
+                    <form method="post" class="edit-post-form card-body" asp-action="EditPost" asp-route-postId="@Model.Id">
                         <fieldset>
                             <input name="postId" type="hidden" value="@Model.Id" />
                             <div class="form-group">
                                 <label class="control-label">Edit post</label>
                                 <div class="">
-                                    <textarea name="body" for="post-body-@Model.Id" type="text" class="form-control tinymce-public" data-apikey="im5cz6mwvyzb4wnmt2m9uylj2oqrlolmxmow161fioddtgy0">@Model.Body</textarea>
+                                    <textarea name="body" for="post-body-@Model.Id" type="text" class="form-control">@Model.Body</textarea>
                                     <span for="post-body-@Model.Id"></span>
                                 </div>
                             </div>
@@ -45,26 +46,22 @@
                         </fieldset>
                     </form>
                 </div>
-            }
-        </div>
-        <div class="col-md-2 text-right">
-            <a class="btn btn btn-success m-b-xs" asp-action="ShowTopic" asp-route-topicId="@Model.TopicId" asp-route-title="@Model.Topic.Title" asp-route-reply="@Model.Id">Reply</a><br />
-            <a class="btn btn-xs btn-info warning-alert" asp-action="ReportPost" asp-route-postId="@Model.Id"  data-warning="This will alert administrators to look into this post for abuse, are you sure you want to send the report?">Report</a>
-        </div>
+            </div>      }
     </div>
-    <hr />
-    <div class="post-content">
+    <div class="card-body text-muted small">
         @Html.Raw(Model.Signature)
     </div>
-    <p class="pull-right">
-        @if (moderator)
-        {
-            <a class="btn btn-xs btn-warning edit-post m-r-xs">Edit</a>
-            <a class="btn btn-xs btn-danger warning-alert m-r-xs" asp-action="DeletePost" asp-route-postId="@Model.Id" data-warning="This will delete the post, and cannot be undone, are you sure?">Delete</a>
-        }
-    </p>
-    <p class="stats">
-        <span class="m-r-sm"><i class="fa fa-user m-r-xs"></i> @Model.Author.ToDisplayName()</span>
-        <span><i class="fa fa-clock-o m-r-xs"></i> @Model.PostedTime.ToHumaneDate()</span>
-    </p>
+    <div class="card-footer d-flex align-items-center">
+        <div class="flex-grow-1">
+            <small class="text-muted mr-2"><i class="fa fa-user mr-1"></i> @Model.Topic.Author.ToDisplayName()</small>
+            <small class="text-muted"><i class="fa fa-clock mr-1"></i> @Model.Topic.CreatedOn.ToHumaneDate()</small>
+        </div>
+        <div>
+            @if (moderator)
+            {
+                <a class="btn btn-sm btn-warning mr-2" data-toggle="collapse" data-target="@string.Format("#edit-post-{0}", Model.Id)">Edit</a>
+                <a class="btn btn-sm btn-danger warning-alert" asp-action="DeletePost" asp-route-postId="@Model.Id" data-warning="This will delete the post, and cannot be undone, are you sure?">Delete</a>
+            }
+        </div>
+    </div>
 </div>

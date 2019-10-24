@@ -1,16 +1,15 @@
 @model TopicModel
-<div class="sidebar-widget m-b-lg">
-    <h4>Search topics...</h4>
-    <hr />
-    <form>
-        <div class="row">
-            <div class="col-xs-8">
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0">Search</h6>
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="form-group">
                 <label for="search" class="hidden">Search</label>
-                <input class="form-control" type="text" asp-for="Search" placeholder="Search Here" name="search">
+                <input class="form-control" type="text" asp-for="Search" placeholder="Enter a search..." name="search">
             </div>
-            <div class="col-xs-4">
-                <button class="btn btn-block" type="submit">Search</button>
-            </div>
-        </div>
-    </form>
+            <button class="btn btn-block btn-outline-dark" type="submit">Search</button>
+        </form>
+    </div>
 </div>

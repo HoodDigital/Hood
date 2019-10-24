@@ -1,9 +1,12 @@
 @inject ForumCategoryCache _categories
-<div class="sidebar-widget m-b-lg">
-    <h4>Categories</h4>
-    <hr />
-    @_categories.ForumCategoryTree(_categories.TopLevel())
-    <ul>
-        <li><a asp-action="Index">Show All</a></li>
-    </ul>
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0">Categories</h6>
+    </div>
+    <div class="card-body">
+        @_categories.ForumCategoryTree(_categories.TopLevel())
+        <ul class="list-unstyled mb-0">
+            <li><a asp-action="Index">Show All</a></li>
+        </ul>
+    </div>
 </div>

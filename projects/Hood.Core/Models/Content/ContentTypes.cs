@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Hood.Models
 {
@@ -94,7 +95,9 @@ namespace Hood.Models
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
-                        CustomFields = BaseFields(new List<CustomField>())
+                        CustomFields = BaseFields(new List<CustomField>() {
+                            new CustomField() { Name = "Settings.Image.Featured.Fit", Default = "contain", System = true, Type = "System.String" }
+                        })
                     },
                     new ContentType() {
                         BaseName = "FAQ",
@@ -199,7 +202,7 @@ namespace Hood.Models
                         Title = "Testimonials",
                         Icon = "fa-comments",
                         Enabled = false,
-                        IsPublic = false,
+                        IsPublic = true,
                         HasPage = true,
                         TypeName = "Testimonial",
                         TypeNamePlural = "Testimonials",
@@ -214,10 +217,12 @@ namespace Hood.Models
                         Gallery = false,
                         Templates = false,
                         TemplateFolder = "Templates",
-                        CustomFields = BaseFields(
-                        new List<CustomField>()
+                        CustomFields = BaseFields(new List<CustomField>()
                         {
+                            new CustomField() { Name = "Settings.Image.Featured.Fit", Default = "contain", System = true, Type = "System.String" },
+
                             new CustomField() { Name = "Content.Testimonial.CompanyName", Default = "", System = true, Type="System.String" },
+                            new CustomField() { Name = "Content.Testimonial.JobTitle", Default = "", System = true, Type="System.String" },
                             new CustomField() { Name = "Content.Testimonial.JobTitle", Default = "", System = true, Type="System.String" }
                         })
                     },
@@ -262,33 +267,42 @@ namespace Hood.Models
         }
         public static List<CustomField> BaseFields(List<CustomField> fields)
         {
-            fields.AddRange(new List<CustomField>()
+            var baseFields = new List<CustomField>()
             {
-                new CustomField() {Name="DisplayOrder", Default="0", System=true, Type="System.Int32" },
+                new CustomField() { Name="DisplayOrder", Default="0", System = true, Type="System.Int32" },
 
-                new CustomField() {Name="Settings.Template", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="Rating", Default="0", System = true, Type="System.Int32" },
 
-                new CustomField() {Name="Settings.SubType", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="Settings.Template", Default = "", System = true, Type = "System.String" },
 
-                new CustomField() {Name="SEO.Meta.Title", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Meta.Description", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="Settings.SubType", Default = "", System = true, Type = "System.String" },
 
-                new CustomField() {Name="SEO.Facebook.Title", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Facebook.Description", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Facebook.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
+                new CustomField() { Name="SEO.Meta.Title", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="SEO.Meta.Description", Default = "", System = true, Type = "System.String" },
 
-                new CustomField() {Name="SEO.Twitter.Title", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Twitter.Description", Default = "", System = true, Type = "System.String" },
-                new CustomField() {Name="SEO.Twitter.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
-                new CustomField() {Name="SEO.Twitter.Creator", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="SEO.Facebook.Title", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="SEO.Facebook.Description", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="SEO.Facebook.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
 
-                new CustomField() {Name="Settings.Security.AdminOnly", Default = "false", System = true, Type = "System.Boolean" },
-                new CustomField() {Name="Settings.Security.Public", Default = "true", System = true, Type = "System.Boolean" },
+                new CustomField() { Name="SEO.Twitter.Title", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="SEO.Twitter.Description", Default = "", System = true, Type = "System.String" },
+                new CustomField() { Name="SEO.Twitter.ImageUrl", Default = "", System = true, Type = "Hood.Image" },
+                new CustomField() { Name="SEO.Twitter.Creator", Default = "", System = true, Type = "System.String" },
 
-                new CustomField() {Name="Settings.Image.Featured.Align", Default = "center", System = true, Type = "System.String" },
-                new CustomField() {Name="Settings.Image.Featured.Fit", Default = "cover", System = true, Type = "System.String" },
-                new CustomField() {Name="Settings.Image.Featured.Background", Default = "transparent", System = true, Type = "System.String" }
-            });
+                new CustomField() { Name="Settings.Security.AdminOnly", Default = "false", System = true, Type = "System.Boolean" },
+                new CustomField() { Name="Settings.Security.Public", Default = "true", System = true, Type = "System.Boolean" },
+
+                new CustomField() { Name="Settings.Image.Featured.Align", Default = "center", System = true, Type = "System.String" },
+                new CustomField() { Name="Settings.Image.Featured.Fit", Default = "cover", System = true, Type = "System.String" },
+                new CustomField() { Name="Settings.Image.Featured.Background", Default = "transparent", System = true, Type = "System.String" }
+            };
+            foreach (var field in baseFields)
+            {
+                if (!fields.Any(f => f.Name == field.Name))
+                {
+                    fields.Add(field);
+                }
+            }
             return fields;
         }
     }
