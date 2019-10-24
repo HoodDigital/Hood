@@ -119,6 +119,7 @@ $.hood.Stripe = {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
             $.hood.Stripe.Lists.PaymentMethods.Reload();
+            $('.card-modal').modal('hide');
           });
         }
       };
@@ -134,15 +135,7 @@ $.hood.Stripe = {
           $.post($tag.attr('href'), function (data) {
             $.hood.Helpers.ProcessResponse(data);
             $.hood.Stripe.Lists.PaymentMethods.Reload();
-
-            if (data.Success) {
-              if ($tag && $tag.data('redirect')) {
-                $.hood.Alerts.Success("<strong>Card deleted, redirecting...</strong><br />Just taking you back to the list.");
-                setTimeout(function () {
-                  window.location = $tag.data('redirect');
-                }, 1500);
-              }
-            }
+            $('.card-modal').modal('hide');
           });
         }
       };

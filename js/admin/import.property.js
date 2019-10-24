@@ -69,25 +69,25 @@ $.hood.Import.Property = {
         if (result.Importer.Errors.length) {
           errorHtml = "";
 
-          for (i = 0; i < result.Importer.Errors.length; i++) {
-            errorHtml += '<p class="text-danger">' + result.Importer.Errors[i] + '</p>';
+          for (i = result.Importer.Errors.length - 1; i >= 0; i--) {
+            errorHtml += '<div class="text-danger">' + result.Importer.Errors[i] + '</div>';
           }
 
           $('#import-property-errors').html(errorHtml);
         } else {
-          $('#import-property-errors').html("<p>No errors reported.</p>");
+          $('#import-property-errors').html("<div>No errors reported.</div>");
         }
 
         if (result.Importer.Warnings.length) {
           warningHtml = "";
 
-          for (i = 0; i < result.Importer.Warnings.length; i++) {
-            warningHtml += '<p class="text-warning">' + result.Importer.Warnings[i] + '</p>';
+          for (i = result.Importer.Warnings.length - 1; i >= 0; i--) {
+            warningHtml += '<div class="text-warning">' + result.Importer.Warnings[i] + '</div>';
           }
 
           $('#import-property-warnings').html(warningHtml);
         } else {
-          $('#import-property-warnings').html("<p>No warnings reported.</p>");
+          $('#import-property-warnings').html("<div>No warnings reported.</div>");
         }
       }
     });
