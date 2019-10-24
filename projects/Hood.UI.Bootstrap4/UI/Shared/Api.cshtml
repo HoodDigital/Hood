@@ -1,0 +1,8 @@
+@model ApiViewModel
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+}
+<h2>@Model.Title</h2>
+<p class="lead">@Model.Details</p>
+

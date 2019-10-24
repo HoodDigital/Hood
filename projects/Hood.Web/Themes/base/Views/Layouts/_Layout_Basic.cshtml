@@ -1,0 +1,11 @@
+@{ 
+    Layout = "_Layout";
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<h1>@ViewData["Title"]</h1>
+<p>@Html.Raw(ViewData["SubTitle"])</p>

@@ -1,5 +1,5 @@
 ﻿if (!$.hood)
-    $.hood = {}
+    $.hood = {};
 $.hood.Themes = {
     Init: function () {
         $('body').on('click', '.activate-theme', $.hood.Themes.Activate);
@@ -21,7 +21,7 @@ $.hood.Themes = {
             if (isConfirm) {
                 $.post($tag.attr('href'), function (data) {
                     $.hood.Helpers.ProcessResponse(data);
-                    $.hood.Themes.Reload();
+                    setTimeout(function () { $.hood.Themes.Reload(); }, 2000);
                 });
             }
         };

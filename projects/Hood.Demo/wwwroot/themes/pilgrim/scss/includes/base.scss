@@ -1,0 +1,38 @@
+﻿body {
+    font-family: $body-font;
+    background-color: $Hood.Demo-light;
+
+    div.preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #242a23;
+        z-index: 99999;
+
+        > img {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate3d(-50%, -50%, 0);
+        }
+    }
+
+    .booking-slideout {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 300px;
+        background: white;
+        z-index: 9999;
+        box-shadow: 0 0 5px black;
+        @include transform(translateX(-315px));
+        @include transition(all .3s ease-in-out);
+    }
+
+    &.booking .booking-slideout {
+        @include transform(translateX(0px));
+    }
+}

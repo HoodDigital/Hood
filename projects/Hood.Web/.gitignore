@@ -1,9 +1,10 @@
 # Project Ignores
 package-lock.json
 /Properties/PublishProfiles
+/Feed
 /Temporary
-/Temporary/*
 
+# Ignore Development Views & Migrations
 /Areas/Admin/Views
 /Views
 /Migrations
@@ -22,3 +23,6 @@ package-lock.json
 /wwwroot/themes/**/*.min.js
 /wwwroot/themes/**/*.packaged.js
 /wwwroot/themes/**/lib
+
+# Ignore local settings files, apart from the base settings
+appsettings.*.json

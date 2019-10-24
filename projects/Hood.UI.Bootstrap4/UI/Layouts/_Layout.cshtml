@@ -1,0 +1,103 @@
+@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment _env
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+
+    bool bundleScripts = _env.EnvironmentName != "Development";
+}
+<!DOCTYPE html>
+<html lang="en-gb" xml:lang="en">
+<head>
+
+    <partial name="_Scripts_Validation" />
+    <partial name="_Scripts_Vendors" />
+    <partial name="_Scripts_Hood" />
+    <partial name="_Scripts_Google" />
+    <partial name="_Scripts" />
+
+    <partial name="_Metas_Base" />
+    <title>@ViewData["Title"]</title>
+
+    @Html.Raw(_seoSettings.HeadTags)
+
+    @if (!IsSectionDefined("metas"))
+    {
+        <partial name="_Metas" />
+    }
+    @RenderSection("metas", required: false)
+
+    @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)
+
+    @if (Engine.Settings.Basic.EnablePreload)
+    {
+        <partial name="_DeferredStyles" />
+    }
+    else
+    {
+        <partial name="_Styles" />
+    }
+    @RenderSection("styles", required: false)
+
+    @Html.RenderScripts(Url, ResourceLocation.AfterCss)
+    @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
+
+</head>
+<body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
+    @Html.Raw(_seoSettings.BodyTags)
+
+    @RenderSection("afterbody", required: false)
+
+    <partial name="_NoScript" />
+
+    @if (Engine.Settings.Basic.EnablePreload)
+    {
+        <partial name="_PreLoader" />
+    }
+
+    @RenderSection("beforecontent", required: false)
+
+    <div class="wrapper" id="wrapper">
+        @await Component.InvokeAsync(nameof(Hood.ViewComponents.Header))
+        @RenderBody()
+    </div>
+
+    @RenderSection("beforefooter", required: false)
+    <partial name="_Footer" />
+    <partial name="_CookieConsentPartial" />
+
+    @RenderSection("afterfooter", required: false)
+    <partial name="_AdminEditor" />
+
+    @if (Engine.Settings.Basic.EnablePreload)
+    {
+        <partial name="_DeferredStylesLoader" />
+    }
+
+    @RenderSection("includes", required: false)
+
+    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, bundleScripts)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
+
+    <partial name="_Scripts_JQuery" />
+    <partial name="_Scripts_Bootstrap" />
+
+    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, bundleScripts)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
+
+    @Html.RenderScripts(Url, ResourceLocation.Vendors, bundleScripts)
+
+    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, bundleScripts)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
+
+    @Html.RenderScripts(Url, ResourceLocation.Scripts, bundleScripts)
+
+    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, bundleScripts)
+    @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
+
+    @RenderSection("scripts", required: false)
+
+    @Html.Raw(JavaScriptSnippet.FullScript)
+    @Html.Raw(_seoSettings.GoogleAnalytics)
+</body>
+</html>

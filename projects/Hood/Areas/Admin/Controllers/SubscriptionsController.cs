@@ -6,6 +6,7 @@ using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -355,6 +356,31 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction(nameof(Subscribers));
         }
         #endregion
+
+        [Authorize(Roles = "SuperUser")]
+        public async Task<IActionResult> ClearAllLocalData()
+        {
+            try
+            {
+                _db.Database.SetCommandTimeout(new TimeSpan(0, 10, 0));
+                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodSubscriptionFeatures");
+                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodUserSubscriptions");
+                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodSubscriptions");
+                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodSubscriptionGroups");
+                await _db.Database.ExecuteSqlCommandAsync("UPDATE AspNetUsers SET StripeId = NULL");
+                _db.Database.SetCommandTimeout(new TimeSpan(0, 0, 30));
+                SaveMessage = "Logs have been cleared.";
+                MessageType = Enums.AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Error clearing the site logs.";
+                MessageType = Enums.AlertType.Danger;
+                await _logService.AddExceptionAsync<LogsController>(SaveMessage, ex);
+            }
+            return RedirectToAction(nameof(Products));
+        }
+
     }
 }
 

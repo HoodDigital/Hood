@@ -1,0 +1,23 @@
+@model PagedList<Forum>
+@if (Model != null && Model.List.Count > 0)
+{
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="m-0">Recently Added</h6>
+        </div>
+        <div class="card-body">
+            @foreach (Forum forum in Model.List)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="media-heading"><a class="title-link" href="@forum.Url">@forum.Title</a></h5>
+                        <small class="text-muted">
+                            <i class="mr-2 fa fa-user"></i>@forum.Author.ToDisplayName()
+                            <i class="mr-2 fa fa-clock-o"></i>@forum.CreatedOn.ToLongDateString()
+                        </small>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

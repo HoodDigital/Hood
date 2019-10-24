@@ -1,0 +1,31 @@
+@model SubscriptionProductsModel
+@{
+    ViewBag.Title = "Purchase Subscriptions";
+    ViewBag.SubTitle = "You can add subscription packages to your Hood CMS website and connect them to a Stripe account so you can charge your customers to access areas of the site, manage your regular billing or provide ongoing services.";
+}
+<div class="container">
+    @if (Model.SaveMessage.IsSet())
+    {
+        <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+    }
+    @if (Model.Products.Count() == 0)
+    {
+        <alert type="Warning" size="Medium" icon="fa-exclamation-triangle">There are no subscription products added to the site yet.</alert>
+    }
+    else
+    {
+        foreach (var product in Model.Products)
+        {
+            <h3>
+                @product.DisplayName
+            </h3>
+            <hr />
+            <div class="card-deck mb-3 text-center">
+                @foreach (Subscription plan in product.Subscriptions.OrderBy(s => s.Level))
+                {
+                    <partial name="_Template_Plan" model="plan" />
+                }
+            </div>
+        }
+    }
+</div>

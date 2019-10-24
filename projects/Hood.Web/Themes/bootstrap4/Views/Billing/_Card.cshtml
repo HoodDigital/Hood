@@ -1,0 +1,54 @@
+@model Stripe.PaymentMethod
+<div class="nav nav-pills flex-column">
+    <a class="nav-link nav-item bg-light" data-toggle="modal" href="@string.Format("#card-modal-{0}", Model.Id)">
+        @if (Model.Id == Model.Customer.InvoiceSettings.DefaultPaymentMethodId || Model.Id == Model.Customer.DefaultSourceId)
+        {
+            <span class="float-right badge badge-success">Default</span>
+        }
+        <img class="mr-2" src="@string.Format("/hood/images/cards/{0}.png", Model.Card.Brand.StripSpaces())" style="width:30px;" />
+        <span>Card ending in <strong>@Model.Card.Last4</strong></span>
+    </a>
+</div>
+<div class="modal fade modal-right card-modal" id="@string.Format("card-modal-{0}", Model.Id)" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Card ending in <strong>@Model.Card.Last4</strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <table class="table mb-0">
+                <tr>
+                    <th>
+                        Brand
+                    </th>
+                    <td>
+                        <img class="mr-2" src="@string.Format("/hood/images/cards/{0}.png", Model.Card.Brand.StripSpaces())" style="width:30px;" />
+                        @Model.Card.Brand
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Last 4 digits
+                    </th>
+                    <td>
+                        @Model.Card.Last4
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Expiry Date
+                    </th>
+                    <td>
+                        @Model.Card.ExpMonth / @Model.Card.ExpYear
+                    </td>
+                </tr>
+            </table>
+            <div class="modal-footer">
+                <a class="btn btn-xs btn-primary payment-method-setdefault" asp-action="SetDefault" asp-route-id="@Model.Id">Make Default</a>
+                <a class="btn btn-xs btn-danger payment-method-delete" asp-action="DeletePaymentMethod" asp-route-id="@Model.Id">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>

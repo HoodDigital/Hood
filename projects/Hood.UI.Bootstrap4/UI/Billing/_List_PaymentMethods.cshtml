@@ -1,0 +1,22 @@
+@model PaymentMethodsModel
+@{
+    Layout = null;
+}
+@if (Model.PaymentMethods != null && Model.PaymentMethods.Count > 0)
+{
+        @foreach (var itm in Model.PaymentMethods)
+        {
+            switch (itm.Type)
+            {
+                case Stripe.SourceType.Card:
+                    <partial name="_Card" model="itm" />
+                    break;
+            }
+        }
+}
+else
+{
+    <alert icon="fa fa-exclamation-triangle" type="Warning" class="mb-0">
+        You do not have any saved cards.
+    </alert>
+}

@@ -1,0 +1,34 @@
+@inject IContentRepository _content
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+    var path = Context.Request.Path.ToString().ToLower();
+}
+<ul class="navbar-nav mr-auto">
+    <li class="nav-item active">
+        <a class="nav-link" href="/">Home</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Content</a>
+        <div class="dropdown-menu" aria-labelledby="dropdown05">
+            @{
+                var _propertySettings = Engine.Settings.Property;
+                var sideTypes = Engine.Settings.Content.AllowedTypes;
+                if (_propertySettings.Enabled)
+                {
+                    sideTypes.Add(new ContentType() { Type = "property", Title = _propertySettings.Title, TypeNamePlural = _propertySettings.Plural, Slug = _propertySettings.Slug, IsPublic = true });
+                }
+                sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
+            }
+            @foreach (ContentType ct in sideTypes)
+            {
+                if (ct.IsPublic)
+                {
+                    <a class="dropdown-item" href="@string.Format("/{0}/", ct.Slug)">@ct.Title</a>
+                }
+            }
+        </div>
+    </li>
+    <li class="nav-item active">
+        <a class="nav-link" asp-action="Index" asp-controller="Forums">Forums</a>
+    </li>
+</ul>

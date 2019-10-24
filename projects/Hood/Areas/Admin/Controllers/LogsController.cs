@@ -28,9 +28,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                var logs = _db.Logs;
-                logs.ForEach(a => _db.Entry(a).State = EntityState.Deleted);
-                await _db.SaveChangesAsync();
+                _db.Database.SetCommandTimeout(new TimeSpan(0, 10, 0));
+                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodLogs");
+                _db.Database.SetCommandTimeout(new TimeSpan(0, 0, 30));
                 SaveMessage = "Logs have been cleared.";
                 MessageType = Enums.AlertType.Success;
             } catch (Exception ex)

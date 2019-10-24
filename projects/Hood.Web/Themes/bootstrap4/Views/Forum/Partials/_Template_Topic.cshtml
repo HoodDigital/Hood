@@ -1,0 +1,35 @@
+@model Topic
+@{
+    bool moderator = User.Identity.IsAuthenticated &&
+        (Model.AuthorId == Engine.Account.Id || User.IsForumModerator() || User.IsAdminOrBetter());
+}
+<div class="post card mb-4" id="@string.Format("topic-{0}", Model.Id)">
+    <a asp-action="ShowTopic" asp-route-topicId="@Model.Id" asp-route-title="@Model.Title.ToSeoUrl()" class="full-box-link"></a>
+    <div class="card-body d-flex align-items-center">
+        <div class="flex-grow-1">
+            <h5 class="">@Model.Title</h5>
+            <p class="mb-2">@Model.Description</p>
+            @if (Model.LastPostId.HasValue)
+            {
+                <small class="d-block mb-1">
+                    Latest Post by <strong>@Model.LastUserDisplayName</strong> at <strong>@Model.LastPosted.Value.ToDisplay()</strong>
+                </small>
+            }
+            else
+            {
+                <small class="d-block mt-1 mb-1">No posts yet.</small>
+            }
+        </div>
+    </div>
+    <div class="card-footer">
+        @if (moderator)
+        {
+            <div class="float-right">
+                <a class="btn btn-sm btn-warning mr-2" asp-action="ShowTopic" asp-route-topicId="@Model.Id" asp-route-title="@Model.Title.ToSeoUrl()">Edit</a>
+                <a class="btn btn-sm btn-danger warning-alert" asp-action="DeleteTopic" asp-route-slug="@Model.Forum.Slug" asp-route-topicId="@Model.Id" data-warning="This will delete the post, and cannot be undone, are you sure?">Delete</a>
+            </div>
+        }
+        <small class="mr-2 text-muted d-block d-md-inline-block"><i class="fa fa-paper-plane mr-1"></i> <strong>@Model.NumPosts</strong> posts.</small>
+        <small class="mr-2 text-muted d-block d-md-inline-block"><i class="fa fa-user mr-1"></i> Created by <strong>@Model.Author.ToDisplayName()</strong></small>
+    </div>
+</div>

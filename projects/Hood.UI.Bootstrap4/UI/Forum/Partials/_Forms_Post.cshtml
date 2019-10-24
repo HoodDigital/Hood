@@ -1,0 +1,23 @@
+@model PostModel
+@if (User.Identity.IsAuthenticated)
+{
+    <form method="post" id="forum-post-form">
+            <input asp-for="Post.ReplyId" type="hidden" />
+            <input asp-for="Post.Id" type="hidden" />
+            <div class="form-group">
+                <label>Your message</label>
+                <textarea asp-for="Post.Body" type="text" class="form-control" placeholder="Enter your message here..."></textarea>
+                <span asp-validation-for="Post.Body"></span>
+            </div>
+            <div class="form-group">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary"><span>Post message</span></button>
+                </div>
+            </div>
+    </form>
+}
+else
+{
+    <div id="forum-post-form">@Html.BootstrapAlert("Log in to add your message to this topic.", AlertType.Info)</div>
+}
+

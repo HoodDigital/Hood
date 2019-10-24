@@ -1,6 +1,7 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System;

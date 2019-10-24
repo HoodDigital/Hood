@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Threading.Tasks;
+using Hood.Models;
 
 namespace Hood.Areas.Admin.Controllers
 {

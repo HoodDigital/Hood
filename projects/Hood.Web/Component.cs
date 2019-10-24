@@ -1,5 +1,5 @@
-﻿using Hood.Extensions;
-using Hood.Interfaces;
+﻿using Hood.Interfaces;
+using Hood.Startup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

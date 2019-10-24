@@ -1,0 +1,16 @@
+@model ForumModel
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0">Search</h6>
+    </div>
+    <div class="card-body">
+        <form>
+            <input type="hidden" asp-for="Category" name="category" />
+            <div class="form-group">
+                <label for="search" class="hidden">Search</label>
+                <input class="form-control" type="text" asp-for="Search" placeholder="Enter a search..." name="search">
+            </div>
+            <button class="btn btn-block btn-outline-dark" type="submit">Search</button>
+        </form>
+    </div>
+</div>

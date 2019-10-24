@@ -1,0 +1,56 @@
+﻿﻿body {
+    min-width: 380px;
+
+    h1, h2, h3, h4, h5, h6 {
+        color: @theme-color;
+    }
+
+    .jumbotron {
+        background-color: @dark-color;
+        color: white;
+        margin-bottom: 0px;
+        padding: 25px 0;
+
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+    }
+
+    section.container {
+        padding: 25px 0;
+    }
+
+    section {
+        &.padded {
+            padding: 50px 0;
+        }
+
+        &.grey {
+            background-color: @theme-light;
+        }
+    }
+
+    .text-red {
+        font-weight: bold;
+        color: @theme-color;
+    }
+
+    .contact-form.loading:after {
+        content: 'Sending your enquiry...';
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: fade(@theme-light, 50%);
+        z-index: 2;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 45%;
+    }
+
+    .google-map {
+        height: 300px;
+    }
+}

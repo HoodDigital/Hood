@@ -2,6 +2,7 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Filters;
+using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -120,7 +121,7 @@ namespace Hood.Controllers
                     throw new Exception("There was a problem loading the customer object.");
                 }
 
-                Subscription subscription = null;
+                Stripe.Subscription subscription = null;
                 if (model.IntentId.IsSet())
                 {
                     // We are already processing a payment intent, just try and get the subscription.

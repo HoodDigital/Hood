@@ -9,6 +9,7 @@ using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,6 +107,34 @@ namespace Hood.Areas.Admin.Controllers
         }
 
 
+        [Route("admin/settings/scheduled-tasks/")]
+        public IActionResult ScheduledTasks()
+        {
+            _cache.Remove(typeof(ScheduledTaskSettings).ToString());
+            ScheduledTaskSettings model = Engine.Settings.ScheduledTasks;
+            if (model == null)
+                model = new ScheduledTaskSettings();
+            return View(model);
+        }
+
+        [HttpPost]
+        [Route("admin/settings/scheduled-tasks/")]
+        public IActionResult ScheduledTasks(ScheduledTaskSettings model)
+        {
+            try
+            {
+                Engine.Settings.Set(model);
+
+                SaveMessage = "Settings saved!";
+                MessageType = AlertType.Success;
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Error saving: " + ex.Message;
+                MessageType = AlertType.Danger;
+            }
+            return View(model);
+        }
 
         [Route("admin/integrations/")]
         public IActionResult Integrations()
@@ -202,7 +231,7 @@ namespace Hood.Areas.Admin.Controllers
                 Engine.Settings.Set(model);
 
                 // refresh all content metas and things
-                await _content.RefreshAllMetasAsync();
+                await RefreshAllMetasAsync();
 
 
                 SaveMessage = "Settings saved!";
@@ -222,7 +251,7 @@ namespace Hood.Areas.Admin.Controllers
             var model = new ContentSettings();
             Engine.Settings.Set(model);
             // refresh all content metas and things
-            await _content.RefreshAllMetasAsync();
+            await RefreshAllMetasAsync();
             return RedirectWithResetMessage("Content");
         }
 
@@ -272,7 +301,7 @@ namespace Hood.Areas.Admin.Controllers
             Engine.Settings.Set(model);
 
             // refresh all content metas and things
-            await _content.RefreshAllMetasAsync();
+            await RefreshAllMetasAsync();
 
             MessageType = AlertType.Success;
             SaveMessage = "Created successfully.";
@@ -303,7 +332,7 @@ namespace Hood.Areas.Admin.Controllers
             Engine.Settings.Set(model);
 
             // refresh all content metas and things
-            await _content.RefreshAllMetasAsync();
+            await RefreshAllMetasAsync();
 
             MessageType = AlertType.Info;
             SaveMessage = "Deleted successfully.";
@@ -626,6 +655,32 @@ namespace Hood.Areas.Admin.Controllers
             MessageType = AlertType.Success;
             return RedirectToAction(actionName);
         }
+
+        public async Task RefreshAllMetasAsync()
+        {
+            foreach (var content in _db.Content.Include(p => p.Metadata).AsNoTracking().ToList())
+            {
+                var type = Engine.Settings.Content.GetContentType(content.ContentType);
+                if (type != null)
+                {
+                    await _content.RefreshMetasAsync(content);
+                    var currentTemplate = content.GetMeta("Settings.Template");
+                    if (currentTemplate.GetStringValue().IsSet())
+                    {
+                        var template = currentTemplate.GetStringValue();
+                        if (template.IsSet())
+                        {
+                            // delete all template metas that do not exist in the new template, and add any that are missing
+                            List<string> newMetas = _content.GetMetasForTemplate(template, type.TemplateFolder);
+                            if (newMetas != null)
+                                _content.UpdateTemplateMetas(content, newMetas);
+                        }
+                    }
+                }
+            }
+            await _db.SaveChangesAsync();
+        }
+
         #endregion
     }
 }

@@ -142,7 +142,7 @@ namespace Hood.Controllers
 
                     var options = new PaymentMethodAttachOptions
                     {
-                        CustomerId = customer.Id,
+                        Customer = customer.Id,
                     };
                     await _stripe.PaymentMethodService.AttachAsync(intent.PaymentMethodId, options);
 

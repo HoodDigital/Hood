@@ -1,8 +1,9 @@
 {
   "Name": "default",
-  "FullName": "Default",
+  "FullName": "Default Theme",
   "BaseColour": "#C33610",
   "Author": "Hood Digital",
-  "Description": "The latest currently supported Hood CMS standard theme. Built on the Bootstrap 3 framework.",
-  "PreviewImage": "https://hood.blob.core.windows.net/hood/hood-bg.jpg"
+  "Description": "The default site theme, uses the default Bootstrap4 UI.",
+  "PreviewImage": "https://hood.blob.core.windows.net/hood/hood-bg.jpg",
+  "UI": "Bootstrap4"
 }

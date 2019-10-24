@@ -1,4 +1,4 @@
-﻿using Hood.Extensions;
+﻿using Hood.Startup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,5 +26,7 @@ namespace Hood.Web
         {
             app.UseHood(env, config);
         }
+
+
     }
 }
