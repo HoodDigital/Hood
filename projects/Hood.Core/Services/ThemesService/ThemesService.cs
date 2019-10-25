@@ -65,7 +65,22 @@ namespace Hood.Services
                     ["Public"] = "true",
                     ["UI"] = "Bootstrap3"
                 };
-                _configs.Add("default", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+                _configs.Add("bootstrap3", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
+            }
+            if (!_configs.ContainsKey("bootstrap4"))
+            {
+                IReadOnlyDictionary<string, string> defaultConfig = new Dictionary<string, string>()
+                {
+                    ["Name"] = "bootstrap4",
+                    ["FullName"] = "Default (Bootstrap 4)",
+                    ["BaseColour"] = "#ffffff",
+                    ["Author"] = "Hood Digital",
+                    ["Description"] = "The default site theme, uses the default Bootstrap4 UI.",
+                    ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
+                    ["Public"] = "true",
+                    ["UI"] = "Bootstrap4"
+                };
+                _configs.Add("bootstrap4", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
             }
         }
 
