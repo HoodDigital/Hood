@@ -670,18 +670,74 @@ namespace Hood.Services
             }
             foreach (string key in data.Keys.Where(k => k.Contains("MEDIA_IMAGE") && !k.Contains("TEXT")).OrderBy(k => k))
             {
-                if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
+                try
                 {
-                    Lock.AcquireWriterLock(Timeout.Infinite);
-                    StatusMessage = $"Checking image ({data[key]})...";
-                    Lock.ReleaseWriterLock();
-
-                    // if the photo exists, overwrite it.
-                    PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == data[key]);
-                    if (fp == null)
+                    if (data[key].IsSet() && !key.Contains("60") && !key.Contains("61"))
                     {
-                        // This image filename is not added to the property yet.
+                        Lock.AcquireWriterLock(Timeout.Infinite);
+                        StatusMessage = $"Checking image ({data[key]})...";
+                        Lock.ReleaseWriterLock();
 
+                        // if the photo exists, overwrite it.
+                        PropertyMedia fp = property.Media.FirstOrDefault(f => f.Filename == data[key]);
+                        if (fp == null)
+                        {
+                            // This image filename is not added to the property yet.
+
+                            switch (_propertySettings.FTPImporterSettings.Method)
+                            {
+                                case PropertyImporterMethod.Directory:
+                                    await GetFileFromLocalAsync(data[key]);
+                                    break;
+                                case PropertyImporterMethod.FtpBlm:
+                                    GetFileFromFtp(data[key]);
+                                    break;
+                            }
+
+                            if (!HasFileError())
+                            {
+
+                                string imageFile = TempFolder + data[key];
+                                Lock.AcquireWriterLock(Timeout.Infinite);
+                                StatusMessage = $"Thumbnailing and processing image ({data[key]})...";
+                                Lock.ReleaseWriterLock();
+                                MediaObject mediaResult = null;
+                                FileInfo fi = new FileInfo(imageFile);
+                                using (FileStream s = File.OpenRead(imageFile))
+                                {
+                                    mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
+                                }
+                                if (mediaResult != null)
+                                {
+                                    fp = new PropertyMedia(mediaResult);
+                                    property.Media.Add(fp);
+                                    await SaveChangesToDatabaseAsync();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Lock.AcquireWriterLock(Timeout.Infinite);
+                            StatusMessage = $"The image ({data[key]}) has already been added to property {property.Title} ({property.Id}), skipping upload & processing...";
+                            Warnings.Add(FormatLog(StatusMessage));
+                            Lock.ReleaseWriterLock();
+                        }
+                        if (property.FeaturedImageJson != null)
+                        {
+                            if (data[key] == property.FeaturedImage?.Filename)
+                            {
+                                property.FeaturedImage = property.FeaturedImage.UpdateUrls(fp) as MediaObject;
+                            }
+                        }
+                        else
+                        {
+                            // add it.
+                            property.FeaturedImage = fp;
+                        }
+                    }
+                    else if (data[key].IsSet() && key.Contains("60"))
+                    {
+                        // We have an EPC, download it with the FTPService.
                         switch (_propertySettings.FTPImporterSettings.Method)
                         {
                             case PropertyImporterMethod.Directory:
@@ -694,85 +750,39 @@ namespace Hood.Services
 
                         if (!HasFileError())
                         {
+                            Lock.AcquireWriterLock(Timeout.Infinite);
+                            StatusMessage = "Thumbnailing and processing EPC...";
+                            Lock.ReleaseWriterLock();
 
                             string imageFile = TempFolder + data[key];
-                            Lock.AcquireWriterLock(Timeout.Infinite);
-                            StatusMessage = $"Thumbnailing and processing image ({data[key]})...";
-                            Lock.ReleaseWriterLock();
                             MediaObject mediaResult = null;
                             FileInfo fi = new FileInfo(imageFile);
+                            string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
                             using (FileStream s = File.OpenRead(imageFile))
                             {
-                                mediaResult = await _media.ProcessUpload(s, fi.Name, MimeTypes.GetMimeType(fi.Extension), fi.Length, DirectoryPath) as MediaObject;
+                                mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, DirectoryPath) as MediaObject;
                             }
                             if (mediaResult != null)
                             {
-                                fp = new PropertyMedia(mediaResult);
-                                property.Media.Add(fp);
-                                await SaveChangesToDatabaseAsync();
+                                string url = mediaResult.Url;
+                                if (!property.HasMeta("EnergyPerformanceCertificate"))
+                                {
+                                    property.AddMeta(new PropertyMeta("EnergyPerformanceCertificate", url));
+                                }
+                                else
+                                {
+                                    property.UpdateMeta("EnergyPerformanceCertificate", url);
+                                }
                             }
                         }
-                    } 
-                    else
-                    {
-                        Lock.AcquireWriterLock(Timeout.Infinite);
-                        StatusMessage = $"The image ({data[key]}) has already been added to property {property.Title} ({property.Id}), skipping upload & processing...";
-                        Warnings.Add(FormatLog(StatusMessage));
-                        Lock.ReleaseWriterLock();
-                    }
-                    if (property.FeaturedImageJson != null)
-                    {
-                        if (data[key] == property.FeaturedImage?.Filename)
-                        {
-                            property.FeaturedImage = property.FeaturedImage.UpdateUrls(fp) as MediaObject;
-                        }
-                    }
-                    else
-                    {
-                        // add it.
-                        property.FeaturedImage = fp;
                     }
                 }
-                else if (data[key].IsSet() && key.Contains("60"))
+                catch (Exception ex)
                 {
-                    // We have an EPC, download it with the FTPService.
-                    switch (_propertySettings.FTPImporterSettings.Method)
-                    {
-                        case PropertyImporterMethod.Directory:
-                            await GetFileFromLocalAsync(data[key]);
-                            break;
-                        case PropertyImporterMethod.FtpBlm:
-                            GetFileFromFtp(data[key]);
-                            break;
-                    }
-
-                    if (!HasFileError())
-                    {
-                        Lock.AcquireWriterLock(Timeout.Infinite);
-                        StatusMessage = "Thumbnailing and processing EPC...";
-                        Lock.ReleaseWriterLock();
-
-                        string imageFile = TempFolder + data[key];
-                        MediaObject mediaResult = null;
-                        FileInfo fi = new FileInfo(imageFile);
-                        string fileName = data[key].ToLower().Replace(".jpg", ".pdf");
-                        using (FileStream s = File.OpenRead(imageFile))
-                        {
-                            mediaResult = await _media.ProcessUpload(s, fileName, MimeTypes.GetMimeType("pdf"), fi.Length, DirectoryPath) as MediaObject;
-                        }
-                        if (mediaResult != null)
-                        {
-                            string url = mediaResult.Url;
-                            if (!property.HasMeta("EnergyPerformanceCertificate"))
-                            {
-                                property.AddMeta(new PropertyMeta("EnergyPerformanceCertificate", url));
-                            }
-                            else
-                            {
-                                property.UpdateMeta("EnergyPerformanceCertificate", url);
-                            }
-                        }
-                    }
+                    Lock.AcquireWriterLock(Timeout.Infinite);
+                    StatusMessage = $"There was an error processing an image ({data[key]}): {ex.Message}";
+                    Errors.Add(FormatLog(StatusMessage, property));
+                    Lock.ReleaseWriterLock();
                 }
             }
             await SaveChangesToDatabaseAsync();
