@@ -15,6 +15,8 @@ namespace Hood.Models
             LogoLight = "/hood/images/hood-cms-white.svg";
             Owner = new Person();
             Address = new SiteAddress();
+            LoginAreaSettings = new LoginAreaSettings();
+            AdminAreaSettings = new AdminAreaSettings();
         }
 
         public Person Owner { get; set; }
@@ -57,6 +59,9 @@ namespace Hood.Models
         public int? LockoutModeHoldingPage { get; set; }
 
         #endregion
+
+        public LoginAreaSettings LoginAreaSettings { get; set; }
+        public AdminAreaSettings AdminAreaSettings { get; set; }
 
 
         public string FullTitle

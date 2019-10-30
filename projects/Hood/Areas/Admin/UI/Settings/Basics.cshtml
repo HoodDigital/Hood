@@ -34,6 +34,16 @@
                         Lockout/Maintenance Mode
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="false">
+                        Login Area Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">
+                        Admin Area Settings
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
@@ -226,6 +236,44 @@
                     </div>
                     <small asp-for="LockoutModeTokens"></small>
                 </div>
+            </div>
+            <div id="login" class="tab-pane" role="tabpanel" aria-labelledby="login-tab">
+                <div class="form-group floating-label">
+                    <input asp-for="LoginAreaSettings.Title" class="form-control">
+                    <label asp-for="LoginAreaSettings.Title"></label>
+                    <small asp-for="LoginAreaSettings.Title"></small>
+                </div>
+                <mediaSelect asp-for="LoginAreaSettings.Logo" asp-background-size="contain"></mediaSelect>
+                <div class="form-group floating-label">
+                    <textarea asp-for="LoginAreaSettings.BackgroundImages" class="form-control"></textarea>
+                    <label asp-for="LoginAreaSettings.BackgroundImages"></label>
+                    <small asp-for="LoginAreaSettings.BackgroundImages"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="LoginAreaSettings.RandomiseImages" class="custom-control-input">
+                        <label asp-for="LoginAreaSettings.RandomiseImages" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="LoginAreaSettings.RandomiseImages"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed" class="form-control">
+                    <label asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed"></label>
+                    <small asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="LoginAreaSettings.BackgroundImagesChangeDuration" class="form-control">
+                    <label asp-for="LoginAreaSettings.BackgroundImagesChangeDuration"></label>
+                    <small asp-for="LoginAreaSettings.BackgroundImagesChangeDuration"></small>
+                </div>
+            </div>
+            <div id="admin" class="tab-pane" role="tabpanel" aria-labelledby="admin-tab">
+                <div class="form-group floating-label">
+                    <input asp-for="AdminAreaSettings.Title" class="form-control">
+                    <label asp-for="AdminAreaSettings.Title"></label>
+                    <small asp-for="AdminAreaSettings.Title"></small>
+                </div>
+                <mediaSelect asp-for="AdminAreaSettings.Logo" asp-background-size="contain"></mediaSelect>
             </div>
         </div>
     </div>
