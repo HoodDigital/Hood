@@ -3,7 +3,7 @@
 }
 <div class="container-fluid">
     <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="logo">
-        <img src="~/hood/images/hood-cms.png" alt="HoodCMS - Content Managed" />
+        <img src="@Engine.Settings.Basic.AdminAreaSettings.Logo" alt="@Engine.Settings.Basic.AdminAreaSettings.Title" />
     </a>
 
     <partial name="_Sidebar_Theme_Top" />

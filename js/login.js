@@ -184,10 +184,6 @@
   l = !((-1 < m.indexOf("iPhone") || -1 < m.indexOf("iPad") || -1 < m.indexOf("iPod")) && e && 534 > e || d.operamini && "[object OperaMini]" === {}.toString.call(d.operamini) || n && 7458 > t || -1 < f.indexOf("Android") && e && 533 > e || h && 6 > h || "palmGetResource" in d && e && 534 > e || -1 < f.indexOf("MeeGo") && -1 < f.indexOf("NokiaBrowser/8.5.0") || k && 6 >= k);
 })(jQuery, window);
 
-$.backstretch(["/hood/images/bg/1.jpg", "/hood/images/bg/3.jpg", "/hood/images/bg/4.jpg", "/hood/images/bg/5.jpg", "/hood/images/bg/6.jpg", "/hood/images/bg/7.jpg", "/hood/images/bg/8.jpg", "/hood/images/bg/9.jpg"], {
-  fade: 1000,
-  duration: 3000
-});
 $('.code-mask').mask("000-000", {
   placeholder: "___-___"
 });

@@ -3,7 +3,7 @@
 <html>
 <head>
     <partial name="_Metas_Base" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - @Engine.Settings.Basic.LoginAreaSettings.Title</title>
     @RenderSection("metas", required: false)
     <partial name="_Styles_Login" />
     @RenderSection("styles", required: false)
@@ -12,7 +12,7 @@
     <div class="login-block">
         <header>
             <a href="/">
-                <img src="~/hood/images/hood-cms.png" alt="@Engine.Settings.Basic.FullTitle" />
+                <img src="@Engine.Settings.Basic.LoginAreaSettings.Logo" alt="@Engine.Settings.Basic.LoginAreaSettings.Title" />
             </a>
         </header>
         @RenderBody()
@@ -20,7 +20,11 @@
             <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
         </footer>
     </div>
+    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
     <partial name="_Scripts_Login" />
     @RenderSection("scripts", required: false)
+    @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
+    @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
 </body>
 </html>

@@ -11,6 +11,7 @@
 </div>
 <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-signin" role="form">
     @Html.RenderHoneypotField()
+    <recaptcha />
     <div asp-validation-summary="All" class="validation-summary"></div>
     <div class="form-group">
         <div class="floating-label">

@@ -53,12 +53,19 @@ namespace Hood.Controllers
             if (ModelState.IsValid && ModelState.IsNotSpam(model))
             {
 
+                Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
+                if (!recaptcha.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
+                    return View(model);
+                }
+
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Username);
+                    ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
                     user.LastLogOn = DateTime.Now;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
@@ -97,14 +104,14 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
         {
             // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load two-factor authentication user.");
             }
 
-            var model = new LoginWith2faViewModel { RememberMe = rememberMe };
+            LoginWith2faViewModel model = new LoginWith2faViewModel { RememberMe = rememberMe };
             ViewData["ReturnUrl"] = returnUrl;
 
             return View(model);
@@ -120,15 +127,15 @@ namespace Hood.Controllers
                 return View(model);
             }
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+            string authenticatorCode = model.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, model.RememberMachine);
+            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, model.RememberMachine);
 
             if (result.Succeeded)
             {
@@ -157,7 +164,7 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> LoginWithRecoveryCode(string returnUrl = null)
         {
             // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load two-factor authentication user.");
@@ -178,15 +185,15 @@ namespace Hood.Controllers
                 return View(model);
             }
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load two-factor authentication user.");
             }
 
-            var recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
+            string recoveryCode = model.RecoveryCode.Replace(" ", string.Empty);
 
-            var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 
             if (result.Succeeded)
             {
@@ -218,12 +225,16 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Register(string returnUrl = null)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Code)
+            {
                 return RedirectToAction(nameof(Create), new { returnUrl });
+            }
 
             return View();
         }
@@ -233,12 +244,16 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Code)
+            {
                 return RedirectToAction(nameof(Create), new { returnUrl });
+            }
 
             ViewData["ReturnUrl"] = returnUrl;
 
@@ -250,7 +265,15 @@ namespace Hood.Controllers
             if (ModelState.IsValid && ModelState.IsNotSpam(model))
             {
 
-                var user = new ApplicationUser {
+                Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
+                if (!recaptcha.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
+                    return View(model);
+                }
+
+                ApplicationUser user = new ApplicationUser
+                {
                     UserName = model.Username.IsSet() ? model.Username : model.Email,
                     Email = model.Email,
                     FirstName = model.FirstName,
@@ -264,15 +287,15 @@ namespace Hood.Controllers
                     LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
                     LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
                 };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     if ((Engine.Settings.Account.EnableWelcome || Engine.Settings.Account.RequireEmailConfirmation) && Engine.Settings.Mail.IsSetup)
                     {
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-                        var welcomeModel = new WelcomeEmailModel(user, Engine.Settings.Account.RequireEmailConfirmation ? callbackUrl : null)
-                        {                           
+                        string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        string callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+                        WelcomeEmailModel welcomeModel = new WelcomeEmailModel(user, Engine.Settings.Account.RequireEmailConfirmation ? callbackUrl : null)
+                        {
                             SendToRecipient = true,
                             NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
                         };
@@ -290,9 +313,13 @@ namespace Hood.Controllers
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
                     if (user.Active)
+                    {
                         return RedirectToLocal(returnUrl);
+                    }
                     else
+                    {
                         return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
+                    }
                 }
                 AddErrors(result);
             }
@@ -309,12 +336,16 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult Create(string returnUrl)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Default)
+            {
                 return RedirectToAction(nameof(Register), new { returnUrl });
+            }
 
             return View();
         }
@@ -324,26 +355,30 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> Create(RegisterCodeViewModel model, string returnUrl)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Default)
+            {
                 return RedirectToAction(nameof(Register), new { returnUrl });
+            }
 
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var keyGen = new KeyGenerator(true, true, true, false);
+                KeyGenerator keyGen = new KeyGenerator(true, true, true, false);
 
                 // check if the user is registered, if so forward to login, filling in the email address.
-                var user = await _account.GetUserByEmailAsync(model.Email);
+                ApplicationUser user = await _account.GetUserByEmailAsync(model.Email);
 
                 if (user == null)
                 {
                     // Try to create the new account, then carry on.
                     user = new ApplicationUser { UserName = Guid.NewGuid().ToString(), Email = model.Email };
-                    var result = await _userManager.CreateAsync(user, keyGen.Generate(24));
+                    IdentityResult result = await _userManager.CreateAsync(user, keyGen.Generate(24));
                     if (!result.Succeeded)
                     {
                         AddErrors(result);
@@ -359,9 +394,12 @@ namespace Hood.Controllers
 
                 // Attach the code to the user, along with it's expiry date.
                 keyGen = new KeyGenerator(false, false, true, false);
-                var code = keyGen.Generate(6);
+                string code = keyGen.Generate(6);
                 if (user.AccessCodes == null)
+                {
                     user.AccessCodes = new List<UserAccessCode>();
+                }
+
                 user.AccessCodes.Add(
                     new UserAccessCode()
                     {
@@ -376,13 +414,13 @@ namespace Hood.Controllers
                 MailObject message = new MailObject()
                 {
                     To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                    PreHeader ="Your access code.",
+                    PreHeader = "Your access code.",
                     Subject = "Your access code."
                 };
                 message.AddParagraph($"You can use the following access code to complete your registration:");
                 message.AddH2(code.Substring(0, 3) + " - " + code.Substring(3, 3), "#5fba7d", "center");
                 message.AddParagraph($"Once you have entered your code you can create a username and password for the site. Click the button below to enter your code now.");
-                var callbackUrl = Url.Action("Code", "Account", new { uid = user.Id }, protocol: HttpContext.Request.Scheme);
+                string callbackUrl = Url.Action("Code", "Account", new { uid = user.Id }, protocol: HttpContext.Request.Scheme);
                 message.AddCallToAction("Enter your code", callbackUrl);
                 message.Template = MailSettings.SuccessTemplate;
                 await _emailSender.SendEmailAsync(message);
@@ -398,12 +436,16 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual async Task<IActionResult> Code(string uid, string returnUrl)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Default)
+            {
                 return RedirectToAction(nameof(Register), new { returnUrl });
+            }
 
             // Here we must flag the account as email confirmed. If the code entered matches. 
 
@@ -415,7 +457,7 @@ namespace Hood.Controllers
             }
 
             // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
-            var user = await _account.GetUserByIdAsync(uid);
+            ApplicationUser user = await _account.GetUserByIdAsync(uid);
             if (!CheckForAccessCodes(user))
             {
                 // generate one with their account info, and re-display the code page.
@@ -430,29 +472,33 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual async Task<IActionResult> Code(EnterCodeViewModel model, string returnUrl)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Default)
+            {
                 return RedirectToAction(nameof(Register), new { returnUrl });
+            }
 
             // check if they have a current valid code, if not forward them back to the create page to set up a new code.
-            var user = await _account.GetUserByIdAsync(model.UserId);
+            ApplicationUser user = await _account.GetUserByIdAsync(model.UserId);
             if (!CheckForAccessCodes(user))
             {
                 return RedirectWithReturnUrl("/account/code?uid=" + user.Id, returnUrl);
             }
 
-            var codes = user.AccessCodes.Where(ac =>
+            IEnumerable<UserAccessCode> codes = user.AccessCodes.Where(ac =>
                 ac.Type == "Registration" &&
                 ac.Expiry > DateTime.Now &&
                 !ac.Used);
 
             // Here we must flag the account as email confirmed. If the code entered matches. 
-            var code = model.Code.Replace("-", "");
+            string code = model.Code.Replace("-", "");
 
-            foreach (var test in codes)
+            foreach (UserAccessCode test in codes)
             {
                 if (code == test.Code)
                 {
@@ -471,12 +517,16 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual async Task<IActionResult> Finish(string uid, string returnUrl)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
+            {
                 return RegistrationClosed();
+            }
 
             if (accountSettings.RegistrationType == RegistrationType.Default)
+            {
                 return RedirectToAction(nameof(Register), new { returnUrl });
+            }
 
             // Here we must flag the account as email confirmed. If the code entered matches. 
 
@@ -488,7 +538,7 @@ namespace Hood.Controllers
             }
 
             // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
-            var user = await _account.GetUserByIdAsync(uid);
+            ApplicationUser user = await _account.GetUserByIdAsync(uid);
             if (!user.EmailConfirmed)
             {
                 // generate one with their account info, and re-display the code page.
@@ -505,15 +555,19 @@ namespace Hood.Controllers
         {
             try
             {
-                var accountSettings = Engine.Settings.Account;
+                AccountSettings accountSettings = Engine.Settings.Account;
                 if (!accountSettings.EnableRegistration)
+                {
                     return RegistrationClosed();
+                }
 
                 if (accountSettings.RegistrationType == RegistrationType.Default)
+                {
                     return RedirectToAction(nameof(Register), new { returnUrl });
+                }
 
                 // check if they have a current valid code, if not forward them back to the code page forward them to the code page.
-                var user = await _account.GetUserByIdAsync(model.UserId);
+                ApplicationUser user = await _account.GetUserByIdAsync(model.UserId);
                 if (!user.EmailConfirmed)
                 {
                     // generate one with their account info, and re-display the code page.
@@ -521,24 +575,26 @@ namespace Hood.Controllers
                 }
 
                 // check if the username is already taken
-                var dupeUser = await _userManager.FindByNameAsync(model.Username);
+                ApplicationUser dupeUser = await _userManager.FindByNameAsync(model.Username);
                 if (dupeUser != null)
+                {
                     throw new Exception($"The username '{model.Username}' is already taken.");
+                }
 
                 user.UserName = model.Username;
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 await _account.UpdateUserAsync(user);
 
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+                string token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                IdentityResult result = await _userManager.ResetPasswordAsync(user, token, model.Password);
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.UserName}) created a new account with password.");
 
                 if (Engine.Settings.Account.EnableWelcome)
                 {
-                    var welcomeModel = new WelcomeEmailModel(user, Url.Action("Login", new { returnUrl = "/" }))
+                    WelcomeEmailModel welcomeModel = new WelcomeEmailModel(user, Url.Action("Login", new { returnUrl = "/" }))
                     {
                         SendToRecipient = true,
                         NotifyRole = accountSettings.NotifyNewAccount ? "NewAccountNotifications" : null
@@ -561,7 +617,7 @@ namespace Hood.Controllers
         [ValidateAntiForgeryToken]
         public virtual async Task<IActionResult> LogOff()
         {
-            var user = User.Identity;
+            System.Security.Principal.IIdentity user = User.Identity;
             await _signInManager.SignOutAsync();
             await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.Name}) logged out.");
             return RedirectToAction("Index", "Home");
@@ -588,8 +644,8 @@ namespace Hood.Controllers
         public virtual IActionResult ExternalLogin(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
-            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            string redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            Microsoft.AspNetCore.Authentication.AuthenticationProperties properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return Challenge(properties, provider);
         }
 
@@ -602,14 +658,14 @@ namespace Hood.Controllers
                 ErrorMessage = $"Error from external provider: {remoteError}";
                 return RedirectToAction(nameof(Login));
             }
-            var info = await _signInManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
                 await _logService.AddLogAsync<AccountController<TContext>>($"User ({info.Principal.FindFirstValue(ClaimTypes.Email)}) created an account using {info.LoginProvider} provider.");
@@ -624,7 +680,7 @@ namespace Hood.Controllers
                 // If the user does not have an account, then ask the user to create an account.
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                string email = info.Principal.FindFirstValue(ClaimTypes.Email);
                 return View("ExternalLogin", new ExternalLoginViewModel { Email = email });
             }
         }
@@ -637,13 +693,13 @@ namespace Hood.Controllers
             if (ModelState.IsValid)
             {
                 // Get the information about the user from the external login provider
-                var info = await _signInManager.GetExternalLoginInfoAsync();
+                ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
                 if (info == null)
                 {
                     throw new ApplicationException("Error loading external login information during confirmation.");
                 }
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user);
+                ApplicationUser user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                IdentityResult result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
                     result = await _userManager.AddLoginAsync(user, info);
@@ -677,18 +733,20 @@ namespace Hood.Controllers
             {
                 return RedirectToAction(nameof(HomeController<TContext>.Index), "Home");
             }
-            var user = await _userManager.FindByIdAsync(userId);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, code);
+            IdentityResult result = await _userManager.ConfirmEmailAsync(user, code);
             if (!result.Succeeded)
+            {
                 throw new Exception("Your email address could not be confirmed, the link you have clicked is invalid, perhaps it has expired. You can log in to resend a new verification email.");
+            }
 
             if (user.Active)
-            { 
+            {
                 if (User.Identity.IsAuthenticated)
                 {
                     SaveMessage = "Your email address has been successfully validated.";
@@ -721,7 +779,7 @@ namespace Hood.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(model.Email);
+                ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
                 if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
@@ -730,8 +788,8 @@ namespace Hood.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                 // Send an email with this link
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+                string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                string callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
 
                 MailObject message = new MailObject()
                 {
@@ -769,7 +827,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException("A code must be supplied for password reset.");
             }
-            var model = new ResetPasswordViewModel { Code = code };
+            ResetPasswordViewModel model = new ResetPasswordViewModel { Code = code };
             return View(model);
         }
 
@@ -784,13 +842,13 @@ namespace Hood.Controllers
             {
                 return View(model);
             }
-            var user = await _userManager.FindByNameAsync(model.Email);
+            ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            IdentityResult result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
@@ -812,13 +870,13 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual async Task<ActionResult> SendCode(string returnUrl = null, bool rememberMe = false)
         {
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 return View("Error");
             }
-            var userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
+            IList<string> userFactors = await _userManager.GetValidTwoFactorProvidersAsync(user);
+            List<SelectListItem> factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
             return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
@@ -832,14 +890,14 @@ namespace Hood.Controllers
                 return View();
             }
 
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 return View("Error");
             }
 
             // Generate the token and send it
-            var code = await _userManager.GenerateTwoFactorTokenAsync(user, model.SelectedProvider);
+            string code = await _userManager.GenerateTwoFactorTokenAsync(user, model.SelectedProvider);
             if (string.IsNullOrWhiteSpace(code))
             {
                 return View("Error");
@@ -868,7 +926,7 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> VerifyCode(string provider, bool rememberMe, string returnUrl = null)
         {
             // Require that the user has already logged in via username/password or external login
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            ApplicationUser user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
                 return View("Error");
@@ -889,7 +947,7 @@ namespace Hood.Controllers
             // The following code protects for brute force attacks against the two factor codes.
             // If a user enters incorrect codes for a specified amount of time then the user account
             // will be locked out for a specified amount of time.
-            var result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
+            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.TwoFactorSignInAsync(model.Provider, model.Code, model.RememberMe, model.RememberBrowser);
             if (result.Succeeded)
             {
                 return RedirectToLocal(model.ReturnUrl);
@@ -909,9 +967,10 @@ namespace Hood.Controllers
         [AllowAnonymous]
         public virtual IActionResult RegistrationClosed(string returnUrl = null)
         {
-            var accountSettings = Engine.Settings.Account;
+            AccountSettings accountSettings = Engine.Settings.Account;
 
             if (accountSettings.EnableRegistration)
+            {
                 switch (accountSettings.RegistrationType)
                 {
                     case RegistrationType.Default:
@@ -919,6 +978,7 @@ namespace Hood.Controllers
                     case RegistrationType.Code:
                         return RedirectToAction(nameof(Code), new { returnUrl });
                 }
+            }
 
             return View();
         }
@@ -927,7 +987,7 @@ namespace Hood.Controllers
 
         protected void AddErrors(IdentityResult result)
         {
-            foreach (var error in result.Errors)
+            foreach (IdentityError error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
@@ -953,22 +1013,29 @@ namespace Hood.Controllers
         protected IActionResult RedirectWithReturnUrl(string url, string returnUrl)
         {
             if (returnUrl != null)
+            {
                 url += "&returnUrl=" + System.Net.WebUtility.UrlEncode(returnUrl);
+            }
+
             return RedirectToLocal(url);
         }
 
         protected bool CheckForAccessCodes(ApplicationUser user)
         {
             if (user.AccessCodes == null)
+            {
                 return false;
+            }
 
-            var codes = user.AccessCodes.Where(ac =>
+            IEnumerable<UserAccessCode> codes = user.AccessCodes.Where(ac =>
                     ac.Type == "Registration" &&
                     ac.Expiry > DateTime.Now &&
                     !ac.Used);
 
             if (codes.Count() > 0)
+            {
                 return true;
+            }
 
             return false;
         }
