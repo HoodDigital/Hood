@@ -1,9 +1,9 @@
 <ul class="navbar-nav">
-    <li class="nav-item">
-        <h4>Dashboard</h4>
-    </li>
     @if (User.IsEditorOrBetter())
     {
+        <li class="nav-item">
+            <h4>Website Management</h4>
+        </li>
         <li class="nav-item">
             <a class="nav-link" asp-action="Index" asp-controller="Home" asp-area="Admin">
                 <i class="fe fe-home"></i>
