@@ -2,9 +2,18 @@
     Layout = null;
 }
 <div class="container-fluid">
-    <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="logo">
-        <img src="@Engine.Settings.Basic.AdminAreaSettings.Logo" alt="@Engine.Settings.Basic.AdminAreaSettings.Title" />
-    </a>
+    @if (User.IsEditorOrBetter())
+    {
+        <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="logo">
+            <img src="@Engine.Settings.Basic.AdminAreaSettings.Logo" alt="@Engine.Settings.Basic.AdminAreaSettings.Title" />
+        </a>
+    }
+    else
+    { 
+        <a asp-action="Index" asp-controller="Home" asp-area="" class="logo">
+            <img src="@Engine.Settings.Basic.AdminAreaSettings.Logo" alt="@Engine.Settings.Basic.AdminAreaSettings.Title" />
+        </a>
+    }
 
     <partial name="_Sidebar_Theme_Top" />
     <partial name="_Sidebar_Nav" />
