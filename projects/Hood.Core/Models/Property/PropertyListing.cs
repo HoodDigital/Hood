@@ -414,15 +414,30 @@ namespace Hood.Models
 
             return cm;
         }
-        public void UpdateMeta<T>(string name, T value)
+        public void UpdateMeta(string name, string value)
         {
             if (Metadata != null)
             {
                 PropertyMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
                 if (cm != null)
                 {
-                    cm.Set(value);
+                    cm.SetValue(value);
                 }
+            }
+        }
+        public void AddMeta(string name, string value, string metaType = "System.String")
+        {
+
+            var newMeta = new PropertyMeta()
+            {
+                Name = name,
+                Type = metaType,
+                PropertyId = Id
+            };
+            newMeta.SetValue(value);
+            if (Metadata != null)
+            {
+                Metadata.Add(newMeta);
             }
         }
         public void RemoveMeta(string name)
@@ -431,13 +446,6 @@ namespace Hood.Models
             {
                 PropertyMeta meta = GetMeta(name);
                 Metadata.Remove(meta);
-            }
-        }
-        public void AddMeta(PropertyMeta value)
-        {
-            if (Metadata != null)
-            {
-                Metadata.Add(value);
             }
         }
         public bool HasMeta(string name)

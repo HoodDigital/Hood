@@ -1,8 +1,9 @@
 ﻿using Hood.Entities;
 using Hood.Extensions;
+using Microsoft.AspNetCore.Html;
 using Newtonsoft.Json;
+using System;
 using System.Linq;
-using System.Reflection;
 
 namespace Hood.Models
 {
@@ -11,14 +12,8 @@ namespace Hood.Models
         public MetadataBase()
         {
         }
-        public MetadataBase(string name, string value, string type = "System.String")
-        {
-            Type = type;
-            Name = name;
-            BaseValue = value;
-        }
 
-        public string BaseValue { get; set; }
+        public string BaseValue { get; internal set; }
         public string Name { get; set; }
         public string Type { get; set; }
 
@@ -30,7 +25,7 @@ namespace Hood.Models
             {
                 if (IsTemplate)
                 {
-                    var name = Name.Split('.')[Name.Split('.').Length - 2].Replace("-", " ").CamelCaseToString().ToTitleCase();
+                    string name = Name.Split('.')[Name.Split('.').Length - 2].Replace("-", " ").CamelCaseToString().ToTitleCase();
                     return $"{name} - {InputType}";
                 }
 
@@ -49,12 +44,59 @@ namespace Hood.Models
                 return Type;
             }
         }
-        public new System.Type GetType
+        public void SetValue(string value)
         {
-            get
+            switch (Type)
             {
-                Assembly a = Assembly.Load("Hood");
-                return a.GetType(Type);
+                case "Hood.Date":
+                case "Hood.Time":
+                case "System.DateTime":
+                    if (DateTime.TryParse(value, out DateTime val))
+                    {
+                        BaseValue = JsonConvert.SerializeObject(val);
+                    }
+                    else
+                    {
+                        BaseValue = JsonConvert.SerializeObject(DateTime.Now);
+                    }
+                    break;
+                case "System.Int32":
+                    if (int.TryParse(value, out int intVal))
+                    {
+                        BaseValue = JsonConvert.SerializeObject(intVal);
+                    }
+                    else
+                    {
+                        BaseValue = JsonConvert.SerializeObject(0);
+                    }
+                    break;
+                case "System.Double":
+                    if (double.TryParse(value, out double doubleVal))
+                    {
+                        BaseValue = JsonConvert.SerializeObject(doubleVal);
+                    }
+                    else
+                    {
+                        BaseValue = JsonConvert.SerializeObject(0);
+                    }
+                    break;
+                case "System.Decimal":
+                    if (decimal.TryParse(value, out decimal decimalVal))
+                    {
+                        BaseValue = JsonConvert.SerializeObject(decimalVal);
+                    }
+                    else
+                    {
+                        BaseValue = JsonConvert.SerializeObject(0);
+                    }
+                    break;
+                case "System.String":
+                case "Hood.WYSIWYG":
+                case "Hood.ImageUrl":
+                case "Hood.MultiLineString":
+                default:
+                    BaseValue = JsonConvert.SerializeObject(value);
+                    break;
             }
         }
         public override string ToString()
@@ -75,15 +117,21 @@ namespace Hood.Models
                 }
             }
         }
-        public object GetValue()
-        {
-            return JsonConvert.DeserializeObject(BaseValue, GetType);
-        }
         public T GetValue<T>()
         {
-            return JsonConvert.DeserializeObject<T>(BaseValue);
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(BaseValue);
+            }
+            catch (ArgumentNullException)
+            {
+                return default;
+            }
+            catch (JsonSerializationException)
+            {
+                return default;
+            }
         }
-
         public bool IsTemplate => Name.StartsWith("Template.");
         public bool IsImageSetting => Name.StartsWith("Settings.Image.");
     }

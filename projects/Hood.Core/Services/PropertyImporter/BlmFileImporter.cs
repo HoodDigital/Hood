@@ -767,7 +767,7 @@ namespace Hood.Services
                                 string url = mediaResult.Url;
                                 if (!property.HasMeta("EnergyPerformanceCertificate"))
                                 {
-                                    property.AddMeta(new PropertyMeta("EnergyPerformanceCertificate", url));
+                                    property.AddMeta("EnergyPerformanceCertificate", url);
                                 }
                                 else
                                 {
@@ -1158,26 +1158,23 @@ namespace Hood.Services
             }
 
             string[] format = { "yyyy-MM-dd hh:mm:ss" };
-            DateTime available = DateTime.Now;
-
-            if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime date))
+            if (DateTime.TryParseExact(data["LET_DATE_AVAILABLE"], format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime available))
             {
-                available = date;
+                if (!property.HasMeta("LetDate"))
+                {
+                    property.AddMeta("LetDate", available.ToString(), "System.DateTime");
+                }
+                else
+                {
+                    property.UpdateMeta("LetDate", available.ToString());
+                }
             }
 
-            if (!property.HasMeta("LetDate"))
-            {
-                property.AddMeta(new PropertyMeta() { Name = "LetDate", BaseValue = JsonConvert.SerializeObject(available), Type = "System.DateTime" });
-            }
-            else
-            {
-                property.UpdateMeta("LetDate", available);
-            }
 
             string furnished = PropertyDetails.Furnished[int.Parse(data["LET_FURN_ID"])];
             if (!property.HasMeta("Furnished"))
             {
-                property.AddMeta(new PropertyMeta("Furnished", furnished));
+                property.AddMeta("Furnished", furnished);
             }
             else
             {
@@ -1187,7 +1184,7 @@ namespace Hood.Services
             string priceQual = PropertyDetails.PriceQualifiers[int.Parse(data["PRICE_QUALIFIER"])];
             if (!property.HasMeta("PriceQualifier"))
             {
-                property.AddMeta(new PropertyMeta("PriceQualifier", priceQual));
+                property.AddMeta("PriceQualifier", priceQual);
             }
             else
             {
@@ -1199,7 +1196,7 @@ namespace Hood.Services
                 string metaKey = key.ToTitleCase();
                 if (!property.HasMeta(metaKey))
                 {
-                    property.AddMeta(new PropertyMeta(metaKey, data[key]));
+                    property.AddMeta(metaKey, data[key]);
                 }
                 else
                 {
@@ -1243,7 +1240,7 @@ namespace Hood.Services
         {
             if (!property.HasMeta(key))
             {
-                property.AddMeta(new PropertyMeta(key, value, type));
+                property.AddMeta(key, value, type);
             }
             else
             {

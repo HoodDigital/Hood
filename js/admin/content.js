@@ -138,9 +138,13 @@ $.hood.Content = {
         locale: 'en-gb',
         format: 'L'
       });
-      $('.datetimepicker').datetimepicker({
+      $('.timepicker').datetimepicker({
         locale: 'en-gb',
         format: 'LT'
+      });
+      $('.datetimepicker').datetimepicker({
+        locale: 'en-gb',
+        sideBySide: true
       });
       $.hood.Content.Edit.InitImageUploader();
     },

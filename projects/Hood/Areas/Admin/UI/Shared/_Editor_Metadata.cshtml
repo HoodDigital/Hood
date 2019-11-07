@@ -87,18 +87,43 @@
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="text"
-                           value="@Model.GetStringValue()"
+                           value="@(Model.GetValue<DateTime>())"
                            placeholder="@Model.InputDisplayName"
                            class="form-control datetimepicker" />
                     <small class="text-info form-text">
                         Enter a date and time.
                     </small>
                 </div>
-                DateTime val = DateTime.Now;
-                if (!DateTime.TryParse(Model.GetStringValue(), out val))
-                {
-                    val = DateTime.Now;
-                }
+                break;
+
+            case "Hood.Time":
+                <div class="form-group floating-label">
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                    <input id="@Model.InputId"
+                           name="@Model.InputName"
+                           type="text"
+                           value="@(Model.GetValue<DateTime>())"
+                           placeholder="@Model.InputDisplayName"
+                           class="form-control timepicker" />
+                    <small class="text-info form-text">
+                        Enter a time.
+                    </small>
+                </div>
+                break;
+
+            case "Hood.Date":
+                <div class="form-group floating-label">
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                    <input id="@Model.InputId"
+                           name="@Model.InputName"
+                           type="text"
+                           value="@(Model.GetValue<DateTime>())"
+                           placeholder="@Model.InputDisplayName"
+                           class="form-control datepicker" />
+                    <small class="text-info form-text">
+                        Enter a date.
+                    </small>
+                </div>
                 break;
 
             case "System.Boolean":

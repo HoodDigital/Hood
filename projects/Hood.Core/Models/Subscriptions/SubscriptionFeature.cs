@@ -8,13 +8,7 @@ namespace Hood.Models
         {
         }
 
-        public SubscriptionFeature(string name, string value, string type = "System.String") : base(name, value, type)
-        {
-        }
-
-        [JsonIgnore]
         public int SubscriptionId { get; set; }
-        [JsonIgnore]
         public Subscription Subscription { get; set; }
     }
 

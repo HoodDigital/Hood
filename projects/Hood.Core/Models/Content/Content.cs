@@ -257,22 +257,30 @@ namespace Hood.Models
                 return cm.GetValue<T>();
             return default;
         }
-        public void UpdateMeta<T>(string name, T value)
+        public void UpdateMeta(string name, string value)
         {
             if (Metadata != null)
             {
                 ContentMeta cm = Metadata.FirstOrDefault(p => p.Name == name);
                 if (cm != null)
                 {
-                    cm.Set(value);
+                    cm.SetValue(value);
                 }
             }
         }
-        public void AddMeta(ContentMeta value)
+        public void AddMeta(string name, string value, string metaType = "System.String")
         {
+
+            var newMeta = new ContentMeta()
+            {
+                Name = name, 
+                Type = metaType,
+                ContentId = Id
+            };
+            newMeta.SetValue(value);
             if (Metadata != null)
             {
-                Metadata.Add(value);
+                Metadata.Add(newMeta);
             }
         }
         public bool HasMeta(string name)
