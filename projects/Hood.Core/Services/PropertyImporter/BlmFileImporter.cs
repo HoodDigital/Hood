@@ -1101,29 +1101,6 @@ namespace Hood.Services
                 {
                     GoogleAddress loc = _address.GeocodeAddress(property);
                     property.SetLocation(loc.Coordinates);
-
-                    // check for missing address elements
-                    try
-                    {
-                        if (!property.Address2.IsSet())
-                        {
-                            property.Address2 = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.Route)).LongName;
-                        }
-
-                        if (!property.County.IsSet())
-                        {
-                            property.County = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.AdministrativeAreaLevel2)).LongName;
-                        }
-
-                        if (!property.City.IsSet())
-                        {
-                            property.City = loc.Components.FirstOrDefault(a => a.Types.Contains(GoogleAddressType.PostalTown)).LongName;
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                    }
                 }
                 catch (GoogleGeocodingException ex)
                 {
