@@ -588,13 +588,7 @@ namespace Hood.Services
                 else
                 {
                     // Add it...
-                    content.AddMeta(new ContentMeta()
-                    {
-                        ContentId = content.Id,
-                        Name = field.Name,
-                        Type = field.Type,
-                        BaseValue = JsonConvert.SerializeObject(field.Default)
-                    });
+                    content.AddMeta(field.Name, field.Default, field.Type);
                 }
             }
             await _db.SaveChangesAsync();

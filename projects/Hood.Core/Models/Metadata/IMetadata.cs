@@ -6,8 +6,7 @@ namespace Hood.Models
 {
     public interface IMetadata
     {
-        string BaseValue { get; set; }
-        Type GetType { get; }
+        string BaseValue { get; }
         int Id { get; set; }
         string InputDisplayName { get; }
         string InputId { get; }
@@ -18,7 +17,7 @@ namespace Hood.Models
         string Name { get; set; }
         string Type { get; set; }
 
-        object GetValue();
+        void SetValue(string value);
         T GetValue<T>();
         string ToString();
     }
@@ -34,16 +33,6 @@ namespace Hood.Models
             else
             {
                 return default(T);
-            }
-        }
-
-        public static void Set<T>(this IMetadata meta, T value)
-        {
-            string val = JsonConvert.SerializeObject(value);
-            meta.BaseValue = val;
-            if (!meta.Type.IsSet())
-            {
-                meta.Type = value.GetType().ToString();
             }
         }
 

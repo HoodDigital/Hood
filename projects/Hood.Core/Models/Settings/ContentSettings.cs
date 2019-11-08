@@ -72,16 +72,5 @@ namespace Hood.Models
                 }
             }
         }
-
-        #region Obsolete
-        [Obsolete("Use AllowedTypes instead.", true)]
-        public List<ContentType> GetAllowedTypes() => throw new NotImplementedException();
-        [Obsolete("Use DisallowedTypes instead.", true)]
-        public List<ContentType> GetDisallowedTypes() => throw new NotImplementedException();
-        [Obsolete("Use PublicTypes instead.", true)]
-        public List<ContentType> GetPublicTypes() => throw new NotImplementedException();
-        [Obsolete("Use RestrictedTypes instead.", true)]
-        public List<ContentType> GetRestrictedTypes() => throw new NotImplementedException();
-        #endregion
     }
 }

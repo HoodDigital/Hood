@@ -86,21 +86,16 @@ namespace Hood.Areas.Admin.Controllers
                     if (val.Key.StartsWith("Meta:"))
                     {
                         // bosh we have a meta
-                        if (model.HasMeta(val.Key.Replace("Meta:", "")))
+                        var metaKey = val.Key.Replace("Meta:", "");
+                        if (model.HasMeta(metaKey))
                         {
-                            model.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            model.UpdateMeta(metaKey, val.Value.ToString());
                         }
                         else
                         {
                             // Add it...
                             CustomField metaDetails = model.Type.GetMetaDetails(val.Key.Replace("Meta:", ""));
-                            model.AddMeta(new ContentMeta()
-                            {
-                                ContentId = model.Id,
-                                Name = metaDetails.Name,
-                                Type = metaDetails.Type,
-                                BaseValue = JsonConvert.SerializeObject(val.Value)
-                            });
+                            model.AddMeta(metaDetails.Name, val.Value.ToString(), metaDetails.Type);
                         }
                     }
                 }

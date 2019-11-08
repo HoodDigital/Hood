@@ -393,18 +393,6 @@ namespace Hood.Areas.Admin.Controllers
 
                         break;
 
-                    case "ContentMeta":
-
-                        int idForMeta = int.Parse(model.Id);
-                        Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();
-                        MediaObject mi = await _db.Media.Where(m => m.Id == model.MediaId).FirstOrDefaultAsync();
-                        contentForMeta.UpdateMeta(model.Field, mi);
-
-                        cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
-                        _cache.Remove(cacheKey);
-
-                        break;
-
                     default:
                         throw new Exception("No field set to attach the media item to.");
                 }
@@ -537,21 +525,6 @@ namespace Hood.Areas.Admin.Controllers
                                 break;
                         }
 
-                        return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
-
-                    case nameof(ContentMeta):
-
-                        int idForMeta = int.Parse(model.Id);
-                        Content contentForMeta = await _db.Content.Include(c => c.Metadata).Where(p => p.Id == idForMeta).FirstOrDefaultAsync();
-                        MediaObject mi = await _db.Media.Where(m => m.Id == model.MediaId).FirstOrDefaultAsync();
-                        contentForMeta.UpdateMeta(model.Field, mi);
-                        if (await _db.SaveChangesAsync() == 0)
-                        {
-                            throw new Exception("Could not update the database");
-                        }
-
-                        cacheKey = typeof(Content).ToString() + ".Single." + idForMeta;
-                        _cache.Remove(cacheKey);
                         return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
 
                     default:

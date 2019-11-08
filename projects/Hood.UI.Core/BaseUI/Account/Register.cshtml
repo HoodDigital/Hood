@@ -10,7 +10,7 @@
 </div>
 <form asp-controller="Account" asp-action="Register" method="post" class="" role="form">
     @Html.RenderHoneypotField()
-    <recaptcha />
+    <recaptcha action="register" />
     <div asp-validation-summary="All" class="validation-summary"></div>
     <div class="form-group">
         <div class="floating-label">

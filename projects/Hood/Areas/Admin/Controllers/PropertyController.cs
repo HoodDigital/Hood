@@ -100,7 +100,7 @@ namespace Hood.Areas.Admin.Controllers
                         model.Metadata = new List<PropertyMeta>();
                     }
 
-                    model.AddMeta(new PropertyMeta("PlanningDescription", type));
+                    model.AddMeta("PlanningDescription", type);
                 }
 
                 foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
@@ -113,13 +113,7 @@ namespace Hood.Areas.Admin.Controllers
                         }
                         else
                         {
-                            model.AddMeta(new PropertyMeta()
-                            {
-                                PropertyId = model.Id,
-                                Name = val.Key.Replace("Meta:", ""),
-                                Type = "System.String",
-                                BaseValue = JsonConvert.SerializeObject(val.Value.ToString())
-                            });
+                            model.AddMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                     }
                 }
@@ -232,13 +226,7 @@ namespace Hood.Areas.Admin.Controllers
 
                 for (int i = 0; i < 11; i++)
                 {
-                    model.AddMeta(new PropertyMeta()
-                    {
-                        PropertyId = model.Id,
-                        Name = "Feature" + i.ToString(),
-                        Type = "System.String",
-                        BaseValue = JsonConvert.SerializeObject("")
-                    });
+                    model.AddMeta("Feature" + i.ToString(), "", "System.String");
                 }
 
                 await _property.UpdateAsync(model);
@@ -577,9 +565,9 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     PropertyId = property.Id,
                     Name = name,
-                    Type = "System.String",
-                    BaseValue = JsonConvert.SerializeObject("")
+                    Type = "System.String"
                 };
+                meta.SetValue("");
                 _db.Add(meta);
                 await _db.SaveChangesAsync();
                 SaveMessage = $"Successfully added new field: {meta.Name}.";
