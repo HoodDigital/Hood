@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -88,18 +87,18 @@ namespace Hood.Services
 
             if (!string.IsNullOrEmpty(model.Filter))
             {
-                if (model.Filter.StartsWith("Meta:"))
+                // search for a specific meta value 
+                if (model.Filter.Contains("<"))
                 {
-                    model.Filter = model.Filter.Replace("Meta:", "");
-                    // search for a specific meta value 
-                    if (model.Filter.Contains("="))
-                    {
-                        var meta = model.Filter.Split('=')[0];
-                        var str = model.Filter.Split('=');
-                        var value = str[str.Length - 1];
-                        var jsonValue = JsonConvert.SerializeObject(value);
-                        content = content.Where(c => c.Metadata.Any(cm => cm.Name == meta && cm.BaseValue == jsonValue));
-                    }
+                    content = ProcessFilterByOperator(content, model.Filter, '<');
+                }
+                else if (model.Filter.Contains(">"))
+                {
+                    content = ProcessFilterByOperator(content, model.Filter, '>');
+                }
+                else if (model.Filter.Contains("="))
+                {
+                    content = ProcessFilterByOperator(content, model.Filter, '=');
                 }
             }
 
@@ -108,7 +107,7 @@ namespace Hood.Services
             {
                 if (model.Order.StartsWith("Meta"))
                 {
-                    var sortVal = model.Order.Replace("Meta:", "").Replace(":Desc", "");
+                    string sortVal = model.Order.Replace("Meta:", "").Replace(":Desc", "");
                     if (model.Order.EndsWith("Desc"))
                     {
                         content = content.Where(n => n.Metadata != null && n.Metadata.SingleOrDefault(m => m.Name == sortVal) != null);
@@ -163,6 +162,27 @@ namespace Hood.Services
             await model.ReloadAsync(content);
             return model;
         }
+
+        private static IQueryable<Content> ProcessFilterByOperator(IQueryable<Content> content, string filterString, char filterOperator)
+        {
+            List<string> stringParts = filterString.Split(filterOperator).ToList();
+            string value = stringParts.LastOrDefault();
+            string metaName = stringParts.FirstOrDefault();
+            if (!value.IsSet() || !metaName.IsSet())
+                return content;
+            string jsonValue = JsonConvert.SerializeObject(value, new JsonSerializerSettings() { DateFormatHandling = DateFormatHandling.IsoDateFormat });
+            switch (filterOperator)
+            {
+                case '>':
+                    return content.Where(c => c.Metadata.Any(cm => cm.Name == metaName && string.Compare(cm.BaseValue, jsonValue) > 0));
+                case '<':
+                    return content.Where(c => c.Metadata.Any(cm => cm.Name == metaName && string.Compare(cm.BaseValue, jsonValue) < 0));
+                case '=':
+                    return content.Where(c => c.Metadata.Any(cm => cm.Name == metaName && string.Equals(cm.BaseValue, jsonValue)));
+            }
+            return content;
+        }
+
         public async Task<Content> GetContentByIdAsync(int id, bool clearCache = false, bool track = true)
         {
             string cacheKey = typeof(Content).ToString() + ".Single." + id;
@@ -174,7 +194,10 @@ namespace Hood.Services
                                     .Include(p => p.Author)
                                     .FirstOrDefault(c => c.Id == id);
                 if (content == null)
+                {
                     return content;
+                }
+
                 await RefreshMetasAsync(content);
                 _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }
@@ -183,10 +206,12 @@ namespace Hood.Services
         public async Task<Content> AddAsync(Content content)
         {
             // create the slug
-            var generator = new KeyGenerator();
+            KeyGenerator generator = new KeyGenerator();
             content.Slug = generator.UrlSlug();
             while (await SlugExists(content.Slug))
+            {
                 content.Slug = generator.UrlSlug();
+            }
 
             _db.Content.Add(content);
             await _db.SaveChangesAsync();
@@ -241,11 +266,13 @@ namespace Hood.Services
         #region Duplicate
         public async Task<Content> DuplicateContentAsync(int id)
         {
-            var clone = await _db.Content
+            Content clone = await _db.Content
                                  .AsNoTracking()
                                  .SingleOrDefaultAsync(c => c.Id == id);
             if (clone == null)
+            {
                 return null;
+            }
 
             clone.Id = 0;
             clone.Title += " - Copy";
@@ -256,7 +283,7 @@ namespace Hood.Services
             _db.Content.Add(clone);
             await _db.SaveChangesAsync();
 
-            var copyObject = await _db.Content
+            Content copyObject = await _db.Content
                                 .AsNoTracking()
                                 .Include(p => p.Categories).ThenInclude(c => c.Category)
                                 .Include(p => p.Media)
@@ -264,22 +291,22 @@ namespace Hood.Services
                                 .SingleOrDefaultAsync(c => c.Id == id);
 
             clone.Categories = new List<ContentCategoryJoin>();
-            foreach (var c in copyObject.Categories)
+            foreach (ContentCategoryJoin c in copyObject.Categories)
             {
                 clone.Categories.Add(new ContentCategoryJoin() { ContentId = clone.Id, CategoryId = c.CategoryId });
             }
             clone.Media = new List<ContentMedia>();
-            foreach (var c in copyObject.Media)
+            foreach (ContentMedia c in copyObject.Media)
             {
-                var newMedia = new ContentMedia();
+                ContentMedia newMedia = new ContentMedia();
                 c.CopyProperties(newMedia);
                 newMedia.Id = 0;
                 clone.Media.Add(newMedia);
             }
             clone.Metadata = new List<ContentMeta>();
-            foreach (var c in copyObject.Metadata)
+            foreach (ContentMeta c in copyObject.Metadata)
             {
-                var newMeta = new ContentMeta();
+                ContentMeta newMeta = new ContentMeta();
                 c.CopyProperties(newMeta);
                 newMeta.Id = 0;
                 clone.Metadata.Add(newMeta);
@@ -294,7 +321,10 @@ namespace Hood.Services
         public async Task AddImageAsync(Content content, ContentMedia media)
         {
             if (content.Media == null)
+            {
                 content.Media = new List<ContentMedia>();
+            }
+
             content.Media.Add(media);
             await UpdateAsync(content);
         }
@@ -305,7 +335,10 @@ namespace Hood.Services
         {
             string cacheKey = typeof(ContentModel).ToString() + ".Recent." + type;
             if (category.IsSet())
+            {
                 cacheKey += "-" + category;
+            }
+
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
                 content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "DateDesc", Status = ContentStatus.Published });
@@ -317,7 +350,10 @@ namespace Hood.Services
         {
             string cacheKey = typeof(ContentModel).ToString() + ".Featured." + type;
             if (category.IsSet())
+            {
                 cacheKey += "." + category;
+            }
+
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
                 content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = pageSize, Status = ContentStatus.Published });
@@ -332,8 +368,8 @@ namespace Hood.Services
             {
                 // get all the content - sorted by publish date.
                 // find the ones either side of the id.
-                var all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
-                var index = Array.FindIndex(all, row => row.Id == id);
+                Content[] all = (await GetContentAsync(new ContentModel() { Status = ContentStatus.Published, Category = category, Type = type, PageSize = int.MaxValue, Order = "Date" })).List.ToArray();
+                int index = Array.FindIndex(all, row => row.Id == id);
                 neighbours = new ContentNeighbours()
                 {
                     Next = all.ElementAtOrDefault(index + 1),
@@ -348,26 +384,26 @@ namespace Hood.Services
         #region Categories 
         public async Task<ContentCategory> GetCategoryByIdAsync(int categoryId)
         {
-            var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            ContentCategory category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
             return category;
         }
         public async Task<IEnumerable<ContentCategory>> GetCategoriesAsync(int contentId)
         {
-            var club = await GetContentByIdAsync(contentId);
+            Content club = await GetContentByIdAsync(contentId);
             return club?.Categories?.Select(c => c.Category);
         }
         public async Task<ContentCategory> AddCategoryAsync(string value, string type)
         {
             // Ensure it is in title case.
             value = value.Trim().ToTitleCase();
-            var slug = value.ToSeoUrl();
+            string slug = value.ToSeoUrl();
             int counter = 1;
             while (await _db.ContentCategories.CountAsync(cc => cc.Slug == slug && cc.ContentType == type) > 0)
             {
                 slug = value.ToSeoUrl() + "-" + counter;
                 counter++;
             }
-            var category = _db.ContentCategories.SingleOrDefault(t => t.DisplayName == value && t.ContentType == type);
+            ContentCategory category = _db.ContentCategories.SingleOrDefault(t => t.DisplayName == value && t.ContentType == type);
             if (category == null)
             {
                 category = new ContentCategory()
@@ -401,7 +437,7 @@ namespace Hood.Services
         }
         public async Task DeleteCategoryAsync(int categoryId)
         {
-            var category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            ContentCategory category = await _db.ContentCategories.FirstOrDefaultAsync(c => c.Id == categoryId);
             _db.Entry(category).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
@@ -417,11 +453,15 @@ namespace Hood.Services
             Content content = await GetContentByIdAsync(contentId, true);
 
             if (content.IsInCategory(categoryId)) // Content is already in!
+            {
                 return;
+            }
 
-            var category = await _db.ContentCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
+            ContentCategory category = await _db.ContentCategories.SingleOrDefaultAsync(c => c.Id == categoryId);
             if (category == null)
+            {
                 throw new Exception("The category does not exist.");
+            }
 
             content.Categories.Add(new ContentCategoryJoin() { CategoryId = category.Id, ContentId = content.Id });
 
@@ -432,12 +472,16 @@ namespace Hood.Services
             Content content = await GetContentByIdAsync(contentId, true);
 
             if (!content.IsInCategory(categoryId))// Content is already out!
+            {
                 return;
+            }
 
-            var cat = content.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
+            ContentCategoryJoin cat = content.Categories.SingleOrDefault(c => c.CategoryId == categoryId);
 
             if (cat == null)// Content is already out!
+            {
                 return;
+            }
 
             content.Categories.Remove(cat);
 
@@ -452,7 +496,7 @@ namespace Hood.Services
             string cacheKey = typeof(Content).ToString() + (category.IsSet() ? $".{category}" : "") + ".Pages";
             if (!_cache.TryGetValue(cacheKey, out List<Content> pages))
             {
-                var content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
+                ContentModel content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
                 pages = content.List;
                 _cache.Add(cacheKey, pages, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
             }
@@ -491,8 +535,8 @@ namespace Hood.Services
                     }
                     if (type.HasPage)
                     {
-                        var typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
-                        foreach (var content in typeContent.List.OrderByDescending(c => c.PublishDate))
+                        ContentModel typeContent = await GetContentAsync(new ContentModel() { Type = type.Type, PageSize = int.MaxValue });
+                        foreach (Content content in typeContent.List.OrderByDescending(c => c.PublishDate))
                         {
                             nodes.Add(new SitemapNode()
                             {
@@ -556,6 +600,7 @@ namespace Hood.Services
             // iterate through new metas 
             // if it doesnt exist in content.Metas, add to content.Metas
             if (newMetas != null)
+            {
                 foreach (string meta in newMetas)
                 {
                     if (!content.HasMeta(meta))
@@ -569,21 +614,26 @@ namespace Hood.Services
                         });
                     }
                 }
-
+            }
         }
         public async Task RefreshMetasAsync(Content content)
         {
-            var type = Engine.Settings.Content.GetContentType(content.ContentType);
+            ContentType type = Engine.Settings.Content.GetContentType(content.ContentType);
             if (type == null)
+            {
                 return;
+            }
+
             foreach (CustomField field in type.CustomFields)
             {
                 if (content.HasMeta(field.Name))
                 {
                     // ensure it has the correct type.
-                    var meta = content.GetMeta(field.Name);
+                    ContentMeta meta = content.GetMeta(field.Name);
                     if (meta.Type != field.Type)
+                    {
                         meta.Type = field.Type;
+                    }
                 }
                 else
                 {
@@ -600,7 +650,10 @@ namespace Hood.Services
         public async Task<bool> SlugExists(string slug, int? id = null)
         {
             if (id.HasValue)
+            {
                 return await _db.Content.AnyAsync(c => c.Slug == slug && c.Id != id);
+            }
+
             return await _db.Content.AnyAsync(c => c.Slug == slug);
         }
         #endregion
@@ -608,8 +661,8 @@ namespace Hood.Services
         #region Statistics
         public async Task<object> GetStatisticsAsync()
         {
-            var totalPosts = await _db.Content.CountAsync();
-            var totalPublished = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
+            int totalPosts = await _db.Content.CountAsync();
+            int totalPublished = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
             var data = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).Select(c => new { type = c.ContentType, date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
@@ -618,12 +671,12 @@ namespace Hood.Services
             var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
             var byType = data.GroupBy(p => p.type).Select(g => new { type = Engine.Settings.Content.GetContentType(g.Key), total = g.Count(), typeName = g.Key });
 
-            var days = new List<KeyValuePair<string, int>>();
-            var publishDays = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
             foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
             {
                 var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
-                var count = dayvalue != null ? dayvalue.count : 0;
+                int count = dayvalue != null ? dayvalue.count : 0;
                 days.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
 
                 dayvalue = publishedByDate.SingleOrDefault(c => c.name == day.Date);
@@ -631,12 +684,12 @@ namespace Hood.Services
                 publishDays.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
             }
 
-            var months = new List<KeyValuePair<string, int>>();
-            var publishMonths = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> months = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> publishMonths = new List<KeyValuePair<string, int>>();
             for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
             {
                 var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
-                var count = monthvalue != null ? monthvalue.count : 0;
+                int count = monthvalue != null ? monthvalue.count : 0;
                 months.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
 
                 monthvalue = publishedByMonth.SingleOrDefault(c => c.name == dt.Month);
@@ -669,11 +722,13 @@ namespace Hood.Services
             string cacheKey = typeof(LinqToTwitter.Status).ToString() + ".Recent." + name.ToSeoUrl();
             List<LinqToTwitter.Status> tweets = new List<LinqToTwitter.Status>();
             if (_cache.TryGetValue(cacheKey, out tweets))
+            {
                 return tweets;
+            }
             else
             {
 
-                var auth = new LinqToTwitter.ApplicationOnlyAuthorizer
+                LinqToTwitter.ApplicationOnlyAuthorizer auth = new LinqToTwitter.ApplicationOnlyAuthorizer
                 {
                     CredentialStore = new LinqToTwitter.InMemoryCredentialStore
                     {
@@ -688,9 +743,9 @@ namespace Hood.Services
                 ulong sinceID = 1;
 
                 ulong maxID;
-                var statusList = new List<LinqToTwitter.Status>();
+                List<LinqToTwitter.Status> statusList = new List<LinqToTwitter.Status>();
 
-                var userStatusResponse =
+                List<LinqToTwitter.Status> userStatusResponse =
                     (from tweet in twitterCtx.Status
                      where tweet.Type == LinqToTwitter.StatusType.User &&
                            tweet.ScreenName == name &&
