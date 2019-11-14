@@ -1,6 +1,0 @@
-{
-  "name": "Hood.Web",
-  "dependencies": {
-    "hood": "3.0.8"
-  }
-}
