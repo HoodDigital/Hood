@@ -12,6 +12,8 @@ var cssnano = require('gulp-cssnano');
 var rename = require('gulp-rename');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
+var babel = require('gulp-babel');
+var uglify = require('gulp-uglify');
 
 /*
  * 
@@ -21,7 +23,8 @@ var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('themes:clean', function (cb) {
     return gulp.src([
-        './wwwroot/themes/*/css/'
+        './wwwroot/themes/*/css/',
+        './wwwroot/themes/*/js/*.min.js'
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });
@@ -74,6 +77,22 @@ gulp.task('themes:cssnano', function () {
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest('./wwwroot/themes/'));
 });
+gulp.task('themes:jsmin', function () {
+    l = uglify({});
+    l.on('error', function (e) {
+        console.log(e);
+        l.end();
+    });
+    return gulp.src([
+        './wwwroot/themes/*/js/*.js'
+    ])
+        .pipe(babel({
+            presets: ['@babel/env']
+        }))
+        .pipe(l)
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest('./wwwroot/themes/'));
+});
 
 gulp.task('themes:build',
     gulp.parallel(
@@ -84,6 +103,7 @@ gulp.task('themes:build',
 gulp.task('themes',
     gulp.series('themes:clean',
         'themes:build',
-        'themes:cssnano'
+        'themes:cssnano',
+        'themes:jsmin'
     )
 );
