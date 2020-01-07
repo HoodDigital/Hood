@@ -58,6 +58,12 @@ namespace Hood.Services
                 content = content.Where(p => p.Status == model.Status.Value);
             }
 
+            // Featured?
+            if (model.Featured)
+            {
+                content = content.Where(p => p.Featured);
+            }
+
             // posts by author
             if (!string.IsNullOrEmpty(model.AuthorName))
             {
