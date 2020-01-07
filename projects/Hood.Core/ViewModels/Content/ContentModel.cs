@@ -11,7 +11,6 @@ namespace Hood.ViewModels
     {
         public ContentModel() : base()
         {
-            Status = ContentStatus.Published;
         }
 
         // Params
