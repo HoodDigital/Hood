@@ -742,15 +742,17 @@ $.hood.Handlers = {
   },
   Uploaders: {
     Init: function Init() {
-      $(".upload-progress-bar").hide();
-      $.getScript('/lib/dropzone/min/dropzone.min.js', $.proxy(function () {
-        $('.image-uploader').each(function () {
-          $.hood.Handlers.Uploaders.SingleImage($(this).attr('id'), $(this).data('json'));
-        });
-        $('.gallery-uploader').each(function () {
-          $.hood.Handlers.Uploaders.Gallery($(this).attr('id'), $(this).data('json'));
-        });
-      }, this));
+      if ($('.image-uploader').length || $('.gallery-uploader').length) {
+        $(".upload-progress-bar").hide();
+        $.getScript('/lib/dropzone/min/dropzone.min.js', $.proxy(function () {
+          $('.image-uploader').each(function () {
+            $.hood.Handlers.Uploaders.SingleImage($(this).attr('id'), $(this).data('json'));
+          });
+          $('.gallery-uploader').each(function () {
+            $.hood.Handlers.Uploaders.Gallery($(this).attr('id'), $(this).data('json'));
+          });
+        }, this));
+      }
     },
     RefreshImage: function RefreshImage(data) {
       $('.' + data.Class).css({

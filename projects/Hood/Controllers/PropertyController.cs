@@ -33,7 +33,7 @@ namespace Hood.Controllers
             return View(model);
         }
 
-        [Route("property/{id}/{city}/{postcode}/{title}")]
+        [Route("property/{id}/{city?}/{postcode?}/{title?}")]
         public async Task<IActionResult> Show(int id)
         {
             var propertySettings = Engine.Settings.Property;

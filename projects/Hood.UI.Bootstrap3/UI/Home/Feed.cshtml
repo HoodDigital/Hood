@@ -7,7 +7,7 @@
     @switch (Model.ContentType.BaseName)
     {
         case "Custom":
-            Feed = $"_Feed_{Model.ContentType.BaseName}";
+            Feed = $"_Feed_{Model.ContentType.TypeName}";
             Layout = $"_Layout_{Model.ContentType.TypeName}";
             break;
         default:

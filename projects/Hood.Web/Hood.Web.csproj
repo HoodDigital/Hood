@@ -21,5 +21,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>
+        
+  <ItemGroup>
+    <Content Update="Themes\base\Views\Shared\_CookieConsentPartial.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
       
 </Project>
