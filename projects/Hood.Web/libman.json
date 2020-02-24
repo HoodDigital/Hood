@@ -93,6 +93,11 @@
       "library": "raty@2.8.0"
     },
     {
+      "destination": "wwwroot/lib/pickr",
+      "library": "@simonwep/pickr@1.5.1",
+      "provider": "jsdelivr"
+    },
+    {
       "destination": "wwwroot/lib/selectize",
       "library": "selectize.js@0.12.6"
     },

@@ -203,6 +203,15 @@ $.hood.App = {
       body_class: 'tiny-mce-body',
       content_css: '/css/site.css'
     });
+  },
+  Property: {
+    Loaded: function Loaded(data) {
+      $.hood.Loader(false);
+      $.hood.Google.ClusteredMap();
+    },
+    Reload: function Reload(complete) {
+      if ($('#property-list').doesExist()) $.hood.Inline.Reload($('#property-list'), complete);
+    }
   }
 }; // Initialise
 

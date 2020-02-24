@@ -25,7 +25,7 @@
     <meta name="twitter:description" content="Have a look a our properties, there are plenty to have a look at!" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
-<section id="search-rental-box">3
+<section id="search-rental-box">
     <partial name="_Form_Property" />
 </section>
 <div id="clustered-map" class="google-map" style="height:300px;"
@@ -38,41 +38,9 @@
      data-locations="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Locations)">
 </div>
 <section class="container">
-    @if (Model.List.Count == 0)
-    {
-        @if (string.IsNullOrEmpty(Model.Search))
-        {
-            <div class="row text-center">
-                <div class="col-md-8 col-md-offset-2">
-                    <h3 class="h4">There are no properties to view just yet</h3>
-                    <div class="spacer-15"></div>
-                    <p class="lead">Please check back later.</p>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="row text-center">
-                <div class="col-md-8 col-md-offset-2">
-                    <h3 class="h4">We couldn't find anything!</h3>
-                    <div class="spacer-15"></div>
-                    <p class="lead">Your search '@Model.Search' did not return any results. Please try searching for something else.</p>
-                </div>
-            </div>
-        }
-    }
-    else
-    {
-        <div class="card-columns">
-            @foreach (var property in Model.List)
-            {
-                <partial name="_Template_Property" model="property" />
-            }
-        </div>
-        <div class="text-center">
-            <partial name="_Pagination" />
-        </div>
-    }
+    <div id="property-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Property.Lists.Property.Loaded">
+        <partial name="_List_Property" />
+    </div>
 </section>
 
 <div class="modal fade" tabindex="-1" role="dialog" id="property-modal">

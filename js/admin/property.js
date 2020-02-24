@@ -14,6 +14,7 @@ $.hood.Property = {
     Property: {
       Loaded: function Loaded(data) {
         $.hood.Loader(false);
+        $.hood.Google.ClusteredMap();
       },
       Reload: function Reload(complete) {
         if ($('#property-list').doesExist()) $.hood.Inline.Reload($('#property-list'), complete);

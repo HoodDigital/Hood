@@ -131,7 +131,7 @@ $.hood.Google = {
 
       });
       marker.setIcon({
-        url: '/images/marker.png',
+        url: mapElement.data('marker'),
         size: iconSize,
         scaledSize: iconSize // makes SVG icons work in IE
 
@@ -141,8 +141,8 @@ $.hood.Google = {
         func = clickFunction + "(" + location.AssociatedId + ")";
         eval(func);
       });
-      var icon1 = '/images/marker.png';
-      var icon2 = '/images/marker-highlight.png';
+      var icon1 = mapElement.data('marker');
+      var icon2 = mapElement.data('highlight');
       var info = '<div class="google-popup">' + '<img src="' + location.ImageUrl + '" class="map-image" />' + '<p>' + location.Address1 + ', ' + location.Postcode + '</p>' + '<p>' + location.Description + '</p>' + '</div>';
       var infowindow = new google.maps.InfoWindow({
         content: info

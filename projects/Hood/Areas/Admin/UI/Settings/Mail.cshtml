@@ -37,11 +37,7 @@
                     </div>
                     <hr class="mt-4 mb-4" />
                     <mediaSelect asp-for="Logo"></mediaSelect>
-                    <div class="form-group floating-label">
-                        <label asp-for="BackgroundColour"></label>
-                        <input asp-for="BackgroundColour" type="text" class="form-control" />
-                        <small asp-for="BackgroundColour"></small>
-                    </div>
+                    <colorSelect asp-for="BackgroundColour"></colorSelect>
                     <div class="form-group floating-label">
                         <label asp-for="FromName"></label>
                         <input asp-for="FromName" type="text" class="form-control" />
