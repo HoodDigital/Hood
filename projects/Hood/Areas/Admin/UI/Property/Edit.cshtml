@@ -24,6 +24,7 @@
 }
 <form method="post" id="property-edit-form" data-id="@Model.Id">
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+    <div asp-validation-summary="All" class="validation-summary"></div>
     <div class="row">
         <div class="col-md-8">
             <partial name="_Editor_Tabs" />

@@ -20,6 +20,7 @@ $.hood.Handlers = {
         $('body').on('change', '.inline-date', $.hood.Handlers.DateChange);
 
         $.hood.Handlers.Uploaders.Init();
+        $.hood.Handlers.ColorPickers();
     },
     ScrollToTop: function (e) {
         if (e) e.preventDefault();
@@ -256,6 +257,56 @@ $.hood.Handlers = {
                 galleryDropzone.removeAllFiles(true);
             };
         }
+    },
+    ColorPickers: function () {
+        let updateColorFieldValue = function (color, instance) {
+            let elemId = $(instance._root.button).parent().data('target');
+            $(instance._root.button).css({ 'background-color': color.toHEXA().toString() });
+            let colorHex = instance.getColor().toHEXA();
+            var result = "";
+            for (i = colorHex.length - 1; i >= 0; i--) {
+                result = colorHex[i] + result;
+            }
+            $(elemId).val('#' + result);
+        };
+        var pickrs = [];
+        // Simple example, see optional options for more configuration.
+        $('.color-picker').each(function (index, elem) {
+
+            let pickr = Pickr.create({
+                el: elem.children[0],
+                appClass: 'custom-class',
+                theme: 'monolith',
+                useAsButton: true,
+                defaultRepresentation: 'HEXA',
+                position: 'bottom-end',
+                components: {
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+
+                    interaction: {
+                        hex: false,
+                        rgba: false,
+                        hsva: false,
+                        input: true,
+                        clear: true
+                    }
+                }
+            })
+                .on('init', instance => {
+                    let elemId = $(instance._root.button).parent().data('target');
+                    let value = $(elemId).val();
+                    $(elemId).on('click', $.proxy(function () {
+                        this.show();
+                    }, instance));
+                    instance.setColor(value);
+                    updateColorFieldValue(instance.getColor(), instance);
+                })
+                .on('change', updateColorFieldValue);
+
+            pickrs.push(pickr);
+        });
     }
 };
 $(document).ready($.hood.Handlers.Init);

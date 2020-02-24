@@ -37,8 +37,6 @@ $.hood.Admin = {
         $.hood.Admin.Editors.Init();
         $.hood.Admin.Stats.Init();
 
-        $('.colorpicker-component').colorpicker();
-
     },
     Editors: {
         Init: function () {

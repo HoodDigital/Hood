@@ -17,6 +17,12 @@ namespace Hood.Controllers
 
         public async Task<IActionResult> Index(PropertyListModel model)
         {
+            return await List(model, "Index");
+        }
+
+        [Route("property/list/")]
+        public async Task<IActionResult> List(PropertyListModel model, string viewName = "_List_Property")
+        {
             var propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
                 return NotFound();
@@ -30,7 +36,7 @@ namespace Hood.Controllers
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
 
-            return View(model);
+            return View(viewName, model);
         }
 
         [Route("property/{id}/{city?}/{postcode?}/{title?}")]

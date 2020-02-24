@@ -207,6 +207,17 @@ $.hood.App = {
             body_class: 'tiny-mce-body',
             content_css: '/css/site.css'
         });
+    }, 
+
+    Property: {
+        Loaded: function (data) {
+            $.hood.Loader(false);
+            $.hood.Google.ClusteredMap();
+        },
+        Reload: function (complete) {
+            if ($('#property-list').doesExist())
+                $.hood.Inline.Reload($('#property-list'), complete);
+        }
     }
 };
 

@@ -34,5 +34,9 @@
     <EmbeddedResource Remove="node_modules\**" />
     <None Remove="node_modules\**" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="UI\Property\_List_Property.cshtml" />
+  </ItemGroup>
 
 </Project>

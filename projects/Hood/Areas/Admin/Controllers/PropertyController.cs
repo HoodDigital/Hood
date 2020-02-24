@@ -1,4 +1,5 @@
-﻿using Hood.Controllers;
+﻿using Geocoding.Google;
+using Hood.Controllers;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
@@ -35,7 +36,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/list/")]
-        public async Task<IActionResult> List(PropertyListModel model, string viewName)
+        public async Task<IActionResult> List(PropertyListModel model, string viewName = "_List_Property")
         {
             PropertySettings propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
@@ -53,7 +54,7 @@ namespace Hood.Areas.Admin.Controllers
             model.Types = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
 
-            return View(viewName.IsSet() ? viewName : "_List_Property", model);
+            return View(viewName, model);
         }
 
         #region Edit
@@ -81,11 +82,51 @@ namespace Hood.Areas.Admin.Controllers
 
                 if (model.AutoGeocode)
                 {
-                    Geocoding.Google.GoogleAddress address = _address.GeocodeAddress(model);
-                    if (address != null)
+                    var StatusMessage = "";
+                    try
                     {
-                        model.SetLocation(address.Coordinates);
+
+                        try
+                        {
+                            GoogleAddress address = _address.GeocodeAddress(model);
+                            if (address != null)
+                            {
+                                model.SetLocation(address.Coordinates);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex.InnerException != null)
+                            {
+                                throw ex.InnerException;
+                            }
+                            StatusMessage = "There was an error GeoLocating the property.";
+                            ModelState.AddModelError("GeoCoding", StatusMessage);
+                            await _logService.AddExceptionAsync<PropertyController>(StatusMessage, ex, LogType.Warning);
+                        }
                     }
+                    catch (GoogleGeocodingException ex)
+                    {
+                        switch (ex.Status)
+                        {
+                            case GoogleStatus.RequestDenied:
+                                StatusMessage = "There was an error with the Google API [RequestDenied] this means your API account is not activated for Geocoding Requests.";
+                                ModelState.AddModelError("GeoCoding", StatusMessage);
+                                await _logService.AddExceptionAsync<PropertyController>(StatusMessage, ex, LogType.Warning);
+                                break;
+                            case GoogleStatus.OverQueryLimit:
+                                StatusMessage = "There was an error with the Google API [OverQueryLimit] this means your API account is has run out of Geocoding Requests.";
+                                ModelState.AddModelError("GeoCoding", StatusMessage);
+                                await _logService.AddExceptionAsync<PropertyController>(StatusMessage, ex, LogType.Warning);
+                                break;
+                            default:
+                                StatusMessage = "There was an error with the Google API [" + ex.Status.ToString() + "]: " + ex.Message;
+                                ModelState.AddModelError("GeoCoding", StatusMessage);
+                                await _logService.AddExceptionAsync<PropertyController>(StatusMessage, ex, LogType.Warning);
+                                break;
+                        }
+                    }
+
                 }
 
                 string type = Engine.Settings.Property.GetPlanningFromType(model.Planning);

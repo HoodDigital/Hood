@@ -6,7 +6,7 @@
     "url": "https://github.com/HoodDigital/Hood"
   },
   "license": "GPL-3.0",
-  "version": "3.1.0",
+  "version": "3.1.4",
   "devDependencies": {
     "gulp": "^4.0.2",
     "gulp-rimraf": "0.2.1"
