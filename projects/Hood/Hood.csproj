@@ -43,6 +43,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Areas\**\*.cshtml" />
+    <EmbeddedResource Include="Areas\**\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
     <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
     <ProjectReference Include="..\Hood.UI.Bootstrap3\Hood.UI.Bootstrap3.csproj" />
