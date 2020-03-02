@@ -37,6 +37,21 @@
                     </div>
                     <hr class="mt-4 mb-4" />
                     <mediaSelect asp-for="Logo"></mediaSelect>
+                <div class="form-group image-editor">
+                    <div class="row no-gutter align-items-center">
+                        <div class="col-auto pr-0">
+                            <figure class="img img-xs border-3 border-white shadow-sm color-picker" data-target="#a81a488d-1da9-493a-9ea2-916e000b012d">
+                                <div class="pickr w-100 h-100"></div>
+                            </figure>                        
+                        </div>
+                        <div class="col">
+                            <div class="floating-label">
+                            
+                                <input type="text" class="form-control" placeholder="Choose a colour..." id="a81a488d-1da9-493a-9ea2-916e000b012d" name="BackgroundColour" value="#dadada">
+                            <label for="BackgroundColour">Background Colour</label></div>                        
+                        </div>
+                    </div>
+                </div>
                     <colorSelect asp-for="BackgroundColour"></colorSelect>
                     <div class="form-group floating-label">
                         <label asp-for="FromName"></label>

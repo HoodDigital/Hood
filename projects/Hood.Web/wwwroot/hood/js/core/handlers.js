@@ -281,7 +281,6 @@ $.hood.Handlers = {
                 defaultRepresentation: 'HEXA',
                 position: 'bottom-end',
                 components: {
-                    preview: true,
                     opacity: true,
                     hue: true,
 
@@ -302,6 +301,12 @@ $.hood.Handlers = {
                     }, instance));
                     instance.setColor(value);
                     updateColorFieldValue(instance.getColor(), instance);
+                })
+                .on('clear', instance => {
+                    let elemId = $(instance._root.button).parent().data('target');
+                    instance.setColor('transparent');
+                    updateColorFieldValue(instance.getColor(), instance);
+                    $(elemId).val('');
                 })
                 .on('change', updateColorFieldValue);
 

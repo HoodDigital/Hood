@@ -1,3 +1,4 @@
+/// <binding BeforeBuild='hood:views' />
 /*
  *
  *   Includes
