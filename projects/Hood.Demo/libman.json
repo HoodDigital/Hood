@@ -4,7 +4,7 @@
   "libraries": [
     {
       "destination": "wwwroot/hood",
-      "library": "hoodcms@3.0.8",
+      "library": "hoodcms@3.1.5",
       "provider": "jsdelivr"
     },
     {
