@@ -902,7 +902,6 @@ $.hood.Handlers = {
         defaultRepresentation: 'HEXA',
         position: 'bottom-end',
         components: {
-          preview: true,
           opacity: true,
           hue: true,
           interaction: {
@@ -921,6 +920,11 @@ $.hood.Handlers = {
         }, instance));
         instance.setColor(value);
         updateColorFieldValue(instance.getColor(), instance);
+      }).on('clear', function (instance) {
+        var elemId = $(instance._root.button).parent().data('target');
+        instance.setColor('transparent');
+        updateColorFieldValue(instance.getColor(), instance);
+        $(elemId).val('');
       }).on('change', updateColorFieldValue);
       pickrs.push(pickr);
     });

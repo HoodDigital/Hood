@@ -1,0 +1,21 @@
+@model MediaListModel
+@{
+    ViewBag.Title = "Website Media";
+}
+@section buttons {
+    <partial name="_Media_Actions" />
+}
+<script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js" asp-location="BeforeScripts"></script>
+<form class="inline" data-target="#media-list">
+    <div class="row">
+        <div class="col-sm-3">
+            <partial name="_Media_Filters" />
+        </div>
+        <div class="col-sm">
+            <partial name="_Media_Uploader" />
+            <div id="media-list" class="hood-inline-list query" data-url="@Url.Action("List")" data-complete="$.hood.Media.Loaded">
+                <partial name="_List_Media" />
+            </div>
+        </div>
+    </div>
+</form>

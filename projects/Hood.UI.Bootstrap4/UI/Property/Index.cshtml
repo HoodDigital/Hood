@@ -25,24 +25,19 @@
     <meta name="twitter:description" content="Have a look a our properties, there are plenty to have a look at!" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
-<section id="search-rental-box">
-    <partial name="_Form_Property" />
-</section>
-<div id="clustered-map" class="google-map" style="height:300px;"
-     data-lat="@Model.CentrePoint.Latitude"
-     data-long="@Model.CentrePoint.Longitude"
-     data-zoom="3"
-     data-scrollwheel="false"
-     data-marker="/hood/images/maps/marker.png"
-     data-click="openPropertyModal"
-     data-locations="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Locations)">
-</div>
 <section class="container">
-    <div id="property-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.Property.Lists.Property.Loaded">
-        <partial name="_List_Property" />
+    <div class="row">
+        <div class="col">
+            <div id="property-list" class="hood-inline-list refresh query" data-url="@Url.Action("List")" data-complete="$.hood.App.Property.Loaded">
+                <partial name="_List_Property" />
+            </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <partial name="_Form_Property" />
+        </div>
     </div>
 </section>
-
+<partial name="_Map" />
 <div class="modal fade" tabindex="-1" role="dialog" id="property-modal">
 </div>
 <script>
@@ -57,4 +52,3 @@
         });
     }
 </script>
-<script src="~/hood/js/includes/markerclusterer.min.js"></script>

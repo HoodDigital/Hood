@@ -1,0 +1,17 @@
+@model UserProfile
+@{
+    Layout = null;
+}
+@foreach (var note in Model.Notes)
+{
+    <div class="list-group-item list-group-item-action">
+        <blockquote class="blockquote m-0">
+            <p class="mb-0">@Html.Raw(note.Note.ToHtml())</p>
+            <footer class="blockquote-footer">
+                @note.CreatedBy 
+                <cite title="Source Title">@note.CreatedOn.ToDisplay()</cite>
+                <a class="text-danger text-decoration-none user-notes-delete ml-2" asp-action="DeleteNote" asp-route-id="@Model.Id" asp-route-noteId="@note.Id"><i class="fa fa-trash-alt mr-2"></i>Delete</a>
+            </footer>
+        </blockquote>
+    </div>
+}

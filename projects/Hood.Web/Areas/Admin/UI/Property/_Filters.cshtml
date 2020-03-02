@@ -1,0 +1,222 @@
+@model PropertyListModel
+
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<input type="hidden" asp-for="PageIndex" />
+<input type="hidden" asp-for="PageSize" />
+<div class="card mb-3">
+    <div class="card-header position-relative" id="property-filters-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#property-filters-panel" href="#property-filters-panel" aria-expanded="true" aria-controls="property-filters-panel">
+                Search &amp; Filters
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="property-filters-panel-heading" id="property-filters-panel">
+        <div class="form-group floating-label">
+            <input type="text" class="form-control" placeholder="Search our portfolio..." asp-for="Search" />
+            <label asp-for="Search"></label>
+            <small asp-for="Search"></small>
+        </div>
+        <div class="form-group floating-label">
+            <select class="form-control submit-on-change" asp-items="Html.GetEnumSelectList<ContentStatus>()" asp-for="PublishStatus"></select>
+            <label asp-for="Status"></label>
+            <small asp-for="Status"></small>
+        </div>
+        <div class="form-group floating-label">
+            <select class="form-control submit-on-change" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
+                <option value="">Show All</option>
+            </select>
+            <label asp-for="Type"></label>
+            <small asp-for="Type"></small>
+        </div>
+
+        <div class="form-group floating-label">
+            <select class="form-control submit-on-change" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
+                <option value="">Show All</option>
+            </select>
+            <label asp-for="PlanningType"></label>
+            <small asp-for="PlanningType"></small>
+        </div>
+        <div class="form-group floating-label">
+            <select class="form-control submit-on-change" asp-for="Order">
+                <optgroup label="Property">
+                    <option value="name">Name (A-Z)</option>
+                    <option value="name+desc">Name (Z-A)</option>
+                    <option value="date+desc">Added Date (Newest)</option>
+                    <option value="date">Added Date (Oldest)</option>
+                    <option value="area">Area (A-Z)</option>
+                    <option value="area+desc">Area (Z-A)</option>
+                </optgroup>
+                <optgroup label="Price">
+                    <option value="rent+desc">Rent (£££-£)</option>
+                    <option value="rent">Rent (£-£££)</option>
+                    <option value="premium+desc">Premium (£££-£)</option>
+                    <option value="premium">Premium (£-£££)</option>
+                </optgroup>
+                <optgroup label="Listings">
+                    <option value="planning">Planning (A-Z)</option>
+                    <option value="planning+desc">Planning (Z-A)</option>
+                    <option value="type">Listing Type (A-Z)</option>
+                    <option value="type+desc">Listing Type (Z-A)</option>
+                </optgroup>
+            </select>
+            <label asp-for="Order"></label>
+            <small asp-for="Order"></small>
+        </div>
+    </div>
+</div>
+
+@if (_propertySettings.ShowBedrooms)
+{
+    <div class="card mb-3">
+        <div class="card-header position-relative" id="property-bedrooms-panel-heading">
+            <p class="card-title m-0 font-weight-bold">
+                <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#property-bedrooms-panel" href="#property-bedrooms-panel" aria-expanded="true" aria-controls="property-bedrooms-panel">
+                    Bedrooms
+                    <i class="fe fe-arrow-up mt-1"></i>
+                </a>
+            </p>
+        </div>
+        <div class="card-body collapse show" aria-labelledby="property-bedrooms-panel-heading" id="property-bedrooms-panel">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="Bedrooms">
+                            <option value="">Show All</option>
+                            @for (int i = 0; i < 13; i++)
+                            {
+                                <option value="@i">@(i)</option>
+                            }
+                        </select>
+                        <label asp-for="Bedrooms"></label>
+                        <small asp-for="Bedrooms"></small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MaxBedrooms">
+                            <option value="">Show All</option>
+                            @for (int i = 0; i < 13; i++)
+                            {
+                                <option value="@i">@(i)</option>
+                            }
+                        </select>
+                        <label asp-for="MaxBedrooms"></label>
+                        <small asp-for="MaxBedrooms"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="card mb-3">
+    <div class="card-header position-relative" id="property-price-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#property-price-panel" href="#property-price-panel" aria-expanded="true" aria-controls="property-price-panel">
+                Rent/Prices
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="property-price-panel-heading" id="property-price-panel">
+        @if (_propertySettings.ShowRent)
+        {
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MinRent">
+                            <option value="">Show All</option>
+                            @for (int i = _propertySettings.RentMinimum; i <= _propertySettings.RentMaximum; i = i + _propertySettings.RentIncrement)
+                            {
+                                <option value="@i">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                            }
+                        </select>
+                        <label asp-for="MinRent"></label>
+                        <small asp-for="MinRent"></small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MaxRent">
+                            <option value="">Show All</option>
+                            @for (int i = _propertySettings.RentMinimum; i <= _propertySettings.RentMaximum; i = i + _propertySettings.RentIncrement)
+                            {
+                                <option value="@i">£ @(string.Format(_propertySettings.ShowRentDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                            }
+                        </select>
+                        <label asp-for="MaxRent"></label>
+                        <small asp-for="MaxRent"></small>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (_propertySettings.ShowAskingPrice)
+        {
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MinPrice">
+                            <option value="">Show All</option>
+                            @for (int i = _propertySettings.AskingPriceMinimum; i <= _propertySettings.AskingPriceMaximum; i = i + _propertySettings.AskingPriceIncrement)
+                            {
+                                <option value="@i">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                            }
+                        </select>
+                        <label asp-for="MinPrice"></label>
+                        <small asp-for="MinPrice"></small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MaxPrice">
+                            <option value="">Show All</option>
+                            @for (int i = _propertySettings.AskingPriceMinimum; i <= _propertySettings.AskingPriceMaximum; i = i + _propertySettings.AskingPriceIncrement)
+                            {
+                                <option value="@i">£ @(string.Format(_propertySettings.ShowAskingPriceDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                            }
+                        </select>
+                        <label asp-for="MaxPrice"></label>
+                        <small asp-for="MaxPrice"></small>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (_propertySettings.ShowPremium)
+        {
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MinPremium">
+                            <option value="">Show All</option>
+                            @for (int i = _propertySettings.PremiumMinimum; i <= _propertySettings.PremiumMaximum; i = i + _propertySettings.PremiumIncrement)
+                            {
+                                <option value="@i">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                            }
+                        </select>
+                        <label asp-for="MinPremium"></label>
+                        <small asp-for="MinPremium"></small>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group floating-label">
+                        <select class="form-control submit-on-change" asp-for="MaxPremium">
+                            <option value="">Show All</option>
+                            @for (int i = _propertySettings.PremiumMinimum; i <= _propertySettings.PremiumMaximum; i = i + _propertySettings.PremiumIncrement)
+                            {
+                                <option value="@i">£ @(string.Format(_propertySettings.ShowPremiumDecimals ? "{0:n}" : "{0:n0}", i))</option>
+                            }
+                        </select>
+                        <label asp-for="MaxPremium"></label>
+                        <small asp-for="MaxPremium"></small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="form-group floating-label">
+    <button type="submit" class="btn btn-sm btn-block btn-success"><i class="fa fa-refresh m-r-md"></i>Search</button>
+</div>

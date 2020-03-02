@@ -1,3 +1,4 @@
+/// <binding BeforeBuild='hood:views' />
 /*
  *
  *   Includes
@@ -327,6 +328,45 @@ gulp.task('hood:js:package:admin', function () {
 
 });
 
+gulp.task('hood:views:clean', function (cb) {
+    return gulp.src([
+        './../Hood.UI.Core/BaseUI/',
+        './../Hood.UI.Bootstrap3/UI/',
+        './../Hood.UI.Bootstrap4/UI/',
+        './../Hood/Areas/Admin/UI/'
+    ], { read: false, allowEmpty: true })
+        .pipe(rimraf({ force: true }));
+});
+gulp.task('hood:views:core', function () {
+    return gulp.src('./Themes/core/Views/**/*.*')
+        .pipe(gulp.dest('./../Hood.UI.Core/BaseUI/'));
+});
+gulp.task('hood:views:bootstrap3', function () {
+    return gulp.src('./Themes/bootstrap3/Views/**/*.*')
+        .pipe(gulp.dest('./../Hood.UI.Bootstrap3/UI/'));
+});
+gulp.task('hood:views:bootstrap4', function () {
+    return gulp.src('./Themes/bootstrap4/Views/**/*.*')
+        .pipe(gulp.dest('./../Hood.UI.Bootstrap4/UI/'));
+});
+gulp.task('hood:views:admin', function () {
+    return gulp.src('./Areas/Admin/UI/**/*.*')
+        .pipe(gulp.dest('./../Hood/Areas/Admin/UI/'));
+});
+
+
+gulp.task('hood:views',
+    gulp.series(
+        'hood:views:clean',
+        gulp.parallel(
+            'hood:views:core',
+            'hood:views:bootstrap3',
+            'hood:views:bootstrap4',
+            'hood:views:admin'
+        )
+    )
+);
+
 gulp.task('hood:package',
     gulp.series(
         'hood:js',
@@ -338,9 +378,11 @@ gulp.task('hood:package',
         )
     )
 );
+
 gulp.task('hood',
     gulp.series(
         'hood:clean',
+        'hood:views',
         gulp.parallel(
             'hood:scss',
             'hood:js',

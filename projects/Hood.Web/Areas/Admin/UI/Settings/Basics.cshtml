@@ -1,0 +1,281 @@
+@model BasicSettings
+@inject IContentRepository _content
+@{
+    ViewData["Title"] = "Site Settings";
+    Layout = "_Layout_Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+    {
+        <a asp-action="ResetBasics" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="basics-tab" data-toggle="tab" href="#basics" role="tab" aria-controls="basics" aria-selected="true">
+                        Basics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
+                        Address
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="owner-tab" data-toggle="tab" href="#owner" role="tab" aria-controls="owner" aria-selected="false">
+                        Owner
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="lockout-tab" data-toggle="tab" href="#lockout" role="tab" aria-controls="lockout" aria-selected="false">
+                        Lockout/Maintenance Mode
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="false">
+                        Login Area Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">
+                        Admin Area Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="basics" class="tab-pane active" role="tabpanel" aria-labelledby="basics-tab">
+                <div class="form-group floating-label">
+                    <input asp-for="Title" class="form-control" placeholder="Website Title">
+                    <label asp-for="Title"></label>
+                    <small asp-for="Title"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="CompanyName" class="form-control">
+                    <label asp-for="CompanyName"></label>
+                    <small asp-for="CompanyName"></small>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Phone" class="form-control">
+                            <label asp-for="Phone"></label>
+                            <small asp-for="Phone"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Email" class="form-control">
+                            <label asp-for="Email"></label>
+                            <small asp-for="Email"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="Homepage"></label>
+                    <select asp-for="Homepage" class="form-control">
+                        <option value="">Default Homepage</option>
+                        @foreach (var content in await _content.GetPages())
+                        {
+                            <option value="@content.Id">@content.Title</option>
+                        }
+                    </select>
+                    <small asp-for="Homepage"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableThemes" class="custom-control-input">
+                        <label asp-for="EnableThemes" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableThemes"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableApiKeys" class="custom-control-input">
+                        <label asp-for="EnableApiKeys" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableApiKeys"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnablePreload" class="custom-control-input">
+                        <label asp-for="EnablePreload" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnablePreload"></small>
+                </div>
+                <mediaSelect asp-for="Logo" asp-background-size="contain"></mediaSelect>
+                <mediaSelect asp-for="LogoLight" asp-background-size="contain"></mediaSelect>
+            </div>
+            <div id="address" class="tab-pane" role="tabpanel" aria-labelledby="address-tab">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group floating-label">
+                            <input asp-for="Address.Number" class="form-control">
+                            <label asp-for="Address.Number"></label>
+                            <small asp-for="Address.Number"></small>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group floating-label">
+                            <input asp-for="Address.Address1" class="form-control">
+                            <label asp-for="Address.Address1"></label>
+                            <small asp-for="Address.Address1"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="Address.Address2" class="form-control">
+                    <label asp-for="Address.Address2"></label>
+                    <small asp-for="Address.Address2"></small>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Address.City" class="form-control">
+                            <label asp-for="Address.City"></label>
+                            <small asp-for="Address.City"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Address.County" class="form-control">
+                            <label asp-for="Address.County"></label>
+                            <small asp-for="Address.County"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <select asp-for="Address.Country" class="form-control" asp-items="Countries.AsSelectListItems"></select>
+                            <label asp-for="Address.Country"></label>
+                            <small asp-for="Address.Country"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Address.Postcode" class="form-control">
+                            <label asp-for="Address.Postcode"></label>
+                            <small asp-for="Address.Postcode"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="owner" class="tab-pane" role="tabpanel" aria-labelledby="owner-tab">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Owner.FirstName" class="form-control">
+                            <label asp-for="Owner.FirstName"></label>
+                            <small asp-for="Owner.FirstName"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Owner.LastName" class="form-control">
+                            <label asp-for="Owner.LastName"></label>
+                            <small asp-for="Owner.LastName"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Owner.Phone" class="form-control">
+                            <label asp-for="Owner.Phone"></label>
+                            <small asp-for="Owner.Phone"></small>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group floating-label">
+                            <input asp-for="Owner.Email" class="form-control">
+                            <label asp-for="Owner.Email"></label>
+                            <small asp-for="Owner.Email"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="lockout" class="tab-pane" role="tabpanel" aria-labelledby="lockout-tab">
+                <div class="alert alert-info">
+                    Use this to set a holding page when your site is under construction. You can choose to lock the login page to prevent logins during this time also.
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="LockoutMode" class="custom-control-input">
+                        <label asp-for="LockoutMode" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="LockoutMode"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="LockLoginPage" class="custom-control-input">
+                        <label asp-for="LockLoginPage" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="LockLoginPage"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="LockoutModeHoldingPage"></label>
+                    <select asp-for="LockoutModeHoldingPage" class="form-control">
+                        <option value="">Default Holding Page</option>
+                        @foreach (var content in await _content.GetPages())
+                        {
+                            <option value="@content.Id">@content.Title</option>
+                        }
+                    </select>
+                    <small asp-for="LockoutModeHoldingPage"></small>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LockoutModeTokens"></label>
+                    <div>
+                        <textarea asp-for="LockoutModeTokens" class="form-control" rows="6"></textarea>
+                    </div>
+                    <small asp-for="LockoutModeTokens"></small>
+                </div>
+            </div>
+            <div id="login" class="tab-pane" role="tabpanel" aria-labelledby="login-tab">
+                <div class="form-group floating-label">
+                    <input asp-for="LoginAreaSettings.Title" class="form-control">
+                    <label asp-for="LoginAreaSettings.Title"></label>
+                    <small asp-for="LoginAreaSettings.Title"></small>
+                </div>
+                <mediaSelect asp-for="LoginAreaSettings.Logo" asp-background-size="contain"></mediaSelect>
+                <div class="form-group floating-label">
+                    <textarea asp-for="LoginAreaSettings.BackgroundImages" class="form-control"></textarea>
+                    <label asp-for="LoginAreaSettings.BackgroundImages"></label>
+                    <small asp-for="LoginAreaSettings.BackgroundImages"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="LoginAreaSettings.RandomiseImages" class="custom-control-input">
+                        <label asp-for="LoginAreaSettings.RandomiseImages" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="LoginAreaSettings.RandomiseImages"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed" class="form-control">
+                    <label asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed"></label>
+                    <small asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="LoginAreaSettings.BackgroundImagesChangeDuration" class="form-control">
+                    <label asp-for="LoginAreaSettings.BackgroundImagesChangeDuration"></label>
+                    <small asp-for="LoginAreaSettings.BackgroundImagesChangeDuration"></small>
+                </div>
+            </div>
+            <div id="admin" class="tab-pane" role="tabpanel" aria-labelledby="admin-tab">
+                <div class="form-group floating-label">
+                    <input asp-for="AdminAreaSettings.Title" class="form-control">
+                    <label asp-for="AdminAreaSettings.Title"></label>
+                    <small asp-for="AdminAreaSettings.Title"></small>
+                </div>
+                <mediaSelect asp-for="AdminAreaSettings.Logo" asp-background-size="contain"></mediaSelect>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,36 @@
+@model PropertyListing
+@{
+    ViewBag.Title = "Edit " + Model.Title;
+}
+@section buttons {
+    <a href="javascript:document.getElementById('property-edit-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item " href="@Model.Url" target="_blank"><i class="fa fa-search m-r-xs"></i>Preview</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete Property</a>
+    </div>
+}
+@section breadcrumbs {
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="/admin">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a asp-action="Index" asp-controller="Property" asp-route-area="Admin"><i class="fa fa-building mr-1"></i>All Properties</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
+        </ol>
+    </nav>
+}
+<form method="post" id="property-edit-form" data-id="@Model.Id">
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+    <div asp-validation-summary="All" class="validation-summary"></div>
+    <div class="row">
+        <div class="col-md-8">
+            <partial name="_Editor_Tabs" />
+        </div>
+        <div class="col-md-4">
+            <partial name="_Editor_Sidebar" />
+        </div>
+    </div>
+</form>
