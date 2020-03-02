@@ -1,0 +1,85 @@
+@model StripeProductListModel
+@{
+    ViewBag.Title = "Stripe Products";
+}
+@section buttons {
+    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-ellipsis-h"></i>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" asp-action="Products">
+            <i class="fa fa-layer-group mr-2"></i>Product Groups
+        </a>
+        <a class="dropdown-item" asp-action="Plans">
+            <i class="fa fa-award mr-2"></i>Plans
+        </a>
+        <a class="dropdown-item" asp-action="Stripe">
+            <i class="fab fa-stripe-s mr-2"></i>Connected Stripe Plans
+        </a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" asp-action="Select" asp-controller="Subscriptions" asp-area="" target="_blank">
+            <i class="fa fa-shopping-bag mr-2"></i>Pricing Page
+        </a>
+        @if (User.IsSuperUser()) { 
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item warning-alert" asp-action="ClearAllLocalData" asp-controller="Subscriptions" asp-area="Admin" data-title="Are you sure?" data-warning="This will clear ALL the LOCAL subscription data from the database, this does not delete any Stripe data. Local products, plans and subscriptions will need to be resynced from Stripe.">
+                <i class="fa fa-trash mr-2"></i>Delete Local Data
+            </a>
+        }
+    </div>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
+}
+<form class="inline" data-target="#subscriptions-stripe-products-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="subscriptions-stripe-products-list" class="hood-inline-list refresh query" data-url="@Url.Action("StripeList")" data-complete="$.hood.Subscriptions.Lists.StripeProducts.Loaded">
+                <partial name="_List_StripeProducts" />
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="subscription-stripe-filters-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#subscription-stripe-filters-panel" href="#subscription-stripe-filters-panel" aria-expanded="true" aria-controls="subscription-stripe-filters-panel">
+                            Search Filters
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
+                </div>
+                <div class="card-body collapse show" aria-labelledby="subscription-stripe-filters-panel-heading" id="subscription-stripe-filters-panel">
+                   <div class="form-group floating-label">
+                        <label asp-for="Search"></label>
+                        <select class="form-control refresh-on-change" asp-for="Order">
+                            <optgroup label="Subscription">
+                                <option value="Name">Name (A-Z)</option>
+                                <option value="NameDesc">Name (Z-A)</option>
+                                <option value="AmountDesc">Price (&pound;&pound;&pound;-&pound;)</option>
+                                <option value="Amount">Price (&pound;-&pound;&pound;&pound;)</option>
+                                <option value="CreatedDesc">Added Date (Newest)</option>
+                                <option value="Created">Added Date (Oldest)</option>
+                            </optgroup>
+                            <optgroup label="Subscribers">
+                                <option value="ActiveCountDesc">Active Subscribers (Higest to Lowest)</option>
+                                <option value="ActiveCount">Active Subscribers (Lowest to Higest)</option>
+                                <option value="TrialCountDesc">Trials (Higest to Lowest)</option>
+                                <option value="TrialCount">Trials (Lowest to Higest)</option>
+                            </optgroup>
+                        </select>
+                        <small asp-for="Search"></small>
+                    </div>
+                   <div class="form-group floating-label mb-0">
+                        <label asp-for="Search"></label>
+                        <input asp-for="Search" class="form-control">
+                        <small asp-for="Search"></small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-block"> Search!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

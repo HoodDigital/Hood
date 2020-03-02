@@ -1,0 +1,11 @@
+@inject IThemesService _themes
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/classic.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/nano.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/nano.min.css"/>
+<environment include="Development">
+    <link rel="stylesheet" href="@string.Format("{0}/css/admin.css", Engine.LibraryFolder)" asp-append-version="true" />
+</environment>
+<environment exclude="Development">
+    <link rel="stylesheet" href="@($"https://cdn.jsdelivr.net/npm/hoodcms@{Engine.Version}/css/admin.min.css")" />
+</environment>

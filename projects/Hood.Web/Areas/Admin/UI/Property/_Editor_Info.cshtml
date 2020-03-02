@@ -1,0 +1,53 @@
+@model PropertyListing
+@inject IContentRepository _data
+@{
+    var _integrationSettings = Engine.Settings.Integrations;
+}
+<div id="info" class="tab-pane active">
+    <h5 class="mt-2 mb-0">Property Listing, Title and Description</h5>
+    <p>Set titles, descriptions and enter the main body of the property. You can adjust what editors you see here in the <a asp-action="Property" asp-controller="Settings">content settings</a> area.</p>
+   <div class="form-group floating-label">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" type="text" class="form-control" />
+        <small asp-for="Title"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="ShortDescription"></label>
+        <textarea asp-for="ShortDescription" class="tinymce-simple"></textarea>
+        <small asp-for="ShortDescription"></small>
+    </div>
+    <div class="form-group floating-label">
+        <label asp-for="Reference"></label>
+        <input asp-for="Reference" type="text" class="form-control" />
+        <small asp-for="Reference"></small>
+    </div>
+    <hr class="mt-4 mb-4" />
+    <partial name="_Editor_Images" />
+    <hr class="mt-4 mb-4" />
+    <h5 class="mt-2 mb-0">Property Address</h5>
+    <p>Addres and location information for this property listing.</p>
+    @if (_integrationSettings.EnableGoogleGeocoding && _integrationSettings.GoogleMapsApiKey.IsSet())
+    {
+        <div class="form-group floating-label">
+            <label for="address-autocomplete">Search for an address (Google Lookup)</label>
+            <input id="address-autocomplete" type="text" class="form-control" value="" placeholder="Enter an address..." autocomplete="off" />
+            <small class="text-info form-text">Search for an address here with Google, and automatically fill in the address form, including the map Latitude/Longitude fields.</small>
+        </div>
+        <hr />
+    }
+    <partial name="_Editor_Address" />
+    @if (Engine.Settings.Integrations.IsGoogleGeocodingEnabled)
+    {
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="AutoGeocode" class="custom-control-input">
+                <label asp-for="AutoGeocode" class="custom-control-label"></label>
+            </div>
+            <small asp-for="AutoGeocode"></small>
+        </div>
+    }
+    else
+    {
+        <input asp-for="AutoGeocode" type="hidden">
+    }
+</div>

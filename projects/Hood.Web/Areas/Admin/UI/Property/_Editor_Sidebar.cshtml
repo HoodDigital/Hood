@@ -1,0 +1,95 @@
+@model PropertyListing
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<div class="card mb-3">
+    <div class="card-header position-relative" id="content-access-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#content-access-panel" href="#content-access-panel" aria-expanded="true" aria-controls="content-access-panel">
+                URL &amp; Status
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="content-access-panel-heading" id="content-access-panel">
+        <div class="form-group floating-label">
+            <label asp-for="Status">Publish Status</label>
+            <select class="form-control" asp-for="Status" asp-items="@(Html.GetEnumSelectList<ContentStatus>())"></select>
+            <small asp-for="Status"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="PublishDate"></label>
+            <input class="datepicker form-control" asp-for="PublishDate" type="text" value="@Model.PublishDate.ToShortDateString()">
+            <small asp-for="Status"></small>
+        </div>
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="Featured" class="custom-control-input">
+                <label asp-for="Featured" class="custom-control-label"></label>
+            </div>
+            <small asp-for="Featured"></small>
+        </div>
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input asp-for="Confidential" class="custom-control-input">
+                <label asp-for="Confidential" class="custom-control-label"></label>
+            </div>
+            <small asp-for="Confidential"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="PropertyType"></label>
+            <select class="form-control" asp-for="PropertyType">
+                @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PropertyType, "\r\n|\r|\n"))
+                {
+                    <option value="@s.ToSeoUrl()">@s</option>
+                }
+            </select>
+            <small asp-for="PropertyType"></small>
+        </div>
+        <hr class="mt-4 mb-4" />
+        @if (_propertySettings.ShowBedrooms)
+        {
+            <div class="form-group floating-label">
+                <label asp-for="Bedrooms"></label>
+                <select class="form-control" asp-for="Bedrooms">
+                    <option value="">N/A</option>
+                    <option value="0">Studio</option>
+                    @for (int i = 1; i < 15; i++)
+                    {
+                        <option value="@i">@i.ToString("0")</option>
+                    }
+                </select>
+              <small asp-for="Bedrooms"></small>
+          </div>
+        }
+        else
+        {
+            <input asp-for="Bedrooms" type="hidden">
+        }
+        <div class="form-group floating-label">
+            <label asp-for="Planning"></label>
+            <select class="form-control" asp-for="Planning" asp-items="_propertySettings.GetPlanningTypes().Select(p => new SelectListItem() { Value = p.Key, Text = p.Value })"></select>
+            <small asp-for="Planning"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="ListingType"></label>
+            <select class="form-control" asp-for="ListingType" asp-items="_propertySettings.GetListingTypes().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+            <small asp-for="ListingType"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="LeaseStatus"></label>
+            <select class="form-control" asp-for="LeaseStatus" asp-items="_propertySettings.GetLeaseStatuses().Select(p => new SelectListItem() { Value = p, Text = p })"></select>
+            <small asp-for="LeaseStatus"></small>
+        </div>
+        <div class="form-group floating-label">
+            <label asp-for="AgentId"></label>
+            <select class="form-control" asp-for="AgentId">
+                @foreach (var author in Model.AvailableAgents)
+                {
+                    <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
+                }
+            </select>
+            <small asp-for="AgentId"></small>
+        </div>
+    </div>
+</div>

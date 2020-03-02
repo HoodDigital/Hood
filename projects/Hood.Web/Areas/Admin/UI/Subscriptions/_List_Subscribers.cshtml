@@ -1,0 +1,117 @@
+@model UserSubscriptionListModel
+@{
+    Layout = null;
+    var stripeUrl = string.Format("https://dashboard.stripe.com{0}", Engine.Settings.Billing.EnableStripeTestMode ? "/test" : "");
+}
+@if (Model.TotalCount > 0)
+{
+    @foreach (var subscription in Model.List)
+    {
+        var user = subscription.User;
+        <div class="card hover mb-3 p-3 @(user != null ? "border-success" : "border-danger")">
+            <div class="row no-gutters align-items-center">
+                @if (user != null)
+                {
+                    <div class="col-auto">
+                        <a asp-action="Edit" asp-controller="Users" asp-route-id="@user.Id">
+                            <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@user.ToFullName()"></fixedImage>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-auto">
+                        <a target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)">
+                            <fixedImage src="" class="img img-circle img-sm m-2 mr-4" alt="No User Found"></fixedImage>
+                        </a>
+                    </div>
+                }
+                <div class="col">
+                    <div class="mb-1">
+                        <h5 class="card-title d-lg-inline">
+                            @if (user != null)
+                            {
+                                <a target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)">@user.ToAdminName()</a>
+                            }
+                            else
+                            {
+                                <a target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)" class=" text-muted">Unlinked Subscription</a>
+                            }
+                        </h5>
+                        @if (subscription.Subscription != null)
+                        {
+                            <small class="d-lg-inline">
+                                @if (subscription.Subscription.SubscriptionProduct != null)
+                                {
+                                    <a asp-action="EditProduct" asp-route-id="@subscription.Subscription.SubscriptionProductId">@subscription.Subscription.SubscriptionProduct.DisplayName</a>
+                                    <span><i class="fa-caret-right fa"></i></span>
+                                }
+                                <a asp-action="Edit" asp-route-id="@subscription.SubscriptionId">@subscription.Subscription.Name</a>
+                            </small>
+                        }
+                    </div>
+                    <p class="mb-1">
+                        @subscription.StatusBadge
+                    </p>
+                    <small class="d-block">
+                        Next Period:
+                        <strong>@subscription.CurrentPeriodEnd</strong>
+                    </small>
+                    @if (user != null)
+                    {
+                        <p class="card-text mb-1">
+                            <small class="d-block">
+                                Username:
+                                <strong>@user.UserName</strong>
+                            </small>
+                            <small class="d-block">
+                                Email:
+                                <strong>@user.Email</strong>
+                                @if (!user.EmailConfirmed)
+                                {<i class="fa fa-exclamation-triangle text-danger" title="Email not confirmed."></i>}
+                            </small>
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-danger mt-2 mb-0"><i class="fa fa-exclamation-triangle mr-2"></i>This subscription is not linked to a current user.</p>
+                    }
+                </div>
+                <div class="col-auto d-flex align-items-center">
+                    <button type="button" class="btn btn-lg shadow-none v-middle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" target="_blank" href="@string.Format("{0}/subscriptions/{1}", stripeUrl, subscription.StripeId)">
+                            <i class="fa fa-external-link-alt"></i>
+                            View on Stripe
+                        </a>
+                        <a class="dropdown-item" asp-action="SyncSubscription" asp-route-id="@subscription.Id">
+                            <i class="fab fa-stripe-s"></i>
+                            Sync with Stripe
+                        </a>
+                        @if (user != null)
+                        {
+                            <a class="dropdown-item" asp-action="Edit" asp-controller="Users" asp-route-id="@user.Id">
+                                <i class="fa fa-edit"></i>
+                                Edit User
+                            </a>
+                        }
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item subscriptions-subs-delete" asp-action="DeleteSubscription" asp-route-id="@subscription.Id">
+                            <i class="fa fa-trash-alt"></i>
+                            Delete Item
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <partial name="_Pagination" />
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        There are subscribers yet.
+    </alert>
+}

@@ -1,0 +1,35 @@
+@model PropertyListing
+<div id="descriptions" class="tab-pane">
+    <h5 class="mt-2 mb-0">Descriptions</h5>
+    <p>Add detailed descriptions of the property, area, location and anything else!</p>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="tinymce-simple"></textarea>
+        <small asp-for="Description"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="Lease"></label>
+        <textarea asp-for="Lease" class="tinymce-simple"></textarea>
+        <small asp-for="Lease"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="Areas"></label>
+        <textarea asp-for="Areas" class="tinymce-simple"></textarea>
+        <small asp-for="Areas"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="Location"></label>
+        <textarea asp-for="Location" class="tinymce-simple"></textarea>
+        <small asp-for="Location"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="AgentInfo"></label>
+        <textarea asp-for="AgentInfo" class="tinymce-simple"></textarea>
+        <small asp-for="AgentInfo"></small>
+    </div>
+    <div class="form-group">
+        <label asp-for="Additional"></label>
+        <textarea asp-for="Additional" class="tinymce-simple"></textarea>
+        <small asp-for="Additional"></small>
+    </div>
+</div>

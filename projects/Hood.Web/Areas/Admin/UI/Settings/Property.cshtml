@@ -1,0 +1,368 @@
+@model PropertySettings
+@{
+    ViewData["Title"] = "Property Settings";
+    Layout = "_Layout_Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+{
+        <a asp-action="ResetProperty" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+}
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="property-tab" data-toggle="tab" href="#property" role="tab" aria-controls="property" aria-selected="true">
+                        Property
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="editor-tab" data-toggle="tab" href="#editor" role="tab" aria-controls="editor" aria-selected="true">
+                        Editor Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="price-tab" data-toggle="tab" href="#price" role="tab" aria-controls="price" aria-selected="true">
+                        Price Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="importer-tab" data-toggle="tab" href="#importer" role="tab" aria-controls="importer" aria-selected="true">
+                        Auto Importer
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="property" class="tab-pane active" role="tabpanel" aria-labelledby="mail-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="Enabled" class="custom-control-input">
+                        <label asp-for="Enabled" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="Enabled"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowList" class="custom-control-input">
+                        <label asp-for="ShowList" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowList"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowItem" class="custom-control-input">
+                        <label asp-for="ShowItem" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowItem"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="DefaultPageSize"></label>
+                    <input asp-for="DefaultPageSize" type="number" min="0" class="form-control" />
+                    <small asp-for="DefaultPageSize"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="Title"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <small asp-for="Title"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="Name"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <small asp-for="Name"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="Plural"></label>
+                    <input asp-for="Plural" class="form-control" />
+                    <small asp-for="Plural"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="Slug"></label>
+                    <input asp-for="Slug" class="form-control restrict-to-slug" />
+                    <small asp-for="Slug"></small>
+                </div>
+            </div>
+            <div id="editor" class="tab-pane" role="tabpanel" aria-labelledby="editor-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowBedrooms" class="custom-control-input">
+                        <label asp-for="ShowBedrooms" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowBedrooms"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowBathrooms" class="custom-control-input">
+                        <label asp-for="ShowBathrooms" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowBathrooms"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowShowers" class="custom-control-input">
+                        <label asp-for="ShowShowers" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowShowers"></small>
+                </div>
+                <mediaSelect asp-for="NoImage"></mediaSelect>
+                <div class="card">
+                    <div class="card-header border-dark bg-light">
+                        <h6 class="m-0">
+                            Editor &amp; Type Settings
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <alert size="Medium" type="Warning" icon="fa-exclamation-triangle">
+                            Do not change the system values if you are using property importers using Rightmove, BLM or Other API protocols.<br />You can of course add your own to the lists.
+                        </alert>
+                        <div class="form-group">
+                            <label asp-for="PriceDisplays"></label>
+                            <textarea asp-for="PriceDisplays" class="form-control">@Model.PriceDisplays</textarea>
+                            <small asp-for="PriceDisplays"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="RentDisplays"></label>
+                            <textarea asp-for="RentDisplays" class="form-control">@Model.RentDisplays</textarea>
+                            <small asp-for="RentDisplays"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="FeesDisplay"></label>
+                            <textarea asp-for="FeesDisplay" class="form-control">@Model.FeesDisplay</textarea>
+                            <small asp-for="FeesDisplay"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PropertyType"></label>
+                            <textarea asp-for="PropertyType" class="form-control">@Model.PropertyType</textarea>
+                            <small asp-for="PropertyType"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="PlanningType"></label>
+                            <textarea asp-for="PlanningType" class="form-control">@Model.PlanningType</textarea>
+                            <small asp-for="PlanningType"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ListingTypes"></label>
+                            <textarea asp-for="ListingTypes" class="form-control">@Model.ListingTypes</textarea>
+                            <small asp-for="ListingTypes"></small>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LeaseStatuses"></label>
+                            <textarea asp-for="LeaseStatuses" class="form-control">@Model.LeaseStatuses</textarea>
+                            <small asp-for="LeaseStatuses"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="price" class="tab-pane" role="tabpanel" aria-labelledby="price-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowRent" class="custom-control-input">
+                        <label asp-for="ShowRent" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowRent"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowRentDecimals" class="custom-control-input">
+                        <label asp-for="ShowRentDecimals" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowRentDecimals"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="RentMinimum"></label>
+                    <input type="number" asp-for="RentMinimum" class="form-control" />
+                    <small asp-for="RentMinimum"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="RentMaximum"></label>
+                    <input type="number" asp-for="RentMaximum" class="form-control" />
+                    <small asp-for="RentMaximum"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="RentIncrement"></label>
+                    <input type="number" asp-for="RentIncrement" class="form-control" />
+                    <small asp-for="RentIncrement"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowAskingPrice" class="custom-control-input">
+                        <label asp-for="ShowAskingPrice" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowAskingPrice"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowAskingPriceDecimals" class="custom-control-input">
+                        <label asp-for="ShowAskingPriceDecimals" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowAskingPriceDecimals"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="AskingPriceMinimum"></label>
+                    <input type="number" asp-for="AskingPriceMinimum" class="form-control" />
+                    <small asp-for="AskingPriceMinimum"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="AskingPriceMaximum"></label>
+                    <input type="number" asp-for="AskingPriceMaximum" class="form-control" />
+                    <small asp-for="AskingPriceMaximum"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="AskingPriceIncrement"></label>
+                    <input type="number" asp-for="AskingPriceIncrement" class="form-control" />
+                    <small asp-for="AskingPriceIncrement"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowPremium" class="custom-control-input">
+                        <label asp-for="ShowPremium" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowPremium"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowPremiumDecimals" class="custom-control-input">
+                        <label asp-for="ShowPremiumDecimals" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowPremiumDecimals"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="PremiumMinimum"></label>
+                    <input asp-for="PremiumMinimum" class="form-control" type="number" />
+                    <small asp-for="PremiumMinimum"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="PremiumMaximum"></label>
+                    <input asp-for="PremiumMaximum" class="form-control" type="number" />
+                    <small asp-for="PremiumMaximum"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="PremiumIncrement"></label>
+                    <input asp-for="PremiumIncrement" class="form-control" type="number" />
+                    <small asp-for="PremiumIncrement"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowFees" class="custom-control-input">
+                        <label asp-for="ShowFees" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowFees"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ShowFeesDecimals" class="custom-control-input">
+                        <label asp-for="ShowFeesDecimals" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="ShowFeesDecimals"></small>
+                </div>
+            </div>
+            <div id="importer" class="tab-pane" role="tabpanel" aria-labelledby="importer-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="FTPImporterSettings.Enabled" class="custom-control-input">
+                        <label asp-for="FTPImporterSettings.Enabled" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="FTPImporterSettings.Enabled"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="FTPImporterSettings.ClearImagesBeforeImport" class="custom-control-input">
+                        <label asp-for="FTPImporterSettings.ClearImagesBeforeImport" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="FTPImporterSettings.ClearImagesBeforeImport"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="FTPImporterSettings.DeletePhysicalImageFiles" class="custom-control-input">
+                        <label asp-for="FTPImporterSettings.DeletePhysicalImageFiles" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="FTPImporterSettings.DeletePhysicalImageFiles"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="FTPImporterSettings.ExtraneousPropertyProcess"></label>
+                    <select asp-for="FTPImporterSettings.ExtraneousPropertyProcess" class="form-control">
+                        <option value="@((int)ExtraneousPropertyProcess.Delete)">Delete property entirely</option>
+                        <option value="@((int)ExtraneousPropertyProcess.StatusDelete)">Set status as "Deleted"</option>
+                        <option value="@((int)ExtraneousPropertyProcess.StatusArchive)">Set status as "Archived"</option>
+                        <option value="@((int)ExtraneousPropertyProcess.LeaseStatusLetSold)">Mark as Let/Sold depeding on sale or rental</option>
+                    </select>
+                    <small asp-for="FTPImporterSettings.ExtraneousPropertyProcess"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="FTPImporterSettings.Method">Use FTP Service:</label>
+                    <select asp-for="FTPImporterSettings.Method" class="form-control">
+                        <option value="@((int)PropertyImporterMethod.FtpBlm)">Download BLM file from remote FTP</option>
+                        <option value="@((int)PropertyImporterMethod.Directory)">Load BLM file from local folder.</option>
+                    </select>
+                    <small asp-for="FTPImporterSettings.Method"></small>
+                </div>
+                <script asp-location="AfterScripts">
+                    $('body').on('change', '#FTPImporterSettings_Method', function () {
+                        $('div.form-group[class*="method-"]').hide();
+                        $('div.form-group.method-' + $(this).val()).show();
+                    });
+                    $('div.form-group[class*="method-"]').hide();
+                    $('div.form-group.method-' + $('#FTPImporterSettings_Method').val()).show();
+                </script>
+                <div class="card">
+                    <div class="card-header border-dark bg-light mb-3">
+                        <h6 class="m-0">
+                            Editor &amp; Type Settings
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="form-group @($"method-{(int)PropertyImporterMethod.FtpBlm}")">
+                            <div class="custom-control custom-checkbox">
+                                <input asp-for="FTPImporterSettings.RequireUnzip" class="custom-control-input">
+                                <label asp-for="FTPImporterSettings.RequireUnzip" class="custom-control-label"></label>
+                            </div>
+                            <small asp-for="FTPImporterSettings.RequireUnzip"></small>
+                        </div>
+                        <div class="form-group floating-label @($"method-{(int)PropertyImporterMethod.FtpBlm}")">
+                            <label asp-for="FTPImporterSettings.Server"></label>
+                            <input asp-for="FTPImporterSettings.Server" class="form-control" />
+                            <small asp-for="FTPImporterSettings.Server"></small>
+                        </div>
+                        <div class="form-group floating-label @($"method-{(int)PropertyImporterMethod.FtpBlm}")">
+                            <label asp-for="FTPImporterSettings.Username"></label>
+                            <input asp-for="FTPImporterSettings.Username" class="form-control" />
+                            <small asp-for="FTPImporterSettings.Username"></small>
+                        </div>
+                        <div class="form-group floating-label @($"method-{(int)PropertyImporterMethod.FtpBlm}")">
+                            <label asp-for="FTPImporterSettings.Password"></label>
+                            <input asp-for="FTPImporterSettings.Password" class="form-control" />
+                            <small asp-for="FTPImporterSettings.Password"></small>
+                        </div>
+                        <div class="form-group floating-label @($"method-{(int)PropertyImporterMethod.Directory}")">
+                            <label asp-for="FTPImporterSettings.LocalFolder"></label>
+                            <input asp-for="FTPImporterSettings.LocalFolder" class="form-control" />
+                            <small asp-for="FTPImporterSettings.LocalFolder"></small>
+                        </div>
+                        <div class="form-group floating-label @($"method-{(int)PropertyImporterMethod.FtpBlm}")  @($"method-{(int)PropertyImporterMethod.Directory}")">
+                            <label asp-for="FTPImporterSettings.Filename"></label>
+                            <input asp-for="FTPImporterSettings.Filename" class="form-control" />
+                            <small asp-for="FTPImporterSettings.Filename"></small>
+                        </div>
+                        <div class="form-group floating-label @($"method-{(int)PropertyImporterMethod.Directory}")">
+                            <label asp-for="FTPImporterSettings.ZipFile"></label>
+                            <input asp-for="FTPImporterSettings.ZipFile" class="form-control" />
+                            <small asp-for="FTPImporterSettings.ZipFile"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="TriggerAuthKey"></label>
+                    <input asp-for="TriggerAuthKey" class="form-control" />
+                    <small asp-for="TriggerAuthKey"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

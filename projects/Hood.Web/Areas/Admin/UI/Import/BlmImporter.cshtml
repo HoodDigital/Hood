@@ -1,0 +1,92 @@
+@{
+    ViewBag.Title = "Import Properties via BLM";
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+@section buttons {
+    <a class="btn btn-primary" asp-action="Manage" asp-controller="Property" asp-area="Admin"><i class="fa fa-list-ol mr-2"></i>Back to List</a>
+}
+<script src="/hood/js/admin/import.property.js" asp-location="AfterScripts"></script>
+<div class="card mb-3">
+    <div class="card-header position-relative" id="import-controls-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#import-controls-panel" href="#import-controls-panel" aria-expanded="true" aria-controls="import-controls-panel">
+                Update from FTP Service
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="import-controls-panel-heading" id="import-controls-panel">
+        <p>Here you can run the update from the remote FTP service. Click 'Run Update' to start the automatic update.</p>
+        <button id="import-property-start" data-url="@Url.Action("BlmImporterStart")" class="btn btn-success">Run Update</button>
+        <button id="import-property-cancel" data-url="@Url.Action("BlmImporterCancel")" class="btn" value="">Cancel</button>
+        <div id="import-property-error-message"></div>
+        <div id="import-property-progress" class="mt-3 p-4 alert alert-dark d-none">
+            <h5 class="mb-3"><span class="pc">0.0</span>% Complete</h5>
+            <div id="progresscontainer" class="progress progress-striped active mb-3" style="height:2rem;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="progressbar" class="progress-bar bg-info progress-bar-striped progress-bar-animated" style="width:0%;"><span>Processing: <strong class="pc">0</strong>% Complete</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header position-relative" id="import-activity-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#import-activity-panel" href="#import-activity-panel" aria-expanded="true" aria-controls="import-activity-panel">
+                Activity
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse show" aria-labelledby="import-activity-panel-heading" id="import-activity-panel">
+        <div id="import-property-status" data-url="@Url.Action("BlmImporterStatus")">
+            <div class="well-lg">
+                <p>Current Task: <strong id="pt"></strong></p>
+                <p>FTP Service Activity: <strong id="ft"></strong></p>
+                <p>Properties Processed: <strong id="pp"></strong> of <strong class="tp"></strong></p>
+                <p>
+                    Properties Added:
+                    <strong id="pa"></strong> of <strong id="ToAdd"></strong>
+                </p>
+                <p>
+                    Properties Updated:
+                    <strong id="pu"></strong> of <strong id="ToUpdate"></strong>
+                </p>
+                <p>
+                    Properties Deleted:
+                    <strong id="pd"></strong> of <strong id="ToDelete"></strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header position-relative" id="import-errors-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#import-errors-panel" href="#import-errors-panel" aria-expanded="false" aria-controls="import-errors-panel">
+                Errors
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse" aria-labelledby="import-errors-panel-heading" id="import-errors-panel">
+        <div id="import-property-errors">
+            <p>No errors reported.</p>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header position-relative" id="import-warnings-panel-heading">
+        <p class="card-title m-0 font-weight-bold">
+            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#import-warnings-panel" href="#import-warnings-panel" aria-expanded="false" aria-controls="import-warnings-panel">
+                Warnings
+                <i class="fe fe-arrow-up mt-1"></i>
+            </a>
+        </p>
+    </div>
+    <div class="card-body collapse" aria-labelledby="import-warnings-panel-heading" id="import-warnings-panel">
+        <div id="import-property-warnings">
+            <p>No warnings reported.</p>
+        </div>
+    </div>
+</div>

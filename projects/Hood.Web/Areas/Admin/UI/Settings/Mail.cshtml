@@ -1,0 +1,90 @@
+@model MailSettings
+@{
+    ViewData["Title"] = "Mail Settings";
+    Layout = "_Layout_Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+    {
+        <a asp-action="ResetMail" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="mail-tab" data-toggle="tab" href="#mail" role="tab" aria-controls="mail" aria-selected="true">
+                        Mail Settings
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="test-tab" data-toggle="tab" href="#test" role="tab" aria-controls="test" aria-selected="false">
+                        Send a Test E-Mail
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="mail" class="tab-pane active" role="tabpanel" aria-labelledby="mail-tab">
+                <form method="post" id="settings-form">
+                    <div class="form-group floating-label">
+                        <label asp-for="SendGridKey"></label>
+                        <input asp-for="SendGridKey" type="text" class="form-control" />
+                        <small asp-for="SendGridKey"></small>
+                    </div>
+                    <hr class="mt-4 mb-4" />
+                    <mediaSelect asp-for="Logo"></mediaSelect>
+                    <colorSelect asp-for="BackgroundColour"></colorSelect>
+                    <div class="form-group floating-label">
+                        <label asp-for="FromName"></label>
+                        <input asp-for="FromName" type="text" class="form-control" />
+                        <small asp-for="FromName"></small>
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="FromEmail"></label>
+                        <input asp-for="FromEmail" type="text" class="form-control" />
+                        <small asp-for="FromEmail"></small>
+                    </div>
+                </form>
+                <hr class="mt-4 mb-4" />
+                <alert type="Light" size="Medium" icon="fa-envelope-open-text" class="border-dark">
+                    <p class="h5 mb-3">Preview how your emails will look, these links will open in a new tab.</p>
+                    <p class="m-0">
+                        <a class="btn btn-outline-dark" asp-action="Plain" asp-controller="Mail" asp-area="Admin" target="_blank">Plain Message</a>
+                        <a class="btn btn-success" asp-action="Success" asp-controller="Mail" asp-area="Admin" target="_blank">Success Message</a>
+                        <a class="btn btn-warning" asp-action="Warning" asp-controller="Mail" asp-area="Admin" target="_blank">Warning Message</a>
+                        <a class="btn btn-danger" asp-action="Danger" asp-controller="Mail" asp-area="Admin" target="_blank">Danger Message</a>
+                    </p>
+                </alert>
+            </div>
+            <div id="test" class="tab-pane" role="tabpanel" aria-labelledby="test-tab">
+                <alert type="Info" size="Medium" icon="fa-envelope-open-text">
+                    Preview how your email will look in an actual email, send a test version of this email to a specified email address...
+                </alert>
+                <form asp-action="Test" asp-controller="Mail" method="post">
+                    <fieldset class="form-horizontal">
+                        <div class="form-group floating-label">
+                            <label for="email">Email address</label>
+                            <input id="email" name="email" type="text" class="form-control" placeholder="Email address" />
+                        </div>
+                        <div class="form-group floating-label">
+                            <label for="email">Template</label>
+                            <select id="template" name="template" type="text" class="form-control">
+                                <option value="@MailSettings.PlainTemplate">Plain</option>
+                                <option value="@MailSettings.SuccessTemplate">Success</option>
+                                <option value="@MailSettings.WarningTemplate">Warning</option>
+                                <option value="@MailSettings.DangerTemplate">Danger</option>
+                            </select>
+                        </div>
+                        <p>
+                            <button type="submit" class="btn btn-success m-t-md"><i class="fa fa-envelope mr-3"></i>Send Test</button>
+                        </p>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

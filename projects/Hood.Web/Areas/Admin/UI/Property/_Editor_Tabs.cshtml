@@ -1,0 +1,60 @@
+@model PropertyListing
+@inject IContentRepository _data
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<partial name="_Editor_Hidden" />
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item active">
+                    <a class="nav-link" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">
+                        Basic Info
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="media-tab" data-toggle="tab" href="#media" role="tab" aria-controls="media" aria-selected="false">
+                        Images
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="descriptions-tab" data-toggle="tab" href="#descriptions" role="tab" aria-controls="descriptions" aria-selected="false">
+                        Descriptions
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="price-tab" data-toggle="tab" href="#price" role="tab" aria-controls="price" aria-selected="false">
+                        Prices
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="floorareas-tab" data-toggle="tab" href="#floorareas" role="tab" aria-controls="floorareas" aria-selected="false">
+                        Floor Areas
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="floorplans-tab" data-toggle="tab" href="#floorplans" role="tab" aria-controls="floorplans" aria-selected="false">
+                        Floor Plans
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="features-tab" data-toggle="tab" href="#features" role="tab" aria-controls="features" aria-selected="false">
+                        Features
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <partial name="_Editor_Info" />
+            <partial name="_Editor_Descriptions" />
+            <partial name="_Editor_Prices" />
+            <partial name="_Editor_Media" />
+            <partial name="_Editor_Floorplans" />
+            <partial name="_Editor_Features" />
+            <partial name="_Editor_FloorAreas" />
+      </div>
+    </div>
+</div>
