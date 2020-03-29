@@ -20,8 +20,8 @@ namespace Hood.Extensions
             builder.Entity<ApiEvent>().ToTable("HoodApiEvents");
             builder.Entity<Address>().ToTable("HoodAddresses");
             builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
-            builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
-            builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
+            builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0);
+            builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValue(0.0);
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
             builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<ApiKey>().HasOne(up => up.User).WithMany(add => add.ApiKeys).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
@@ -91,8 +91,8 @@ namespace Hood.Extensions
 
             // Property
             builder.Entity<PropertyListing>().ToTable("HoodProperties");
-            builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
-            builder.Entity<PropertyListing>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
+            builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValue(0.0);
+            builder.Entity<PropertyListing>().Property(a => a.Longitude).HasDefaultValue(0.0);
             builder.Entity<PropertyListing>().HasOne(c => c.Agent).WithMany(up => up.Properties).HasForeignKey(c => c.AgentId);
 
             builder.Entity<PropertyMeta>().ToTable("HoodPropertyMetadata");

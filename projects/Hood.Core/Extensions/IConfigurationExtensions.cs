@@ -13,13 +13,25 @@ namespace Hood.Extensions
         public static bool IsDatabaseConfigured(this IConfiguration config)
         {
             if (Engine.Services.DatabaseConnectionFailed)
+            {
                 return false;
+            }
+
             if (Engine.Services.DatabaseMigrationsMissing)
+            {
                 return false;
+            }
+
             if (Engine.Services.MigrationNotApplied)
+            {
                 return false;
+            }
+
             if (Engine.Services.DatabaseSeedFailed)
+            {
                 return false;
+            }
+
             return config.IsDatabaseConnected();
         }
         public static bool IsDatabaseConnected(this IConfiguration config)
@@ -39,7 +51,16 @@ namespace Hood.Extensions
             return config.CheckConfiguration("Google", "Authentication:Google:AppId", "Authentication:Google:Secret");
         }
 
+        public static SqlConnectionStringBuilder GetConnectionSettings(this IConfiguration config)
+        {
+            string conString = "SERVER=localhost;DATABASE=tree;UID=root;PASSWORD=branch;Min Pool Size = 0;Max Pool Size=200";
+            if (config.IsDatabaseConnected())
+            {
+                conString = config["ConnectionStrings:DefaultConnection"];
+            }
 
+            return new SqlConnectionStringBuilder(conString);
+        }
 
         private static bool CheckConfiguration(this IConfiguration config, string flag, params string[] keys)
         {
@@ -57,7 +78,10 @@ namespace Hood.Extensions
         public static bool IsConfigured(this IConfiguration config, string key)
         {
             if (!string.IsNullOrEmpty(config[key]) && config[key] == "true")
+            {
                 return true;
+            }
+
             return false;
         }
 

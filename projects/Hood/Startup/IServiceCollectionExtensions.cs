@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,11 +30,6 @@ namespace Hood.Startup
         public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config)
           where TContext : HoodDbContext
         {
-
-            services
-                .AddMvc()
-                .AddApplicationPart(typeof(Engine).Assembly)
-                .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
 
             if (config.IsDatabaseConnected())
             {
@@ -51,6 +47,14 @@ namespace Hood.Startup
             services.ConfigureImpersonation();
             services.ConfigureRoutes();
 
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation()
+                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver())
+                .AddApplicationPart(typeof(Engine).Assembly)
+                .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
+
+            services.AddRazorPages();
+
             return services;
         }
 
@@ -61,8 +65,6 @@ namespace Hood.Startup
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IPropertyImporter, BlmFileImporter>();
             services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
-            services.AddSingleton<IPropertyExporter, PropertyExporter>();
-            services.AddSingleton<IContentExporter, ContentExporter>();
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
@@ -89,6 +91,8 @@ namespace Hood.Startup
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRecaptchaService, RecaptchaService>();
+            services.AddScoped<IPropertyExporter, PropertyExporter>();
+            services.AddScoped<IContentExporter, ContentExporter>();
 
             return services;
         }

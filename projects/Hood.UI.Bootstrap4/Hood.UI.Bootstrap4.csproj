@@ -1,12 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    
     <AssemblyName>Hood.UI.Bootstrap4</AssemblyName>
+    <PackageId>Hood.UI.Bootstrap4</PackageId>
+    
     <Version>4.0.0</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
-    <PackageId>Hood.UI.Bootstrap4</PackageId>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    
   </PropertyGroup>
 
   <ItemGroup>

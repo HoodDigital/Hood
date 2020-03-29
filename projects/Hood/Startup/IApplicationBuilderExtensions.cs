@@ -95,8 +95,9 @@ namespace Hood.Startup
                     }
             });
 
-            app.UseCookiePolicy();
-
+            app.UseRouting();
+            app.UseCors();
+            
             // Activate url helpers
             var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             UrlHelpers.Configure(httpContextAccessor);
@@ -104,6 +105,7 @@ namespace Hood.Startup
             if (config.IsDatabaseConfigured())
             {
                 app.UseAuthentication();
+                app.UseAuthorization();
 
                 var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
@@ -142,57 +144,58 @@ namespace Hood.Startup
             }
             catch (StartupException)
             {
-                app.UseMvc(routes =>
+                app.UseEndpoints(endpoints =>
                 {
-                    routes.MapRoute(
+                    // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
+                    endpoints.MapControllerRoute(
                         name: "SiteNotInstalled",
-                        template: "{*url}",
+                        pattern: "{*url}",
                         defaults: new { controller = "Install", action = "Install" }
                     );
                 });
                 return app;
             }
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
                 // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Content",
-                    template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
+                    pattern: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
                     defaults: new { controller = "Home", action = "Show" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Manage",
-                     template: "account/manage/{action=Index}/{id?}",
+                     pattern: "account/manage/{action=Index}/{id?}",
                      defaults: new { controller = "Manage" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Billing",
-                     template: "account/billing/{action=Index}/{id?}",
+                     pattern: "account/billing/{action=Index}/{id?}",
                      defaults: new { controller = "Billing" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Addresses",
-                     template: "account/addresses/{action=Index}/{id?}",
+                     pattern: "account/addresses/{action=Index}/{id?}",
                      defaults: new { controller = "Address" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Api",
-                     template: "account/api/{action=Index}/{id?}",
+                     pattern: "account/api/{action=Index}/{id?}",
                      defaults: new { controller = "Api" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Subscriptions",
-                     template: "account/subscriptions/{action=Index}/{id?}",
+                     pattern: "account/subscriptions/{action=Index}/{id?}",
                      defaults: new { controller = "Subscriptions" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Areas",
-                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Default",
-                    template: "{controller=Home}/{action=Index}/{id?}"
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
                 );
             });
             return app;
