@@ -73,7 +73,7 @@
             {
                 case "succeeded":
                     <alert>
-                        Your card has been charged @latest.PaymentIntent.Amount.Value.ToCurrencyString() on @latest.PaymentIntent.Created.Value.ToDisplay()
+                        Your card has been charged @latest.PaymentIntent.Amount.Value.ToCurrencyString() on @latest.PaymentIntent.Created.ToDisplay()
                     </alert>
                     break;
                 case "processing":

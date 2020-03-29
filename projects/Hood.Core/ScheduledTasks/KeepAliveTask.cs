@@ -19,6 +19,7 @@ namespace Hood.Core.ScheduledTasks
         public async Task ExecuteAsync()
         {
             // This task does not need to do anything, the server has been hit by the task executor, so it will keep the system alive anyway.
+            await Task.Delay(1);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Hood.UI.Bootstrap3
     {
         public int ServiceConfigurationOrder => 1;
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {}
 
         public void ConfigureServices(IServiceCollection services, IConfiguration config)

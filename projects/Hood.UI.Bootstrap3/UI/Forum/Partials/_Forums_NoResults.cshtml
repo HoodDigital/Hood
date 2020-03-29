@@ -1,17 +1,13 @@
 @model ForumModel
 @if (string.IsNullOrEmpty(Model.Search))
 {
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            @Html.BootstrapAlert("There are no forums available right now, maybe check back later?", AlertType.Info, false, "text-center m-t-lg")
-        </div>
-    </div>
+    <alert type="Info" size="Medium" icon="fa fa-info-circle">
+        There are no forums available right now.
+    </alert>
 }
 else
 {
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            @Html.BootstrapAlert("Your search '" + Model.Search + "' did not return any results. Please try searching for something else.", AlertType.Info, false, "text-center m-t-lg")
-        </div>
-    </div>
+    <alert type="Info" size="Medium" icon="fa fa-info-circle">
+        Your search @Model.Search did not return any results. Please try searching for something else.
+    </alert>
 }

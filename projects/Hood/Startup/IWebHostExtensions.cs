@@ -64,7 +64,7 @@ namespace Hood.Startup
                             Engine.Services.MigrationNotApplied = true;
                             Engine.Services.AdminUserSetupError = true;
                             break;
-                        case StartupError.DatabaseMediaTimeout:
+                        case StartupError.DatabaseMediaError:
                             Engine.Services.DatabaseConnectionFailed = false;
                             Engine.Services.DatabaseMigrationsMissing = false;
                             Engine.Services.MigrationNotApplied = false;

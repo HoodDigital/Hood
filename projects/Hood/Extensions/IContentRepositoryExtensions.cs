@@ -15,7 +15,7 @@ namespace Hood.Extensions
         public static List<string> GetMetasForTemplate(this IContentRepository contentRepository, string templateName, string folder)
         {
             templateName = templateName.Replace("Meta:", "");
-            var _env = Engine.Services.Resolve<IHostingEnvironment>();
+            var _env = Engine.Services.Resolve<IWebHostEnvironment>();
             // get the right template file (from theme or if it doesnt appear there from base)
             string templatePath = _env.ContentRootPath + "\\Themes\\" + Engine.Settings["Hood.Settings.Theme"] + "\\Views\\" + folder + "\\" + templateName + ".cshtml";
             if (!System.IO.File.Exists(templatePath))

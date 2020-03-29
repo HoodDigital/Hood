@@ -1,26 +1,23 @@
 ﻿using Hood.Caching;
 using Hood.Core;
+using Hood.Extensions;
 using Hood.Filters;
-using Hood.Services;
 using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Hood.Extensions;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Identity.UI;
-using System.Collections.Generic;
 
 namespace Hood.Startup
 {
@@ -52,10 +49,8 @@ namespace Hood.Startup
             services.ConfigureCacheProfiles();
             services.ConfigureFilters();
             services.ConfigureImpersonation();
-            services.ConfigureJson();
             services.ConfigureRoutes();
 
-            services.AddApplicationInsightsTelemetry(config);
             return services;
         }
 
@@ -120,8 +115,8 @@ namespace Hood.Startup
         public static IServiceCollection ConfigureHoodDatabase<TContext>(this IServiceCollection services, IConfiguration config)
             where TContext : HoodDbContext
         {
-            services.AddDbContext<TContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
-            services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
+            services.AddDbContext<TContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
             return services;
         }
         public static IServiceCollection ConfigureHoodAntiForgery(this IServiceCollection services, IConfiguration config)
@@ -291,20 +286,6 @@ namespace Hood.Startup
 
             return services;
         }
-        public static IServiceCollection ConfigureJson(this IServiceCollection services)
-        {
-            services.Configure<MvcJsonOptions>(opt =>
-            {
-                var resolver = opt.SerializerSettings.ContractResolver;
-                if (resolver != null)
-                {
-                    var res = resolver as DefaultContractResolver;
-                    res.NamingStrategy = null;  // <<!-- this removes the camelcasing
-                }
-            });
-
-            return services;
-        }
         public static IServiceCollection ConfigureRoutes(this IServiceCollection services)
         {
             services.Configure<RouteOptions>(options =>
@@ -316,7 +297,7 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureViewEngine(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RazorViewEngineOptions>(options =>
+            services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
             {
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib"));
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(IServiceCollectionExtensions).Assembly, "ComponentLib"));
@@ -325,6 +306,9 @@ namespace Hood.Startup
                 var defaultUI = UserInterfaceProvider.GetProvider(config);
                 if (defaultUI != null)
                     options.FileProviders.Add(defaultUI);
+            });
+            services.Configure<RazorViewEngineOptions>(options =>
+            {
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
             return services;

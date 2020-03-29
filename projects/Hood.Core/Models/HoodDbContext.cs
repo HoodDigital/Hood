@@ -63,8 +63,8 @@ namespace Hood.Models
         public DbSet<Log> Logs { get; set; }
 
         // Views
-        public DbQuery<UserProfile> UserProfiles { get; set; }
-        public DbQuery<SubscriptionPlan> SubscriptionPlans { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -406,7 +406,7 @@ namespace Hood.Models
 
                         string commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL AND Directory = 'Property'";
                         SqlParameter sqlParameter = new SqlParameter("@DirectoryId", propertyDir.Id);
-                        int affectedRows = Database.ExecuteSqlCommand(commandText, sqlParameter);
+                        int affectedRows = Database.ExecuteSqlRaw(commandText, sqlParameter);
 
                         Option option = Options.Find(typeof(ContentSettings).ToString());
                         var contentSettings = JsonConvert.DeserializeObject<ContentSettings>(option.Value);
@@ -415,24 +415,24 @@ namespace Hood.Models
                             commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL AND Directory = '@Directory'";
                             sqlParameter = new SqlParameter("@DirectoryId", contentDir.Id);
                             SqlParameter sqlParameterType = new SqlParameter("@Directory", type.TypeName);
-                            affectedRows = Database.ExecuteSqlCommand(commandText, sqlParameter, sqlParameterType);
+                            affectedRows = Database.ExecuteSqlRaw(commandText, sqlParameter, sqlParameterType);
                         }
 
                         commandText = "UPDATE HoodMedia SET DirectoryId = @DirectoryId WHERE DirectoryId IS NULL";
                         sqlParameter = new SqlParameter("@DirectoryId", defaultDir.Id);
-                        affectedRows = Database.ExecuteSqlCommand(commandText, sqlParameter);
+                        affectedRows = Database.ExecuteSqlRaw(commandText, sqlParameter);
 
                     }
                 }
-                catch (SqlException ex)
+                catch (SqlException)
                 {
-                    throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaTimeout);
+                    throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaError);
                 }
                 catch (DbUpdateException dbEx)
                 {
                     if (dbEx.InnerException != null && dbEx.InnerException.Message.Contains("Timeout"))
                     {
-                        throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaTimeout);
+                        throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaError);
                     }
                 }
             }

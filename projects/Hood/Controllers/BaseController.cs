@@ -41,7 +41,7 @@ namespace Hood.Controllers
         protected readonly IStripeService _stripe;
         protected readonly ILogService _logService;
         protected readonly IConfiguration _config;
-        protected readonly IHostingEnvironment _env;
+        protected readonly IWebHostEnvironment _env;
         protected readonly IHoodCache _cache;
         protected readonly IDirectoryManager _directoryManager;
         protected readonly IMediaManager _media;
@@ -79,7 +79,7 @@ namespace Hood.Controllers
             _stripe = Engine.Services.Resolve<IStripeService>();
             _logService = Engine.Services.Resolve<ILogService>();
             _config = Engine.Services.Resolve<IConfiguration>();
-            _env = Engine.Services.Resolve<IHostingEnvironment>();
+            _env = Engine.Services.Resolve<IWebHostEnvironment>();
             _cache = Engine.Services.Resolve<IHoodCache>();
             _address = Engine.Services.Resolve<IAddressService>();
             _eventService = Engine.Services.Resolve<IEventsService>();
@@ -104,18 +104,12 @@ namespace Hood.Controllers
 
         public async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
         {
-            if (!_env.IsProduction())
-            {
-                await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success);
-            }
+            await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
         public async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
         {
-            if (!_env.IsProduction())
-            {
-                await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success);
-            }
+            await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
         public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)

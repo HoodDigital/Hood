@@ -42,7 +42,9 @@
 }
 @if (Model.SaveMessage.IsSet())
 {
-    @Html.ContainedBootstrapAlert(Model.SaveMessage, Model.MessageType, true, "no-margin");
+    <alert type="@Model.MessageType" size="Medium" icon="fa fa-info-circle">
+        @Model.SaveMessage
+    </alert>
 }
 <div class="row">
     <div class="col-sm-8">

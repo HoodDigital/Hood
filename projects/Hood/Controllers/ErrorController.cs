@@ -1,7 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
 using Hood.Models;
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,12 +13,9 @@ namespace Hood.Controllers
     [Route("error")]
     public class ErrorController : BaseController
     {
-        private readonly TelemetryClient _telemetryClient;
 
-        public ErrorController(TelemetryClient telemetryClient) : base()
-        {
-            _telemetryClient = telemetryClient;
-        }
+        public ErrorController() : base()
+        { }
 
         [Route("500")]
         public async System.Threading.Tasks.Task<IActionResult> AppError()
@@ -33,12 +29,6 @@ namespace Hood.Controllers
             }
 
             await _logService.AddExceptionAsync<ErrorController>($"500 - Application Error: {model.OriginalUrl}", model.Error);
-
-            _telemetryClient.TrackException(model.Error);
-            _telemetryClient.TrackEvent("Error.ServerError", new Dictionary<string, string>
-            {
-                ["error"] = model.ErrorMessage
-            });
 
             return View("Index", model);
         }
@@ -65,11 +55,6 @@ namespace Hood.Controllers
             }
 
             await _logService.AddLogAsync<ErrorController>($"404 - Page not found: {model.OriginalUrl}", type: LogType.Error404);
-
-            _telemetryClient.TrackEvent("Error.PageNotFound", new Dictionary<string, string>
-            {
-                ["originalPath"] = model.OriginalUrl
-            });
 
             return View("Index", model);
         }

@@ -76,7 +76,7 @@ namespace Hood.Core
 
             //set base application path
             var provider = services.BuildServiceProvider();
-            var hostingEnvironment = provider.GetRequiredService<IHostingEnvironment>();
+            var hostingEnvironment = provider.GetRequiredService<IWebHostEnvironment>();
 
             //initialize plugins
             var mvcCoreBuilder = services.AddMvcCore();

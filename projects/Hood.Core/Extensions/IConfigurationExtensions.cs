@@ -61,19 +61,5 @@ namespace Hood.Extensions
             return false;
         }
 
-        public static bool ForceHttps(this IConfiguration config)
-        {
-            if (!string.IsNullOrEmpty(config["UseHttps"]) && config["UseHttps"] == "true")
-                return true;
-            return false;
-        }
-
-        public static SqlConnectionStringBuilder GetConnectionSettings(this IConfiguration config)
-        {
-            SqlConnectionStringBuilder builder =
-                new SqlConnectionStringBuilder(config["ConnectionStrings:DefaultConnection"]);
-            return builder;
-        }
-
     }
 }

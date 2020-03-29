@@ -395,8 +395,8 @@ namespace Hood.Services
             if (plan == null)
                 throw new Exception("The plan could not be found on Stripe.");
 
-            List<SubscriptionItemOption> items = new List<SubscriptionItemOption> {
-                    new SubscriptionItemOption {
+            List<SubscriptionItemOptions> items = new List<SubscriptionItemOptions> {
+                    new SubscriptionItemOptions {
                         Plan = plan.Id,
                         Quantity = quantity
                     }
@@ -441,8 +441,8 @@ namespace Hood.Services
                 throw new Exception("Could not load Stripe subscription object to update.");
             }
 
-            List<SubscriptionItemUpdateOption> items = new List<SubscriptionItemUpdateOption>();
-            subscription.Items.ForEach(i => items.Add(new SubscriptionItemUpdateOption
+            List<SubscriptionItemOptions> items = new List<SubscriptionItemOptions>();
+            subscription.Items.ForEach(i => items.Add(new SubscriptionItemOptions
             {
                 Id = i.Id,
                 Plan = i.Plan.Id
@@ -474,9 +474,9 @@ namespace Hood.Services
                 throw new Exception("Could not find a plan from the same product to switch from in the given subscription");
             }
 
-            List<SubscriptionItemUpdateOption> items = new List<SubscriptionItemUpdateOption>
+            List<SubscriptionItemOptions> items = new List<SubscriptionItemOptions>
             {
-                new SubscriptionItemUpdateOption()
+                new SubscriptionItemOptions()
                 {
                     Id = oldPlanItem.Id,
                     Plan = newPlan.Id                    

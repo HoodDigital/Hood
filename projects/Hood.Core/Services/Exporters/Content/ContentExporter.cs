@@ -32,7 +32,7 @@ namespace Hood.Services
         private string ContentFolder { get; set; }
         private bool KillFlag { get; set; }
 
-        public ContentExporter(IFTPService ftp, IHostingEnvironment env, IConfiguration config, IMediaManager media, IEmailSender email)
+        public ContentExporter(IFTPService ftp, IWebHostEnvironment env, IConfiguration config, IMediaManager media, IEmailSender email)
         {
             _ftp = ftp;
             _config = config;

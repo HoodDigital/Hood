@@ -107,11 +107,11 @@ namespace Hood.Extensions
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
 
-            builder.Query<UserProfile>().ToView("HoodUserProfiles");
-            builder.Query<UserProfile>().Property(b => b.RolesJson).HasColumnName("Roles");
-            builder.Query<UserProfile>().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
+            builder.Entity<UserProfile>().HasNoKey().ToView("HoodUserProfiles");
+            builder.Entity<UserProfile>().HasNoKey().Property(b => b.RolesJson).HasColumnName("Roles");
+            builder.Entity<UserProfile>().HasNoKey().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
 
-            builder.Query<SubscriptionPlan>().ToView("HoodSubscriptionPlans");
+            builder.Entity<SubscriptionPlan>().HasNoKey().ToView("HoodSubscriptionPlans");
 
         }
 

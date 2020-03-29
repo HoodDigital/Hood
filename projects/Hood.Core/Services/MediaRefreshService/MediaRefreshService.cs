@@ -17,14 +17,14 @@ namespace Hood.Services
     public class MediaRefreshService : IMediaRefreshService
     {
         private readonly IConfiguration _config;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly IDirectoryManager _directoryManager;
         private IMediaManager _media;
 
         private HoodDbContext Database { get; set; }
 
         public MediaRefreshService(
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             IDirectoryManager directoryManager,
             IConfiguration config)
         {

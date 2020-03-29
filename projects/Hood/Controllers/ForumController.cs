@@ -630,14 +630,8 @@ namespace Hood.Controllers
                 message.AddCallToAction("View reported post", string.Format("{0}?highlight={1}", url, post.Id), "#f39c12", "center");
                 message.Template = MailSettings.WarningTemplate;
 
-                if (_env.IsDevelopment() || _env.IsStaging())
-                {
-                    await _emailSender.NotifyRoleAsync(message, "SuperUser");
-                }
-                else
-                {
-                    await _emailSender.NotifyRoleAsync(message, "Moderator");
-                }
+                await _emailSender.NotifyRoleAsync(message, "SuperUser");
+                await _emailSender.NotifyRoleAsync(message, "Moderator");
 
                 SaveMessage = $"Thank you. The post has been reported to our moderators.";
                 MessageType = AlertType.Success;
