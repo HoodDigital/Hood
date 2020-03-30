@@ -25,6 +25,7 @@ namespace Hood.Controllers
         public HomeController() : base() { }
 
         [ResponseCache(CacheProfileName = "Day")]
+        [Route("/")]
         public virtual async Task<IActionResult> Index()
         {
 
@@ -54,6 +55,7 @@ namespace Hood.Controllers
         #region "Content"
 
         [ResponseCache(CacheProfileName = "Hour")]
+        [Route("{type:contentTypeSlug}/")]
         public virtual async Task<IActionResult> Feed(ContentModel model)
         {
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
@@ -71,7 +73,7 @@ namespace Hood.Controllers
         }
 
         [ResponseCache(CacheProfileName = "Hour")]
-        [Route("{type}/author/{author}/")]
+        [Route("{type:contentTypeSlug}/author/{author}/")]
         public virtual async Task<IActionResult> Author(ContentModel model)
         {
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
@@ -84,7 +86,7 @@ namespace Hood.Controllers
         }
 
         [ResponseCache(CacheProfileName = "Hour")]
-        [Route("{type}/category/{category}/")]
+        [Route("{type:contentTypeSlug}/category/{category}/")]
         public virtual async Task<IActionResult> Category(ContentModel model)
         {
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
@@ -98,6 +100,8 @@ namespace Hood.Controllers
         }
 
         [ResponseCache(CacheProfileName = "Day")]
+        [Route("{type:contentTypeSlug}/{id:int}/{title?}")]
+        [Route("{url:pageSlug}/{urlSlug1?}/{urlSlug2?}/{urlSlug3?}/{urlSlug4?}", Order = 2)]
         public virtual async Task<IActionResult> Show(int id, bool editMode = false)
         {
             if (id == 0)
@@ -166,6 +170,5 @@ namespace Hood.Controllers
         }
 
         #endregion
-
     }
 }

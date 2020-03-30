@@ -71,20 +71,8 @@ namespace Hood.Startup
             else
             {
                 app.UseExceptionHandler("/error/500");
+                app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
-
-            app.Use(async (ctx, next) =>
-            {
-                await next();
-
-                if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
-                {
-                    string originalPath = ctx.Request.Path.Value;
-                    ctx.Items["originalPath"] = originalPath;
-                    ctx.Request.Path = "/error/404";
-                    await next();
-                }
-            });
 
             app.UseStaticFiles(new StaticFileOptions()
             {
@@ -146,7 +134,6 @@ namespace Hood.Startup
             {
                 app.UseEndpoints(endpoints =>
                 {
-                    // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
                     endpoints.MapControllerRoute(
                         name: "SiteNotInstalled",
                         pattern: "{*url}",
@@ -158,12 +145,7 @@ namespace Hood.Startup
 
             app.UseEndpoints(endpoints =>
             {
-                // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
-                endpoints.MapControllerRoute(
-                    name: "Content",
-                    pattern: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
-                    defaults: new { controller = "Home", action = "Show" }
-                );
+
                 endpoints.MapControllerRoute(
                      name: "Manage",
                      pattern: "account/manage/{action=Index}/{id?}",
@@ -193,10 +175,12 @@ namespace Hood.Startup
                     name: "Areas",
                     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
                 );
+
                 endpoints.MapControllerRoute(
                     name: "Default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"
                 );
+
             });
             return app;
         }

@@ -23,40 +23,53 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Address1");
+                    b.Property<string>("Address1")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Address2");
+                    b.Property<string>("Address2")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContactName");
+                    b.Property<string>("ContactName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("County")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Latitude")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
                         .HasDefaultValueSql("0.0");
 
                     b.Property<double>("Longitude")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
                         .HasDefaultValueSql("0.0");
 
                     b.Property<string>("Number")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Postcode")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("QuickName");
+                    b.Property<string>("QuickName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -69,21 +82,29 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Action");
+                    b.Property<string>("Action")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ApiKeyId");
+                    b.Property<string>("ApiKeyId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("IpAddress");
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RequiredAccessLevel");
+                    b.Property<int>("RequiredAccessLevel")
+                        .HasColumnType("int");
 
-                    b.Property<string>("RouteDataJson");
+                    b.Property<string>("RouteDataJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Time");
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -95,19 +116,26 @@ namespace Hood.Development.Migrations
             modelBuilder.Entity("Hood.Models.ApiKey", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccessLevel");
+                    b.Property<int>("AccessLevel")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("Active");
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Key");
+                    b.Property<string>("Key")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -119,72 +147,103 @@ namespace Hood.Development.Migrations
             modelBuilder.Entity("Hood.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("AccessFailedCount");
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("Active");
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("Anonymous");
+                    b.Property<bool>("Anonymous")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("AvatarJson");
+                    b.Property<string>("AvatarJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BillingAddressJson");
+                    b.Property<string>("BillingAddressJson")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("DeliveryAddressJson");
+                    b.Property<string>("DeliveryAddressJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<bool>("EmailConfirmed");
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("FirstName");
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastLogOn");
+                    b.Property<DateTime>("LastLogOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("LastLoginIP");
+                    b.Property<string>("LastLoginIP")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastLoginLocation");
+                    b.Property<string>("LastLoginLocation")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastName");
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Latitude");
+                    b.Property<string>("Latitude")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("LockoutEnabled");
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd");
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Longitude");
+                    b.Property<string>("Longitude")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedUserName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<string>("PasswordHash");
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber");
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PhoneNumberConfirmed");
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("SecurityStamp");
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StripeId");
+                    b.Property<string>("StripeId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("TwoFactorEnabled");
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
-                    b.Property<string>("UserVars");
+                    b.Property<string>("UserVars")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -203,55 +262,79 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("AllowComments");
+                    b.Property<bool>("AllowComments")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("AuthorId");
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Body");
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContentType");
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Excerpt")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Featured");
+                    b.Property<bool>("Featured")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("FeaturedImageJson");
+                    b.Property<string>("FeaturedImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastEditedBy");
+                    b.Property<string>("LastEditedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastEditedOn");
+                    b.Property<DateTime>("LastEditedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Notes");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentId");
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("Public");
+                    b.Property<bool>("Public")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("PublishDate");
+                    b.Property<DateTime>("PublishDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("ShareCount");
+                    b.Property<int>("ShareCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ShareImageJson");
+                    b.Property<string>("ShareImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Slug");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SystemNotes");
+                    b.Property<string>("SystemNotes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserVars");
+                    b.Property<string>("UserVars")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Views");
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -265,15 +348,20 @@ namespace Hood.Development.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("ContentCategoryId")
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ContentType");
+                    b.Property<string>("ContentType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentCategoryId");
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Slug");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -284,9 +372,11 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Hood.Models.ContentCategoryJoin", b =>
                 {
-                    b.Property<int>("ContentId");
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("CategoryId");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.HasKey("ContentId", "CategoryId");
 
@@ -299,38 +389,54 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BlobReference");
+                    b.Property<string>("BlobReference")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ContentId");
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long>("FileSize");
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("FileType");
+                    b.Property<string>("FileType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filename");
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GenericFileType");
+                    b.Property<int>("GenericFileType")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LargeUrl");
+                    b.Property<string>("LargeUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MediumUrl");
+                    b.Property<string>("MediumUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory");
+                        .HasColumnName("Directory")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SmallUrl");
+                    b.Property<string>("SmallUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ThumbUrl");
+                    b.Property<string>("ThumbUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UniqueId");
+                    b.Property<string>("UniqueId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -343,16 +449,21 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BaseValue");
+                    b.Property<string>("BaseValue")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ContentId");
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -365,85 +476,124 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AuthorDisplayName");
+                    b.Property<string>("AuthorDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorId");
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AuthorName");
+                    b.Property<string>("AuthorName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorRoles");
+                    b.Property<string>("AuthorRoles")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Body");
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Featured");
+                    b.Property<bool>("Featured")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("FeaturedImageJson");
+                    b.Property<string>("FeaturedImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastEditedBy");
+                    b.Property<string>("LastEditedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastEditedOn");
+                    b.Property<DateTime>("LastEditedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long?>("LastPostId");
+                    b.Property<long?>("LastPostId")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("LastPosted");
+                    b.Property<DateTime?>("LastPosted")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("LastTopicId");
+                    b.Property<int?>("LastTopicId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LastUserDisplayName");
+                    b.Property<string>("LastUserDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastUserId");
+                    b.Property<string>("LastUserId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastUserName");
+                    b.Property<string>("LastUserName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ModeratedPostCount");
+                    b.Property<int>("ModeratedPostCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Notes");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NumPosts");
+                    b.Property<int>("NumPosts")
+                        .HasColumnType("int");
 
-                    b.Property<int>("NumTopics");
+                    b.Property<int>("NumTopics")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("PostingRequiresLogin");
+                    b.Property<bool>("PostingRequiresLogin")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("PostingRoles");
+                    b.Property<string>("PostingRoles")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PostingSubscriptions");
+                    b.Property<string>("PostingSubscriptions")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Published");
+                    b.Property<bool>("Published")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("RequirePostModeration");
+                    b.Property<bool>("RequirePostModeration")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("RequireTopicModeration");
+                    b.Property<bool>("RequireTopicModeration")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("ShareCount");
+                    b.Property<int>("ShareCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ShareImageJson");
+                    b.Property<string>("ShareImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Slug");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SystemNotes");
+                    b.Property<string>("SystemNotes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserVars");
+                    b.Property<string>("UserVars")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("ViewingRequiresLogin");
+                    b.Property<bool>("ViewingRequiresLogin")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ViewingRoles");
+                    b.Property<string>("ViewingRoles")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ViewingSubscriptions");
+                    b.Property<string>("ViewingSubscriptions")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Views");
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -457,13 +607,17 @@ namespace Hood.Development.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("ForumCategoryId")
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentCategoryId");
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Slug");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -474,9 +628,11 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Hood.Models.ForumCategoryJoin", b =>
                 {
-                    b.Property<int>("ForumId");
+                    b.Property<int>("ForumId")
+                        .HasColumnType("int");
 
-                    b.Property<int>("CategoryId");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.HasKey("ForumId", "CategoryId");
 
@@ -489,21 +645,29 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Detail");
+                    b.Property<string>("Detail")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Source");
+                    b.Property<string>("Source")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SourceUrl");
+                    b.Property<string>("SourceUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Time");
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -516,17 +680,23 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerId");
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentId");
+                    b.Property<int?>("ParentId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Slug");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -539,38 +709,54 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BlobReference");
+                    b.Property<string>("BlobReference")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("DirectoryId");
+                    b.Property<int?>("DirectoryId")
+                        .HasColumnType("int");
 
-                    b.Property<long>("FileSize");
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("FileType");
+                    b.Property<string>("FileType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filename");
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GenericFileType");
+                    b.Property<int>("GenericFileType")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LargeUrl");
+                    b.Property<string>("LargeUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MediumUrl");
+                    b.Property<string>("MediumUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory");
+                        .HasColumnName("Directory")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SmallUrl");
+                    b.Property<string>("SmallUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ThumbUrl");
+                    b.Property<string>("ThumbUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UniqueId");
+                    b.Property<string>("UniqueId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -582,9 +768,11 @@ namespace Hood.Development.Migrations
             modelBuilder.Entity("Hood.Models.Option", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -595,48 +783,69 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("Approved");
+                    b.Property<bool>("Approved")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime?>("ApprovedTime");
+                    b.Property<DateTime?>("ApprovedTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("AuthorDisplayName");
+                    b.Property<string>("AuthorDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorId");
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AuthorIp");
+                    b.Property<string>("AuthorIp")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorName");
+                    b.Property<string>("AuthorName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorRoles");
+                    b.Property<string>("AuthorRoles")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Body")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DeleteReason");
+                    b.Property<string>("DeleteReason")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Deleted");
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("DeletedById");
+                    b.Property<string>("DeletedById")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("DeletedTime");
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("EditReason");
+                    b.Property<string>("EditReason")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Edited");
+                    b.Property<bool>("Edited")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("EditedById");
+                    b.Property<string>("EditedById")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("EditedTime");
+                    b.Property<DateTime?>("EditedTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PostedTime");
+                    b.Property<DateTime>("PostedTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long?>("ReplyId");
+                    b.Property<long?>("ReplyId")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Signature");
+                    b.Property<string>("Signature")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TopicId");
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -657,38 +866,54 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BlobReference");
+                    b.Property<string>("BlobReference")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long>("FileSize");
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("FileType");
+                    b.Property<string>("FileType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filename");
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GenericFileType");
+                    b.Property<int>("GenericFileType")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LargeUrl");
+                    b.Property<string>("LargeUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MediumUrl");
+                    b.Property<string>("MediumUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory");
+                        .HasColumnName("Directory")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PropertyId");
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SmallUrl");
+                    b.Property<string>("SmallUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ThumbUrl");
+                    b.Property<string>("ThumbUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UniqueId");
+                    b.Property<string>("UniqueId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -701,125 +926,183 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Additional");
+                    b.Property<string>("Additional")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Address1");
+                    b.Property<string>("Address1")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Address2");
+                    b.Property<string>("Address2")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Addressee");
+                    b.Property<string>("Addressee")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AgentId");
+                    b.Property<string>("AgentId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AgentInfo");
+                    b.Property<string>("AgentInfo")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("AllowComments");
+                    b.Property<bool>("AllowComments")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Areas");
+                    b.Property<string>("Areas")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("AskingPrice");
+                    b.Property<decimal?>("AskingPrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("AskingPriceDisplay");
+                    b.Property<string>("AskingPriceDisplay")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Bedrooms");
+                    b.Property<int>("Bedrooms")
+                        .HasColumnType("int");
 
-                    b.Property<string>("City");
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Confidential");
+                    b.Property<bool>("Confidential")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ContactName");
+                    b.Property<string>("ContactName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Country");
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("County");
+                    b.Property<string>("County")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Email");
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Featured");
+                    b.Property<bool>("Featured")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("FeaturedImageJson");
+                    b.Property<string>("FeaturedImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Fees");
+                    b.Property<decimal?>("Fees")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("FeesDisplay");
+                    b.Property<string>("FeesDisplay")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Floors");
+                    b.Property<string>("Floors")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InfoDownloadJson");
+                    b.Property<string>("InfoDownloadJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastEditedBy");
+                    b.Property<string>("LastEditedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastEditedOn");
+                    b.Property<DateTime>("LastEditedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("Latitude")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
                         .HasDefaultValueSql("0.0");
 
-                    b.Property<string>("Lease");
+                    b.Property<string>("Lease")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LeaseStatus");
+                    b.Property<string>("LeaseStatus")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ListingType");
+                    b.Property<string>("ListingType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Location");
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Longitude")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("float")
                         .HasDefaultValueSql("0.0");
 
-                    b.Property<string>("Notes");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Number");
+                    b.Property<string>("Number")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Phone");
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Planning");
+                    b.Property<string>("Planning")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Postcode");
+                    b.Property<string>("Postcode")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Premium");
+                    b.Property<decimal?>("Premium")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("PremiumDisplay");
+                    b.Property<string>("PremiumDisplay")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PropertyType");
+                    b.Property<string>("PropertyType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Public");
+                    b.Property<bool>("Public")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("PublishDate");
+                    b.Property<DateTime>("PublishDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("QuickName");
+                    b.Property<string>("QuickName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Reference");
+                    b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Rent");
+                    b.Property<decimal?>("Rent")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("RentDisplay");
+                    b.Property<string>("RentDisplay")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ShareCount");
+                    b.Property<int>("ShareCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ShortDescription");
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Size");
+                    b.Property<string>("Size")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SystemNotes");
+                    b.Property<string>("SystemNotes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tags");
+                    b.Property<string>("Tags")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserVars");
+                    b.Property<string>("UserVars")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Views");
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -832,38 +1115,54 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BlobReference");
+                    b.Property<string>("BlobReference")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long>("FileSize");
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("FileType");
+                    b.Property<string>("FileType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Filename");
+                    b.Property<string>("Filename")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GenericFileType");
+                    b.Property<int>("GenericFileType")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LargeUrl");
+                    b.Property<string>("LargeUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MediumUrl");
+                    b.Property<string>("MediumUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory");
+                        .HasColumnName("Directory")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PropertyId");
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SmallUrl");
+                    b.Property<string>("SmallUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ThumbUrl");
+                    b.Property<string>("ThumbUrl")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UniqueId");
+                    b.Property<string>("UniqueId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Url");
+                    b.Property<string>("Url")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -876,16 +1175,21 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BaseValue");
+                    b.Property<string>("BaseValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("PropertyId");
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -898,51 +1202,74 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("Addon");
+                    b.Property<bool>("Addon")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("Amount");
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Colour");
+                    b.Property<string>("Colour")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Currency");
+                    b.Property<string>("Currency")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FeaturedImageJson");
+                    b.Property<string>("FeaturedImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FeaturesJson");
+                    b.Property<string>("FeaturesJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Interval");
+                    b.Property<string>("Interval")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("IntervalCount");
+                    b.Property<int>("IntervalCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LastEditedBy");
+                    b.Property<string>("LastEditedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastEditedOn");
+                    b.Property<DateTime>("LastEditedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Level");
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("LiveMode");
+                    b.Property<bool>("LiveMode")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NumberAllowed");
+                    b.Property<int>("NumberAllowed")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("Public");
+                    b.Property<bool>("Public")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("StatementDescriptor");
+                    b.Property<string>("StatementDescriptor")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StripeId");
+                    b.Property<string>("StripeId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("SubscriptionProductId");
+                    b.Property<int?>("SubscriptionProductId")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("TrialPeriodDays");
+                    b.Property<int?>("TrialPeriodDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -955,15 +1282,20 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BaseValue");
+                    b.Property<string>("BaseValue")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SubscriptionId");
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -976,29 +1308,41 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Body");
+                    b.Property<string>("Body")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DisplayName");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FeaturedImageJson");
+                    b.Property<string>("FeaturedImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FeaturesJson");
+                    b.Property<string>("FeaturesJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastEditedBy");
+                    b.Property<string>("LastEditedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastEditedOn");
+                    b.Property<DateTime>("LastEditedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("Public");
+                    b.Property<bool>("Public")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("Slug");
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StripeId");
+                    b.Property<string>("StripeId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1009,83 +1353,121 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("AllowReplies");
+                    b.Property<bool>("AllowReplies")
+                        .HasColumnType("bit");
 
-                    b.Property<bool>("Approved");
+                    b.Property<bool>("Approved")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime?>("ApprovedTime");
+                    b.Property<DateTime?>("ApprovedTime")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("AuthorDisplayName");
+                    b.Property<string>("AuthorDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorId");
+                    b.Property<string>("AuthorId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AuthorName");
+                    b.Property<string>("AuthorName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AuthorRoles");
+                    b.Property<string>("AuthorRoles")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedOn");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Featured");
+                    b.Property<bool>("Featured")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("FeaturedImageJson");
+                    b.Property<string>("FeaturedImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ForumId");
+                    b.Property<int>("ForumId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LastEditedBy");
+                    b.Property<string>("LastEditedBy")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastEditedOn");
+                    b.Property<DateTime>("LastEditedOn")
+                        .HasColumnType("datetime2");
 
-                    b.Property<long?>("LastPostId");
+                    b.Property<long?>("LastPostId")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("LastPosted");
+                    b.Property<DateTime?>("LastPosted")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("LastTopicId");
+                    b.Property<int?>("LastTopicId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("LastUserDisplayName");
+                    b.Property<string>("LastUserDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastUserId");
+                    b.Property<string>("LastUserId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastUserName");
+                    b.Property<string>("LastUserName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ModeratedPostCount");
+                    b.Property<int>("ModeratedPostCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Notes");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("NumPosts");
+                    b.Property<int>("NumPosts")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("PostingRequiresLogin");
+                    b.Property<bool>("PostingRequiresLogin")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("PostingRoles");
+                    b.Property<string>("PostingRoles")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PostingSubscriptions");
+                    b.Property<string>("PostingSubscriptions")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Published");
+                    b.Property<bool>("Published")
+                        .HasColumnType("bit");
 
-                    b.Property<int>("ShareCount");
+                    b.Property<int>("ShareCount")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ShareImageJson");
+                    b.Property<string>("ShareImageJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SystemNotes");
+                    b.Property<string>("SystemNotes")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserVars");
+                    b.Property<string>("UserVars")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("ViewingRequiresLogin");
+                    b.Property<bool>("ViewingRequiresLogin")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ViewingRoles");
+                    b.Property<string>("ViewingRoles")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ViewingSubscriptions");
+                    b.Property<string>("ViewingSubscriptions")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Views");
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1100,19 +1482,26 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Code");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateUsed");
+                    b.Property<DateTime>("DateUsed")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Expiry");
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Used");
+                    b.Property<bool>("Used")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1126,49 +1515,71 @@ namespace Hood.Development.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("UserSubscriptionId")
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("CancelAtPeriodEnd");
+                    b.Property<bool>("CancelAtPeriodEnd")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime?>("CanceledAt");
+                    b.Property<DateTime?>("CanceledAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("Confirmed");
+                    b.Property<bool>("Confirmed")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime?>("Created");
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CurrentPeriodEnd");
+                    b.Property<DateTime?>("CurrentPeriodEnd")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CurrentPeriodStart");
+                    b.Property<DateTime?>("CurrentPeriodStart")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerId");
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Deleted");
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
 
-                    b.Property<DateTime>("DeletedAt");
+                    b.Property<DateTime>("DeletedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("EndedAt");
+                    b.Property<DateTime?>("EndedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("LastUpdated");
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Notes");
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("Quantity");
+                    b.Property<long>("Quantity")
+                        .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("Start");
+                    b.Property<DateTime?>("Start")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Status");
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StripeId");
+                    b.Property<string>("StripeId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SubscriptionId");
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("int");
 
-                    b.Property<decimal?>("TaxPercent");
+                    b.Property<decimal?>("TaxPercent")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime?>("TrialEnd");
+                    b.Property<DateTime?>("TrialEnd")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("TrialStart");
+                    b.Property<DateTime?>("TrialStart")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1182,15 +1593,19 @@ namespace Hood.Development.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.Property<string>("NormalizedName")
+                        .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
                     b.HasKey("Id");
@@ -1207,14 +1622,18 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoleId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1227,14 +1646,18 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ClaimType");
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -1245,14 +1668,18 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderKey");
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderDisplayName");
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -1263,9 +1690,11 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("RoleId");
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -1276,13 +1705,17 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("LoginProvider");
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Value");
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
@@ -1509,7 +1942,7 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1517,7 +1950,7 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Hood.Models.ApplicationUser")
+                    b.HasOne("Hood.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1525,7 +1958,7 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Hood.Models.ApplicationUser")
+                    b.HasOne("Hood.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1533,12 +1966,12 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Hood.Models.ApplicationUser")
+                    b.HasOne("Hood.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -1546,7 +1979,7 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Hood.Models.ApplicationUser")
+                    b.HasOne("Hood.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

@@ -294,7 +294,9 @@ namespace Hood.Startup
         {
             services.Configure<RouteOptions>(options =>
             {
-                options.ConstraintMap.Add("cms", typeof(RouteConstraint));
+                options.ConstraintMap.Add("propertySlug", typeof(PropertyRouteConstraint));
+                options.ConstraintMap.Add("pageSlug", typeof(PagesRouteConstraint));
+                options.ConstraintMap.Add("contentTypeSlug", typeof(ContentTypeRouteConstraint));
                 options.LowercaseUrls = true;
             });
             return services;

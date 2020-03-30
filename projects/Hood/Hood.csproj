@@ -4,14 +4,11 @@
     
     <AssemblyName>Hood</AssemblyName>
     <PackageId>Hood</PackageId>
-    
-    <Version>4.0.0</Version>
+
+    <Version>3.2.0</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    
-    <PackageId>Hood</PackageId>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     
     <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>

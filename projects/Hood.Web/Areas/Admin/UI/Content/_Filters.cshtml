@@ -3,7 +3,7 @@
 <input type="hidden" asp-for="PageSize" />
 @if (Model.ContentType.ShowCategories)
 {
-    <div id="content-categories-list" class="hood-inline-list" data-url="@Url.Action("Categories")" data-complete="$.hood.Content.Lists.Categories.Loaded">
+    <div id="content-categories-list" class="hood-inline-list" data-url="@Url.Action("Categories", new { type = Model.Type })" data-complete="$.hood.Content.Lists.Categories.Loaded">
         <partial name="_List_Categories" />
     </div>
 }
