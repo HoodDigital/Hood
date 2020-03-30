@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UserSecretsId>Hood.Demo</UserSecretsId>
+    <UserSecretsId>Hood.Nuget</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hood" Version="4.0.0" />
+    <PackageReference Include="Hood" Version="3.2.0" />
   </ItemGroup>
 
 </Project>
