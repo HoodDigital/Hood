@@ -6,7 +6,7 @@
 
 ## About Hood CMS
 
-Hood CMS Hood Digital's own content management system, built entirely in ASP.NET Core 2.2. With a fully functional CMS admin area and themable front site, including subscriptions powered by Stripe. 
+Hood CMS Hood Digital's own content management system, built entirely in ASP.NET Core. With a fully functional CMS admin area and themable front site, including subscriptions powered by Stripe. 
 Access and security is all based on the latest patterns for ASP.NET Core & EF Core Identity provider.
 
 ## Installation
