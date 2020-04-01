@@ -1,7 +1,7 @@
 ﻿if (!$.hood)
     $.hood = {};
 $.hood.Content = {
-    Init: function () {
+    Init: function() {
         $('body').on('click', '.content-delete', $.hood.Content.Delete);
         $('body').on('click', '.content-meta-delete', $.hood.Content.Meta.Delete);
         $('body').on('click', '.content-clone', $.hood.Content.Clone);
@@ -15,7 +15,7 @@ $.hood.Content = {
         $('body').on('click', '.add-custom-field', $.hood.Content.Types.AddField);
         $('body').on('click', '.delete-custom-field', $.hood.Content.Types.DeleteField);
 
-        $('body').on('keyup', '#Slug', function () {
+        $('body').on('keyup', '#Slug', function() {
             $('.slug-display').html($(this).val());
         });
 
@@ -29,56 +29,56 @@ $.hood.Content = {
 
     Lists: {
         Content: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#content-list').doesExist())
                     $.hood.Inline.Reload($('#content-list'), complete);
             }
         },
         Categories: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#content-categories-list').doesExist())
                     $.hood.Inline.Reload($('#content-categories-list'), complete);
             }
         },
         Fields: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#content-meta-list').doesExist())
                     $.hood.Inline.Reload($('#content-meta-list'), complete);
             }
         },
         Media: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#content-media-list').doesExist())
                     $.hood.Inline.Reload($('#content-media-list'), complete);
             }
         }
     },
 
-    Delete: function (e) {
+    Delete: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let deleteContentCallback = function (isConfirm) {
+        let deleteContentCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), function (data) {
+                $.post($tag.attr('href'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Content.Lists.Content.Reload();
                     if (data.Success) {
                         if ($tag && $tag.data('redirect')) {
                             $.hood.Alerts.Success(`<strong>Content deleted, redirecting...</strong><br />Just taking you back to the content list.`);
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location = $tag.data('redirect');
                             }, 1500);
                         }
@@ -96,13 +96,13 @@ $.hood.Content = {
         );
     },
 
-    SetStatus: function (e) {
+    SetStatus: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let publishContentCallback = function (isConfirm) {
+        let publishContentCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), $tag.data('status'), function (data) {
+                $.post($tag.attr('href'), $tag.data('status'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Content.Lists.Content.Reload();
                 });
@@ -117,13 +117,13 @@ $.hood.Content = {
         );
     },
 
-    Clone: function (e) {
+    Clone: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let duplicateContentCallback = function (isConfirm) {
+        let duplicateContentCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), $tag.data('status'), function (data) {
+                $.post($tag.attr('href'), $tag.data('status'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Content.Lists.Content.Reload();
                 });
@@ -138,7 +138,7 @@ $.hood.Content = {
         );
     },
 
-    Create: function () {
+    Create: function() {
         $('#content-create-form').find('.datepicker').datetimepicker({
             locale: 'en-gb',
             format: 'L'
@@ -158,7 +158,7 @@ $.hood.Content = {
             },
             submitButtonTag: $('#content-create-submit'),
             submitUrl: $('#content-create-form').attr('action'),
-            submitFunction: function (data) {
+            submitFunction: function(data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Content.Lists.Content.Reload();
             }
@@ -166,7 +166,7 @@ $.hood.Content = {
     },
 
     Edit: {
-        Init: function () {
+        Init: function() {
             $('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
@@ -181,7 +181,7 @@ $.hood.Content = {
             });
             $.hood.Content.Edit.InitImageUploader();
         },
-        InitImageUploader: function () {
+        InitImageUploader: function() {
             if (!$('#content-gallery-add').doesExist())
                 return;
 
@@ -203,23 +203,23 @@ $.hood.Content = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-            myDropzone.on("success", function (file, data) {
+            myDropzone.on("success", function(file, data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Content.Lists.Media.Reload();
             });
 
-            myDropzone.on("addedfile", function (file) {
+            myDropzone.on("addedfile", function(file) {
                 $('#content-gallery-total-progress .progress-bar').css({ width: 0 + "%" });
                 $('#content-gallery-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
-            myDropzone.on("totaluploadprogress", function (progress) {
+            myDropzone.on("totaluploadprogress", function(progress) {
                 $('#content-gallery-total-progress .progress-bar').css({ width: progress + "%" });
                 $('#content-gallery-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
-            myDropzone.on("sending", function (file) {
+            myDropzone.on("sending", function(file) {
                 // Show the total progress bar when upload starts
                 $('#content-gallery-total-progress').fadeIn();
                 $('#content-gallery-total-progress .progress-bar').css({ width: "0%" });
@@ -227,12 +227,12 @@ $.hood.Content = {
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("complete", function (file) {
+            myDropzone.on("complete", function(file) {
                 $.hood.Content.Lists.Media.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("queuecomplete", function (progress) {
+            myDropzone.on("queuecomplete", function(progress) {
                 $('#content-gallery-total-progress').hide();
                 $.hood.Content.Lists.Media.Reload();
             });
@@ -240,7 +240,7 @@ $.hood.Content = {
     },
 
     Categories: {
-        Editor: function () {
+        Editor: function() {
             $('#content-categories-edit-form').hoodValidator({
                 validationRules: {
                     DisplayName: {
@@ -252,25 +252,25 @@ $.hood.Content = {
                 },
                 submitButtonTag: $('#content-categories-edit-submit'),
                 submitUrl: $('#content-categories-edit-form').attr('action'),
-                submitFunction: function (data) {
+                submitFunction: function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Content.Lists.Categories.Reload();
                 }
             });
         },
-        ToggleCategory: function () {
-            $.post($(this).data('url'), { categoryId: $(this).val(), add: $(this).is(':checked') }, function (data) {
+        ToggleCategory: function() {
+            $.post($(this).data('url'), { categoryId: $(this).val(), add: $(this).is(':checked') }, function(data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Content.Lists.Categories.Reload();
             });
         },
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteCategoryCallback = function (isConfirm) {
+            let deleteCategoryCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Content.Lists.Categories.Reload();
                     });
@@ -289,7 +289,7 @@ $.hood.Content = {
 
     // Metadata
     Meta: {
-        Create: function () {
+        Create: function() {
             $('#add-field-form').hoodValidator({
                 validationRules: {
                     cfName: {
@@ -301,19 +301,19 @@ $.hood.Content = {
                 },
                 submitButtonTag: $('#add-field-submit'),
                 submitUrl: '/admin/content/addmeta',
-                submitFunction: function (data) {
+                submitFunction: function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Content.Lists.Fields.Reload();
                 }
             });
         },
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteCategoryCallback = function (isConfirm) {
+            let deleteCategoryCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Content.Lists.Fields.Reload();
                     });
@@ -333,13 +333,13 @@ $.hood.Content = {
 
     // Media
     Media: {
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteMediaCallback = function (isConfirm) {
+            let deleteMediaCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Content.Lists.Media.Reload();
                     });
@@ -359,11 +359,11 @@ $.hood.Content = {
 
     // Content Types
     Types: {
-        AddField: function () {
+        AddField: function() {
             let name = $('#custom-field-name-' + $(this).data('id')).val();
             let fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
             let exists = false;
-            $.each(fields, function (key, value) {
+            $.each(fields, function(key, value) {
                 if (value.Name === name)
                     exists = true;
             });
@@ -391,17 +391,17 @@ $.hood.Content = {
             $('#custom-fields-' + $(this).data('id')).val(JSON.stringify(fields));
             $.hood.Alerts.Success("Added field.");
         },
-        DeleteField: function () {
+        DeleteField: function() {
             let fields = $.hood.Content.Types.GetFieldsList($(this).data('id'));
             let name = $(this).data('name');
-            fields = $.grep(fields, function (e) {
+            fields = $.grep(fields, function(e) {
                 return e.Name !== name;
             });
             $.hood.Content.Types.ReRenderFields(fields, $(this).data('id'));
             $('#custom-fields-' + $(this).data('id')).val(JSON.stringify(fields));
             $.hood.Alerts.Success("Deleted field.");
         },
-        GetFieldsList: function (id) {
+        GetFieldsList: function(id) {
             // Take the contents of the fields input. 
             let fieldsInput = $('#custom-fields-' + id).val();
             // if it is null, we need a new object.
@@ -417,7 +417,7 @@ $.hood.Content = {
             // if not, we can deserialise to an array of FieldAreas
             return new Array();
         },
-        ReRenderFields: function (arr, id) {
+        ReRenderFields: function(arr, id) {
             let newList = $('#field-list-' + id).empty();
             for (i = 0; i < arr.length; i++) {
                 let fld = "<tr><td class='col-xs-8'><strong>" + arr[i].Name + "</strong> " + arr[i].Type + "</td><td class='col-xs-4 text-right'>";

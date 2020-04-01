@@ -15,7 +15,7 @@ $.hood.Forums = {
   },
   Lists: {
     Forums: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -23,7 +23,7 @@ $.hood.Forums = {
       }
     },
     Categories: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {

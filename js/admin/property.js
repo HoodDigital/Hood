@@ -12,7 +12,7 @@ $.hood.Property = {
   },
   Lists: {
     Property: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
         $.hood.Google.ClusteredMap();
       },
@@ -21,7 +21,7 @@ $.hood.Property = {
       }
     },
     Media: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -29,7 +29,7 @@ $.hood.Property = {
       }
     },
     Floorplans: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -37,7 +37,7 @@ $.hood.Property = {
       }
     },
     Floorareas: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {

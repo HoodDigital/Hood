@@ -1,7 +1,7 @@
 ﻿if (!$.hood)
     $.hood = {};
 $.hood.Subscriptions = {
-    Init: function () {
+    Init: function() {
         $('body').on('click', '.subscriptions-subs-delete', $.hood.Subscriptions.Subscriptions.Delete);
 
         $('body').on('click', '.subscriptions-plans-delete', $.hood.Subscriptions.Plans.Delete);
@@ -18,46 +18,46 @@ $.hood.Subscriptions = {
 
     Lists: {
         Plans: {
-            Loaded: function () {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#subscriptions-plans-list').doesExist())
                     $.hood.Inline.Reload($('#subscriptions-plans-list'), complete);
             }
         },
         Stripe: {
-            Loaded: function () {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#subscriptions-stripe-list').doesExist())
                     $.hood.Inline.Reload($('#subscriptions-stripe-list'), complete);
             }
         },
         StripeProducts: {
-            Loaded: function () {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#subscriptions-stripe-products-list').doesExist())
                     $.hood.Inline.Reload($('#subscriptions-stripe-products-list'), complete);
             }
         },
         Products: {
-            Loaded: function () {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#subscriptions-products-list').doesExist())
                     $.hood.Inline.Reload($('#subscriptions-products-list'), complete);
             }
         },
         Subscribers: {
-            Loaded: function () {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#subscriptions-subscribers-list').doesExist())
                     $.hood.Inline.Reload($('#subscriptions-subscribers-list'), complete);
             }
@@ -65,19 +65,19 @@ $.hood.Subscriptions = {
     },
 
     Subscriptions: {
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteSubscriptionCallback = function (isConfirm) {
+            let deleteSubscriptionCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Subscriptions.Lists.Subscribers.Reload();
                         if (data.Success) {
                             if ($tag && $tag.data('redirect')) {
                                 $.hood.Alerts.Success(`<strong>Subscription deleted, redirecting...</strong><br />Just taking you back to the subscription list.`);
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     window.location = $tag.data('redirect');
                                 }, 1500);
                             }
@@ -97,19 +97,19 @@ $.hood.Subscriptions = {
     },
 
     Plans: {
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deletePlanCallback = function (isConfirm) {
+            let deletePlanCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Subscriptions.Lists.Plans.Reload();
                         if (data.Success) {
                             if ($tag && $tag.data('redirect')) {
                                 $.hood.Alerts.Success(`<strong>Plan deleted, redirecting...</strong><br />Just taking you back to the subscription plan list.`);
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     window.location = $tag.data('redirect');
                                 }, 1500);
                             }
@@ -126,7 +126,7 @@ $.hood.Subscriptions = {
                 '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
             );
         },
-        Create: function () {
+        Create: function() {
             $('#subscriptions-plans-create-form').hoodValidator({
                 validationRules: {
                     Name: {
@@ -150,7 +150,7 @@ $.hood.Subscriptions = {
                 },
                 submitButtonTag: $('#subscriptions-plans-create-submit'),
                 submitUrl: $('#subscriptions-plans-create-form').attr('action'),
-                submitFunction: function (data) {
+                submitFunction: function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Subscriptions.Lists.Plans.Reload();
                 }
@@ -159,19 +159,19 @@ $.hood.Subscriptions = {
     },
 
     Products: {
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteProductCallback = function (isConfirm) {
+            let deleteProductCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Subscriptions.Lists.Products.Reload();
                         if (data.Success) {
                             if ($tag && $tag.data('redirect')) {
                                 $.hood.Alerts.Success(`<strong>Product deleted, redirecting...</strong><br />Just taking you back to the subscription product list.`);
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     window.location = $tag.data('redirect');
                                 }, 1500);
                             }
@@ -188,7 +188,7 @@ $.hood.Subscriptions = {
                 '<span class="text-danger"><i class="fa fa-exclamation-triangle"></i> <strong>This process CANNOT be undone!</strong></span>',
             );
         },
-        Create: function () {
+        Create: function() {
             $('#susbcriptions-products-create-form').find('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
@@ -201,7 +201,7 @@ $.hood.Subscriptions = {
                 },
                 submitButtonTag: $('#susbcriptions-products-create-submit'),
                 submitUrl: $('#susbcriptions-products-create-form').attr('action'),
-                submitFunction: function (data) {
+                submitFunction: function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Subscriptions.Lists.Products.Reload();
                 }

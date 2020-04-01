@@ -4,43 +4,43 @@ if (!$.hood.Import)
     $.hood.Import = {};
 $.hood.Import.Property = {
     UpdateInterval: -1,
-    Init: function () {
+    Init: function() {
         if ($('#import-property-start').doesExist()) {
             $.hood.Import.Property.Update();
-            $('#import-property-start').click(function () {
+            $('#import-property-start').click(function() {
                 $.ajax({
                     url: $('#import-property-start').data('url'),
                     type: "POST",
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
                     },
-                    success: function (result) {
+                    success: function(result) {
                         $.hood.Import.Property.Update();
                     }
                 });
             });
-            $('#import-property-cancel').click(function () {
+            $('#import-property-cancel').click(function() {
                 $.ajax({
                     url: $('#import-property-cancel').data('url'),
                     type: "POST",
-                    error: function (jqXHR, textStatus, errorThrown) {
+                    error: function(jqXHR, textStatus, errorThrown) {
                         $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
                     },
-                    success: function (result) {
+                    success: function(result) {
                         $.hood.Import.Property.Update();
                     }
                 });
             });
         }
     },
-    Update: function () {
+    Update: function() {
         $.ajax({
             url: $('#import-property-status').data('url'),
             type: "POST",
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus, errorThrown) {
                 $.hood.Import.Property.View.ShowError("There was an error, " + jqXHR + "<br />" + textStatus + "<br />" + errorThrown);
             },
-            success: function (result) {
+            success: function(result) {
                 if (result.Importer.Running) {
                     $.hood.Import.Property.View.ShowInfo();
                     clearInterval($.hood.Import.Property.UpdateInterval);
@@ -86,19 +86,19 @@ $.hood.Import.Property = {
         });
     },
     View: {
-        HideInfo: function () {
+        HideInfo: function() {
             $('#import-property-start').removeAttr('disabled');
             $('#import-property-cancel').attr('disabled', 'disabled');
             $('#import-property-progress').removeClass('d-block');
             $('#import-property-progress').addClass('d-none');
         },
-        ShowInfo: function () {
+        ShowInfo: function() {
             $('#import-property-cancel').removeAttr('disabled');
             $('#import-property-start').attr('disabled', 'disabled');
             $('#import-property-progress').addClass('d-block');
             $('#import-property-progress').removeClass('d-none');
         },
-        ShowError: function (string) {
+        ShowError: function(string) {
             $('#import-property-error-message').html(string).addClass('alert').addClass('alert-danger').addClass('m-t-lg');
         }
     }

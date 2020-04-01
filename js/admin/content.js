@@ -20,7 +20,7 @@ $.hood.Content = {
   },
   Lists: {
     Content: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -28,7 +28,7 @@ $.hood.Content = {
       }
     },
     Categories: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -36,7 +36,7 @@ $.hood.Content = {
       }
     },
     Fields: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -44,7 +44,7 @@ $.hood.Content = {
       }
     },
     Media: {
-      Loaded: function Loaded(data) {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {

@@ -1,7 +1,7 @@
 ﻿if (!$.hood)
     $.hood = {};
 $.hood.Property = {
-    Init: function () {
+    Init: function() {
         $('body').on('click', '.property-delete', $.hood.Property.Delete);
         $('body').on('click', '.property-delete-all', $.hood.Property.DeleteAll);
         $('body').on('click', '.property-delete-floor', $.hood.Property.DeleteFloorArea);
@@ -15,57 +15,57 @@ $.hood.Property = {
 
     Lists: {
         Property: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
                 $.hood.Google.ClusteredMap();
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#property-list').doesExist())
                     $.hood.Inline.Reload($('#property-list'), complete);
             }
         },
         Media: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#property-gallery-list').doesExist())
                     $.hood.Inline.Reload($('#property-gallery-list'), complete);
             }
         },
         Floorplans: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#property-floorplans-list').doesExist())
                     $.hood.Inline.Reload($('#property-floorplans-list'), complete);
             }
         },
         Floorareas: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#property-floors-list').doesExist())
                     $.hood.Inline.Reload($('#property-floors-list'), complete);
             }
         }
     },
 
-    Delete: function (e) {
+    Delete: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let deletePropertyCallback = function (isConfirm) {
+        let deletePropertyCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), function (data) {
+                $.post($tag.attr('href'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Property.Lists.Property.Reload();
                     if (data.Success) {
                         if ($tag && $tag.data('redirect')) {
                             $.hood.Alerts.Success(`<strong>Property deleted, redirecting...</strong><br />Just taking you back to the property list.`);
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location = $tag.data('redirect');
                             }, 1500);
                         }
@@ -83,7 +83,7 @@ $.hood.Property = {
         );
     },
 
-    DeleteAll: function (e) {
+    DeleteAll: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
@@ -101,13 +101,13 @@ $.hood.Property = {
             preConfirm: (login) => {
                 if (login.toLowerCase() === "delete") {
                     var url = $tag.attr('href');
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Property.Lists.Property.Reload();
                         if (data.Success) {
                             if ($tag && $tag.data('redirect')) {
                                 $.hood.Alerts.Success(`<strong>Properties deleted, redirecting...</strong><br />Just taking you back to the property list.`);
-                                setTimeout(function () {
+                                setTimeout(function() {
                                     window.location = $tag.data('redirect');
                                 }, 1500);
                             }
@@ -127,13 +127,13 @@ $.hood.Property = {
         });
     },
 
-    SetStatus: function (e) {
+    SetStatus: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let publishPropertyCallback = function (isConfirm) {
+        let publishPropertyCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), $tag.data('status'), function (data) {
+                $.post($tag.attr('href'), $tag.data('status'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Property.Lists.Property.Reload();
                 });
@@ -148,7 +148,7 @@ $.hood.Property = {
         );
     },
 
-    Create: function () {
+    Create: function() {
         $('#property-create-form').find('.datepicker').datetimepicker({
             locale: 'en-gb',
             format: 'L'
@@ -180,7 +180,7 @@ $.hood.Property = {
             },
             submitButtonTag: $('#property-create-submit'),
             submitUrl: $('#property-create-form').attr('action'),
-            submitFunction: function (data) {
+            submitFunction: function(data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Property.Lists.Property.Reload();
             }
@@ -188,7 +188,7 @@ $.hood.Property = {
         $.hood.Google.Addresses.InitAutocomplete();
     },
 
-    CreateFloorArea: function () {
+    CreateFloorArea: function() {
         $('#property-floorArea-create-form').hoodValidator({
             validationRules: {
                 Name: {
@@ -206,27 +206,27 @@ $.hood.Property = {
             },
             submitButtonTag: $('#property-floorArea-create-submit'),
             submitUrl: $('#property-floorArea-create-form').attr('action'),
-            submitFunction: function (data) {
+            submitFunction: function(data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Property.Lists.Floorareas.Reload();
             }
         });
         $('body').on('change', '.recalc-floor', $.hood.Property.RecalcFloor);
     },
-    RecalcFloor: function (e) {
+    RecalcFloor: function(e) {
         if (this.id === "SquareMetres")
             $('#property-floorArea-create-form #SquareFeet').val(Number($(this).val()) * 10.7639);
         else {
             $('#property-floorArea-create-form #SquareMetres').val(Number($(this).val()) / 10.7639);
         }
     },
-    DeleteFloorArea: function (e) {
+    DeleteFloorArea: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let deleteFloorAreaCallback = function (isConfirm) {
+        let deleteFloorAreaCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), function (data) {
+                $.post($tag.attr('href'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Property.Lists.Floorareas.Reload();
                 });
@@ -243,7 +243,7 @@ $.hood.Property = {
     },
 
     Edit: {
-        Init: function () {
+        Init: function() {
             $('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
@@ -255,7 +255,7 @@ $.hood.Property = {
     },
 
     Upload: {
-        InitImageUploader: function () {
+        InitImageUploader: function() {
             if (!$('#property-gallery-add').doesExist())
                 return;
 
@@ -277,23 +277,23 @@ $.hood.Property = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-            myDropzone.on("success", function (file, data) {
+            myDropzone.on("success", function(file, data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Property.Lists.Media.Reload();
             });
 
-            myDropzone.on("addedfile", function (file) {
+            myDropzone.on("addedfile", function(file) {
                 $('#property-gallery-total-progress .progress-bar').css({ width: 0 + "%" });
                 $('#property-gallery-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
-            myDropzone.on("totaluploadprogress", function (progress) {
+            myDropzone.on("totaluploadprogress", function(progress) {
                 $('#property-gallery-total-progress .progress-bar').css({ width: progress + "%" });
                 $('#property-gallery-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
-            myDropzone.on("sending", function (file) {
+            myDropzone.on("sending", function(file) {
                 // Show the total progress bar when upload starts
                 $('#property-gallery-total-progress').fadeIn();
                 $('#property-gallery-total-progress .progress-bar').css({ width: "0%" });
@@ -301,17 +301,17 @@ $.hood.Property = {
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("complete", function (file) {
+            myDropzone.on("complete", function(file) {
                 $.hood.Property.Lists.Media.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("queuecomplete", function (progress) {
+            myDropzone.on("queuecomplete", function(progress) {
                 $('#property-gallery-total-progress').hide();
                 $.hood.Property.Lists.Media.Reload();
             });
         },
-        InitFloorplanUploader: function () {
+        InitFloorplanUploader: function() {
             if (!$('#property-floorplans-add').doesExist())
                 return;
 
@@ -333,23 +333,23 @@ $.hood.Property = {
                 dictResponseError: 'Error while uploading file!'
             });
 
-            myDropzone.on("success", function (file, data) {
+            myDropzone.on("success", function(file, data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Property.Lists.Floorplans.Reload();
             });
 
-            myDropzone.on("addedfile", function (file) {
+            myDropzone.on("addedfile", function(file) {
                 $('#property-floorplans-total-progress .progress-bar').css({ width: 0 + "%" });
                 $('#property-floorplans-total-progress .progress-bar .percentage').html(0 + "%");
             });
 
             // Update the total progress bar
-            myDropzone.on("totaluploadprogress", function (progress) {
+            myDropzone.on("totaluploadprogress", function(progress) {
                 $('#property-floorplans-total-progress .progress-bar').css({ width: progress + "%" });
                 $('#property-floorplans-total-progress .progress-bar .percentage').html(progress + "%");
             });
 
-            myDropzone.on("sending", function (file) {
+            myDropzone.on("sending", function(file) {
                 // Show the total progress bar when upload starts
                 $('#property-floorplans-total-progress').fadeIn();
                 $('#property-floorplans-total-progress .progress-bar').css({ width: "0%" });
@@ -357,12 +357,12 @@ $.hood.Property = {
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("complete", function (file) {
+            myDropzone.on("complete", function(file) {
                 $.hood.Property.Lists.Floorplans.Reload();
             });
 
             // Hide the total progress bar when nothing's uploading anymore
-            myDropzone.on("queuecomplete", function (progress) {
+            myDropzone.on("queuecomplete", function(progress) {
                 $('#property-floorplans-total-progress').hide();
                 $.hood.Property.Lists.Floorplans.Reload();
             });
@@ -370,13 +370,13 @@ $.hood.Property = {
     },
 
     Media: {
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteMediaCallback = function (isConfirm) {
+            let deleteMediaCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Property.Lists.Media.Reload();
                         $.hood.Property.Lists.Floorplans.Reload();

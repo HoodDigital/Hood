@@ -1293,11 +1293,13 @@ $.hood.Inline = {
     if (!complete) complete = $tag.data('complete');
     var urlLoad = $tag.data('url');
     $.get(urlLoad, $.proxy(function (data) {
-      $(this).html(data);
-      $(this).removeClass('loading');
-    }, $tag)).done(function () {
-      $.hood.Inline.RunComplete(complete);
-    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
+      $tag.html(data);
+      $tag.removeClass('loading');
+
+      if (complete) {
+        $.hood.Inline.RunComplete(complete, $tag, data);
+      }
+    }, $tag)).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   CurrentModal: null,
   Modal: function Modal(url, complete) {
@@ -1325,8 +1327,10 @@ $.hood.Inline = {
       $(modalId).on('hidden.bs.modal', function (e) {
         $(this).remove();
       });
-    }).done(function () {
-      $.hood.Inline.RunComplete(complete);
+
+      if (complete) {
+        $.hood.Inline.RunComplete(complete, $(modalId), data);
+      }
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   CloseModal: function CloseModal() {
@@ -1351,8 +1355,10 @@ $.hood.Inline = {
       }
 
       $tag.removeClass('loading');
-    }).done(function () {
-      $.hood.Inline.RunComplete(complete);
+
+      if (complete) {
+        $.hood.Inline.RunComplete(complete, $tag, data);
+      }
     }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   DataList: {
@@ -1429,12 +1435,12 @@ $.hood.Inline = {
     // Function can be overridden, to add global functionality to end of inline loads.
     $.hood.Loader(false);
   },
-  RunComplete: function RunComplete(complete) {
+  RunComplete: function RunComplete(complete, sender, data) {
     if (!$.hood.Helpers.IsNullOrUndefined(complete)) {
       var func = eval(complete);
 
       if (typeof func === 'function') {
-        func();
+        func(element, data);
       }
     }
   }

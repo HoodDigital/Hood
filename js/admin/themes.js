@@ -5,7 +5,7 @@ $.hood.Themes = {
   Init: function Init() {
     $('body').on('click', '.activate-theme', $.hood.Themes.Activate);
   },
-  Loaded: function Loaded(data) {
+  Loaded: function Loaded(sender, data) {
     $.hood.Loader(false);
   },
   Reload: function Reload(complete) {

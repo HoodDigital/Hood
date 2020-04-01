@@ -1,27 +1,27 @@
 ﻿if (!$.hood)
     $.hood = {};
 $.hood.Themes = {
-    Init: function () {
+    Init: function() {
         $('body').on('click', '.activate-theme', $.hood.Themes.Activate);
     },
 
-    Loaded: function (data) {
+    Loaded: function(sender, data) {
         $.hood.Loader(false);
     },
-    Reload: function (complete) {
+    Reload: function(complete) {
         if ($('#themes-list').doesExist())
             $.hood.Inline.Reload($('#themes-list'), complete);
     },
 
-    Activate: function (e) {
+    Activate: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let activateThemeCallback = function (isConfirm) {
+        let activateThemeCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), function (data) {
+                $.post($tag.attr('href'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
-                    setTimeout(function () { $.hood.Themes.Reload(); }, 2000);
+                    setTimeout(function() { $.hood.Themes.Reload(); }, 2000);
                 });
             }
         };
