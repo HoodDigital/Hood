@@ -1359,7 +1359,7 @@ $.hood.Inline = {
       if (complete) {
         $.hood.Inline.RunComplete(complete, $tag, data);
       }
-    }).fail($.hood.Inline.HandleError).complete($.hood.Inline.Finish);
+    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
   },
   DataList: {
     Init: function Init() {
