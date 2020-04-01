@@ -1359,7 +1359,7 @@ $.hood.Inline = {
       if (complete) {
         $.hood.Inline.RunComplete(complete, $tag, data);
       }
-    }).fail($.hood.Inline.HandleError).always($.hood.Inline.Finish);
+    }).fail($.hood.Inline.HandleError).complete($.hood.Inline.Finish);
   },
   DataList: {
     Init: function Init() {
@@ -1431,7 +1431,7 @@ $.hood.Inline = {
       window.location = window.location;
     }
   },
-  Finish: function Finish(data) {
+  Finish: function Finish() {
     // Function can be overridden, to add global functionality to end of inline loads.
     $.hood.Loader(false);
   },
@@ -1440,7 +1440,7 @@ $.hood.Inline = {
       var func = eval(complete);
 
       if (typeof func === 'function') {
-        func(element, data);
+        func(sender, data);
       }
     }
   }
