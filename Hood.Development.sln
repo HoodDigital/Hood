@@ -7,10 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		azure-pipelines.yml = azure-pipelines.yml
 		bower.json = bower.json
 		LICENSE = LICENSE
-		package.json = package.json
+		projects\Hood.Web\wwwroot\hood\package.json = projects\Hood.Web\wwwroot\hood\package.json
 		readme.md = readme.md
 	EndProjectSection
 EndProject
@@ -40,8 +39,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.UI.Core", "projects\Hood.UI.Core\Hood.UI.Core.csproj", "{C8D14AA4-199E-409F-B02D-4B2818B8DE0B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Development", "Development", "{306ED7A4-6F3F-4BE1-96CE-CA9DAE98CC53}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.NuGet", "projects\Hood.NuGet\Hood.NuGet.csproj", "{B72C61AE-7F88-4BDF-9660-84A0FBC22321}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -167,22 +164,6 @@ Global
 		{C8D14AA4-199E-409F-B02D-4B2818B8DE0B}.Release|x64.Build.0 = Release|Any CPU
 		{C8D14AA4-199E-409F-B02D-4B2818B8DE0B}.Release|x86.ActiveCfg = Release|Any CPU
 		{C8D14AA4-199E-409F-B02D-4B2818B8DE0B}.Release|x86.Build.0 = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|ARM.Build.0 = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|x64.Build.0 = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Debug|x86.Build.0 = Debug|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|ARM.ActiveCfg = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|ARM.Build.0 = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|x64.ActiveCfg = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|x64.Build.0 = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|x86.ActiveCfg = Release|Any CPU
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -195,7 +176,6 @@ Global
 		{11923D82-CAA1-4239-A4BC-A365C5D49017} = {A89DE859-75A0-418B-BE31-3228BD827619}
 		{C2E726E7-B3F7-4DD7-BC90-ECBAC11DB907} = {4BDDD020-CFDD-4A9E-BEA0-D3D7D54B2AC4}
 		{C8D14AA4-199E-409F-B02D-4B2818B8DE0B} = {5CF84357-EA5D-42CF-8CBC-05940FF0F73C}
-		{B72C61AE-7F88-4BDF-9660-84A0FBC22321} = {4BDDD020-CFDD-4A9E-BEA0-D3D7D54B2AC4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E5B47CFC-A139-40DC-9B6A-7CB4C3ED7C71}

@@ -1,9 +1,0 @@
-{
-  "Name": "default",
-  "FullName": "Default Theme",
-  "BaseColour": "#C33610",
-  "Author": "Hood Digital",
-  "Description": "The default site theme, uses the default Bootstrap4 UI.",
-  "PreviewImage": "https://hood.blob.core.windows.net/hood/hood-bg.jpg",
-  "UI": "Bootstrap4"
-}
