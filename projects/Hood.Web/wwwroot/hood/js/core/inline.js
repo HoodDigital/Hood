@@ -91,7 +91,7 @@ $.hood.Inline = {
             }
         })
             .fail($.hood.Inline.HandleError)
-            .complete($.hood.Inline.Finish);
+            .always($.hood.Inline.Finish);
     },
     DataList: {
         Init: function() {
