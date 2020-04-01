@@ -26,6 +26,7 @@ namespace Hood.Core.ScheduledTasks
                     wc.Headers.Add("Auth", Engine.Settings.Property.TriggerAuthKey);
                     wc.DownloadString(url);
                 }
+                await Task.Delay(1);
             }
             catch (Exception ex)
             {

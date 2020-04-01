@@ -1,8 +1,8 @@
 @inject IThemesService _themes
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
 <environment include="Development">
-    <link rel="stylesheet" href="@($"https://cdn.jsdelivr.net/npm/hoodcms@{Engine.Version}/css/styles.bs3.css")" />
+    <link rel="stylesheet" href="~/hood/css/styles.bs3.css" />
 </environment>
 <environment exclude="Development">
-    <link rel="stylesheet" href="@($"https://cdn.jsdelivr.net/npm/hoodcms@{Engine.Version}/css/styles.bs3.css")" />
+    <link rel="stylesheet" href="~/hood/css/styles.bs3.min.css" />
 </environment>

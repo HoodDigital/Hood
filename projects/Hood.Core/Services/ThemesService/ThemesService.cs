@@ -10,10 +10,10 @@ namespace Hood.Services
     public class ThemesService : IThemesService
     {
         private Dictionary<string, IConfiguration> _configs;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         public static object scriptLock = new object();
 
-        public ThemesService(IHostingEnvironment env)
+        public ThemesService(IWebHostEnvironment env)
         {
             _env = env;
             Reload();

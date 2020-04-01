@@ -1,6 +1,6 @@
 ﻿namespace Hood.Models.Payments
 {
-    public partial class SagePayCard
+    public partial class Card
     {
         /// <summary>
         /// The unique reference of the card you want to charge.

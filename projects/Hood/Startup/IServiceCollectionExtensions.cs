@@ -1,13 +1,15 @@
 ﻿using Hood.Caching;
 using Hood.Core;
+using Hood.Extensions;
 using Hood.Filters;
-using Hood.Services;
 using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -17,10 +19,6 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Hood.Extensions;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.AspNetCore.Identity.UI;
-using System.Collections.Generic;
 
 namespace Hood.Startup
 {
@@ -33,11 +31,6 @@ namespace Hood.Startup
           where TContext : HoodDbContext
         {
 
-            services
-                .AddMvc()
-                .AddApplicationPart(typeof(Engine).Assembly)
-                .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
-
             if (config.IsDatabaseConnected())
             {
                 services.ConfigureHoodServices();
@@ -47,15 +40,24 @@ namespace Hood.Startup
 
             services.ConfigureViewEngine(config);
             services.ConfigureHoodAntiForgery(config);
+
+            services.AddDistributedMemoryCache();
+
             services.ConfigureCookies(config);
             services.ConfigureSession(config);
             services.ConfigureCacheProfiles();
             services.ConfigureFilters();
             services.ConfigureImpersonation();
-            services.ConfigureJson();
             services.ConfigureRoutes();
 
-            services.AddApplicationInsightsTelemetry(config);
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation()
+                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+                .AddApplicationPart(typeof(Engine).Assembly)
+                .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
+
+            services.AddRazorPages();
+
             return services;
         }
 
@@ -66,8 +68,6 @@ namespace Hood.Startup
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IPropertyImporter, BlmFileImporter>();
             services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
-            services.AddSingleton<IPropertyExporter, PropertyExporter>();
-            services.AddSingleton<IContentExporter, ContentExporter>();
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
@@ -94,6 +94,8 @@ namespace Hood.Startup
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRecaptchaService, RecaptchaService>();
+            services.AddScoped<IPropertyExporter, PropertyExporter>();
+            services.AddScoped<IContentExporter, ContentExporter>();
 
             return services;
         }
@@ -110,9 +112,9 @@ namespace Hood.Startup
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //create, initialize and configure the engine
-            var engine = Engine.CreateHoodServiceProvider();
+            IHoodServiceProvider engine = Engine.CreateHoodServiceProvider();
             engine.Initialize(services);
-            var serviceProvider = engine.ConfigureServices(services, configuration);
+            IServiceProvider serviceProvider = engine.ConfigureServices(services, configuration);
 
             return serviceProvider;
         }
@@ -120,13 +122,13 @@ namespace Hood.Startup
         public static IServiceCollection ConfigureHoodDatabase<TContext>(this IServiceCollection services, IConfiguration config)
             where TContext : HoodDbContext
         {
-            services.AddDbContext<TContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
-            services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"], b => { b.UseRowNumberForPaging(); }));
+            services.AddDbContext<TContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
+            services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
             return services;
         }
         public static IServiceCollection ConfigureHoodAntiForgery(this IServiceCollection services, IConfiguration config)
         {
-            var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
             services.AddAntiforgery(options =>
             {
@@ -136,7 +138,7 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureCookies(this IServiceCollection services, IConfiguration config)
         {
-            var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
             bool consentRequired = config.GetValue("Cookies:ConsentRequired", true);
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -179,7 +181,7 @@ namespace Hood.Startup
             .AddEntityFrameworkStores<HoodDbContext>()
             .AddDefaultTokenProviders();
 
-            var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -196,17 +198,24 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureSession(this IServiceCollection services, IConfiguration config)
         {
-            var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
             int sessionTimeout = 60;
             services.AddSession(options =>
             {
+                options.Cookie.IsEssential = true;
                 options.Cookie.Name = $".{cookieName}.Session";
                 options.Cookie.HttpOnly = true;
                 if (int.TryParse(config["Session:Timeout"], out sessionTimeout))
+                {
+                    options.IdleTimeout = TimeSpan.FromMinutes(sessionTimeout);
                     options.Cookie.Expiration = TimeSpan.FromMinutes(sessionTimeout);
+                }
                 else
+                {
+                    options.IdleTimeout = TimeSpan.FromMinutes(60);
                     options.Cookie.Expiration = TimeSpan.FromMinutes(60);
+                }
             });
             return services;
         }
@@ -278,8 +287,8 @@ namespace Hood.Startup
                 options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
                 options.OnRefreshingPrincipal = context =>             // new property name
                 {
-                    var originalUserIdClaim = context.CurrentPrincipal.FindFirst("OriginalUserId");
-                    var isImpersonatingClaim = context.CurrentPrincipal.FindFirst("IsImpersonating");
+                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst("OriginalUserId");
+                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst("IsImpersonating");
                     if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
                     {
                         context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);
@@ -291,40 +300,33 @@ namespace Hood.Startup
 
             return services;
         }
-        public static IServiceCollection ConfigureJson(this IServiceCollection services)
-        {
-            services.Configure<MvcJsonOptions>(opt =>
-            {
-                var resolver = opt.SerializerSettings.ContractResolver;
-                if (resolver != null)
-                {
-                    var res = resolver as DefaultContractResolver;
-                    res.NamingStrategy = null;  // <<!-- this removes the camelcasing
-                }
-            });
-
-            return services;
-        }
         public static IServiceCollection ConfigureRoutes(this IServiceCollection services)
         {
             services.Configure<RouteOptions>(options =>
             {
-                options.ConstraintMap.Add("cms", typeof(RouteConstraint));
+                options.ConstraintMap.Add("propertySlug", typeof(PropertyRouteConstraint));
+                options.ConstraintMap.Add("pageSlug", typeof(PagesRouteConstraint));
+                options.ConstraintMap.Add("contentTypeSlug", typeof(ContentTypeRouteConstraint));
                 options.LowercaseUrls = true;
             });
             return services;
         }
         public static IServiceCollection ConfigureViewEngine(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<RazorViewEngineOptions>(options =>
+            services.Configure<MvcRazorRuntimeCompilationOptions>(options =>
             {
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib"));
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(IServiceCollectionExtensions).Assembly, "ComponentLib"));
                 options.FileProviders.Add(UserInterfaceProvider.GetAdminProvider());
                 options.FileProviders.Add(UserInterfaceProvider.GetAccountProvider());
-                var defaultUI = UserInterfaceProvider.GetProvider(config);
+                EmbeddedFileProvider defaultUI = UserInterfaceProvider.GetProvider(config);
                 if (defaultUI != null)
+                {
                     options.FileProviders.Add(defaultUI);
+                }
+            });
+            services.Configure<RazorViewEngineOptions>(options =>
+            {
                 options.ViewLocationExpanders.Add(new ViewLocationExpander());
             });
             return services;

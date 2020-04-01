@@ -12,7 +12,7 @@ $.hood.Subscriptions = {
   },
   Lists: {
     Plans: {
-      Loaded: function Loaded() {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -20,7 +20,7 @@ $.hood.Subscriptions = {
       }
     },
     Stripe: {
-      Loaded: function Loaded() {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -28,7 +28,7 @@ $.hood.Subscriptions = {
       }
     },
     StripeProducts: {
-      Loaded: function Loaded() {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -36,7 +36,7 @@ $.hood.Subscriptions = {
       }
     },
     Products: {
-      Loaded: function Loaded() {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {
@@ -44,7 +44,7 @@ $.hood.Subscriptions = {
       }
     },
     Subscribers: {
-      Loaded: function Loaded() {
+      Loaded: function Loaded(sender, data) {
         $.hood.Loader(false);
       },
       Reload: function Reload(complete) {

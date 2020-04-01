@@ -8,16 +8,6 @@ namespace Hood.Models.Payments
         public SagePayPaymentMethodRequest PaymentMethod { get; set; }
 
         /// <summary>
-        ///  The currency of the amount in 3 letter ISO 4217 format. e.g. GBP for Pound Sterling.
-        /// </summary>
-        public string Currency { get; set; }
-
-        /// <summary>
-        /// Provides information regarding the transaction amount. This is only returned in GET requests.
-        /// </summary>
-        public int Amount { get; set; }
-
-        /// <summary>
         ///  Use this field to override your default account level AVS CVC settings. 
         /// <para>UseMSPSetting - Use default MySagePay settings.</para>
         /// <para>Force - Apply authentication even if turned off. </para>

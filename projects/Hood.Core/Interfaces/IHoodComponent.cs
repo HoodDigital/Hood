@@ -25,6 +25,6 @@ namespace Hood.Interfaces
         /// Register services and interfaces
         /// </summary>
         /// <param name="builder">Services collection</param>
-        void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config);
+        void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config);
     }
 }

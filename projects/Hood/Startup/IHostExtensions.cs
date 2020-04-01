@@ -5,13 +5,14 @@ using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 
 namespace Hood.Startup
 {
-    public static class IWebHostExtensions
+    public static class IHostExtensions
     {
-        public static IWebHost LoadHood<TDbContext>(this IWebHost host)
+        public static IHost LoadHood<TDbContext>(this IHost host)
             where TDbContext : HoodDbContext
         {
             using (IServiceScope scope = host.Services.CreateScope())
@@ -64,7 +65,7 @@ namespace Hood.Startup
                             Engine.Services.MigrationNotApplied = true;
                             Engine.Services.AdminUserSetupError = true;
                             break;
-                        case StartupError.DatabaseMediaTimeout:
+                        case StartupError.DatabaseMediaError:
                             Engine.Services.DatabaseConnectionFailed = false;
                             Engine.Services.DatabaseMigrationsMissing = false;
                             Engine.Services.MigrationNotApplied = false;

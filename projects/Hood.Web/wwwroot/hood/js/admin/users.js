@@ -1,7 +1,7 @@
 ﻿if (!$.hood)
     $.hood = {};
 $.hood.Users = {
-    Init: function () {
+    Init: function() {
         $('body').on('click', '.user-delete', $.hood.Users.Delete);
 
         $('body').on('click', '.user-reset-password', $.hood.Users.Edit.ResetPassword);
@@ -13,27 +13,27 @@ $.hood.Users = {
         $('body').on('change', '.user-role-check', $.hood.Users.Edit.ToggleRole);
     },
 
-    Loaded: function (data) {
+    Loaded: function(sender, data) {
         $.hood.Loader(false);
     },
-    Reload: function (complete) {
+    Reload: function(complete) {
         if ($('#user-list').doesExist())
             $.hood.Inline.Reload($('#user-list'), complete);
     },
 
-    Delete: function (e) {
+    Delete: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let deleteUserCallback = function (isConfirm) {
+        let deleteUserCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), function (data) {
+                $.post($tag.attr('href'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Users.Reload();
                     if (data.Success) {
                         if ($tag && $tag.data('redirect')) {
                             $.hood.Alerts.Success(`<strong>User deleted, redirecting...</strong><br />Just taking you back to the user list.`);
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location = $tag.data('redirect');
                             }, 1500);
                         }
@@ -52,7 +52,7 @@ $.hood.Users = {
     },
 
     Create: {
-        Loaded: function (e) {
+        Loaded: function(e) {
             $('#user-create-form').hoodValidator({
                 validationRules: {
                     FirstName: {
@@ -71,13 +71,13 @@ $.hood.Users = {
                 },
                 submitButtonTag: $('#user-create-submit'),
                 submitUrl: $('#user-create-form').attr('action'),
-                submitFunction: function (data) {
+                submitFunction: function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Users.Reload();
                 }
             });
         },
-        GeneratePassword: function () {
+        GeneratePassword: function() {
             if ($(this).is(':checked')) {
                 $('#user-create-form #Password').val($.hood.Helpers.GenerateRandomString(0));
                 $('#user-create-form #Password').attr('type', 'text');
@@ -89,15 +89,16 @@ $.hood.Users = {
     },
 
     Edit: {
-        ResetPassword: function (e) {
+        ResetPassword: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let resetPasswordCallback = function (inputValue) {
+            let resetPasswordCallback = function(inputValue) {
                 if (inputValue === false) return false; if (inputValue === "") {
-                    swal.showInputError("You didn't supply a new password, we can't reset the password without it!"); return false
+                    swal.showInputError("You didn't supply a new password, we can't reset the password without it!");
+                    return false;
                 }
-                $.post($tag.attr('href'), { password: inputValue }, function (data) {
+                $.post($tag.attr('href'), { password: inputValue }, function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                 });
             };
@@ -110,16 +111,16 @@ $.hood.Users = {
 
         },
         Notes: {
-            Add: function (e) {
+            Add: function(e) {
                 e.preventDefault();
                 let $tag = $(this);
 
-                let addNoteCallback = function (inputValue) {
+                let addNoteCallback = function(inputValue) {
                     if (inputValue === false || inputValue === "") {
                         swal.showInputError("You enter anything!");
                         return false;
                     }
-                    $.post($tag.attr('href'), { note: inputValue }, function (data) {
+                    $.post($tag.attr('href'), { note: inputValue }, function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Inline.Reload('#user-notes');
                     });
@@ -133,14 +134,14 @@ $.hood.Users = {
                 );
 
             },
-            Delete: function (e) {
+            Delete: function(e) {
                 e.preventDefault();
                 let $tag = $(this);
 
-                let deleteUserNoteCallback = function (isConfirm) {
+                let deleteUserNoteCallback = function(isConfirm) {
                     if (isConfirm) {
                         // delete functionality
-                        $.post($tag.attr('href'), function (data) {
+                        $.post($tag.attr('href'), function(data) {
                             $.hood.Helpers.ProcessResponse(data);
                             $.hood.Inline.Reload('#user-notes');
                         });
@@ -157,13 +158,13 @@ $.hood.Users = {
 
             }
         },
-        ToggleRole: function () {
+        ToggleRole: function() {
             if ($(this).is(':checked')) {
-                $.post($(this).data('url'), { role: $(this).val(), add: true }, function (data) {
+                $.post($(this).data('url'), { role: $(this).val(), add: true }, function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                 });
             } else {
-                $.post($(this).data('url'), { role: $(this).val(), add: false }, function (data) {
+                $.post($(this).data('url'), { role: $(this).val(), add: false }, function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                 });
             }

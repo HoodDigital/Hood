@@ -46,6 +46,15 @@ namespace Hood.TagHelpers
         [HtmlAttributeName("asp-delete-class")]
         public string DeleteButtonClass { get; set; } = "btn btn-sm btn-danger mr-1";
 
+        [HtmlAttributeName("asp-area")]
+        public string Area { get; set; } = "Admin";
+        [HtmlAttributeName("asp-controller")]
+        public string Controller { get; set; } = "Media";
+        [HtmlAttributeName("asp-action")]
+        public string Action { get; set; } = "Action";
+        [HtmlAttributeName("asp-clear")]
+        public string Clear { get; set; } = "Clear";
+
         /// <summary>
         /// ViewContext
         /// </summary>
@@ -62,8 +71,9 @@ namespace Hood.TagHelpers
             string contentTemplate = (await output.GetChildContentAsync()).GetContent();
 
             var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
-            var attachUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new {
-                area = "Admin",
+            var attachUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action(Action, Controller, new
+            {
+                area = Area,
                 doAction = MediaWindowAction.Attach.ToString(),
                 entity = Entity,
                 field = For.Name,
@@ -74,9 +84,9 @@ namespace Hood.TagHelpers
             var attachButton = $"<a class='{AttachButtonClass} hood-image-attach' data-url='{attachUrl}' data-tag='.{For.Name}' data-json='#{Json.Name}' href='javascript:void(0);'>{contentTemplate}</a>";
             output.Content.SetHtmlContent(attachButton);
 
-            var clearUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Clear", "Media", new
+            var clearUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action(Clear, Controller, new
             {
-                area = "Admin",
+                area = Area,
                 entity = Entity,
                 field = For.Name,
                 id = Id

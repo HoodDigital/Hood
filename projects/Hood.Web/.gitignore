@@ -7,7 +7,6 @@ package-lock.json
 # Ignore Development Views & Migrations
 /Areas/Admin/Views
 /Views
-/Migrations
 
 # Ignore Libraries
 /wwwroot/lib

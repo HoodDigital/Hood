@@ -20,8 +20,8 @@ namespace Hood.Extensions
             builder.Entity<ApiEvent>().ToTable("HoodApiEvents");
             builder.Entity<Address>().ToTable("HoodAddresses");
             builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
-            builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
-            builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
+            builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
+            builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
             builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
             builder.Entity<ApiKey>().HasOne(up => up.User).WithMany(add => add.ApiKeys).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
@@ -91,8 +91,8 @@ namespace Hood.Extensions
 
             // Property
             builder.Entity<PropertyListing>().ToTable("HoodProperties");
-            builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
-            builder.Entity<PropertyListing>().Property(a => a.Longitude).HasDefaultValue(0.0).HasDefaultValueSql("0.0");
+            builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
+            builder.Entity<PropertyListing>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
             builder.Entity<PropertyListing>().HasOne(c => c.Agent).WithMany(up => up.Properties).HasForeignKey(c => c.AgentId);
 
             builder.Entity<PropertyMeta>().ToTable("HoodPropertyMetadata");
@@ -107,22 +107,12 @@ namespace Hood.Extensions
             builder.Entity<PropertyFloorplan>().HasOne(up => up.Property).WithMany(t => t.FloorPlans).HasForeignKey(au => au.PropertyId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
 
-            builder.Query<UserProfile>().ToView("HoodUserProfiles");
-            builder.Query<UserProfile>().Property(b => b.RolesJson).HasColumnName("Roles");
-            builder.Query<UserProfile>().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
+            builder.Entity<UserProfile>().HasNoKey().ToView("HoodUserProfiles");
+            builder.Entity<UserProfile>().HasNoKey().Property(b => b.RolesJson).HasColumnName("Roles");
+            builder.Entity<UserProfile>().HasNoKey().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
 
-            builder.Query<SubscriptionPlan>().ToView("HoodSubscriptionPlans");
+            builder.Entity<SubscriptionPlan>().HasNoKey().ToView("HoodSubscriptionPlans");
 
         }
-
-        public static void RegisterSagePayBackingFields<T>(this ModelBuilder builder) where T : SagePayTransaction
-        {
-            builder.Entity<T>().Property<string>("NotesJson").HasField("_NotesJson").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("PaymentMethodJson").HasField("_PaymentMethodJson").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("AmountJson").HasField("_AmountJson").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("BillingAddressJson").HasField("_BillingAddressJson").UsePropertyAccessMode(PropertyAccessMode.Field);
-            builder.Entity<T>().Property<string>("ShippingAddressJson").HasField("_ShippingAddressJson").UsePropertyAccessMode(PropertyAccessMode.Field);
-        }
-
     }
 }

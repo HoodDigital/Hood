@@ -23,12 +23,12 @@ namespace Hood.Services
         private readonly HoodDbContext _db;
         private readonly IHoodCache _cache;
         private readonly IEventsService _eventService;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
         public ContentRepository(
             HoodDbContext db,
             IHoodCache cache,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             IEventsService eventService)
         {
             _db = db;

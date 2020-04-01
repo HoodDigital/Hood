@@ -17,7 +17,7 @@ namespace Hood.Services
 {
     public class PageBuilder : IPageBuilder
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IHoodCache _cache;
         private readonly BundleFileProcessor _bundleFileProcessor;
 
@@ -25,7 +25,7 @@ namespace Hood.Services
         private readonly Dictionary<ResourceLocation, List<FileReferenceMetadata>> _scripts;
         private readonly Dictionary<ResourceLocation, List<string>> _inlineScripts;
 
-        public PageBuilder(IHostingEnvironment hostingEnvironment, IHoodCache cache)
+        public PageBuilder(IWebHostEnvironment hostingEnvironment, IHoodCache cache)
         {
             _hostingEnvironment = hostingEnvironment;
             _cache = cache;
@@ -71,7 +71,7 @@ namespace Hood.Services
             if (!_scripts.Any())
                 return "";
 
-            if (bundleScripts && location.Bundleable() && !_hostingEnvironment.IsDevelopment())
+            if (bundleScripts && location.Bundleable() && _hostingEnvironment.EnvironmentName != "Development")
             {
                 var partsToBundle = _scripts[location]
                     .Where(x => x.Bundle)

@@ -363,11 +363,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 _db.Database.SetCommandTimeout(new TimeSpan(0, 10, 0));
-                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodSubscriptionFeatures");
-                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodUserSubscriptions");
-                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodSubscriptions");
-                await _db.Database.ExecuteSqlCommandAsync("DELETE FROM HoodSubscriptionGroups");
-                await _db.Database.ExecuteSqlCommandAsync("UPDATE AspNetUsers SET StripeId = NULL");
+                await _db.Database.ExecuteSqlRawAsync("DELETE FROM HoodSubscriptionFeatures");
+                await _db.Database.ExecuteSqlRawAsync("DELETE FROM HoodUserSubscriptions");
+                await _db.Database.ExecuteSqlRawAsync("DELETE FROM HoodSubscriptions");
+                await _db.Database.ExecuteSqlRawAsync("DELETE FROM HoodSubscriptionGroups");
+                await _db.Database.ExecuteSqlRawAsync("UPDATE AspNetUsers SET StripeId = NULL");
                 _db.Database.SetCommandTimeout(new TimeSpan(0, 0, 30));
                 SaveMessage = "Logs have been cleared.";
                 MessageType = Enums.AlertType.Success;

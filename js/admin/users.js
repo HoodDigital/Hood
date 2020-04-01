@@ -10,7 +10,7 @@ $.hood.Users = {
     $('body').on('change', '#user-create-form #GeneratePassword', $.hood.Users.Create.GeneratePassword);
     $('body').on('change', '.user-role-check', $.hood.Users.Edit.ToggleRole);
   },
-  Loaded: function Loaded(data) {
+  Loaded: function Loaded(sender, data) {
     $.hood.Loader(false);
   },
   Reload: function Reload(complete) {

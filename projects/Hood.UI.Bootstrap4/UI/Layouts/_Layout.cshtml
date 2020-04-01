@@ -1,8 +1,5 @@
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment _env
-@{
-    BasicSettings _basicSettings = Engine.Settings.Basic;
-    SeoSettings _seoSettings = Engine.Settings.Seo;
-
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
+@{     
     bool bundleScripts = _env.EnvironmentName != "Development";
 }
 <!DOCTYPE html>
@@ -18,7 +15,7 @@
     <partial name="_Metas_Base" />
     <title>@ViewData["Title"]</title>
 
-    @Html.Raw(_seoSettings.HeadTags)
+    @Html.Raw(Engine.Settings.Seo.HeadTags)
 
     @if (!IsSectionDefined("metas"))
     {
@@ -43,8 +40,8 @@
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
 </head>
-<body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
-    @Html.Raw(_seoSettings.BodyTags)
+<body class="@ViewData["BodyClass"]">
+    @Html.Raw(Engine.Settings.Seo.BodyTags)
 
     @RenderSection("afterbody", required: false)
 
@@ -97,7 +94,6 @@
 
     @RenderSection("scripts", required: false)
 
-    @Html.Raw(JavaScriptSnippet.FullScript)
-    @Html.Raw(_seoSettings.GoogleAnalytics)
+    @Html.Raw(Engine.Settings.Seo.GoogleAnalytics)
 </body>
 </html>

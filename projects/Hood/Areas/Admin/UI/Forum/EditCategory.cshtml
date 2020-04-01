@@ -28,7 +28,7 @@
             <div>
                 <select asp-for="ParentCategoryId" class="form-control">
                     <option>No Parent</option>
-                    @_categories.CategorySelectOptions(Model.Categories, Model.ParentCategoryId.ToString())
+                    @_categories.CategorySelectOptions(Model.Categories, Model.ParentCategoryId)
                 </select>
             </div>
         </div>

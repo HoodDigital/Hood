@@ -21,8 +21,8 @@ namespace Hood.Services
 
         public void OnUserSubscriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
         {
-            var env = Engine.Services.Resolve<IHostingEnvironment>();
-            if (!env.IsProduction())
+            var env = Engine.Services.Resolve<IWebHostEnvironment>();
+            if (env.EnvironmentName != "Production")
             {
                 var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddLogAsync<SubscriptionsEventListener>($"User Subscription Changed Event: {e.Action}", new { EventData = e, Sender = sender.GetType().ToString() });
@@ -31,8 +31,8 @@ namespace Hood.Services
 
         public void OnWebhookTriggered(object sender, StripeWebHookTriggerArgs e)
         {
-            var env = Engine.Services.Resolve<IHostingEnvironment>();
-            if (!env.IsProduction())
+            var env = Engine.Services.Resolve<IWebHostEnvironment>();
+            if (env.EnvironmentName != "Production")
             {
                 var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddLogAsync<SubscriptionsEventListener>($"Webhook Triggered Event: {e.Action}", new { EventData = e, Sender = sender.GetType().ToString() });

@@ -3,10 +3,8 @@ using Newtonsoft.Json;
 
 namespace Hood.Models.Payments
 {
-    public class SagePayAddress : IAddress
+    public class OrderAddress : IAddress
     {
-        public string RecipientFirstName { get; set; }
-        public string RecipientLastName { get; set; }
         [JsonIgnore]
         public string ContactName { get; set; }
         [JsonIgnore]

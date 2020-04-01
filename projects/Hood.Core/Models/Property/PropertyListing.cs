@@ -215,7 +215,7 @@ namespace Hood.Models
         }
 
         [NotMapped]
-        public string Url => string.Format("/property/{0}/{1}/{2}/{3}", Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.Split(' ').First().ToSeoUrl(), Title.ToSeoUrl());
+        public string Url => string.Format("/{0}/{1}/{2}/{3}/{4}", Engine.Settings.Property.Slug, Id, Address2.IsSet() ? Address2.ToSeoUrl() : City.ToSeoUrl(), Postcode.IsSet() ? Postcode.Split(' ').First().ToSeoUrl() : "unknown", Title.ToSeoUrl());
 
         [NotMapped]
         public string FormattedRent

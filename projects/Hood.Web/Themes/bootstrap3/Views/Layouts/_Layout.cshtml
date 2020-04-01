@@ -1,4 +1,3 @@
-@inject Microsoft.AspNetCore.Hosting.IHostingEnvironment _env
 @{
     BasicSettings _basicSettings = Engine.Settings.Basic;
     SeoSettings _seoSettings = Engine.Settings.Seo;
@@ -47,7 +46,7 @@
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
 </head>
-<body class="@ViewData["BodyClass"]" @ViewData["BodyAttributes"]>
+<body class="@ViewData["BodyClass"]">
     @Html.Raw(_seoSettings.BodyTags)
 
     @RenderSection("afterbody", required: false)
@@ -93,7 +92,6 @@
 
     @RenderSection("scripts", required: false)
 
-    @Html.Raw(JavaScriptSnippet.FullScript)
     @Html.Raw(_seoSettings.GoogleAnalytics)
 </body>
 </html>

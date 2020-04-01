@@ -25,14 +25,14 @@ namespace Hood.Services
     public class BlmFileImporter : IPropertyImporter
     {
         private readonly IFTPService _ftp;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
         private readonly IDirectoryManager _directoryManager;
         private readonly IHttpContextAccessor _context;
 
         public BlmFileImporter(
             IFTPService ftp,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             IHttpContextAccessor context,
             IConfiguration config,
             IAddressService address,

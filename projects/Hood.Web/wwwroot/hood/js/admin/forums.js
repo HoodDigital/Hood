@@ -1,7 +1,7 @@
 ﻿if (!$.hood)
     $.hood = {};
 $.hood.Forums = {
-    Init: function () {
+    Init: function() {
         $('body').on('click', '.forum-delete', $.hood.Forums.Delete);
         $('body').on('click', '.forum-archive', $.hood.Forums.Archive);
         $('body').on('click', '.forum-publish', $.hood.Forums.Publish);
@@ -9,7 +9,7 @@ $.hood.Forums = {
         $('body').on('click', '.forum-categories-delete', $.hood.Forums.Categories.Delete);
         $('body').on('change', '.forum-categories-check', $.hood.Forums.Categories.ToggleCategory);
 
-        $('body').on('keyup', '#Slug', function () {
+        $('body').on('keyup', '#Slug', function() {
             $('.slug-display').html($(this).val());
         });
 
@@ -19,38 +19,38 @@ $.hood.Forums = {
 
     Lists: {
         Forums: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#forum-list').doesExist())
                     $.hood.Inline.Reload($('#forum-list'), complete);
             }
         },
         Categories: {
-            Loaded: function (data) {
+            Loaded: function(sender, data) {
                 $.hood.Loader(false);
             },
-            Reload: function (complete) {
+            Reload: function(complete) {
                 if ($('#forum-categories-list').doesExist())
                     $.hood.Inline.Reload($('#forum-categories-list'), complete);
             }
         }
     },
 
-    Delete: function (e) {
+    Delete: function(e) {
         e.preventDefault();
         let $tag = $(this);
 
-        let deleteForumCallback = function (isConfirm) {
+        let deleteForumCallback = function(isConfirm) {
             if (isConfirm) {
-                $.post($tag.attr('href'), function (data) {
+                $.post($tag.attr('href'), function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Forums.Lists.Forums.Reload();
                     if (data.Success) {
                         if ($tag && $tag.data('redirect')) {
                             $.hood.Alerts.Success(`<strong>Forum deleted, redirecting...</strong><br />Just taking you back to the forum list.`);
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location = $tag.data('redirect');
                             }, 1500);
                         }
@@ -68,7 +68,7 @@ $.hood.Forums = {
         );
     },
 
-    Publish: function (e) {
+    Publish: function(e) {
         var $this = $(this);
         swal({
             title: "Are you sure?",
@@ -82,10 +82,10 @@ $.hood.Forums = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-            function (isConfirm) {
+            function(isConfirm) {
                 if (isConfirm) {
                     // delete functionality
-                    $.post('/admin/forums/publish/' + $this.data('id'), null, function (data) {
+                    $.post('/admin/forums/publish/' + $this.data('id'), null, function(data) {
                         if (data.Success) {
                             swal({
                                 title: "Published!",
@@ -93,7 +93,7 @@ $.hood.Forums = {
                                 timer: 1300,
                                 type: "success"
                             });
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location = data.Url;
                             }, 500);
                         } else {
@@ -110,7 +110,7 @@ $.hood.Forums = {
                 }
             });
     },
-    Archive: function (e) {
+    Archive: function(e) {
         var $this = $(this);
         swal({
             title: "Are you sure?",
@@ -124,9 +124,9 @@ $.hood.Forums = {
             showLoaderOnConfirm: true,
             closeOnCancel: false
         },
-            function (isConfirm) {
+            function(isConfirm) {
                 if (isConfirm) {
-                    $.post('/admin/forums/archive/' + $this.data('id'), null, function (data) {
+                    $.post('/admin/forums/archive/' + $this.data('id'), null, function(data) {
                         if (data.Success) {
                             swal({
                                 title: "Archived!",
@@ -134,7 +134,7 @@ $.hood.Forums = {
                                 timer: 1300,
                                 type: "success"
                             });
-                            setTimeout(function () {
+                            setTimeout(function() {
                                 window.location = data.Url;
                             }, 500);
                         } else {
@@ -152,7 +152,7 @@ $.hood.Forums = {
             });
     },
 
-    Create: function () {
+    Create: function() {
         $('#forum-create-form').find('.datepicker').datetimepicker({
             locale: 'en-gb',
             format: 'L'
@@ -168,7 +168,7 @@ $.hood.Forums = {
             },
             submitButtonTag: $('#forum-create-submit'),
             submitUrl: $('#forum-create-form').attr('action'),
-            submitFunction: function (data) {
+            submitFunction: function(data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Forums.Lists.Forums.Reload();
             }
@@ -176,7 +176,7 @@ $.hood.Forums = {
     },
 
     Edit: {
-        Init: function () {
+        Init: function() {
             $('.datepicker').datetimepicker({
                 locale: 'en-gb',
                 format: 'L'
@@ -189,7 +189,7 @@ $.hood.Forums = {
     },
 
     Categories: {
-        Editor: function () {
+        Editor: function() {
             $('#forum-categories-edit-form').hoodValidator({
                 validationRules: {
                     DisplayName: {
@@ -201,25 +201,25 @@ $.hood.Forums = {
                 },
                 submitButtonTag: $('#forum-categories-edit-submit'),
                 submitUrl: $('#forum-categories-edit-form').attr('action'),
-                submitFunction: function (data) {
+                submitFunction: function(data) {
                     $.hood.Helpers.ProcessResponse(data);
                     $.hood.Forums.Lists.Categories.Reload();
                 }
             });
         },
-        ToggleCategory: function () {
-            $.post($(this).data('url'), { categoryId: $(this).val(), add: $(this).is(':checked') }, function (data) {
+        ToggleCategory: function() {
+            $.post($(this).data('url'), { categoryId: $(this).val(), add: $(this).is(':checked') }, function(data) {
                 $.hood.Helpers.ProcessResponse(data);
                 $.hood.Forums.Lists.Categories.Reload();
             });
         },
-        Delete: function (e) {
+        Delete: function(e) {
             e.preventDefault();
             let $tag = $(this);
 
-            let deleteCategoryCallback = function (isConfirm) {
+            let deleteCategoryCallback = function(isConfirm) {
                 if (isConfirm) {
-                    $.post($tag.attr('href'), function (data) {
+                    $.post($tag.attr('href'), function(data) {
                         $.hood.Helpers.ProcessResponse(data);
                         $.hood.Forums.Lists.Categories.Reload();
                     });

@@ -24,10 +24,10 @@ namespace Hood.Services
         private MediaSettings _mediaSettings;
         private string _container;
         private string _key;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration _config;
 
-        public MediaManager(IHostingEnvironment env, IConfiguration config)
+        public MediaManager(IWebHostEnvironment env, IConfiguration config)
         {
             _env = env;
             _config = config;

@@ -12,7 +12,7 @@ namespace Hood.Demo
     {
         public int ServiceConfigurationOrder => 0;
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
             app.UseHoodDefaults(env, config);
             app.UseHoodDefaultRoutes(config);

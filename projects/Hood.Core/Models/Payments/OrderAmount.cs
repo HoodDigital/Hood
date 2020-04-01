@@ -1,6 +1,6 @@
 ﻿namespace Hood.Models.Payments
 {
-    public class SagePayAmount
+    public class OrderAmount
     {
         /// <summary>
         /// The total amount for the transaction that includes any sale or surcharge values.

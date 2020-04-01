@@ -6,7 +6,6 @@ using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -29,7 +28,7 @@ namespace Hood.Startup
         /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
         /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
         /// <returns></returns>
-        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
+        public static IApplicationBuilder UseHood(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
             if (app == null)
                 throw new ArgumentNullException(nameof(app));
@@ -58,12 +57,12 @@ namespace Hood.Startup
             return app;
         }
 
-        public static IApplicationBuilder UseHoodDefaults(this IApplicationBuilder app, IHostingEnvironment env, IConfiguration config)
+        public static IApplicationBuilder UseHoodDefaults(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
-            if (env.IsDevelopment())
+            if (env.EnvironmentName == "Development")
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
@@ -71,25 +70,7 @@ namespace Hood.Startup
             else
             {
                 app.UseExceptionHandler("/error/500");
-            }
-
-            app.Use(async (ctx, next) =>
-            {
-                await next();
-
-                if (ctx.Response.StatusCode == 404 && !ctx.Response.HasStarted)
-                {
-                    string originalPath = ctx.Request.Path.Value;
-                    ctx.Items["originalPath"] = originalPath;
-                    ctx.Request.Path = "/error/404";
-                    await next();
-                }
-            });
-
-            if (config.ForceHttps())
-            {
-                app.UseHttpsRedirection();
-                app.UseHsts();
+                app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
 
             app.UseStaticFiles(new StaticFileOptions()
@@ -101,8 +82,9 @@ namespace Hood.Startup
                     }
             });
 
-            app.UseCookiePolicy();
-
+            app.UseRouting();
+            app.UseCors();
+            
             // Activate url helpers
             var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             UrlHelpers.Configure(httpContextAccessor);
@@ -110,6 +92,7 @@ namespace Hood.Startup
             if (config.IsDatabaseConfigured())
             {
                 app.UseAuthentication();
+                app.UseAuthorization();
 
                 var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
@@ -148,58 +131,55 @@ namespace Hood.Startup
             }
             catch (StartupException)
             {
-                app.UseMvc(routes =>
+                app.UseEndpoints(endpoints =>
                 {
-                    routes.MapRoute(
+                    endpoints.MapControllerRoute(
                         name: "SiteNotInstalled",
-                        template: "{*url}",
+                        pattern: "{*url}",
                         defaults: new { controller = "Install", action = "Install" }
                     );
                 });
                 return app;
             }
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                // Check for a url string that matches pages, content routes or custom user set urls. Maximum of five '/' allowed in the route.
-                routes.MapRoute(
-                    name: "Content",
-                    template: "{lvl1:cms}/{lvl2:cms?}/{lvl3:cms?}/{lvl4:cms?}/{lvl5:cms?}",
-                    defaults: new { controller = "Home", action = "Show" }
-                );
-                routes.MapRoute(
+
+                endpoints.MapControllerRoute(
                      name: "Manage",
-                     template: "account/manage/{action=Index}/{id?}",
+                     pattern: "account/manage/{action=Index}/{id?}",
                      defaults: new { controller = "Manage" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Billing",
-                     template: "account/billing/{action=Index}/{id?}",
+                     pattern: "account/billing/{action=Index}/{id?}",
                      defaults: new { controller = "Billing" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Addresses",
-                     template: "account/addresses/{action=Index}/{id?}",
+                     pattern: "account/addresses/{action=Index}/{id?}",
                      defaults: new { controller = "Address" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Api",
-                     template: "account/api/{action=Index}/{id?}",
+                     pattern: "account/api/{action=Index}/{id?}",
                      defaults: new { controller = "Api" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                      name: "Subscriptions",
-                     template: "account/subscriptions/{action=Index}/{id?}",
+                     pattern: "account/subscriptions/{action=Index}/{id?}",
                      defaults: new { controller = "Subscriptions" }
                 );
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "Areas",
-                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
                 );
-                routes.MapRoute(
+
+                endpoints.MapControllerRoute(
                     name: "Default",
-                    template: "{controller=Home}/{action=Index}/{id?}"
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
                 );
+
             });
             return app;
         }

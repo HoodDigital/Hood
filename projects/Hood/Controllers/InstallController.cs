@@ -1,20 +1,17 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
-using Hood.Models;
 using Hood.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Linq;
+using Microsoft.Extensions.Hosting;
 
 namespace Hood.Controllers
 {
     public class InstallController : Controller
     {
-        private readonly IApplicationLifetime _applicationLifetime;
+        private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IConfiguration _config;
-        public InstallController(IApplicationLifetime applicationLifetime, IConfiguration config)
+        public InstallController(IHostApplicationLifetime applicationLifetime, IConfiguration config)
         {
             _applicationLifetime = applicationLifetime;
             _config = config;

@@ -1,5 +1,14 @@
 ﻿@each $color, $value in $colors {
-    @include bg-variant(".bg-#{$color}", $value);
+    .bg-#{$color} {
+        background-color: $value !important;
+    }
+
+    a.bg-#{$color},
+    button.bg-#{$color} {
+        @include hover-focus() {
+            background-color: darken($value, 10%) !important;
+        }
+    }
 }
 @each $color, $value in $colors {
     .badge-#{$color} {

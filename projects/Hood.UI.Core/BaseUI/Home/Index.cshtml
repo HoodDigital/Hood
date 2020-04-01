@@ -3,11 +3,11 @@
     var _integrations = Engine.Settings.Integrations;
     var _seoSettings = Engine.Settings.Seo;
     string description = _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-    string title = _basicSettings.CompanyName.IsSet() ? "Home - " + _basicSettings.CompanyName : _basicSettings.SiteTitle.IsSet() ? "Home - " + _basicSettings.SiteTitle : "Home";
+    string title = _basicSettings.FullTitle;
     if (_seoSettings.Home != null)
     {
         description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Home - " + _basicSettings.CompanyName;
+        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Home - " + _basicSettings.FullTitle;
     }
     ViewData["Title"] = title;
     ViewData["SubTitle"] = "You are viewing the site unthemed, you should add a theme or switch to a system theme.";

@@ -1,40 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    
     <AssemblyName>Hood</AssemblyName>
-    <Version>3.1.5</Version>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Description>Hood Digital's own content management system, built entirely in ASP.NET Core 2.2.</Description>
-    <Authors>Hood Digital;George Whysall;</Authors>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <OutputType>Library</OutputType>
     <PackageId>Hood</PackageId>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
+
+    <Version>3.2.2</Version>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Hood Digital;George Whysall;</Authors>
+    <OutputType>Library</OutputType>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    
     <PackageProjectUrl>https://github.com/HoodDigital/Hood</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/HoodDigital/Hood/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://hood.blob.core.windows.net/hood/nuget.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>
-    <RepositoryType>GitHub</RepositoryType>
-    <NeutralLanguage>en-GB</NeutralLanguage>
-    <PackageTags>ASP.NET MVC EntityFramework CMS</PackageTags>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
-    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
-    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+    <RepositoryUrl>https://github.com/HoodDigital/Hood</RepositoryUrl>    
+    
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="node_modules\**" />
@@ -45,6 +27,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Areas\**\*.cshtml" />
     <EmbeddedResource Include="Areas\**\*.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.3" />
   </ItemGroup>
 
   <ItemGroup>

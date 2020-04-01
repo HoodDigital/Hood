@@ -5,7 +5,7 @@ $.hood.Logs = {
         $('body').on('change', '.logs-inline', $.hood.Logs.InlineToggle);
     },
 
-    Loaded: function (data) {
+    Loaded: function(sender, data) {
         $.hood.Loader(false);
     },
     Reload: function (complete) {
