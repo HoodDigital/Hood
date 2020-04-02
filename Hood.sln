@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.Demo", "projects\Hood.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.UI.Core", "projects\Hood.UI.Core\Hood.UI.Core.csproj", "{C8D14AA4-199E-409F-B02D-4B2818B8DE0B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hood.NuGet", "projects\Hood.NuGet\Hood.NuGet.csproj", "{A172206B-67E2-47FE-A7AC-3628C5FE60F6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
