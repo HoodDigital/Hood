@@ -4,14 +4,14 @@ $.hood.Helpers = {
 
     IsNullOrUndefined: function (a) {
         let rc = false;
-        if (a === null || typeof (a) === "undefined" || a === "") {
+        if (a === null || typeof a === "undefined" || a === "") {
             rc = true;
         }
         return rc;
     },
     IsSet: function (a) {
         let rc = false;
-        if (a === null || typeof (a) === "undefined" || a === "") {
+        if (a === null || typeof a === "undefined" || a === "") {
             rc = true;
         }
         return !rc;
@@ -19,7 +19,7 @@ $.hood.Helpers = {
     IsEventSupported: function (eventName) {
         let el = document.createElement('div');
         eventName = 'on' + eventName;
-        var isSupported = (eventName in el);
+        var isSupported = eventName in el;
         if (!isSupported) {
             el.setAttribute(eventName, 'return;');
             isSupported = typeof el[eventName] === 'function';
@@ -69,6 +69,38 @@ $.hood.Helpers = {
         n = n / 1024;
         return currency + " " + n.toFixed(2).replace(/./g, function (c, i, a) {
             return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
+        });
+    },
+
+    FallbackCopyTextToClipboard: function (text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            var successful = document.execCommand('copy');
+        } catch (err) {
+            console.error('Oops, unable to copy', err);
+        }
+
+        document.body.removeChild(textArea);
+    },
+    CopyTextToClipboard: function (text) {
+        if (!navigator.clipboard) {
+            $.hood.Handlers.FallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(function () {
+        }, function (err) {
+            console.error('Could not copy text: ', err);
         });
     },
 
@@ -188,8 +220,8 @@ $.hood.Helpers = {
     },
 
     GenerateRandomString: function (numSpecials) {
-        let  specials = '!@#$&*';
-        let  lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        let specials = '!@#$&*';
+        let lowercase = 'abcdefghijklmnopqrstuvwxyz';
         let uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         let numbers = '0123456789';
         let all = lowercase + uppercase + numbers;

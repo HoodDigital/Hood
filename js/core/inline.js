@@ -98,6 +98,22 @@ $.hood.Inline = {
         $(this).data('url', $(this).data('url') + window.location.search);
       });
       $('.hood-inline-list:not(.refresh)').each($.hood.Inline.Load);
+      $('body').on('click', 'a.hood-inline-list-target', function (e) {
+        e.preventDefault();
+        $.hood.Loader(true);
+        var url = document.createElement('a');
+        url.href = $(this).attr('href');
+        var $list = $($(this).data('target'));
+        var listUrl = document.createElement('a');
+        listUrl.href = $list.data('url');
+        listUrl.search = url.search;
+        $.hood.Inline.DataList.Reload($list, listUrl);
+        complete = $(this).data('complete');
+
+        if (complete) {
+          $.hood.Inline.RunComplete(complete, $(this));
+        }
+      });
       $('body').on('click', '.hood-inline-list .pagination a', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
