@@ -78,6 +78,35 @@ $.hood.Helpers = {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   },
+  FallbackCopyTextToClipboard: function FallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text; // Avoid scrolling to bottom
+
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+    } catch (err) {
+      console.error('Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+  },
+  CopyTextToClipboard: function CopyTextToClipboard(text) {
+    if (!navigator.clipboard) {
+      $.hood.Handlers.FallbackCopyTextToClipboard(text);
+      return;
+    }
+
+    navigator.clipboard.writeText(text).then(function () {}, function (err) {
+      console.error('Could not copy text: ', err);
+    });
+  },
   ProcessResponse: function ProcessResponse(data) {
     var title = '';
     if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");

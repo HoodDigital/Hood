@@ -453,6 +453,35 @@ $.hood.Helpers = {
       return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
     });
   },
+  FallbackCopyTextToClipboard: function FallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text; // Avoid scrolling to bottom
+
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+    } catch (err) {
+      console.error('Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+  },
+  CopyTextToClipboard: function CopyTextToClipboard(text) {
+    if (!navigator.clipboard) {
+      $.hood.Handlers.FallbackCopyTextToClipboard(text);
+      return;
+    }
+
+    navigator.clipboard.writeText(text).then(function () {}, function (err) {
+      console.error('Could not copy text: ', err);
+    });
+  },
   ProcessResponse: function ProcessResponse(data) {
     var title = '';
     if (data.Title) title = "<strong>".concat(data.Title, "</strong><br />");
@@ -1367,6 +1396,22 @@ $.hood.Inline = {
         $(this).data('url', $(this).data('url') + window.location.search);
       });
       $('.hood-inline-list:not(.refresh)').each($.hood.Inline.Load);
+      $('body').on('click', 'a.hood-inline-list-target', function (e) {
+        e.preventDefault();
+        $.hood.Loader(true);
+        var url = document.createElement('a');
+        url.href = $(this).attr('href');
+        var $list = $($(this).data('target'));
+        var listUrl = document.createElement('a');
+        listUrl.href = $list.data('url');
+        listUrl.search = url.search;
+        $.hood.Inline.DataList.Reload($list, listUrl);
+        complete = $(this).data('complete');
+
+        if (complete) {
+          $.hood.Inline.RunComplete(complete, $(this));
+        }
+      });
       $('body').on('click', '.hood-inline-list .pagination a', function (e) {
         e.preventDefault();
         $.hood.Loader(true);
