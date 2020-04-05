@@ -126,7 +126,7 @@ $.hood.Handlers = {
     },
     Uploaders: {
         Init: function () {
-          if ($('.image-uploader').length || $('.gallery-uploader').length) {
+            if ($('.image-uploader').length || $('.gallery-uploader').length) {
                 $(".upload-progress-bar").hide();
                 $.getScript('/lib/dropzone/min/dropzone.min.js', $.proxy(function () {
                     $('.image-uploader').each(function () {
@@ -138,11 +138,11 @@ $.hood.Handlers = {
                 }, this));
             }
         },
-        RefreshImage: function (data) {
-            $('.' + data.Class).css({
-                'background-image': 'url(' + data.Image + ')'
+        RefreshImage: function (sender, data) {
+            $(sender.data('preview')).css({
+                'background-image': 'url(' + data.Media.SmallUrl + ')'
             });
-            $('.' + data.Class).find('img').attr('src', data.Image);
+            $(sender.data('preview')).find('img').attr('src', data.Media.SmallUrl);
         },
         SingleImage: function (tag, jsontag) {
             tag = '#' + tag;
