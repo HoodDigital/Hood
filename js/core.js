@@ -784,11 +784,11 @@ $.hood.Handlers = {
         }, this));
       }
     },
-    RefreshImage: function RefreshImage(data) {
-      $('.' + data.Class).css({
-        'background-image': 'url(' + data.Image + ')'
+    RefreshImage: function RefreshImage(sender, data) {
+      $(sender.data('preview')).css({
+        'background-image': 'url(' + data.Media.SmallUrl + ')'
       });
-      $('.' + data.Class).find('img').attr('src', data.Image);
+      $(sender.data('preview')).find('img').attr('src', data.Media.SmallUrl);
     },
     SingleImage: function SingleImage(tag, jsontag) {
       tag = '#' + tag;
