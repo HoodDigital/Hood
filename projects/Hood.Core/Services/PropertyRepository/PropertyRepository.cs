@@ -1,4 +1,5 @@
 ﻿using Hood.Caching;
+using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -32,94 +33,109 @@ namespace Hood.Services
         public async Task<PropertyListModel> GetPropertiesAsync(PropertyListModel model)
         {
             IQueryable<PropertyListing> properties = _db.Properties
-                .Include(p => p.Media)
-                .Include(p => p.FloorPlans)
                 .Include(p => p.Agent)
                 .Include(p => p.Metadata);
 
-            // published?
+            if (model.LoadImages)
+            {
+                properties = properties
+                    .Include(p => p.Media)
+                    .Include(p => p.FloorAreas);
+            }
+
             if (model.PublishStatus.HasValue)
+            {
                 properties = properties.Where(p => p.Status == model.PublishStatus);
-
-            if (!string.IsNullOrEmpty(model.Transaction))
-            {
-                if (model.Transaction == "Student")
-                {
-                    properties = properties.Where(n => n.ListingType == "Student");
-                }
-                else if (model.Transaction == "Sale")
-                {
-                    properties = properties.Where(n => n.ListingType == "Sale");
-                }
-                else
-                {
-                    properties = properties.Where(n => n.ListingType != "Sale" && n.ListingType != "Student");
-                }
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(model.Type))
-                    properties = properties.Where(n => n.ListingType == model.Type);
             }
 
-            if (!string.IsNullOrEmpty(model.Agent))
+            if (model.Type != null && model.Type.Count > 0)
+            {
+                properties = properties.Where(n => model.Type.Contains(n.ListingType));
+            }
+
+            if (model.Status != null && model.Status.Count > 0)
+            {
+                properties = properties.Where(n => model.Status.Contains(n.LeaseStatus));
+            }
+
+            if (model.Agent.IsSet())
+            {
                 properties = properties.Where(n => n.Agent.UserName == model.Agent);
+            }
 
-            if (!string.IsNullOrEmpty(model.PlanningType))
+            if (model.PlanningType.IsSet())
+            {
                 properties = properties.Where(n => n.Planning == model.PlanningType);
-
-            if (!string.IsNullOrEmpty(model.Status))
-                properties = properties.Where(n => n.LeaseStatus == model.Status);
+            }
 
             if (model.Bedrooms.HasValue)
             {
                 if (model.MaxBedrooms.HasValue)
                 {
                     if (model.Bedrooms != -1)
+                    {
                         properties = properties.Where(n => n.Bedrooms >= model.Bedrooms.Value);
+                    }
+
                     if (model.MaxBedrooms != -1)
+                    {
                         properties = properties.Where(n => n.Bedrooms <= model.MaxBedrooms.Value);
+                    }
                 }
                 else
+                {
                     properties = properties.Where(n => n.Bedrooms == model.Bedrooms.Value);
+                }
             }
 
             if (model.MinRent.HasValue)
-                properties = properties.Where(n => n.Rent >= model.MinRent.Value);
-            if (model.MaxRent.HasValue)
-                properties = properties.Where(n => n.Rent <= model.MaxRent.Value);
-
-            if (model.MinPremium.HasValue)
-                properties = properties.Where(n => n.Premium >= model.MinPremium.Value);
-            if (model.MaxPremium.HasValue)
-                properties = properties.Where(n => n.Premium <= model.MaxPremium.Value);
-
-            if (model.MinPrice.HasValue)
-                properties = properties.Where(n => n.AskingPrice >= model.MinPrice.Value);
-            if (model.MaxPrice.HasValue)
-                properties = properties.Where(n => n.AskingPrice <= model.MaxPrice.Value);
-
-            // search the collection
-            if (!string.IsNullOrEmpty(model.Search))
             {
-
-                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                properties = properties.Where(n => searchTerms.Any(s => n.Title != null && n.Title.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Address1 != null && n.Address1.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Address2 != null && n.Address2.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.City != null && n.City.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.County != null && n.County.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Country != null && n.Country.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Postcode != null && n.Postcode.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.ShortDescription != null && n.ShortDescription.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Lease != null && n.Lease.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Location != null && n.Location.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Planning != null && n.Planning.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Reference != null && n.Reference.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0));
+                properties = properties.Where(n => n.Rent >= model.MinRent.Value);
             }
 
-            // sort the collection and then output it.
-            if (!string.IsNullOrEmpty(model.Order))
+            if (model.MaxRent.HasValue)
+            {
+                properties = properties.Where(n => n.Rent <= model.MaxRent.Value);
+            }
+
+            if (model.MinPremium.HasValue)
+            {
+                properties = properties.Where(n => n.Premium >= model.MinPremium.Value);
+            }
+
+            if (model.MaxPremium.HasValue)
+            {
+                properties = properties.Where(n => n.Premium <= model.MaxPremium.Value);
+            }
+
+            if (model.MinPrice.HasValue)
+            {
+                properties = properties.Where(n => n.AskingPrice >= model.MinPrice.Value);
+            }
+
+            if (model.MaxPrice.HasValue)
+            {
+                properties = properties.Where(n => n.AskingPrice <= model.MaxPrice.Value);
+            }
+
+            if (model.Search.IsSet())
+            {
+                properties = properties.Where(n => 
+                    n.Title.Contains(model.Search) ||
+                    n.Address1.Contains(model.Search) ||
+                    n.Address2.Contains(model.Search) ||
+                    n.City.Contains(model.Search) ||
+                    n.County.Contains(model.Search) ||
+                    n.Postcode.Contains(model.Search) ||
+                    n.ShortDescription.Contains(model.Search) ||
+                    n.Lease.Contains(model.Search) ||
+                    n.Location.Contains(model.Search) ||
+                    n.Planning.Contains(model.Search) ||
+                    n.Reference.Contains(model.Search)
+                );
+            }
+
+            if (model.Order.IsSet())
             {
                 switch (model.Order)
                 {
@@ -177,12 +193,19 @@ namespace Hood.Services
                 }
             }
 
+            model.Locations = (await properties.ToListAsync()).Select(p => new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(), p.Url, p.FeaturedImage.Url)).ToList();
+            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
+            model.AvailableTypes = await _db.Properties.Select(p => p.ListingType).Distinct().ToListAsync();
+            model.AvailableStatuses = await _db.Properties.Select(p => p.LeaseStatus).Distinct().ToListAsync();
+            model.AvailablePlanningTypes = await _db.Properties.Select(p => p.Planning).Distinct().ToListAsync();
+            model.PlanningTypes = Engine.Settings.Property.GetPlanningTypes();
+
             await model.ReloadAsync(properties);
             return model;
         }
         public async Task<List<MapMarker>> GetLocationsAsync(PropertyListModel filters)
         {
-            var propertiesQuery = await GetPropertiesAsync(filters);
+            PropertyListModel propertiesQuery = await GetPropertiesAsync(filters);
             return propertiesQuery.List.Select(p =>
                 new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(), p.Url, p.FeaturedImage.Url)
             ).ToList();
@@ -191,7 +214,9 @@ namespace Hood.Services
         {
             string cacheKey = typeof(PropertyListModel) + ".Featured";
             if (_cache.TryGetValue(cacheKey, out PropertyListModel properties))
+            {
                 return properties;
+            }
             else
             {
                 properties = await GetPropertiesAsync(new PropertyListModel() { Featured = true, PageSize = int.MaxValue });
@@ -203,7 +228,9 @@ namespace Hood.Services
         {
             string cacheKey = typeof(PropertyListModel) + ".Recent";
             if (_cache.TryGetValue(cacheKey, out PropertyListModel properties))
+            {
                 return properties;
+            }
             else
             {
                 properties = await GetPropertiesAsync(new PropertyListModel() { PageSize = int.MaxValue, Order = "DateDesc" });
@@ -213,23 +240,7 @@ namespace Hood.Services
         }
         public async Task<PropertyListing> GetPropertyByIdAsync(int id, bool nocache = false)
         {
-            //string cacheKey = typeof(PropertyListing) + ".Single." + id.ToString();
-            //if (_cache.TryGetValue(cacheKey, out PropertyListing property) && !nocache)
-            //    return property;
-            //else
-            //{
-            //    property = await _db.Properties
-            //        .Include(p => p.Media)
-            //        .Include(p => p.FloorPlans)
-            //        .Include(p => p.Agent)
-            //        .Include(p => p.Metadata)
-            //        .AsNoTracking()
-            //        .FirstOrDefaultAsync(c => c.Id == id);
-
-            //    _cache.Add(cacheKey, property, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
-            //    return property;
-            //}
-            var property = await _db.Properties
+            PropertyListing property = await _db.Properties
                     .Include(p => p.Media)
                     .Include(p => p.FloorPlans)
                     .Include(p => p.Agent)
@@ -300,7 +311,7 @@ namespace Hood.Services
         }
         public async Task DeleteAllAsync()
         {
-            var all = _db.Properties
+            Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<PropertyListing, List<PropertyFloorplan>> all = _db.Properties
                 .Include(p => p.Metadata)
                 .Include(p => p.Media)
                 .Include(p => p.FloorPlans);
@@ -357,7 +368,10 @@ namespace Hood.Services
         public async Task AddMediaAsync(PropertyListing property, PropertyMedia media)
         {
             if (property.Media == null)
+            {
                 property.Media = new List<PropertyMedia>();
+            }
+
             property.Media.Add(media);
             _db.Properties.Update(property);
             await _db.SaveChangesAsync();
@@ -366,7 +380,10 @@ namespace Hood.Services
         public async Task AddFloorplanAsync(PropertyListing property, PropertyFloorplan media)
         {
             if (property.FloorPlans == null)
+            {
                 property.FloorPlans = new List<PropertyFloorplan>();
+            }
+
             property.FloorPlans.Add(media);
             _db.Properties.Update(property);
             await _db.SaveChangesAsync();
@@ -374,19 +391,25 @@ namespace Hood.Services
         }
         public async Task<PropertyListing> RemoveMediaAsync(int id, int mediaId)
         {
-            var property = await _db.Properties.Include(p => p.Media).SingleOrDefaultAsync(p => p.Id == id);
-            var media = property.Media.SingleOrDefault(m => m.Id == mediaId);
+            PropertyListing property = await _db.Properties.Include(p => p.Media).SingleOrDefaultAsync(p => p.Id == id);
+            PropertyMedia media = property.Media.SingleOrDefault(m => m.Id == mediaId);
             if (media != null)
+            {
                 property.Media.Remove(media);
+            }
+
             await _db.SaveChangesAsync();
             return property;
         }
         public async Task<PropertyListing> RemoveFloorplanAsync(int id, int mediaId)
         {
-            var property = await _db.Properties.Include(p => p.FloorPlans).SingleOrDefaultAsync(p => p.Id == id);
-            var media = property.FloorPlans.SingleOrDefault(m => m.Id == mediaId);
+            PropertyListing property = await _db.Properties.Include(p => p.FloorPlans).SingleOrDefaultAsync(p => p.Id == id);
+            PropertyFloorplan media = property.FloorPlans.SingleOrDefault(m => m.Id == mediaId);
             if (media != null)
+            {
                 property.FloorPlans.Remove(media);
+            }
+
             await _db.SaveChangesAsync();
             return property;
         }
@@ -398,15 +421,17 @@ namespace Hood.Services
             _cache.Remove("Property:Featured");
             _cache.Remove("Property:Recent");
             if (id.HasValue)
+            {
                 _cache.Remove("Property:Listing:" + id.ToString());
+            }
         }
         #endregion
 
         #region Statistics
         public async Task<object> GetStatisticsAsync()
         {
-            var totalPosts = await _db.Properties.CountAsync();
-            var totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
+            int totalPosts = await _db.Properties.CountAsync();
+            int totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
             var data = await _db.Properties.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
@@ -414,12 +439,12 @@ namespace Hood.Services
             var publishedByDate = data.GroupBy(p => p.pubdate).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
 
-            var days = new List<KeyValuePair<string, int>>();
-            var publishDays = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
             foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
             {
                 var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
-                var count = dayvalue != null ? dayvalue.count : 0;
+                int count = dayvalue != null ? dayvalue.count : 0;
                 days.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
 
                 dayvalue = publishedByDate.SingleOrDefault(c => c.name == day.Date);
@@ -427,12 +452,12 @@ namespace Hood.Services
                 publishDays.Add(new KeyValuePair<string, int>(day.ToString("dd MMM"), count));
             }
 
-            var months = new List<KeyValuePair<string, int>>();
-            var publishMonths = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> months = new List<KeyValuePair<string, int>>();
+            List<KeyValuePair<string, int>> publishMonths = new List<KeyValuePair<string, int>>();
             for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
             {
                 var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
-                var count = monthvalue != null ? monthvalue.count : 0;
+                int count = monthvalue != null ? monthvalue.count : 0;
                 months.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
 
                 monthvalue = publishedByMonth.SingleOrDefault(c => c.name == dt.Month);

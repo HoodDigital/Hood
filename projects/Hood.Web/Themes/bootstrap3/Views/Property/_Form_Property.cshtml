@@ -11,25 +11,24 @@
                 <input type="text" class="form-control m-t-lg" placeholder="Search our portfolio..." asp-for="Search" />
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="well">
-                <h4 class="no-margin">Transaction</h4>
-                <select class="form-control m-t-lg" asp-for="Transaction">
-                    <option value="" selected>Show All</option>
-                    <option value="Rent">to Rent</option>
-                    <option value="Sale">to Buy</option>
-                    <option value="Student">for Students</option>
-                </select>
+    @foreach (var type in Model.AvailableTypes)
+    {
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input id="Type_@type" name="type" class="custom-control-input submit-on-change" type="checkbox" value="@type" />
+                <label for="Type_@type" class="custom-control-label">@type</label>
             </div>
         </div>
-        <div class="col-sm-6 col-md-3">
-            <div class="well">
-                <h4 class="no-margin">Type</h4>
-                <select class="form-control m-t-lg" asp-items="Model.Types.Select(c => new SelectListItem() { Value = c, Text = c })" asp-for="Type">
-                    <option value="">Show All</option>
-                </select>
+    }
+    @foreach (var type in Model.AvailableStatuses)
+    {
+        <div class="form-group">
+            <div class="custom-control custom-checkbox">
+                <input id="Availability_@type" name="status" class="custom-control-input submit-on-change" type="checkbox" value="@type" />
+                <label for="Availability_@type" class="custom-control-label">@type</label>
             </div>
         </div>
+    }
         @if (_propertySettings.ShowBedrooms)
     {
         <div class="col-sm-6 col-md-3">
