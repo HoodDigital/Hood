@@ -43,17 +43,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-
             model = await _property.GetPropertiesAsync(model);
-
-            model.Locations = await _property.GetLocationsAsync(model);
-            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
-
-            PropertySettings settings = Engine.Settings.Property;
-
-            model.Types = settings.GetListingTypes();
-            model.PlanningTypes = settings.GetPlanningTypes();
-
             return View(viewName, model);
         }
 

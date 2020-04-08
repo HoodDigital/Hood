@@ -37,7 +37,7 @@ namespace Hood.Controllers
             model.Locations = await _property.GetLocationsAsync(model);
             model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             PropertySettings settings = Engine.Settings.Property;
-            model.Types = settings.GetListingTypes();
+            model.AvailableTypes = settings.GetListingTypes();
             model.PlanningTypes = settings.GetPlanningTypes();
 
             return View(viewName, model);

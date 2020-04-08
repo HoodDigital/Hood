@@ -1438,10 +1438,15 @@ $.hood.Inline = {
         $.hood.Loader(true);
         var $form = $(this);
         var $list = $($form.data('target'));
-        var url = document.createElement('a');
-        url.href = $list.data('url');
-        url.search = "?" + $form.serialize();
-        $.hood.Inline.DataList.Reload($list, url);
+        $list.each(function () {
+          var url = document.createElement('a');
+          url.href = $(this).data('url');
+
+          if (url.href) {
+            url.search = "?" + $form.serialize();
+            $.hood.Inline.DataList.Reload($(this), url);
+          }
+        });
       });
       $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form', function (e) {
         e.preventDefault();
