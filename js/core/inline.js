@@ -73,7 +73,7 @@ $.hood.Inline = {
     e.preventDefault();
     var $tag = $(e.currentTarget);
     $tag.addClass('loading');
-    complete = $tag.data('complete');
+    var complete = $tag.data('complete');
     $.get($tag.attr('href'), function (data) {
       $.hood.Helpers.ProcessResponse(data);
 
