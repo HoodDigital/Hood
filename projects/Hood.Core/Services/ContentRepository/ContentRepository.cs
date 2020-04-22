@@ -47,7 +47,11 @@ namespace Hood.Services
                                                      .AsNoTracking();
 
             // filter posts by type
-            if (model.Type.IsSet())
+            if (model.ContentType != null)
+            {
+                content = content.Where(c => c.ContentType == model.ContentType.Type);
+            }
+            else if (model.Type.IsSet())
             {
                 content = content.Where(c => c.ContentType == model.Type);
             }
