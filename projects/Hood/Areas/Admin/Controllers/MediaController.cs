@@ -44,17 +44,9 @@ namespace Hood.Areas.Admin.Controllers
                 var directory = _directoryManager.GetDirectoryById(model.DirectoryId.Value);
                 if (directory != null)
                 {
-                    var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
-                    media = media.Where(n => tree.Any(t => t.Id == n.DirectoryId));
+                    var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory }).Select(d => d.Id);
+                    media = media.Where(n => n.DirectoryId.HasValue && tree.Contains(n.DirectoryId.Value));
                 }
-            }
-            else
-            {
-                var directory = await _db.MediaDirectories.SingleOrDefaultAsync(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
-                directory = _directoryManager.GetDirectoryById(directory.Id);
-                var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
-                media = media.Where(n => tree.Any(t => t.Id == n.DirectoryId));
-                model.DirectoryId = directory.Id;
             }
 
             if (model.UserId.IsSet())
@@ -64,8 +56,10 @@ namespace Hood.Areas.Admin.Controllers
 
             if (model.Search.IsSet())
             {
-                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                media = media.Where(n => searchTerms.Any(s => n.Filename.ToLower().Contains(s.ToLower())));
+                media = media.Where(m =>
+                  m.Filename.Contains(model.Search) ||
+                  m.FileType.Contains(model.Search)
+              );
             }
 
             switch (model.Order)
