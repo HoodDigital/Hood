@@ -48,14 +48,22 @@ namespace Hood.Services
                 properties = properties.Where(p => p.Status == model.PublishStatus);
             }
 
-            if (model.Type != null && model.Type.Count > 0)
+            if (model.Type != null)
             {
-                properties = properties.Where(n => model.Type.Contains(n.ListingType));
+                model.Type.RemoveAll(t => !t.IsSet());
+                if (model.Type.Count > 0)
+                {
+                    properties = properties.Where(n => model.Type.Any(t => n.ListingType == t));
+                }
             }
 
-            if (model.Status != null && model.Status.Count > 0)
+            if (model.Status != null)
             {
-                properties = properties.Where(n => model.Status.Contains(n.LeaseStatus));
+                model.Status.RemoveAll(t => !t.IsSet());
+                if (model.Status.Count > 0)
+                {
+                    properties = properties.Where(n => model.Status.Any(t => n.LeaseStatus == t));
+                }
             }
 
             if (model.Agent.IsSet())
@@ -68,24 +76,19 @@ namespace Hood.Services
                 properties = properties.Where(n => n.Planning == model.PlanningType);
             }
 
+            if (model.MinBedrooms.HasValue)
+            {
+                properties = properties.Where(n => n.Bedrooms >= model.MinBedrooms.Value);
+            }
+
+            if (model.MaxBedrooms.HasValue)
+            {
+                properties = properties.Where(n => n.Bedrooms <= model.MaxBedrooms.Value);
+            }
+
             if (model.Bedrooms.HasValue)
             {
-                if (model.MaxBedrooms.HasValue)
-                {
-                    if (model.Bedrooms != -1)
-                    {
-                        properties = properties.Where(n => n.Bedrooms >= model.Bedrooms.Value);
-                    }
-
-                    if (model.MaxBedrooms != -1)
-                    {
-                        properties = properties.Where(n => n.Bedrooms <= model.MaxBedrooms.Value);
-                    }
-                }
-                else
-                {
-                    properties = properties.Where(n => n.Bedrooms == model.Bedrooms.Value);
-                }
+                properties = properties.Where(n => n.Bedrooms == model.Bedrooms.Value);
             }
 
             if (model.MinRent.HasValue)
@@ -120,7 +123,7 @@ namespace Hood.Services
 
             if (model.Search.IsSet())
             {
-                properties = properties.Where(n => 
+                properties = properties.Where(n =>
                     n.Title.Contains(model.Search) ||
                     n.Address1.Contains(model.Search) ||
                     n.Address2.Contains(model.Search) ||
