@@ -27,10 +27,14 @@ namespace Hood.Startup
                     {
                         throw new StartupException("No database connection could be established.", StartupError.DatabaseConnectionFailed);
                     }
-                    // Seed the database
-                    UserManager<ApplicationUser> userManager = services.GetService<UserManager<ApplicationUser>>();
-                    RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
-                    db.Seed(userManager, roleManager);
+
+                    if (Engine.Configuration.SeedOnStart)
+                    {
+                        // Seed the database
+                        UserManager<ApplicationUser> userManager = services.GetService<UserManager<ApplicationUser>>();
+                        RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
+                        db.Seed(userManager, roleManager);
+                    }
 
                     Engine.Services.DatabaseConnectionFailed = false;
                     Engine.Services.DatabaseMigrationsMissing = false;
@@ -75,7 +79,7 @@ namespace Hood.Startup
                     }
                     Engine.Services.DatabaseSeedFailed = true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Engine.Services.DatabaseSeedFailed = true;
                 }
