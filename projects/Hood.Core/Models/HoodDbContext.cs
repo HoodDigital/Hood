@@ -5,12 +5,12 @@ using Hood.Interfaces;
 using Hood.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
-using System.Data.SqlClient;
 using System.Linq;
 
 namespace Hood.Models
