@@ -33,7 +33,8 @@ namespace Hood.Areas.Admin.Controllers
                 _db.Database.SetCommandTimeout(new TimeSpan(0, 0, 30));
                 SaveMessage = "Logs have been cleared.";
                 MessageType = Enums.AlertType.Success;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 SaveMessage = "Error clearing the site logs.";
                 MessageType = Enums.AlertType.Danger;
@@ -45,7 +46,7 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> Show(LogListModel model)
         {
             var logs = _db.Logs
-                .Include(l => l.User).Where(l => l.Time > DateTime.MinValue);
+                .Where(l => l.Time > DateTime.MinValue);
 
             if (model.Source.IsSet())
             {
@@ -79,7 +80,7 @@ namespace Hood.Areas.Admin.Controllers
                     break;
             }
 
-            model.List = await logs.ToListAsync();
+            await model.ReloadAsync(logs);
             return View(model);
         }
 

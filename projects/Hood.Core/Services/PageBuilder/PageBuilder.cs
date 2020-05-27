@@ -151,7 +151,15 @@ namespace Hood.Services
 
         private void BundleMinifier_ErrorMinifyingFile(object sender, MinifyFileEventArgs e)
         {
-#warning TODO: Add logging here to notify of failures during minification.
+            var logger = Hood.Core.Engine.Services.Resolve<ILogService>();
+            var logWriter = new System.IO.StringWriter();
+            logWriter.WriteLine($"Bundle errors from {e.Result.FileName} - {DateTime.Now.ToDisplay()}");
+            foreach (var error in e.Result.Errors)
+            {
+                logWriter.WriteLine($"Line {error.LineNumber} and column {error.ColumnNumber}: {error.Message}");
+            }
+            logger.AddLogAsync<PageBuilder>($"Bundle errors from {e.Result.FileName}", logWriter.ToString(), Models.LogType.Error);
+            logWriter.Dispose();
         }
 
         public virtual string GenerateInlineScripts(IUrlHelper urlHelper, ResourceLocation location)
