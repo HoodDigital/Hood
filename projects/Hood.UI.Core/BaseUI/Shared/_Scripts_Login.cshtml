@@ -1,12 +1,7 @@
-<script src="~/lib/jquery/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validate-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-<script src="~/lib/jquery-mask/jquery.mask.min.js"></script>
-<environment include="Development">
-    <script src="@string.Format("{0}/js/login.js", Engine.LibraryFolder)" asp-append-version="true"></script>
-</environment>
-<environment exclude="Development">
-    <script src="@string.Format("{0}/js/login.min.js", Engine.LibraryFolder)" asp-append-version="true"></script>
-</environment>
+<script src="~/lib/jquery/jquery.min.js" asp-location="Vendors"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-location="Vendors"></script>
+<script src="~/lib/jquery-validate/jquery.validate.min.js" asp-location="Vendors"></script>
+<script src="~/lib/jquery-validate-unobtrusive/jquery.validate.unobtrusive.min.js" asp-location="Vendors"></script>
+<script src="~/lib/jquery-mask/jquery.mask.min.js" asp-location="Vendors"></script>
+<script src="~/hood/js/login.js" asp-location="Scripts"></script>
 @Engine.Settings.Basic.LoginAreaSettings.BackgroundImagesScript

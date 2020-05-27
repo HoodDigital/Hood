@@ -32,7 +32,7 @@ namespace System.Collections.Generic
         /// <param name="pageSize">Page size</param>
         public PagedList(IQueryable<T> source, int pageIndex, int pageSize)
         {
-            this.Reload(source, pageIndex, pageSize);
+            Reload(source, pageIndex, pageSize);
         }
 
 
@@ -75,29 +75,17 @@ namespace System.Collections.Generic
         /// <summary>
         /// Has previous page
         /// </summary>
-        public bool HasPreviousPage
-        {
-            get { return (PageIndex > 0); }
-        }
+        public bool HasPreviousPage => (PageIndex > 0);
         /// <summary>
         /// Has next page
         /// </summary>
-        public bool HasNextPage
-        {
-            get { return (PageIndex + 1 < TotalPages); }
-        }
+        public bool HasNextPage => (PageIndex + 1 < TotalPages);
 
 
         public List<T> List
         {
-            set
-            {
-                Reload(value, this.PageIndex, this.PageSize);
-            }
-            get
-            {
-                return _list;
-            }
+            set => Reload(value, PageIndex, PageSize);
+            get => _list;
         }
 
         /// <summary>
@@ -108,7 +96,7 @@ namespace System.Collections.Generic
         /// <param name="pageSize">Page size</param>
         public PagedList(IList<T> source, int pageIndex, int pageSize)
         {
-            this.Reload(source, pageIndex, pageSize);
+            Reload(source, pageIndex, pageSize);
         }
 
         public IPagedList<T> Reload(IPagedList<T> source)
@@ -125,56 +113,84 @@ namespace System.Collections.Generic
 
         public IPagedList<T> Reload(IEnumerable<T> source, int pageIndex, int pageSize)
         {
-            var total = source.Count();
-            this.TotalCount = total;
-            this.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+            int total = source.Count();
+            TotalCount = total;
+            TotalPages = (int)Math.Ceiling((double)total / pageSize);
             if (pageIndex > TotalPages)
+            {
                 pageIndex = TotalPages;
-            this.PageSize = pageSize;
-            this.PageIndex = pageIndex;
+            }
+
+            PageSize = pageSize;
+            PageIndex = pageIndex;
             _list = new List<T>();
             if (PageSize > TotalCount)
+            {
                 _list.AddRange(source.ToList());
+            }
             else
+            {
                 _list.AddRange(source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToList());
+            }
+
             return this;
         }
 
         public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source, int pageIndex, int pageSize)
         {
-            var total = await source.CountAsync();
-            this.TotalCount = total;
-            this.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+            int total = await source.CountAsync();
+            TotalCount = total;
+            TotalPages = (int)Math.Ceiling((double)total / pageSize);
             if (pageIndex > TotalPages)
+            {
                 pageIndex = TotalPages;
-            this.PageSize = pageSize;
-            this.PageIndex = pageIndex;
+            }
+
+            PageSize = pageSize;
+            PageIndex = pageIndex;
             _list = new List<T>();
             if (PageSize > TotalCount)
+            {
                 _list.AddRange(await source.ToListAsync());
+            }
             else
+            {
                 _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
+            }
+
             return this;
         }
 
         public async Threading.Tasks.Task<IPagedList<T>> ReloadAsync(IQueryable<T> source)
         {
-            var total = await source.CountAsync();
-            this.TotalCount = total;
-            this.TotalPages = (int)Math.Ceiling((double)total / PageSize);
+            int total = await source.CountAsync();
+            TotalCount = total;
+            TotalPages = (int)Math.Ceiling((double)total / PageSize);
             if (PageIndex > TotalPages)
+            {
                 PageIndex = TotalPages;
+            }
+
             _list = new List<T>();
             if (PageSize > TotalCount)
+            {
                 _list.AddRange(await source.ToListAsync());
+            }
             else
+            {
                 _list.AddRange(await source.Skip((PageIndex - 1) * PageSize).Take(PageSize).ToListAsync());
+            }
+
             return this;
         }
 
         public virtual string GetPageUrl(int pageIndex)
         {
-            var query = $"?page={pageIndex}&pageSize={PageSize}";
+            string query = "?";
+            if (pageIndex > 0)
+            {
+                query = $"?page={pageIndex}&pageSize={PageSize}";
+            }
             query += Search.IsSet() ? "&search=" + Search : "";
             query += Order.IsSet() ? "&sort=" + Order : "";
             return query;

@@ -1,7 +1,6 @@
 ﻿using Hood.Extensions;
 using Hood.Models;
 using Hood.ViewModels;
-using LinqToTwitter;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -88,8 +87,10 @@ namespace Hood.Services
                 result.Insert(0, directory);
 
                 if (stopAtId.HasValue && directory.Id == stopAtId.Value)
+                {
                     return result;
-                
+                }
+
                 directory = directory.Parent;
             }
 
@@ -127,13 +128,13 @@ namespace Hood.Services
         {
             List<string> links = new List<string>();
 
-            var linkGenerator = Hood.Core.Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
-            var baseUrl = linkGenerator.GetPathByAction("List", "Media", new { area = "Admin" });
+            LinkGenerator linkGenerator = Hood.Core.Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+            string baseUrl = linkGenerator.GetPathByAction("List", "Media", new { area = "Admin" });
 
 
-            var linkModel = new MediaListModel();
+            MediaListModel linkModel = new MediaListModel();
             model.CopyProperties(linkModel);
-            var link = "";
+            string link;
 
             if (!model.RootId.HasValue)
             {
@@ -143,9 +144,11 @@ namespace Hood.Services
             }
 
             if (!model.DirectoryId.HasValue)
+            {
                 return FormatBreadcrumbLinks(links);
+            }
 
-            foreach (var directory in GetHierarchy(model.DirectoryId.Value, model.RootId))
+            foreach (MediaDirectory directory in GetHierarchy(model.DirectoryId.Value, model.RootId))
             {
                 linkModel.DirectoryId = directory.Id;
                 link = linkModel.GetPageUrl(linkModel.PageIndex);
@@ -156,7 +159,7 @@ namespace Hood.Services
 
         private static IHtmlContent FormatBreadcrumbLinks(List<string> links)
         {
-            var htmlOutput = string.Join(" <i class=\"fa fa-caret-right ml-2 mr-2\"></i> ", links.ToArray());
+            string htmlOutput = string.Join(" <i class=\"fa fa-caret-right ml-2 mr-2\"></i> ", links.ToArray());
             HtmlString builder = new HtmlString(htmlOutput);
             return builder;
         }

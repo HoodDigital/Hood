@@ -5,7 +5,7 @@
     <AssemblyName>Hood.UI.Bootstrap4</AssemblyName>
     <PackageId>Hood.UI.Bootstrap4</PackageId>
 
-    <Version>3.2.9</Version>
+    <Version>3.2.10</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>

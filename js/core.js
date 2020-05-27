@@ -1306,7 +1306,7 @@ $.hood.Inline = {
     $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
     $('body').on('click', '.hood-modal', function (e) {
       e.preventDefault();
-      $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'));
+      $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'), $(this).data('close'));
     });
     $.hood.Inline.DataList.Init();
   },
@@ -1332,10 +1332,10 @@ $.hood.Inline = {
   },
   CurrentModal: null,
   Modal: function Modal(url, complete) {
-    var closePrevious = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var closePrevious = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
-    if (closePrevious && $.hood.Inline.CurrentModal) {
-      $.hood.Inline.CurrentModal.modal('hide');
+    if ($.hood.Inline.CurrentModal && closePrevious) {
+      $.hood.Inline.CloseModal();
     }
 
     $.get(url, function (data) {
@@ -1558,7 +1558,7 @@ $.hood.Media = {
             onclick: $.proxy(function (e) {
               $.hood.Inline.Modal($(this).data('imagesUrl'), function () {
                 $.hood.Media.Reload(function () {
-                  $('body').off('click');
+                  $('body').off('click', '.media-insert');
                   $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
                 });
                 $.hood.Media.Upload.Init();
@@ -1731,7 +1731,7 @@ $.hood.Media = {
       });
     },
     UploadUrl: function UploadUrl() {
-      return $("#media-upload").data('url') + "?directoryId=" + $("input[type='radio'][name='dir']:checked").val();
+      return $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
     }
   },
   Delete: function Delete(e) {
