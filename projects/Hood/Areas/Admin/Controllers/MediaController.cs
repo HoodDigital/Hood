@@ -41,12 +41,13 @@ namespace Hood.Areas.Admin.Controllers
 
             if (model.DirectoryId.HasValue)
             {
-                var directory = _directoryManager.GetDirectoryById(model.DirectoryId.Value);
-                if (directory != null)
-                {
-                    var tree = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory }).Select(d => d.Id);
-                    media = media.Where(n => n.DirectoryId.HasValue && tree.Contains(n.DirectoryId.Value));
-                }
+                media = media.Where(m => m.DirectoryId == model.DirectoryId);
+            }
+            else
+            {
+                var userDirs = GetDirectoriesForCurrentUser();
+                var tree = _directoryManager.GetAllCategoriesIncludingChildren(userDirs).Select(d => d.Id);
+                media = media.Where(n => n.DirectoryId.HasValue && tree.Contains(n.DirectoryId.Value));
             }
 
             if (model.UserId.IsSet())

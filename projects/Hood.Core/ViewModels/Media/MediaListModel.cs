@@ -23,6 +23,8 @@ namespace Hood.ViewModels
         public bool Restrict { get; set; }
         [FromQuery(Name = "dir")]
         public int? DirectoryId { get; set; }
+        [FromQuery(Name = "root")]
+        public int? RootId { get; set; }
 
         #region Actions
         [FromQuery(Name = "doAction")]
@@ -42,6 +44,7 @@ namespace Hood.ViewModels
         #endregion
 
         public IEnumerable<MediaDirectory> TopLevelDirectories { get; set; }
+        public MediaDirectory Root { get; set; }
 
         public override string GetPageUrl(int pageIndex)
         {
@@ -49,6 +52,7 @@ namespace Hood.ViewModels
 
             query += Action.HasValue ? "&doAction=" + Action : "";
             query += DirectoryId.HasValue ? "&dir=" + DirectoryId : "";
+            query += RootId.HasValue ? "&root=" + RootId : "";
             query += Restrict ? "&restrict=" + Restrict : "";
             query += GenericFileType.HasValue ? "&fileType=" + GenericFileType : "";
             query += UserId.IsSet() ? "&user=" + UserId : "";

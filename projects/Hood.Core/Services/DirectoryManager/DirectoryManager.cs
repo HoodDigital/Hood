@@ -1,6 +1,9 @@
 ﻿using Hood.Extensions;
 using Hood.Models;
+using Hood.ViewModels;
+using LinqToTwitter;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -76,13 +79,17 @@ namespace Hood.Services
             return _topLevel.Value;
         }
 
-        public IEnumerable<MediaDirectory> GetHierarchy(int id)
+        public IEnumerable<MediaDirectory> GetHierarchy(int id, int? stopAtId = null)
         {
             List<MediaDirectory> result = new List<MediaDirectory>();
             MediaDirectory directory = GetDirectoryById(id);
             while (directory != null)
             {
                 result.Insert(0, directory);
+
+                if (stopAtId.HasValue && directory.Id == stopAtId.Value)
+                    return result;
+                
                 directory = directory.Parent;
             }
 
@@ -116,17 +123,44 @@ namespace Hood.Services
             return "/";
         }
 
-        public IHtmlContent GetBreadcrumb(int id)
+        public IHtmlContent GetBreadcrumb(MediaListModel model, string targetListDOMObject = "#media-list")
         {
             List<string> links = new List<string>();
-            foreach (var directory in GetHierarchy(id))
+
+            var linkGenerator = Hood.Core.Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+            var baseUrl = linkGenerator.GetPathByAction("List", "Media", new { area = "Admin" });
+
+
+            var linkModel = new MediaListModel();
+            model.CopyProperties(linkModel);
+            var link = "";
+
+            if (!model.RootId.HasValue)
             {
-                links.Add($"<a href=\"/admin/media?dir={directory.Id}\">{directory.DisplayName}</a>");
+                linkModel.DirectoryId = null;
+                link = linkModel.GetPageUrl(linkModel.PageIndex);
+                links.Add($"<a class=\"hood-inline-list-target\" data-target=\"{targetListDOMObject}\" href=\"{baseUrl}{link}\">Everything</a>");
             }
+
+            if (!model.DirectoryId.HasValue)
+                return FormatBreadcrumbLinks(links);
+
+            foreach (var directory in GetHierarchy(model.DirectoryId.Value, model.RootId))
+            {
+                linkModel.DirectoryId = directory.Id;
+                link = linkModel.GetPageUrl(linkModel.PageIndex);
+                links.Add($"<a class=\"hood-inline-list-target\" data-target=\"{targetListDOMObject}\" href=\"{baseUrl}{link}\">{directory.DisplayName}</a>");
+            }
+            return FormatBreadcrumbLinks(links);
+        }
+
+        private static IHtmlContent FormatBreadcrumbLinks(List<string> links)
+        {
             var htmlOutput = string.Join(" <i class=\"fa fa-caret-right ml-2 mr-2\"></i> ", links.ToArray());
             HtmlString builder = new HtmlString(htmlOutput);
             return builder;
         }
+
         // Html
         public IHtmlContent SelectOptions(IEnumerable<MediaDirectory> startLevel, int? selectedValue, int startingLevel = 0)
         {

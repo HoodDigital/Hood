@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Hood.Models;
+using Hood.ViewModels;
 using Microsoft.AspNetCore.Html;
 
 namespace Hood.Services
@@ -14,10 +15,10 @@ namespace Hood.Services
         IEnumerable<MediaDirectory> TopLevel();
         IEnumerable<MediaDirectory> MediaDirectories();
         IEnumerable<MediaDirectory> UserDirectories(string userId);
-        IEnumerable<MediaDirectory> GetHierarchy(int id);
+        IEnumerable<MediaDirectory> GetHierarchy(int id, int? stopAtId = null);
         IEnumerable<MediaDirectory> GetAllCategoriesIncludingChildren(IEnumerable<MediaDirectory> startLevel);
         MediaDirectory GetTopLevelDirectory(int id);
-        IHtmlContent GetBreadcrumb(int id);
+        IHtmlContent GetBreadcrumb(MediaListModel model, string targetListDOMObject = "#media-list");
         IHtmlContent SelectOptions(IEnumerable<MediaDirectory> startLevel, int? selectedValue, int startingLevel = 0);
         IHtmlContent AdminDirectoryTree(IEnumerable<MediaDirectory> startLevel, int? selectedValue, int startingLevel = 0);
         IHtmlContent DirectoryTree(IEnumerable<MediaDirectory> startLevel, int? selectedValue, int startingLevel = 0);

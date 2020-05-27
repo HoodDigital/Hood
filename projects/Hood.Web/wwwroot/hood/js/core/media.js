@@ -60,7 +60,7 @@ $.hood.Media = {
                         onclick: $.proxy(function (e) {
                             $.hood.Inline.Modal($(this).data('imagesUrl'), function () {
                                 $.hood.Media.Reload(function () {
-                                    $('body').off('click');
+                                    $('body').off('click', '.media-insert');
                                     $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
                                 });
                                 $.hood.Media.Upload.Init();
@@ -236,7 +236,7 @@ $.hood.Media = {
             });
         },
         UploadUrl: function () {
-            return $("#media-upload").data('url') + "?directoryId=" + $("input[type='radio'][name='dir']:checked").val();
+            return $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
         }
     },
 

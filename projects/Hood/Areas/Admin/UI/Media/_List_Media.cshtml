@@ -7,10 +7,16 @@
 {
     <div class="card mb-3 d-none d-md-block">
         <div class="card-body p-2">
-            <i class="fa fa-folder-open mr-2 text-warning"></i> @_directoryManager.GetBreadcrumb(Model.DirectoryId.Value)
+            <i class="fa fa-folder-open mr-2 text-warning"></i> @_directoryManager.GetBreadcrumb(Model)
         </div>
     </div>
 }
+
+@foreach (var dir in _directoryManager.GetAllCategoriesIncludingChildren(Model.TopLevelDirectories))
+{
+    <p>@dir.DisplayName</p>
+}
+
 @if (Model.TotalCount > 0)
 {
     <div class="card-deck card-deck-5">
