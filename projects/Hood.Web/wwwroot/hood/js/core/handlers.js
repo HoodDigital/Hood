@@ -264,7 +264,7 @@ $.hood.Handlers = {
             $(instance._root.button).css({ 'background-color': color.toHEXA().toString() });
             let colorHex = instance.getColor().toHEXA();
             var result = "";
-            for (i = colorHex.length - 1; i >= 0; i--) {
+            for (let i = colorHex.length - 1; i >= 0; i--) {
                 result = colorHex[i] + result;
             }
             $(elemId).val('#' + result);

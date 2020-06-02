@@ -1,4 +1,7 @@
 @inject IConfiguration Config
+
+<partial name="_Scripts_Login" />
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,11 +23,32 @@
             <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
         </footer>
     </div>
+
+    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
+
+    <partial name="_Scripts_JQuery" />
+    <partial name="_Scripts_Bootstrap" />
+
+    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors)
+    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
+
+    @Html.RenderScripts(Url, ResourceLocation.Vendors)
+
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
-    <partial name="_Scripts_Login" />
-    @RenderSection("scripts", required: false)
+
+    @Html.RenderScripts(Url, ResourceLocation.Scripts)
+
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
+
+    @RenderSection("scripts", required: false)
+
+    @Engine.Settings.Basic.LoginAreaSettings.BackgroundImagesScript
+
+    @Html.Raw(Engine.Settings.Seo.GoogleAnalytics)
+
+<jh1>TEST</jh1>
 </body>
 </html>

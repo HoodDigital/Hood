@@ -2,9 +2,9 @@
     ViewData["Title"] = "Dashboard";
     var _propertySettings = Engine.Settings.Property;
 }
-<script asp-location="BeforeScripts" src="/lib/chart/Chart.bundle.js"></script>
-<script asp-location="BeforeScripts" src="/lib/waypoints/jquery.waypoints.min.js"></script>
-<script asp-location="BeforeScripts" src="/lib/counter/jquery.counterup.min.js"></script>
+<script asp-location="BeforeScripts" src="/lib/chart/Chart.bundle.js" asp-bundle="false"></script>
+<script asp-location="Vendors" src="/lib/waypoints/jquery.waypoints.min.js"></script>
+<script asp-location="Vendors" src="/lib/counter/jquery.counterup.min.js"></script>
 <div class="card-deck admin-stats">
     <div class="card text-white bg-yellow">
         <div class="card-body">

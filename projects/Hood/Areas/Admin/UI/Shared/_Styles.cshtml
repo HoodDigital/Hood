@@ -5,5 +5,5 @@
     <link rel="stylesheet" href="@string.Format("{0}/css/admin.css", Engine.LibraryFolder)" asp-append-version="true" />
 </environment>
 <environment exclude="Development">
-    <link rel="stylesheet" href="@($"https://cdn.jsdelivr.net/npm/hoodcms@{Engine.Version}/css/admin.min.css")" />
+    <link rel="stylesheet" href="@string.Format("{0}/css/admin.min.css", Engine.LibraryFolder)" asp-append-version="true" />
 </environment>

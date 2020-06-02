@@ -270,7 +270,7 @@ $.hood.Handlers = {
       var colorHex = instance.getColor().toHEXA();
       var result = "";
 
-      for (i = colorHex.length - 1; i >= 0; i--) {
+      for (var i = colorHex.length - 1; i >= 0; i--) {
         result = colorHex[i] + result;
       }
 

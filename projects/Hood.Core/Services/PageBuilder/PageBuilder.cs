@@ -71,7 +71,7 @@ namespace Hood.Services
             if (!_scripts.Any())
                 return "";
 
-            if (bundleScripts && location.Bundleable() && _hostingEnvironment.EnvironmentName != "Development")
+            if (bundleScripts && _hostingEnvironment.EnvironmentName != "Development")
             {
                 var partsToBundle = _scripts[location]
                     .Where(x => x.Bundle)
@@ -126,7 +126,7 @@ namespace Hood.Services
                         }
                     }
 
-                    result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + bundleSha256 + (minified ? ".min.js" : ".js")));
+                    result.AppendFormat("<script id=\"hood-{1}\" src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + bundleSha256 + (minified ? ".min.js" : ".js")), location.ToString().ToSentenceCase().ToSeoUrl());
                     result.Append(Environment.NewLine);
                 }
                 foreach (var item in partsToDontBundle)
