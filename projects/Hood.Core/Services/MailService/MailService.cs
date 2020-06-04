@@ -3,6 +3,7 @@ using System;
 using Hood.Models;
 using Hood.Extensions;
 using Hood.Interfaces;
+using SendGrid.Helpers.Mail;
 
 namespace Hood.Services
 {
@@ -27,7 +28,7 @@ namespace Hood.Services
                 if (model.SendToRecipient)
                 {
                     message.To = model.To;
-                    await _email.SendEmailAsync(message, model.From);
+                    await _email.SendEmailAsync(message, model.From, model.ReplyTo);
                 }
 
                 message = new MailObject();
@@ -38,12 +39,12 @@ namespace Hood.Services
                     foreach (var recipient in model.NotifyEmails)
                     {
                         message.To = recipient;
-                        await _email.SendEmailAsync(message, model.From);
+                        await _email.SendEmailAsync(message, model.From, model.ReplyTo);
                     }
                 }
 
                 if (model.NotifyRole.IsSet())
-                    await _email.NotifyRoleAsync(message, model.NotifyRole, model.From);
+                    await _email.NotifyRoleAsync(message, model.NotifyRole, model.From, model.ReplyTo);
 
                 return new Response(true, $"The message has been sent.");
             }

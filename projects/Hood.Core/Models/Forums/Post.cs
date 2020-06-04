@@ -14,6 +14,8 @@ namespace Hood.Models
     {
         [NotMapped]
         public EmailAddress From { get; set; } = null;
+        [NotMapped]
+        public EmailAddress ReplyTo { get; set; } = null;
 
         // Parent
         public int TopicId { get; set; }

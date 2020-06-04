@@ -46,21 +46,7 @@ namespace Hood.Services
             return new EmailAddress(fromEmail, fromName);
         }
 
-        public async Task<int> SendEmailAsync(string to, string subject, string body, EmailAddress from = null, string toName = null)
-        {
-            MailObject message = new MailObject
-            {
-                Html = body,
-                Text = body,
-                To = new EmailAddress(to, toName),
-                ToName = toName,
-                Subject = subject,
-                PreHeader = subject
-            };
-            return await SendEmailAsync(message, from);
-        }
-
-        public async Task<int> SendEmailAsync(MailObject message, EmailAddress from = null)
+        public async Task<int> SendEmailAsync(MailObject message, EmailAddress from = null, EmailAddress replyTo = null)
         {
             SendGridClient client = GetMailClient();
             if (from == null)
@@ -68,6 +54,7 @@ namespace Hood.Services
 
             var html = await _renderer.Render(message.Template, message);
             var msg = MailHelper.CreateSingleEmail(from, message.To, message.Subject, message.ToString(), html);
+            msg.ReplyTo = replyTo;
             var response = await client.SendEmailAsync(msg);
             var body = await response.DeserializeResponseBodyAsync(response.Body);
             if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
@@ -75,7 +62,7 @@ namespace Hood.Services
 
             return 0;
         }
-        public async Task<int> SendEmailAsync(EmailAddress[] emails, string subject, string htmlContent, string textContent = null, EmailAddress from = null)
+        public async Task<int> SendEmailAsync(EmailAddress[] emails, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
         {
             SendGridClient client = GetMailClient();
             if (from == null)
@@ -84,6 +71,7 @@ namespace Hood.Services
             foreach (var email in emails)
             {
                 var msg = MailHelper.CreateSingleEmail(from, email, subject, textContent, htmlContent);
+                msg.ReplyTo = replyTo;
                 var response = await client.SendEmailAsync(msg);
                 var body = await response.DeserializeResponseBodyAsync(response.Body);
                 if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
@@ -92,7 +80,7 @@ namespace Hood.Services
             return sent;
         }
 
-        public async Task<int> NotifyRoleAsync(MailObject message, string roleName, EmailAddress from = null)
+        public async Task<int> NotifyRoleAsync(MailObject message, string roleName, EmailAddress from = null, EmailAddress replyTo = null)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
             int sent = 0;
@@ -100,15 +88,15 @@ namespace Hood.Services
             {
                 var messageToSend = message;
                 messageToSend.To = new EmailAddress(user.Email);
-                sent += await SendEmailAsync(messageToSend);
+                sent += await SendEmailAsync(messageToSend, from, replyTo);
             }
             return sent;
         }
-        public async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null)
+        public async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
         {
             var users = await _userManager.GetUsersInRoleAsync(roleName);
             var emails = users.Select(u => new EmailAddress(u.Email, u.ToFullName())).ToArray();
-            return await SendEmailAsync(emails, subject, htmlContent, textContent);
+            return await SendEmailAsync(emails, subject, htmlContent, textContent, from, replyTo);
         }
     }
 }
