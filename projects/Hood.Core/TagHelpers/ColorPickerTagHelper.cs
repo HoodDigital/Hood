@@ -74,29 +74,47 @@ namespace Hood.TagHelpers
 
             string fieldValue = For.Model != null ? For.Model.ToString() : "";
 
-            string floatingClass = Floating ? "floating-label" : "";
-
             if (output.Attributes.ContainsName("class"))
                 output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} {GroupClass}");
             else
                 output.Attributes.SetAttribute("class", $"{GroupClass}");
 
-            output.Content.SetHtmlContent($@"
-                <div class='row no-gutter align-items-center'>
-                    <div class='col-auto pr-0'>
-                        <figure class='{ImageClass} color-picker' data-target='#{fieldId}'>
-                            <div class='{PickerClass}'></div>
-                        </figure>                        
+            if (Floating)
+            {
+                output.Content.SetHtmlContent($@"
+                    <div class='row no-gutter align-items-center'>
+                        <div class='col-auto pr-0'>
+                            <figure class='{ImageClass} color-picker' data-target='#{fieldId}'>
+                                <div class='{PickerClass}'></div>
+                            </figure>                        
+                        </div>
+                        <div class='col'>
+                            <div class='floating-label'>
+                                <label for='{fieldName}'>{fieldDisplayName}</label>
+                                {fieldDescription}
+                                <input type='text' class='{InputClass}' placeholder='Choose a colour...' id='{fieldId}' name='{fieldName}' value='{fieldValue}' />
+                            </div>                        
+                        </div>
                     </div>
-                    <div class='col'>
-                        <div class='{floatingClass}'>
-                            <label for='{fieldName}'>{fieldDisplayName}</label>
+                ");
+            }
+            else
+            {
+                output.Content.SetHtmlContent($@"
+                    <label for='{fieldName}'>{fieldDisplayName}</label>
+                    {fieldDescription}
+                    <div class='row no-gutter align-items-center'>
+                        <div class='col-auto pr-0'>
+                            <figure class='{ImageClass} color-picker' data-target='#{fieldId}'>
+                                <div class='{PickerClass}'></div>
+                            </figure>                        
+                        </div>
+                        <div class='col'>
                             <input type='text' class='{InputClass}' placeholder='Choose a colour...' id='{fieldId}' name='{fieldName}' value='{fieldValue}' />
-                        </div>                        
+                        </div>
                     </div>
-                </div>
-                {fieldDescription}
-            ");
+                ");
+            }
         }
     }
 }
