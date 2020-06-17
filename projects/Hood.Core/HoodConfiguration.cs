@@ -1,4 +1,7 @@
-﻿namespace Hood.Core
+﻿using Hood.Models;
+using Microsoft.Extensions.Logging;
+
+namespace Hood.Core
 {
     public class HoodConfiguration
     {
@@ -11,5 +14,6 @@
         public string LibraryFolder { get; set; }
         public string UI { get; set; }
         public bool SeedOnStart { get; set; }
+        public LogLevel LogLevel { get; set; }
     }
 }
