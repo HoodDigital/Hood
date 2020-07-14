@@ -6,11 +6,13 @@ using Hood.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace Hood.Startup
@@ -73,8 +75,12 @@ namespace Hood.Startup
                 app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
 
+            var provider = new FileExtensionContentTypeProvider();
+            provider.Mappings[".md"] = "text/markdown";
+            provider.Mappings[".webmanifest"] = "text/json";
             app.UseStaticFiles(new StaticFileOptions()
             {
+                ContentTypeProvider = provider,
                 OnPrepareResponse =
                     ctx =>
                     {
@@ -84,7 +90,7 @@ namespace Hood.Startup
 
             app.UseRouting();
             app.UseCors();
-            
+
             // Activate url helpers
             var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             UrlHelpers.Configure(httpContextAccessor);
