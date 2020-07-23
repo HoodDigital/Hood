@@ -15,5 +15,6 @@ namespace Hood.Core
         public string UI { get; set; }
         public bool SeedOnStart { get; set; }
         public LogLevel LogLevel { get; set; }
+        public bool ScheduledTasks { get; set; }
     }
 }

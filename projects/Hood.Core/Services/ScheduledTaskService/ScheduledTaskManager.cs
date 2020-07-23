@@ -23,6 +23,9 @@ namespace Hood.Services
         {
             _threads.Clear();
 
+            if (!Engine.Configuration.ScheduledTasks)
+                return;
+
             List<Models.ScheduledTask> scheduleTasks = Engine.Settings.ScheduledTasks.Tasks
                 .OrderBy(x => x.Interval)
                 .ToList();
