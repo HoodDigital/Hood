@@ -195,6 +195,7 @@ $.hood.Media = {
                 parallelUploads: 5,
                 previewTemplate: false,
                 paramName: 'files',
+                acceptedFiles: $("#media-upload").data('types') || ".png,.jpg,.jpeg,.gif",
                 autoProcessQueue: true, // Make sure the files aren't queued until manually added
                 previewsContainer: false, // Define the container to display the previews
                 clickable: "#media-add", // Define the element that should be used as click trigger to select files.

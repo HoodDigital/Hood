@@ -153,6 +153,7 @@ $.hood.Handlers = {
                 maxFiles: 1,
                 paramName: 'file',
                 parallelUploads: 1,
+                acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
                 autoProcessQueue: true, // Make sure the files aren't queued until manually added
                 previewsContainer: false, // Define the container to display the previews
                 clickable: tag // Define the element that should be used as click trigger to select files.
@@ -202,6 +203,7 @@ $.hood.Handlers = {
                 parallelUploads: 5,
                 previewTemplate: previewTemplate,
                 paramName: 'files',
+                acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
                 autoProcessQueue: true, // Make sure the files aren't queued until manually added
                 previewsContainer: "#previews", // Define the container to display the previews
                 clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.

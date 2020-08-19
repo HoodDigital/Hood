@@ -799,6 +799,7 @@ $.hood.Handlers = {
         maxFiles: 1,
         paramName: 'file',
         parallelUploads: 1,
+        acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: false,
@@ -852,6 +853,7 @@ $.hood.Handlers = {
         parallelUploads: 5,
         previewTemplate: previewTemplate,
         paramName: 'files',
+        acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: "#previews",
@@ -1687,6 +1689,7 @@ $.hood.Media = {
         parallelUploads: 5,
         previewTemplate: false,
         paramName: 'files',
+        acceptedFiles: $("#media-upload").data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: false,

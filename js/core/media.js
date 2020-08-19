@@ -187,6 +187,7 @@ $.hood.Media = {
         parallelUploads: 5,
         previewTemplate: false,
         paramName: 'files',
+        acceptedFiles: $("#media-upload").data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: false,
