@@ -27,7 +27,7 @@ namespace Hood.ViewModels
         /// Specify the exact filter term for listing type - cannot be used in conjunction with Transaction, which specifies generally. 
         /// </summary>
         [FromQuery(Name = "type")]
-        public List<string> Type { get; set; }
+        public List<string> Type { get; set; } = new List<string>();
 
 
         /// <summary>
@@ -56,6 +56,11 @@ namespace Hood.ViewModels
         [FromQuery(Name = "beds")]
         public int? Bedrooms { get; set; }
 
+        /// <summary>
+        /// Set this as -1 in order to use Bedrooms as a low filter.  
+        /// </summary>
+        [FromQuery(Name = "beds-min")]
+        public int? MinBedrooms { get; set; }
         /// <summary>
         /// Set this as -1 in order to use Bedrooms as a low filter.  
         /// </summary>
@@ -107,6 +112,8 @@ namespace Hood.ViewModels
             }
             query += PlanningType.IsSet() ? "&planning=" + PlanningType : "";
             query += Bedrooms.HasValue ? "&beds=" + Bedrooms : "";
+            query += MinBedrooms.HasValue ? "&beds-min=" + MinBedrooms : "";
+            query += MaxBedrooms.HasValue ? "&beds-max=" + MaxBedrooms : "";
             query += MinPremium.HasValue ? "&prem-min=" + MinPremium : "";
             query += MaxPremium.HasValue ? "&prem-max=" + MaxPremium : "";
             query += MinPrice.HasValue ? "&price-min=" + MinPrice : "";

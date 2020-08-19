@@ -4,6 +4,7 @@ using Hood.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace Hood.Services
                 return new HoodDbContext(options.Options);
             }
         }
+
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _contextAccessor;
 
@@ -35,6 +37,39 @@ namespace Hood.Services
             if (!Engine.Services.Installed)
                 return;
 
+            if (Engine.Configuration.LogLevel == LogLevel.None)
+            {
+                return;
+            }
+
+            switch (type)
+            {
+                case LogType.Error:
+                    if (Engine.Configuration.LogLevel >= LogLevel.None)
+                    {
+                        return;
+                    }
+                    break;
+                case LogType.Warning:
+                    if (Engine.Configuration.LogLevel >= LogLevel.Error)
+                    {
+                        return;
+                    }
+                    break;
+                case LogType.Info:
+                    if (Engine.Configuration.LogLevel >= LogLevel.Warning)
+                    {
+                        return;
+                    }
+                    break;
+                default:
+                    if (Engine.Configuration.LogLevel >= LogLevel.Information)
+                    {
+                        return;
+                    }
+                    break;
+            }
+
             string userId = null;
             if (Engine.Account != null)
             {
@@ -46,7 +81,7 @@ namespace Hood.Services
             {
                 url = _contextAccessor.HttpContext.GetSiteUrl(true, true);
             }
-            
+
             using (HoodDbContext context = _hoodDbContext)
             {
                 Log log = new Log()
@@ -68,6 +103,20 @@ namespace Hood.Services
         {
             try
             {
+                var _logger = Engine.Services.Resolve<ILogger<TSource>>();
+                switch (type)
+                {
+                    case LogType.Error:
+                        _logger.LogError(message);
+                        break;
+                    case LogType.Warning:
+                        _logger.LogWarning(message);
+                        break;
+                    default:
+                        _logger.LogInformation(message);
+                        break;
+                }
+
                 if (logObject is string)
                 {
                     await AddLogAsync(message, logObject.ToString(), type, typeof(TSource).ToString());
@@ -87,6 +136,19 @@ namespace Hood.Services
         {
             try
             {
+                var _logger = Engine.Services.Resolve<ILogger<TSource>>();
+                switch (type)
+                {
+                    case LogType.Error:
+                        _logger.LogError(ex, message);
+                        break;
+                    case LogType.Warning:
+                        _logger.LogWarning(ex, message);
+                        break;
+                    default:
+                        _logger.LogInformation(ex, message);
+                        break;
+                }
                 string json = JsonConvert.SerializeObject(new ErrorLogDetail
                 {
                     Exception = ex.ToDictionary(),
@@ -104,6 +166,19 @@ namespace Hood.Services
         {
             try
             {
+                var _logger = Engine.Services.Resolve<ILogger<TSource>>();
+                switch (type)
+                {
+                    case LogType.Error:
+                        _logger.LogError(ex, message);
+                        break;
+                    case LogType.Warning:
+                        _logger.LogWarning(ex, message);
+                        break;
+                    default:
+                        _logger.LogInformation(ex, message);
+                        break;
+                }
                 string json = JsonConvert.SerializeObject(new ErrorLogDetail
                 {
                     ObjectJson = logObject.ToJson(),

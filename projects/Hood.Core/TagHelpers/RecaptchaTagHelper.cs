@@ -43,18 +43,9 @@ namespace Hood.TagHelpers
             output.TagName = "div";
             output.TagMode = TagMode.StartTagAndEndTag;
             string recaptchaId = Guid.NewGuid().ToString();
-            _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}", true);
-            var scriptTemplate = $@"
-<script>
-	if (typeof grecaptcha !== 'undefined') {{
-		grecaptcha.ready(function () {{
-			grecaptcha.execute('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}', {{ 'action': '{Action}' }}).then(function (token) {{
-				document.getElementById('{recaptchaId}').value = token;
-			}});
-		}});
-	}}
-</script>
-";
+            _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}", false);
+            _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"{Engine.LibraryFolder}/js/recaptcha.js", false);
+            var scriptTemplate = $@"<script>hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');setInterval(function(){{hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');}},150000);</script>";
             _htmlHelper.AddInlineScript(ResourceLocation.AfterScripts, scriptTemplate);
             output.Content.SetHtmlContent($@"<input id=""{recaptchaId}"" name=""g-recaptcha-response"" type=""hidden"" value="""" />");
         }

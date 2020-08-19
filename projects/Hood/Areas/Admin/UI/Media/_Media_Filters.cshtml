@@ -1,27 +1,5 @@
 @model MediaListModel
 <div class="card mb-3">
-    <div class="card-header position-relative" id="media-directories-panel-heading">
-        <p class="card-title m-0 font-weight-bold">
-            <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#media-directories-panel" href="#media-directories-panel" aria-expanded="true" aria-controls="media-directories-panel">
-                Directories
-                <i class="fe fe-arrow-up mt-1"></i>
-            </a>
-        </p>
-    </div>
-    <div class="card-body p-0 collapse show" aria-labelledby="media-directories-panel-heading" id="media-directories-panel">
-        <div id="media-directories-list" class="hood-inline-list refresh" data-url="@Url.Action("Directories")" data-complete="$.hood.Content.Lists.Categories.Loaded">
-            <partial name="_List_Directories" />
-        </div>
-    </div>
-    <div class="card-body d-flex">
-        <a class="btn btn-success btn-sm btn-block hood-modal"
-                asp-action="CreateDirectory" 
-                data-complete="$.hood.Media.Directories.Editor" title="Create directory">
-            <i class="fa fa-plus-circle mr-2"></i> Create Directory
-        </a>
-    </div>
-</div>
-<div class="card mb-3">
     <div class="card-header position-relative" id="media-search-panel-heading">
         <p class="card-title m-0 font-weight-bold">
             <a class="stretched-link text-dark text-decoration-none" data-toggle="collapse" data-target="#media-search-panel" href="#media-search-panel" aria-expanded="true" aria-controls="media-search-panel">

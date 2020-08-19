@@ -2,15 +2,41 @@
 @inject IDirectoryManager _directoryManager
 @{
     Layout = null;
+    var rootDirModel = new MediaListModel();
+    Model.CopyProperties(rootDirModel);
+    rootDirModel.DirectoryId = null;
+    var rootDirs = Model.TopLevelDirectories;
 }
 @if (Model.DirectoryId.HasValue)
 {
-    <div class="card mb-3 d-none d-md-block">
-        <div class="card-body p-2">
-            <i class="fa fa-folder-open mr-2 text-warning"></i> @_directoryManager.GetBreadcrumb(Model.DirectoryId.Value)
-        </div>
-    </div>
+    <input type="hidden" id="upload-directory-id" value="@Model.DirectoryId.Value" />
+    rootDirs = _directoryManager.GetDirectoryById(Model.DirectoryId.Value).Children;
 }
+<div class="card mb-3 d-none d-md-block">
+    <div class="card-body p-2">
+        <i class="fa fa-folder-open mr-2 text-warning"></i>
+        @_directoryManager.GetBreadcrumb(Model)
+    </div>
+</div>
+<div class="card-deck card-deck-5">
+    @foreach (var dir in rootDirs)
+    {
+        rootDirModel.DirectoryId = dir.Id;
+        var link = rootDirModel.GetPageUrl(rootDirModel.PageIndex);
+        var href = $"{Context.Request.Path}{link}";
+        <div class="card text-center hover">
+            <div class="card-body text-center">
+                <i class="fa fa-3x fa-folder-open mr-2 text-warning"></i>
+            </div>
+            <div class="card-footer p-1">
+                <p class="m-0 font-weight-bold text-truncate">
+                    @dir.DisplayName
+                </p>
+                <a class="full-box-link hood-inline-list-target" data-target="#media-list" href="@href">@dir.DisplayName</a>
+            </div>
+        </div>
+    }
+</div>
 @if (Model.TotalCount > 0)
 {
     <div class="card-deck card-deck-5">
@@ -21,16 +47,16 @@
                 @switch (Model.Action)
                 {
                     case MediaWindowAction.Select:
-                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
+                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
                         break;
                     case MediaWindowAction.Insert:
-                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-insert" data-url="@media.Url" />
+                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top media-insert" data-url="@media.Url" />
                         break;
                     case MediaWindowAction.Attach:
-                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top media-attach" data-url="@attachUrl" />
+                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top media-attach" data-url="@attachUrl" />
                         break;
                     default:
-                        <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
+                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top" />
                         break;
                 }
                 <div class="card-body p-1">
@@ -89,7 +115,14 @@
 }
 else
 {
-    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
-        No media found.
+    <alert type="Info" icon="fa-info" size="Medium" class="m-0">
+        @if (Model.DirectoryId.HasValue)
+        {
+            <span>No media in this directory.</span>
+        }
+        else
+        {
+            <span>No media.</span>
+        }
     </alert>
 }

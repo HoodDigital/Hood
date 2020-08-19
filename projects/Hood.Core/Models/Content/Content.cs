@@ -3,6 +3,7 @@ using Hood.Entities;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
+using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -154,8 +155,11 @@ namespace Hood.Models
             {
                 ContentType type = Engine.Settings.Content.GetContentType(ContentType);
 
-                if (type == null)
-                    return string.Format("/{0}/{1}", ContentType, Id);
+                if (type == null || type.IsUnknown)
+                {
+                    var linkGenerator = Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+                    return linkGenerator.GetPathByAction("Show", "Home", new { id = Id });
+                }
 
                 if (type.BaseName == "Page")
                 {
@@ -163,14 +167,16 @@ namespace Hood.Models
                         return "/";
                     return string.Format("/{0}", Slug);
                 }
+
                 switch (type.UrlFormatting)
                 {
                     case "news-title":
-                        return string.Format("/{0}/{1}/{2}", ContentType, Id, Title.ToSeoUrl());
+                        return string.Format("/{0}/{1}/{2}", type.Slug, Id, Title.ToSeoUrl());
                     case "news":
-                        return string.Format("/{0}/{1}/{2}", ContentType, Id, Slug);
+                        return string.Format("/{0}/{1}/{2}", type.Slug, Id, Slug);
                     default:
-                        return string.Format("/{0}/{1}", ContentType, Id);
+                        var linkGenerator = Engine.Services.Resolve<Microsoft.AspNetCore.Routing.LinkGenerator>();
+                        return linkGenerator.GetPathByAction("Show", "Home", new { id = Id });
                 }
             }
         }

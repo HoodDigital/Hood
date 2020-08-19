@@ -4,6 +4,7 @@ using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 
@@ -45,6 +46,20 @@ namespace Hood.Core
                 }
 
                 return Singleton<IHoodServiceProvider>.Instance;
+            }
+        }
+
+        public static HoodConfiguration Configuration
+        {
+            get
+            {
+                var config = Services.Resolve<IOptions<HoodConfiguration>>();
+                if (config != null)
+                {
+                    return config.Value;
+                }
+                else
+                    return null;
             }
         }
         /// <summary>
@@ -150,12 +165,11 @@ namespace Hood.Core
         {
             get
             {
-                var config = Services.Resolve<IConfiguration>();
-                if (config["Hood:LibraryFolder"] != null)
+                if (Configuration != null)
                 {
-                    return config["Hood:LibraryFolder"].ToString();
+                    return Configuration.LibraryFolder;
                 }
-                return "/hood/";
+                return "/hood";
             }
         }
         /// <summary>
@@ -168,10 +182,9 @@ namespace Hood.Core
         {
             get
             {
-                var config = Services.Resolve<IConfiguration>();
-                if (config["Hood:SuperAdminEmail"] != null)
+                if (Configuration != null)
                 {
-                    return config["Hood:SuperAdminEmail"].ToString();
+                    return Configuration.SuperAdminEmail;
                 }
                 return "admin@hooddigital.com";
             }

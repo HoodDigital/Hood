@@ -31,6 +31,8 @@ namespace Hood.Startup
           where TContext : HoodDbContext
         {
 
+            services.Configure<HoodConfiguration>(config.GetSection("Hood"));
+
             if (config.IsDatabaseConnected())
             {
                 services.ConfigureHoodServices();

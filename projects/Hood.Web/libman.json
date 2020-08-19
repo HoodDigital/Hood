@@ -89,6 +89,11 @@
       "library": "metisMenu@3.0.4"
     },
     {
+      "destination": "wwwroot/lib/pickr",
+      "library": "@simonwep/pickr@1.6.0",
+      "provider": "jsdelivr"
+    },
+    {
       "destination": "wwwroot/lib/raty",
       "library": "raty@2.8.0"
     },

@@ -156,6 +156,7 @@ $.hood.Handlers = {
         maxFiles: 1,
         paramName: 'file',
         parallelUploads: 1,
+        acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: false,
@@ -209,6 +210,7 @@ $.hood.Handlers = {
         parallelUploads: 5,
         previewTemplate: previewTemplate,
         paramName: 'files',
+        acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: "#previews",
@@ -270,7 +272,7 @@ $.hood.Handlers = {
       var colorHex = instance.getColor().toHEXA();
       var result = "";
 
-      for (i = colorHex.length - 1; i >= 0; i--) {
+      for (var i = colorHex.length - 1; i >= 0; i--) {
         result = colorHex[i] + result;
       }
 

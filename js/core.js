@@ -799,6 +799,7 @@ $.hood.Handlers = {
         maxFiles: 1,
         paramName: 'file',
         parallelUploads: 1,
+        acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: false,
@@ -852,6 +853,7 @@ $.hood.Handlers = {
         parallelUploads: 5,
         previewTemplate: previewTemplate,
         paramName: 'files',
+        acceptedFiles: $(tag).data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: "#previews",
@@ -913,7 +915,7 @@ $.hood.Handlers = {
       var colorHex = instance.getColor().toHEXA();
       var result = "";
 
-      for (i = colorHex.length - 1; i >= 0; i--) {
+      for (var i = colorHex.length - 1; i >= 0; i--) {
         result = colorHex[i] + result;
       }
 
@@ -1306,7 +1308,7 @@ $.hood.Inline = {
     $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
     $('body').on('click', '.hood-modal', function (e) {
       e.preventDefault();
-      $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'));
+      $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'), $(this).data('close'));
     });
     $.hood.Inline.DataList.Init();
   },
@@ -1332,10 +1334,10 @@ $.hood.Inline = {
   },
   CurrentModal: null,
   Modal: function Modal(url, complete) {
-    var closePrevious = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var closePrevious = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
-    if (closePrevious && $.hood.Inline.CurrentModal) {
-      $.hood.Inline.CurrentModal.modal('hide');
+    if ($.hood.Inline.CurrentModal && closePrevious) {
+      $.hood.Inline.CloseModal();
     }
 
     $.get(url, function (data) {
@@ -1558,7 +1560,7 @@ $.hood.Media = {
             onclick: $.proxy(function (e) {
               $.hood.Inline.Modal($(this).data('imagesUrl'), function () {
                 $.hood.Media.Reload(function () {
-                  $('body').off('click');
+                  $('body').off('click', '.media-insert');
                   $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
                 });
                 $.hood.Media.Upload.Init();
@@ -1687,6 +1689,7 @@ $.hood.Media = {
         parallelUploads: 5,
         previewTemplate: false,
         paramName: 'files',
+        acceptedFiles: $("#media-upload").data('types') || ".png,.jpg,.jpeg,.gif",
         autoProcessQueue: true,
         // Make sure the files aren't queued until manually added
         previewsContainer: false,
@@ -1731,7 +1734,7 @@ $.hood.Media = {
       });
     },
     UploadUrl: function UploadUrl() {
-      return $("#media-upload").data('url') + "?directoryId=" + $("input[type='radio'][name='dir']:checked").val();
+      return $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
     }
   },
   Delete: function Delete(e) {

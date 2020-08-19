@@ -16,6 +16,7 @@ namespace Hood.Models
         }
 
         public EmailAddress From { get; set; } = null;
+        public EmailAddress ReplyTo { get; set; } = null;
 
         public ApplicationUser User { get; set; }
         public string LoginLink { get; }

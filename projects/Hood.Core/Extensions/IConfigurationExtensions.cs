@@ -77,7 +77,7 @@ namespace Hood.Extensions
 
         public static bool IsConfigured(this IConfiguration config, string key)
         {
-            if (!string.IsNullOrEmpty(config[key]) && config[key] == "true")
+            if (!string.IsNullOrEmpty(config[key]))
             {
                 return true;
             }

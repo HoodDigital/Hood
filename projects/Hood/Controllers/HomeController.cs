@@ -102,6 +102,7 @@ namespace Hood.Controllers
         [ResponseCache(CacheProfileName = "Day")]
         [Route("{type:contentTypeSlug}/{id:int}/{title?}")]
         [Route("{url:pageSlug}/{urlSlug1?}/{urlSlug2?}/{urlSlug3?}/{urlSlug4?}", Order = 2)]
+        [Route("content/show/{id}", Order = 3)]
         public virtual async Task<IActionResult> Show(int id, bool editMode = false)
         {
             if (id == 0)

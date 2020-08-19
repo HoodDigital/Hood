@@ -71,7 +71,7 @@ namespace Hood.Services
             if (!_scripts.Any())
                 return "";
 
-            if (bundleScripts && location.Bundleable() && _hostingEnvironment.EnvironmentName != "Development")
+            if (bundleScripts && _hostingEnvironment.EnvironmentName != "Development")
             {
                 var partsToBundle = _scripts[location]
                     .Where(x => x.Bundle)
@@ -86,7 +86,7 @@ namespace Hood.Services
 
                 if (partsToBundle.Any())
                 {
-                    var bundlesDirectory = _hostingEnvironment.WebRootPath + "bundles";
+                    var bundlesDirectory = _hostingEnvironment.WebRootPath + "\\bundles";
                     if (!Directory.Exists(bundlesDirectory))
                         Directory.CreateDirectory(bundlesDirectory);
 
@@ -100,7 +100,7 @@ namespace Hood.Services
                         }
 
                         new PathString(urlHelper.Content(item.Src)).StartsWithSegments(urlHelper.ActionContext.HttpContext.Request.PathBase, out PathString path);
-                        
+
                         var src = path.Value.TrimStart('/');
                         if (!File.Exists(_hostingEnvironment.WebRootPath + src))
                             src = $"wwwroot/{src}";
@@ -109,21 +109,24 @@ namespace Hood.Services
                     }
 
                     var bundleSha256 = GetBundleSha256(partsToBundle.Select(x => x.Src).ToArray());
-                    bundle.OutputFileName = "wwwroot/bundles/" + location.ToString().ToLower() + ".js";
+                    bundle.OutputFileName = $"wwwroot/bundles/" + bundleSha256 + ".js";
 
-                    bundle.FileName = _hostingEnvironment.ContentRootPath + "\\" + bundleSha256 + ".json"; ;
+                    bundle.FileName = _hostingEnvironment.ContentRootPath + "\\" + bundleSha256 + ".json";
+                    bool minified = true;
                     lock (accessLock)
                     {
                         var cacheKey = $"Hood.Bundling.ShouldRebuild.{bundleSha256}";
                         bool shouldRebuild = !_cache.TryGetValue(cacheKey, out shouldRebuild);
                         if (shouldRebuild)
                         {
-                            _bundleFileProcessor.Process(bundle.FileName, new List<Bundle> { bundle });
+                            BundleMinifier.ErrorMinifyingFile += BundleMinifier_ErrorMinifyingFile;
+
+                            minified = _bundleFileProcessor.Process(bundle.FileName, new List<Bundle> { bundle });
                             _cache.Add(cacheKey, false, new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = new TimeSpan(2, 0, 0) });
                         }
                     }
 
-                    result.AppendFormat("<script src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + location.ToString().ToLower() + ".min.js"));
+                    result.AppendFormat("<script id=\"hood-{1}\" src=\"{0}\"></script>", urlHelper.Content("~/bundles/" + bundleSha256 + (minified ? ".min.js" : ".js")), location.ToString().ToSentenceCase().ToSeoUrl());
                     result.Append(Environment.NewLine);
                 }
                 foreach (var item in partsToDontBundle)
@@ -144,6 +147,19 @@ namespace Hood.Services
                 }
                 return result.ToString();
             }
+        }
+
+        private void BundleMinifier_ErrorMinifyingFile(object sender, MinifyFileEventArgs e)
+        {
+            var logger = Hood.Core.Engine.Services.Resolve<ILogService>();
+            var logWriter = new System.IO.StringWriter();
+            logWriter.WriteLine($"Bundle errors from {e.Result.FileName} - {DateTime.Now.ToDisplay()}");
+            foreach (var error in e.Result.Errors)
+            {
+                logWriter.WriteLine($"Line {error.LineNumber} and column {error.ColumnNumber}: {error.Message}");
+            }
+            logger.AddLogAsync<PageBuilder>($"Bundle errors from {e.Result.FileName}", logWriter.ToString(), Models.LogType.Error);
+            logWriter.Dispose();
         }
 
         public virtual string GenerateInlineScripts(IUrlHelper urlHelper, ResourceLocation location)

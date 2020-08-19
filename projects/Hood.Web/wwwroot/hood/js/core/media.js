@@ -60,7 +60,7 @@ $.hood.Media = {
                         onclick: $.proxy(function (e) {
                             $.hood.Inline.Modal($(this).data('imagesUrl'), function () {
                                 $.hood.Media.Reload(function () {
-                                    $('body').off('click');
+                                    $('body').off('click', '.media-insert');
                                     $('body').on('click', '.media-insert', $.proxy($.hood.Media.Actions.Complete.Insert, editor));
                                 });
                                 $.hood.Media.Upload.Init();
@@ -195,6 +195,7 @@ $.hood.Media = {
                 parallelUploads: 5,
                 previewTemplate: false,
                 paramName: 'files',
+                acceptedFiles: $("#media-upload").data('types') || ".png,.jpg,.jpeg,.gif",
                 autoProcessQueue: true, // Make sure the files aren't queued until manually added
                 previewsContainer: false, // Define the container to display the previews
                 clickable: "#media-add", // Define the element that should be used as click trigger to select files.
@@ -236,7 +237,7 @@ $.hood.Media = {
             });
         },
         UploadUrl: function () {
-            return $("#media-upload").data('url') + "?directoryId=" + $("input[type='radio'][name='dir']:checked").val();
+            return $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
         }
     },
 

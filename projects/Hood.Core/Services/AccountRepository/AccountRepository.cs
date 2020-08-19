@@ -272,8 +272,13 @@ namespace Hood.Services
 
             if (!string.IsNullOrEmpty(model.Search))
             {
-                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                query = query.Where(n => searchTerms.Any(s => n.UserName.ToLower().Contains(s.ToLower())));
+                query = query.Where(u =>
+                    u.UserName.Contains(model.Search) ||
+                    u.Email.Contains(model.Search) ||
+                    u.DisplayName.Contains(model.Search) ||
+                    u.FirstName.Contains(model.Search) ||
+                    u.LastName.Contains(model.Search)
+                );
             }
 
             switch (model.Order)

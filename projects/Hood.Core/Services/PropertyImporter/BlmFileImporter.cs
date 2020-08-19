@@ -209,9 +209,6 @@ namespace Hood.Services
 
                 List<PropertyListing> feedProperties = new List<PropertyListing>();
                 List<PropertyListing> siteProperties = _db.Properties
-                    .Include(p => p.Media)
-                    .Include(p => p.FloorPlans)
-                    .Include(p => p.Metadata)
                     .Where(p => p.UserVars == "IMPORTED")
                     .AsNoTracking()
                     .ToList();

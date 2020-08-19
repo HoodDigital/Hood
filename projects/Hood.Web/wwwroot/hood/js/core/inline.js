@@ -8,7 +8,7 @@ $.hood.Inline = {
         $('body').on('click', '.hood-inline-task', $.hood.Inline.Task);
         $('body').on('click', '.hood-modal', function (e) {
             e.preventDefault();
-            $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'));
+            $.hood.Inline.Modal($(this).attr('href'), $(this).data('complete'), $(this).data('close'));
         });
         $.hood.Inline.DataList.Init();
     },
@@ -35,9 +35,9 @@ $.hood.Inline = {
             .always($.hood.Inline.Finish);
     },
     CurrentModal: null,
-    Modal: function (url, complete, closePrevious = false) {
-        if (closePrevious && $.hood.Inline.CurrentModal) {
-            $.hood.Inline.CurrentModal.modal('hide');
+    Modal: function (url, complete, closePrevious = true) {
+        if ($.hood.Inline.CurrentModal && closePrevious) {
+            $.hood.Inline.CloseModal();
         }
         $.get(url, function (data) {
             let modalId = '#' + $(data).attr('id');

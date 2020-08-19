@@ -47,7 +47,11 @@ namespace Hood.Services
                                                      .AsNoTracking();
 
             // filter posts by type
-            if (model.Type.IsSet())
+            if (model.ContentType != null)
+            {
+                content = content.Where(c => c.ContentType == model.ContentType.Type);
+            }
+            else if (model.Type.IsSet())
             {
                 content = content.Where(c => c.ContentType == model.Type);
             }
@@ -83,12 +87,12 @@ namespace Hood.Services
 
             if (!string.IsNullOrEmpty(model.Search))
             {
-
-                string[] searchTerms = model.Search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                content = content.Where(n => searchTerms.Any(s => n.Title != null && n.Title.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Body != null && n.Body.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Excerpt != null && n.Excerpt.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                                      || searchTerms.Any(s => n.Metadata.Any(m => m.BaseValue != null && m.BaseValue.IndexOf(s, StringComparison.InvariantCultureIgnoreCase) >= 0)));
+                content = content.Where(c =>
+                    c.Title.Contains(model.Search) ||
+                    c.Body.Contains(model.Search) ||
+                    c.Excerpt.Contains(model.Search) ||
+                    c.Metadata.Any(m => m.BaseValue.Contains(model.Search))
+                );
             }
 
             if (!string.IsNullOrEmpty(model.Filter))

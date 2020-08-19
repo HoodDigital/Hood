@@ -7,16 +7,21 @@
         public string Src { get; set; }
         public bool IsDefer { get; set; }
 
-        public bool Equals(FileReferenceMetadata item)
+        public override bool Equals(object obj)
         {
+            var item = obj as FileReferenceMetadata;
+
             if (item == null)
+            {
                 return false;
-            return Src.Equals(item.Src);
-        }
-        public override int GetHashCode()
-        {
-            return Src == null ? 0 : Src.GetHashCode();
+            }
+
+            return this.Src.Equals(item.Src);
         }
 
+        public override int GetHashCode()
+        {
+            return this.Src.GetHashCode();
+        }
     }
 }

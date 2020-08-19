@@ -385,7 +385,7 @@ $.hood.Admin = {
             $('.properties-totalPosts').text(data.properties.totalPosts);
             $('.properties-totalPublished').text(data.properties.totalPublished);
 
-            for (i = 0; i < data.content.byType.length; i++) {
+            for (let i = 0; i < data.content.byType.length; i++) {
                 $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
             }
 
