@@ -4,6 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>Hood.Web</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Areas\Admin\UI\Shared\_Scripts_Bootstrap.cshtml" />
+    <Content Remove="Areas\Admin\UI\Shared\_Scripts_JQuery.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Areas\Admin\UI\Shared\_Scripts_Bootstrap.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\UI\Shared\_Scripts_JQuery.cshtml" />
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
