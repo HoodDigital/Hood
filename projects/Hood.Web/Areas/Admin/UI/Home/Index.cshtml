@@ -95,16 +95,17 @@
                 <h5 class="m-0">Site history</h5>
             </div>
             <div class="col-2">
-                <select id="history" class="form-control">
-                    <option value="7">Past 7 days</option>
-                    <option value="30">Past 30 days</option>
-                    <option value="90">Past 90 days</option>
-                    <option value="365">Past 12 months</option>
-                </select>
+                <input id="history" value="365" type="hidden" />
+                @*<select id="history" class="form-control">
+                    <option value="7">Past week</option>
+                    <option value="30">Past month</option>
+                    <option value="90">Past 3 months</option>
+                    <option value="365">All Time</option>
+                </select>*@
             </div>
         </div>
     </div>
-    <div class="card-body" style="height:400px;">
-        <canvas id="admin-stats-chart"></canvas>
+    <div class="card-body">
+        <div id="admin-chart-area"  style="height:50vh;"></div>
     </div>
 </div>

@@ -120,28 +120,29 @@ $.hood.Admin = {
     },
     Stats: {
         Init: function () {
-            if ($('#admin-stats-chart').exists()) {
-                $.hood.Admin.Stats.SetupCharts();
-                $.get('/admin/stats/', function (data) {
-                    $.hood.Admin.Stats.LoadStats(data);
-                    $.hood.Admin.Stats.DoCharts(data);
-                });
+            if ($('#admin-chart-area').exists()) {
+                $.hood.Admin.Stats.LoadChart();
                 $('body').on('change', '#history', function () {
-                    $.get('/admin/stats/', function (data) {
-                        $.hood.Admin.Stats.DoCharts(data);
-                    });
+                    $.hood.Admin.Stats.LoadChart();
                 });
             }
         },
+        LoadChart: function () {
+            $.get('/admin/stats/', function (data) {
+                $('#admin-chart-area').empty();;
+                $('#admin-chart-area').html('<canvas id="admin-stats-chart"></canvas>');
+                $.hood.Admin.Stats.LoadStats(data);
+                $.hood.Admin.Stats.DoCharts(data);
+            });
+        },
         SetupCharts: function () {
-
             Chart.defaults.global.responsive = true;
             Chart.defaults.global.maintainAspectRatio = false;
 
             Chart.defaults.global.defaultColor = "#6E84A3";
             Chart.defaults.global.defaultFontColor = "#6E84A3";
             Chart.defaults.global.defaultFontFamily = '';
-            Chart.defaults.global.defaultFontSize = 12;
+            Chart.defaults.global.defaultFontSize = 16;
 
             Chart.defaults.global.layout.padding = 0;
 
@@ -184,9 +185,9 @@ $.hood.Admin = {
                 },
                 ticks: {
                     beginAtZero: !0,
-                    padding: 10,
+                    padding: 2,
                     callback: function (e) {
-                        return e;                            
+                        return e;
                     }
                 }
             });
@@ -197,90 +198,17 @@ $.hood.Admin = {
                     drawTicks: !1
                 },
                 ticks: {
-                    padding: 20
-                },
-                maxBarThickness: 10
+                    padding: 5
+                }
             });
         },
         DoCharts: function (data) {
             let datasets = [];
             let dataLabels = [];
-            let contentColour = '#6f42c1';
+            let contentColour = '#fabd07';
             let propertyColour = '#20c997';
             let userColour = '#fd7e14';
             let subColour = '#17a2b8';
-            if (Number($('#history').val()) < 100) {
-
-                let labels = [];
-
-                // Content by day
-                var content = data.content.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-                let contentSet = [];
-                content.forEach(function (element) {
-                    contentSet.push(element.Value);
-                    labels.push(element.Key);
-                });
-
-                datasets.push({
-                    label: 'New Content',
-                    data: contentSet,
-                    borderColor: contentColour,
-                    backgroundColor: contentColour,
-                    pointBackgroundColor: contentColour,
-                    pointBorderColor: '#ffffff'
-                });
-
-                // users by day
-                let users = data.users.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-                contentSet = [];
-                users.forEach(function (element) {
-                    contentSet.push(element.Value);
-                });
-
-                datasets.push({
-                    label: 'New Users',
-                    data: contentSet,
-                    borderColor: userColour,
-                    backgroundColor: userColour,
-                    pointBackgroundColor: userColour,
-                    pointBorderColor: '#ffffff'
-                });
-
-                // subs by day
-                let subs = data.subs.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-                contentSet = [];
-                subs.forEach(function (element) {
-                    contentSet.push(element.Value);
-                });
-
-                datasets.push({
-                    label: 'New Subscriptions',
-                    data: contentSet,
-                    borderColor: subColour,
-                    backgroundColor: subColour,
-                    pointBackgroundColor: subColour,
-                    pointBorderColor: '#ffffff'
-                });
-
-                // Properties by day
-                let properties = data.properties.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-                contentSet = [];
-                properties.forEach(function (element) {
-                    contentSet.push(element.Value);
-                });
-
-                datasets.push({
-                    label: 'New Properties',
-                    data: contentSet,
-                    borderColor: propertyColour,
-                    backgroundColor: propertyColour,
-                    pointBackgroundColor: propertyColour,
-                    pointBorderColor: '#ffffff'
-                });
-
-                dataLabels = labels;
-            }
-            else {
                 // 12 months
                 let labels = [];
 
@@ -309,9 +237,9 @@ $.hood.Admin = {
                 datasets.push({
                     label: 'New Users',
                     data: contentSet,
-                    borderColor: contentColour,
-                    backgroundColor: contentColour,
-                    pointBackgroundColor: contentColour,
+                    borderColor: userColour,
+                    backgroundColor: userColour,
+                    pointBackgroundColor: userColour,
                     pointBorderColor: '#ffffff'
                 });
 
@@ -346,7 +274,6 @@ $.hood.Admin = {
                 });
 
                 dataLabels = labels;
-            }
             var ctx = document.getElementById("admin-stats-chart");
             var myChart = new Chart(ctx, {
                 type: 'bar',
@@ -357,9 +284,6 @@ $.hood.Admin = {
                 responsive: true,
                 maintainAspectRatio: false,
                 options: {
-                    events: [],
-                    tooltips: { enabled: false },
-                    hover: { mode: null },
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -388,11 +312,6 @@ $.hood.Admin = {
             for (let i = 0; i < data.content.byType.length; i++) {
                 $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
             }
-
-            $('[data-plugin="counterup"]').counterUp({
-                delay: 10,
-                time: 800
-            });
         }
     },
     CheckAndLoadTabs: function (tag) {

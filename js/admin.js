@@ -95,18 +95,21 @@ $.hood.Admin = {
   },
   Stats: {
     Init: function Init() {
-      if ($('#admin-stats-chart').exists()) {
-        $.hood.Admin.Stats.SetupCharts();
-        $.get('/admin/stats/', function (data) {
-          $.hood.Admin.Stats.LoadStats(data);
-          $.hood.Admin.Stats.DoCharts(data);
-        });
+      if ($('#admin-chart-area').exists()) {
+        $.hood.Admin.Stats.LoadChart();
         $('body').on('change', '#history', function () {
-          $.get('/admin/stats/', function (data) {
-            $.hood.Admin.Stats.DoCharts(data);
-          });
+          $.hood.Admin.Stats.LoadChart();
         });
       }
+    },
+    LoadChart: function LoadChart() {
+      $.get('/admin/stats/', function (data) {
+        $('#admin-chart-area').empty();
+        ;
+        $('#admin-chart-area').html('<canvas id="admin-stats-chart"></canvas>');
+        $.hood.Admin.Stats.LoadStats(data);
+        $.hood.Admin.Stats.DoCharts(data);
+      });
     },
     SetupCharts: function SetupCharts() {
       Chart.defaults.global.responsive = true;
@@ -114,7 +117,7 @@ $.hood.Admin = {
       Chart.defaults.global.defaultColor = "#6E84A3";
       Chart.defaults.global.defaultFontColor = "#6E84A3";
       Chart.defaults.global.defaultFontFamily = '';
-      Chart.defaults.global.defaultFontSize = 12;
+      Chart.defaults.global.defaultFontSize = 16;
       Chart.defaults.global.layout.padding = 0;
       Chart.defaults.global.legend.display = true;
       Chart.defaults.global.legend.position = "bottom";
@@ -148,7 +151,7 @@ $.hood.Admin = {
         },
         ticks: {
           beginAtZero: !0,
-          padding: 10,
+          padding: 2,
           callback: function callback(e) {
             return e;
           }
@@ -161,139 +164,73 @@ $.hood.Admin = {
           drawTicks: !1
         },
         ticks: {
-          padding: 20
-        },
-        maxBarThickness: 10
+          padding: 5
+        }
       });
     },
     DoCharts: function DoCharts(data) {
       var datasets = [];
       var dataLabels = [];
-      var contentColour = '#6f42c1';
+      var contentColour = '#fabd07';
       var propertyColour = '#20c997';
       var userColour = '#fd7e14';
-      var subColour = '#17a2b8';
+      var subColour = '#17a2b8'; // 12 months
 
-      if (Number($('#history').val()) < 100) {
-        var labels = []; // Content by day
+      var labels = []; // Content by day
 
-        var content = data.content.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-        var contentSet = [];
-        content.forEach(function (element) {
-          contentSet.push(element.Value);
-          labels.push(element.Key);
-        });
-        datasets.push({
-          label: 'New Content',
-          data: contentSet,
-          borderColor: contentColour,
-          backgroundColor: contentColour,
-          pointBackgroundColor: contentColour,
-          pointBorderColor: '#ffffff'
-        }); // users by day
+      var contentSet = [];
+      data.content.months.forEach(function (element) {
+        contentSet.push(element.Value);
+        labels.push(element.Key);
+      });
+      datasets.push({
+        label: 'New Content',
+        data: contentSet,
+        borderColor: contentColour,
+        backgroundColor: contentColour,
+        pointBackgroundColor: contentColour,
+        pointBorderColor: '#ffffff'
+      }); // users by day
 
-        var users = data.users.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-        contentSet = [];
-        users.forEach(function (element) {
-          contentSet.push(element.Value);
-        });
-        datasets.push({
-          label: 'New Users',
-          data: contentSet,
-          borderColor: userColour,
-          backgroundColor: userColour,
-          pointBackgroundColor: userColour,
-          pointBorderColor: '#ffffff'
-        }); // subs by day
+      contentSet = [];
+      data.users.months.forEach(function (element) {
+        contentSet.push(element.Value);
+      });
+      datasets.push({
+        label: 'New Users',
+        data: contentSet,
+        borderColor: userColour,
+        backgroundColor: userColour,
+        pointBackgroundColor: userColour,
+        pointBorderColor: '#ffffff'
+      }); // subs by day
 
-        var subs = data.subs.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-        contentSet = [];
-        subs.forEach(function (element) {
-          contentSet.push(element.Value);
-        });
-        datasets.push({
-          label: 'New Subscriptions',
-          data: contentSet,
-          borderColor: subColour,
-          backgroundColor: subColour,
-          pointBackgroundColor: subColour,
-          pointBorderColor: '#ffffff'
-        }); // Properties by day
+      contentSet = [];
+      data.subs.months.forEach(function (element) {
+        contentSet.push(element.Value);
+      });
+      datasets.push({
+        label: 'New Subscriptions',
+        data: contentSet,
+        borderColor: subColour,
+        backgroundColor: subColour,
+        pointBackgroundColor: subColour,
+        pointBorderColor: '#ffffff'
+      }); // Properties by day
 
-        var properties = data.properties.days.slice(Math.max(data.content.days.length - Number($('#history').val()), 1));
-        contentSet = [];
-        properties.forEach(function (element) {
-          contentSet.push(element.Value);
-        });
-        datasets.push({
-          label: 'New Properties',
-          data: contentSet,
-          borderColor: propertyColour,
-          backgroundColor: propertyColour,
-          pointBackgroundColor: propertyColour,
-          pointBorderColor: '#ffffff'
-        });
-        dataLabels = labels;
-      } else {
-        // 12 months
-        var _labels = []; // Content by day
-
-        var _contentSet = [];
-        data.content.months.forEach(function (element) {
-          _contentSet.push(element.Value);
-
-          _labels.push(element.Key);
-        });
-        datasets.push({
-          label: 'New Content',
-          data: _contentSet,
-          borderColor: contentColour,
-          backgroundColor: contentColour,
-          pointBackgroundColor: contentColour,
-          pointBorderColor: '#ffffff'
-        }); // users by day
-
-        _contentSet = [];
-        data.users.months.forEach(function (element) {
-          _contentSet.push(element.Value);
-        });
-        datasets.push({
-          label: 'New Users',
-          data: _contentSet,
-          borderColor: contentColour,
-          backgroundColor: contentColour,
-          pointBackgroundColor: contentColour,
-          pointBorderColor: '#ffffff'
-        }); // subs by day
-
-        _contentSet = [];
-        data.subs.months.forEach(function (element) {
-          _contentSet.push(element.Value);
-        });
-        datasets.push({
-          label: 'New Subscriptions',
-          data: _contentSet,
-          borderColor: subColour,
-          backgroundColor: subColour,
-          pointBackgroundColor: subColour,
-          pointBorderColor: '#ffffff'
-        }); // Properties by day
-
-        _contentSet = [];
-        data.properties.months.forEach(function (element) {
-          _contentSet.push(element.Value);
-        });
-        datasets.push({
-          label: 'New Properties',
-          data: _contentSet,
-          borderColor: propertyColour,
-          backgroundColor: propertyColour,
-          pointBackgroundColor: propertyColour,
-          pointBorderColor: '#ffffff'
-        });
-        dataLabels = _labels;
-      }
-
+      contentSet = [];
+      data.properties.months.forEach(function (element) {
+        contentSet.push(element.Value);
+      });
+      datasets.push({
+        label: 'New Properties',
+        data: contentSet,
+        borderColor: propertyColour,
+        backgroundColor: propertyColour,
+        pointBackgroundColor: propertyColour,
+        pointBorderColor: '#ffffff'
+      });
+      dataLabels = labels;
       var ctx = document.getElementById("admin-stats-chart");
       var myChart = new Chart(ctx, {
         type: 'bar',
@@ -304,13 +241,6 @@ $.hood.Admin = {
         responsive: true,
         maintainAspectRatio: false,
         options: {
-          events: [],
-          tooltips: {
-            enabled: false
-          },
-          hover: {
-            mode: null
-          },
           responsive: true,
           maintainAspectRatio: false,
           scales: {
@@ -336,11 +266,6 @@ $.hood.Admin = {
       for (var i = 0; i < data.content.byType.length; i++) {
         $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
       }
-
-      $('[data-plugin="counterup"]').counterUp({
-        delay: 10,
-        time: 800
-      });
     }
   },
   CheckAndLoadTabs: function CheckAndLoadTabs(tag) {
