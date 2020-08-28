@@ -930,6 +930,7 @@ $.hood.Handlers = {
         appClass: 'custom-class',
         theme: 'monolith',
         useAsButton: true,
+        "default": $(this).data('default') || 'none',
         defaultRepresentation: 'HEXA',
         position: 'bottom-end',
         components: {

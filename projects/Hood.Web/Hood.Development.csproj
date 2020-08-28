@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>Hood.Web</UserSecretsId>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Hood\Hood.csproj" />
   </ItemGroup>

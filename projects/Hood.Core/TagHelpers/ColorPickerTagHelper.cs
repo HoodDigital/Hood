@@ -26,6 +26,11 @@ namespace Hood.TagHelpers
         [HtmlAttributeName("asp-input-class")]
         public string InputClass { get; set; } = "form-control";
         /// <summary>
+        /// Default: form-control
+        /// </summary>
+        [HtmlAttributeName("asp-default-value")]
+        public string DefaultValue { get; set; } = "transparent";
+        /// <summary>
         /// Default: img img-xs border-3 border-white shadow-sm
         /// </summary>
         [HtmlAttributeName("asp-image-class")]
@@ -84,7 +89,7 @@ namespace Hood.TagHelpers
                 output.Content.SetHtmlContent($@"
                     <div class='row no-gutter align-items-center'>
                         <div class='col-auto pr-0'>
-                            <figure class='{ImageClass} color-picker' data-target='#{fieldId}'>
+                            <figure class='{ImageClass} color-picker' data-target='#{fieldId}' data-default='{DefaultValue}'>
                                 <div class='{PickerClass}'></div>
                             </figure>                        
                         </div>
