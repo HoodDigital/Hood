@@ -274,13 +274,17 @@ $.hood.Handlers = {
         var pickrs = [];
         // Simple example, see optional options for more configuration.
         $('.color-picker').each(function (index, elem) {
-
+            let lockOpacity = true;
+            if ($(this).data('opacity') == 'true') {
+                lockOpacity = false;
+            }
             let pickr = Pickr.create({
                 el: elem.children[0],
                 appClass: 'custom-class',
                 theme: 'monolith',
                 useAsButton: true,
                 default: $(this).data('default') || 'none',
+                lockOpacity: lockOpacity,
                 defaultRepresentation: 'HEXA',
                 position: 'bottom-end',
                 components: {
@@ -302,8 +306,10 @@ $.hood.Handlers = {
                     $(elemId).on('click', $.proxy(function () {
                         this.show();
                     }, instance));
-                    instance.setColor(value);
-                    updateColorFieldValue(instance.getColor(), instance);
+                    if (value) {
+                        instance.setColor(value);
+                        updateColorFieldValue(instance.getColor(), instance);
+                    }
                 })
                 .on('clear', instance => {
                     let elemId = $(instance._root.button).parent().data('target');
