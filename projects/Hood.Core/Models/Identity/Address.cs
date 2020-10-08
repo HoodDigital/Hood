@@ -12,9 +12,9 @@ namespace Hood.Models
         public string QuickName { get; set; }
 
         [Display(Name = "Building Name/Number")]
-        [Required]
         public string Number { get; set; }
 
+        [Required]
         [Display(Name = "Address 1")]
         public string Address1 { get; set; }
 

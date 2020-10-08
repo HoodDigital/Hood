@@ -8,7 +8,6 @@ namespace Hood.Interfaces
         string ContactName { get; set; }
 
         [Display(Name = "Building Name/Number")]
-        [Required]
         string Number { get; set; }
 
         [Display(Name = "Address 1")]
