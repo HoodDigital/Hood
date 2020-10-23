@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
+    public class AdminCreateUserViewModel : RegisterViewModel
+    {
+        [Display(Name = "Create Validated Account", Description = "Create the user, and mark the email address and phone number as valid. This will override the requirement for the user to validate their email when logging in. This is not recommended to maintain account security.")]
+        public bool CreateValidated { get; set; } = false;
+    }
+
     public class RegisterViewModel : HoneyPotFormModel, IName, IAddress, IPerson
     {
         [Required]
