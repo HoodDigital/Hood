@@ -17,10 +17,6 @@
         {
             <a class="dropdown-item hood-inline-task" asp-action="MarkEmailConfirmed" asp-route-id="@Model.Id"><i class="fa fa-envelope-open-text"></i> Mark Email Confirmed</a>
         }
-        @if (!Model.PhoneNumberConfirmed)
-        {
-            <a class="dropdown-item hood-inline-task" asp-action="MarkPhoneConfirmed" asp-route-id="@Model.Id"><i class="fa fa-phone-square"></i> Mark Phone Confirmed</a>
-        }
 
         <div class="dropdown-divider"></div>
         <a class="dropdown-item user-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete User</a>
@@ -102,14 +98,6 @@
                     <div class="form-group floating-label">
                         <label asp-for="PhoneNumber"></label>
                         <input type="text" class="form-control" asp-for="PhoneNumber">
-                        @if (Model.PhoneNumberConfirmed)
-                        {
-                            <small class="text-success"><i class="fa fa-info-circle mr-2"></i>This phone number is confirmed.</small>
-                        }
-                        else
-                        {
-                            <small class="text-danger"><i class="fa fa-info-circle mr-2"></i>This phone number is not confirmed.</small>
-                        }
                     </div>
                     <div class="form-group floating-label">
                         <label asp-for="FirstName"></label>
@@ -118,13 +106,6 @@
                     <div class="form-group floating-label">
                         <label asp-for="LastName"></label>
                         <input type="text" class="form-control" asp-for="LastName">
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input asp-for="Active" class="custom-control-input">
-                            <label asp-for="Active" class="custom-control-label"></label>
-                        </div>
-                        <small asp-for="Active"></small>
                     </div>
                     <div class="form-group">
                         <div class="custom-control custom-checkbox">
@@ -416,10 +397,6 @@
                     <div class="form-group floating-label">
                         <label asp-for="LastLoginLocation"></label>
                         <input type="text" class="form-control disabled" asp-for="LastLoginLocation" disabled />
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="BillingAddressJson"></label>
-                        <input type="text" class="form-control disabled" asp-for="BillingAddressJson" disabled />
                     </div>
                 </div>
                 <div id="notes" class="tab-pane" role="tabpanel" aria-labelledby="notes-tab">
