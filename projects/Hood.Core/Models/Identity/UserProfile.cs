@@ -1,7 +1,6 @@
 ﻿using Hood.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-using Stripe;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -26,10 +25,6 @@ namespace Hood.Models
         #region View Model Stuff
         [NotMapped]
         public IList<IdentityRole> AllRoles { get; set; }
-        [NotMapped]
-        public Customer Customer { get; set; }
-        [NotMapped]
-        public List<Customer> MatchedCustomerObjects { get; set; }
         #endregion
 
         #region Prevent Mapping Sensitive Fields

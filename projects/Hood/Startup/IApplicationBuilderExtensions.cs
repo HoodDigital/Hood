@@ -50,12 +50,6 @@ namespace Hood.Startup
             foreach (var dependency in instances)
                 dependency.Configure(app, env, config);
 
-            if (config.IsDatabaseConfigured())
-            {
-                ScheduledTaskManager.Instance.Initialize();
-                ScheduledTaskManager.Instance.Start();
-            }
-
             return app;
         }
 

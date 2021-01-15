@@ -24,9 +24,3 @@
     <meta name="twitter:description" content="@description" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
-@if (_integrations.EnableTwitter)
-{
-    <div class="hood-inline twitter-feed" data-url="@Url.Action("TwitterFeed", "Hood")">
-        <alert icon="fa fa-2x fa-cog fa-spin" size="Epic" type="Light" class="text-center mb-0">Loading tweets...</alert>
-    </div>
-}

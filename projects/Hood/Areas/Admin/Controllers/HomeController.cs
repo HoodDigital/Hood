@@ -44,10 +44,8 @@ namespace Hood.Areas.Admin.Controllers
         {
             var content = await _content.GetStatisticsAsync();
             var users = await _account.GetStatisticsAsync();
-            var subs = await _account.GetSubscriptionStatisticsAsync();
             var properties = await _property.GetStatisticsAsync();
-
-            return Json(new { content, users, subs, properties });
+            return Json(new { content, users, properties });
         }
 
     }

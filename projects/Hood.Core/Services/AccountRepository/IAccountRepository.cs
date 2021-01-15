@@ -1,7 +1,6 @@
 ﻿using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using Stripe;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,7 +12,6 @@ namespace Hood.Services
         Task<ApplicationUser> GetCurrentUserAsync(bool track = true);
         Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true);
         Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
-        Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true);
         Task<UserProfile> GetUserProfileByIdAsync(string id);
         Task UpdateUserAsync(ApplicationUser user);
         Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser);

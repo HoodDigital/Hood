@@ -21,7 +21,6 @@ namespace Hood.Models
         #endregion
 
         #region Extra Profile Fields
-        string ForumSignature { get; set; }
         string CompanyName { get; set; }
         string Bio { get; set; }
         string JobTitle { get; set; }

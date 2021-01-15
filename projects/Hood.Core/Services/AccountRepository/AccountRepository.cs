@@ -6,7 +6,6 @@ using Hood.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,21 +79,6 @@ namespace Hood.Services
 
             return await query.SingleOrDefaultAsync(u => u.Email == email);
         }
-        public async Task<ApplicationUser> GetUserByStripeIdAsync(string stripeId, bool track = true)
-        {
-            if (!stripeId.IsSet())
-            {
-                return null;
-            }
-
-            IQueryable<ApplicationUser> query = UserQuery;
-            if (!track)
-            {
-                query = query.AsNoTracking();
-            }
-
-            return await query.SingleOrDefaultAsync(u => u.StripeId == stripeId);
-        }
         public async Task<ApplicationUser> GetCurrentUserAsync(bool track = true)
         {
             if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
@@ -105,30 +89,6 @@ namespace Hood.Services
             {
                 return null;
             }
-        }
-        public async Task<ApplicationUser> GetOrCreateLocalUserForCustomerObject(Customer customer)
-        {
-            var user = await _db.Users.SingleOrDefaultAsync(u => u.Email == customer.Email);
-            if (user != null)
-                return user;
-
-            // a user with this email address does not exist on the site, let's create one so they can access their account.
-            user = new ApplicationUser
-            {
-                UserName = customer.Email,
-                Email = customer.Email,
-                FirstName = customer.Name.ToFirstName(),
-                LastName = customer.Name.ToLastName(),
-                PhoneNumber = customer.Phone,
-                Anonymous = false,
-                CreatedOn = DateTime.Now,
-                StripeId = customer.Id
-            };
-            var result = await _userManager.CreateAsync(user);
-            if (result.Succeeded)
-                return user;
-
-            return null;
         }
         public async Task UpdateUserAsync(ApplicationUser user)
         {

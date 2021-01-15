@@ -84,22 +84,6 @@ namespace Hood.Startup
                     Engine.Services.DatabaseSeedFailed = true;
                 }
 
-                try
-                {
-                    // Configure any event listeners. TODO: Make this a TypeFinder iteration.
-                    if (Engine.Services.Installed)
-                    {
-                        services.GetService<SubscriptionsEventListener>().Configure();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (Engine.Services.Installed)
-                    {
-                        ILogService logService = scope.ServiceProvider.GetService<ILogService>();
-                        logService.AddExceptionAsync<IWebHost>("An error occurred while configuring event listeners.", ex);
-                    }
-                }
             }
             return host;
         }

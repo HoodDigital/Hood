@@ -6,8 +6,6 @@ using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
-using MailChimp.Net;
-using MailChimp.Net.Core;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -95,57 +93,11 @@ namespace Hood.Areas.Admin.Controllers
                 return View(model);
             }
         }
-        [Route("admin/users/{id}/stripe/link/")]
-        public async Task<IActionResult> LinkToStripe(string id, string customerId)
-        {
-            try
-            {
-                ApplicationUser user = await _account.GetUserByIdAsync(id);
-                Stripe.Customer customer = await _stripe.GetCustomerByIdAsync(user.StripeId);
-                if (customer == null)
-                {
-                    customer = await _stripe.GetCustomerByIdAsync(customerId);
-                    if (customer == null)
-                    {
-                        throw new Exception("The customer object does could not be validated.");
-                    }
 
-                    if (customer.Email.ToLower() != user.Email.ToLower())
-                    {
-                        throw new Exception("The email for the customer object does not match the user's email.");
-                    }
-
-                    user.StripeId = customerId;
-                    await _account.UpdateUserAsync(user);
-                    SaveMessage = "Account has been successfully linked with the Stripe customer account.";
-                    MessageType = AlertType.Success;
-                }
-                else
-                {
-                    throw new Exception("The user is already linked to stripe.");
-                }
-            }
-            catch (Exception ex)
-            {
-                SaveMessage = $"Error linking the customer object";
-                MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<UsersController>(SaveMessage, ex);
-            }
-            return RedirectToAction(nameof(Edit), new { id });
-        }
         private async Task LoadAndCheckProfile(UserProfile model)
         {
             model.AllRoles = await _account.GetAllRolesAsync();
             model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
-            if (model.StripeId.IsSet())
-            {
-                model.Customer = await _stripe.GetCustomerByIdAsync(model.StripeId);
-            }
-
-            if (model.Customer == null)
-            {
-                model.MatchedCustomerObjects = await _account.GetMatchingCustomerObjectsAsync(model.Email);
-            }
         }
         #endregion
 

@@ -66,7 +66,6 @@ namespace Hood.Startup
         public static IServiceCollection ConfigureHoodServices(this IServiceCollection services)
         {
             // Register singletons.
-            services.AddSingleton<SubscriptionsEventListener>();
             services.AddSingleton<IFTPService, FTPService>();
             services.AddSingleton<IPropertyImporter, BlmFileImporter>();
             services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
@@ -78,10 +77,6 @@ namespace Hood.Startup
             services.AddSingleton<IHoodCache, HoodCache>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
-            services.AddSingleton<ForumCategoryCache>();
-
-            // Register transients.
-            services.AddTransient<IStripeService, StripeService>();
 
             // Register scoped.
             services.AddScoped<ISettingsRepository, SettingsRepository>();
@@ -90,7 +85,6 @@ namespace Hood.Startup
             services.AddScoped<IContentRepository, ContentRepository>();
 
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
-            services.AddScoped<IStripeWebHookService, StripeWebHookService>();
             services.AddScoped<IPageBuilder, PageBuilder>();
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ISmsSender, SmsSender>();

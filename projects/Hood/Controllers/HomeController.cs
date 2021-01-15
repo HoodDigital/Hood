@@ -141,24 +141,6 @@ namespace Hood.Controllers
                 if (model.Content.GetMeta("Settings.Security.Public") != null)
                     if (!User.Identity.IsAuthenticated && model.Content.GetMetaValue<bool>("Settings.Security.Public") == false)
                         return NotFound();
-
-                if (Engine.Settings.Billing.IsSubscriptionsEnabled)
-                {
-                    if (model.Content.GetMeta("Settings.Security.Subscription") != null)
-                    {
-                        List<string> subs = JsonConvert.DeserializeObject<List<string>>(model.Content.GetMetaValue<string>("Settings.Security.Subscription"));
-                        if (subs != null)
-                            if (subs.Count > 0)
-                            {
-                                if (!subs.Any(s => User.IsSubscribed(s)))
-                                {
-                                    SaveMessage = "You need to purchase, upgrade or change your package to view this.";
-                                    MessageType = AlertType.Warning;
-                                    return RedirectToAction("Index", "Subscriptions");
-                                }
-                            }
-                    }
-                }
             }
 
             model.Recent = await _content.GetRecentAsync(model.Type, model.Category);

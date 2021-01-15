@@ -36,22 +36,6 @@
                             <i class="fa fa-money-bill-wave-alt mr-2"></i>Manage Billing
                         </a>
                     </li>
-                    @if (User.IsAdminOrBetter() || User.IsInRole("Api"))
-                    {
-                        <li>
-                            <a class="text-muted" asp-action="Index" asp-controller="Api">
-                                <i class="fa fa-key mr-2"></i>Api Keys
-                            </a>
-                        </li>
-                    }
-                    @if (Engine.Settings.Billing.IsSubscriptionsEnabled)
-                    {
-                        <li>
-                            <a class="text-muted" asp-action="Index" asp-controller="Subscriptions">
-                                <i class="fa fa-credit-card mr-2"></i>Manage Subscription
-                            </a>
-                        </li>
-                    }
                     <li>
                         <a class="text-muted" asp-action="ChangePassword" asp-controller="Manage">
                             <i class="fa fa-lock mr-2"></i>Change Password

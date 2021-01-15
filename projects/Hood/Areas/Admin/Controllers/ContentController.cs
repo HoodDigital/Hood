@@ -518,19 +518,6 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     model = GetTemplates(model, model.Type.TemplateFolder);
                 }
-
-                // Special type features.
-                switch (model.Type.BaseName)
-                {
-                    case "Page":
-                        if (Engine.Settings.Billing.IsSubscriptionsEnabled)
-                        {
-                            // get subscriptions - if there are any.
-                            SubscriptionPlanListModel subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
-                            model.Subscriptions = subs.List;
-                        }
-                        break;
-                }
             }
 
             return model;

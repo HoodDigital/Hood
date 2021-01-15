@@ -106,36 +106,6 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectWithResetMessage("Basics");
         }
 
-
-        [Route("admin/settings/scheduled-tasks/")]
-        public IActionResult ScheduledTasks()
-        {
-            _cache.Remove(typeof(ScheduledTaskSettings).ToString());
-            ScheduledTaskSettings model = Engine.Settings.ScheduledTasks;
-            if (model == null)
-                model = new ScheduledTaskSettings();
-            return View(model);
-        }
-
-        [HttpPost]
-        [Route("admin/settings/scheduled-tasks/")]
-        public IActionResult ScheduledTasks(ScheduledTaskSettings model)
-        {
-            try
-            {
-                Engine.Settings.Set(model);
-
-                SaveMessage = "Settings saved!";
-                MessageType = AlertType.Success;
-            }
-            catch (Exception ex)
-            {
-                SaveMessage = "Error saving: " + ex.Message;
-                MessageType = AlertType.Danger;
-            }
-            return View(model);
-        }
-
         [Route("admin/integrations/")]
         public IActionResult Integrations()
         {
@@ -375,42 +345,6 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectWithResetMessage("Property");
         }
 
-
-        [Route("admin/settings/billing/")]
-        public IActionResult Billing()
-        {
-            _cache.Remove(typeof(BillingSettings).ToString());
-            BillingSettings model = Engine.Settings.Billing;
-            if (model == null)
-                model = new BillingSettings();
-            return View(model);
-        }
-        [HttpPost]
-        [Route("admin/settings/billing/")]
-        public IActionResult Billing(BillingSettings model)
-        {
-            try
-            {
-                Engine.Settings.Set(model);
-                SaveMessage = "Settings saved!";
-                MessageType = AlertType.Success;
-            }
-            catch (Exception ex)
-            {
-                SaveMessage = "Error saving: " + ex.Message;
-                MessageType = AlertType.Danger;
-            }
-            return View(model);
-        }
-
-        [Route("admin/settings/billing/reset/")]
-        public IActionResult ResetBilling()
-        {
-            var model = new BillingSettings();
-            Engine.Settings.Set(model);
-            return RedirectWithResetMessage("Billing");
-        }
-
         [Route("admin/settings/account/")]
         public IActionResult AccountSettings()
         {
@@ -576,50 +510,6 @@ namespace Hood.Areas.Admin.Controllers
             var model = new MailSettings();
             Engine.Settings.Set(model);
             return RedirectWithResetMessage("Mail");
-        }
-
-        [Route("admin/settings/forum/")]
-        public async Task<IActionResult> Forum()
-        {
-            _cache.Remove(typeof(ForumSettings).ToString());
-            ForumSettings model = Engine.Settings.Forum;
-            if (model == null)
-                model = new ForumSettings();
-
-            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
-            model.Subscriptions = subs.List;
-
-            model.Roles = await _account.GetAllRolesAsync();
-            return View(model);
-        }
-        [HttpPost]
-        [Route("admin/settings/forum/")]
-        public async Task<IActionResult> Forum(ForumSettings model)
-        {
-            try
-            {
-                Engine.Settings.Set(model);
-                SaveMessage = "Settings saved!";
-                MessageType = AlertType.Success;
-            }
-            catch (Exception ex)
-            {
-                SaveMessage = "Error saving: " + ex.Message;
-                MessageType = AlertType.Danger;
-            }
-            var subs = await _account.GetSubscriptionPlansAsync(new SubscriptionPlanListModel() { PageSize = int.MaxValue });
-            model.Subscriptions = subs.List;
-
-            model.Roles = await _account.GetAllRolesAsync();
-            return View(model);
-        }
-
-        [Route("admin/settings/forum/reset/")]
-        public IActionResult ResetForum()
-        {
-            var model = new ForumSettings();
-            Engine.Settings.Set(model);
-            return RedirectWithResetMessage("Forum");
         }
 
 

@@ -26,14 +26,7 @@
     @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)
 
-    @if (Engine.Settings.Basic.EnablePreload)
-    {
-        <partial name="_DeferredStyles" />
-    }
-    else
-    {
-        <partial name="_Styles" />
-    }
+    <partial name="_Styles" />
     @RenderSection("styles", required: false)
 
     @Html.RenderScripts(Url, ResourceLocation.AfterCss)
@@ -46,11 +39,6 @@
     @RenderSection("afterbody", required: false)
 
     <partial name="_NoScript" />
-
-    @if (Engine.Settings.Basic.EnablePreload)
-    {
-        <partial name="_PreLoader" />
-    }
 
     @RenderSection("beforecontent", required: false)
 
@@ -65,11 +53,6 @@
 
     @RenderSection("afterfooter", required: false)
     <partial name="_AdminEditor" />
-
-    @if (Engine.Settings.Basic.EnablePreload)
-    {
-        <partial name="_DeferredStylesLoader" />
-    }
 
     @RenderSection("includes", required: false)
 

@@ -17,11 +17,6 @@
 <script src="~/lib/tinymce/themes/inlite/theme.min.js" asp-location="Vendors" asp-bundle="false"></script>
 <script src="~/lib/pickr/dist/pickr.min.js" asp-location="Vendors" asp-bundle="false"></script>
 
-@if (Engine.Settings.Billing.IsStripeEnabled)
-{
-    <script src="https://js.stripe.com/v3/" asp-location="BeforeScripts" asp-bundle="false"></script>
-}
-
 <script src="@string.Format("{0}/js/core/production.js", Engine.LibraryFolder)" asp-location="Vendors"></script>
 <script src="@string.Format("{0}/js/core/globals.js", Engine.LibraryFolder)" asp-location="Vendors"></script>
 

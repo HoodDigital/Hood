@@ -33,12 +33,10 @@ namespace Hood.Controllers
         protected readonly IContentRepository _content;
         protected readonly ContentCategoryCache _contentCategoryCache;
         protected readonly IPropertyRepository _property;
-        protected readonly ForumCategoryCache _forumCategoryCache;
         protected readonly TContext _db;
         protected readonly IEmailSender _emailSender;
         protected readonly IMailService _mailService;
         protected readonly ISmsSender _smsSender;
-        protected readonly IStripeService _stripe;
         protected readonly ILogService _logService;
         protected readonly IConfiguration _config;
         protected readonly IWebHostEnvironment _env;
@@ -70,13 +68,11 @@ namespace Hood.Controllers
             _content = Engine.Services.Resolve<IContentRepository>();
             _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
             _property = Engine.Services.Resolve<IPropertyRepository>();
-            _forumCategoryCache = Engine.Services.Resolve<ForumCategoryCache>();
             _account = Engine.Services.Resolve<IAccountRepository>();
             _db = Engine.Services.Resolve<TContext>();
             _emailSender = Engine.Services.Resolve<IEmailSender>();
             _mailService = Engine.Services.Resolve<IMailService>();
             _smsSender = Engine.Services.Resolve<ISmsSender>();
-            _stripe = Engine.Services.Resolve<IStripeService>();
             _logService = Engine.Services.Resolve<ILogService>();
             _config = Engine.Services.Resolve<IConfiguration>();
             _env = Engine.Services.Resolve<IWebHostEnvironment>();

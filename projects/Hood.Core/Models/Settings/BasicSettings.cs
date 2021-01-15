@@ -42,12 +42,8 @@ namespace Hood.Models
         [Display(Name = "Homepage", Description = "Choose a homepage for the site, other than the default Homepage.")]
         public int? Homepage { get; set; }
 
-        [Display(Name = "Enable Api Keys", Description = "Allow external access to site data via the use of Api Keys, users can be issued with keys to access resources via the Api. <span class=\"badge badge-warning\">Beta</span>")]
-        public bool EnableApiKeys { get; set; }
         [Display(Name = "Enable Themes", Description = "Enable the use of themes, when enabled, you can choose the site theme from the Settings > Themes page")]
         public bool EnableThemes { get; set; }
-        [Display(Name = "Enable Preload", Description = "Preload will use the CSS preload method, and defer main site styles to load once downloaded. This will only work with Preloadable themes.")]
-        public bool EnablePreload { get; set; }
 
         [Display(Name = "Lockout/Maintenance Mode", Description = "Lock the site and force users to view the Maintenance Mode Page. The login page will be available. Administrators can log in to bypass the Lockout Mode. You can include a form on the lockout page to provide code based access to the other areas.")]
         public bool LockoutMode { get; set; }
@@ -75,70 +71,6 @@ namespace Hood.Models
                 return "Untitled Site";
             }
         }
-
-        #region Obsolete
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Logo"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string SiteLogo { get => Logo; set => Logo = value; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.LogoLight"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string SiteLogoLight { get => LogoLight; set => LogoLight = value; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Owner.FirstName"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string OwnerFirstName { get => Owner.FirstName; set => Owner.FirstName = value; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Owner.LastName"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string OwnerLastName { get => Owner.LastName; set => Owner.LastName = value; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Owner.ToDisplayName()"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string OwnerDisplayName { get => Owner.DisplayName; set => Owner.DisplayName = value; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Owner.Phone"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string OwnerPhone { get => Owner.Phone; set => Owner.Phone = value; }
-        /// <summary>
-        /// No replacement for this. Do not use.
-        /// </summary>
-        [Obsolete(null, true)]
-        public string OwnerMobile { get; set; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Owner.JobTitle"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string JobTitle { get => Owner.JobTitle; set => Owner.JobTitle = value; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Title"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string SiteTitle { get; set; }
-        /// <summary>
-        /// Please use <see cref="BasicSettings.Owner.ToFullName()"/>, accessible via <see cref="Hood.Core.Engine.Settings"/>
-        /// </summary>
-        [Obsolete(null, true)]
-        public string OwnerFullName { get; set; }
-        /// <summary>
-        /// No replacement for this. Do not use.
-        /// </summary>
-        [Obsolete(null, true)]
-        public string Description { get; set; }
-        /// <summary>
-        /// No replacement for this. Do not use.
-        /// </summary>
-        [Obsolete(null, true)]
-        public string EditorType { get; set; }
-
-        #endregion
     }
 
     public partial class SiteAddress : IAddress

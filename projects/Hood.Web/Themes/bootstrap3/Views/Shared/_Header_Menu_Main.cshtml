@@ -20,10 +20,6 @@
                     </li>
                 }
             }
-            @if (Engine.Settings.Forum.Enabled)
-            {
-                <li><a asp-action="Index" asp-controller="Forum">Forums</a></li>
-            }
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Content <span class="caret"></span></a>
                 <div class="dropdown-menu full">
@@ -63,10 +59,6 @@
                     </div>
                 </div>
             </li>
-            @if (Engine.Settings.Billing.IsSubscriptionsEnabled)
-            {
-                <li><a asp-action="Select" asp-controller="Subscriptions">Pricing</a></li>
-            }
         </ul>
         <ul class="nav navbar-nav login">
             @if (User.Identity.IsAuthenticated)

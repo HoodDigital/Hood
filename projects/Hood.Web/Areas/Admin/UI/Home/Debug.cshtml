@@ -3,7 +3,6 @@
 }
 <h4>Account Info</h4>
 <div class="text-monospace">
-    <p>User.HasActiveSubscription() = @User.HasActiveSubscription()</p>
     <p>User.GetUserProfile().UserName = @User.GetUserProfile().UserName</p>
     <p>User.GetUserProfile().Email = @User.GetUserProfile().Email</p>
     <p>User.GetUserProfile().Id = @User.GetUserProfile().Id</p>
@@ -21,21 +20,10 @@
     <p>User.GetUserProfile().LastLogOn = @User.GetUserProfile().LastLogOn</p>
     <p>User.GetUserProfile().LastLoginIP = @User.GetUserProfile().LastLoginIP</p>
     <p>User.GetUserProfile().LastLoginLocation = @User.GetUserProfile().LastLoginLocation</p>
-    <p>User.GetUserProfile().ActiveCount = @User.GetUserProfile().TotalSubscriptions</p>
-    <p>User.GetUserProfile().ActiveCount = @User.GetUserProfile().ActiveCount</p>
-    <p>User.GetUserProfile().ActiveCount = @User.GetUserProfile().ActiveCount</p>
-    <p>User.GetUserProfile().OverDueCount = @User.GetUserProfile().OverDueCount</p>
     <p>User.GetUserProfile().Facebook = @User.GetUserProfile().Facebook</p>
     <p>User.GetUserProfile().Twitter = @User.GetUserProfile().Twitter</p>
     <p>User.GetUserProfile().TwitterHandle = @User.GetUserProfile().TwitterHandle</p>
     <p>User.GetUserProfile().WebsiteUrl = @User.GetUserProfile().WebsiteUrl</p>
-</div>
-<h4>Subscriptions</h4>
-<div class="text-monospace">
-    @foreach (var sub in User.GetUserProfile().Subscriptions)
-    {
-        <p>@sub.Name - @sub.StripeId - @sub.StripeSubscriptionId - @sub.Status</p>
-    }
 </div>
 <h4>Notes</h4>
 <div class="text-monospace">
