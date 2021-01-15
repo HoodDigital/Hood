@@ -54,10 +54,6 @@ namespace Hood.Filters
                     controller.Equals("Error", StringComparison.InvariantCultureIgnoreCase))
                     return;
 
-                if (action.Equals(nameof(Hood.Controllers.SubscriptionsController.WebHooks), StringComparison.InvariantCultureIgnoreCase) &&
-                    controller.Equals("Subscriptions", StringComparison.InvariantCultureIgnoreCase))
-                    return;
-
                 if (action.Equals(nameof(Hood.Controllers.HomeController.Index), StringComparison.InvariantCultureIgnoreCase) &&
                     controller.Equals("Home", StringComparison.InvariantCultureIgnoreCase))
                     return;

@@ -539,7 +539,7 @@ namespace Hood.Controllers
             {
                 SaveMessage = $"Error deleting your account: {ex.Message}";
                 MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<ApiController>($"Error when user attemted to delete their account.", ex);
+                await _logService.AddExceptionAsync<ManageController>($"Error when user attemted to delete their account.", ex);
             }
             return RedirectToAction(nameof(Delete));
         }

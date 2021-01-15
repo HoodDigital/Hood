@@ -11,28 +11,8 @@ namespace Hood.Models
 {
     public class UserProfile : UserProfileBase
     {
-        #region Subscription Data
-        public int ActiveCount { get; set; }
-        public int TrialCount { get; set; }
-        public int InactiveCount { get; set; }
-        public int OverDueCount { get; set; }
-        public int TotalSubscriptions { get; set; }
-        public string ActiveSubscriptionIds { get; set; }
+        #region Roles
         public string RoleIds { get; set; }
-
-        internal string SubscriptionsJson { get; set; }
-        public List<UserSubscriptionInfo> Subscriptions
-        {
-            get { return !SubscriptionsJson.IsSet() ? new List<UserSubscriptionInfo>() : JsonConvert.DeserializeObject<List<UserSubscriptionInfo>>(SubscriptionsJson); }
-            set { SubscriptionsJson = JsonConvert.SerializeObject(value); }
-        }
-        public List<UserSubscriptionInfo> ActiveSubscriptions
-        {
-            get
-            {
-                return Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing").ToList();
-            }
-        }
 
         public int RoleCount { get; set; }
         internal string RolesJson { get; set; }

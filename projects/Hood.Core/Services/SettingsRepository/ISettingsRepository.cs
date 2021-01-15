@@ -16,11 +16,8 @@ namespace Hood.Services
         #region Site Settings
         AccountSettings Account { get; }
         BasicSettings Basic { get; }
-        BillingSettings Billing { get; }
         ContactSettings Contact { get; }
         ContentSettings Content { get; }
-        ScheduledTaskSettings ScheduledTasks { get; }
-        ForumSettings Forum { get; }
         IntegrationSettings Integrations { get; }
         MailSettings Mail { get; }
         MediaSettings Media { get; }
