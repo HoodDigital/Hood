@@ -73,7 +73,7 @@ namespace Hood.Controllers
 
                     await _logService.AddLogAsync<AccountController<TContext>>($"User ({model.Username}) logged in.");
 
-                    if (!user.Active && !user.EmailConfirmed)
+                    if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
                         return RedirectToAction(nameof(ConfirmRequired));
                     }
@@ -312,14 +312,12 @@ namespace Hood.Controllers
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
 
-                    if (user.Active)
-                    {
-                        return RedirectToLocal(returnUrl);
-                    }
-                    else
+                    if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
                         return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
                     }
+
+                    return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
             }

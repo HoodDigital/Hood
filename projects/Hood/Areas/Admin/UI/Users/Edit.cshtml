@@ -12,6 +12,12 @@
     <div class="dropdown-menu dropdown-menu-right">
         <a class="dropdown-item user-reset-password" asp-action="ResetPassword" asp-route-id="@Model.Id"><i class="fa fa-lock"></i> Reset Password</a>
         <a class="dropdown-item" asp-action="Impersonate" asp-route-id="@Model.Id"><i class="fa fa-user-secret"></i> Impersonate User</a>
+
+        @if (!Model.EmailConfirmed)
+        {
+            <a class="dropdown-item hood-inline-task" asp-action="MarkEmailConfirmed" asp-route-id="@Model.Id"><i class="fa fa-envelope-open-text"></i> Mark Email Confirmed</a>
+        }
+
         <div class="dropdown-divider"></div>
         <a class="dropdown-item user-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete User</a>
     </div>
@@ -27,6 +33,7 @@
 }
 <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 <form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="edit-user-form" data-id="@Model.Id" class="container ml-md-0 p-0">
+
     <div class="card">
         <div class="card-header">
             <div class="row align-items-center">
@@ -57,6 +64,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">
+                            Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">
                             Notes
                         </a>
@@ -74,7 +86,7 @@
                     <div class="form-group floating-label">
                         <label asp-for="Email"></label>
                         <input type="text" class="form-control" asp-for="Email">
-                        @if (Model.PhoneNumberConfirmed)
+                        @if (Model.EmailConfirmed)
                         {
                             <small class="text-success"><i class="fa fa-info-circle mr-2"></i>This email is confirmed.</small>
                         }
@@ -86,14 +98,6 @@
                     <div class="form-group floating-label">
                         <label asp-for="PhoneNumber"></label>
                         <input type="text" class="form-control" asp-for="PhoneNumber">
-                        @if (Model.PhoneNumberConfirmed)
-                        {
-                            <small class="text-success"><i class="fa fa-info-circle mr-2"></i>This phone number is confirmed.</small>
-                        }
-                        else
-                        {
-                            <small class="text-danger"><i class="fa fa-info-circle mr-2"></i>This phone number is not confirmed.</small>
-                        }
                     </div>
                     <div class="form-group floating-label">
                         <label asp-for="FirstName"></label>
@@ -375,6 +379,24 @@
                                 <p class="m-0 text-muted">No access codes created.</p>
                             </div>
                         }
+                    </div>
+                </div>
+                <div id="info" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="info-tab">
+                    <div class="form-group floating-label">
+                        <label asp-for="CreatedOn"></label>
+                        <input type="text" class="form-control disabled" asp-for="CreatedOn" disabled />
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="LastLogOn"></label>
+                        <input type="text" class="form-control disabled" asp-for="LastLogOn" disabled />
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="LastLoginIP"></label>
+                        <input type="text" class="form-control disabled" asp-for="LastLoginIP" disabled />
+                    </div>
+                    <div class="form-group floating-label">
+                        <label asp-for="LastLoginLocation"></label>
+                        <input type="text" class="form-control disabled" asp-for="LastLoginLocation" disabled />
                     </div>
                 </div>
                 <div id="notes" class="tab-pane" role="tabpanel" aria-labelledby="notes-tab">

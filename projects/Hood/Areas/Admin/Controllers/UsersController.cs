@@ -158,7 +158,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/users/create/")]
         [HttpPost]
-        public async Task<Response> Create(RegisterViewModel model)
+        public async Task<Response> Create(AdminCreateUserViewModel model)
         {
             try
             {
@@ -188,6 +188,21 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     return new Response(result.Errors);
                 }
+
+                if (model.CreateValidated)
+                {
+                    user.EmailConfirmed = true;
+                    user.Active = true;
+                    await _userManager.UpdateAsync(user);
+                }
+                else
+                {
+                    if (!Engine.Settings.Account.RequireEmailConfirmation)
+                    {
+                        user.EmailConfirmed = true;
+                    }
+                }
+
                 if (model.NotifyUser)
                 {
                     // Send the email to the user, letting em know n' shit.
@@ -233,7 +248,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                UserProfile user = await _account.GetUserProfileByIdAsync(id);
+                ApplicationUser user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                 {
                     throw new Exception($"The user Id {id} could not be found, therefore could not be deleted.");
@@ -248,6 +263,73 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<UsersController>($"Error deleting a user via the admin panel.", ex);
             }
         }
+        #endregion
+
+        #region MarkConfirmed
+        [Route("admin/users/{id}/confirm-email/")]
+        public async Task<Response> MarkEmailConfirmed(string id)
+        {
+            try
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                if (user == null)
+                {
+                    throw new Exception($"The user Id {id} could not be found, therefore could not be confirmed.");
+                }
+
+                user.EmailConfirmed = true;
+                if (!user.Active)
+                {
+                    user.Active = true;
+                }
+                user.AddUserNote(new UserNote()
+                {
+                    CreatedBy = User.GetUserId(),
+                    CreatedOn = DateTime.Now,
+                    Note = $"User email marked as confirmed via admin panel by {User.Identity.Name}."
+                });
+                await _userManager.UpdateAsync(user);
+
+                await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) email confirmed via admin panel by {User.Identity.Name}", type: LogType.Warning);
+                return new Response(true, "Email confirmed successfully.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<UsersController>($"Error confirming email for user via the admin panel.", ex);
+            }
+        }
+        //[Route("admin/users/{id}/confirm-phone/")]
+        //public async Task<Response> MarkPhoneConfirmed(string id)
+        //{
+        //    try
+        //    {
+        //        ApplicationUser user = await _userManager.FindByIdAsync(id);
+        //        if (user == null)
+        //        {
+        //            throw new Exception($"The user Id {id} could not be found, therefore could not be confirmed.");
+        //        }
+
+        //        user.PhoneNumberConfirmed = true;
+        //        if (!user.Active)
+        //        {
+        //            user.Active = true;
+        //        }
+        //        user.AddUserNote(new UserNote()
+        //        {
+        //            CreatedBy = User.GetUserId(),
+        //            CreatedOn = DateTime.Now,
+        //            Note = $"User phone marked as confirmed via admin panel by {User.Identity.Name}."
+        //        });
+        //        await _userManager.UpdateAsync(user);
+
+        //        await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) phone confirmed via admin panel by {User.Identity.Name}", type: LogType.Warning);
+        //        return new Response(true, "Phone confirmed successfully.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return await ErrorResponseAsync<UsersController>($"Error confirming phone for user via the admin panel.", ex);
+        //    }
+        //}
         #endregion
 
         #region Notes 
@@ -388,6 +470,14 @@ namespace Hood.Areas.Admin.Controllers
                 userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetUserId()));
                 userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
 
+                impersonatedUser.AddUserNote(new UserNote()
+                {
+                    CreatedBy = User.GetUserId(),
+                    CreatedOn = DateTime.Now,
+                    Note = $"User {impersonatedUser.UserName} was impersonated by {User.Identity.Name}."
+                });
+                await _userManager.UpdateAsync(impersonatedUser);
+
                 // sign out the current user
                 await _signInManager.SignOutAsync();
 
@@ -450,6 +540,13 @@ namespace Hood.Areas.Admin.Controllers
                 IdentityResult result = await _userManager.ResetPasswordAsync(user, token, password);
                 if (result.Succeeded)
                 {
+                    user.AddUserNote(new UserNote()
+                    {
+                        CreatedBy = User.GetUserId(),
+                        CreatedOn = DateTime.Now,
+                        Note = $"User password reset via admin panel by {User.Identity.Name}."
+                    });
+                    await _userManager.UpdateAsync(user);
                     await _logService.AddLogAsync<UsersController>($"The password has been reset by an admin for user with Id: {id}", type: LogType.Success);
                     return new Response(true, $"The user's password has been reset.");
                 }
@@ -467,61 +564,6 @@ namespace Hood.Areas.Admin.Controllers
             {
                 return await ErrorResponseAsync<UsersController>($"Error resetting a password via the admin panel for user with Id: {id}", ex);
             }
-        }
-        #endregion
-
-        #region Mailchimp
-        [Route("admin/users/sync/mailchimp/")]
-        public async Task<IActionResult> SyncToMailchimp()
-        {
-            MailchimpSyncStats stats = new MailchimpSyncStats();
-
-            IntegrationSettings integrations = Engine.Settings.Integrations;
-            MailChimpManager mailchimpManager = new MailChimpManager(integrations.MailchimpApiKey);
-
-            // delete users
-            stats.MailchimpTotal = await mailchimpManager.Members.GetTotalItems(integrations.MailchimpUserListId, MailChimp.Net.Models.Status.Undefined).ConfigureAwait(false);
-            IEnumerable<MailChimp.Net.Models.Member> members = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
-            {
-                Status = MailChimp.Net.Models.Status.Undefined
-            }).ConfigureAwait(false);
-            foreach (MailChimp.Net.Models.Member member in members)
-            {
-                if (!_db.Users.Any(u => u.Email == member.EmailAddress))
-                {
-                    await mailchimpManager.Members.DeleteAsync(integrations.MailchimpUserListId, member.EmailAddress);
-                    stats.Deleted++;
-                }
-            }
-
-            // Add users
-            stats.SiteTotal = _db.Users.Where(u => u.Email != null).Count();
-            foreach (ApplicationUser user in _db.Users)
-            {
-                if (user.Email.IsSet())
-                {
-                    bool exists = await mailchimpManager.Members.ExistsAsync(integrations.MailchimpUserListId, user.Email, falseIfUnsubscribed: false);
-                    if (!exists)
-                    {
-                        MailChimp.Net.Models.Member member = new MailChimp.Net.Models.Member()
-                        {
-                            EmailAddress = user.Email,
-                            Status = MailChimp.Net.Models.Status.Subscribed,
-                            StatusIfNew = MailChimp.Net.Models.Status.Subscribed
-                        };
-                        await mailchimpManager.Members.AddOrUpdateAsync(integrations.MailchimpUserListId, member);
-                        stats.Added++;
-                    }
-                }
-            }
-
-            // show currently [unsubscribed] users
-            IEnumerable<MailChimp.Net.Models.Member> unsubscribed = await mailchimpManager.Members.GetAllAsync(integrations.MailchimpUserListId, new MemberRequest()
-            {
-                Status = MailChimp.Net.Models.Status.Unsubscribed
-            }).ConfigureAwait(false);
-            stats.UnsubscribedUsers = unsubscribed.Select(m => m.EmailAddress).ToList();
-            return View(stats);
         }
         #endregion
     }
