@@ -37,7 +37,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/manage")]
-        public async Task<IActionResult> Index()
+        public virtual async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -62,7 +62,7 @@ namespace Hood.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/manage")]
-        public async Task<IActionResult> Index(UserViewModel model)
+        public virtual async Task<IActionResult> Index(UserViewModel model)
         {
             var user = await _userManager.GetUserAsync(User);
             try
@@ -122,7 +122,7 @@ namespace Hood.Controllers
         }
 
         [Route("account/manage/avatar")]
-        public async Task<Response> UploadAvatar(IFormFile file, string userId)
+        public virtual async Task<Response> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
 
@@ -159,7 +159,7 @@ namespace Hood.Controllers
         }
 
         [Route("account/manage/verify-email")]
-        public async Task<IActionResult> SendVerificationEmail()
+        public virtual async Task<IActionResult> SendVerificationEmail()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -186,7 +186,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/manage/change-password")]
-        public async Task<IActionResult> ChangePassword()
+        public virtual async Task<IActionResult> ChangePassword()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -201,7 +201,7 @@ namespace Hood.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/manage/change-password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -230,7 +230,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/delete")]
-        public IActionResult Delete()
+        public virtual IActionResult Delete()
         {
             return View(nameof(Delete), new SaveableModel());
         }
@@ -238,7 +238,7 @@ namespace Hood.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/delete/confirm")]
-        public async Task<IActionResult> ConfirmDelete()
+        public virtual async Task<IActionResult> ConfirmDelete()
         {
             try
             {
@@ -264,7 +264,7 @@ namespace Hood.Controllers
 
         [AllowAnonymous]
         [Route("account/deleted")]
-        public IActionResult Deleted()
+        public virtual IActionResult Deleted()
         {
             return View(nameof(Deleted));
         }

@@ -28,9 +28,9 @@ namespace Hood.Controllers
             : base()
         { }
 
-        public async Task<IActionResult> Index(AddressListModel model) => await List(model, "Index");
+        public virtual async Task<IActionResult> Index(AddressListModel model) => await List(model, "Index");
         [Route("account/address/list")]
-        public async Task<IActionResult> List(AddressListModel model, string viewName = "_List_Addresses")
+        public virtual async Task<IActionResult> List(AddressListModel model, string viewName = "_List_Addresses")
         {
             IQueryable<Address> addresses = _db.Addresses;
 
@@ -90,7 +90,7 @@ namespace Hood.Controllers
         }
         [HttpPost]
         [Route("account/address/create")]
-        public async Task<IActionResult> Create(Address address)
+        public virtual async Task<IActionResult> Create(Address address)
         {
             try
             {
@@ -131,13 +131,13 @@ namespace Hood.Controllers
         }
 
         [Route("account/address/edit/{id}")]
-        public async Task<ActionResult> Edit(int id)
+        public virtual async Task<ActionResult> Edit(int id)
         {
             return View(await _account.GetAddressByIdAsync(id));
         }
         [HttpPost]
         [Route("account/address/edit/{id}")]
-        public async Task<IActionResult> Edit(Address address)
+        public virtual async Task<IActionResult> Edit(Address address)
         {
             try
             {
@@ -167,7 +167,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [Route("account/address/delete/{id}")]
-        public async Task<Response> Delete(int id)
+        public virtual async Task<Response> Delete(int id)
         {
             try
             {
@@ -182,7 +182,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [Route("account/address/set-billing/{id}")]
-        public async Task<Response> SetBilling(int id)
+        public virtual async Task<Response> SetBilling(int id)
         {
             try
             {
@@ -197,7 +197,7 @@ namespace Hood.Controllers
         }
         [HttpPost]
         [Route("account/address/set-delivery/{id}")]
-        public async Task<Response> SetDelivery(int id)
+        public virtual async Task<Response> SetDelivery(int id)
         {
             try
             {

@@ -25,7 +25,7 @@ namespace Hood.Controllers
         { }
 
         [Route("500")]
-        public async System.Threading.Tasks.Task<IActionResult> AppError()
+        public virtual async System.Threading.Tasks.Task<IActionResult> AppError()
         {
             ErrorModel model = GetErrorInformation();
 
@@ -41,7 +41,7 @@ namespace Hood.Controllers
         }
 
         [Route("404")]
-        public async System.Threading.Tasks.Task<IActionResult> PageNotFound()
+        public virtual async System.Threading.Tasks.Task<IActionResult> PageNotFound()
         {
             BasicSettings basicSettings = Engine.Settings.Basic;
 

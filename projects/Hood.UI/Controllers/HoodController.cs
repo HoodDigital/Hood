@@ -28,7 +28,7 @@ namespace Hood.Controllers
         [HttpPost]
         [Route("hood/contact/send/")]
         [Route("hood/process-contact-form/")]
-        public async Task<Response> ProcessContactForm(ContactFormModel model)
+        public virtual async Task<Response> ProcessContactForm(ContactFormModel model)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace Hood.Controllers
         }
 
         [Route("robots.txt")]
-        public IActionResult Robots()
+        public virtual IActionResult Robots()
         {
             var sw = new StringWriter();
             //write the header
@@ -76,14 +76,14 @@ namespace Hood.Controllers
         }
 
         [Route("sitemap.xml")]
-        public async Task<ActionResult> SitemapXmlAsync()
+        public virtual async Task<ActionResult> SitemapXmlAsync()
         {
             string xml = await _content.GetSitemapDocumentAsync(Url);
             return Content(xml, "text/xml", Encoding.UTF8);
         }
 
         [Route("enter-access-code")]
-        public IActionResult LockoutModeEntrance(string returnUrl)
+        public virtual IActionResult LockoutModeEntrance(string returnUrl)
         {
             if (ControllerContext.HttpContext.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
             {
@@ -96,7 +96,7 @@ namespace Hood.Controllers
 
         [Route("enter-access-code")]
         [HttpPost]
-        public IActionResult LockoutModeEntrance(string token, string returnUrl)
+        public virtual IActionResult LockoutModeEntrance(string token, string returnUrl)
         {
             if (token.IsSet())
             {
@@ -110,7 +110,7 @@ namespace Hood.Controllers
         }
 
         [Route("hood/version/")]
-        public JsonResult Version()
+        public virtual JsonResult Version()
         {
             return Json(new { version = Engine.Version });
         }
