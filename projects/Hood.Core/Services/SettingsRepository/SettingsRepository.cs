@@ -160,13 +160,10 @@ namespace Hood.Services
         public ContactSettings Contact => Get<ContactSettings>();
         public SeoSettings Seo => Get<SeoSettings>();
         public ContentSettings Content => Get<ContentSettings>();
-        public ScheduledTaskSettings ScheduledTasks => Get<ScheduledTaskSettings>();
         public PropertySettings Property => Get<PropertySettings>();
-        public BillingSettings Billing => Get<BillingSettings>();
         public AccountSettings Account => Get<AccountSettings>();
         public MediaSettings Media => Get<MediaSettings>();
         public MailSettings Mail => Get<MailSettings>();
-        public ForumSettings Forum => Get<ForumSettings>();
         public UserProfile SiteOwner
         {
             get
@@ -177,30 +174,6 @@ namespace Hood.Services
         }
 
         #endregion
-
-        public string ConnectionString => _config.GetConnectionString("DefaultConnection");
-        public List<string> LockoutAccessCodes
-        {
-            get
-            {
-                string tokens = Basic.LockoutModeTokens;
-                if (tokens == null)
-                {
-                    return new List<string>();
-                }
-
-                List<string> allowedCodes = tokens.Split(Environment.NewLine.ToCharArray()).ToList();
-                allowedCodes.RemoveAll(str => string.IsNullOrEmpty(str));
-
-                string overrideCode = _config["LockoutMode:OverrideToken"];
-                if (overrideCode.IsSet())
-                {
-                    allowedCodes.Add(overrideCode);
-                }
-
-                return allowedCodes;
-            }
-        }
 
         #region IConfiguration Overrides
         public IConfigurationSection GetSection(string key)

@@ -9,26 +9,6 @@ namespace Hood.Models
     [Serializable]
     public class IntegrationSettings : SaveableModel
     {
-        // Twitter Feed
-        [Display(Name = "Twitter Feed")]
-        public bool EnableTwitter { get; set; }
-        [Display(Name = "Twitter Handle")]
-        public string TwitterId { get; set; }
-
-        // Disqus
-        [Display(Name = "Enable Disqus")]
-        public bool EnableDisqus { get; set; }
-        [Display(Name = "Disqus ID")]
-        public string DisqusId { get; set; }
-
-        // Mailchimp
-        [Display(Name = "Enable Mailchimp")]
-        public bool EnableMailchimp { get; set; }
-        [Display(Name = "Mailchimp Api Key")]
-        public string MailchimpApiKey { get; set; }
-        [Display(Name = "Mailchimp User List Id (Sync your site users to this list)")]
-        public string MailchimpUserListId { get; set; }
-
         // Google Maps Api
         [Display(Name = "Enable Google Geocoding (Location finding for addresses)")]
         public bool EnableGoogleGeocoding { get; set; }
@@ -70,12 +50,6 @@ namespace Hood.Models
         public string GoogleRecaptchaSiteKey { get; set; }
         [Display(Name = "Google Recaptcha Secret Key")]
         public string GoogleRecaptchaSecretKey { get; set; }
-
-        // Disqus
-        [Display(Name = "Enable Chat")]
-        public bool EnableChat { get; set; }
-        [Display(Name = "Script for Chat Plugin")]
-        public string ChatCode { get; set; }
     }
 
 }

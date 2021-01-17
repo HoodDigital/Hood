@@ -1,11 +1,15 @@
 ﻿using Hood.Caching;
 using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using System;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Hood.Core
@@ -47,6 +51,25 @@ namespace Hood.Core
 
                 return Singleton<IHoodServiceProvider>.Instance;
             }
+        }
+
+        public static Assembly ResolveUI(string uiName)
+        {
+            // Register all Hood Components
+            var typeFinder = Engine.Services.Resolve<ITypeFinder>();
+            var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
+
+            var instances = dependencies
+                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
+                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
+
+            foreach (var dependency in instances)
+            {
+                if (dependency.IsUIComponent && dependency.Name == uiName)
+                    return dependency.GetType().Assembly;
+            }
+
+            return null;
         }
 
         public static HoodConfiguration Configuration

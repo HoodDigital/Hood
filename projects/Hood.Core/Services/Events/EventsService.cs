@@ -1,5 +1,4 @@
 ﻿using Hood.Core;
-using Hood.Events;
 using System;
 using System.Linq;
 
@@ -117,68 +116,6 @@ namespace Hood.Services
             {
                 var logService = Engine.Services.Resolve<ILogService>();
                 logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerOptionsChanged), ex);
-            }
-        }
-
-        private event EventHandler<UserSubscriptionChangeEventArgs> _UserSubcriptionChanged;
-        public event EventHandler<UserSubscriptionChangeEventArgs> UserSubcriptionChanged
-        {
-            add
-            {
-                if (_UserSubcriptionChanged == null || !_UserSubcriptionChanged.GetInvocationList().Contains(value))
-                {
-                    _UserSubcriptionChanged += value;
-                }
-            }
-            remove
-            {
-                _UserSubcriptionChanged -= value;
-            }
-        }
-        public void TriggerUserSubcriptionChanged(object sender, UserSubscriptionChangeEventArgs e)
-        {
-            try
-            {
-                foreach (var d in _UserSubcriptionChanged.GetInvocationList())
-                {
-                    d.DynamicInvoke(sender, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                var logService = Engine.Services.Resolve<ILogService>();
-                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerUserSubcriptionChanged), ex);
-            }
-        }
-
-        private event EventHandler<StripeWebHookTriggerArgs> _StripeWebhook;
-        public event EventHandler<StripeWebHookTriggerArgs> StripeWebhook
-        {
-            add
-            {
-                if (_StripeWebhook == null || !_StripeWebhook.GetInvocationList().Contains(value))
-                {
-                    _StripeWebhook += value;
-                }
-            }
-            remove
-            {
-                _StripeWebhook -= value;
-            }
-        }
-        public void TriggerStripeWebhook(object sender, StripeWebHookTriggerArgs e)
-        {
-            try
-            {
-                foreach (var d in _StripeWebhook.GetInvocationList())
-                {
-                    d.DynamicInvoke(sender, e);
-                }
-            }
-            catch (Exception ex)
-            {
-                var logService = Engine.Services.Resolve<ILogService>();
-                logService.AddExceptionAsync<EventsService>("An error while triggering an event handler: " + nameof(TriggerStripeWebhook), ex);
             }
         }
     }

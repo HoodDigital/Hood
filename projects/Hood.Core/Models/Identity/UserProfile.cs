@@ -1,7 +1,6 @@
 ﻿using Hood.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-using Stripe;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,28 +10,8 @@ namespace Hood.Models
 {
     public class UserProfile : UserProfileBase
     {
-        #region Subscription Data
-        public int ActiveCount { get; set; }
-        public int TrialCount { get; set; }
-        public int InactiveCount { get; set; }
-        public int OverDueCount { get; set; }
-        public int TotalSubscriptions { get; set; }
-        public string ActiveSubscriptionIds { get; set; }
+        #region Roles
         public string RoleIds { get; set; }
-
-        internal string SubscriptionsJson { get; set; }
-        public List<UserSubscriptionInfo> Subscriptions
-        {
-            get { return !SubscriptionsJson.IsSet() ? new List<UserSubscriptionInfo>() : JsonConvert.DeserializeObject<List<UserSubscriptionInfo>>(SubscriptionsJson); }
-            set { SubscriptionsJson = JsonConvert.SerializeObject(value); }
-        }
-        public List<UserSubscriptionInfo> ActiveSubscriptions
-        {
-            get
-            {
-                return Subscriptions.Where(s => s.Status == "active" || s.Status == "trialing").ToList();
-            }
-        }
 
         public int RoleCount { get; set; }
         internal string RolesJson { get; set; }
@@ -46,10 +25,6 @@ namespace Hood.Models
         #region View Model Stuff
         [NotMapped]
         public IList<IdentityRole> AllRoles { get; set; }
-        [NotMapped]
-        public Customer Customer { get; set; }
-        [NotMapped]
-        public List<Customer> MatchedCustomerObjects { get; set; }
         #endregion
 
         #region Prevent Mapping Sensitive Fields

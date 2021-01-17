@@ -135,22 +135,6 @@ namespace Hood.Extensions
             }
             return html.Raw(ret);
         }
-
-        public static Stripe.AddressOptions ToStripeAddress(this IAddress address)
-        {
-            if (address == null)
-                return new Stripe.AddressOptions();
-            return new Stripe.AddressOptions()
-            {
-                Line1 = address.Address1,
-                Line2 = address.Address2,
-                Country = address.Country,
-                City = address.City,
-                PostalCode = address.Postcode,
-                State = address.County
-            };
-        }
-
     }
 }
 

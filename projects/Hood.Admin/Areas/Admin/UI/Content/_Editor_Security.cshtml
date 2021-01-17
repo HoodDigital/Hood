@@ -1,0 +1,10 @@
+@model Content
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<h5 class="mt-2 mb-0">Access &amp; Security</h5>
+<p>You can prevent access to this area by non-logged in users, or restrict to administrators only.</p>
+@foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).OrderBy(cm => cm.Name))
+{
+    <partial name="_Editor_Metadata" model="cm" />
+}

@@ -1,0 +1,65 @@
+@model IntegrationSettings
+@{
+    ViewData["Title"] = "Integrations";
+    Layout = "_Layout_Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+    {
+        <a asp-action="ResetIntegrations" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" id="google-tab" data-toggle="tab" href="#google" role="tab" aria-controls="google" aria-selected="false">
+                    Google API
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="google" class="tab-pane in active" role="tabpanel" aria-labelledby="google-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableGoogleMaps" class="custom-control-input">
+                        <label asp-for="EnableGoogleMaps" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableGoogleMaps"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableGoogleGeocoding" class="custom-control-input">
+                        <label asp-for="EnableGoogleGeocoding" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableGoogleGeocoding"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="GoogleMapsApiKey"></label>
+                    <input asp-for="GoogleMapsApiKey" class="form-control">
+                    <small asp-for="GoogleMapsApiKey"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableGoogleRecaptcha" class="custom-control-input">
+                        <label asp-for="EnableGoogleRecaptcha" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableGoogleRecaptcha"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="GoogleRecaptchaSiteKey"></label>
+                    <input asp-for="GoogleRecaptchaSiteKey" class="form-control">
+                    <small asp-for="GoogleRecaptchaSiteKey"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <label asp-for="GoogleRecaptchaSecretKey"></label>
+                    <input asp-for="GoogleRecaptchaSecretKey" class="form-control">
+                    <small asp-for="GoogleRecaptchaSecretKey"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

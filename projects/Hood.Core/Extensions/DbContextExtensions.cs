@@ -1,5 +1,4 @@
 ﻿using Hood.Models;
-using Hood.Models.Payments;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hood.Extensions
@@ -16,16 +15,12 @@ namespace Hood.Extensions
             // Identity
             builder.Entity<Option>().ToTable("HoodOptions");
             builder.Entity<Log>().ToTable("HoodLogs");
-            builder.Entity<ApiKey>().ToTable("HoodApiKeys");
-            builder.Entity<ApiEvent>().ToTable("HoodApiEvents");
             builder.Entity<Address>().ToTable("HoodAddresses");
             builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
             builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<ApiKey>().HasOne(up => up.User).WithMany(add => add.ApiKeys).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<ApiEvent>().HasOne(up => up.ApiKey).WithMany(add => add.Events).HasForeignKey(au => au.ApiKeyId).OnDelete(DeleteBehavior.Cascade);
 
             // Media
             builder.Entity<MediaObject>().ToTable("HoodMedia");
@@ -33,15 +28,6 @@ namespace Hood.Extensions
             builder.Entity<MediaDirectory>().ToTable("HoodMediaDirectories");
             builder.Entity<MediaDirectory>().HasOne(m => m.Parent).WithMany(m => m.Children).HasForeignKey(m => m.ParentId).OnDelete(DeleteBehavior.Restrict);
             builder.Entity<MediaObject>().HasOne(m => m.Directory).WithMany(m => m.Media).HasForeignKey(m => m.DirectoryId).OnDelete(DeleteBehavior.Restrict);
-
-            // Subscriptions
-            builder.Entity<SubscriptionProduct>().ToTable("HoodSubscriptionGroups");
-            builder.Entity<Subscription>().ToTable("HoodSubscriptions");
-            builder.Entity<SubscriptionFeature>().ToTable("HoodSubscriptionFeatures");
-            builder.Entity<UserSubscription>().ToTable("HoodUserSubscriptions");
-            builder.Entity<UserSubscription>().Property("Id").HasColumnName("UserSubscriptionId");
-            builder.Entity<UserSubscription>().HasOne(pt => pt.User).WithMany(p => p.Subscriptions).HasForeignKey(pt => pt.UserId);
-            builder.Entity<UserSubscription>().HasOne(pt => pt.Subscription).WithMany(t => t.Users).HasForeignKey(pt => pt.SubscriptionId);
 
             // Content
             builder.Entity<Content>().ToTable("HoodContent");
@@ -65,30 +51,6 @@ namespace Hood.Extensions
             builder.Entity<ContentMeta>().HasAlternateKey(ol => new { ol.ContentId, ol.Name });
             builder.Entity<ContentMeta>().HasOne(c => c.Content).WithMany(cc => cc.Metadata).HasForeignKey(au => au.ContentId);
 
-            // Forums
-            builder.Entity<Forum>().ToTable("HoodForums");
-            builder.Entity<Forum>().HasOne(c => c.Author).WithMany(up => up.Forums).HasForeignKey(c => c.AuthorId);
-
-            // Forum Categories
-            builder.Entity<ForumCategory>().ToTable("HoodForumCategories");
-            builder.Entity<ForumCategory>().Property("Id").HasColumnName("ForumCategoryId");
-            builder.Entity<ForumCategoryJoin>().ToTable("HoodForumCategoryJoins");
-            builder.Entity<ForumCategoryJoin>().HasKey(t => new { t.ForumId, t.CategoryId });
-            builder.Entity<ForumCategoryJoin>().HasOne(pt => pt.Category).WithMany(p => p.Forum).HasForeignKey(pt => pt.CategoryId).OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<ForumCategoryJoin>().HasOne(pt => pt.Forum).WithMany(t => t.Categories).HasForeignKey(pt => pt.ForumId).OnDelete(DeleteBehavior.Cascade);
-
-            // Forum Topics
-            builder.Entity<Topic>().ToTable("HoodForumTopics");
-            builder.Entity<Topic>().HasOne(c => c.Author).WithMany(up => up.Topics).HasForeignKey(c => c.AuthorId);
-            builder.Entity<Topic>().HasOne(c => c.Forum).WithMany(up => up.Topics).HasForeignKey(c => c.ForumId).OnDelete(DeleteBehavior.Cascade);
-
-            // Forum Posts
-            builder.Entity<Post>().ToTable("HoodForumPosts");
-            builder.Entity<Post>().HasOne(c => c.Author).WithMany(up => up.Posts).HasForeignKey(c => c.AuthorId);
-            builder.Entity<Post>().HasOne(c => c.EditedBy).WithMany(up => up.EditedPosts).HasForeignKey(c => c.EditedById);
-            builder.Entity<Post>().HasOne(c => c.DeletedBy).WithMany(up => up.DeletedPosts).HasForeignKey(c => c.DeletedById);
-            builder.Entity<Post>().HasOne(c => c.Topic).WithMany(up => up.Posts).HasForeignKey(c => c.TopicId).OnDelete(DeleteBehavior.Cascade);
-
             // Property
             builder.Entity<PropertyListing>().ToTable("HoodProperties");
             builder.Entity<PropertyListing>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
@@ -109,10 +71,6 @@ namespace Hood.Extensions
 
             builder.Entity<UserProfile>().HasNoKey().ToView("HoodUserProfiles");
             builder.Entity<UserProfile>().HasNoKey().Property(b => b.RolesJson).HasColumnName("Roles");
-            builder.Entity<UserProfile>().HasNoKey().Property(b => b.SubscriptionsJson).HasColumnName("Subscriptions");
-
-            builder.Entity<SubscriptionPlan>().HasNoKey().ToView("HoodSubscriptionPlans");
-
         }
     }
 }
