@@ -25,12 +25,5 @@ namespace Hood.Services
         SeoSettings Seo { get; }
         UserProfile SiteOwner { get; }
         #endregion
-
-        #region Other Settings/Properties
-        string ConnectionString { get; }
-        List<string> LockoutAccessCodes { get; }
-
-        #endregion
-
     }
 }

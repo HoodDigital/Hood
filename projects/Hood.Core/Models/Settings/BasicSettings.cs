@@ -45,14 +45,6 @@ namespace Hood.Models
         [Display(Name = "Enable Themes", Description = "Enable the use of themes, when enabled, you can choose the site theme from the Settings > Themes page")]
         public bool EnableThemes { get; set; }
 
-        [Display(Name = "Lockout/Maintenance Mode", Description = "Lock the site and force users to view the Maintenance Mode Page. The login page will be available. Administrators can log in to bypass the Lockout Mode. You can include a form on the lockout page to provide code based access to the other areas.")]
-        public bool LockoutMode { get; set; }
-        [Display(Name = "Lock Login Page", Description = "If you set this, user's will need to enter an access code to view the login pages as well as the rest of the site.")]
-        public bool LockLoginPage { get; set; }
-        [Display(Name = "Lockout/Maintenance Mode Access Codes", Description = "Enter codes for access, <strong>one code per line</strong>, you can share these codes to grant access to the site.")]
-        public string LockoutModeTokens { get; set; }
-        [Display(Name = "Lockout/Maintenance Mode Holding Page", Description = "This is the page which your users will be redirected to when navigating to any part of the site, while lockout mode is active.")]
-        public int? LockoutModeHoldingPage { get; set; }
 
         #endregion
 

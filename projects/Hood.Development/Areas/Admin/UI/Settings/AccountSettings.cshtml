@@ -1,0 +1,83 @@
+@model AccountSettings
+@{
+    ViewData["Title"] = "Account Settings";
+    Layout = "_Layout_Settings";
+}
+@section buttons {
+    @if (User.IsAdminOrBetter())
+    {
+        <a asp-action="ResetAccount" class="btn btn-danger warning-alert" data-warning="This will completely reset these settings to their default state, are you sure!?"><i class="fa fa-refresh"></i> Reset to Default</a>
+    }
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row align-items-center">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" id="registration-tab" data-toggle="tab" href="#registration" role="tab" aria-controls="registration" aria-selected="false">
+                        Registration
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="welcome-email-tab" data-toggle="tab" href="#welcome-email" role="tab" aria-controls="welcome-email" aria-selected="false">
+                        Welcome Email
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="tab-content">
+            <div id="registration" class="tab-pane active" role="tabpanel" aria-labelledby="registration-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableRegistration" class="custom-control-input">
+                        <label asp-for="EnableRegistration" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableRegistration"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="RequireEmailConfirmation" class="custom-control-input">
+                        <label asp-for="RequireEmailConfirmation" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="RequireEmailConfirmation"></small>
+                </div>
+            </div>
+            <div id="welcome-email" class="tab-pane" role="tabpanel" aria-labelledby="welcome-email-tab">
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="EnableWelcome" class="custom-control-input">
+                        <label asp-for="EnableWelcome" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="EnableWelcome"></small>
+                </div>
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="NotifyNewAccount" class="custom-control-input">
+                        <label asp-for="NotifyNewAccount" class="custom-control-label"></label>
+                    </div>
+                    <small asp-for="NotifyNewAccount"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <div class="form-group floating-label">
+                    <label asp-for="WelcomeTitle"></label>
+                    <input asp-for="WelcomeTitle" class="form-control">
+                    <small asp-for="WelcomeTitle"></small>
+                </div>
+                <div class="form-group floating-label">
+                    <input asp-for="WelcomeSubject" class="form-control">
+                    <label asp-for="WelcomeSubject"></label>
+                    <small asp-for="WelcomeSubject"></small>
+                </div>
+                <div class="form-group">
+                    <label asp-for="WelcomeMessage"></label>
+                    <textarea asp-for="WelcomeMessage" class="form-control tinymce-simple"></textarea>
+                    <small asp-for="WelcomeMessage"></small>
+                </div>
+                <hr class="mt-4 mb-4" />
+                <partial name="_PlaceholderInformation" />
+            </div>
+        </div>
+    </div>
+</div>

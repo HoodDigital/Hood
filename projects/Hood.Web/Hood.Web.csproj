@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>Hood.Web</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+    <ProjectReference Include="..\Hood.Admin\Hood.Admin.csproj" />
+
+    <ProjectReference Include="..\Hood.UI\Hood.UI.csproj" />
+    <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
+    <ProjectReference Include="..\Hood.UI.Bootstrap3\Hood.UI.Bootstrap3.csproj" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
+</Project>

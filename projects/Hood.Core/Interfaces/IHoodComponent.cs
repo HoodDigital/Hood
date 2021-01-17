@@ -10,6 +10,9 @@ namespace Hood.Interfaces
     /// </summary>
     public interface IHoodComponent
     {
+
+        string Name { get; }
+        bool IsUIComponent { get; }
         /// <summary>
         /// Register services and interfaces
         /// </summary>
