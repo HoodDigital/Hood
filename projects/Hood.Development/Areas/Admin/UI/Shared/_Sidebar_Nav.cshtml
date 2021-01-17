@@ -161,14 +161,6 @@
                     @if (User.IsAdminOrBetter())
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-action="Billing" asp-controller="Settings" asp-route-area="Admin">
-                                <i class="fa fa-money-bill-wave"></i>Billing Settings
-                            </a>
-                        </li>
-                    }
-                    @if (User.IsAdminOrBetter())
-                    {
-                        <li class="nav-item">
                             <a class="nav-link" asp-action="Contact" asp-controller="Settings" asp-route-area="Admin">
                                 <i class="fa fa-envelope"></i>Contact Settings
                             </a>
@@ -179,14 +171,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-action="Content" asp-controller="Settings" asp-route-area="Admin">
                                 <i class="fa fa-tag"></i>Content Settings
-                            </a>
-                        </li>
-                    }
-                    @if (User.IsAdminOrBetter())
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-action="Forum" asp-controller="Settings" asp-route-area="Admin">
-                                <i class="fa fa-comments"></i>Forum Settings
                             </a>
                         </li>
                     }
@@ -219,14 +203,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-action="Property" asp-controller="Settings" asp-route-area="Admin">
                                 <i class="fa fa-building"></i>Property Settings
-                            </a>
-                        </li>
-                    }
-                    @if (User.IsAdminOrBetter())
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-action="ScheduledTasks" asp-controller="Settings" asp-route-area="Admin">
-                                <i class="fa fa-sync"></i>Scheduled Tasks
                             </a>
                         </li>
                     }

@@ -272,27 +272,6 @@ gulp.task('hood:js:package:app', function () {
         .pipe(gulp.dest(hood.js))
         .pipe(gulp.dest(output.js));
 });
-gulp.task('hood:js:package:login', function () {
-    l = uglify({});
-    l.on('error', function (e) {
-        console.log(e);
-        l.end();
-    });
-    return gulp.src([
-
-        lib + 'jquery-mask/jquery.mask.js',
-
-        hood.js + 'login.js'
-
-    ], { base: '.' })
-        .pipe(babel({
-            presets: ['@babel/env']
-        }))
-        .pipe(concat('login.packaged.js'))
-        .pipe(l)
-        .pipe(gulp.dest(hood.js))
-        .pipe(gulp.dest(output.js));
-});
 gulp.task('hood:js:package:admin', function () {
     l = uglify({});
     l.on('error', function (e) {
@@ -304,10 +283,8 @@ gulp.task('hood:js:package:admin', function () {
         hood.js + 'core.js',
 
         hood.js + 'admin/content.js',
-        hood.js + 'admin/forums.js',
         hood.js + 'admin/logs.js',
         hood.js + 'admin/property.js',
-        hood.js + 'admin/subscriptions.js',
         hood.js + 'admin/themes.js',
         hood.js + 'admin/users.js',
 
@@ -371,8 +348,7 @@ gulp.task('hood:package',
         'hood:js:core',
         gulp.parallel(
             'hood:js:package:admin',
-            'hood:js:package:app',
-            'hood:js:package:login'
+            'hood:js:package:app'
         )
     )
 );

@@ -243,21 +243,6 @@ $.hood.Admin = {
                     pointBorderColor: '#ffffff'
                 });
 
-                // subs by day
-                contentSet = [];
-                data.subs.months.forEach(function (element) {
-                    contentSet.push(element.Value);
-                });
-
-                datasets.push({
-                    label: 'New Subscriptions',
-                    data: contentSet,
-                    borderColor: subColour,
-                    backgroundColor: subColour,
-                    pointBackgroundColor: subColour,
-                    pointBorderColor: '#ffffff'
-                });
-
                 // Properties by day
                 contentSet = [];
                 data.properties.months.forEach(function (element) {
@@ -297,20 +282,22 @@ $.hood.Admin = {
             });
         },
         LoadStats: function (data) {
-            $('.content-totalPosts').text(data.content.totalPosts);
-            $('.content-totalPublished').text(data.content.totalPublished);
-
-            $('.users-totalUsers').text(data.users.totalUsers);
-            $('.users-totalAdmins').text(data.users.totalAdmins);
-
-            $('.subs-active').text(data.subs.active);
-            $('.subs-trials').text(data.subs.trials);
-
-            $('.properties-totalPosts').text(data.properties.totalPosts);
-            $('.properties-totalPublished').text(data.properties.totalPublished);
-
-            for (let i = 0; i < data.content.byType.length; i++) {
-                $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
+            if (data.content) {
+                $('.content-totalPosts').text(data.content.totalPosts);
+                $('.content-totalPublished').text(data.content.totalPublished);
+                if (data.content.byType) {
+                    for (let i = 0; i < data.content.byType.length; i++) {
+                        $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
+                    }
+                }
+            }
+            if (data.users) {
+                $('.users-totalUsers').text(data.users.totalUsers);
+                $('.users-totalAdmins').text(data.users.totalAdmins);
+            }
+            if (data.properties) {
+                $('.properties-totalPosts').text(data.properties.totalPosts);
+                $('.properties-totalPublished').text(data.properties.totalPublished);
             }
         }
     },

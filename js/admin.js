@@ -203,19 +203,6 @@ $.hood.Admin = {
         backgroundColor: userColour,
         pointBackgroundColor: userColour,
         pointBorderColor: '#ffffff'
-      }); // subs by day
-
-      contentSet = [];
-      data.subs.months.forEach(function (element) {
-        contentSet.push(element.Value);
-      });
-      datasets.push({
-        label: 'New Subscriptions',
-        data: contentSet,
-        borderColor: subColour,
-        backgroundColor: subColour,
-        pointBackgroundColor: subColour,
-        pointBorderColor: '#ffffff'
       }); // Properties by day
 
       contentSet = [];
@@ -254,17 +241,25 @@ $.hood.Admin = {
       });
     },
     LoadStats: function LoadStats(data) {
-      $('.content-totalPosts').text(data.content.totalPosts);
-      $('.content-totalPublished').text(data.content.totalPublished);
-      $('.users-totalUsers').text(data.users.totalUsers);
-      $('.users-totalAdmins').text(data.users.totalAdmins);
-      $('.subs-active').text(data.subs.active);
-      $('.subs-trials').text(data.subs.trials);
-      $('.properties-totalPosts').text(data.properties.totalPosts);
-      $('.properties-totalPublished').text(data.properties.totalPublished);
+      if (data.content) {
+        $('.content-totalPosts').text(data.content.totalPosts);
+        $('.content-totalPublished').text(data.content.totalPublished);
 
-      for (var i = 0; i < data.content.byType.length; i++) {
-        $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
+        if (data.content.byType) {
+          for (var i = 0; i < data.content.byType.length; i++) {
+            $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
+          }
+        }
+      }
+
+      if (data.users) {
+        $('.users-totalUsers').text(data.users.totalUsers);
+        $('.users-totalAdmins').text(data.users.totalAdmins);
+      }
+
+      if (data.properties) {
+        $('.properties-totalPosts').text(data.properties.totalPosts);
+        $('.properties-totalPublished').text(data.properties.totalPublished);
       }
     }
   },
