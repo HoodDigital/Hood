@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public abstract class HoodController : ManageController<HoodDbContext>
+    public abstract class HoodController : HoodController<HoodDbContext>
     {
         public HoodController() : base() { }
     }

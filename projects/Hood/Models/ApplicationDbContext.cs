@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Hood.Web
+namespace Hood.Models
 {
     public class ApplicationDbContext : HoodDbContext
     {
