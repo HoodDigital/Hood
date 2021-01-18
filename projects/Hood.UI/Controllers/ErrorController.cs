@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Hood.Controllers
 {
-    public abstract class ErrorController : HomeController<HoodDbContext>
+    public abstract class ErrorController : ErrorController<HoodDbContext>
     {
         public ErrorController() : base() { }
     }
