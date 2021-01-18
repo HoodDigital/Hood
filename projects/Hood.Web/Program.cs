@@ -1,4 +1,5 @@
-﻿using Hood.Startup;
+﻿using Hood.Models;
+using Hood.Startup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 

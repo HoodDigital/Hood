@@ -107,11 +107,11 @@ namespace Hood.Models
                 try
                 {
                     MediaSettings mediaSettings = Engine.Settings.Media;
-                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/no-image.jpg";
                 }
                 catch
                 {
-                    noImage = "/hood/images/no-image.jpg";
+                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/no-image.jpg";
                 }
                 return noImage;
             }
@@ -124,11 +124,11 @@ namespace Hood.Models
                 try
                 {
                     MediaSettings mediaSettings = Engine.Settings.Media;
-                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-image.jpg";
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/no-image.jpg";
                 }
                 catch
                 {
-                    noImage = "/hood/images/no-image.jpg";
+                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/no-image.jpg";
                 }
                 MediaObject ret = new MediaObject
                 {
@@ -152,11 +152,11 @@ namespace Hood.Models
                 try
                 {
                     MediaSettings mediaSettings = Engine.Settings.Media;
-                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "/hood/images/no-avatar.jpg";
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/no-avatar.jpg";
                 }
                 catch
                 {
-                    noImage = "/hood/images/no-avatar.jpg";
+                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/no-avatar.jpg";
                 }
                 MediaObject ret = new MediaObject
                 {
