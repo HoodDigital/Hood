@@ -32,14 +32,6 @@ namespace Hood.Models
         public DbSet<MediaObject> Media { get; set; }
         public DbSet<MediaDirectory> MediaDirectories { get; set; }
 
-        // Api
-        public DbSet<ApiKey> ApiKeys { get; set; }
-        public DbSet<ApiEvent> ApiEvents { get; set; }
-
-        // Content
-        public DbSet<SubscriptionProduct> SubscriptionProducts { get; set; }
-        public DbSet<Subscription> Subscriptions { get; set; }
-        public DbSet<UserSubscription> UserSubscriptions { get; set; }
 
         // Options
         public DbSet<Option> Options { get; set; }
@@ -49,11 +41,6 @@ namespace Hood.Models
         public DbSet<ContentMeta> ContentMetadata { get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
 
-        // Forums
-        public DbSet<Forum> Forums { get; set; }
-        public DbSet<Topic> Topics { get; set; }
-        public DbSet<Post> Posts { get; set; }
-        public DbSet<ForumCategory> ForumCategories { get; set; }
 
         // Property
         public DbSet<PropertyListing> Properties { get; set; }
@@ -64,7 +51,6 @@ namespace Hood.Models
 
         // Views
         public DbSet<UserProfile> UserProfiles { get; set; }
-        public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -209,19 +195,6 @@ namespace Hood.Models
                 Options.Add(new Option { Id = "Hood.Settings.Theme", Value = JsonConvert.SerializeObject("default") });
             }
 
-            if (!Options.Any(o => o.Id == typeof(ScheduledTaskSettings).ToString()))
-            {
-                Options.Add(new Option { Id = typeof(ScheduledTaskSettings).ToString(), Value = JsonConvert.SerializeObject(new ScheduledTaskSettings()) });
-            }
-            else
-            {
-                // Check all system tasks exist.
-                Option option = Options.First(o => o.Id == typeof(ScheduledTaskSettings).ToString());
-                ScheduledTaskSettings sheduledTaskSettings = JsonConvert.DeserializeObject<ScheduledTaskSettings>(option.Value);
-                sheduledTaskSettings.CheckTasks();
-                option.Value = JsonConvert.SerializeObject(sheduledTaskSettings);
-            }
-
             if (!Options.Any(o => o.Id == typeof(AccountSettings).ToString()))
             {
                 // No new settings exist, attempt to copy from deprecated settings, or set new.
@@ -252,21 +225,6 @@ namespace Hood.Models
                 }
             }
 
-            if (!Options.Any(o => o.Id == typeof(BillingSettings).ToString()))
-            {
-                // No new settings exist, attempt to copy from deprecated settings, or set new.
-                if (Options.Any(o => o.Id == "Hood.Settings.Billing"))
-                {
-                    Option option = Options.Find("Hood.Settings.Billing");
-                    BillingSettings setting = JsonConvert.DeserializeObject<BillingSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(BillingSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
-                }
-                else
-                {
-                    Options.Add(new Option { Id = typeof(BillingSettings).ToString(), Value = JsonConvert.SerializeObject(new BillingSettings()) });
-                }
-            }
-
             if (!Options.Any(o => o.Id == typeof(ContactSettings).ToString()))
             {
                 // No new settings exist, attempt to copy from deprecated settings, or set new.
@@ -294,21 +252,6 @@ namespace Hood.Models
                 else
                 {
                     Options.Add(new Option { Id = typeof(ContentSettings).ToString(), Value = JsonConvert.SerializeObject(new ContentSettings()) });
-                }
-            }
-
-            if (!Options.Any(o => o.Id == typeof(ForumSettings).ToString()))
-            {
-                // No new settings exist, attempt to copy from deprecated settings, or set new.
-                if (Options.Any(o => o.Id == "Hood.Settings.Forum"))
-                {
-                    Option option = Options.Find("Hood.Settings.Seo");
-                    ForumSettings setting = JsonConvert.DeserializeObject<ForumSettings>(option.Value);
-                    Options.Add(new Option { Id = typeof(ForumSettings).ToString(), Value = JsonConvert.SerializeObject(setting) });
-                }
-                else
-                {
-                    Options.Add(new Option { Id = typeof(ForumSettings).ToString(), Value = JsonConvert.SerializeObject(new ForumSettings()) });
                 }
             }
 

@@ -75,13 +75,6 @@ namespace Hood.Models
             get { return BillingAddressJson.IsSet() ? JsonConvert.DeserializeObject<Address>(BillingAddressJson) : null; }
             set { BillingAddressJson = JsonConvert.SerializeObject(value); }
         }
-        #endregion
-
-        #region Billing 
-
-        [Display(Name = "Stripe Customer Id")]
-        [ProtectedPersonalData]
-        public virtual string StripeId { get; set; }
 
         #endregion
 
@@ -162,10 +155,6 @@ namespace Hood.Models
         #endregion
 
         #region Extra Profile Fields
-        [NotMapped]
-        [PersonalData]
-        [Display(Name = "Forum Signature")]
-        public virtual string ForumSignature { get => this[nameof(ForumSignature)]; set => this[nameof(ForumSignature)] = value; }
         [NotMapped]
         [PersonalData]
         [Display(Name = "Company name")]

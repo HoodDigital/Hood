@@ -282,12 +282,19 @@ $.hood.Handlers = {
     var pickrs = []; // Simple example, see optional options for more configuration.
 
     $('.color-picker').each(function (index, elem) {
+      var lockOpacity = true;
+
+      if ($(this).data('opacity') == 'true') {
+        lockOpacity = false;
+      }
+
       var pickr = Pickr.create({
         el: elem.children[0],
         appClass: 'custom-class',
         theme: 'monolith',
         useAsButton: true,
         "default": $(this).data('default') || 'none',
+        lockOpacity: lockOpacity,
         defaultRepresentation: 'HEXA',
         position: 'bottom-end',
         components: {

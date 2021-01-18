@@ -65,16 +65,5 @@ namespace Hood.Services
         #region Statistics
         Task<object> GetStatisticsAsync();
         #endregion
-
-        #region Obsoletes 
-        [Obsolete("Use List<Country> Country.AllCountries from now on.", true)]
-        List<Country> AllCountries();
-        [Obsolete("Use static Country Country.GetCountry(string name) from now on.", true)]
-        Country GetCountry(string name);
-        #endregion
-
-        #region LinqToTwitter
-        Task<List<LinqToTwitter.Status>> GetTweets(string name, int count = 6);
-        #endregion
     }
 }
