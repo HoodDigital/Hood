@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Hood.Caching
@@ -16,18 +17,19 @@ namespace Hood.Caching
         private readonly IMemoryCache _cache;
         public HoodCache(IMemoryCache cache)
         {
-            // Memory Cache stuff
             _entryKeys = new ConcurrentDictionary<string, DateTime>();
             _cache = cache;
         }
+
+
         public bool Exists(string key)
         {
             return _entryKeys.ContainsKey(key);
         }
 
-        Task<bool> IHoodCache.ExistsAsync(string key)
+        public Task<bool> ExistsAsync(string key)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(_entryKeys.ContainsKey(key));
         }
 
         public bool TryGetValue<T>(string key, out T cacheItem)
@@ -62,7 +64,8 @@ namespace Hood.Caching
 
         public Task AddAsync<T>(string key, T cacheItem, TimeSpan? expiry = null)
         {
-            throw new NotImplementedException();
+            Add(key, cacheItem, expiry);
+            return Task.CompletedTask;
         }
 
         public void Remove(string key)
@@ -74,8 +77,24 @@ namespace Hood.Caching
         }
 
         public Task RemoveAsync(string key)
+        {            
+            Remove(key);
+            return Task.CompletedTask;
+        }
+
+        public void RemoveByType(Type type)
         {
-            throw new NotImplementedException();
+            if (type == null)
+                return;
+            var toRemove = _entryKeys.Where(e => e.Key.StartsWith(type.ToString())).ToList();
+            foreach (var entry in toRemove)
+                Remove(entry.Key);
+        }
+
+        public Task RemoveByTypeAsync(Type type)
+        {
+            RemoveByType(type);
+            return Task.CompletedTask;
         }
 
         public void ResetCache()
@@ -88,7 +107,8 @@ namespace Hood.Caching
 
         public Task ResetCacheAsync()
         {
-            throw new NotImplementedException();
+            ResetCache();
+            return Task.CompletedTask;
         }
 
         #region "Helpers"

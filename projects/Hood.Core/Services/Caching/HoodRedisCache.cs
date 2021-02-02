@@ -20,8 +20,7 @@ namespace Hood.Caching
         {
             _connectionMultiplexer = connectionMultiplexer;
         }
-
-        public IDatabase Database => _connectionMultiplexer.GetDatabase();
+        protected IDatabase Database => _connectionMultiplexer.GetDatabase();
 
         public bool Exists(string key)
         {
@@ -75,14 +74,25 @@ namespace Hood.Caching
             await Database.KeyDeleteAsync(key);
         }
 
-        public void ResetCache()
+        public void RemoveByType(Type type)
         {
             throw new NotImplementedException();
         }
 
-        public Task ResetCacheAsync()
+        public Task RemoveByTypeAsync(Type type)
         {
-            throw new NotImplementedException();
+            RemoveByType(type);
+            return Task.CompletedTask;
+        }
+
+        public void ResetCache()
+        {
+            Database.Execute("FLUSHDB");
+        }
+
+        public async Task ResetCacheAsync()
+        {
+            await Database.ExecuteAsync("FLUSHDB");
         }
     }
 }
