@@ -270,6 +270,7 @@ $.hood.Handlers = {
                 result = colorHex[i] + result;
             }
             $(elemId).val('#' + result);
+            $(elemId).change();
         };
         var pickrs = [];
         // Simple example, see optional options for more configuration.
@@ -316,6 +317,7 @@ $.hood.Handlers = {
                     instance.setColor('transparent');
                     updateColorFieldValue(instance.getColor(), instance);
                     $(elemId).val('');
+                    $(elemId).change();
                 })
                 .on('change', updateColorFieldValue);
 

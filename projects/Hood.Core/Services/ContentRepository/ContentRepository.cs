@@ -209,7 +209,7 @@ namespace Hood.Services
                 }
 
                 await RefreshMetasAsync(content);
-                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
             }
             return content;
         }
@@ -236,7 +236,7 @@ namespace Hood.Services
             _db.Update(content);
             await _db.SaveChangesAsync();
             _eventService.TriggerContentChanged(this);
-            _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+            _cache.Add(cacheKey, content, TimeSpan.FromMinutes(60));
             return content;
         }
         public async Task DeleteAsync(int id)
@@ -352,7 +352,7 @@ namespace Hood.Services
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
                 content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "DateDesc", Status = ContentStatus.Published });
-                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Add(cacheKey, content, TimeSpan.FromMinutes(5));
             }
             return content;
         }
@@ -367,7 +367,7 @@ namespace Hood.Services
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
                 content = await GetContentAsync(new ContentModel() { Featured = true, Type = type, Category = category, PageSize = pageSize, Status = ContentStatus.Published });
-                _cache.Add(cacheKey, content, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Add(cacheKey, content, TimeSpan.FromMinutes(5));
             }
             return content;
         }
@@ -385,7 +385,7 @@ namespace Hood.Services
                     Next = all.ElementAtOrDefault(index + 1),
                     Previous = all.ElementAtOrDefault(index - 1)
                 };
-                _cache.Add(cacheKey, neighbours, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, neighbours, TimeSpan.FromMinutes(60));
             }
             return neighbours;
         }
@@ -508,7 +508,7 @@ namespace Hood.Services
             {
                 ContentModel content = await GetContentAsync(new ContentModel() { Type = "page", PageSize = int.MaxValue, Category = category });
                 pages = content.List;
-                _cache.Add(cacheKey, pages, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, pages, TimeSpan.FromMinutes(60));
             }
             return pages;
         }
@@ -581,7 +581,7 @@ namespace Hood.Services
 
                 XDocument document = new XDocument(root);
                 pages = document.ToString();
-                _cache.Add(cacheKey, pages, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, pages, TimeSpan.FromMinutes(60));
             }
             return pages;
         }
