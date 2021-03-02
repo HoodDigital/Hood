@@ -44,8 +44,8 @@ steps:
 - task: AzureFileCopy@4
   inputs:
     SourcePath: '.\projects\Hood\wwwroot\hood\'
-    azureSubscription: '$(AzureSubscription)'
+    azureSubscription: 'HoodData'
     Destination: 'AzureBlob'
-    storage: '$(StorageName)'
+    storage: 'hooddigital'
     ContainerName: 'cdn'
     BlobPrefix: '$(Version.name)'
