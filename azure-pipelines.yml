@@ -33,17 +33,16 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $file = "package.json"
+      $file = ".\projects\Hood.Development\wwwroot\hood\package.json"
       $json = Get-Content $file | ConvertFrom-Json
       $version = "$($json.version)"
       
       echo "##vso[task.setvariable variable=name;isOutput=true]$version"
   name: Version
 
-
 - task: AzureFileCopy@4
   inputs:
-    SourcePath: '.\projects\Hood.Development\wwwroot\hood\'
+    SourcePath: '.\projects\Hood.Development\wwwroot\hood\*'
     azureSubscription: 'HoodData'
     Destination: 'AzureBlob'
     storage: 'hooddigital'
