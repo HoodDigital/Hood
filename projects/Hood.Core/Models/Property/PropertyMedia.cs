@@ -1,9 +1,11 @@
 ﻿using Hood.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace Hood.Models
 {
     public partial class PropertyMedia : MediaBase
     {
+        [JsonIgnore]
         public PropertyListing Property { get; internal set; }
         public int PropertyId { get; internal set; }
 
@@ -23,6 +25,7 @@ namespace Hood.Models
 
     public partial class PropertyFloorplan : MediaBase
     {
+        [JsonIgnore]
         public PropertyListing Property { get; internal set; }
         public int PropertyId { get; internal set; }
 

@@ -1,4 +1,5 @@
 ﻿using Hood.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace Hood.Models
 {
@@ -16,6 +17,7 @@ namespace Hood.Models
         }
 
         public int ContentId { get; set; }
+        [JsonIgnore]
         public Content Content { get; set; }
 
         public new static IMediaObject Blank => MediaBase.Blank;

@@ -122,7 +122,7 @@ namespace Hood.Services
                             BundleMinifier.ErrorMinifyingFile += BundleMinifier_ErrorMinifyingFile;
 
                             minified = _bundleFileProcessor.Process(bundle.FileName, new List<Bundle> { bundle });
-                            _cache.Add(cacheKey, false, new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions() { AbsoluteExpirationRelativeToNow = new TimeSpan(2, 0, 0) });
+                            _cache.Add(cacheKey, false, new TimeSpan(2, 0, 0));
                         }
                     }
 

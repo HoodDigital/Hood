@@ -127,22 +127,9 @@
                     <alert type="Info" size="Medium" icon="fa-info-circle">
                         Cache Contents &amp; Reset - Reset areas stored in the site cache, this can help if items are not updating correctly on the site.
                     </alert>
-                    <ul class="list-group settings-list clear-list m-t">
-                        @foreach (var entry in _cache.Entries.OrderBy(s => s.Value))
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span class="col font-weight-bold ">
-                                    <i class="fa fa-check-circle mr-2 text-success"></i>@entry.Key 
-                                    <small>Last Updated: @entry.Value.ToDisplay()</small>
-                                </span>
-                                <span class="col-auto text-right">
-                                    <a class="btn btn-sm btn-danger" href="@Url.Action("RemoveCacheItem", new { entry = entry.Key })">
-                                        Remove
-                                    </a>
-                                </span>
-                            </li>
-                        }
-                    </ul>
+                    <a class="btn btn-danger" href="@Url.Action("ResetCache")">
+                        Reset Cache
+                    </a>
                 </div>
             </div>
         </div>

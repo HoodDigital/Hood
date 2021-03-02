@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Serialization;
+using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ namespace Hood.Startup
             if (config.IsDatabaseConnected())
             {
                 services.ConfigureHoodServices();
+                services.ConfigureCache(config);
                 services.ConfigureHoodDatabase<TContext>(config);
                 services.ConfigureAuthentication(config);
             }
@@ -74,7 +76,6 @@ namespace Hood.Startup
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
             services.AddSingleton<IMediaManager, MediaManager>();
             services.AddSingleton<ILogService, LogService>();
-            services.AddSingleton<IHoodCache, HoodCache>();
             services.AddSingleton<ContentCategoryCache>();
             services.AddSingleton<ContentByTypeCache>();
 
@@ -92,6 +93,22 @@ namespace Hood.Startup
             services.AddScoped<IRecaptchaService, RecaptchaService>();
             services.AddScoped<IPropertyExporter, PropertyExporter>();
             services.AddScoped<IContentExporter, ContentExporter>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureCache(this IServiceCollection services, IConfiguration config)
+        {
+            // Caching
+            if (config["ConnectionStrings:RedisCache"].IsSet())
+            {
+                services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(config.GetValue<string>("ConnectionStrings:RedisCache")));
+                services.AddSingleton<IHoodCache, HoodRedisCache>();
+            }
+            else
+            {
+                services.AddSingleton<IHoodCache, HoodCache>();
+            }
 
             return services;
         }
