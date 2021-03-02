@@ -1,13 +1,6 @@
-﻿using Hood.Core;
-using Hood.Extensions;
-using Hood.Models;
-using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hood.Caching
@@ -39,10 +32,10 @@ namespace Hood.Caching
                 cacheItem = default;
                 return false;
             }
-            var json = Database.StringGet(key);
+            RedisValue json = Database.StringGet(key);
             try
             {
-                cacheItem = JsonConvert.DeserializeObject<T>(json);
+                cacheItem = JsonConvert.DeserializeObject<T>(json.ToString());
                 return true;
             }
             catch (JsonSerializationException)
@@ -54,14 +47,28 @@ namespace Hood.Caching
 
         public void Add<T>(string key, T cacheItem, TimeSpan? expiry = null)
         {
-            var json = JsonConvert.SerializeObject(cacheItem);
-            Database.StringSet(key, json, expiry);
+            try
+            {
+                string json = JsonConvert.SerializeObject(cacheItem);
+                Database.StringSet(key, json, expiry);
+            }
+            catch (JsonSerializationException)
+            {
+                return;
+            }
         }
 
         public async Task AddAsync<T>(string key, T cacheItem, TimeSpan? expiry = null)
         {
-            var json = JsonConvert.SerializeObject(cacheItem);
-            await Database.StringSetAsync(key, json, expiry);
+            try
+            {
+                string json = JsonConvert.SerializeObject(cacheItem);
+                await Database.StringSetAsync(key, json, expiry);
+            }
+            catch (JsonSerializationException)
+            {
+                return;
+            }
         }
 
         public void Remove(string key)
@@ -87,7 +94,7 @@ namespace Hood.Caching
 
         public void ResetCache()
         {
-            Database.Execute("FLUSHDB");
+            Database.Execute("FLUSHALL");
         }
 
         public async Task ResetCacheAsync()
