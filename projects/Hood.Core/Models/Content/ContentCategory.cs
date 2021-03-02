@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Hood.Models
 {
@@ -18,6 +20,8 @@ namespace Hood.Models
 
         public ContentCategory ParentCategory { get; set; }
         public List<ContentCategory> Children { get; set; }
+        [JsonIgnore]
+        [IgnoreDataMember]
         public List<ContentCategoryJoin> Content { get; set; }
 
         [NotMapped]
@@ -33,6 +37,8 @@ namespace Hood.Models
         public ContentCategory Category { get; set; }
 
         public int ContentId { get; set; }
+        [JsonIgnore]
+        [IgnoreDataMember]
         public Content Content { get; set; }
     }
 

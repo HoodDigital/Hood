@@ -5,7 +5,7 @@
     <AssemblyName>Hood.UI.Core</AssemblyName>
     <PackageId>Hood.UI.Core</PackageId>
 
-    <Version>4.0.1</Version>
+    <Version>4.1.0</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
@@ -37,7 +37,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.11" />
   </ItemGroup>
     
 </Project>

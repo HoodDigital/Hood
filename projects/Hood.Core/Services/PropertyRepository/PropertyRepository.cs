@@ -223,7 +223,7 @@ namespace Hood.Services
             else
             {
                 properties = await GetPropertiesAsync(new PropertyListModel() { Featured = true, PageSize = int.MaxValue });
-                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, properties, TimeSpan.FromMinutes(60));
                 return properties;
             }
         }
@@ -237,7 +237,7 @@ namespace Hood.Services
             else
             {
                 properties = await GetPropertiesAsync(new PropertyListModel() { PageSize = int.MaxValue, Order = "DateDesc" });
-                _cache.Add(cacheKey, properties, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60)));
+                _cache.Add(cacheKey, properties, TimeSpan.FromMinutes(60));
                 return properties;
             }
         }

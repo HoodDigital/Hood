@@ -1,7 +1,6 @@
 # Hood
 
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/7j755tgusxqrw6nl/branch/master?svg=true)](https://ci.appveyor.com/project/hooddigital/hood/branch/master)
-[![Visual Studio Version](https://img.shields.io/badge/Visual%20Studio-2019-magenta.svg?colorB=770ca3)](https://www.visualstudio.com/)
+[![Build Status](https://dev.azure.com/hooddigital/Hood/_apis/build/status/HoodDigital.Hood)](https://dev.azure.com/hooddigital/Hood/_build/latest?definitionId=4)
 [![Demo](https://img.shields.io/badge/dynamic/json.svg?label=Demo&url=http%3A%2F%2Fcms.hooddigital.com%2Fhood%2Fversion&query=%24.version&colorB=%23eab92d&prefix=v)](http://cms.hooddigital.com/)
 
 ## About Hood CMS
@@ -33,29 +32,18 @@ You can download and use the client side code, containing all JavaScript, SCSS, 
 https://www.npmjs.com/package/hoodcms
 
 ### Recommended Installation 
-To install Hood JS & LESS via LibMan, add the following lines to your libman.json file:
+To install Hood JS & LESS via NPM, add the following lines to your libman.json file:
 ```
-{
-    "destination": "wwwroot/hood",
-    "library": "hoodcms@latest",
-    "provider": "jsdelivr"
-}
+> npm install hoodcms
 ```
 
-### Legacy Themes Bower Installation 
-To install Hood JS & LESS for legacy themes, run the following command in the command line (bower required):
-```
-bower install --save hood
-```
 ### Note
-This package only contains the required SCSS/JavaScript and CSS files required to run Hood CMS with the current default theme. 
+This package contains the required SCSS, JavaScript and CSS files required by Hood CMS, you will need to override the script references in your theme to use your installed version of the code, rather than the NPMJS CDN.
 
 
 ## Full documentation
 
 Documentation is a work in progress!
 
-You can check our growing documentation for HoodCMS here where you can also raise support requests: 
-https://hooddigital.atlassian.net/servicedesk/customer/portals
 
 Also, feel free to add your issues or pull requests to this repo, we always welcome contributions!

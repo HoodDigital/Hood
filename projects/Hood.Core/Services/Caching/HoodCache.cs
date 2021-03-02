@@ -6,6 +6,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Hood.Caching
 {
@@ -15,66 +17,19 @@ namespace Hood.Caching
         private readonly IMemoryCache _cache;
         public HoodCache(IMemoryCache cache)
         {
-            // Memory Cache stuff
             _entryKeys = new ConcurrentDictionary<string, DateTime>();
             _cache = cache;
-
-            Engine.Events.ContentChanged += OnContentChanged;
-            Engine.Events.PropertiesChanged += OnPropertiesChanged;
-            Engine.Events.OptionsChanged += OnOptionsChanged;
         }
 
-        public void Add<T>(string key, T cacheItem, MemoryCacheEntryOptions options = null)
-        {
-            if (options == null)
-                _cache.Set(key, cacheItem);
-            else
-                _cache.Set(key, cacheItem, options);
 
-            AddToKeyStore(key);
+        public bool Exists(string key)
+        {
+            return _entryKeys.ContainsKey(key);
         }
 
-        private void AddToKeyStore(string key)
+        public Task<bool> ExistsAsync(string key)
         {
-            if (_entryKeys.TryGetValue(key, out DateTime priorEntry))
-            {
-                // Try to update with the new entry if a previous entries exist.
-                bool entryAdded = _entryKeys.TryUpdate(key, DateTime.Now, priorEntry);
-
-                if (!entryAdded)
-                {
-                    // The update will fail if the previous entry was removed after retrival.
-                    // Adding the new entry will succeed only if no entry has been added since.
-                    // This guarantees removing an old entry does not prevent adding a new entry.
-                    _entryKeys.TryAdd(key, DateTime.Now);
-                }
-            }
-            else
-            {
-                // Try to add the new entry if no previous entries exist.
-                _entryKeys.TryAdd(key, DateTime.Now);
-            }
-        }
-        private void RemoveKey(string key)
-        {
-            if (!_entryKeys.ContainsKey(key))
-                return;
-            if (_entryKeys.TryRemove(key, out _))
-            {
-            }
-        }
-
-        /// <summary>
-        /// A key/value list of all Keys in the Cache, along with the DateTime they were added to it.
-        /// </summary>
-        public IDictionary<string, DateTime> Entries
-        {
-            get
-            {
-                if (_entryKeys == null)
-                    return null;
-                return _entryKeys;
-            }
+            return Task.FromResult(_entryKeys.ContainsKey(key));
         }
 
         public bool TryGetValue<T>(string key, out T cacheItem)
@@ -97,12 +52,34 @@ namespace Hood.Caching
             }
         }
 
+        public void Add<T>(string key, T cacheItem, TimeSpan? expiry = null)
+        {
+            if (!expiry.HasValue)
+                _cache.Set(key, cacheItem);
+            else
+                _cache.Set(key, cacheItem, expiry.Value);
+
+            AddToKeyStore(key);
+        }
+
+        public Task AddAsync<T>(string key, T cacheItem, TimeSpan? expiry = null)
+        {
+            Add(key, cacheItem, expiry);
+            return Task.CompletedTask;
+        }
+
         public void Remove(string key)
         {
             if (!key.IsSet())
                 return;
             RemoveKey(key);
             _cache.Remove(key);
+        }
+
+        public Task RemoveAsync(string key)
+        {            
+            Remove(key);
+            return Task.CompletedTask;
         }
 
         public void RemoveByType(Type type)
@@ -114,6 +91,12 @@ namespace Hood.Caching
                 Remove(entry.Key);
         }
 
+        public Task RemoveByTypeAsync(Type type)
+        {
+            RemoveByType(type);
+            return Task.CompletedTask;
+        }
+
         public void ResetCache()
         {
             var keys = _entryKeys.Select(e => e.Key);
@@ -122,21 +105,44 @@ namespace Hood.Caching
             _entryKeys.Clear();
         }
 
-        #region "Events"
-        private void OnContentChanged(object sender, EventArgs eventArgs)
+        public Task ResetCacheAsync()
         {
-            RemoveByType(typeof(Content));
+            ResetCache();
+            return Task.CompletedTask;
         }
 
-        private void OnPropertiesChanged(object sender, EventArgs e)
+        #region "Helpers"
+        private void AddToKeyStore(string key)
         {
-            RemoveByType(typeof(PropertyListing));
+            if (_entryKeys.TryGetValue(key, out DateTime priorEntry))
+            {
+                // Try to update with the new entry if a previous entries exist.
+                bool entryAdded = _entryKeys.TryUpdate(key, DateTime.Now, priorEntry);
+
+                if (!entryAdded)
+                {
+                    // The update will fail if the previous entry was removed after retrival.
+                    // Adding the new entry will succeed only if no entry has been added since.
+                    // This guarantees removing an old entry does not prevent adding a new entry.
+                    _entryKeys.TryAdd(key, DateTime.Now);
+                }
+            }
+            else
+            {
+                // Try to add the new entry if no previous entries exist.
+                _entryKeys.TryAdd(key, DateTime.Now);
+            }
         }
 
-        private void OnOptionsChanged(object sender, EventArgs e)
+        private void RemoveKey(string key)
         {
-            RemoveByType(typeof(Option));
+            if (!_entryKeys.ContainsKey(key))
+                return;
+            if (_entryKeys.TryRemove(key, out _))
+            {
+            }
         }
+
         #endregion
     }
 }
