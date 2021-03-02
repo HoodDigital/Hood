@@ -34,7 +34,7 @@ https://www.npmjs.com/package/hoodcms
 ### Recommended Installation 
 To install Hood JS & LESS via NPM, add the following lines to your libman.json file:
 ```
-> nmp install hoodcms
+> npm install hoodcms
 ```
 
 ### Note
