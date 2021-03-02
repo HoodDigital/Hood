@@ -43,7 +43,7 @@ steps:
 
 - task: AzureFileCopy@4
   inputs:
-    SourcePath: '.\projects\Hood\wwwroot\hood\'
+    SourcePath: '.\projects\Hood.Development\wwwroot\hood\'
     azureSubscription: 'HoodData'
     Destination: 'AzureBlob'
     storage: 'hooddigital'
