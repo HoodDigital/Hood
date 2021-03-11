@@ -398,7 +398,7 @@ $.hood.Helpers = {
   IsEventSupported: function IsEventSupported(eventName) {
     var el = document.createElement('div');
     eventName = 'on' + eventName;
-    var isSupported = eventName in el;
+    var isSupported = (eventName in el);
 
     if (!isSupported) {
       el.setAttribute(eventName, 'return;');

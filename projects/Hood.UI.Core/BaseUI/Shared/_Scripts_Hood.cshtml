@@ -1,1 +1,21 @@
-<script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/js/app.packaged.js"></script>
+<environment include="Development">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/production.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/globals.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/helpers.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/handlers.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/stringhelpers.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/validator.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/addresses.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/alerts.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/forms.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/inline.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/media.js")"></script>
+</environment>
+<environment include="Staging">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/app.packaged.js")"></script>
+</environment>
+<environment include="Production">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/js/app.packaged.js"></script>
+</environment>
+
+

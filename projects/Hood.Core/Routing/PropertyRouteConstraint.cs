@@ -16,9 +16,10 @@ namespace Hood.Core
             try
             {
                 string type = null;
-                if (values.ContainsKey("type"))
+                if (values.ContainsKey("slug"))
                 {
-                    type = values["type"].ToString();
+                    type = values["slug"].ToString();
+
                 }
                 if (type != null && type == Engine.Settings.Property.Slug)
                 {

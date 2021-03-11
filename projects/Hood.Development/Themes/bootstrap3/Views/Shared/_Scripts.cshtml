@@ -1,2 +1,10 @@
 @inject IThemesService _themes
-<script asp-location="Scripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/js/theme.bs3.min.js"></script>
+<environment include="Development">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/theme.bs3.js")"></script>
+</environment>
+<environment include="Staging">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/theme.bs3.min.js")"></script>
+</environment>
+<environment include="Production">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/js/theme.bs3.min.js"></script>
+</environment>
