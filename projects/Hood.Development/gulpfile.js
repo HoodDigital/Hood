@@ -108,7 +108,7 @@ gulp.task('hood:theme:js:bootstrap3', function () {
     });
     return gulp.src('./wwwroot/themes/bootstrap3/js/theme.js')
         .pipe(babel({
-            presets: ['@babel/env']
+            presets: ['@babel/preset-env']
         }))
         .pipe(rename({ suffix: '.bs3' }))
         .pipe(gulp.dest(hood.js))
@@ -126,7 +126,7 @@ gulp.task('hood:theme:js:bootstrap4', function () {
     });
     return gulp.src('./wwwroot/themes/bootstrap4/js/theme.js')
         .pipe(babel({
-            presets: ['@babel/env']
+            presets: ['@babel/preset-env']
         }))
         .pipe(rename({ suffix: '.bs4' }))
         .pipe(gulp.dest(hood.js))
@@ -186,6 +186,7 @@ gulp.task('hood:cssnano', function () {
 gulp.task('hood:images', function () {
     return gulp.src(hood.images + '**/*.+(png|jpg|gif|svg)')
         .pipe(imagemin())
+        .pipe(gulp.dest(hood.images))
         .pipe(gulp.dest(output.images));
 });
 
@@ -197,7 +198,7 @@ gulp.task('hood:js', function () {
     });
     return gulp.src([hood.js + '**/*.js', '!' + hood.js + '**/*.min.js', '!' + hood.js + '**/*.packaged.js'], { base: hood.js })
         .pipe(babel({
-            presets: ['@babel/env']
+            presets: ['@babel/preset-env']
         }))
         .pipe(gulp.dest(output.js))
         .pipe(l)
@@ -287,8 +288,6 @@ gulp.task('hood:js:package:admin', function () {
         hood.js + 'admin/property.js',
         hood.js + 'admin/themes.js',
         hood.js + 'admin/users.js',
-
-        hood.js + 'app/google.js',
 
         hood.js + 'admin.js'
 

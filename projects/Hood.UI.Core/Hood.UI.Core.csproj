@@ -5,7 +5,7 @@
     <AssemblyName>Hood.UI.Core</AssemblyName>
     <PackageId>Hood.UI.Core</PackageId>
 
-    <Version>4.1.0</Version>
+    <Version>4.1.1</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>

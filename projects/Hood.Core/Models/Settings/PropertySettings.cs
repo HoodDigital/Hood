@@ -126,7 +126,7 @@ namespace Hood.Models
             Name = "Property";
             Plural = "Properties";
             Title = "Property";
-            Slug = "property";
+            Slug = "properties";
             ShowRent = true;
             ShowAskingPrice = true;
             ShowItem = true;

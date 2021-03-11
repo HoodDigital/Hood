@@ -16,5 +16,30 @@
 <script asp-location="Vendors" asp-bundle="false" src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.9.11/tinymce.min.js" integrity="sha512-3tlegnpoIDTv9JHc9yJO8wnkrIkq7WO7QJLi5YfaeTmZHvfrb1twMwqT4C0K8BLBbaiR6MOo77pLXO1/PztcLg==" crossorigin="anonymous"></script>
 <script asp-location="Vendors" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/@@simonwep/pickr@1.8.0/dist/pickr.min.js" integrity="sha256-wRWU42KOK0asLENS8Aq7tEIYKGmQj2VFKg4rb1d3Z5U=" crossorigin="anonymous"></script>
 
-<script asp-location="Scripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/js/admin.packaged.js"></script>
+<environment include="Development">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/production.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/globals.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/helpers.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/handlers.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/stringhelpers.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/validator.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/addresses.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/alerts.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/forms.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/inline.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/core/media.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin/content.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin/logs.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin/property.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin/themes.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin/users.js")"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin.js")"></script>
+</environment>
+<environment include="Staging">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/admin.packaged.js")"></script>
+</environment>
+<environment include="Production">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/js/admin.packaged.js"></script>
+</environment>
+
 <partial name="_Scripts_Google" />

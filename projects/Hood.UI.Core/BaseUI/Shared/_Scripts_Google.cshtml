@@ -1,7 +1,16 @@
 @{
     IntegrationSettings _plugins = Engine.Settings.Integrations;
 }
-<script asp-location="AfterScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/js/app/google.min.js"></script>
+<environment include="Development">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/app/google.js")"></script>
+</environment>
+<environment include="Staging">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/app/google.min.js")"></script>
+</environment>
+<environment include="Production">
+    <script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/js/google.min.js"></script>
+</environment>
+
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {
     <script asp-location="AfterScripts" asp-bundle="false" async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>

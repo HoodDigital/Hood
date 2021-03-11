@@ -160,7 +160,7 @@ $.hood.Google = {
     }); // Add a marker clusterer to manage the markers.
 
     var markerCluster = new MarkerClusterer(map, markers, {
-      imagePath: 'https://cdn.jsdelivr.net/npm/hoodcms@4.0.1/images/maps/m',
+      imagePath: 'https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/maps/m',
       maxZoom: 15
     });
   },
