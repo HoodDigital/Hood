@@ -32,7 +32,7 @@ You can download and use the client side code, containing all JavaScript, SCSS, 
 https://www.npmjs.com/package/hoodcms
 
 ### Recommended Installation 
-To install Hood JS & LESS via NPM, add the following lines to your libman.json file:
+To install Hood JS & LESS via NPM.
 ```
 > npm install hoodcms
 ```
