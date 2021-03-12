@@ -39,6 +39,7 @@ namespace Hood.ViewModels
         /// <summary>
         /// for internal use only, forces loading of images in the search, not recommended.
         /// </summary>
+        [FromQuery(Name = "img")]
         public bool LoadImages { get; set; } = false;
 
         /// <summary>
@@ -110,6 +111,11 @@ namespace Hood.ViewModels
             {
                 query += "&status=" + status;
             }
+            query += PlanningType.IsSet() ? "&planning=" + PlanningType : "";
+            query += LoadImages ? "&img=true" : "";
+            query += Featured ? "&featured=true" : "";
+            query += Location.IsSet() ? "&location=" + Location : "";
+            query += Agent.IsSet() ? "&agent=" + Agent : "";
             query += PlanningType.IsSet() ? "&planning=" + PlanningType : "";
             query += Bedrooms.HasValue ? "&beds=" + Bedrooms : "";
             query += MinBedrooms.HasValue ? "&beds-min=" + MinBedrooms : "";
