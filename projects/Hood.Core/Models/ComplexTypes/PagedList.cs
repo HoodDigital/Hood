@@ -191,8 +191,8 @@ namespace System.Collections.Generic
             {
                 query = $"?page={pageIndex}&pageSize={PageSize}";
             }
-            query += Search.IsSet() ? "&search=" + Search : "";
-            query += Order.IsSet() ? "&sort=" + Order : "";
+            query += Search.IsSet() ? "&search=" + System.Net.WebUtility.UrlEncode(Search) : "";
+            query += Order.IsSet() ? "&sort=" + System.Net.WebUtility.UrlEncode(Order) : "";
             return query;
         }
     }
