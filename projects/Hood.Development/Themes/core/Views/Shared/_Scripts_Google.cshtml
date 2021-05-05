@@ -8,7 +8,7 @@
     <script asp-location="BeforeScripts" asp-bundle="false" src="@($"{Engine.LibraryFolder}/js/app/google.min.js")"></script>
 </environment>
 <environment include="Production">
-    <script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.1.2/js/google.min.js"></script>
+    <script asp-location="BeforeScripts" asp-bundle="false" src="https://cdn.jsdelivr.net/npm/hoodcms@4.1.2/js/app/google.min.js"></script>
 </environment>
 
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
