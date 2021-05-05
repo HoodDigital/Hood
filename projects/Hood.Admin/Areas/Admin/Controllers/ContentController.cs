@@ -43,7 +43,8 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/{id}/edit/")]
         public async Task<IActionResult> Edit(int id)
         {
-            var model = await GetEditorModel(new Content() { Id = id });
+            var model = await _content.GetContentByIdAsync(id, true, false);
+            model = await GetEditorModel(model);
             if (model == null)
                 return NotFound();
 
@@ -63,21 +64,26 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     if (await _content.SlugExists(model.Slug, model.Id))
                     {
-                        throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                        model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
+                        if (model.Type.BaseName == "Page")
+                        {
+                            throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
+                        }
+                        else
+                        {
+                            await GenerateNewSlug(model);
+                        }
                     }
                 }
                 else
                 {
-                    KeyGenerator generator = new KeyGenerator();
-                    model.Slug = generator.UrlSlug();
-                    while (await _content.SlugExists(model.Slug))
-                    {
-                        model.Slug = generator.UrlSlug();
-                    }
+                    await GenerateNewSlug(model);
                 }
 
                 // Save and reload to deal with metas.
                 await _content.UpdateAsync(model);
+                // reload
+                model = await _content.GetContentByIdAsync(model.Id, true, false);
                 model = await GetEditorModel(model);
 
                 // update  meta values
@@ -120,6 +126,16 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             return View(model);
+        }
+
+        private async Task GenerateNewSlug(Content model)
+        {
+            KeyGenerator generator = new KeyGenerator();
+            model.Slug = generator.UrlSlug();
+            while (await _content.SlugExists(model.Slug))
+            {
+                model.Slug = generator.UrlSlug();
+            }
         }
         #endregion
 
@@ -492,7 +508,8 @@ namespace Hood.Areas.Admin.Controllers
                     await _content.UpdateAsync(content);
                 }
                 return new Response(true, "The image has now been set as the featured image. You may need to reload the page to see the change.");
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 await _logService.AddExceptionAsync<ContentController>("Error setting a featured image from the media list.", ex);
                 return new Response(ex);
@@ -504,7 +521,6 @@ namespace Hood.Areas.Admin.Controllers
 
         protected async Task<Content> GetEditorModel(Content model)
         {
-            model = await _content.GetContentByIdAsync(model.Id, true, false);
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
