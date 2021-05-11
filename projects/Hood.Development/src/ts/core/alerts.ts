@@ -11,7 +11,7 @@ const BootstrapSwal = Swal.mixin({
 
 export class Alerts {
 
-    static Error(message: string, title: string, hideAfter: number = null) {
+    static Error(message: string, title: string = null, hideAfter: number = null) {
       
             $.toast({
                 heading: title,
@@ -26,7 +26,7 @@ export class Alerts {
 
     }
 
-    static Warning(message: string, title: string, hideAfter: number = null) {
+    static Warning(message: string, title: string = null, hideAfter: number = null) {
       
         $.toast({
             heading: title,
@@ -41,7 +41,7 @@ export class Alerts {
 
     }       
 
-    static Message(message: string, title: string, hideAfter: number = null) {
+    static Message(message: string, title: string = null, hideAfter: number = null) {
       
         $.toast({
             heading: title,
@@ -56,7 +56,7 @@ export class Alerts {
 
     }     
 
-    static Success(message: string, title: string, hideAfter: number = null) {
+    static Success(message: string, title: string = null, hideAfter: number = null) {
       
         $.toast({
             heading: title,
@@ -71,7 +71,7 @@ export class Alerts {
 
     }   
 
-    static Alert(message: string, title: string, icon: string, hideAfter: number = 10000) {
+    static Alert(message: string, title: string = null, icon: string = 'info', hideAfter: number = 10000) {
 
         switch (icon) {
             case 'error':

@@ -1,20 +1,44 @@
-import { Modal } from 'bootstrap';
-import { Alerts, Response } from './hood';
+import { Editors } from "./ts/admin/Editors";
+import { Stats } from "./ts/admin/Stats";
+import { Uploader } from "./ts/core/Uploader";
 
-let modal = $('#exampleModal');
-modal.addClass('dewsh');
+class Admin {
+    editors: Editors;
+    stats: Stats;
+    uploader: Uploader;
 
-var myModal = new Modal(document.getElementById('exampleModal'));
-//myModal.show();
+    constructor() {
+        this.editors = new Editors();
+        this.stats = new Stats();
+        this.uploader = new Uploader();
 
-Alerts.Error("This is working!", "Great!!!");
-Alerts.Warning("This is working!", "Great!!!");
-Alerts.Success("This is working!", "Great!!!");
-Alerts.Message("This is working!", "Great!!!");
-Alerts.Prompt({ html: "What is this?", title: "Quick Question".htmlEncode() }, function (result) {
-    if (!result.isDismissed) {
-        Alerts.Message(`We heard ${result.value}`, "Great!!!");
-    } else {
-        Alerts.Message(`Man no respondy...`, "Uh oh...");
+        $('.mobile-sidebar-toggle').on('click', function () {
+            $('nav.sidebar').toggleClass('open');
+        });
+
+        $('.right-sidebar-toggle').on('click', function () {
+            $('#right-sidebar').toggleClass('sidebar-open');
+        });
+
+        $(".alert.auto-dismiss").fadeTo(5000, 500).slideUp(500, function () {
+            $(".alert.auto-dismiss").slideUp(500);
+        });
+
+        console.error("Admin.Constructor() - slimscroll is not implemented... is it needed??");
+        //$('.sidebar-scroll').slimScroll({
+        //    height: '100%',
+        //    railOpacity: 0.4,
+        //    wheelStep: 10
+        //});
+
+        console.error("Admin.Constructor() - counterUp is not implemented... is it needed??");
+        //if ($('[data-plugin="counter"]') && $.counterUp)
+        //    $('[data-plugin="counter"]').counterUp({
+        //        delay: 10,
+        //        time: 800
+        //    });
+
     }
-});
+}
+
+new Admin();

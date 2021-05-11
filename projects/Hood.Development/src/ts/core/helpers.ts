@@ -1,13 +1,9 @@
-﻿import { Alerts } from "./alerts";
-import { Response } from "./response";
-
-export class Helpers {
-
+﻿export class Helpers {
     constructor() {
 
     }
 
-    static isNullOrUndefined(a: string) {
+    static isNullOrUndefined(a: any) {
         let rc = false;
         if (a === null || typeof a === "undefined" || a === "") {
             rc = true;
@@ -15,7 +11,7 @@ export class Helpers {
         return rc;
     }
 
-    static isSet(a: string) {
+    static isSet(a: any) {
         let rc = false;
         if (a === null || typeof a === "undefined" || a === "") {
             rc = true;
@@ -27,14 +23,30 @@ export class Helpers {
         return a && {}.toString.call(a) === '[object Function]';
     }
 
-    static processResponse (data: Response) {
-        let title = '';
-        if (data.Title) title = `<strong>${data.Title}</strong><br />`;
-        //if (data.Success) {
-        //    //Alerts.Success();
-        //} else {
-        //    Alerts.Error(`${title}${data.Errors}`);
-        //}
+    static insertQueryStringParamToUrl(url: { search: string; }, key: string, value: string) {
+        key = escape(key); value = escape(value);
+        var kvp = url.search.substr(1).split('&');
+        if (kvp.length == 1) {
+            url.search = '?' + key + '=' + value;
+        }
+        else {
+
+            var i = kvp.length; var x; while (i--) {
+                x = kvp[i].split('=');
+
+                if (x[0] === key) {
+                    x[1] = value;
+                    kvp[i] = x.join('=');
+                    break;
+                }
+            }
+
+            if (i < 0) { kvp[kvp.length] = [key, value].join('='); }
+
+            //this will reload the page, it's likely better to store this until finished
+            url.search = kvp.join('&');
+        }
+        return url;
     }
 
 }
