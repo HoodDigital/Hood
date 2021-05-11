@@ -4,15 +4,12 @@ package-lock.json
 /Feed
 /Temporary
 
-# Ignore Development Views & Migrations
-/Areas/Admin/Views
-/Views
-
 # Ignore Libraries
 /wwwroot/lib
 
 # Ignore Site Compiled Client Files
-/wwwroot/css
+/wwwroot/dist
+
 /wwwroot/bundles
 /wwwroot/js/**/*.min.js
 /wwwroot/js/**/*.packaged.js

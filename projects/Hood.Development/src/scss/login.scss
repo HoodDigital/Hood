@@ -1,0 +1,81 @@
+@import "bootstrap";
+$feathericon-font-path: "../../lib/feather/build/fonts/";
+@import "../../lib/feather/build/scss/feathericon";
+$fa-font-path: "../../lib/fontawesome/webfonts";
+@import "../../lib/fontawesome/scss/fontawesome";
+@import "../../lib/fontawesome/scss/brands";
+@import "../../lib/fontawesome/scss/regular";
+@import "../../lib/fontawesome/scss/solid";
+@import "core/validation-summary";
+@import "core/floating-label";
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background: #444;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -moz-flex-align: center;
+    -ms-flex-align: center;
+    -webkit-flex-align: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    height: 100%;
+    .login-block {
+        max-width: 450px;
+        width: 100%;
+        padding: 20px;
+        margin: auto;
+        background: white;
+        border-top: solid 3px #fcc20d;
+        border-radius: 4px;
+        box-shadow: 0 0 75px rgba(0, 0, 0, .7);
+        header {
+            img {
+                max-width: 50%;
+                max-height: 60px;
+                margin: 25px auto;
+                display: block;
+            }
+        }
+        .header {
+            text-align: center;
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1em;
+            }
+        }
+        .form-signin {
+            input[type="text"] {
+                margin-bottom: -1px;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+            input[type="password"] {
+                margin-bottom: 10px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+        }
+        footer {
+            text-align: center;
+            small {
+                a {
+                    font-weight: normal;
+                    text-decoration: none;
+                    color: #939393;
+                }
+            }
+        }
+    }
+    &.install {
+        .login-block {
+            max-width: 996px;
+        }
+    }
+}
