@@ -65,10 +65,12 @@
         "webpack-cli": "4.7.0"
     },
   "scripts": {
-    "build": "webpack --progress --profile --env NODE_ENV=development",
-    "watch": "webpack --progress --profile --watch",
-    "production": "webpack --progress --profile --env NODE_ENV=production",
-    "css-lint": "stylelint src/scss/core/_alerts.scss --fix",
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "production": "webpack --config webpack.production.js",
+    "publish-copy": "gulp copy",
+    "publish": "npm-run-all build production publish-copy",
+    "css-lint": "stylelint src/scss/core/ --fix",
     "server": "serve wwwroot",
     "start": "npm-run-all --parallel watch server",
     "test": "npm run css-lint && npm run css"

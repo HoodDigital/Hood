@@ -19,13 +19,13 @@ module.exports = {
         admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
     },
 
-    mode: "development",
+    mode: "production",
 
-    devtool: "source-map",
+    devtool: false,
 
     module: {
         rules: [
-            
+
             {
                 test: /\.tsx?$/,
                 use: [
@@ -66,7 +66,7 @@ module.exports = {
 
     output: {
         filename: 'js/[name].js',
-        path: path.resolve(__dirname, "wwwroot/src")
+        path: path.resolve(__dirname, "wwwroot/dist")
     },
 
     optimization: {

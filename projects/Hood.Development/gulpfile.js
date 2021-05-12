@@ -17,9 +17,39 @@ var imagemin = require('gulp-imagemin');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
 
+gulp.task('clean', function (cb) {
+    return gulp.src([
+        './wwwroot/src/',
+        './wwwroot/dist/',
+        './wwwroot/src/js/',
+        './wwwroot/src/css/',
+        output.scss,
+        output.js,
+        output.images,
+        hood.css,
+        hood.js + 'theme.*.js'
+    ], { read: false, allowEmpty: true })
+        .pipe(rimraf({ force: true }));
+});
+gulp.task('copy:src', function () {
+    return gulp.src('./wwwroot/src/**/*.*')
+        .pipe(gulp.dest('./src/'));
+});
+gulp.task('copy:dist', function () {
+    return gulp.src('./wwwroot/dist/**/*.*')
+        .pipe(gulp.dest('./dist/'));
+});
+gulp.task('copy',
+    gulp.series(
+        'copy:src',
+        'copy:dist'
+    )
+);
+
+
 /*
  *
- *   Variables
+ *   LEGACY STUFF
  *
  */
 
@@ -179,7 +209,6 @@ gulp.task('hood:views:admin', function () {
     return gulp.src('./Areas/Admin/UI/**/*.*')
         .pipe(gulp.dest('./../Hood.Admin/Areas/Admin/UI/'));
 });
-
 
 gulp.task('hood:views',
     gulp.series(
