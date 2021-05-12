@@ -1,6 +1,7 @@
 {
   "rules": {
-    "indentation": 4
+    "indentation": 4,
+    "unicode-bom": "never"
   },
   "extends": [
     "stylelint-config-twbs-bootstrap/scss"

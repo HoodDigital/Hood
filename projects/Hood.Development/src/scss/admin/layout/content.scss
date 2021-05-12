@@ -17,24 +17,6 @@
         top: 0;
     }
 
-    $admin-stats-per-line: ( xs: 1, sm: 2, md: 2, lg: 2, xl: 4 ) !default;
-
-    @each $name, $breakpoint in $grid-breakpoints {
-        @media (min-width: $breakpoint) {
-            .card-deck.admin-stats .card {
-                flex: 0 0 calc(#{100/map-get($admin-stats-per-line, $name)}% - #{$grid-gutter-width});
-                margin-bottom: $grid-gutter-width;
-
-                h5.card-title {
-                    text-transform: uppercase;
-                    font-size: small;
-                    margin: 0;
-                    margin-bottom: 15px;
-                }
-            }
-        }
-    }
-
     @import "content/title";
     @import "content/footer";
     @import "content/breadcrumb";

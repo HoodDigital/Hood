@@ -6,27 +6,77 @@ const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = {
+
     entry: {
-        hood: './src/hood.ts',
-        admin: './src/admin.ts'
+        hood: './src/ts/hood.ts',
+        admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
     },
+
     mode: 'production',
+
     module: {
-        rules: [{
-            test: /\.tsx?$/,
-            use: 'ts-loader',
-            exclude: [/node_modules/, /wwwroot/],
-        }, ],
+        rules: [
+            
+            {
+                test: /\.tsx?$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: 'js/[name].js',
+                        }
+                    },
+                    {
+                        loader: 'ts-loader'
+                    }
+                ],
+                exclude: [/node_modules/, /wwwroot/],
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: 'css/[name].blocks.css',
+                        }
+                    },
+                    {
+                        loader: 'extract-loader'
+                    },
+                    {
+                        loader: 'css-loader?-url'
+                    },
+                    {
+                        loader: 'postcss-loader'
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            // Prefer `dart-sass`
+                            sourceMap: true,
+                            implementation: require("sass"),
+                            sassOptions: {
+                                fiber: false,
+                            }
+                        }
+                    }
+                ]
+            }
+        ],
     },
+
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
+
     externals: {
         jquery: 'jQuery',
         bootstrap: 'bootstrap',
         dropzone: 'Dropzone',
         'tinymce/tinymce': 'tinymce',
     },
+
     output: {
         filename: '[name].js',
         path: path.resolve(__dirname, 'wwwroot/dist')
@@ -37,22 +87,6 @@ module.exports = {
         minimizer: [
             new TerserPlugin(),
             new OptimizeCSSAssetsPlugin()
-        ],
-        runtimeChunk: 'single',
-        splitChunks: {
-            cacheGroups: {
-                vendor: {
-                    test: /[\\\/]node_modules[\\\/]/,
-                    name: 'vendors',
-                    chunks: 'all'
-                },
-                styles: {
-                    name: 'styles',
-                    test: /\.css$/,
-                    chunks: 'all',
-                    enforce: true
-                }
-            }
-        }
-    }
+        ]
+    },
 };

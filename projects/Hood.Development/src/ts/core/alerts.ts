@@ -19,7 +19,7 @@ export class Alerts {
                 icon: 'error',
                 position: 'bottom-left',
                 loader: false,
-                bgColor: '#d0100c',
+                bgColor: '#d0100b',
                 textColor: 'white',
                 hideAfter: hideAfter
             });

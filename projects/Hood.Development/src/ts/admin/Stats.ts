@@ -9,7 +9,7 @@ export class Stats {
     }
 
     LoadChart() {
-        console.error(" is not implemented.");
+        console.error("Stats.LoadCharts() is not implemented.");
     //    $.get('/admin/stats/', function (data) {
     //        $('#admin-chart-area').empty();;
     //        $('#admin-chart-area').html('<canvas id="admin-stats-chart"></canvas>');

@@ -49,7 +49,7 @@
             }
             <small class="d-block">@Model.Message</small>
         </div>
-        <a data-toggle="modal" href="@string.Format("#log-{0}", Model.Id)" class="full-box-link"></a>
+        <a data-bs-toggle="modal" href="@string.Format("#log-{0}", Model.Id)" class="full-box-link"></a>
     </div>
     <div class="modal fade modal-right" id="@string.Format("log-{0}", Model.Id)" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-blade" role="document">

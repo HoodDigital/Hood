@@ -1,14 +1,14 @@
 @model Content
 <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
     <li class="nav-item active">
-        <a class="nav-link" id="content-tab" data-toggle="tab" href="#content" role="tab" aria-controls="content" aria-selected="false">
+        <a class="nav-link" id="content-tab" data-bs-toggle="tab" href="#content" role="tab" aria-controls="content" aria-selected="false">
             Content
         </a>
     </li>
     @if (Model.Type.ShowImage || Model.Type.ShowBanner)
     {
         <li class="nav-item">
-            <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">
+            <a class="nav-link" id="image-tab" data-bs-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="false">
                 Images
             </a>
         </li>
@@ -16,7 +16,7 @@
     @if (Model.Type.Templates)
     {
         <li class="nav-item">
-            <a class="nav-link" id="template-tab" data-toggle="tab" href="#template" role="tab" aria-controls="template" aria-selected="false">
+            <a class="nav-link" id="template-tab" data-bs-toggle="tab" href="#template" role="tab" aria-controls="template" aria-selected="false">
                 Template
             </a>
         </li>
@@ -27,7 +27,7 @@
         )
     {
         <li class="nav-item">
-            <a class="nav-link" id="type-tab" data-toggle="tab" href="#type" role="tab" aria-controls="type" aria-selected="false">
+            <a class="nav-link" id="type-tab" data-bs-toggle="tab" href="#type" role="tab" aria-controls="type" aria-selected="false">
                 @Model.Type.TypeName &amp; Custom Fields
             </a>
         </li>
@@ -35,7 +35,7 @@
     @if (Model.Type.Gallery)
     {
         <li class="nav-item">
-            <a class="nav-link" id="gallery-tab" data-toggle="tab" href="#gallery" role="tab" aria-controls="gallery" aria-selected="false">
+            <a class="nav-link" id="gallery-tab" data-bs-toggle="tab" href="#gallery" role="tab" aria-controls="gallery" aria-selected="false">
                 Gallery
             </a>
         </li>
@@ -43,7 +43,7 @@
     @if (Model.Metadata.Where(c => c.Name.StartsWith("SEO.")).Count() > 0)
     {
         <li class="nav-item">
-            <a class="nav-link" id="seo-tab" data-toggle="tab" href="#seo" role="tab" aria-controls="seo" aria-selected="false">
+            <a class="nav-link" id="seo-tab" data-bs-toggle="tab" href="#seo" role="tab" aria-controls="seo" aria-selected="false">
                 SEO
             </a>
         </li>
@@ -51,7 +51,7 @@
     @if (Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
     {
         <li class="nav-item">
-            <a class="nav-link" id="security-tab" data-toggle="tab" href="#security" role="tab" aria-controls="security" aria-selected="false">
+            <a class="nav-link" id="security-tab" data-bs-toggle="tab" href="#security" role="tab" aria-controls="security" aria-selected="false">
                 Security
             </a>
         </li>

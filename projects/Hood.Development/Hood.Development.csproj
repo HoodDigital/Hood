@@ -26,4 +26,8 @@
     <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\dist\css\" />
+  </ItemGroup>
+
 </Project>
