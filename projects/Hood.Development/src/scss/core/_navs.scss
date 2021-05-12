@@ -1,13 +1,13 @@
-﻿.nav-pills {
+.nav-pills {
     &.nav-buttons {
         .nav-link {
-            border-radius: 0.25rem;
-            background: $gray-200;
             margin-bottom: .2rem;
+            background: $gray-200;
+            border-radius: .25rem;
 
             &.active {
-                background: $primary;
                 color: white;
+                background: $primary;
             }
         }
     }
@@ -18,7 +18,7 @@
         padding-left: 1.5rem;
 
         i {
-            padding: 0.5rem;
+            padding: .5rem;
             padding-left: 0;
         }
     }

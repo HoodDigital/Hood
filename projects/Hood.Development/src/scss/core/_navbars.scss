@@ -1,7 +1,7 @@
-﻿ul.navbar-nav {
+ul.navbar-nav {
     flex-direction: column;
-    margin-left: -1.5rem;
     margin-right: -1.5rem;
+    margin-left: -1.5rem;
 
     li {
         display: block;
@@ -9,28 +9,28 @@
         h4 {
             display: flex;
             align-items: center;
-            margin-bottom: 0;
-            margin-top: 1rem;
             padding: .5rem 1.5rem;
-            color: $gray-400;
+            margin-top: 1rem;
+            margin-bottom: 0;
             font-size: small;
+            color: $gray-400;
             text-transform: uppercase;
         }
 
         a.nav-link {
-            cursor: pointer;
             display: flex;
             align-items: center;
             padding: .5rem 1.5rem;
             color: $gray-600;
+            cursor: pointer;
 
             i {
-                margin-right: 10px;
-                vertical-align: middle;
-                text-align: center;
                 width: 25px;
+                margin-right: 10px;
+                text-align: center;
+                vertical-align: middle;
 
-                @media (min-width:768px) {
+                @media (min-width: 768px) {
                     display: inline-block;
                 }
             }

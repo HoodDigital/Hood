@@ -1,10 +1,11 @@
-﻿.hood-image, .img {
+.hood-image,
+.img {
     display: inline-block;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    vertical-align: middle;
     overflow: hidden;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 
     img {
         display: none !important;
@@ -17,17 +18,17 @@
             @include transform(translateY(-50%));
         }
 
-        &:before {
-            content: '';
+        &::before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
             width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0px;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            z-index: 1;
-            background-color: rgba(255,255,255,0.5);
+            content: "";
+            background-color: rgba(255, 255, 255, .5);
         }
     }
 
@@ -70,41 +71,44 @@
     }
 
     &.img-full {
-        width: 100%;
         display: block;
+        width: 100%;
     }
 
     &.img-square,
     &.img-standard,
     &.img-wide,
     &.img-mobile-card {
-        &:after {
-            padding-top: 100%;
+        &::after {
             /* 16:9 ratio */
             display: block;
-            content: '';
+            padding-top: 100%;
+            content: "";
             background-size: contain;
         }
     }
 
     &.img-standard {
-        &:after {
+        &::after {
             padding-top: 33%;
+
             /* tall */
         }
     }
 
     &.img-wide {
-        &:after {
+        &::after {
             padding-top: 56.25%;
+
             /* 16:9 ratio */
         }
     }
 
 
     &.img-mobile-card {
-        &:after {
+        &::after {
             padding-top: 151.3%;
+
             /* tall */
         }
     }
@@ -114,14 +118,16 @@
     }
 }
 
-.post-content, #post-content {
+.post-content,
+#post-content {
 
-    &:before, &:after {
-        content: " ";
+    &::before,
+    &::after {
         display: table;
+        content: " ";
     }
 
-    &:after {
+    &::after {
         clear: both;
     }
 
@@ -131,25 +137,25 @@
 }
 
 img.user-image {
-    max-width: 100%;
     display: block;
+    max-width: 100%;
 
     &.full {
         width: 100%;
     }
 
     &.left {
-        margin: 0px auto;
-        margin-left: 0px;
+        margin: 0 auto;
+        margin-left: 0;
     }
 
     &.center {
-        margin: 0px auto;
+        margin: 0 auto;
     }
 
     &.right {
-        margin: 0px auto;
-        margin-right: 0px;
+        margin: 0 auto;
+        margin-right: 0;
     }
 
     &.inline {
@@ -168,14 +174,14 @@ img.user-image {
 
 .bg-img {
     position: absolute;
-    overflow: hidden;
     top: 0;
-    left: 0;
     right: 0;
     bottom: 0;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+    left: 0;
+    overflow: hidden;
     background-size: cover;
+    backface-visibility: hidden;
+    backface-visibility: hidden;
 
     img {
         position: absolute;

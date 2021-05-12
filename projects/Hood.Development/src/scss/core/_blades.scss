@@ -1,18 +1,18 @@
-﻿.modal {
+.modal {
     &[data-backdrop] {
-        background: rgba(0,0,0,0.4);
+        background: rgba(0, 0, 0, .4);
     }
 
     .modal-blade {
-        height: 100%;
         width: 100%;
         max-width: 450px;
+        height: 100%;
         margin: 0;
 
         &.modal-lg {
             max-width: 100%;
 
-            @media (min-width:996px) {
+            @media (min-width: 996px) {
                 max-width: 50%;
             }
         }
@@ -20,7 +20,7 @@
         &.modal-xl {
             max-width: 100%;
 
-            @media (min-width:996px) {
+            @media (min-width: 996px) {
                 max-width: 85%;
             }
         }
@@ -36,12 +36,12 @@
         }
 
         .modal-header {
-            border-radius: inherit
+            border-radius: inherit;
         }
 
         .modal-body {
             height: inherit;
-            overflow-y: auto
+            overflow-y: auto;
         }
     }
 
@@ -61,7 +61,7 @@
         padding-right: 0 !important;
 
         .modal-blade {
-            margin-left: auto
+            margin-left: auto;
         }
 
         &.fade {
