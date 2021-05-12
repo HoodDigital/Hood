@@ -33,33 +33,17 @@ module.exports = {
                 exclude: [/node_modules/, /wwwroot/],
             },
             {
-                test: /\.scss$/,
+                test: /\.ss?css$/,
                 use: [
+                    MiniCssExtractPlugin.loader,
                     {
-                        loader: 'file-loader',
-                        options: {
-                            name: 'css/[name].blocks.css',
-                        }
-                    },
-                    {
-                        loader: 'extract-loader'
-                    },
-                    {
-                        loader: 'css-loader?-url'
+                        loader: 'css-loader'
                     },
                     {
                         loader: 'postcss-loader'
                     },
                     {
-                        loader: 'sass-loader',
-                        options: {
-                            // Prefer `dart-sass`
-                            sourceMap: true,
-                            implementation: require("sass"),
-                            sassOptions: {
-                                fiber: false,
-                            }
-                        }
+                        loader: 'sass-loader'
                     }
                 ]
             }
@@ -67,7 +51,7 @@ module.exports = {
     },
 
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+        extensions: ['.tsx', '.ts', '.js', '.scss'],
     },
 
     externals: {
@@ -85,8 +69,16 @@ module.exports = {
     optimization: {
         minimize: true,
         minimizer: [
-            new TerserPlugin(),
-            new OptimizeCSSAssetsPlugin()
+            new TerserPlugin()
         ]
     },
+
+    devtool: "source-map",
+
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+            chunkFilename: "[id].css"
+        })
+    ]
 };

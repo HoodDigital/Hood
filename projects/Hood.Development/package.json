@@ -28,7 +28,8 @@
         "source-map-loader": "^2.0.1",
         "sweetalert2": "10.16.7",
         "three": "0.128.0",
-        "tinymce": "^5.8.0"
+        "tinymce": "^5.8.0",
+        "webpack-fix-style-only-entries": "^0.6.1"
     },
     "devDependencies": {
         "@babel/core": "7.14.0",
