@@ -1,3 +1,5 @@
+const devMode = process.env.NODE_ENV !== 'production';
+
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -5,14 +7,25 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+const plugins = [];
+    // enable in production only
+    plugins.push(new MiniCssExtractPlugin({
+        filename: "[name].css",
+        chunkFilename: "[id].css"
+    }));
+
 module.exports = {
+
+    plugins,
 
     entry: {
         hood: './src/ts/hood.ts',
         admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
     },
 
-    mode: 'production',
+    mode: devMode ? "development" : "production",
+
+    devtool: devMode ? "source-map" : false,
 
     module: {
         rules: [
@@ -21,19 +34,13 @@ module.exports = {
                 test: /\.tsx?$/,
                 use: [
                     {
-                        loader: 'file-loader',
-                        options: {
-                            name: 'js/[name].js',
-                        }
-                    },
-                    {
                         loader: 'ts-loader'
                     }
                 ],
                 exclude: [/node_modules/, /wwwroot/],
             },
             {
-                test: /\.ss?css$/,
+                test: /\.(sa|sc|c)ss$/,
                 use: [
                     MiniCssExtractPlugin.loader,
                     {
@@ -63,7 +70,7 @@ module.exports = {
 
     output: {
         filename: '[name].js',
-        path: path.resolve(__dirname, 'wwwroot/dist')
+        path: path.resolve(__dirname, devMode ? "wwwroot/src" :'wwwroot/dist')
     },
 
     optimization: {
@@ -73,12 +80,4 @@ module.exports = {
         ]
     },
 
-    devtool: "source-map",
-
-    plugins: [
-        new MiniCssExtractPlugin({
-            filename: "[name].css",
-            chunkFilename: "[id].css"
-        })
-    ]
 };

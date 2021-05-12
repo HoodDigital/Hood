@@ -9,6 +9,7 @@ package-lock.json
 
 # Ignore Site Compiled Client Files
 /wwwroot/dist
+/wwwroot/src
 
 /wwwroot/bundles
 /wwwroot/js/**/*.min.js
