@@ -1,10 +1,10 @@
-﻿.card {
+.card {
     &.hover {
         background-color: white;
 
         &:hover {
-            border-color: $gray-400;
             background-color: $gray-100;
+            border-color: $gray-400;
         }
     }
 }

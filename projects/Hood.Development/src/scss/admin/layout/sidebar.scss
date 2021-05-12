@@ -1,44 +1,44 @@
-﻿nav.sidebar {
-    display: block;
+nav.sidebar {
     position: fixed;
     top: 59px;
     bottom: 0;
     z-index: 9;
-    background: white;
+    display: block;
     width: 100%;
     max-width: 250px;
-    padding-left: 1.5rem;
     padding-right: 1.5rem;
+    padding-left: 1.5rem;
     overflow-y: auto;
+    background: white;
     border-right: 1px solid $gray-200;
     @include transition(all .2s ease-in-out);
     @include transform(translateX(-100%));
 
-    > [class*=container] {
+    > [class*="container"] {
         flex-direction: column;
         align-items: stretch;
         min-height: 100%;
-        padding-left: 0;
         padding-right: 0;
+        padding-left: 0;
     }
 
     &.open {
         @include transform(translateX(0%));
     }
 
-    @media (min-width:768px) {
+    @media (min-width: 768px) {
         @include transform(translateX(0%));
-        top: 0px;
+        top: 0;
     }
 
     .logo {
+        display: none;
         padding: 26px 0;
-        text-align: center;
         font-size: 18px;
         font-weight: 600;
-        display: none;
+        text-align: center;
 
-        @media (min-width:768px) {
+        @media (min-width: 768px) {
             display: block;
         }
 
@@ -46,7 +46,7 @@
             max-width: 90%;
             height: 45px;
 
-            @media (min-width:768px) {
+            @media (min-width: 768px) {
                 height: auto;
             }
         }
@@ -55,9 +55,9 @@
     @import "../../core/navbars";
 
     .navbar-user {
-        margin-left: -1.5rem;
-        margin-right: -1.5rem;
         padding: .75rem 1rem .5rem;
+        margin-right: -1.5rem;
+        margin-left: -1.5rem;
         border-top: 1px solid $gray-200;
 
         a.icon-link {

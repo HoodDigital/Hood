@@ -21,13 +21,9 @@ gulp.task('clean', function (cb) {
     return gulp.src([
         './wwwroot/src/',
         './wwwroot/dist/',
-        './wwwroot/src/js/',
-        './wwwroot/src/css/',
-        output.scss,
-        output.js,
-        output.images,
-        hood.css,
-        hood.js + 'theme.*.js'
+        './dist/',
+        './src/js/',
+        './src/css/'
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });

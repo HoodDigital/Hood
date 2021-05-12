@@ -70,7 +70,7 @@
     "production": "webpack --config webpack.production.js",
     "publish-copy": "gulp copy",
     "publish": "npm-run-all build production publish-copy",
-    "css-lint": "stylelint src/scss/core/ --fix",
+    "css-lint": "stylelint src/scss/ --fix",
     "server": "serve wwwroot",
     "start": "npm-run-all --parallel watch server",
     "test": "npm run css-lint && npm run css"

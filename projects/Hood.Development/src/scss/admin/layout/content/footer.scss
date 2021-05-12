@@ -1,12 +1,12 @@
 footer.footer {
+    position: relative;
+    padding-top: $grid-gutter-width / 2;
+    margin-top: $grid-gutter-width / 2;
     border: 0;
     border-top: 1px solid $gray-200;
-    position: relative;
-    margin-top: $grid-gutter-width / 2;
-    padding-top: $grid-gutter-width / 2;
 
-    @media (min-width:768px) {
-        margin-top: $grid-gutter-width;
+    @media (min-width: 768px) {
         padding-top: $grid-gutter-width;
+        margin-top: $grid-gutter-width;
     }
 }
