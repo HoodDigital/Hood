@@ -10,6 +10,13 @@ plugins.push(new MiniCssExtractPlugin({
     filename: "css/[name].css"
 }));
 
+console.log('---------------------------------------------------------------------------')
+console.log('-                                                                         -')
+console.log('-                          Building Hood CMS                              -')
+console.log('-                              PRODUCTION                                 -')
+console.log('-                                                                         -')
+console.log('---------------------------------------------------------------------------')
+
 module.exports = {
 
     plugins,
@@ -61,6 +68,7 @@ module.exports = {
         jquery: 'jQuery',
         bootstrap: 'bootstrap',
         dropzone: 'Dropzone',
+        'chart.js': 'Chart',
         'tinymce/tinymce': 'tinymce',
     },
 

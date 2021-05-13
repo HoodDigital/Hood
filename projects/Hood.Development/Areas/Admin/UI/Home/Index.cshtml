@@ -2,75 +2,77 @@
     ViewData["Title"] = "Dashboard";
     var _propertySettings = Engine.Settings.Property;
 }
-<script asp-location="Vendors" asp-bundle="false" src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js" integrity="sha512-CEiA+78TpP9KAIPzqBvxUv8hy41jyI3f2uHi7DGp/Y/Ka973qgSdybNegWFciqh6GrN2UePx2KkflnQUbUhNIA==" crossorigin="anonymous"></script>
-<script asp-location="Vendors" asp-bundle="false" src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js" integrity="sha512-d8F1J2kyiRowBB/8/pAWsqUl0wSEOkG5KATkVV4slfblq9VRQ6MyDZVxWl2tWd+mPhuCbpTB4M7uU/x9FlgQ9Q==" crossorigin="anonymous"></script>
-<div class="card-deck admin-stats">
-    <div class="card text-white bg-yellow">
-        <div class="card-body">
-            <h5 class="card-title">Content on the site</h5>
-            <div class="row align-items-center">
-                <div class="col-auto d-md-none d-lg-flex">
-                    <i class="fa fa-pen-fancy fa-3x mr-2"></i>
+<div class="row align-items-stretch mb-3">
+    <div class="col">
+        <div class="card p-4 text-white bg-purple">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto d-md-none d-lg-flex">
+                        <i class="fa fa-pen-fancy fa-2x me-2"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2 h2 fw-light"><strong data-plugin="counterup" class="content-totalPosts fw-bold display-6">0</strong><small> Content</small></p>
+                    </div>
                 </div>
-                <div class="col">
-                    <p class="h5 m-0"><strong data-plugin="counterup" class="content-totalPosts">0</strong> items</p>
-                    <p class="m-0"><small><b data-plugin="counterup" class="content-totalPublished">0</b> published</small></p>
-                </div>
+                <a class="full-box-link" href="#content-types" data-bs-toggle="collapse">Show content...</a>
             </div>
-            <a class="full-box-link" href="#content-types" data-bs-toggle="collapse">Show content...</a>
         </div>
     </div>
     @if (_propertySettings.Enabled)
     {
-        <div class="card text-white bg-teal">
-            <div class="card-body">
-                <h5 class="card-title">Property Listings</h5>
-                <div class="row align-items-center">
-                    <div class="col-auto d-md-none d-lg-flex">
-                        <i class="fa fa-user-plus fa-3x mr-2"></i>
+        <div class="col">
+            <div class="card p-4 text-white bg-teal">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto d-md-none d-lg-flex">
+                            <i class="fa fa-building fa-2x me-2"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2 h2 fw-light"><strong data-plugin="counterup" class="properties-totalPosts fw-bold display-6">0</strong><small> Properties</small></p>
+                        </div>
                     </div>
-                    <div class="col">
-                        <p class="h5 m-0"><strong data-plugin="counterup" class="properties-totalPosts">0</strong> properties</p>
-                        <p class="m-0"><small><b data-plugin="counterup" class="properties-totalPublished">0</b> published</small></p>
-                    </div>
+                    <a class="full-box-link" asp-action="Index" asp-controller="Property">Show properties...</a>
                 </div>
-                <a class="full-box-link" asp-action="Index" asp-controller="Property">Show properties...</a>
             </div>
         </div>
     }
-    <div class="card text-white bg-orange">
-        <div class="card-body">
-            <h5 class="card-title">Registered Users</h5>
-            <div class="row align-items-center">
-                <div class="col-auto d-md-none d-lg-flex">
-                    <i class="fa fa-user-plus fa-3x mr-2"></i>
+    <div class="col">
+        <div class="card p-4 text-white bg-orange">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-auto d-md-none d-lg-flex">
+                        <i class="fa fa-user-plus fa-2x me-2"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2 h2 fw-light"><strong data-plugin="counterup" class="users-totalUsers fw-bold display-6">0</strong><small> Users</small></p>
+                    </div>
+                    <a class="full-box-link" asp-action="Index" asp-controller="Users">Show users...</a>
                 </div>
-                <div class="col">
-                    <p class="h5 m-0"><strong data-plugin="counterup" class="users-totalUsers">0</strong> users</p>
-                    <p class="m-0"><small><b data-plugin="counterup" class="users-totalAdmins">0</b> administrators</small></p>
-                </div>
-                <a class="full-box-link" asp-action="Index" asp-controller="Users">Show users...</a>
             </div>
         </div>
     </div>
 </div>
 <div class="collapse text-center" id="content-types">
-    @{
-        var types = Engine.Settings.Content.AllowedTypes;
-    }
+    <div class="row mb-3">
+        @{
+            var types = Engine.Settings.Content.AllowedTypes;
+        }
         @foreach (var t in types)
         {
-            <div class="card mb-3 text-center d-inline-block mr-3" style="width:10rem">
-                <div class="card-body">
-                    <p class="text-black-50">
-                        <i class="fa fa-3x @t.Icon"></i>
-                    </p>
-                    <h4 class="m-0"><span data-plugin="counterup" class="content-@t.Type-total">0</span></h4>
-                    <small class="d-block text-nowrap">@t.TypeNamePlural</small>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-black-50">
+                            <i class="fa fa-3x @t.Icon"></i>
+                        </p>
+                        <div class="mb-2 display-6"><span data-plugin="counterup" class="content-@t.Type-total fw-bold display-6">0</span></div>
+                        <small class="d-block text-nowrap fw-bold">@t.TypeNamePlural</small>
+                    </div>
+                    <a class="full-box-link" href="/admin/content/manage/@t.Type">Show subscriptions...</a>
                 </div>
-                <a class="full-box-link" href="/admin/content/manage/@t.Type">Show subscriptions...</a>
             </div>
         }
+    </div>
 </div>
 <div class="card">
     <div class="card-header p-3">
@@ -81,15 +83,15 @@
             <div class="col-2">
                 <input id="history" value="365" type="hidden" />
                 @*<select id="history" class="form-control">
-                    <option value="7">Past week</option>
-                    <option value="30">Past month</option>
-                    <option value="90">Past 3 months</option>
-                    <option value="365">All Time</option>
-                </select>*@
+                        <option value="7">Past week</option>
+                        <option value="30">Past month</option>
+                        <option value="90">Past 3 months</option>
+                        <option value="365">All Time</option>
+                    </select>*@
             </div>
         </div>
     </div>
     <div class="card-body">
-        <div id="admin-chart-area"  style="height:50vh;"></div>
+        <div id="admin-chart-area" style="height:50vh;"></div>
     </div>
 </div>

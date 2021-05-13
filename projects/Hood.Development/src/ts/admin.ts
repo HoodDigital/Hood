@@ -1,6 +1,6 @@
+export * from "./hood";
 import { Alerts } from "./core/Alerts";
 import { Uploader } from "./core/Uploader";
-
 import { Editors } from "./admin/Editors";
 import { Stats } from "./admin/Stats";
 
@@ -10,9 +10,18 @@ class Admin {
     stats: Stats;
 
     constructor() {
+
         this.editors = new Editors();
         this.stats = new Stats();
         this.uploader = new Uploader();
+
+        // hookups- put somewhere
+        $('.restrict-to-slug').restrictToSlug();
+        $('.restrict-to-page-slug').restrictToPageSlug();
+        $('.restrict-to-meta-slug').restrictToMetaSlug();
+        $('.character-counter').characterCounter();
+        $('.character-counter').trigger('change');
+        $('.warning-alert').warningAlert();
 
         $('.mobile-sidebar-toggle').on('click', function () {
             $('nav.sidebar').toggleClass('open');
@@ -22,25 +31,18 @@ class Admin {
             $('#right-sidebar').toggleClass('sidebar-open');
         });
 
-        //$(".alert.auto-dismiss").fadeTo(5000, 500).slideUp(500, function () {
-        //    $(".alert.auto-dismiss").slideUp(500);
-        //});
+        $(".alert.auto-dismiss").fadeTo(5000, 500).slideUp(500, function () {
+            $(".alert.auto-dismiss").slideUp(500);
+        });
 
-        Alerts.Error("Admin.Constructor() - slimscroll is not implemented... is it needed??");
-        //$('.sidebar-scroll').slimScroll({
-        //    height: '100%',
-        //    railOpacity: 0.4,
-        //    wheelStep: 10
-        //});
-
-        Alerts.Error("Admin.Constructor() - counterUp is not implemented... is it needed??");
-        //if ($('[data-plugin="counter"]') && $.counterUp)
-        //    $('[data-plugin="counter"]').counterUp({
-        //        delay: 10,
-        //        time: 800
-        //    });
+        $('.sidebar-scroll').slimScroll({
+            height: '100%',
+            railOpacity: 0.4,
+            wheelStep: 10
+        });
 
     }
+
 }
 
 new Admin();

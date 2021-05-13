@@ -38,7 +38,7 @@ namespace Hood.Services
         #endregion
 
         #region Statistics
-        Task<object> GetStatisticsAsync();
+        Task<UserStatistics> GetStatisticsAsync();
         #endregion
     }
 }

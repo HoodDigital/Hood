@@ -29,7 +29,7 @@
         <div class="content">
             <div class="title">
                 <div class="row align-items-center">
-                    <div class="col-lg text-center text-md-left">
+                    <div class="col-lg text-center text-md-start">
                         @if (!IsSectionDefined("breadcrumbs"))
                         {
                             <nav aria-label="breadcrumb">
@@ -45,7 +45,7 @@
                         }
                         <h1 class="m-0">@ViewBag.Title</h1>
                     </div>
-                    <div class="col-lg text-center text-md-left text-lg-right mt-3 mt-lg-0">
+                    <div class="col-lg text-center text-md-start text-lg-end mt-3 mt-lg-0">
                         @RenderSection("buttons", false)
                     </div>
                 </div>

@@ -313,7 +313,7 @@ namespace Hood.Services
         #endregion
 
         #region Statistics
-        public async Task<object> GetStatisticsAsync()
+        public async Task<UserStatistics> GetStatisticsAsync()
         {
             int totalUsers = await _db.Users.CountAsync();
             int totalAdmins = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
@@ -339,9 +339,25 @@ namespace Hood.Services
                 months.Add(new KeyValuePair<string, int>(dt.ToString("dd MMM"), count));
             }
 
-            return new { totalUsers, totalAdmins, days, months };
+            return new UserStatistics(totalUsers, totalAdmins, days, months);
         }
         #endregion
 
+    }
+
+    public class UserStatistics
+    {
+        public UserStatistics(int totalUsers, int totalAdmins, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months)
+        {
+            TotalUsers = totalUsers;
+            TotalAdmins = totalAdmins;
+            Days = days;
+            Months = months;
+        }
+
+        public int TotalUsers { get; }
+        public int TotalAdmins { get; }
+        public List<KeyValuePair<string, int>> Days { get; }
+        public List<KeyValuePair<string, int>> Months { get; }
     }
 }

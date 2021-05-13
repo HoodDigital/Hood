@@ -2,6 +2,7 @@
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Hosting;
@@ -669,7 +670,7 @@ namespace Hood.Services
         #endregion
 
         #region Statistics
-        public async Task<object> GetStatisticsAsync()
+        public async Task<ContentStatitsics> GetStatisticsAsync()
         {
             int totalPosts = await _db.Content.CountAsync();
             int totalPublished = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
@@ -679,7 +680,7 @@ namespace Hood.Services
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByDate = data.GroupBy(p => p.pubdate).Select(g => new { name = g.Key, count = g.Count() });
             var publishedByMonth = data.GroupBy(p => p.pubmonth).Select(g => new { name = g.Key, count = g.Count() });
-            var byType = data.GroupBy(p => p.type).Select(g => new { type = Engine.Settings.Content.GetContentType(g.Key), total = g.Count(), typeName = g.Key });
+            var byType = data.GroupBy(p => p.type).Select(g => new ContentTypeStat() { Type = Engine.Settings.Content.GetContentType(g.Key), Total = g.Count(), Name = g.Key } );
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
@@ -707,9 +708,38 @@ namespace Hood.Services
                 publishMonths.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
             }
 
-            return new { totalPosts, totalPublished, days, months, publishDays, publishMonths, byType };
+            return new ContentStatitsics(totalPosts, totalPublished, days, months, publishDays, publishMonths, byType);
 
         }
         #endregion
+    }
+
+    public class ContentTypeStat
+    {
+        public ContentType Type { get; set; }
+        public int Total { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class ContentStatitsics
+    {
+        public ContentStatitsics(int totalPosts, int totalPublished, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months, List<KeyValuePair<string, int>> publishDays, List<KeyValuePair<string, int>> publishMonths, IEnumerable<ContentTypeStat> byType)
+        {
+            TotalPosts = totalPosts;
+            TotalPublished = totalPublished;
+            Days = days;
+            Months = months;
+            PublishDays = publishDays;
+            PublishMonths = publishMonths;
+            ByType = byType;
+        }
+
+        public int TotalPosts { get; set; }
+        public int TotalPublished { get; set; }
+        public List<KeyValuePair<string, int>> Days { get; set; }
+        public List<KeyValuePair<string, int>> Months { get; set; }
+        public List<KeyValuePair<string, int>> PublishDays { get; set; }
+        public List<KeyValuePair<string, int>> PublishMonths { get; set; }
+        public IEnumerable<ContentTypeStat> ByType { get; set; }
     }
 }

@@ -8,7 +8,7 @@
         <i class="fa fa-save"></i> Save
     </a>
 }
-<form method="post" id="settings-form" class="container ml-md-0 p-0">
+<form method="post" id="settings-form" class="container ms-md-0 p-0">
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
     @RenderSection("alerts", required: false)
     @RenderBody()

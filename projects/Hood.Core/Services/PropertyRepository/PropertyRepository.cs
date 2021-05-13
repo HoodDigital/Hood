@@ -433,7 +433,7 @@ namespace Hood.Services
         #region Statistics
         public async Task<object> GetStatisticsAsync()
         {
-            int totalPosts = await _db.Properties.CountAsync();
+            int totalProperties = await _db.Properties.CountAsync();
             int totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
             var data = await _db.Properties.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
 
@@ -468,8 +468,32 @@ namespace Hood.Services
                 publishMonths.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
             }
 
-            return new { totalPosts, totalPublished, days, months, publishDays, publishMonths };
+            return new PropertyStatistics (totalProperties, totalPublished, days, months, publishDays, publishMonths);
         }
         #endregion
+    }
+
+    public class PropertyStatistics
+    {
+        public PropertyStatistics()
+        {
+        }
+
+        public PropertyStatistics(int totalProperties, int totalPublished, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months, List<KeyValuePair<string, int>> publishDays, List<KeyValuePair<string, int>> publishMonths)
+        {
+            TotalProperties = totalProperties;
+            TotalPublished = totalPublished;
+            Days = days;
+            Months = months;
+            PublishDays = publishDays;
+            PublishMonths = publishMonths;
+        }
+
+        public int TotalProperties { get; set; }
+        public int TotalPublished { get; set; }
+        public List<KeyValuePair<string, int>> Days { get; set; }
+        public List<KeyValuePair<string, int>> Months { get; set; }
+        public List<KeyValuePair<string, int>> PublishDays { get; set; }
+        public List<KeyValuePair<string, int>> PublishMonths { get; set; }
     }
 }

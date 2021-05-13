@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Hood.Models
 {
-    public class ContentType
+    public class ContentType 
     {
         public static ContentType Null
         {
@@ -43,7 +43,8 @@ namespace Hood.Models
         }
         public static ContentType CustomType
         {
-            get {
+            get
+            {
                 return new ContentType()
                 {
                     BaseName = "Custom",
@@ -77,7 +78,7 @@ namespace Hood.Models
         public bool IsUnknown { get { return Type == "unknown"; } }
         [Display(Name = "Base Name", Description = "The base name of this content type. Do not change this.")]
         public string BaseName { get; set; }
-        [Display(Name= "Enabled", Description= "Enable this content type for use on the site.")]
+        [Display(Name = "Enabled", Description = "Enable this content type for use on the site.")]
         public bool Enabled { get; set; }
         [Display(Name = "Slug", Description = "The base URL slug for accessing this content type etc <code>yourdomain.com/news/</code>")]
         public string Slug { get; set; }
