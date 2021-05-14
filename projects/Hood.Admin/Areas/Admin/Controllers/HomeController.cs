@@ -1,7 +1,10 @@
 ﻿using Hood.Controllers;
 using Hood.Models;
+using Hood.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Threading.Tasks;
 
@@ -26,7 +29,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize(Roles = "SuperUser")]
         public async Task<IActionResult> Debug()
         {
-            var user = await _userManager.GetUserAsync(User);
+            ApplicationUser user = await _userManager.GetUserAsync(User);
             user.AddUserNote(new UserNote()
             {
                 Id = Guid.NewGuid(),
@@ -42,11 +45,25 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/stats/")]
         public async Task<IActionResult> StatsAsync()
         {
-            var content = await _content.GetStatisticsAsync();
-            var users = await _account.GetStatisticsAsync();
-            var properties = await _property.GetStatisticsAsync();
-            return Json(new { content, users, properties });
+            ContentStatitsics content = await _content.GetStatisticsAsync();
+            UserStatistics users = await _account.GetStatisticsAsync();
+            PropertyStatistics properties = await _property.GetStatisticsAsync();
+            return Json(new Statistics(content, users, properties));
         }
 
     }
+    public class Statistics
+    {
+        public Statistics(ContentStatitsics content, UserStatistics users, PropertyStatistics properties)
+        {
+            Content = content;
+            Users = users;
+            Properties = properties;
+        }
+
+        public ContentStatitsics Content { get; set; }
+        public UserStatistics Users { get; set; }
+        public PropertyStatistics Properties { get; set; }
+    }
+
 }

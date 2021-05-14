@@ -1,6 +1,6 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
 @{     
-    bool bundleScripts = _env.EnvironmentName != "Development";
+    bool production = _env.EnvironmentName != "Development";
 }
 
 <!DOCTYPE html>
@@ -20,7 +20,7 @@
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
 </head>
-<body>
+<body class="@(!production ? "dev-mode" : "")">
     <div class="wrapper">
         <partial name="_Mobile_Header" />
         <nav class="navbar navbar-expand-md sidebar">
@@ -29,7 +29,7 @@
         <div class="content">
             <div class="title">
                 <div class="row align-items-center">
-                    <div class="col-lg text-center text-md-left">
+                    <div class="col-lg text-center text-md-start">
                         @if (!IsSectionDefined("breadcrumbs"))
                         {
                             <nav aria-label="breadcrumb">
@@ -45,7 +45,7 @@
                         }
                         <h1 class="m-0">@ViewBag.Title</h1>
                     </div>
-                    <div class="col-lg text-center text-md-left text-lg-right mt-3 mt-lg-0">
+                    <div class="col-lg text-center text-md-start text-lg-end mt-3 mt-lg-0">
                         @RenderSection("buttons", false)
                     </div>
                 </div>
@@ -63,20 +63,20 @@
         </div>
     </div>
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
 
-    @Html.RenderScripts(Url, ResourceLocation.Vendors, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.Vendors, production)
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
     <partial name="_Scripts" />
 
-    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
 </body>
 </html>

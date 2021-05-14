@@ -159,7 +159,7 @@ namespace Hood.Services
 
         private static IHtmlContent FormatBreadcrumbLinks(List<string> links)
         {
-            string htmlOutput = string.Join(" <i class=\"fa fa-caret-right ml-2 mr-2\"></i> ", links.ToArray());
+            string htmlOutput = string.Join(" <i class=\"fa fa-caret-right mx-2\"></i> ", links.ToArray());
             HtmlString builder = new HtmlString(htmlOutput);
             return builder;
         }

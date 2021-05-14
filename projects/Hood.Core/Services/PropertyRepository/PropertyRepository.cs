@@ -431,7 +431,7 @@ namespace Hood.Services
         #endregion
 
         #region Statistics
-        public async Task<object> GetStatisticsAsync()
+        public async Task<PropertyStatistics> GetStatisticsAsync()
         {
             int totalProperties = await _db.Properties.CountAsync();
             int totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();

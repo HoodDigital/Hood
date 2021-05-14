@@ -1,6 +1,6 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
 @{     
-    bool bundleScripts = _env.EnvironmentName != "Development";
+    bool production = _env.EnvironmentName != "Development";
 }
 <!DOCTYPE html>
 <html lang="en-gb" xml:lang="en">
@@ -33,7 +33,7 @@
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
 </head>
-<body class="@ViewData["BodyClass"]">
+<body class="@(!production ? "dev-mode" : "")">
     @Html.Raw(Engine.Settings.Seo.BodyTags)
 
     @RenderSection("afterbody", required: false)
@@ -56,23 +56,23 @@
 
     @RenderSection("includes", required: false)
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
 
     <partial name="_Scripts_JQuery" />
     <partial name="_Scripts_Bootstrap" />
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
 
-    @Html.RenderScripts(Url, ResourceLocation.Vendors, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.Vendors, production)
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
-    @Html.RenderScripts(Url, ResourceLocation.Scripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.Scripts, production)
 
-    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
 
     @RenderSection("scripts", required: false)

@@ -4,6 +4,7 @@ using Hood.Interfaces;
 using Hood.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
@@ -17,6 +18,7 @@ namespace Hood.ViewModels
 
         [FromQuery(Name = "user")]
         public string UserId { get; set; }
+        [Display(Name = "File Type")]
         [FromQuery(Name = "fileType")]
         public GenericFileType? GenericFileType { get; set; }
         [FromQuery(Name = "restrict")]

@@ -4,58 +4,8 @@
     ViewBag.Title = "Website Media";
 }
 @section buttons {
-    <partial name="_Media_Actions" />
 }
-<script src="//amp.azure.net/libs/amp/2.3.0/azuremediaplayer.min.js" asp-location="BeforeScripts"></script>
 <form class="inline" data-target="#media-list">
-    <div class="row">
-        <div class="col-sm-3">
-            <div class="card mb-3">
-                <div class="card-header position-relative" id="media-directories-panel-heading">
-                    <p class="card-title m-0 font-weight-bold">
-                        <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#media-directories-panel" href="#media-directories-panel" aria-expanded="true" aria-controls="media-directories-panel">
-                            Directories
-                            <i class="fe fe-arrow-up mt-1"></i>
-                        </a>
-                    </p>
-                </div>
-                <div class="card-body p-0 collapse show" aria-labelledby="media-directories-panel-heading" id="media-directories-panel">
-                    <div id="media-directories-list" class="hood-inline-list refresh" data-url="@Url.Action("Directories")" data-complete="$.hood.Content.Lists.Categories.Loaded">
-                        <div class="list-group list-group-flush">
-                            <div class="list-group-item list-group-item-action p-0">
-                                <div class="d-flex align-items-center">
-                                    <div class="col-auto p-2">
-                                        <small><i class='fa fa-square p-1'></i></small>
-                                    </div>
-                                    <div class="col p-0">
-                                        <div class="custom-control custom-checkbox">
-                                            <input class="custom-control-input refresh-on-change" id="Directory-all" name="dir" type="radio" value="" @(!Model.DirectoryId.HasValue ? "checked" : "") />
-                                            <label class="custom-control-label" for="Directory-all">
-                                                All Directories
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @_directoryManager.DirectoryTree(Model.TopLevelDirectories, Model.DirectoryId)
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body d-flex">
-                    <a class="btn btn-success btn-sm btn-block hood-modal"
-                            asp-action="CreateDirectory" 
-                            data-complete="$.hood.Media.Directories.Editor" title="Create directory">
-                        <i class="fa fa-plus-circle mr-2"></i> Create Directory
-                    </a>
-                </div>
-            </div>
-            <partial name="_Media_Filters" />
-        </div>
-        <div class="col-sm">
-            <partial name="_Media_Uploader" />
-            <div id="media-list" class="hood-inline-list query" data-url="@Url.Action("List")" data-complete="$.hood.Media.Loaded">
-                <partial name="_List_Media" />
-            </div>
-        </div>
-    </div>
+    <partial name="_Media_Uploader" />
+    <div id="media-list" class="query" data-url="@Url.Action("List")"></div>
 </form>

@@ -210,7 +210,7 @@ namespace Hood.Caching
                     htmlOutput += $@"
                         <div class='list-group-item list-group-item-action p-0'>
                             <div class='custom-control custom-checkbox d-flex'>
-                                <input class='custom-control-input refresh-on-change'
+                                <input class='custom-control-input submit-on-change'
                                        id='Category-{category.Slug}' name='categories'
                                        type='checkbox'
                                        value='{category.Slug}' />

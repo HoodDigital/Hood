@@ -2,6 +2,7 @@
 
 import { SweetAlertResult } from 'sweetalert2';
 import { Alerts } from '../core/Alerts';
+import { DataList } from "../core/DataList";
 
 declare global {
     interface JQuery {
@@ -51,7 +52,7 @@ $.fn.restrictToPageSlug = function (restrictPattern: RegExp = /[^0-9a-zA-Z-//]*/
         if ((newVal.match(new RegExp("/", "g")) || []).length > 4) {
             var pos = newVal.lastIndexOf('/');
             newVal = newVal.substring(0, pos) + newVal.substring(pos + 1);
-            Alerts.Warning("You can only have up to 4 '/' characters in a url slug.");
+            Alerts.warning("You can only have up to 4 '/' characters in a url slug.");
         }
         // This condition is to prevent selection and keyboard navigation issues
         if (val !== newVal) {
@@ -75,7 +76,7 @@ $.fn.restrictToMetaSlug = function (restrictPattern: RegExp = /[^0-9a-zA-Z.]*/g)
         if ((newVal.match(new RegExp(".", "g")) || []).length > 1) {
             let pos = newVal.lastIndexOf('.');
             newVal = newVal.substring(0, pos) + newVal.substring(pos + 1);
-            Alerts.Warning("You can only have up to 1 '.' characters in a meta slug.");
+            Alerts.warning("You can only have up to 1 '.' characters in a meta slug.");
         }
         // This condition is to prevent selection and keyboard navigation issues
         if (val !== newVal) {
@@ -115,7 +116,7 @@ $.fn.warningAlert = function () {
                 window.location.href = url;
             }
         };
-        Alerts.Confirm(
+        Alerts.confirm(
             {
                 title: $(e.currentTarget).data('title'),
                 html: $(e.currentTarget).data('warning'),

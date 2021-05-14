@@ -1,6 +1,6 @@
 ﻿import { KeyValue } from "../../interfaces/KeyValue";
 
-export class ContentStatistics {
+export declare interface ContentStatistics {
     totalPosts: number;
     totalPublished: number;
 
@@ -12,44 +12,44 @@ export class ContentStatistics {
     byType: ContentTypeStatistic[];
 }
 
-export class ContentTypeStatistic {
+export declare interface ContentTypeStatistic {
     type: ContentType;
     total: number;
-    typeName: string;
+    name: string;
 }
 
-export class ContentType {
-    BaseName: string;
-    CachedByType: boolean;
-    CustomFields: any;
-    CustomFieldsJson: string;
-    Description: string;
-    Enabled: boolean;
-    ExcerptName: string;
-    Gallery: boolean;
-    HasPage: boolean;
-    HideAuthor: boolean;
-    Icon: string;
-    IsPublic: boolean;
-    IsUnknown: boolean;
-    MetaTitle: string;
-    MultiLineExcerpt: boolean;
-    NoImage: string;
-    RichTextExcerpt: boolean;
-    Search: string;
-    ShowBanner: boolean;
-    ShowCategories: boolean;
-    ShowDesigner: boolean;
-    ShowEditor: boolean;
-    ShowImage: boolean;
-    ShowPreview: boolean;
-    Slug: string;
-    TemplateFolder: string;
-    Templates: boolean;
-    Title: string;
-    TitleName: string;
-    Type: string;
-    TypeName: string;
-    TypeNamePlural: string;
-    UrlFormatting: string;
+export declare interface ContentType {
+    baseName: string;
+    cachedByType: boolean;
+    customFields: any;
+    customFieldsJson: string;
+    description: string;
+    enabled: boolean;
+    excerptName: string;
+    gallery: boolean;
+    hasPage: boolean;
+    hideAuthor: boolean;
+    icon: string;
+    isPublic: boolean;
+    isUnknown: boolean;
+    metaTitle: string;
+    multiLineExcerpt: boolean;
+    noImage: string;
+    richTextExcerpt: boolean;
+    search: string;
+    showBanner: boolean;
+    showCategories: boolean;
+    showDesigner: boolean;
+    showEditor: boolean;
+    showImage: boolean;
+    showPreview: boolean;
+    slug: string;
+    templateFolder: string;
+    templates: boolean;
+    title: string;
+    titleName: string;
+    type: string;
+    typeName: string;
+    typeNamePlural: string;
+    urlFormatting: string;
 }

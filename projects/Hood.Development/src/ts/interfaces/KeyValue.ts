@@ -1,4 +1,4 @@
 ﻿export declare interface KeyValue<K, V> {
-    Key: K;
-    Value: V;
+    key: K;
+    value: V;
 }

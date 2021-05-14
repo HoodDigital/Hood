@@ -45,9 +45,7 @@
 <form class="inline" data-target="#content-list">
     <div class="row">
         <div class="col-lg-8 mb-3">
-            <div id="content-list" class="hood-inline-list refresh query" data-url="@Url.Action("List", new { type = Model.Type })" data-complete="$.hood.Content.Lists.Content.Loaded">
-                <partial name="_List_Content" />
-            </div>
+            <div id="content-list" class="query refresh-only" data-url="@Url.Action("List", new { type = Model.Type })"></div>
         </div>
         <div class="col-lg-4">
                  <partial name="_Filters" />

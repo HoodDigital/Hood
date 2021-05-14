@@ -7,14 +7,14 @@ modal.addClass('dewsh');
 var myModal = new Modal(document.getElementById('exampleModal'));
 //myModal.show();
 
-Alerts.Error("This is working!", "Great!!!");
-Alerts.Warning("This is working!", "Great!!!");
-Alerts.Success("This is working!", "Great!!!");
-Alerts.Message("This is working!", "Great!!!");
-Alerts.Prompt({ html: "What is this?", title: "Quick Question".htmlEncode() }, function (result) {
+Alerts.error("This is working!", "Great!!!");
+Alerts.warning("This is working!", "Great!!!");
+Alerts.success("This is working!", "Great!!!");
+Alerts.message("This is working!", "Great!!!");
+Alerts.prompt({ html: "What is this?", title: "Quick Question".htmlEncode() }, function (result) {
     if (!result.isDismissed) {
-        Alerts.Message(`We heard ${result.value}`, "Great!!!");
+        Alerts.message(`We heard ${result.value}`, "Great!!!");
     } else {
-        Alerts.Message(`Man no respondy...`, "Uh oh...");
+        Alerts.message(`Man no respondy...`, "Uh oh...");
     }
 });

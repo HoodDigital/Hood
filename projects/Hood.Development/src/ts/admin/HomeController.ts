@@ -4,7 +4,7 @@ import { PropertyStatistics } from "./models/Property";
 import { UserStatistics } from "./models/Users";
 import { Chart } from 'chart.js';
 
-export class Stats {
+export class HomeController {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
     chart: Chart<"bar", any[], any>;
@@ -32,7 +32,6 @@ export class Stats {
     }
 
     DrawChart(data: Statistics): void {
-        console.error("Hood.Stats.DoCharts() is not implemented.");
 
         let datasets = [];
         let dataLabels = [];
@@ -48,8 +47,8 @@ export class Stats {
         let contentSet: number[] = [];
 
         data.content.months.forEach(function (element: KeyValue<string, number>) {
-            contentSet.push(element.Value);
-            labels.push(element.Key);
+            contentSet.push(element.value);
+            labels.push(element.key);
         });
 
         datasets.push({
@@ -64,7 +63,7 @@ export class Stats {
         // users by day
         contentSet = [];
         data.users.months.forEach(function (element: KeyValue<string, number>) {
-            contentSet.push(element.Value);
+            contentSet.push(element.value);
         });
 
         datasets.push({
@@ -79,7 +78,7 @@ export class Stats {
         // Properties by day
         contentSet = [];
         data.properties.months.forEach(function (element: KeyValue<string, number>) {
-            contentSet.push(element.Value);
+            contentSet.push(element.value);
         });
 
         datasets.push({
@@ -119,7 +118,7 @@ export class Stats {
             $('.content-totalPublished').text(data.content.totalPublished);
             if (data.content.byType) {
                 for (let i = 0; i < data.content.byType.length; i++) {
-                    $('.content-' + data.content.byType[i].typeName + '-total').text(data.content.byType[i].total);
+                    $('.content-' + data.content.byType[i].name + '-total').text(data.content.byType[i].total);
                 }
             }
         }

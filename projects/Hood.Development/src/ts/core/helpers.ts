@@ -23,7 +23,7 @@
         return a && {}.toString.call(a) === '[object Function]';
     }
 
-    static insertQueryStringParamToUrl(url: { search: string; }, key: string, value: string) {
+    static insertQueryStringParamToUrl(url: URL, key: string, value: string) {
         key = escape(key); value = escape(value);
         var kvp = url.search.substr(1).split('&');
         if (kvp.length == 1) {

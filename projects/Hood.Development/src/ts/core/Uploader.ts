@@ -17,9 +17,9 @@ export class Uploader {
 
     refreshImage(sender: JQuery<HTMLElement>, data: Response) {
         $(sender.data('preview')).css({
-            'background-image': 'url(' + data.Media.SmallUrl + ')'
+            'background-image': 'url(' + data.media.SmallUrl + ')'
         });
-        $(sender.data('preview')).find('img').attr('src', data.Media.SmallUrl);
+        $(sender.data('preview')).find('img').attr('src', data.media.SmallUrl);
     }
 
     singleImage(this: HTMLElement) {
@@ -57,17 +57,17 @@ export class Uploader {
         });
 
         avatarDropzone.on("success", function (file, response: Response) {
-            if (response.Success) {
-                if (response.Media) {
-                    $(jsontag).val(JSON.stringify(response.Media));
+            if (response.success) {
+                if (response.media) {
+                    $(jsontag).val(JSON.stringify(response.media));
                     $($tag.data('preview')).css({
-                        'background-image': 'url(' + response.Media.SmallUrl + ')'
+                        'background-image': 'url(' + response.media.SmallUrl + ')'
                     });
-                    $($tag.data('preview')).find('img').attr('src', response.Media.SmallUrl);
+                    $($tag.data('preview')).find('img').attr('src', response.media.SmallUrl);
                 }
-                Alerts.Success("New image added!");
+                Alerts.success("New image added!");
             } else {
-                Alerts.Error("There was a problem adding the image: " + response.Error);
+                Alerts.error("There was a problem adding the image: " + response.error);
             }
             avatarDropzone.removeFile(file);
             $($tag.data('preview')).removeClass('loading');
@@ -141,10 +141,10 @@ export class Uploader {
             console.error("Uploader.Gallery.Dropzone.OnSuccess - Inline.Refresh('.gallery') is not implemented.");
             //Inline.Refresh('.gallery');
 
-            if (response.Success) {
-                Alerts.Success("New images added!");
+            if (response.success) {
+                Alerts.success("New images added!");
             } else {
-                Alerts.Error("There was a problem adding the profile image: " + response.Error);
+                Alerts.error("There was a problem adding the profile image: " + response.error);
             }
         });
 

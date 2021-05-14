@@ -59,7 +59,12 @@ namespace Hood.Startup
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation()
-                .AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+                .AddNewtonsoftJson(options => {
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver()
+                    {
+                        NamingStrategy = new CamelCaseNamingStrategy()
+                    };
+                })
                 .AddApplicationPart(typeof(Engine).Assembly)
                 .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
 

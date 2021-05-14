@@ -1,46 +1,46 @@
 @model MediaListModel
-<div class="card mb-3">
-    <div class="card-header position-relative" id="media-search-panel-heading">
-        <p class="card-title m-0 font-weight-bold">
-            <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#media-search-panel" href="#media-search-panel" aria-expanded="true" aria-controls="media-search-panel">
-                Search Filters
-                <i class="fe fe-arrow-up mt-1"></i>
-            </a>
-        </p>
-    </div>
-    <div class="card-body collapse show" aria-labelledby="media-search-panel-heading" id="media-search-panel">
-        <input asp-for="Action" type="hidden" />
-        <input asp-for="Entity" type="hidden" />
-        <input asp-for="Field" type="hidden" />
-        <input asp-for="Id" type="hidden" />
-        <input asp-for="PageIndex" type="hidden" value="@(Model.PageIndex == 0 ? 1 : Model.PageIndex)" />
-        <input asp-for="PageSize" type="hidden" />
-        <input asp-for="Tag" type="hidden" />
-        <input asp-for="Type" type="hidden" />
-        <input asp-for="DirectoryId" type="hidden" class="refresh-on-change" />
-        <div class="form-group floating-label">
-            <input asp-for="Search" class="form-control">
-            <label asp-for="Search"></label>
+<div class="mb-3">
+    <input asp-for="Action" type="hidden" />
+    <input asp-for="Entity" type="hidden" />
+    <input asp-for="Field" type="hidden" />
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="PageIndex" type="hidden" value="@(Model.PageIndex == 0 ? 1 : Model.PageIndex)" />
+    <input asp-for="PageSize" type="hidden" />
+    <input asp-for="Tag" type="hidden" />
+    <input asp-for="Type" type="hidden" />
+    <input asp-for="DirectoryId" type="hidden" class="refresh-on-change" />
+    <div class="row g-1 g-lg-3 align-items-center">
+        <div class="col">
+            <div class="form-floating">
+                <input asp-for="Search" class="form-control">
+                <label asp-for="Search"></label>
+            </div>
         </div>
-        <div class="form-group floating-label">
-            <select asp-for="GenericFileType" asp-items="Html.GetEnumSelectList<GenericFileType>()" class="form-control refresh-on-change">
-                <option value="">Show All</option>
-            </select>
-            <label asp-for="GenericFileType"></label>
+        <div class="col">
+            <div class="form-floating">
+                <select class="form-select submit-on-change" asp-for="GenericFileType" asp-items="Html.GetEnumSelectList<GenericFileType>()">
+                    <option value="">Show All</option>
+                </select>
+                <label asp-for="GenericFileType"></label>
+            </div>
         </div>
-        <div class="form-group floating-label">
-            <select class="form-control refresh-on-change" asp-for="Order" data-selected="DateDesc">
-                <option value="DateDesc">Newest First</option>
-                <option value="Date">Oldest First</option>
-                <option value="Title">By Title (A-Z)</option>
-                <option value="TitleDesc">By Title (Z-A)</option>
-                <option value="Filename">By Filename (A-Z)</option>
-                <option value="FilenameDesc">By Filename (Z-A)</option>
-                <option value="Size">By File Size (&#8593;-&#8595;)</option>
-                <option value="SizeDesc">By File Size (&#8595;-&#8593;)</option>
-            </select>
-            <label asp-for="Order"></label>
+        <div class="col">
+            <div class="form-floating">
+                <select class="form-select submit-on-change" asp-for="Order" data-selected="DateDesc">
+                    <option value="DateDesc">Newest First</option>
+                    <option value="Date">Oldest First</option>
+                    <option value="Title">By Title (A-Z)</option>
+                    <option value="TitleDesc">By Title (Z-A)</option>
+                    <option value="Filename">By Filename (A-Z)</option>
+                    <option value="FilenameDesc">By Filename (Z-A)</option>
+                    <option value="Size">By File Size (&#8593;-&#8595;)</option>
+                    <option value="SizeDesc">By File Size (&#8595;-&#8593;)</option>
+                </select>
+                <label asp-for="Order"></label>
+            </div>
         </div>
-        <button type="submit" class="btn btn-success btn-block"> Search</button>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-success btn-block square"><i class="fa fa-search"></i></button>
+        </div>
     </div>
 </div>
