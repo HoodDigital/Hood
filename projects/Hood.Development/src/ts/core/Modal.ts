@@ -34,7 +34,7 @@ export class ModalController {
         closePrevious: true
     }
 
-    constructor(options: ModalOptions) {
+    constructor(options: ModalOptions = null) {
         this.options = { ...this.options, ...options };
     }
 

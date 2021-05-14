@@ -33,7 +33,7 @@ export class Response {
         if (data.success) {
             Alerts.success(data.message, data.title, autoHide);
         } else {
-            Alerts.error(data.message, data.title, autoHide);
+            Alerts.error(data.errors, data.title, autoHide);
         }
     }
 }

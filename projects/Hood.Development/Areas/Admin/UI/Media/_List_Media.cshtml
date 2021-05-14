@@ -42,7 +42,12 @@ else
         </div>
     </div>
 </div>
+<div id="media-upload" class="media-upload text-center" data-url="@Url.Action("UploadToDirectory")"></div>
+<div id="media-progress" class="card p-3 mb-3 collapse"></div>
+<form class="inline" data-target="#media-list">
 <partial name="_Media_Filters" />
+    </form>
+
 <div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 g-1">
     @foreach (var dir in rootDirs)
     {
@@ -50,7 +55,7 @@ else
         var link = rootDirModel.GetPageUrl(rootDirModel.PageIndex);
         var href = $"{Context.Request.Path}{link}";
         <div class="col mb-3">
-            <div class="card text-center hover">
+            <div class="card media-directory-item text-center hover">
                 <div class="card-body text-center">
                     <i class="fa fa-3x fa-folder-open me-2 text-warning"></i>
                 </div>
@@ -81,24 +86,9 @@ else
             {
                 NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy()
             };
-            var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });
             <div class="col">
-                <div class="card text-center hover" data-json="@Newtonsoft.Json.JsonConvert.SerializeObject(media, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = contract });">
-                    @switch (Model.Action)
-                    {
-                        case MediaWindowAction.Select:
-                            <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
-                            break;
-                        case MediaWindowAction.Insert:
-                            <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top media-insert" data-url="@media.Url" />
-                            break;
-                        case MediaWindowAction.Attach:
-                            <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top media-attach" data-url="@attachUrl" />
-                            break;
-                        default:
-                            <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top" />
-                            break;
-                    }
+                <div class="card media-item text-center hover">
+                    <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top" />
                     <div class="card-body p-1">
                         <div class="fw-bold small text-truncate">
                             @media.Filename
@@ -106,50 +96,13 @@ else
                         <div class="text-muted">
                             @media.FormattedSize
                         </div>
-                        @switch (Model.Action)
-                        {
-                            case MediaWindowAction.Select:
-                                <div>
-                                    <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
-                                        Small
-                                    </a>
-                                    <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
-                                        Medium
-                                    </a>
-                                    <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
-                                        Large
-                                    </a>
-                                </div>
-                                break;
-                            case MediaWindowAction.Insert:
-                                <p>
-                                    <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.SmallUrl" data-title="@media.Filename" href="javascript:void(0);">
-                                        Small
-                                    </a>
-                                    <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.MediumUrl" data-title="@media.Filename" href="javascript:void(0);">
-                                        Medium
-                                    </a>
-                                    <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.LargeUrl" data-title="@media.Filename" href="javascript:void(0);">
-                                        Large
-                                    </a>
-                                </p>
-                                break;
-                            case MediaWindowAction.Attach:
-                                <p class="no-margin">
-                                    <a class="media-insert btn btn-sm btn-outline-success" data-url="@attachUrl">
-                                        <i class="fa fa-link me-2"></i>
-                                        Attach
-                                    </a>
-                                </p>
-                                break;
-                            default:
-                                <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">@media.Filename</a>
-                                break;
-                        }
-
                     </div>
+                    <a class="full-box-link media-item" data-id="@media.Id"
+                         data-blade="@Url.Action("Blade", new { id = media.Id })"
+                         data-json="@Newtonsoft.Json.JsonConvert.SerializeObject(media, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = contract })"></a>
                 </div>
-            </div>}
+            </div>
+        }
     </div>
     <partial name="_Pagination" />
 }

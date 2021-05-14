@@ -1,7 +1,9 @@
-﻿import { Inline } from "./Inline";
+﻿import { Alerts } from "./Alerts";
+import { Inline } from "./Inline";
 import { Response } from "./Response";
 
 export interface ValidatorOptions {
+    errorAlert?: string;
 
     /**
      * Called before the submit of the form data, you can return the data to be serialised.
@@ -24,7 +26,9 @@ export interface ValidatorOptions {
 
 export class Validator {
     element: HTMLFormElement;
-    options: ValidatorOptions = {};
+    options: ValidatorOptions = {
+        errorAlert: 'There are errors, please check the form.'
+    };
 
     /**
       * @param element The datalist element. The element must have a data-url attribute to connect to a feed.
@@ -77,6 +81,10 @@ export class Validator {
                 }
             }.bind(this))
                 .fail(this.options.onError ?? Inline.handleError);
+        } else {
+            if (this.options.errorAlert) {
+                Alerts.error(this.options.errorAlert);
+            }
         }
     }
 }
