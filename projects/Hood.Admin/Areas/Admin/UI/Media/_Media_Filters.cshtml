@@ -1,5 +1,5 @@
 @model MediaListModel
-<div class="mb-3">
+<div class="card p-3 mb-3">
     <input asp-for="Action" type="hidden" />
     <input asp-for="Entity" type="hidden" />
     <input asp-for="Field" type="hidden" />
@@ -9,7 +9,7 @@
     <input asp-for="Tag" type="hidden" />
     <input asp-for="Type" type="hidden" />
     <input asp-for="DirectoryId" type="hidden" class="refresh-on-change" />
-    <div class="row g-1 g-lg-3 align-items-center">
+    <div class="row g-1 align-items-center">
         <div class="col">
             <div class="form-floating">
                 <input asp-for="Search" class="form-control">

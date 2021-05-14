@@ -1,5 +1,4 @@
 ﻿using Hood.Controllers;
-using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
@@ -45,8 +44,8 @@ namespace Hood.Areas.Admin.Controllers
             }
             else
             {
-                var userDirs = GetDirectoriesForCurrentUser();
-                var tree = _directoryManager.GetAllCategoriesIncludingChildren(userDirs).Select(d => d.Id);
+                IEnumerable<MediaDirectory> userDirs = GetDirectoriesForCurrentUser();
+                IEnumerable<int> tree = _directoryManager.GetAllCategoriesIncludingChildren(userDirs).Select(d => d.Id);
                 media = media.Where(n => n.DirectoryId.HasValue && tree.Contains(n.DirectoryId.Value));
             }
 
@@ -225,16 +224,32 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                MediaDirectory directory = await _db.MediaDirectories.Include(md => md.Children).SingleOrDefaultAsync(md => md.Id == id);
+                MediaDirectory directory = await _db.MediaDirectories
+                    .Include(md => md.Children)
+                    .Include(md => md.Media)
+                    .SingleOrDefaultAsync(md => md.Id == id);
+
+                int? parent = directory.ParentId;
 
                 if (directory == null)
+                {
                     throw new Exception("You have to select a directory to delete.");
+                }
 
                 if (directory.Type == DirectoryType.System)
+                {
                     throw new Exception("You cannot delete a system directory.");
+                }
 
                 if (directory.Type == DirectoryType.User)
+                {
                     throw new Exception("You cannot delete a user directory.");
+                }
+
+                if (directory.Children.Count > 0 || directory.Media.Count > 0)
+                {
+                    throw new Exception("You cannot delete a non-empty directory.");
+                }
 
                 IEnumerable<MediaDirectory> directories = _directoryManager.GetAllCategoriesIncludingChildren(new List<MediaDirectory>() { directory });
 
@@ -257,11 +272,17 @@ namespace Hood.Areas.Admin.Controllers
                 await _db.SaveChangesAsync();
 
                 _directoryManager.ResetCache();
-                return new Response(true, $"The directory has been deleted.");
+                Response response = new Response(true, $"The directory has been deleted.");
+                if (parent.HasValue)
+                {
+                    // return the directory parent id so the list can refresh correctly.
+                    response.Data = (new List<int>() { parent.Value }).ToArray();
+                }
+                return response;
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<MediaController>($"Error deleting a directory.", ex);
+                return await ErrorResponseAsync<MediaController>(ex.Message, ex);
             }
         }
         #endregion

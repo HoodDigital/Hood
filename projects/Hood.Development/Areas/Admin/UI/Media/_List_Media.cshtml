@@ -24,9 +24,13 @@ else
                 @_directoryManager.GetBreadcrumb(Model)
             </div>
             <div>
-                <a class="btn btn-outline-success btn-sm media-create-directory"
-                   asp-action="CreateDirectory"
-                   data-complete="$.hood.Media.Directories.Editor" title="Create directory">
+                @if (Model.DirectoryId.HasValue)
+                {
+                    <a class="btn btn-outline-danger btn-sm media-delete-directory" asp-action="DeleteDirectory" asp-route-id="@Model.DirectoryId" title="Delete directory">
+                        <i class="fa fa-trash me-1"></i> Directory
+                    </a>
+                }
+                <a class="btn btn-outline-success btn-sm media-create-directory" asp-action="CreateDirectory" title="Create directory">
                     <i class="fa fa-plus-circle me-1"></i> Directory
                 </a>
                 <a class="btn btn-success btn-sm" id="media-add">
@@ -52,7 +56,14 @@ else
                 </div>
                 <div class="card-footer p-1">
                     <p class="m-0 font-weight-bold text-truncate">
-                        @dir.DisplayName
+                        @if (dir.DisplayName.IsSet())
+                        {
+                            @dir.DisplayName
+                        }
+                        else
+                        {
+                            <span>Untitled</span>
+                        }
                     </p>
                     <a class="full-box-link hood-inline-list-target" data-target="#media-list" href="@href">@dir.DisplayName</a>
                 </div>
@@ -66,9 +77,13 @@ else
     <div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 g-1 mb-3">
         @foreach (var media in Model.List)
         {
+            var contract = new Newtonsoft.Json.Serialization.DefaultContractResolver()
+            {
+                NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy()
+            };
             var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });
             <div class="col">
-                <div class="card text-center hover">
+                <div class="card text-center hover" data-json="@Newtonsoft.Json.JsonConvert.SerializeObject(media, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = contract });">
                     @switch (Model.Action)
                     {
                         case MediaWindowAction.Select:

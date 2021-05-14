@@ -5,7 +5,7 @@
 }
 <div class="modal fade" id="@string.Format("media-object-{0}", Model.Id)" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <form id="content-directories-edit-form" asp-action="CreateDirectory" asp-antiforgery="true" autocomplete="off" class="modal-content">
+        <form id="content-directories-edit-form" asp-action="CreateDirectory" asp-antiforgery="true" autocomplete="off" class="modal-content" novalidate>
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title">
@@ -19,12 +19,12 @@
              </div>
             <div class="modal-body">
                 <div class="form-floating mb-3">
-                    <input class="form-control" asp-for="DisplayName">
+                    <input class="form-control" asp-for="DisplayName" required>
                     <label asp-for="DisplayName"></label>
                     <small asp-for="DisplayName"></small>
                 </div>
                 <div class="form-floating">
-                    <select asp-for="ParentId" class="form-select">
+                    <select asp-for="ParentId" class="form-select" required>
                         @_directoryManager.SelectOptions(Model.TopLevelDirectories, Model.ParentId)
                     </select>
                     <label asp-for="ParentId" class="control-label"></label>
@@ -32,7 +32,7 @@
             </div>
             <div class="modal-footer d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
-                <button type="button" id="content-directories-edit-submit" class="btn btn-success"><i class="fa fa-save"></i> Add</button>
+                <button type="submit" id="content-directories-edit-submit" class="btn btn-success"><i class="fa fa-save"></i> Add</button>
             </div>
         </form>
     </div>

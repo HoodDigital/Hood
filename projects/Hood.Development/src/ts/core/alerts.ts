@@ -120,7 +120,9 @@ export class Alerts {
 
         let baseOptions: SweetAlertOptions = {
             showCancelButton: true,
-            footer: '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> This cannot be undone.</span>', 
+            footer: '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> This cannot be undone.</span>',
+            title: 'Are you sure?',
+            html: 'Are you sure you want to do this?',
             confirmButtonText: 'Ok', 
             cancelButtonText:'Cancel'
         };

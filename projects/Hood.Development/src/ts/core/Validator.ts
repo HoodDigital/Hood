@@ -1,6 +1,5 @@
 ﻿import { Inline } from "./Inline";
 import { Response } from "./Response";
-import 'jquery-validation';
 
 export interface ValidatorOptions {
 
@@ -19,16 +18,7 @@ export interface ValidatorOptions {
      */
     onError?: (jqXHR: any, textStatus: any, errorThrown: any) => void;
 
-    validationRules?: null;
-    validationMessages?: {};
-
-
     serializationFunction?: () => string;
-
-    placeBelow?: true;
-    focusInvalid?: boolean;
-
-    errorClass?: string;
 
 }
 
@@ -41,55 +31,52 @@ export class Validator {
       */
     constructor(element: HTMLFormElement, options: ValidatorOptions) {
 
-        let that = this;
         this.element = element;
         if (!this.element) {
             return;
         }
 
-        this.options.serializationFunction = function () {
-            let rtn = $(that.element).serialize();
+        this.options.serializationFunction = function (this: Validator) {
+            let rtn = $(this.element).serialize();
             return rtn;
-        }
+        }.bind(this);
 
         this.options = { ...this.options, ...options };
 
-        $(this.element).validate({
-            submitHandler: function (e) {
-                e.preventDefault();
-            },
-            errorClass: this.options.errorClass,
-            focusInvalid: this.options.focusInvalid,
-            rules: this.options.validationRules,
-            messages: this.options.validationMessages,
-        });
-        $(this.element).on('submit', function () {
-            that.submitForm();
-        });
+        this.element.addEventListener('submit', function (this: Validator, e: Event) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            this.submitForm();
+        }.bind(this));
     }
 
     submitForm() {
-        let that = this;
+        if (this.element.checkValidity()) {
 
-        let $form = $(this.element);
-        if ($form.valid()) {
+            this.element.classList.add('loading');
 
-            $form.addClass('loading');
+            let checkboxes = this.element.querySelector('input[type=checkbox]');
+            if (checkboxes) {
+                Array.prototype.slice.call(checkboxes)
+                    .forEach(function (checkbox: HTMLInputElement) {
+                        if ($(this).is(':checked')) {
+                            $(this).val('true');
+                        }
+                    });
+            }
 
-            $form.find('input[type=checkbox]').each(function () {
-                if ($(this).is(':checked')) {
-                    $(this).val('true');
-                }
-            });
-
-            this.options.onSubmit(this);
+            if (this.options.onSubmit) {
+                this.options.onSubmit(this);
+            }
 
             let formData = this.options.serializationFunction();
 
-            $.post($form.attr('action'), formData, function (data) {
-                that.options.onComplete(that, data);
-            })
-                .fail(that.options.onError ?? Inline.HandleError);
+            $.post(this.element.action, formData, function (this: Validator, data: any) {
+                if (this.options.onComplete) {
+                    this.options.onComplete(this, data);
+                }
+            }.bind(this))
+                .fail(this.options.onError ?? Inline.handleError);
         }
     }
 }

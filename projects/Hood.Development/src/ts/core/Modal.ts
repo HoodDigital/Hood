@@ -39,48 +39,47 @@ export class ModalController {
     }
 
     show(url: string | URL, sender: HTMLElement) {
-        let that = this;
-
-        if (that.options.onLoad) {
-            that.options.onLoad(that.element);
+        if (this.options.onLoad) {
+            this.options.onLoad(this.element);
         }
 
         $.get(url as string, function (data: string) {
 
-            if (that.modal && that.options.closePrevious) {
-                that.close();
+            if (this.modal && this.options.closePrevious) {
+                this.close();
             }
 
-            if (that.options.onRender) {
-                data = that.options.onRender(that.element, data);
+            if (this.options.onRender) {
+                data = this.options.onRender(this.element, data);
             }
 
-            that.element = that.createElementFromHTML(data);
-            that.element.classList.add('hood-inline-modal');
+            this.element = this.createElementFromHTML(data);
+            this.element.classList.add('hood-inline-modal');
 
-            $('body').append(that.element);
-            that.modal = new Modal(that.element, {});
-            that.modal.show();
+            $('body').append(this.element);
+            this.modal = new Modal(this.element, {});
+            this.modal.show();
 
             // Workaround for sweetalert popups.
-            that.element.addEventListener('shown.bs.modal', function () {
+            this.element.addEventListener('shown.bs.modal', function (this: ModalController) {
                 $(document).off('focusin.modal');
-            });
-            that.element.addEventListener('hidden.bs.modal', function (e) {
-                that.modal.dispose();
-            });
+            }.bind(this));
+            this.element.addEventListener('hidden.bs.modal', function (this: ModalController) {
+                this.close();
+            }.bind(this));
 
-            if (that.options.onComplete) {
-                that.options.onComplete(that.element);
+            if (this.options.onComplete) {
+                this.options.onComplete(this.element);
             }
-        })
-            .fail(that.options.onError ?? Inline.HandleError);
+        }.bind(this))
+            .fail(this.options.onError ?? Inline.handleError);
     }
 
     close() {
         if (this.modal) {
             this.modal.hide();
             this.modal.dispose();
+            this.element.remove();
         }
     }
 

@@ -38,7 +38,6 @@ export class DataList {
       */
     constructor(element: HTMLElement, options: DataListOptions) {
 
-        let that = this;
         this.element = element;
         if (!this.element) {
             return;
@@ -53,39 +52,38 @@ export class DataList {
 
         if (!$(this.element).hasClass('refresh-only')) {
             var listUrl = document.createElement('a');
-            listUrl.href = $(that.element).data('url');
+            listUrl.href = $(this.element).data('url');
             this.Reload(new URL(listUrl.href));
         }
 
-        $(this.element).on('click', '.pagination a, a.hood-inline-list-target', function(e) {
+        $(this.element).on('click', '.pagination a, a.hood-inline-list-target', function (e: JQuery.ClickEvent) {
 
             e.preventDefault();
 
             var url = document.createElement('a');
-            url.href = $(this).attr('href');
+            url.href = (e.target as HTMLAnchorElement).href;
 
             var listUrl = document.createElement('a');
-            listUrl.href = $(that.element).data('url');
+            listUrl.href = $(this.element).data('url');
             listUrl.search = url.search;
 
-            that.Reload(new URL(listUrl.href));
+            this.Reload(new URL(listUrl.href));
 
-        });
+        }.bind(this));
 
-        $('body').on('submit', `form.inline[data-target="#${this.element.id}"]`, function(e) {
+        $('body').on('submit', `form.inline[data-target="#${this.element.id}"]`, function (e: JQuery.ClickEvent) {
 
             e.preventDefault();
 
-            let $form = $(this);
-            let url = document.createElement('a');
-            url.href = $(this).data('url');
+            let $form = $(e.target);
 
             var listUrl = document.createElement('a');
-            listUrl.href = $(that.element).data('url');
+            listUrl.href = $(this.element).data('url');
 
             listUrl.search = "?" + $form.serialize();
-            that.Reload(new URL(listUrl.href));
-        });
+            this.Reload(new URL(listUrl.href));
+
+        }.bind(this));
 
         //    $('body').on('submit', '.hood-inline-list form', function (e) {
         //        e.preventDefault();
@@ -105,9 +103,9 @@ export class DataList {
                 let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + (url.href.contains('?') ? "?" + url.href.substring(url.href.indexOf('?') + 1) : '');
                 window.history.pushState({ path: newurl }, '', newurl);
             }
-            $(this.element).data('url', Helpers.insertQueryStringParamToUrl(url, 'inline', 'true'));
+            $(this.element).data('url', url);
         }
-        Inline.Load(this.element, { ...this.options });
+        Inline.load(this.element, { ...this.options });
     }
 
 }

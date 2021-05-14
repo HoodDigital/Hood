@@ -152,7 +152,8 @@ namespace Hood.Services
             {
                 linkModel.DirectoryId = directory.Id;
                 link = linkModel.GetPageUrl(linkModel.PageIndex);
-                links.Add($"<a class=\"hood-inline-list-target\" data-target=\"{targetListDOMObject}\" href=\"{baseUrl}{link}\">{directory.DisplayName}</a>");
+                var linkTitle = directory.DisplayName.IsSet() ? directory.DisplayName : "Untitled";
+                links.Add($"<a class=\"hood-inline-list-target\" data-target=\"{targetListDOMObject}\" href=\"{baseUrl}{link}\">{linkTitle}</a>");
             }
             return FormatBreadcrumbLinks(links);
         }

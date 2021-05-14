@@ -4,6 +4,7 @@ import { DataList } from "./DataList";
 import { ModalController } from "./Modal";
 import { Validator } from "./Validator";
 import { Modal } from "bootstrap";
+import { Inline } from "./Inline";
 
 export declare interface MediaObject {
 
@@ -83,9 +84,9 @@ export class MediaService {
 
         this.options = { ...this.options, ...options };
 
-        $(this.element).on('click', '.media-delete', this.delete);
-        $(this.element).on('click', '.media-create-directory', this.createDirectory)
-        $(this.element).on('click', '.media-directories-delete', this.deleteDirectory);
+        $(this.element).on('click', '.media-delete', this.delete.bind(this));
+        $(this.element).on('click', '.media-create-directory', this.createDirectory.bind(this))
+        $(this.element).on('click', '.media-delete-directory', this.deleteDirectory.bind(this));
 
 
         this.media = new DataList(this.element, {
@@ -97,27 +98,44 @@ export class MediaService {
 
     }
 
-    createDirectory(e: JQuery.ClickEvent) {
+    createDirectory(this: MediaService, e: JQuery.ClickEvent) {
         e.preventDefault();
         e.stopPropagation();
-        let that = this;
         let createDirectoryModal: ModalController = new ModalController({
-            onComplete: function () {
+            onComplete: function (this: MediaService) {
                 let form = document.getElementById('content-directories-edit-form') as HTMLFormElement;
                 let validator = new Validator(form, {
-                    onComplete: function (sender: Validator, data: Response) {
-                        data.process();
-                        that.media.Reload();
-                        createDirectoryModal.close();
-                    }
+                    onComplete: function (this: MediaService, sender: Validator, data: Response) {
+                        if (data.success) {
+                            this.media.Reload();
+                            createDirectoryModal.close();
+                            Alerts.success(data.message);
+                        } else {
+                            Alerts.error(data.error);
+                        }
+                    }.bind(this)
                 });
-            }
+            }.bind(this)
         });
-        createDirectoryModal.show($(this).attr('href'), this.element);
+        createDirectoryModal.show($(e.target).attr('href'), this.element);
     }
 
-    deleteDirectory(this: HTMLElement, e: JQuery.ClickEvent) {
-        throw new Error("Method not implemented.");
+    deleteDirectory(this: MediaService, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        Alerts.confirm({
+
+        }, function (this: MediaService) {
+            Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
+                // parent directory id is stored in the response data array.
+                if (data.data.length > 0) {
+                    var listUrl = document.createElement('a');
+                    listUrl.href = $(this.element).data('url');
+                    listUrl.search = `?dir=${data.data[0]}`;
+                    this.media.Reload(new URL(listUrl.href));
+                }
+            }.bind(this), 5000);
+        }.bind(this))
     }
 
     delete(this: HTMLElement, e: JQuery.ClickEvent) {

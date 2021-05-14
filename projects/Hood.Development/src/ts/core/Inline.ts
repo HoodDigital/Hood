@@ -27,7 +27,7 @@ export interface InlineOptions {
 }
 
 export class Inline {
-    static Load(tag: HTMLElement, options: InlineOptions) {
+    static load(tag: HTMLElement, options: InlineOptions) {
 
         let $tag = $(tag) as JQuery<HTMLElement>;
         $tag.addClass('loading');
@@ -50,10 +50,10 @@ export class Inline {
             }
 
         })
-            .fail(options.onError ?? Inline.HandleError);
+            .fail(options.onError ?? Inline.handleError);
     }
 
-    static Task(this: HTMLElement, e: JQuery.ClickEvent,
+    static task(e: JQuery.ClickEvent,
         complete: (sender: HTMLElement, data: Response) => void = null,
         autoHideResponse: number = null,
         error: (jqXHR: any, textStatus: any, errorThrown: any) => void = null): void {
@@ -62,7 +62,7 @@ export class Inline {
         let $tag = $(e.currentTarget);
         $tag.addClass('loading');
         $.get($tag.attr('href'), function (data: Response) {
-            data.process(autoHideResponse);
+            Response.process(data, autoHideResponse);
             if (data.success) {
                 if ($tag && $tag.data('redirect')) {
                     setTimeout(function () {
@@ -75,11 +75,37 @@ export class Inline {
                 complete(e.currentTarget, data);
             }
         })
-            .fail(error ?? Inline.HandleError);
+            .fail(error ?? Inline.handleError);
 
     }
 
-    static HandleError(xhr: { status: string | number; }) {
+    static post(e: JQuery.ClickEvent,
+        complete: (sender: HTMLElement, data: Response) => void = null,
+        autoHideResponse: number = null,
+        error: (jqXHR: any, textStatus: any, errorThrown: any) => void = null): void {
+
+        e.preventDefault();
+        let $tag = $(e.currentTarget);
+        $tag.addClass('loading');
+        $.post($tag.attr('href'), function (data: Response) {
+            Response.process(data, autoHideResponse);
+            if (data.success) {
+                if ($tag && $tag.data('redirect')) {
+                    setTimeout(function () {
+                        window.location = $tag.data('redirect');
+                    }, 1500);
+                }
+            }
+            $tag.removeClass('loading');
+            if (complete) {
+                complete(e.currentTarget, data);
+            }
+        })
+            .fail(error ?? Inline.handleError);
+
+    }
+
+    static handleError(xhr: { status: string | number; }) {
         if (xhr.status === 500) {
             Alerts.error("There was an error processing the content, please contact an administrator if this continues.", "Error " + xhr.status);
         } else if (xhr.status === 404) {

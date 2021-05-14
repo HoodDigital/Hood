@@ -12,17 +12,25 @@
     <input type="hidden" id="upload-directory-id" value="@Model.DirectoryId.Value" />
     rootDirs = _directoryManager.GetDirectoryById(Model.DirectoryId.Value).Children;
 }
+else
+{
+    <input type="hidden" id="upload-directory-id" value="@Model.TopLevelDirectories.FirstOrDefault().Id" />
+}
 <div class="card mb-3 d-none d-md-block">
     <div class="card-body p-2">
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
             <div div class="flex-fill">
-                <i class="fa fa-folder-open me-2 text-warning"></i>
+                <i class="fa fa-folder-open mx-2 text-warning"></i>
                 @_directoryManager.GetBreadcrumb(Model)
             </div>
             <div>
-                <a class="btn btn-outline-success btn-sm media-create-directory"
-                   asp-action="CreateDirectory"
-                   data-complete="$.hood.Media.Directories.Editor" title="Create directory">
+                @if (Model.DirectoryId.HasValue)
+                {
+                    <a class="btn btn-outline-danger btn-sm media-delete-directory" asp-action="DeleteDirectory" asp-route-id="@Model.DirectoryId" title="Delete directory">
+                        <i class="fa fa-trash me-1"></i> Directory
+                    </a>
+                }
+                <a class="btn btn-outline-success btn-sm media-create-directory" asp-action="CreateDirectory" title="Create directory">
                     <i class="fa fa-plus-circle me-1"></i> Directory
                 </a>
                 <a class="btn btn-success btn-sm" id="media-add">
@@ -35,7 +43,7 @@
     </div>
 </div>
 <partial name="_Media_Filters" />
-<div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 row-cols-xxl-8">
+<div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 g-1">
     @foreach (var dir in rootDirs)
     {
         rootDirModel.DirectoryId = dir.Id;
@@ -48,7 +56,14 @@
                 </div>
                 <div class="card-footer p-1">
                     <p class="m-0 font-weight-bold text-truncate">
-                        @dir.DisplayName
+                        @if (dir.DisplayName.IsSet())
+                        {
+                            @dir.DisplayName
+                        }
+                        else
+                        {
+                            <span>Untitled</span>
+                        }
                     </p>
                     <a class="full-box-link hood-inline-list-target" data-target="#media-list" href="@href">@dir.DisplayName</a>
                 </div>
@@ -59,12 +74,16 @@
 @if (Model.TotalCount > 0)
 {
     <div class="mb-3"><partial name="_Pagination" /></div>
-    <div class="row row-cols-2 row-cols-lg-4 row-cols-xxl-5 row-cols-xxl-7">
+    <div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 g-1 mb-3">
         @foreach (var media in Model.List)
         {
+            var contract = new Newtonsoft.Json.Serialization.DefaultContractResolver()
+            {
+                NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy()
+            };
             var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });
-            <div class="col mb-3">
-                <div class="card text-center hover">
+            <div class="col">
+                <div class="card text-center hover" data-json="@Newtonsoft.Json.JsonConvert.SerializeObject(media, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = contract });">
                     @switch (Model.Action)
                     {
                         case MediaWindowAction.Select:

@@ -29,11 +29,11 @@ export class Response {
 
     }
 
-    process(autoHide: number = 5000) {
-        if (this.success) {
-            Alerts.success(this.message, this.title, autoHide);
+    static process(data: Response | any, autoHide: number = 5000) {
+        if (data.success) {
+            Alerts.success(data.message, data.title, autoHide);
         } else {
-            Alerts.error(this.message, this.title, autoHide);
+            Alerts.error(data.message, data.title, autoHide);
         }
     }
 }
