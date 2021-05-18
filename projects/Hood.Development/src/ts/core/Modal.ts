@@ -65,7 +65,7 @@ export class ModalController {
                 $(document).off('focusin.modal');
             }.bind(this));
             this.element.addEventListener('hidden.bs.modal', function (this: ModalController) {
-                this.close();
+                this.dispose();
             }.bind(this));
 
             if (this.options.onComplete) {
@@ -78,9 +78,12 @@ export class ModalController {
     close() {
         if (this.modal) {
             this.modal.hide();
-            this.modal.dispose();
-            this.element.remove();
         }
+    }
+
+    dispose() {
+        this.modal.dispose();
+        this.element.remove();
     }
 
     createElementFromHTML(htmlString: string): HTMLElement {

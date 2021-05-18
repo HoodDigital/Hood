@@ -413,6 +413,90 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        #region Media
+        /// <summary>
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the media attach action.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/content/{id}/media/upload")]
+        public async Task<Response> UploadMedia(int id, AttachMediaModel model)
+        {
+            try
+            {
+                model.ValidateOrThrow();
+
+                // load the media object.
+                Content content = await _db.Content.Where(p => p.Id == id).FirstOrDefaultAsync();
+                if (content == null)
+                {
+                    throw new Exception("Could not load content to attach media.");
+                }
+
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
+                if (media == null)
+                {
+                    throw new Exception("Could not load media to attach.");
+                }
+
+                switch (model.FieldName)
+                {
+                    case "FeaturedImage":
+                        content.FeaturedImage = new ContentMedia(media);
+                        break;
+                    case "ShareImage":
+                        content.ShareImage = new ContentMedia(media);
+                        break;
+                }
+
+                await _db.SaveChangesAsync();
+
+                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+                _cache.Remove(cacheKey);
+
+                return new Response(true, media, $"The media has been attached successfully.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Remove media file from entity.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/content/{id}/media/remove")]
+        public async Task<Response> RemoveMedia(int id, AttachMediaModel model)
+        {
+            try
+            {
+                // load the media object.
+                Content content = await _db.Content.Where(p => p.Id == id).FirstOrDefaultAsync();
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
+                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+
+                switch (model.FieldName)
+                {
+                    case nameof(Models.Content.FeaturedImage):
+                        content.FeaturedImageJson = null;
+                        break;
+                    case nameof(Models.Content.ShareImage):
+                        content.ShareImageJson = null;
+                        break;
+                }
+
+                await _db.SaveChangesAsync();
+                _cache.Remove(cacheKey);
+                return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error removing a media file from an entity.", ex);
+            }
+        }
+        #endregion
+
         #region Gallery
         [Route("admin/content/{id}/gallery")]
         public async Task<IActionResult> Gallery(int id)

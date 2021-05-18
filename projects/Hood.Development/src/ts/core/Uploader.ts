@@ -17,9 +17,9 @@ export class Uploader {
 
     refreshImage(sender: JQuery<HTMLElement>, data: Response) {
         $(sender.data('preview')).css({
-            'background-image': 'url(' + data.media.SmallUrl + ')'
+            'background-image': 'url(' + data.media.smallUrl + ')'
         });
-        $(sender.data('preview')).find('img').attr('src', data.media.SmallUrl);
+        $(sender.data('preview')).find('img').attr('src', data.media.smallUrl);
     }
 
     singleImage(this: HTMLElement) {
@@ -61,9 +61,9 @@ export class Uploader {
                 if (response.media) {
                     $(jsontag).val(JSON.stringify(response.media));
                     $($tag.data('preview')).css({
-                        'background-image': 'url(' + response.media.SmallUrl + ')'
+                        'background-image': 'url(' + response.media.smallUrl + ')'
                     });
-                    $($tag.data('preview')).find('img').attr('src', response.media.SmallUrl);
+                    $($tag.data('preview')).find('img').attr('src', response.media.smallUrl);
                 }
                 Alerts.success("New image added!");
             } else {

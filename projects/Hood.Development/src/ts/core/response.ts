@@ -19,6 +19,7 @@ export declare interface Response {
     error: string;
 
     media: MediaObject;
+    mediaJson: string;
 
     process(autoHide: number): void;
 

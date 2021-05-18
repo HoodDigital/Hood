@@ -10,10 +10,13 @@ import { DataList } from "./core/DataList";
 
 import { HoodController } from './core/HoodController';
 import { MediaController } from './admin/MediaController';
+import { MediaModal } from './core/Media';
 
 class Admin extends HoodController {
     home: HomeController;
     media: MediaController;
+
+    mediaModal: MediaModal;
 
     constructor() {
         super();
@@ -21,6 +24,7 @@ class Admin extends HoodController {
         this.editors = new Editors();
         this.home = new HomeController();
         this.media = new MediaController();
+        this.mediaModal = new MediaModal();
 
         let contentListDiv = document.getElementById('content-list');
         let contentList = new DataList(contentListDiv, {
@@ -38,10 +42,6 @@ class Admin extends HoodController {
                 Alerts.success('Finished loading content list.');
             }
         });
-
-
-
-
 
         $('.restrict-to-slug').restrictToSlug();
         $('.restrict-to-page-slug').restrictToPageSlug();

@@ -41,20 +41,59 @@ export declare interface MediaObject {
 }
 
 export interface MediaOptions {
-    action?: 'insert' | 'attach' | 'select';
 
     /**
-     * Called before the data is fetched.
+    * Action for the media service to take when a media item is clicked.
+    */
+    action: 'insert' | 'attach' | 'select' | string;
+
+    /**
+     * Selector for any elements that require a refresh of background-image or src (if applicable). 
+     */
+    refresh?: string;
+
+    /**
+     * Insert/Select Only: Input field to insert image url to. 
+     */
+    size?: string;
+
+    /**
+     * Insert/Select Only: Input field to insert image url to. 
+     */
+    target?: HTMLElement;
+
+    /**
+     * Attach Only: Post url to send the selected media id to when clicked. Must accept mediaId as a parameter.
+     */
+    url?: string;
+
+    /**
+     * Attach Only: JSON input, add this to
+     */
+    json?: string;
+
+    /**
+     * Called before the action is carried out.
+     */
+    beforeAction?: (sender: HTMLElement) => void;
+
+    /**
+     * Called when the action is complete.
+     */
+    onAction?: (sender: HTMLElement, mediaObject: MediaObject) => void;
+
+    /**
+     * Called before the media list is is fetched.
      */
     onListLoad?: (sender: HTMLElement) => void;
 
     /**
-     * Called before the fetched HTML is rendered to the list. Must return the data back to datalist to render.
+     * Called before the fetched HTML is rendered to the media list. Must return the data back to datalist to render.
      */
     onListRender?: (sender: HTMLElement, html: string) => string;
 
     /**
-     * Called when loading and rendering is complete.
+     * Called when media list loading and rendering is complete.
      */
     onListComplete?: (sender: HTMLElement, html: string) => void;
 
@@ -63,22 +102,13 @@ export interface MediaOptions {
      */
     onError?: (jqXHR: any, textStatus: any, errorThrown: any) => void;
 
-    /**
-     * Called before the data is fetched.
-     */
-    beforeAction?: (sender: HTMLElement) => void;
-
-    /**
-     * Called before the data is fetched.
-     */
-    onAction?: (sender: HTMLElement) => void;
-
 }
 
 export class MediaService {
     media: DataList;
     element: HTMLElement;
     options: MediaOptions = {
+        action: 'show'
     };
     currentBlade: ModalController;
     progress: JQuery<HTMLElement>;
@@ -86,6 +116,7 @@ export class MediaService {
     uploadButton: HTMLElement;
     uploader: HTMLElement;
     progressArea: HTMLElement;
+    dropzone: Dropzone;
 
     constructor(element: HTMLElement, options: MediaOptions) {
         this.element = element;
@@ -128,7 +159,7 @@ export class MediaService {
         this.progressText.appendTo(this.progressArea);
         this.progress.appendTo(this.progressArea);
 
-        let myDropzone = new Dropzone("#media-upload", {
+        this.dropzone = new Dropzone("#media-upload", {
             url: $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val(),
             thumbnailWidth: 80,
             thumbnailHeight: 80,
@@ -142,22 +173,22 @@ export class MediaService {
             dictResponseError: 'Error while uploading file!'
         });
 
-        myDropzone.on("success", function (this: MediaService, file: Dropzone.DropzoneFile, data: Response) {
+        this.dropzone.on("success", function (this: MediaService, file: Dropzone.DropzoneFile, data: Response) {
             Response.process(data);
         }.bind(this));
 
-        myDropzone.on("addedfile", function (this: MediaService, file: Dropzone.DropzoneFile) {
+        this.dropzone.on("addedfile", function (this: MediaService, file: Dropzone.DropzoneFile) {
             this.progress.find('.progress-bar').css({ width: 0 + "%" });
             this.progressText.find('span').html(0 + "%");
         }.bind(this));
 
         // Update the total progress bar
-        myDropzone.on("totaluploadprogress", function (this: MediaService, totalProgress: number, totalBytes: number, totalBytesSent: number) {
+        this.dropzone.on("totaluploadprogress", function (this: MediaService, totalProgress: number, totalBytes: number, totalBytesSent: number) {
             this.progress.find('.progress-bar').css({ width: totalProgress + "%" });
             this.progressText.find('span').html(totalProgress + "%");
         }.bind(this));
 
-        myDropzone.on("sending", function (this: MediaService, file: Dropzone.DropzoneFile) {
+        this.dropzone.on("sending", function (this: MediaService, file: Dropzone.DropzoneFile) {
             // Show the total progress bar when upload starts
             this.progressArea.classList.remove('collapse');
             this.progress.find('.progress-bar').css({ width: 0 + "%" });
@@ -165,12 +196,12 @@ export class MediaService {
         }.bind(this));
 
         // Hide the total progress bar when nothing's uploading anymore
-        myDropzone.on("complete", function (this: MediaService, file: Dropzone.DropzoneFile) {
+        this.dropzone.on("complete", function (this: MediaService, file: Dropzone.DropzoneFile) {
             this.media.Reload();
         }.bind(this));
 
         // Hide the total progress bar when nothing's uploading anymore
-        myDropzone.on("queuecomplete", function (this: MediaService) {
+        this.dropzone.on("queuecomplete", function (this: MediaService) {
             this.progressArea.classList.add('collapse');
             this.media.Reload();
         }.bind(this));
@@ -218,7 +249,6 @@ export class MediaService {
         }.bind(this))
     }
 
-
     uploadUrl() {
         return $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
     }
@@ -227,18 +257,57 @@ export class MediaService {
         e.preventDefault();
         e.stopPropagation();
         let mediaObject: MediaObject = $(e.target).data('json') as MediaObject;
+        if (this.options.onAction) {
+            this.options.onAction(this.element, mediaObject);
+        }
         switch (this.options.action) {
             case 'insert':
-                this.insert(mediaObject);
+                this.insert(mediaObject, e);
                 break;
             case 'attach':
-                this.insert(mediaObject);
+                this.attach(mediaObject, e);
                 break;
             default:
-                this.currentBlade = new ModalController();
-                this.currentBlade.show($(e.target).data('blade'), e.target);
+                this.show(mediaObject, e);
                 break;
         }
+    }
+
+    show(this: MediaService, mediaObject: MediaObject, sender: JQuery.ClickEvent) {
+        this.currentBlade = new ModalController();
+        this.currentBlade.show($(sender.target).data('blade'), sender.target);
+    }
+
+    insert(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
+        // basic functionality to insert the correct string from the media response (from uploader) to given input element. 
+    }
+
+    attach(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
+        // once file is uploaded to given directory, send media id to the given attach endpoint.
+        Alerts.log(`[MediaService.attach] Attaching media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.options.url}`);
+        $.post(this.options.url, { mediaId: mediaObject.id }, function (this: MediaService, data: Response) {
+            Response.process(data);
+
+            let icon = data.media.icon;
+            if (data.media.genericFileType === "Image") {
+                icon = data.media.mediumUrl;
+            }
+
+            if (this.options.refresh) {
+                let $image = $(this.options.refresh);
+                $image.css({
+                    'background-image': 'url(' + icon + ')'
+                });
+                $image.find('img').attr('src', icon);
+                $image.removeClass('loading');
+            }
+
+            if (this.options.json && data.mediaJson) {
+                let $json = $(this.options.json);
+                $json.val(data.mediaJson);
+            }
+
+        }.bind(this));
     }
 
     delete(this: MediaService, e: JQuery.ClickEvent) {
@@ -258,12 +327,60 @@ export class MediaService {
         }.bind(this))
     }
 
-    insert(mediaObject: MediaObject): void {
-        // basic functionality to insert the correct string from the media response (from uploader) to given input element. 
+    destroy(this: MediaService) {
+        this.dropzone.destroy();
+    }
+}
+
+export class MediaModal {
+    modal: ModalController;
+    list: HTMLElement;
+    service: MediaService;
+    element: HTMLElement;
+
+    constructor() {
+        $('body').on('click', '[data-hood-media]', this.load.bind(this));
     }
 
-    attach(mediaObject: MediaObject): void {
-        // once file is uploaded to given directory, send media id to the given attach endpoint.
-    }
+    load(this: MediaModal, e: JQuery.ClickEvent): void {
 
+        this.element = e.target;
+        this.modal = new ModalController({
+
+            onComplete: function (this: MediaModal, sender: HTMLElement) {
+
+                this.list = document.getElementById('media-list');
+                this.service = new MediaService(this.list, {
+                    action: this.element.dataset.hoodMedia,
+                    url: this.element.dataset.hoodMediaUrl,
+                    json: this.element.dataset.hoodMediaJson,
+                    refresh: this.element.dataset.hoodMediaRefresh,
+                    beforeAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
+                        Alerts.log(`[beforeAction] Attaching media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.element.dataset.hoodMediaUrl}`);
+                    }.bind(this),
+                    onAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
+                        Alerts.log(`[onAction] Attached media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.element.dataset.hoodMediaUrl}`);
+                        this.service.destroy();
+                        this.modal.close();
+                    }.bind(this),
+                    onListLoad: (sender: HTMLElement) => {
+                        Alerts.log('Commencing media list fetch.');
+                    },
+                    onListRender: (sender: HTMLElement, data: string) => {
+                        Alerts.log('Fetched media list data.');
+                        return data;
+                    },
+                    onListComplete: (sender: HTMLElement, data: string) => {
+                        Alerts.log('Finished loading media list... now attach the media actions to the things.', 'warning');
+                    },
+                    onError: (jqXHR: any, textStatus: any, errorThrown: any) => {
+                        Alerts.log(`Error loading media list: ${textStatus}`);
+                    },
+                });
+
+            }.bind(this)
+
+        });
+        this.modal.show($(e.target).data('hood-media-list'), e.target);
+    }
 }

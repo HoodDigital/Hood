@@ -4,18 +4,24 @@
 @if (Model.Type.ShowImage)
 {
     <input type="hidden" asp-for="FeaturedImageJson">
-    <div class="form-group row align-items-center">
-        <div class="col-auto">
-            <fixedImage src="@Model.FeaturedImage.SmallUrl" class="img-sm img-circle m-0 FeaturedImage" id="content-feature-image" />
+    <div class="form-group row align-items-center g-3">
+        <div class="col-2">
+            <div style="background-image:url(@Model.FeaturedImage.SmallUrl)" class="img img-full img-square round m-0 FeaturedImage" id="content-feature-image"
+                 media-for="FeaturedImage"
+                 media-json="FeaturedImageJson"
+                 media-refresh=".FeaturedImage"
+                 media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.FeaturedImage) })"></div>
         </div>
         <div class="col">
             <h6>Featured Image</h6>
             <p>Choose a featured image for this @Model.Type.TypeName. This will appear in content lists, and as the main featured image.</p>
-            <p class="m-0">
-                <mediaAttach asp-for="FeaturedImage" asp-entity="@nameof(Content)" asp-id="@Model.Id" asp-filetype="Image" asp-json="FeaturedImageJson">
-                    Choose...
-                </mediaAttach>
-            </p>
+            <a class="btn btn-success btn-sm"
+               media-for="FeaturedImage"
+               media-json="FeaturedImageJson"
+               media-refresh=".FeaturedImage"
+               media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.FeaturedImage) })">
+                Choose...
+            </a>
         </div>
     </div>
 }
@@ -23,19 +29,25 @@
 {
     <hr class="mt-4 mb-4" />
     <input type="hidden" asp-for="ShareImageJson">
-    <div class="form-group row align-items-center">
-        <div class="col-auto">
-            <fixedImage src="@Model.ShareImage.SmallUrl" class="img-sm img-circle m-0 ShareImage" id="content-share-image" />
+    <div class="form-group row align-items-center g-3">
+        <div class="col-2">
+            <div style="background-image:url(@Model.ShareImage.SmallUrl)" class="img img-full img-square round m-0 ShareImage" id="content-share-image"
+                 media-for="ShareImage"
+                 media-json="ShareImageJson"
+                 media-refresh=".ShareImage"
+                 media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.ShareImage) })"></div>
         </div>
         <div class="col">
             <h6>Sharer Image</h6>
             <p>Choose a sharer image for this @Model.Type.TypeName. This will appear when shared in social media, or in links, this will override the featured image if one is set.</p>
-            <p class="m-0">
-                <mediaAttach asp-for="ShareImage" asp-entity="@nameof(Content)" asp-id="@Model.Id" asp-filetype="Image" asp-json="ShareImageJson">
-                    Choose...
-                </mediaAttach>
-            </p>
-        </div>
+             <a class="btn btn-success btn-sm"
+                 media-for="ShareImage"
+                 media-json="ShareImageJson"
+                 media-refresh=".ShareImage"
+                 media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.ShareImage) })">
+                Choose...
+            </a>
+       </div>
     </div>
 }
 @{
