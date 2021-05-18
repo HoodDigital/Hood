@@ -6,6 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Areas\Admin\UI\Media\_List_Media.cshtml" />
+    <Content Remove="Areas\Admin\UI\Media\_Media_Uploader.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Areas\Admin\UI\Media\_List_Media.cshtml" />
+    <EmbeddedResource Include="Areas\Admin\UI\Media\_Media_Uploader.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
     <ProjectReference Include="..\Hood.Admin\Hood.Admin.csproj" />
     <ProjectReference Include="..\Hood.UI\Hood.UI.csproj" />
