@@ -185,7 +185,7 @@ gulp.task('hood:views:clean', function (cb) {
         './../Hood.UI.Core/BaseUI/',
         './../Hood.UI.Bootstrap3/UI/',
         './../Hood.UI.Bootstrap4/UI/',
-        './../Hood/Areas/Admin/UI/'
+        './../Hood.Admin/Areas/Admin/UI/'
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });

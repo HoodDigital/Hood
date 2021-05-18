@@ -11,6 +11,10 @@
 {
     <input type="hidden" id="upload-directory-id" value="@Model.DirectoryId.Value" />
     rootDirs = _directoryManager.GetDirectoryById(Model.DirectoryId.Value).Children;
+} 
+else
+{
+    <input type="hidden" id="upload-directory-id" value="@Model.TopLevelDirectories.FirstOrDefault().Id" />
 }
 else
 {
