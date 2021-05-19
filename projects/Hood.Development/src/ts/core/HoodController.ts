@@ -9,9 +9,14 @@ export class HoodController {
     handlers: Handlers;
 
     constructor() {
+
+        // Global Services
         this.uploader = new Uploader();
         this.handlers = new Handlers();
+
+        // Global Handlers
         this.setupLoaders();
+
     }
 
     setupLoaders(): void {

@@ -1,19 +1,17 @@
 @model Content
-<h5 class="mt-2 mb-0">Meta Tags</h5>
+<h5 class="mb-0">Meta Tags</h5>
 <p>These meta tags will override what you set in the <a asp-action="SEO" asp-controller="Settings">SEO settings</a> area.</p>
 @foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("SEO.Meta")).OrderByDescending(cm => cm.Name))
 {
     <partial name="_Editor_Metadata" model="cm" />
 }
-<hr class="mt-4 mb-4" />
-<h5 class="mb-0">Facebook Tags</h5>
+<h5 class="mt-4 mb-0">Facebook Tags</h5>
 <p>Set Facebook Open Graph tags. These tags will override what you set in the <a asp-action="SEO" asp-controller="Settings">SEO settings</a> area.</p>
 @foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("SEO.Twitter")).OrderByDescending(cm => cm.Name))
 {
     <partial name="_Editor_Metadata" model="cm" />
 }
-<hr class="mt-4 mb-4" />
-<h5 class="mb-0">Facebook Tags</h5>
+<h5 class="mt-4 mb-0">Facebook Tags</h5>
 <p>Set Twitter Card tags. These tags will override what you set in the <a asp-action="SEO" asp-controller="Settings">SEO settings</a> area.</p>
 @foreach (ContentMeta cm in Model.Metadata.Where(c => c.Name.StartsWith("SEO.Facebook")).OrderByDescending(cm => cm.Name))
 {

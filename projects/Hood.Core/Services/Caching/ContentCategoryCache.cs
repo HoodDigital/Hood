@@ -190,7 +190,7 @@ namespace Hood.Caching
             var builder = new HtmlString(htmlOutput);
             return builder;
         }
-        public IHtmlContent AdminContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentType, int startingLevel = 0)
+        public IHtmlContent AdminContentCategoryTree(IEnumerable<ContentCategory> startLevel, string contentType, List<string> categoriesSelected, int startingLevel = 0)
         {
             string htmlOutput = string.Empty;
 
@@ -204,36 +204,38 @@ namespace Hood.Caching
                     string carets = "";
                     for (int i = 0; i < startingLevel; i++)
                     {
-                        carets += "<i class='fa fa-caret-right mr-1'></i>";
+                        carets += "<i class='fa fa-angle-double-right me-1'></i>";
                     }
 
+                    var currentChecked = categoriesSelected != null && categoriesSelected.Contains(category.Slug) ? "checked" : "";
+
                     htmlOutput += $@"
-                        <div class='list-group-item list-group-item-action p-0'>
-                            <div class='custom-control custom-checkbox d-flex'>
-                                <input class='custom-control-input submit-on-change'
-                                       id='Category-{category.Slug}' name='categories'
+                        <div class='list-group-item list-group-item-action d-flex align-items-center p-2'>
+                            <div class='col form-check'>
+                                <input class='form-check-input submit-on-change'
+                                       id='Category-{category.Slug}' name='categories' {currentChecked}
                                        type='checkbox'
                                        value='{category.Slug}' />
-                                <label class='custom-control-label col m-2 mt-1 mb-1' for='Category-{category.Slug}'>
+                                <label class='form-check-label d-block' for='Category-{category.Slug}'>
                                     {carets}{category.DisplayName} <span>({category.Count})</span>
                                 </label>
-                                <div class='col-auto p-2'>
-                                    <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
-                                        <i class='fa fa-edit'></i><span>
-                                            Edit
-                                        </span>
-                                    </a>
-                                    <a class='btn-link text-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
-                                        <i class='fa fa-trash'></i>
-                                        <span>
-                                            Delete
-                                        </span>
-                                    </a>
-                                </div>
+                            </div>
+                            <div class='col-auto'>
+                                <a class='btn btn-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
+                                    <i class='fa fa-edit'></i><span>
+                                        Edit
+                                    </span>
+                                </a>
+                                <a class='btn btn-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
+                                    <i class='fa fa-trash'></i>
+                                    <span>
+                                        Delete
+                                    </span>
+                                </a>
                             </div>
                         </div>";
 
-                    htmlOutput += AdminContentCategoryTree(category.Children, contentType, startingLevel + 1);
+                    htmlOutput += AdminContentCategoryTree(category.Children, contentType, categoriesSelected, startingLevel + 1);
 
                 }
             }
@@ -261,30 +263,30 @@ namespace Hood.Caching
                     string check = content.Categories.Any(c => c.CategoryId == category.Id) ? "checked" : "";
 
                     htmlOutput += $@"
-                        <div class='list-group-item list-group-item-action p-0'>
-                            <div class='custom-control custom-checkbox d-flex'>
-                                <input class='custom-control-input content-categories-check'
+                        <div class='list-group-item list-group-item-action d-flex align-items-center p-2'>
+                            <div class='col form-check'>
+                                <input class='form-check-input content-categories-check'
                                        id='content-categories-check-{category.Id}'
                                        name='content-categories-check-{category.Id}'
                                        type='checkbox'
                                        data-url='/admin/content/{content.Id}/categories/toggle'
                                        value='{category.Id}' {check} />
-                                <label class='custom-control-label col m-2 mt-1 mb-1' for='content-categories-check-{category.Id}'>
+                                <label class='form-check-label d-block' for='content-categories-check-{category.Id}'>
                                     {carets}{category.DisplayName} <span>({category.Count})</span>
                                 </label>
-                                <div class='col-auto p-2'>
-                                    <a class='btn-link text-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
-                                        <i class='fa fa-edit'></i><span>
-                                            Edit
-                                        </span>
-                                    </a>
-                                    <a class='btn-link text-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
-                                        <i class='fa fa-trash'></i>
-                                        <span>
-                                            Delete
-                                        </span>
-                                    </a>
-                                </div>
+                            </div>
+                            <div class='col-auto'>
+                                <a class='btn btn-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
+                                    <i class='fa fa-edit'></i><span>
+                                        Edit
+                                    </span>
+                                </a>
+                                <a class='btn btn-danger content-categories-delete' href='/admin/content/categories/delete/{category.Id}'>
+                                    <i class='fa fa-trash'></i>
+                                    <span>
+                                        Delete
+                                    </span>
+                                </a>
                             </div>
                         </div>";
 

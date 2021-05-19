@@ -11,38 +11,28 @@ import { DataList } from "./core/DataList";
 import { HoodController } from './core/HoodController';
 import { MediaController } from './admin/MediaController';
 import { MediaModal } from './core/Media';
+import { ContentController } from './admin/ContentController';
 
 class Admin extends HoodController {
-    home: HomeController;
-    media: MediaController;
 
     mediaModal: MediaModal;
+
+    home: HomeController;
+    media: MediaController;
+    content: ContentController;
 
     constructor() {
         super();
 
-        this.editors = new Editors();
-        this.home = new HomeController();
-        this.media = new MediaController();
+        // Admin Services
         this.mediaModal = new MediaModal();
 
-        let contentListDiv = document.getElementById('content-list');
-        let contentList = new DataList(contentListDiv, {
-            onLoad: (sender: HTMLElement) => {
-                Alerts.success('Commencing content list fetch.');
-            },
-            onError: (sender: HTMLElement, data: string) => {
-                Alerts.error('Error loading content list.');
-            },
-            onRender: (sender: HTMLElement, data: string) => {
-                Alerts.success('Fetched content list data.');
-                return data;
-            },
-            onComplete: (sender: HTMLElement, data: string) => {
-                Alerts.success('Finished loading content list.');
-            }
-        });
+        // Admin Controllers
+        this.home = new HomeController();
+        this.media = new MediaController();
+        this.content = new ContentController();
 
+        // Admin Handlers
         $('.restrict-to-slug').restrictToSlug();
         $('.restrict-to-page-slug').restrictToPageSlug();
         $('.restrict-to-meta-slug').restrictToMetaSlug();

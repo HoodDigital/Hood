@@ -3,25 +3,21 @@
 {
 
     case "Settings.CSS.BodyClass":
-        <div class="form-group floating-label">
-            <label for="@Model.InputId">@Model.InputDisplayName</label>
+        <div class="form-floating mb-3">
             <input id="@Model.InputId"
                    name="@Model.InputName"
                    type="hidden"
                    value="@Model.GetStringValue()"
                    placeholder="@Model.InputDisplayName"
                    class="form-control" />
-            <small class="text-info form-text">
-                Use this to set a custom class on the <code>&lt;body&gt;</code> tags.
-            </small>
+            <label for="@Model.InputId">@Model.InputDisplayName</label>
         </div>
         break;
 
     case "Settings.Image.Align":
     case "Settings.Image.Featured.Align":
-        <div class="form-group floating-label">
-            <label for="@Model.InputId">@Model.InputDisplayName</label>
-            <select class="form-control"
+        <div class="form-floating mb-3">
+            <select class="form-select"
                     data-selected="@Model.GetStringValue()"
                     id="@Model.InputId"
                     name="@Model.InputName">
@@ -33,17 +29,14 @@
                 <option value="bottom center">Bottom Centered</option>
                 <option value="bottom right">Bottom Right</option>
             </select>
-            <small class="text-info form-text">
-                Use this to set how the image will be rendered on the page and listings.
-            </small>
+            <label for="@Model.InputId">@Model.InputDisplayName</label>
         </div>
         break;
 
     case "Settings.Image.Fit":
     case "Settings.Image.Featured.Fit":
-        <div class="form-group floating-label">
-            <label for="@Model.InputId">@Model.InputDisplayName</label>
-            <select class="form-control"
+        <div class="form-floating mb-3">
+            <select class="form-select"
                     data-selected="@Model.GetStringValue()"
                     id="@Model.InputId"
                     name="@Model.InputName">
@@ -56,15 +49,13 @@
                 <option value="cover">Fill (Image will fill the space automatically, in a fixed block)</option>
                 <option value="100% 100%">Stretch (Image will distort to fill the space, in a fixed block)</option>
             </select>
-            <small class="text-info form-text">
-                Use this to set how the image will be rendered on the page and listings.
-            </small>
+            <label for="@Model.InputId">@Model.InputDisplayName</label>
         </div>
         break;
 
     case "Settings.Image.Background":
     case "Settings.Image.Featured.Background":
-        <div class="form-group floating-label">
+        <div class="form-floating mb-3">
             <label for="@Model.InputId">@Model.InputDisplayName</label>
             <input id="@Model.InputId"
                    name="@Model.InputName"
@@ -82,14 +73,14 @@
         switch (Model.InputType)
         {
             case "System.DateTime":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
-                           type="text"
+                           type="datetime"
                            value="@(Model.GetValue<DateTime>())"
                            placeholder="@Model.InputDisplayName"
-                           class="form-control datetimepicker" />
+                           class="form-control" />
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
                     <small class="text-info form-text">
                         Enter a date and time.
                     </small>
@@ -97,14 +88,14 @@
                 break;
 
             case "Hood.Time":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
-                           type="text"
+                           type="time"
                            value="@(Model.GetValue<DateTime>())"
                            placeholder="@Model.InputDisplayName"
-                           class="form-control timepicker" />
+                           class="form-control" />
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
                     <small class="text-info form-text">
                         Enter a time.
                     </small>
@@ -112,46 +103,43 @@
                 break;
 
             case "Hood.Date":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
-                           type="text"
+                           type="date"
                            value="@(Model.GetValue<DateTime>())"
                            placeholder="@Model.InputDisplayName"
-                           class="form-control datepicker" />
-                    <small class="text-info form-text">
-                        Enter a date.
-                    </small>
+                           class="form-control" />
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
                 </div>
                 break;
 
             case "System.Boolean":
-                <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input id="@Model.InputId" name="@Model.InputName" type="checkbox" class="custom-control-input">
-                        <label for="@Model.InputId" class="custom-control-label">@Model.InputDisplayName</label>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" id="@Model.InputId" name="@Model.InputName" type="checkbox">
+                        <label class="form-check-label d-block" for="@Model.InputId">@Model.InputDisplayName</label>
                     </div>
                 </div>
                 break;
             case "Hood.YesNo":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <select data-selected="@Model.GetStringValue()" class="form-control" id="@Model.InputId" name="@Model.InputName">
                         <option value="true">Yes</option>
                         <option value="false">No</option>
                     </select>
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
                 </div>
                 break;
 
             case "MultiLine":
             case "Hood.MultiLineString":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <textarea id="@Model.InputId"
                               name="@Model.InputName"
                               class="form-control"
                               placeholder="@Model.InputDisplayName">@Model.GetStringValue()</textarea>
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
                 </div>
                 break;
 
@@ -159,7 +147,7 @@
             case "MediaUrl":
             case "File":
             case "Media":
-                <div class="form-group image-editor">
+                <div class="image-editor mb-3">
                     <div class="row no-gutter align-items-center">
                         <div class="col-auto pr-0">
                             <figure class="img img-xs border-3 border-white shadow-sm @Model.InputId" style="background-image:url(@Model.GetStringValue());background-size:contain;">
@@ -167,7 +155,7 @@
                             </figure>
                         </div>
                         <div class="col">
-                            <div class="floating-label">
+                            <div class="form-floating">
                                 <input type="url" class="form-control @Model.InputId valid"
                                        placeholder="@Model.InputDisplayName"
                                        id="@Model.InputId"
@@ -195,7 +183,7 @@
             case "PictureUrl":
             case "Hood.Image":
             case "Hood.ImageUrl":
-                <div class="form-group image-editor">
+                <div class="image-editor">
                     <div class="row no-gutter align-items-center">
                         <div class="col-auto pr-0">
                             <figure class="img img-xs border-3 border-white shadow-sm @Model.InputId" style="background-image:url(@Model.GetStringValue());background-size:contain;">
@@ -203,7 +191,7 @@
                             </figure>
                         </div>
                         <div class="col">
-                            <div class="floating-label">
+                            <div class="form-floating">
                                 <input type="url" class="form-control @Model.InputId valid"
                                        placeholder="@Model.InputDisplayName"
                                        id="@Model.InputId"
@@ -226,7 +214,7 @@
 
             case "Body":
             case "Hood.WYSIWYG":
-                <div class="form-group">
+                <div class="form-floating mb-3">
                     <label for="@Model.InputId">@Model.InputDisplayName</label>
                     <textarea id="@Model.InputId"
                               placeholder="@Model.InputDisplayName"
@@ -237,51 +225,51 @@
 
             case "Number":
             case "Integer":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="number" step="1"
                            placeholder="@Model.InputDisplayName"
                            value="@Model.GetStringValue()"
                            class="form-control" />
-                </div>
+                       <label for="@Model.InputId">@Model.InputDisplayName</label>
+             </div>
                 break;
 
             case "Currency":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="number" step="0.01"
                            placeholder="@Model.InputDisplayName"
                            value="@Model.GetStringValue()"
                            class="form-control" />
-                </div>
+                       <label for="@Model.InputId">@Model.InputDisplayName</label>
+             </div>
                 break;
 
             case "Email":
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="number" step="0.01"
                            placeholder="@Model.InputDisplayName"
                            value="@Model.GetStringValue()"
                            class="form-control" />
-                </div>
+                      <label for="@Model.InputId">@Model.InputDisplayName</label>
+              </div>
                 break;
 
             default:
-                <div class="form-group floating-label">
-                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="text"
                            placeholder="@Model.InputDisplayName"
                            value="@Model.GetStringValue()"
                            class="form-control" />
-                </div>
+                      <label for="@Model.InputId">@Model.InputDisplayName</label>
+              </div>
                 break;
 
         }

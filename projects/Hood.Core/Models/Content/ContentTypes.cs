@@ -290,7 +290,7 @@ namespace Hood.Models
                 new CustomField() { Name="SEO.Twitter.Creator", Default = "", System = true, Type = "System.String" },
 
                 new CustomField() { Name="Settings.Security.AdminOnly", Default = "false", System = true, Type = "System.Boolean" },
-                new CustomField() { Name="Settings.Security.Public", Default = "true", System = true, Type = "System.Boolean" },
+                new CustomField() { Name="Settings.Security.UsersOnly", Default = "false", System = true, Type = "System.Boolean" },
 
                 new CustomField() { Name="Settings.Image.Featured.Align", Default = "center", System = true, Type = "System.String" },
                 new CustomField() { Name="Settings.Image.Featured.Fit", Default = "cover", System = true, Type = "System.String" },

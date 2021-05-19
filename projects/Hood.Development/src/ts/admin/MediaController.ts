@@ -32,7 +32,7 @@ export class MediaController {
                 return data;
             },
             onListComplete: (sender: HTMLElement, data: string) => {
-                Alerts.log('Finished loading media list... now attach the media actions to the things.', 'warning');
+                Alerts.log('Finished loading media list...', 'info');
             }
         });
     }

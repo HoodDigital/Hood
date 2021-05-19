@@ -1,4 +1,5 @@
-﻿import { Helpers } from "./Helpers";
+﻿import { Alerts } from "./Alerts";
+import { Helpers } from "./Helpers";
 import { Inline } from "./Inline";
 
 export interface DataListOptions {
@@ -39,7 +40,8 @@ export class DataList {
     constructor(element: HTMLElement, options: DataListOptions) {
 
         this.element = element;
-        if (!this.element) {
+        if (typeof(element) == 'undefined' || element == null) {
+            Alerts.log('Could not DataList to element, element does not exist.', 'error');
             return;
         }
 
@@ -47,6 +49,7 @@ export class DataList {
 
         if ($(this.element).hasClass('query')) {
             let pageUrl = $(this.element).data('url') + window.location.search;
+            $(this.element).attr('data-url', pageUrl);
             $(this.element).data('url', pageUrl);
         }
 

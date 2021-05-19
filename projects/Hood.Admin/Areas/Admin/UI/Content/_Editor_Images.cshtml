@@ -4,9 +4,9 @@
 @if (Model.Type.ShowImage)
 {
     <input type="hidden" asp-for="FeaturedImageJson">
-    <div class="form-group row align-items-center g-3">
+    <div class="form-group row align-items-center g-3 mb-3">
         <div class="col-2">
-            <div style="background-image:url(@Model.FeaturedImage.SmallUrl)" class="img img-full img-square round m-0 FeaturedImage" id="content-feature-image"
+            <div style="background-image:url(@Model.FeaturedImage.SmallUrl)" class="img img-full img-square rounded m-0 FeaturedImage" id="content-feature-image"
                  media-for="FeaturedImage"
                  media-json="FeaturedImageJson"
                  media-refresh=".FeaturedImage"
@@ -27,11 +27,10 @@
 }
 @if (Model.Type.ShowBanner)
 {
-    <hr class="mt-4 mb-4" />
     <input type="hidden" asp-for="ShareImageJson">
-    <div class="form-group row align-items-center g-3">
+    <div class="form-group row align-items-center g-3 mb-3">
         <div class="col-2">
-            <div style="background-image:url(@Model.ShareImage.SmallUrl)" class="img img-full img-square round m-0 ShareImage" id="content-share-image"
+            <div style="background-image:url(@Model.ShareImage.SmallUrl)" class="img img-full img-square rounded m-0 ShareImage" id="content-share-image"
                  media-for="ShareImage"
                  media-json="ShareImageJson"
                  media-refresh=".ShareImage"
@@ -55,7 +54,6 @@
 }
 @if (imageSettings.Count() > 0)
 {
-    <hr class="mt-4 mb-4" />
     <h5 class="mb-0">Image Settings</h5>
     <p>These image settings will dictate how the featured image is displayed in standard templates.</p>
     foreach (ContentMeta cm in imageSettings)

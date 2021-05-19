@@ -11,21 +11,31 @@
         </p>
     </div>
     <div class="card-body collapse show" aria-labelledby="content-access-panel-heading" id="content-access-panel">
-        <div class="form-group">
+        <div class="form-floating mb-3">
+            <select class="form-select" asp-for="Status" asp-items="@(Html.GetEnumSelectList<ContentStatus>())"></select>
             <label asp-for="Status">Publish Status</label>
-            <select class="form-control" asp-for="Status" asp-items="@(Html.GetEnumSelectList<ContentStatus>())"></select>
             <small asp-for="Status"></small>
         </div>
-        <div class="form-group floating-label">
+        <div class="form-floating mb-3">
+            <select class="form-select" asp-for="AuthorId">
+                @foreach (var author in Model.Authors)
+                {
+                    <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
+                }
+            </select>
+            <label asp-for="AuthorId"></label>
+            <small asp-for="AuthorId"></small>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="PublishDate" type="datetime-local" class="form-control" />
             <label asp-for="PublishDate"></label>
-            <input asp-for="PublishDate" type="datetime" class="form-control" />
-            <small asp-for="Status"></small>
+            <small asp-for="PublishDate"></small>
         </div>
         @if (Model.ContentType == "page")
         {
-                <div class="form-group floating-label m-0">
-                <label asp-for="Slug">Slug</label>
+            <div class="form-floating mb-3">
                 <input asp-for="Slug" class="form-control restrict-to-page-slug" value="@Model.Slug" />
+                <label asp-for="Slug"></label>
                 <small asp-for="Slug"></small>
             </div>
         }
@@ -40,9 +50,9 @@
             </div>
             @if (Model.Type.UrlFormatting == "news")
             {
-                <div class="form-group floating-label m-0">
-                    <label asp-for="Slug"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Slug" class="form-control restrict-to-page-slug" value="@Model.Slug" />
+                    <label asp-for="Slug"></label>
                     <small asp-for="Slug"></small>
                 </div>
             }
@@ -94,27 +104,5 @@
                 }
             </div>
         }
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header position-relative" id="content-author-panel-heading">
-        <p class="card-title m-0 font-weight-bold">
-            <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#content-author-panel" href="#content-author-panel" aria-expanded="true" aria-controls="content-author-panel">
-                Author
-                <i class="fe fe-arrow-up mt-1"></i>
-            </a>
-        </p>
-    </div>
-    <div class="card-body collapse show" aria-labelledby="content-author-panel-heading" id="content-author-panel">
-        <div class="form-group floating-label">
-            <label asp-for="AuthorId"></label>
-            <select class="form-control" asp-for="AuthorId">
-                @foreach (var author in Model.Authors)
-                {
-                    <option value="@author.Id">@author.UserName - @author.FirstName @author.LastName</option>
-                }
-            </select>
-            <small asp-for="AuthorId"></small>
-        </div>
     </div>
 </div>

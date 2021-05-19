@@ -31,7 +31,7 @@ namespace Hood.Models
         public int? ParentId { get; set; }
 
         // Dates
-        [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
+        [Display(Name = "Publish Date")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
@@ -73,7 +73,7 @@ namespace Hood.Models
 
         public bool Public { get; set; }
 
-        [Display(Name = "Featured Content", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]
+        [Display(Name = "Featured Content", Description = "This will appear in the featured lists on which can be displayed in templates.")]
         public bool Featured { get; set; }
 
         // MVVM Helpers

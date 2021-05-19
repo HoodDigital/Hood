@@ -17,7 +17,7 @@
         <div class='list-group list-group-flush'>
             @if (_categories.Count(Model.ContentType.Type) > 0)
             {
-                @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Type)
+                @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Type, Model.Categories)
             }
             else
             {
