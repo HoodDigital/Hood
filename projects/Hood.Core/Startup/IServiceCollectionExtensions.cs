@@ -28,7 +28,7 @@ namespace Hood.Startup
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config, bool configureDatabase = true)
           where TContext : HoodDbContext
         {
 
@@ -36,9 +36,12 @@ namespace Hood.Startup
 
             if (config.IsDatabaseConnected())
             {
+                if (configureDatabase)
+                {
+                    services.ConfigureHoodDatabase<TContext>(config);
+                }
                 services.ConfigureHoodServices();
                 services.ConfigureCache(config);
-                services.ConfigureHoodDatabase<TContext>(config);
                 services.ConfigureAuthentication(config);
             }
 
@@ -100,16 +103,17 @@ namespace Hood.Startup
         public static IServiceCollection ConfigureCache(this IServiceCollection services, IConfiguration config)
         {
             // Caching
-            if (config["ConnectionStrings:RedisCache"].IsSet())
-            {
-                services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(config.GetValue<string>("ConnectionStrings:RedisCache")));
-                services.AddSingleton<IHoodCache, HoodRedisCache>();
-            }
-            else
-            {
-                services.AddSingleton<IHoodCache, HoodCache>();
-            }
-
+            //if (config["ConnectionStrings:RedisCache"].IsSet())
+            //{
+            //    services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(config.GetValue<string>("ConnectionStrings:RedisCache")));
+            //    services.AddSingleton<IHoodCache, HoodRedisCache>();
+            //}
+            //else
+            //{
+            //    services.AddSingleton<IHoodCache, HoodCache>();
+            //}
+            services.AddSingleton<IHoodCache, HoodCache>();
+            
             return services;
         }
 
@@ -166,8 +170,13 @@ namespace Hood.Startup
             {
                 options.AccessDeniedPath = "/Account/AccessDenied";
                 options.Cookie.Name = $".{cookieName}.Authentication";
-                options.Cookie.HttpOnly = true;
+
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
+
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
                 options.LoginPath = "/Account/Login";
                 options.LogoutPath = "/Account/Logout";
                 options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;

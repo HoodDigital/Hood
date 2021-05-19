@@ -174,8 +174,7 @@ $.hood.Property = {
                     required: true
                 },
                 PublishDate: {
-                    required: true,
-                    ukdate: true
+                    required: true
                 }
             },
             submitButtonTag: $('#property-create-submit'),

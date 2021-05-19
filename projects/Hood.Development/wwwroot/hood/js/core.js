@@ -1,10 +1,5 @@
 "use strict";
 
-var console = {};
-
-console.log = function () {};
-
-window.console = console;
 if (!$.hood) $.hood = {};
 $.body = $('body'); // Console hack
 

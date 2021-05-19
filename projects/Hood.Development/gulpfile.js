@@ -214,7 +214,6 @@ gulp.task('hood:js:core', function () {
     });
     return gulp.src([
 
-        hood.js + 'core/production.js',
         hood.js + 'core/globals.js',
 
         hood.js + 'core/helpers.js',
@@ -248,7 +247,6 @@ gulp.task('hood:js:package:app', function () {
     });
     return gulp.src([
 
-        hood.js + 'core/production.js',
         hood.js + 'core/globals.js',
 
         hood.js + 'core/helpers.js',

@@ -20,7 +20,7 @@ namespace Hood.ViewModels
         [FromQuery(Name = "fileType")]
         public GenericFileType? GenericFileType { get; set; }
         [FromQuery(Name = "restrict")]
-        public bool Restrict { get; set; }
+        public string Restrict { get; set; }
         [FromQuery(Name = "dir")]
         public int? DirectoryId { get; set; }
         [FromQuery(Name = "root")]
@@ -53,7 +53,7 @@ namespace Hood.ViewModels
             query += Action.HasValue ? "&doAction=" + Action : "";
             query += DirectoryId.HasValue ? "&dir=" + DirectoryId : "";
             query += RootId.HasValue ? "&root=" + RootId : "";
-            query += Restrict ? "&restrict=" + Restrict : "";
+            query += Restrict.IsSet() ? "&restrict=" + Restrict : "";
             query += GenericFileType.HasValue ? "&fileType=" + GenericFileType : "";
             query += UserId.IsSet() ? "&user=" + UserId : "";
 

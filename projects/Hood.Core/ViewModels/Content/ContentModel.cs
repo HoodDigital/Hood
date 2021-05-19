@@ -52,10 +52,10 @@ namespace Hood.ViewModels
                 {
                     query += "&categories=" + cat;
                 }
-            query += Category.IsSet() ? "&category=" + Category : "";
-            query += Type.IsSet() ? "&type=" + Type : "";
-            query += Filter.IsSet() ? "&filter=" + Filter : "";
-            query += AuthorName.IsSet() ? "&author=" + AuthorName : "";
+            query += Category.IsSet() ? "&category=" + System.Net.WebUtility.UrlEncode(Category) : "";
+            query += Type.IsSet() ? "&type=" + System.Net.WebUtility.UrlEncode(Type) : "";
+            query += Filter.IsSet() ? "&filter=" + System.Net.WebUtility.UrlEncode(Filter) : "";
+            query += AuthorName.IsSet() ? "&author=" + System.Net.WebUtility.UrlEncode(AuthorName) : "";
             query += Status.HasValue ? "&status=" + Status : "";
             query += Inline ? "&inline=" + Inline : "";
             return query;
