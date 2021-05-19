@@ -40,7 +40,8 @@ namespace Hood.Models
         public ContentStatus Status { get; set; }
 
         // Dates
-        [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
+        [Display(Name = "Publish Date")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddThh:mm}")]
         public DateTime PublishDate { get; set; }
 
         // Creator/Editor

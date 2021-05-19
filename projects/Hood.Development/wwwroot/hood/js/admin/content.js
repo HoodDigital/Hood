@@ -152,8 +152,7 @@ $.hood.Content = {
                     required: true
                 },
                 PublishDate: {
-                    required: true,
-                    ukdate: true
+                    required: true
                 }
             },
             submitButtonTag: $('#content-create-submit'),
