@@ -236,7 +236,6 @@ $.hood.Media = {
     },
     UploadUrl: function UploadUrl() {
       var url = $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
-      alert(url);
       return url;
     }
   },
