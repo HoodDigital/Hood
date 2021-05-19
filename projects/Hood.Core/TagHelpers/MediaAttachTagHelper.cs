@@ -78,8 +78,7 @@ namespace Hood.TagHelpers
                 entity = Entity,
                 field = For.Name,
                 id = Id,
-                fileType = FileType,
-                restrict = true
+                fileType = FileType
             });
             var attachButton = $"<a class='{AttachButtonClass} hood-image-attach' data-url='{attachUrl}' data-tag='.{For.Name}' data-json='#{Json.Name}' href='javascript:void(0);'>{contentTemplate}</a>";
             output.Content.SetHtmlContent(attachButton);

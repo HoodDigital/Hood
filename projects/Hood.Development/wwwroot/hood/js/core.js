@@ -1691,7 +1691,7 @@ $.hood.Media = {
       $('#media-total-progress').hide();
       Dropzone.autoDiscover = false;
       var myDropzone = new Dropzone("#media-upload", {
-        url: $.hood.Media.Upload.UploadUrl,
+        url: $.hood.Media.Upload.UploadUrl(),
         thumbnailWidth: 80,
         thumbnailHeight: 80,
         parallelUploads: 5,
@@ -1740,9 +1740,14 @@ $.hood.Media = {
         $('#media-total-progress').hide();
         $.hood.Media.Reload();
       });
+      myDropzone.on('error', function (file, response) {
+        alert(response, file);
+      });
     },
     UploadUrl: function UploadUrl() {
-      return $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
+      var url = $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val();
+      alert(url);
+      return url;
     }
   },
   Delete: function Delete(e) {
