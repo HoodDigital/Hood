@@ -96,8 +96,7 @@ namespace Hood.TagHelpers
                 area = "Admin",
                 doAction = MediaWindowAction.Select.ToString(),
                 tag = $".{fieldId}",
-                fileType = FileType,
-                restrict = true
+                fileType = FileType
             }); ;
 
             output.Content.SetHtmlContent($@"

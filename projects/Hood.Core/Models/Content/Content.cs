@@ -31,7 +31,8 @@ namespace Hood.Models
         public int? ParentId { get; set; }
 
         // Dates
-        [Display(Name = "Publish Date")]
+        [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddThh:mm}")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
