@@ -126,7 +126,11 @@ export class MediaService {
 
         this.options = { ...this.options, ...options };
 
+        $('body').off('click', '.media-delete', this.delete.bind(this));
         $('body').on('click', '.media-delete', this.delete.bind(this));
+
+        $('body').off('click', '[data-hood-media=clear]', this.clear.bind(this));
+        $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
 
         $(this.element).on('click', '.media-item', this.action.bind(this));
         $(this.element).on('click', '.media-create-directory', this.createDirectory.bind(this))
@@ -287,27 +291,48 @@ export class MediaService {
         Alerts.log(`[MediaService.attach] Attaching media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.options.url}`);
         $.post(this.options.url, { mediaId: mediaObject.id }, function (this: MediaService, data: Response) {
             Response.process(data);
-
-            let icon = data.media.icon;
-            if (data.media.genericFileType === "Image") {
-                icon = data.media.mediumUrl;
-            }
-
-            if (this.options.refresh) {
-                let $image = $(this.options.refresh);
-                $image.css({
-                    'background-image': 'url(' + icon + ')'
-                });
-                $image.find('img').attr('src', icon);
-                $image.removeClass('loading');
-            }
-
-            if (this.options.json && data.mediaJson) {
-                let $json = $(this.options.json);
-                $json.val(data.mediaJson);
-            }
-
+            this.refresh(data);
         }.bind(this));
+    }
+
+    clear(this: MediaService, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        Alerts.confirm({
+
+        }, function (this: MediaService, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
+
+                    Response.process(data);
+                    this.refresh(data);
+
+                }.bind(this), 5000);
+            }
+        }.bind(this))
+    }
+
+    refresh(this: MediaService, data: Response): void {
+
+        let icon = data.media.icon;
+        if (data.media.genericFileType === "Image") {
+            icon = data.media.mediumUrl;
+        }
+
+        if (this.options.refresh) {
+            let $image = $(this.options.refresh);
+            $image.css({
+                'background-image': 'url(' + icon + ')'
+            });
+            $image.find('img').attr('src', icon);
+            $image.removeClass('loading');
+        }
+
+        if (this.options.json && data.mediaJson) {
+            let $json = $(this.options.json);
+            $json.val(data.mediaJson);
+        }
+
     }
 
     delete(this: MediaService, e: JQuery.ClickEvent) {
@@ -339,7 +364,7 @@ export class MediaModal {
     element: HTMLElement;
 
     constructor() {
-        $('body').on('click', '[data-hood-media]', this.load.bind(this));
+        $('body').on('click', '[data-hood-media=attach],[data-hood-media=select]', this.load.bind(this));
     }
 
     load(this: MediaModal, e: JQuery.ClickEvent): void {
