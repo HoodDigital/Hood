@@ -35,22 +35,22 @@ namespace Hood.Extensions
                     output = mediaObject.SmallUrl;
                     break;
                 case GenericFileType.Excel:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/excel.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/excel.png";
                 case GenericFileType.PDF:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/pdf.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/pdf.png";
                 case GenericFileType.PowerPoint:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/powerpoint.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/powerpoint.png";
                 case GenericFileType.Word:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/word.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/word.png";
                 case GenericFileType.Photoshop:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/photoshop.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/photoshop.png";
                 case GenericFileType.Audio:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/audio.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/audio.png";
                 case GenericFileType.Video:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/video.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/video.png";
                 case GenericFileType.Unknown:
                 default:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/icons/file.png";
+                    return "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/icons/file.png";
             }
             if (!output.IsSet())
             {

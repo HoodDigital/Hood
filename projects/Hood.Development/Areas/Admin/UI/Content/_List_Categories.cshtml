@@ -21,12 +21,12 @@
             }
             else
             {
-                <alert type="Light" icon="fa-info" size="Small" class="text-center m-0">
+                <alert type="Info" icon="fa-info" size="Medium" class="m-0 border-0 rounded-0">
                     No categories added yet.
                 </alert>
             }
             <div class="list-group-item list-group-item-action">
-                <a class="stretched-link text-success text-decoration-none content-category-create"
+                <a class="stretched-link text-success text-decoration-none content-categories-create"
                    asp-action="CreateCategory" 
                    asp-route-type="@Model.ContentType.Type">
                     <i class="fa fa-plus-circle mr-2"></i>

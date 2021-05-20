@@ -8,7 +8,7 @@ export class ContentController {
         this.manage();
 
         $('body').on('click', '.content-categories-delete', this.deleteCategory.bind(this));
-        $('body').on('click', '.content-category-create', this.createCategory.bind(this));
+        $('body').on('click', '.content-categories-create,.content-categories-edit', this.createOrEditCategory.bind(this));
 
     }
 
@@ -36,7 +36,7 @@ export class ContentController {
     manage(this: ContentController): void {
         this.element = document.getElementById('content-list');
         this.list = new DataList(this.element, {
-            onComplete: function (this: ContentController, sender: HTMLElement, data: string) {
+            onComplete: function (this: ContentController, data: string, sender: HTMLElement = null) {
 
                 Alerts.log('Finished loading content list.', 'info');
 
@@ -45,7 +45,7 @@ export class ContentController {
 
         this.categoryElement = document.getElementById('content-categories-list');
         this.categoryList = new DataList(this.categoryElement, {
-            onComplete: function (this: ContentController, sender: HTMLElement, data: string) {
+            onComplete: function (this: ContentController, data: string, sender: HTMLElement = null) {
 
                 Alerts.log('Finished loading category list.', 'info');
 
@@ -53,12 +53,12 @@ export class ContentController {
         });
     }
 
-    createCategory(this: ContentController, e: JQuery.ClickEvent) {
+    createOrEditCategory(this: ContentController, e: JQuery.ClickEvent) {
         e.preventDefault();
         e.stopPropagation();
         let createCategoryModal: ModalController = new ModalController({
             onComplete: function (this: ContentController) {
-                let form = document.getElementById('content-directories-edit-form') as HTMLFormElement;
+                let form = document.getElementById('content-categories-edit-form') as HTMLFormElement;
                 let validator = new Validator(form, {
                     onComplete: function (this: ContentController, sender: Validator, data: Response) {
                         if (data.success) {
@@ -72,7 +72,7 @@ export class ContentController {
                 });
             }.bind(this)
         });
-        createCategoryModal.show($(e.target).attr('href'), this.element);
+        createCategoryModal.show($(e.currentTarget).attr('href'), this.element);
     }
 
     deleteCategory(this: ContentController, e: JQuery.ClickEvent) {

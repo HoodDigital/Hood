@@ -21,17 +21,17 @@ export class MediaController {
             onAction: function (this: MediaController, sender: HTMLElement, mediaObject: MediaObject) {
                 Alerts.log(`Showing media object id ${mediaObject.id} - ${mediaObject.filename}`);
             }.bind(this),
-            onListLoad: (sender: HTMLElement) => {
+            onListLoad: function () {
                 Alerts.log('Commencing media list fetch.');
             },
-            onError: (jqXHR: any, textStatus: any, errorThrown: any) => {
+            onError: function (jqXHR: any, textStatus: any, errorThrown: any) {
                 Alerts.log(`Error loading media list: ${textStatus}`);
             },
-            onListRender: (sender: HTMLElement, data: string) => {
+            onListRender: function (data: string) {
                 Alerts.log('Fetched media list data.');
                 return data;
             },
-            onListComplete: (sender: HTMLElement, data: string) => {
+            onListComplete: function () {
                 Alerts.log('Finished loading media list...', 'info');
             }
         });

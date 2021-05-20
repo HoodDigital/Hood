@@ -6,7 +6,7 @@ namespace Hood.Models
     {
         public AdminAreaSettings()
         {
-            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@4.1.1/images/hood-cms.png";
+            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/hood-cms.png";
             Title = "Hood CMS";
         }
 

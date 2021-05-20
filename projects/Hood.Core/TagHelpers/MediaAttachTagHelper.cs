@@ -26,20 +26,14 @@ namespace Hood.TagHelpers
         [HtmlAttributeName("media-url")]
         public string Url { get; set; }
 
-        /// <summary>
-        /// The json field which this editor is bound to.
-        /// </summary>
-        [HtmlAttributeName("media-json")]
-        public ModelExpression Json { get; set; }
-
         [HtmlAttributeName("media-list")]
         public string List { get; set; }
 
         [HtmlAttributeName("media-refresh")]
         public string Refresh { get; set; }
 
-        [HtmlAttributeName("media-filetype")]
-        public GenericFileType FileType { get; set; } = GenericFileType.Image;
+        [HtmlAttributeName("media-types")]
+        public string Types { get; set; }
 
         /// <summary>
         /// ViewContext
@@ -53,7 +47,7 @@ namespace Hood.TagHelpers
         {
             output.Attributes.Add("data-hood-media", "attach");
             output.Attributes.Add("data-hood-media-url", Url);
-            output.Attributes.Add("data-hood-media-filetype", FileType);
+            output.Attributes.Add("data-hood-media-types", Types);
 
             if (!List.IsSet())
             {
@@ -62,55 +56,6 @@ namespace Hood.TagHelpers
             }
             output.Attributes.Add("data-hood-media-list", List);
 
-            if (Json != null)
-            {
-                output.Attributes.Add("data-hood-media-json", Json.Name);
-            }
-            if (Refresh.IsSet())
-            {
-                output.Attributes.Add("data-hood-media-refresh", Refresh);
-            }
-        }
-    }
-
-    [HtmlTargetElement("a", Attributes = "media-clear")]
-    [HtmlTargetElement("button", Attributes = "media-clear")]
-    public class MediaClearTagHelper : TagHelper
-    {
-        /// <summary>
-        /// The field which this editor is bound to.
-        /// </summary>
-        [HtmlAttributeName("media-clear")]
-        public ModelExpression For { get; set; }
-
-        [HtmlAttributeName("media-url")]
-        public string Url { get; set; }
-
-        /// <summary>
-        /// The json field which this editor is bound to.
-        /// </summary>
-        [HtmlAttributeName("media-json")]
-        public ModelExpression Json { get; set; }
-
-        [HtmlAttributeName("media-refresh")]
-        public string Refresh { get; set; }
-
-        /// <summary>
-        /// ViewContext
-        /// </summary>
-        [HtmlAttributeNotBound]
-        [ViewContext]
-        public ViewContext ViewContext { get; set; }
-
-
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-        {
-            output.Attributes.Add("data-hood-media", "clear");
-
-            if (Json != null)
-            {
-                output.Attributes.Add("data-hood-media-json", Json.Name);
-            }
             if (Refresh.IsSet())
             {
                 output.Attributes.Add("data-hood-media-refresh", Refresh);

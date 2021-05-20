@@ -1,8 +1,8 @@
-@model ContentModel
+@model Content
 @inject ContentCategoryCache _categories
 @{
     Layout = null;
-    var categories = _categories.TopLevel(Model.ContentType.Type);
+    var categories = _categories.TopLevel(Model.ContentType);
 }
 <div class="card mb-3">
     <div class="card-header position-relative" id="content-category-panel-heading">
@@ -15,9 +15,9 @@
     </div>
     <div class="card-body p-0 collapse show" aria-labelledby="content-category-panel-heading" id="content-category-panel">
         <div class='list-group list-group-flush'>
-            @if (_categories.Count(Model.ContentType.Type) > 0)
+            @if (_categories.Count(Model.ContentType) > 0)
             {
-                @_categories.AdminContentCategoryTree(_categories.TopLevel(Model.ContentType.Type), Model.ContentType.Type, Model.Categories)
+                @_categories.AddToCategoryTree(categories, Model);
             }
             else
             {
@@ -28,7 +28,7 @@
             <div class="list-group-item list-group-item-action">
                 <a class="stretched-link text-success text-decoration-none content-categories-create"
                    asp-action="CreateCategory" 
-                   asp-route-type="@Model.ContentType.Type">
+                   asp-route-type="@Model.ContentType">
                     <i class="fa fa-plus-circle mr-2"></i>
                     Add category
                 </a>

@@ -7,17 +7,17 @@ export interface DataListOptions {
     /**
      * Called before the data is fetched.
      */
-    onLoad?: (sender: HTMLElement) => void;
+    onLoad?: (sender?: HTMLElement) => void;
 
     /**
      * Called before the fetched HTML is rendered to the list. Must return the data back to datalist to render.
      */
-    onRender?: (sender: HTMLElement, html: string) => string;
+    onRender?: (html: string, sender?: HTMLElement) => string;
 
     /**
      * Called when loading and rendering is complete.
      */
-    onComplete?: (sender: HTMLElement, html: string) => void;
+    onComplete?: (html: string, sender?: HTMLElement) => void;
 
     /**
      * Called when an error occurs.
@@ -64,7 +64,7 @@ export class DataList {
             e.preventDefault();
 
             var url = document.createElement('a');
-            url.href = (e.target as HTMLAnchorElement).href;
+            url.href = (e.currentTarget as HTMLAnchorElement).href;
 
             var listUrl = document.createElement('a');
             listUrl.href = $(this.element).data('url');
@@ -78,7 +78,7 @@ export class DataList {
 
             e.preventDefault();
 
-            let $form = $(e.target);
+            let $form = $(e.currentTarget);
 
             var listUrl = document.createElement('a');
             listUrl.href = $(this.element).data('url');

@@ -7,17 +7,17 @@ export interface InlineOptions {
     /**
      * Called before the data is fetched.
      */
-    onLoad?: (sender: HTMLElement) => void;
+    onLoad?: (sender?: HTMLElement) => void;
 
     /**
      * Called before the fetched HTML is rendered to the list. Must return the data back to datalist to render.
      */
-    onRender?: (sender: HTMLElement, html: string) => string;
+    onRender?: (html: string, sender?: HTMLElement) => string;
 
     /**
      * Called when loading and rendering is complete.
      */
-    onComplete?: (sender: HTMLElement, html: string) => void;
+    onComplete?: (html: string, sender?: HTMLElement) => void;
 
     /**
      * Called when an error occurs.
@@ -39,14 +39,14 @@ export class Inline {
         $.get(url, function (data: string) {
 
             if (options.onRender) {
-                data = options.onRender(tag, data);
+                data = options.onRender(data, tag);
             }
 
             $tag.html(data);
             $tag.removeClass('loading');
 
             if (options.onComplete) {
-                options.onComplete(tag, data);
+                options.onComplete(data, tag);
             }
 
         })

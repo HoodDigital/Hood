@@ -221,7 +221,7 @@ namespace Hood.Caching
                                 </label>
                             </div>
                             <div class='col-auto'>
-                                <a class='btn btn-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
+                                <a class='btn btn-warning content-categories-edit mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
                                     <i class='fa fa-edit'></i><span>
                                         Edit
                                     </span>
@@ -276,7 +276,7 @@ namespace Hood.Caching
                                 </label>
                             </div>
                             <div class='col-auto'>
-                                <a class='btn btn-warning hood-modal mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
+                                <a class='btn btn-warning content-categories-edit mr-2' href='/admin/content/categories/edit/{category.Id}?type={category.Slug}' data-complete='$.hood.Content.Categories.Editor'>
                                     <i class='fa fa-edit'></i><span>
                                         Edit
                                     </span>

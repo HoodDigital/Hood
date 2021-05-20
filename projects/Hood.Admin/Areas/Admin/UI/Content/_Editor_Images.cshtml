@@ -3,12 +3,10 @@
 <p>Set images for this content. You can enable/disable these images for this content type in <a asp-action="Content" asp-controller="Settings">content settings</a>.</p>
 @if (Model.Type.ShowImage)
 {
-    <input type="hidden" asp-for="FeaturedImageJson">
     <div class="form-group row align-items-center g-3 mb-3">
         <div class="col-2">
             <div style="background-image:url(@Model.FeaturedImage.SmallUrl)" class="img img-full img-square rounded m-0 FeaturedImage" id="content-feature-image"
                  media-attach="FeaturedImage"
-                 media-json="FeaturedImageJson"
                  media-refresh=".FeaturedImage"
                  media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.FeaturedImage) })"></div>
         </div>
@@ -17,14 +15,12 @@
             <p>Choose a featured image for this @Model.Type.TypeName. This will appear in content lists, and as the main featured image.</p>
             <a class="btn btn-success btn-sm"
                media-attach="FeaturedImage"
-               media-json="FeaturedImageJson"
                media-refresh=".FeaturedImage"
                media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.FeaturedImage) })">
                 Choose...
             </a>
             <a class="btn btn-danger btn-sm"
                 media-clear="FeaturedImage"
-                media-json="FeaturedImageJson"
                 media-refresh=".FeaturedImage"
                 media-url="@Url.Action("RemoveMedia", "Content", new { id = Model.Id, field = nameof(Model.FeaturedImage) })">
                 <i class="fa fa-trash"></i>    
@@ -34,12 +30,10 @@
 }
 @if (Model.Type.ShowBanner)
 {
-    <input type="hidden" asp-for="ShareImageJson">
     <div class="form-group row align-items-center g-3 mb-3">
         <div class="col-2">
             <div style="background-image:url(@Model.ShareImage.SmallUrl)" class="img img-full img-square rounded m-0 ShareImage" id="content-share-image"
                  media-attach="ShareImage"
-                 media-json="ShareImageJson"
                  media-refresh=".ShareImage"
                  media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.ShareImage) })"></div>
         </div>
@@ -48,14 +42,12 @@
             <p>Choose a sharer image for this @Model.Type.TypeName. This will appear when shared in social media, or in links, this will override the featured image if one is set.</p>
              <a class="btn btn-success btn-sm"
                  media-attach="ShareImage"
-                 media-json="ShareImageJson"
                  media-refresh=".ShareImage"
                  media-url="@Url.Action("UploadMedia", "Content", new { id = Model.Id, field = nameof(Model.ShareImage) })">
                 Choose...
             </a>
             <a class="btn btn-danger btn-sm"
                 media-clear="ShareImage"
-                media-json="ShareImageJson"
                 media-refresh=".ShareImage"
                 media-url="@Url.Action("RemoveMedia", "Content", new { id = Model.Id, field = nameof(Model.ShareImage) })">
                 <i class="fa fa-trash"></i>    

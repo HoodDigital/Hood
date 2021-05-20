@@ -38,7 +38,7 @@ export class ModalController {
         this.options = { ...this.options, ...options };
     }
 
-    show(url: string | URL, sender: HTMLElement) {
+    show(url: string | URL, sender: HTMLElement = null) {
         if (this.options.onLoad) {
             this.options.onLoad(this.element);
         }

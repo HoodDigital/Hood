@@ -75,27 +75,27 @@ export interface MediaOptions {
     /**
      * Called before the action is carried out.
      */
-    beforeAction?: (sender: HTMLElement) => void;
+    beforeAction?: (sender?: HTMLElement) => void;
 
     /**
      * Called when the action is complete.
      */
-    onAction?: (sender: HTMLElement, mediaObject: MediaObject) => void;
+    onAction?: (mediaObject: MediaObject, sender?: HTMLElement) => void;
 
     /**
      * Called before the media list is is fetched.
      */
-    onListLoad?: (sender: HTMLElement) => void;
+    onListLoad?: (sender?: HTMLElement) => void;
 
     /**
      * Called before the fetched HTML is rendered to the media list. Must return the data back to datalist to render.
      */
-    onListRender?: (sender: HTMLElement, html: string) => string;
+    onListRender?: (html: string, sender?: HTMLElement) => string;
 
     /**
      * Called when media list loading and rendering is complete.
      */
-    onListComplete?: (sender: HTMLElement, html: string) => void;
+    onListComplete?: (html: string, sender?: HTMLElement) => void;
 
     /**
      * Called when an error occurs.
@@ -129,9 +129,6 @@ export class MediaService {
         $('body').off('click', '.media-delete', this.delete.bind(this));
         $('body').on('click', '.media-delete', this.delete.bind(this));
 
-        $('body').off('click', '[data-hood-media=clear]', this.clear.bind(this));
-        $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
-
         $(this.element).on('click', '.media-item', this.action.bind(this));
         $(this.element).on('click', '.media-create-directory', this.createDirectory.bind(this))
         $(this.element).on('click', '.media-delete-directory', this.deleteDirectory.bind(this));
@@ -140,10 +137,10 @@ export class MediaService {
             onLoad: this.options.onListLoad,
             onError: this.options.onError,
             onRender: this.options.onListRender,
-            onComplete: function (this: MediaService, sender: HTMLElement, html: string) {
+            onComplete: function (this: MediaService, html: string, sender: HTMLElement) {
                 this.initUploader();
                 if (this.options.onListComplete) {
-                    this.options.onListComplete(sender, html)
+                    this.options.onListComplete(html, sender)
                 }
             }.bind(this)
         });
@@ -230,7 +227,7 @@ export class MediaService {
                 });
             }.bind(this)
         });
-        createDirectoryModal.show($(e.target).attr('href'), this.element);
+        createDirectoryModal.show($(e.currentTarget).attr('href'), this.element);
     }
 
     deleteDirectory(this: MediaService, e: JQuery.ClickEvent) {
@@ -260,9 +257,9 @@ export class MediaService {
     action(this: MediaService, e: JQuery.ClickEvent) {
         e.preventDefault();
         e.stopPropagation();
-        let mediaObject: MediaObject = $(e.target).data('json') as MediaObject;
+        let mediaObject: MediaObject = $(e.currentTarget).data('json') as MediaObject;
         if (this.options.onAction) {
-            this.options.onAction(this.element, mediaObject);
+            this.options.onAction(mediaObject);
         }
         switch (this.options.action) {
             case 'insert':
@@ -291,36 +288,19 @@ export class MediaService {
         Alerts.log(`[MediaService.attach] Attaching media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.options.url}`);
         $.post(this.options.url, { mediaId: mediaObject.id }, function (this: MediaService, data: Response) {
             Response.process(data);
-            this.refresh(data);
+            MediaService.refresh(data, this.options.refresh, this.options.json);
         }.bind(this));
     }
 
-    clear(this: MediaService, e: JQuery.ClickEvent) {
-        e.preventDefault();
-        e.stopPropagation();
-        Alerts.confirm({
-
-        }, function (this: MediaService, result: SweetAlertResult) {
-            if (result.isConfirmed) {
-                Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
-
-                    Response.process(data);
-                    this.refresh(data);
-
-                }.bind(this), 5000);
-            }
-        }.bind(this))
-    }
-
-    refresh(this: MediaService, data: Response): void {
+    static refresh(data: Response, refresh: string, json: string): void {
 
         let icon = data.media.icon;
         if (data.media.genericFileType === "Image") {
             icon = data.media.mediumUrl;
         }
 
-        if (this.options.refresh) {
-            let $image = $(this.options.refresh);
+        if (refresh) {
+            let $image = $(refresh);
             $image.css({
                 'background-image': 'url(' + icon + ')'
             });
@@ -328,8 +308,8 @@ export class MediaService {
             $image.removeClass('loading');
         }
 
-        if (this.options.json && data.mediaJson) {
-            let $json = $(this.options.json);
+        if (json && data.mediaJson) {
+            let $json = $(json);
             $json.val(data.mediaJson);
         }
 
@@ -365,11 +345,12 @@ export class MediaModal {
 
     constructor() {
         $('body').on('click', '[data-hood-media=attach],[data-hood-media=select]', this.load.bind(this));
-    }
+        $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
+   }
 
     load(this: MediaModal, e: JQuery.ClickEvent): void {
 
-        this.element = e.target;
+        this.element = e.currentTarget;
         this.modal = new ModalController({
 
             onComplete: function (this: MediaModal, sender: HTMLElement) {
@@ -381,31 +362,41 @@ export class MediaModal {
                     json: this.element.dataset.hoodMediaJson,
                     refresh: this.element.dataset.hoodMediaRefresh,
                     beforeAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
-                        Alerts.log(`[beforeAction] Attaching media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.element.dataset.hoodMediaUrl}`);
                     }.bind(this),
                     onAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
-                        Alerts.log(`[onAction] Attached media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.element.dataset.hoodMediaUrl}`);
                         this.service.destroy();
                         this.modal.close();
                     }.bind(this),
                     onListLoad: (sender: HTMLElement) => {
-                        Alerts.log('Commencing media list fetch.');
                     },
-                    onListRender: (sender: HTMLElement, data: string) => {
-                        Alerts.log('Fetched media list data.');
+                    onListRender: (data: string) => {
                         return data;
                     },
-                    onListComplete: (sender: HTMLElement, data: string) => {
-                        Alerts.log('Finished loading media list... now attach the media actions to the things.', 'warning');
+                    onListComplete: (data: string) => {
                     },
                     onError: (jqXHR: any, textStatus: any, errorThrown: any) => {
-                        Alerts.log(`Error loading media list: ${textStatus}`);
                     },
                 });
 
             }.bind(this)
 
         });
-        this.modal.show($(e.target).data('hood-media-list'), e.target);
+        this.modal.show($(e.currentTarget).data('hood-media-list'), e.currentTarget);
+    }
+
+    clear(this: MediaService, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        Alerts.confirm({
+
+        }, function (this: MediaService, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
+
+                    MediaService.refresh(data, e.currentTarget.dataset.hoodMediaRefresh, e.currentTarget.dataset.hoodMediaJson);
+
+                }.bind(this), 5000);
+            }
+        }.bind(this))
     }
 }

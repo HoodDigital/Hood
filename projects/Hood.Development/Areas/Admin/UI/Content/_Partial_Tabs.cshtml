@@ -48,12 +48,4 @@
             </a>
         </li>
     }
-    @if (Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
-    {
-        <li class="nav-item">
-            <a class="nav-link" id="security-tab" data-bs-toggle="tab" href="#security" role="tab" aria-controls="security" aria-selected="false">
-                Security
-            </a>
-        </li>
-    }
 </ul>

@@ -5,13 +5,13 @@
 <div class="modal fade modal-right media-blade" id="content-create-modal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-blade" role="document">
         <form id="content-create-form" action="@Url.Action("Create")" asp-antiforgery="true" autocomplete="off" class="modal-content">
-            <div class="modal-header bg-dark text-white">
+            <div class="modal-header">
                 <div>
                     <h5 class="modal-title">
-                        Create new @Model.Type.TypeName.ToLower()
+                        <i class="fa fa-plus-circle text-success me-2"></i> Create new @Model.Type.TypeName.ToLower()
                     </h5>
                     <p class="m-0 text-muted">
-                        <i class="fa fa-plus-circle mr-2"></i> Add a new @Model.Type.TypeName.ToLower() to the website.
+                        Add a new @Model.Type.TypeName.ToLower() to the website.
                     </p>
                 </div>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">

@@ -57,34 +57,35 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                model.LastEditedBy = User.Identity.Name;
-                model.LastEditedOn = DateTime.Now;
+                var modelToUpdate = await _content.GetContentByIdAsync(model.Id, true, false);
+                modelToUpdate = await GetEditorModel(modelToUpdate);
 
-                if (model.Slug.IsSet())
+                var updatedFields = Request.Form.Keys.ToHashSet();
+                modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
+
+                modelToUpdate.LastEditedBy = User.Identity.Name;
+                modelToUpdate.LastEditedOn = DateTime.Now;
+
+                if (modelToUpdate.Slug.IsSet())
                 {
-                    if (await _content.SlugExists(model.Slug, model.Id))
+                    if (await _content.SlugExists(modelToUpdate.Slug, modelToUpdate.Id))
                     {
-                        model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
-                        if (model.Type.BaseName == "Page")
+                        modelToUpdate.Type = Engine.Settings.Content.GetContentType(modelToUpdate.ContentType);
+                        if (modelToUpdate.Type.BaseName == "Page")
                         {
                             throw new Exception("The slug is not valid, it already exists or is a reserved system word.");
                         }
                         else
                         {
-                            await GenerateNewSlug(model);
+                            await GenerateNewSlug(modelToUpdate);
                         }
                     }
                 }
                 else
                 {
-                    await GenerateNewSlug(model);
+                    await GenerateNewSlug(modelToUpdate);
                 }
 
-                // Save and reload to deal with metas.
-                await _content.UpdateAsync(model);
-                // reload
-                model = await _content.GetContentByIdAsync(model.Id, true, false);
-                model = await GetEditorModel(model);
 
                 // update  meta values
                 foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
@@ -93,29 +94,31 @@ namespace Hood.Areas.Admin.Controllers
                     {
                         // bosh we have a meta
                         var metaKey = val.Key.Replace("Meta:", "");
-                        if (model.HasMeta(metaKey))
+                        if (modelToUpdate.HasMeta(metaKey))
                         {
-                            model.UpdateMeta(metaKey, val.Value.ToString());
+                            modelToUpdate.UpdateMeta(metaKey, val.Value.ToString());
                         }
                         else
                         {
                             // Add it...
-                            CustomField metaDetails = model.Type.GetMetaDetails(val.Key.Replace("Meta:", ""));
-                            model.AddMeta(metaDetails.Name, val.Value.ToString(), metaDetails.Type);
+                            CustomField metaDetails = modelToUpdate.Type.GetMetaDetails(val.Key.Replace("Meta:", ""));
+                            modelToUpdate.AddMeta(metaDetails.Name, val.Value.ToString(), metaDetails.Type);
                         }
                     }
                 }
-                string currentTemplate = model.GetMeta("Settings.Template").GetStringValue();
-                // delete all template metas that do not exist in the new template, and add any that are missing
-                List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, model.Type.TemplateFolder);
-                if (newMetas != null)
-                    _content.UpdateTemplateMetas(model, newMetas);
 
-                await _content.UpdateAsync(model);
+                string currentTemplate = modelToUpdate.GetMeta("Settings.Template").GetStringValue();
+
+                // delete all template metas that do not exist in the new template, and add any that are missing
+                List<string> newMetas = _content.GetMetasForTemplate(currentTemplate, modelToUpdate.Type.TemplateFolder);
+                if (newMetas != null)
+                    _content.UpdateTemplateMetas(modelToUpdate, newMetas);
+
+                await _content.UpdateAsync(modelToUpdate);
 
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
-                return View(model);
+                return View(modelToUpdate);
 
             }
             catch (Exception ex)
@@ -234,6 +237,13 @@ namespace Hood.Areas.Admin.Controllers
                 ContentType = Engine.Settings.Content.GetContentType(type)
             };
             return View("_List_Categories", model);
+        }
+
+        [Route("admin/content/categories/list-content/{id}/")]
+        public async Task<IActionResult> CategoriesContentAsync(int id)
+        {
+            var model = await _content.GetContentByIdAsync(id, true, false);
+            return View("_List_Categories_Content", model);
         }
 
         [Route("admin/content/categories/add/{type}/")]

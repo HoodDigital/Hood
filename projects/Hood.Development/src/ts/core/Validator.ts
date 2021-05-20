@@ -20,7 +20,7 @@ export interface ValidatorOptions {
      */
     onError?: (jqXHR: any, textStatus: any, errorThrown: any) => void;
 
-    serializationFunction?: () => string;
+    serializationFunction?: () => string; 
 
 }
 
@@ -55,6 +55,7 @@ export class Validator {
     }
 
     submitForm() {
+        this.element.classList.add('was-validated');
         if (this.element.checkValidity()) {
 
             this.element.classList.add('loading');
@@ -81,10 +82,13 @@ export class Validator {
                 }
             }.bind(this))
                 .fail(this.options.onError ?? Inline.handleError);
+
         } else {
+
             if (this.options.errorAlert) {
                 Alerts.error(this.options.errorAlert);
             }
         }
+
     }
 }

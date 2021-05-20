@@ -9,7 +9,7 @@
 @if (Model.Type.MultiLineExcerpt)
 {
     <div class="form-floating mb-3">
-        <textarea asp-for="Excerpt" class="form-control @(Model.Type.RichTextExcerpt ? "tinymce-simple" : "")">@Model.Excerpt</textarea>
+        <textarea asp-for="Excerpt" class="form-control @(Model.Type.RichTextExcerpt ? "tinymce-simple" : "")" style="@(Model.Type.RichTextExcerpt ? "" : "height:100px;")">@Model.Excerpt</textarea>
         <label asp-for="Excerpt">@Model.Type.ExcerptName</label>
         <small asp-for="Title"></small>
     </div>

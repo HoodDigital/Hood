@@ -40,9 +40,6 @@
 <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="editor">
         <form method="post" id="content-edit-form" data-id="@Model.Id" data-type="@Model.ContentType">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="Views" />
-            <input type="hidden" asp-for="ContentType" />
             <div class="row">
                 <div class="col-md-8">
                     <div class="card">
@@ -59,7 +56,11 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <partial name="_Editor_Sidebar" />
+                    <partial name="_Editor_Sidebar" />                    
+                    @if (Model.Type.ShowCategories)
+                    {
+                        <div id="content-categories-list" class="" data-url="@Url.Action("CategoriesContent", new { id = Model.Id })"></div>
+                    }
                 </div>
             </div>
         </form>

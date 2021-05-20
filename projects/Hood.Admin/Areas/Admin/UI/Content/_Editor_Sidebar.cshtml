@@ -12,7 +12,11 @@
     </div>
     <div class="card-body collapse show" aria-labelledby="content-access-panel-heading" id="content-access-panel">
         <div class="form-floating mb-3">
-            <select class="form-select" asp-for="Status" asp-items="@(Html.GetEnumSelectList<ContentStatus>())"></select>
+            <select class="form-select" asp-for="Status">
+                <option value="1">Draft</option>
+                <option value="2">Published</option>
+                <option value="3">Archived</option>
+            </select>
             <label asp-for="Status">Publish Status</label>
             <small asp-for="Status"></small>
         </div>
@@ -61,6 +65,13 @@
                 <input asp-for="Slug" type="hidden" value="@Model.Slug" />
             }
         }
+        <div class="mb-3">
+            <div class="form-check form-switch">
+                <input asp-for="Public" class="form-check-input">
+                <label asp-for="Public" class="form-check-label d-block"></label>
+            </div>
+            <small asp-for="Public"></small>
+        </div>
     </div>
     <div class="card-footer text-center">
         <p class="font-weight-bold m-0">URL Preview:</p>
@@ -75,34 +86,6 @@
         else
         {
             <p class="m-0k">@Url.AbsoluteUrl()<strong><span class="slug-display">@Model.Url.TrimStart('/')</span></strong></p>
-        }
-    </div>
-</div>
-<div class="card mb-3">
-    <div class="card-header position-relative" id="content-categories-panel-heading">
-        <p class="card-title m-0 font-weight-bold">
-            <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#content-categories-panel" href="#content-categories-panel" aria-expanded="true" aria-controls="content-categories-panel">
-                Categories
-                <i class="fe fe-arrow-up mt-1"></i>
-            </a>
-        </p>
-    </div>
-    <div class="card-body collapse p-0 show" aria-labelledby="content-categories-panel-heading" id="content-categories-panel">
-        @if (Model.Type.ShowCategories)
-        {
-            <div class="list-group list-group-flush">
-                @{
-                    _categories.ResetCache();
-                }
-                @if (_categories.Count(Model.Type.Type) > 0)
-                {
-                    @_categories.AddToCategoryTree(_categories.TopLevel(Model.Type.Type), Model)
-                }
-                else
-                {
-                    <p class="text-center p-2">No categories added yet. To add a category, go back to the @Model.Type.TypeName list and select @Model.Type.TypeName Categories.</p>
-                }
-            </div>
         }
     </div>
 </div>

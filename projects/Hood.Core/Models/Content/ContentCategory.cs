@@ -9,8 +9,10 @@ namespace Hood.Models
 {
     public partial class ContentCategory :  BaseEntity
     {
+        [Required]
         [Display(Name = "Title / Name", Description = "Display name for your category.")]
         public string DisplayName { get; set; }
+        [Required]
         [Display(Name = "Url Slug", Description = "Will be used in the url for the category e.g. <code>yourdomain.com/news/category/your-category-slug/</code>")]
         public string Slug { get; set; }
         [Display(Name = "Content Type")]

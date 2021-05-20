@@ -76,8 +76,8 @@
                 <div class="form-floating mb-3">
                     <input id="@Model.InputId"
                            name="@Model.InputName"
-                           type="datetime"
-                           value="@(Model.GetValue<DateTime>())"
+                           type="datetime-local"
+                           value="@(Model.GetValue<DateTime>().ToString("yyyy-MM-ddThh:mm"))"
                            placeholder="@Model.InputDisplayName"
                            class="form-control" />
                     <label for="@Model.InputId">@Model.InputDisplayName</label>
@@ -92,7 +92,7 @@
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="time"
-                           value="@(Model.GetValue<DateTime>())"
+                           value="@(Model.GetValue<DateTime>().ToString("hh:mm"))"
                            placeholder="@Model.InputDisplayName"
                            class="form-control" />
                     <label for="@Model.InputId">@Model.InputDisplayName</label>
@@ -107,7 +107,7 @@
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="date"
-                           value="@(Model.GetValue<DateTime>())"
+                           value="@(Model.GetValue<DateTime>().ToString("yyyy-MM-dd"))"
                            placeholder="@Model.InputDisplayName"
                            class="form-control" />
                     <label for="@Model.InputId">@Model.InputDisplayName</label>
