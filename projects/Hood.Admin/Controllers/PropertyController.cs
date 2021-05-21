@@ -63,12 +63,15 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                model = await _property.ReloadReferences(model);
+                var modelToUpdate = await _property.GetPropertyByIdAsync(model.Id, true);
 
-                model.PublishDate = model.PublishDate.AddHours(model.PublishHour);
-                model.PublishDate = model.PublishDate.AddMinutes(model.PublishMinute);
-                model.LastEditedBy = User.Identity.Name;
-                model.LastEditedOn = DateTime.Now;
+                var updatedFields = Request.Form.Keys.ToHashSet();
+                modelToUpdate = modelToUpdate.UpdateFromFormModel(modelToUpdate, updatedFields);
+
+                modelToUpdate = await _property.ReloadReferences(modelToUpdate);
+
+                modelToUpdate.LastEditedBy = User.Identity.Name;
+                modelToUpdate.LastEditedOn = DateTime.Now;
 
                 if (model.AutoGeocode)
                 {
@@ -78,10 +81,10 @@ namespace Hood.Areas.Admin.Controllers
 
                         try
                         {
-                            GoogleAddress address = _address.GeocodeAddress(model);
+                            GoogleAddress address = _address.GeocodeAddress(modelToUpdate);
                             if (address != null)
                             {
-                                model.SetLocation(address.Coordinates);
+                                modelToUpdate.SetLocation(address.Coordinates);
                             }
                         }
                         catch (Exception ex)
@@ -119,40 +122,43 @@ namespace Hood.Areas.Admin.Controllers
 
                 }
 
-                string type = Engine.Settings.Property.GetPlanningFromType(model.Planning);
-                if (model.HasMeta("PlanningDescription"))
+                string type = Engine.Settings.Property.GetPlanningFromType(modelToUpdate.Planning);
+                if (modelToUpdate.HasMeta("PlanningDescription"))
                 {
-                    model.UpdateMeta("PlanningDescription", type);
+                    modelToUpdate.UpdateMeta("PlanningDescription", type);
                 }
                 else
                 {
-                    if (model.Metadata == null)
+                    if (modelToUpdate.Metadata == null)
                     {
-                        model.Metadata = new List<PropertyMeta>();
+                        modelToUpdate.Metadata = new List<PropertyMeta>();
                     }
 
-                    model.AddMeta("PlanningDescription", type);
+                    modelToUpdate.AddMeta("PlanningDescription", type);
                 }
 
                 foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> val in Request.Form)
                 {
                     if (val.Key.StartsWith("Meta:"))
                     {
-                        if (model.HasMeta(val.Key.Replace("Meta:", "")))
+                        if (modelToUpdate.HasMeta(val.Key.Replace("Meta:", "")))
                         {
-                            model.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            modelToUpdate.UpdateMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                         else
                         {
-                            model.AddMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
+                            modelToUpdate.AddMeta(val.Key.Replace("Meta:", ""), val.Value.ToString());
                         }
                     }
                 }
 
-                await _property.UpdateAsync(model);
+                await _property.UpdateAsync(modelToUpdate);
 
                 SaveMessage = "Saved";
                 MessageType = AlertType.Success;
+
+                return View(modelToUpdate);
+
             }
             catch (Exception ex)
             {
@@ -160,11 +166,13 @@ namespace Hood.Areas.Admin.Controllers
 
                 SaveMessage = "An error occurred: " + ex.Message;
                 MessageType = AlertType.Danger;
+
+                model = await _property.ReloadReferences(model);
+                model = await LoadAgents(model);
+
+                return View(model);
             }
 
-            model = await LoadAgents(model);
-
-            return View(model);
         }
         private async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
