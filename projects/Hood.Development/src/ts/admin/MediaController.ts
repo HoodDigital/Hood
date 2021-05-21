@@ -18,7 +18,7 @@ export class MediaController {
         this.list = document.getElementById('media-list');
         this.service = new MediaService(this.list, {
             action: 'show',
-            onAction: function (this: MediaController, sender: HTMLElement, mediaObject: MediaObject) {
+            onAction: function (this: MediaController, mediaObject: MediaObject) {
                 Alerts.log(`Showing media object id ${mediaObject.id} - ${mediaObject.filename}`);
             }.bind(this),
             onListLoad: function () {

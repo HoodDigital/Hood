@@ -49,8 +49,8 @@
                 <div class="form-check form-switch">
                     <input asp-for="Featured" class="form-check-input">
                     <label asp-for="Featured" class="form-check-label d-block"></label>
+                    <small asp-for="Featured"></small>
                 </div>
-                <small asp-for="Featured"></small>
             </div>
             @if (Model.Type.UrlFormatting == "news")
             {
@@ -69,8 +69,9 @@
             <div class="form-check form-switch">
                 <input asp-for="Public" class="form-check-input">
                 <label asp-for="Public" class="form-check-label d-block"></label>
+                <small asp-for="Public"></small>
             </div>
-            <small asp-for="Public"></small>
+            
         </div>
     </div>
     <div class="card-footer text-center">

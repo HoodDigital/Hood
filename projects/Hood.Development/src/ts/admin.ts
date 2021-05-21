@@ -12,6 +12,7 @@ import { HoodController } from './core/HoodController';
 import { MediaController } from './admin/MediaController';
 import { MediaModal } from './core/Media';
 import { ContentController } from './admin/ContentController';
+import * as bootstrap from 'bootstrap';
 
 class Admin extends HoodController {
 
@@ -26,11 +27,16 @@ class Admin extends HoodController {
 
         // Admin Services
         this.mediaModal = new MediaModal();
+        this.mediaModal.initUploaders();
 
         // Admin Controllers
         this.home = new HomeController();
         this.media = new MediaController();
         this.content = new ContentController();
+
+        if ($('page-tabs').length > 0) {
+            this.CheckAndLoadTabs('#page-tabs');
+        }
 
         // Admin Handlers
         $('.restrict-to-slug').restrictToSlug();
@@ -58,6 +64,20 @@ class Admin extends HoodController {
             wheelStep: 10
         });
 
+    }
+
+    CheckAndLoadTabs(tag: string): void  {
+        $(tag + ' a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            localStorage.setItem('tab-' + $(tag).data('hoodTabs'), $(e.target).attr('href'));
+        });
+
+        let activeTab = localStorage.getItem('tab-' + $(tag).data('hoodTabs'));
+        let triggerEl = $(tag + ' a[data-bs-toggle="tab"]')[0];
+        if (activeTab) {
+            triggerEl = document.querySelector(tag + ' a[href="' + activeTab + '"]')
+        }
+        let tabTrigger = new bootstrap.Tab(triggerEl);
+        tabTrigger.show();
     }
 }
 

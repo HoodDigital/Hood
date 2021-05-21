@@ -11,6 +11,7 @@ export class HoodController {
     constructor() {
 
         // Global Services
+        this.editors = new Editors();
         this.uploader = new Uploader();
         this.handlers = new Handlers();
 

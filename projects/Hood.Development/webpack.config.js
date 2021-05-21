@@ -22,6 +22,7 @@ module.exports = {
     plugins,
 
     entry: {
+        editor: './src/scss/editor.scss',
         hood: './src/ts/hood.ts',
         admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
     },

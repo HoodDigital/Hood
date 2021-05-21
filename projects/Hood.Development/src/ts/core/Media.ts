@@ -7,6 +7,7 @@ import { Modal } from "bootstrap";
 import { Inline } from "./Inline";
 import * as Dropzone from "dropzone";
 import { SweetAlertResult } from "sweetalert2";
+import { Editor } from "tinymce";
 
 const dz = Dropzone
 dz.autoDiscover = false;
@@ -58,19 +59,19 @@ export interface MediaOptions {
     size?: string;
 
     /**
-     * Insert/Select Only: Input field to insert image url to. 
+     * Select Only: Input field to insert image url to. 
      */
-    target?: HTMLElement;
+    target?: string;
+
+    /**
+     * Insert Only: Input field to insert image url to. 
+     */
+    targetEditor?: Editor;
 
     /**
      * Attach Only: Post url to send the selected media id to when clicked. Must accept mediaId as a parameter.
      */
     url?: string;
-
-    /**
-     * Attach Only: JSON input, add this to
-     */
-    json?: string;
 
     /**
      * Called before the action is carried out.
@@ -108,7 +109,8 @@ export class MediaService {
     media: DataList;
     element: HTMLElement;
     options: MediaOptions = {
-        action: 'show'
+        action: 'show',
+        size: 'large'
     };
     currentBlade: ModalController;
     progress: JQuery<HTMLElement>;
@@ -215,14 +217,15 @@ export class MediaService {
             onComplete: function (this: MediaService) {
                 let form = document.getElementById('content-directories-edit-form') as HTMLFormElement;
                 let validator = new Validator(form, {
-                    onComplete: function (this: MediaService, sender: Validator, data: Response) {
-                        if (data.success) {
+                    onComplete: function (this: MediaService, sender: Validator, response: Response) {
+
+                        Response.process(response, 5000);
+
+                        if (response.success) {
                             this.media.Reload();
                             createDirectoryModal.close();
-                            Alerts.success(data.message);
-                        } else {
-                            Alerts.error(data.error);
                         }
+
                     }.bind(this)
                 });
             }.bind(this)
@@ -237,15 +240,17 @@ export class MediaService {
 
         }, function (this: MediaService, result: SweetAlertResult) {
             if (result.isConfirmed) {
-                Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
-                    // parent directory id is stored in the response data array.
-                    if (data.data.length > 0) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, sender: HTMLElement, response: Response) {
+                    // Refresh the list, using the parent directory id - stored in the response's data array.
+                    Response.process(response, 5000);
+
+                    if (response.data.length > 0) {
                         var listUrl = document.createElement('a');
                         listUrl.href = $(this.element).data('url');
-                        listUrl.search = `?dir=${data.data[0]}`;
+                        listUrl.search = `?dir=${response.data[0]}`;
                         this.media.Reload(new URL(listUrl.href));
                     }
-                }.bind(this), 5000);
+                }.bind(this));
             }
         }.bind(this))
     }
@@ -255,13 +260,23 @@ export class MediaService {
     }
 
     action(this: MediaService, e: JQuery.ClickEvent) {
+
         e.preventDefault();
         e.stopPropagation();
+
+        // Load media object from clicked item in the media list
         let mediaObject: MediaObject = $(e.currentTarget).data('json') as MediaObject;
+
+        // Run the callback for onAction
         if (this.options.onAction) {
             this.options.onAction(mediaObject);
         }
+
+        // Perform the chosen action, which is set on the service's options when loaded.
         switch (this.options.action) {
+            case 'select':
+                this.select(mediaObject, e);
+                break;
             case 'insert':
                 this.insert(mediaObject, e);
                 break;
@@ -272,31 +287,67 @@ export class MediaService {
                 this.show(mediaObject, e);
                 break;
         }
+
     }
 
     show(this: MediaService, mediaObject: MediaObject, sender: JQuery.ClickEvent) {
+
+        // Load the media as a new blade to display.
         this.currentBlade = new ModalController();
         this.currentBlade.show($(sender.target).data('blade'), sender.target);
+
+        // TODO: On close, reload the list and reinstate the modal??
+    }
+
+    select(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
+        Alerts.log(`[MediaService.select] Selecting media object id ${mediaObject.id} - ${mediaObject.filename} and inserting ${this.options.size} url to target: ${ this.options.target }`);
+        if (this.options.target) {
+            let target = $(this.options.target);
+
+            switch (this.options.size) {
+                case 'thumb':
+                    target.val(mediaObject.thumbUrl);
+                    break;
+                case 'small':
+                    target.val(mediaObject.smallUrl);
+                    break;
+                case 'medium':
+                    target.val(mediaObject.mediumUrl);
+                    break;
+                case 'large':
+                    target.val(mediaObject.largeUrl);
+                    break;
+                case 'full':
+                    target.val(mediaObject.url);
+                    break;
+            }
+        }
+        if (this.options.refresh) {
+            MediaService.refresh(mediaObject, this.options.refresh);
+        }
     }
 
     insert(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
         // basic functionality to insert the correct string from the media response (from uploader) to given input element. 
+        Alerts.log(`[MediaService.insert] Selecting media object id ${mediaObject.id} - ${mediaObject.filename} and inserting ${this.options.size} image to target editor: ${this.options.target}`);
+        this.options.targetEditor.insertContent('<img alt="' + mediaObject.filename + '" src="' + mediaObject.url + '" class="img-fluid" />');
     }
 
     attach(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
         // once file is uploaded to given directory, send media id to the given attach endpoint.
         Alerts.log(`[MediaService.attach] Attaching media object id ${mediaObject.id} - ${mediaObject.filename} to url: ${this.options.url}`);
-        $.post(this.options.url, { mediaId: mediaObject.id }, function (this: MediaService, data: Response) {
-            Response.process(data);
-            MediaService.refresh(data, this.options.refresh, this.options.json);
+        $.post(this.options.url, { mediaId: mediaObject.id }, function (this: MediaService, response: Response) {
+            Response.process(response, 5000);
+            MediaService.refresh(response.media, this.options.refresh);
         }.bind(this));
     }
 
-    static refresh(data: Response, refresh: string, json: string): void {
+    static refresh(media: MediaObject, refresh: string): void {
 
-        let icon = data.media.icon;
-        if (data.media.genericFileType === "Image") {
-            icon = data.media.mediumUrl;
+        let icon = media.icon;
+
+        if (media.genericFileType === "Image") {
+            icon = media.mediumUrl;
         }
 
         if (refresh) {
@@ -308,11 +359,6 @@ export class MediaService {
             $image.removeClass('loading');
         }
 
-        if (json && data.mediaJson) {
-            let $json = $(json);
-            $json.val(data.mediaJson);
-        }
-
     }
 
     delete(this: MediaService, e: JQuery.ClickEvent) {
@@ -322,12 +368,15 @@ export class MediaService {
             html: 'This file will be permanently deleted, are you sure?'
         }, function (this: MediaService, result: SweetAlertResult) {
             if (result.isConfirmed) {
-                Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, response: Response) {
+
+                    Response.process(response, 5000);
                     this.media.Reload();
                     if (this.currentBlade) {
                         this.currentBlade.close();
                     }
-                }.bind(this), 5000);
+
+                }.bind(this));
             }
         }.bind(this))
     }
@@ -344,9 +393,12 @@ export class MediaModal {
     element: HTMLElement;
 
     constructor() {
+    }
+
+    initUploaders () {
         $('body').on('click', '[data-hood-media=attach],[data-hood-media=select]', this.load.bind(this));
         $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
-   }
+    }
 
     load(this: MediaModal, e: JQuery.ClickEvent): void {
 
@@ -359,8 +411,9 @@ export class MediaModal {
                 this.service = new MediaService(this.list, {
                     action: this.element.dataset.hoodMedia,
                     url: this.element.dataset.hoodMediaUrl,
-                    json: this.element.dataset.hoodMediaJson,
                     refresh: this.element.dataset.hoodMediaRefresh,
+                    target: this.element.dataset.hoodMediaTarget,
+                    size: this.element.dataset.hoodMediaSize,
                     beforeAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
                     }.bind(this),
                     onAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
@@ -391,11 +444,12 @@ export class MediaModal {
 
         }, function (this: MediaService, result: SweetAlertResult) {
             if (result.isConfirmed) {
-                Inline.post(e, function (this: MediaService, sender: HTMLElement, data: Response) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, response: Response) {
 
-                    MediaService.refresh(data, e.currentTarget.dataset.hoodMediaRefresh, e.currentTarget.dataset.hoodMediaJson);
+                    Response.process(response, 5000);
+                    MediaService.refresh(response.media, e.currentTarget.dataset.hoodMediaRefresh);
 
-                }.bind(this), 5000);
+                }.bind(this));
             }
         }.bind(this))
     }

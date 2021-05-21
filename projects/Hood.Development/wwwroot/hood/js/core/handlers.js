@@ -263,7 +263,7 @@ $.hood.Handlers = {
     ColorPickers: function () {
         let updateColorFieldValue = function (color, instance) {
             let elemId = $(instance._root.button).parent().data('target');
-            $(instance._root.button).css({ 'background-color': color.toHEXA().toString() });
+            $(instance._root.button).parent().css({ 'background-color': color.toHEXA().toString() });
             let colorHex = instance.getColor().toHEXA();
             var result = "";
             for (let i = colorHex.length - 1; i >= 0; i--) {

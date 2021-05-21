@@ -86,7 +86,7 @@ export class Validator {
         } else {
 
             if (this.options.errorAlert) {
-                Alerts.error(this.options.errorAlert);
+                Alerts.error(this.options.errorAlert, null, 5000);
             }
         }
 

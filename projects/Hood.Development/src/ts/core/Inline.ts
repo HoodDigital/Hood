@@ -53,52 +53,38 @@ export class Inline {
             .fail(options.onError ?? Inline.handleError);
     }
 
-    static task(e: JQuery.ClickEvent,
-        complete: (sender: HTMLElement, data: Response) => void = null,
-        autoHideResponse: number = null,
+    static task(url: string, sender: HTMLElement,
+        complete: (data: Response, sender?: HTMLElement) => void = null,
         error: (jqXHR: any, textStatus: any, errorThrown: any) => void = null): void {
 
-        e.preventDefault();
-        let $tag = $(e.currentTarget);
-        $tag.addClass('loading');
-        $.get($tag.attr('href'), function (data: Response) {
-            Response.process(data, autoHideResponse);
-            if (data.success) {
-                if ($tag && $tag.data('redirect')) {
-                    setTimeout(function () {
-                        window.location = $tag.data('redirect');
-                    }, 1500);
-                }
+        if (sender) {
+            sender.classList.add('loading');
+        }
+        $.get(url, function (response: Response) {
+            if (sender) {
+                sender.classList.remove('loading');
             }
-            $tag.removeClass('loading');
             if (complete) {
-                complete(e.currentTarget, data);
+                complete(response, sender);
             }
         })
             .fail(error ?? Inline.handleError);
 
     }
 
-    static post(e: JQuery.ClickEvent,
-        complete: (sender: HTMLElement, data: Response) => void = null,
-        autoHideResponse: number = null,
+    static post(url: string, sender: HTMLElement,
+        complete: (data: Response, sender?: HTMLElement) => void = null,
         error: (jqXHR: any, textStatus: any, errorThrown: any) => void = null): void {
 
-        e.preventDefault();
-        let $tag = $(e.currentTarget);
-        $tag.addClass('loading');
-        $.post($tag.attr('href'), function (data: Response) {
-            Response.process(data, autoHideResponse);
-            if (data.success) {
-                if ($tag && $tag.data('redirect')) {
-                    setTimeout(function () {
-                        window.location = $tag.data('redirect');
-                    }, 1500);
-                }
+        if (sender) {
+            sender.classList.add('loading');
+        }
+        $.post(url, function (response: Response) {
+            if (sender) {
+                sender.classList.remove('loading');
             }
-            $tag.removeClass('loading');
             if (complete) {
-                complete(e.currentTarget, data);
+                complete(response, sender);
             }
         })
             .fail(error ?? Inline.handleError);

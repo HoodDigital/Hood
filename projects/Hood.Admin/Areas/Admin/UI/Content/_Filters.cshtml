@@ -38,8 +38,11 @@
             <small asp-for="Search"></small>
         </div>
         <div class="form-floating mb-3">
-            <select class="form-select submit-on-change" asp-items="Html.GetEnumSelectList<ContentStatus>()" asp-for="Status">
+            <select class="form-select submit-on-change" asp-for="Status">
                 <option value="">Show All</option>
+                <option value="1">Draft</option>
+                <option value="2">Published</option>
+                <option value="3">Archived</option>
             </select>
             <label asp-for="Status"></label>
             <small asp-for="Status"></small>

@@ -1,6 +1,6 @@
 @model Content
-<ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
-    <li class="nav-item active">
+<ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs" data-hood-tabs="@($"tabs-content-{Model.Id}")">
+    <li class="nav-item">
         <a class="nav-link" id="content-tab" data-bs-toggle="tab" href="#content" role="tab" aria-controls="content" aria-selected="false">
             Content
         </a>

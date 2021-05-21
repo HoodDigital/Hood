@@ -12,7 +12,7 @@
 @section buttons {
     @if (!Model.ContentType.IsUnknown)
     {
-        <a class="btn btn-success hood-modal" asp-action="Create" asp-route-type="@Model.ContentType.Slug" data-complete="$.hood.Content.Create">
+        <a class="btn btn-success content-create" asp-action="Create" asp-route-type="@Model.ContentType.Slug">
             <i class="fa fa-user-plus mr-2"></i>
             Create New
         </a>

@@ -55,16 +55,28 @@
 
     case "Settings.Image.Background":
     case "Settings.Image.Featured.Background":
-        <div class="form-floating mb-3">
-            <label for="@Model.InputId">@Model.InputDisplayName</label>
-            <input id="@Model.InputId"
-                   name="@Model.InputName"
-                   value="@Model.GetStringValue()"
-                   placeholder="@Model.InputDisplayName"
-                   class="form-control colorpicker" />
-            <small class="text-info form-text">
-                Use this to set a colour background for the image area when an image is not present, or the image has transparent areas. Use CSS colours or hex/rgb.
-            </small>
+        <div class="row align-items-center mb-3">
+            <div class="col-auto" style="width:75px;">
+                <div class="img img-full img-square img-circle color-picker shadow" 
+                     data-target="#@Model.InputId" 
+                     data-default="#333333" 
+                     data-opacity="true">
+                    <div class="pickr"></div>
+                </div>                        
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input id="@Model.InputId"
+                           name="@Model.InputName"
+                           value="@Model.GetStringValue()"
+                           placeholder="@Model.InputDisplayName"
+                           class="form-control" />
+                    <label for="@Model.InputId">@Model.InputDisplayName</label>
+                    <small class="text-info form-text">
+                        Use this to set a colour background for the image area when an image is not present, or the image has transparent areas. Use CSS colours or hex/rgb.
+                    </small>
+                </div>
+            </div>
         </div>
         break;
 
@@ -148,15 +160,13 @@
             case "File":
             case "Media":
                 <div class="image-editor mb-3">
-                    <div class="row no-gutter align-items-center">
-                        <div class="col-auto pr-0">
-                            <figure class="img img-xs border-3 border-white shadow-sm @Model.InputId" style="background-image:url(@Model.GetStringValue());background-size:contain;">
-                                <img src="@Model.GetStringValue()" alt="">
-                            </figure>
+                    <div class="row align-items-center">
+                        <div class="col-auto" style="width:75px;">
+                            <div class="img img-full img-square img-circle bg-dark @Model.InputId" style="background-image:url(@Model.GetStringValue());background-size:contain;"></div>
                         </div>
                         <div class="col">
                             <div class="form-floating">
-                                <input type="url" class="form-control @Model.InputId valid"
+                                <input type="url" class="form-control valid"
                                        placeholder="@Model.InputDisplayName"
                                        id="@Model.InputId"
                                        name="@Model.InputName"
@@ -165,9 +175,12 @@
                             </div>
                         </div>
                         <div class="col-auto pl-0">
-                            <button class="btn btn-dark btn-lg hood-media-select"
-                                    data-url="@Url.Action("Action", "Media", new { doAction = "Select", tag = $".{Model.InputId}" })"
-                                    data-target=".@Model.InputId"
+                            <button class="btn btn-dark btn-lg"
+                                    data-hood-media="select"
+                                    data-hood-media-size="large"
+                                    data-hood-media-list="@Url.Action("Action", "Media")"
+                                    data-hood-media-target="#@Model.InputId"
+                                    data-hood-media-refresh=".@Model.InputId"
                                     type="button">
                                 <i class="fa fa-camera fa-2x"></i>
                             </button>
@@ -183,16 +196,14 @@
             case "PictureUrl":
             case "Hood.Image":
             case "Hood.ImageUrl":
-                <div class="image-editor">
-                    <div class="row no-gutter align-items-center">
-                        <div class="col-auto pr-0">
-                            <figure class="img img-xs border-3 border-white shadow-sm @Model.InputId" style="background-image:url(@Model.GetStringValue());background-size:contain;">
-                                <img src="@Model.GetStringValue()" alt="">
-                            </figure>
+                <div class="image-editor mb-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto" style="width:75px;">
+                            <div class="img img-full img-square img-circle bg-dark @Model.InputId" style="background-image:url(@Model.GetStringValue());background-size:contain;"></div>
                         </div>
                         <div class="col">
                             <div class="form-floating">
-                                <input type="url" class="form-control @Model.InputId valid"
+                                <input type="url" class="form-control valid"
                                        placeholder="@Model.InputDisplayName"
                                        id="@Model.InputId"
                                        name="@Model.InputName"
@@ -201,9 +212,12 @@
                             </div>
                         </div>
                         <div class="col-auto pl-0">
-                            <button class="btn btn-dark btn-lg hood-media-select"
-                                    data-url="@Url.Action("Action", "Media", new { doAction = "Select", tag = $".{Model.InputId}" })"
-                                    data-target=".@Model.InputId"
+                            <button class="btn btn-dark btn-lg"
+                                    data-hood-media="select"
+                                    data-hood-media-size="large"
+                                    data-hood-media-list="@Url.Action("Action", "Media")"
+                                    data-hood-media-target="#@Model.InputId"
+                                    data-hood-media-refresh=".@Model.InputId"
                                     type="button">
                                 <i class="fa fa-camera fa-2x"></i>
                             </button>

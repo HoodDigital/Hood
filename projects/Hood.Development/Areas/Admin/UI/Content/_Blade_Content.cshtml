@@ -2,9 +2,9 @@
 @{
     Layout = null;
 }
-<div class="modal fade modal-right media-blade" id="content-create-modal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-blade" role="document">
-        <form id="content-create-form" action="@Url.Action("Create")" asp-antiforgery="true" autocomplete="off" class="modal-content">
+<div class="modal fade" id="content-create-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="content-create-form" action="@Url.Action("Create")" asp-antiforgery="true" autocomplete="off" class="modal-content" novalidate>
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title">
@@ -14,44 +14,38 @@
                         Add a new @Model.Type.TypeName.ToLower() to the website.
                     </p>
                 </div>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" asp-for="ContentType" value="@Model.Type.Type" />
-                <div class="form-group floating-label">
-                    <input asp-for="Title" class="form-control" />
+                <div class="form-floating mb-3">
+                    <input asp-for="Title" class="form-control" required />
                     <label asp-for="Title">@Model.Type.TitleName</label>
                     <small asp-for="Title"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <textarea asp-for="Excerpt" class="form-control"></textarea>
+                <div class="form-floating mb-3">
+                    <textarea asp-for="Excerpt" class="form-control" required></textarea>
                     <label asp-for="Excerpt">@Model.Type.ExcerptName</label>
                     <small asp-for="Excerpt"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <input asp-for="PublishDate" type="datetime-local" class="form-control" />
+                <div class="form-floating mb-3">
+                    <input asp-for="PublishDate" type="datetime-local" class="form-control" required />
                     <label asp-for="PublishDate"></label>
                     <small asp-for="PublishDate"></small>
                 </div>
-                <div class="blade-field">
-                    <div class="form-group">
-                        <label>Create as</label>
-                        <div class="">
-                            <select asp-for="Status" class="form-control">
-                                <option value="1">Draft</option>
-                                <option value="2">Published</option>
-                                <option value="3">Archived</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="form-floating mb-3">
+                    <select asp-for="Status" class="form-select">
+                        <option value="1">Draft</option>
+                        <option value="2">Published</option>
+                        <option value="3">Archived</option>
+                    </select>
+                    <label asp-for="Status">Create as</label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="content-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
-            </div>
+                 <button type="submit" id="content-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+           </div>
         </form>
     </div>
 </div>

@@ -14,20 +14,20 @@
             <div class="dropdown-divider"></div>
         }
         <a class="dropdown-item" asp-action="Duplicate" asp-route-id="@Model.Id"><i class="fa fa-copy"></i>Duplicate</a>
-        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index")"><i class="fa fa-trash-alt"></i> Delete</a>
+        <a class="dropdown-item content-delete" asp-action="Delete" asp-route-id="@Model.Id" data-redirect="@Url.Action("Index", new { type = Model.ContentType })"><i class="fa fa-trash-alt"></i> Delete</a>
     </div>
 }
 @section breadcrumbs {
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
+            <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
             @if (Model.Type.IsUnknown)
             {
-                <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="" asp-route-area="Admin"><i class="fa fa-archive me-1"></i>All Content</a></li>
+                <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="" asp-route-area="Admin"><i class="fa fa-archive me-2"></i>All Content</a></li>
             }
             else
             {
-                <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="@Model.Type.Type" asp-route-area="Admin"><i class="fa @Model.Type.Icon me-1"></i>@Model.Type.TypeNamePlural</a></li>
+                <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Content" asp-route-type="@Model.Type.Type" asp-route-area="Admin"><i class="fa @Model.Type.Icon me-2"></i>@Model.Type.TypeNamePlural</a></li>
             }
             <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
         </ol>

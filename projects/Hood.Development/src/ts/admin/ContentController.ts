@@ -7,8 +7,18 @@ export class ContentController {
     constructor() {
         this.manage();
 
+        $('body').on('click', '.content-create', this.create.bind(this));
+        $('body').on('click', '.content-delete', this.delete.bind(this));
+        $('body').on('click', '.content-set-status', this.setStatus.bind(this));
+
         $('body').on('click', '.content-categories-delete', this.deleteCategory.bind(this));
         $('body').on('click', '.content-categories-create,.content-categories-edit', this.createOrEditCategory.bind(this));
+        $('body').on('change', '.content-categories-check', this.toggleCategory.bind(this));
+
+        $('body').on('keyup', '#Slug', function (this: HTMLElement) {
+            let slugValue: string = $(this).val() as string;
+            $('.slug-display').html(slugValue);
+        });
 
     }
 
@@ -22,7 +32,6 @@ export class ContentController {
     */
     list: DataList;
 
-
     /**
     * Content list element, #content-list
     */
@@ -34,23 +43,137 @@ export class ContentController {
     categoryList: DataList;
 
     manage(this: ContentController): void {
+
         this.element = document.getElementById('content-list');
-        this.list = new DataList(this.element, {
-            onComplete: function (this: ContentController, data: string, sender: HTMLElement = null) {
+        if (this.element) {
+            this.list = new DataList(this.element, {
+                onComplete: function (this: ContentController, data: string, sender: HTMLElement = null) {
 
-                Alerts.log('Finished loading content list.', 'info');
+                    Alerts.log('Finished loading content list.', 'info');
 
-            }.bind(this)
-        });
+                }.bind(this)
+            });
+        }
 
         this.categoryElement = document.getElementById('content-categories-list');
-        this.categoryList = new DataList(this.categoryElement, {
-            onComplete: function (this: ContentController, data: string, sender: HTMLElement = null) {
+        if (this.categoryElement) {
+            this.categoryList = new DataList(this.categoryElement, {
+                onComplete: function (this: ContentController, data: string, sender: HTMLElement = null) {
 
-                Alerts.log('Finished loading category list.', 'info');
+                    Alerts.log('Finished loading category list.', 'info');
 
+                }.bind(this)
+            });
+        }
+
+    }
+
+    create(this: ContentController, e: JQuery.ClickEvent) {
+
+        e.preventDefault();
+        e.stopPropagation();
+        let createContentModal: ModalController = new ModalController({
+            onComplete: function (this: ContentController) {
+                let form = document.getElementById('content-create-form') as HTMLFormElement;
+                let validator = new Validator(form, {
+                    onComplete: function (this: ContentController, sender: Validator, response: Response) {
+
+                        Response.process(response, 5000);
+
+                        if (this.list) {
+                            this.list.Reload();
+                        }
+
+                        if (response.success) {
+                            createContentModal.close();
+                        } 
+
+                    }.bind(this)
+                });
             }.bind(this)
         });
+        createContentModal.show($(e.currentTarget).attr('href'), this.element);
+    }
+
+    delete(this: ContentController, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        Alerts.confirm({
+            // Confirm options...
+            title: "Are you sure?",
+            html: "The content will be permanently removed."
+        }, function (this: ContentController, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: ContentController, data: Response) {
+
+                    Response.process(data, 5000);
+
+                    if (this.list) {
+                        this.list.Reload();
+                    }
+
+                    if (e.currentTarget.dataset.redirect) {
+
+                        Alerts.message('Just taking you back to the content list.', 'Redirecting...');
+                        setTimeout(function () {
+                            window.location = e.currentTarget.dataset.redirect;
+                        }, 1500);
+
+                    }
+
+                }.bind(this));
+            }
+        }.bind(this))
+
+    }
+
+    setStatus(this: ContentController, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        Alerts.confirm({
+            // Confirm options...
+            title: "Are you sure?",
+            html: "The change will happen immediately."
+        }, function (this: ContentController, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: ContentController, data: Response) {
+
+                    Response.process(data, 5000);
+
+                    if (this.list) {
+                        this.list.Reload();
+                    }
+
+                }.bind(this));
+            }
+        }.bind(this))
+
+    }
+
+    clone(this: ContentController, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        Alerts.confirm({
+            // Confirm options...
+            title: "Are you sure?",
+            html: "This will duplicate the content and everything inside it."
+        }, function (this: ContentController, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: ContentController, data: Response) {
+
+                    Response.process(data, 5000);
+
+                    if (this.list) {
+                        this.list.Reload();
+                    }
+
+                }.bind(this));
+            }
+        }.bind(this))
+
     }
 
     createOrEditCategory(this: ContentController, e: JQuery.ClickEvent) {
@@ -60,14 +183,19 @@ export class ContentController {
             onComplete: function (this: ContentController) {
                 let form = document.getElementById('content-categories-edit-form') as HTMLFormElement;
                 let validator = new Validator(form, {
-                    onComplete: function (this: ContentController, sender: Validator, data: Response) {
-                        if (data.success) {
+                    onComplete: function (this: ContentController, sender: Validator, response: Response) {
+
+                        Response.process(response, 5000);
+
+                        if (this.list) {
+                            this.list.Reload();
+                        }
+
+                        if (response.success) {
                             this.categoryList.Reload();
                             createCategoryModal.close();
-                            Alerts.success(data.message);
-                        } else {
-                            Alerts.error(data.error);
                         }
+
                     }.bind(this)
                 });
             }.bind(this)
@@ -78,19 +206,37 @@ export class ContentController {
     deleteCategory(this: ContentController, e: JQuery.ClickEvent) {
         e.preventDefault();
         e.stopPropagation();
+
         Alerts.confirm({
             // Confirm options...
         }, function (this: ContentController, result: SweetAlertResult) {
             if (result.isConfirmed) {
-                Inline.post(e, function (this: ContentController, sender: HTMLElement, data: Response) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: ContentController, data: Response) {
 
                     // category deleted...
-                    Response.process(data);
+                    Response.process(data, 5000);
+
                     this.categoryList.Reload();
 
-                }.bind(this), 5000);
+                }.bind(this));
             }
         }.bind(this))
+    }
+
+    toggleCategory(this: ContentController, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        $.post($(e.currentTarget).data('url'), { categoryId: $(e.currentTarget).val(), add: $(e.currentTarget).is(':checked') }, function (this: ContentController, response: Response) {
+
+            Response.process(response, 5000);
+
+            if (this.categoryList) {
+                this.categoryList.Reload();
+            }
+
+        }.bind(this));
+    
     }
 
 }
