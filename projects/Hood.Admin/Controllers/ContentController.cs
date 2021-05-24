@@ -522,7 +522,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/media/{id}/upload/gallery")]
-        public async Task<Response> UploadToGallery(List<IFormFile> files, int id)
+        public async Task<Response> UploadToGallery(List<int> media, int id)
         {
 
             try
@@ -533,25 +533,31 @@ namespace Hood.Areas.Admin.Controllers
                     throw new Exception("Content not found!");
                 }
 
-                MediaObject mediaResult = null;
-                if (files != null)
+                if (media != null)
                 {
-                    if (files.Count == 0)
+                    if (media.Count == 0)
                     {
-                        throw new Exception("There are no files attached!");
+                        throw new Exception("There are no files selected!");
                     }
 
-                    var directory = await _content.GetDirectoryAsync();
-                    foreach (IFormFile file in files)
+                    var directory = await _property.GetDirectoryAsync();
+                    foreach (int mediaId in media)
                     {
-                        mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
-                        await _content.AddImageAsync(content, new ContentMedia(mediaResult));
-                        mediaResult.DirectoryId = directory.Id;
-                        _db.Media.Add(mediaResult);
+                        // load the media object from db
+                        MediaObject mediaObject = _db.Media.AsNoTracking().SingleOrDefault(m => m.Id == mediaId);
+                        if (media == null)
+                        {
+                            throw new Exception("Could not load media to attach.");
+                        }
+                        var propertyMedia = new ContentMedia(mediaObject);
+                        propertyMedia.ContentId = content.Id;
+                        propertyMedia.Id = 0;
+                        _db.ContentMedia.Add(propertyMedia);
                         await _db.SaveChangesAsync();
+
                     }
                 }
-                return new Response(true, mediaResult, "The image/media file has been attached successfully.");
+                return new Response(true, "The media has been attached successfully.");
             }
             catch (Exception ex)
             {
@@ -565,20 +571,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                Content content = await _content.GetContentByIdAsync(id, true);
-                ContentMedia media = content.Media.Find(m => m.Id == mediaId);
-                if (media != null)
-                {
-                    var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == media.UniqueId);
-                    if (mediaItem != null)
-                    {
-                        _db.Entry(mediaItem).State = EntityState.Deleted;
-                    }
-                    await _media.DeleteStoredMedia(media);
-                    _db.Entry(media).State = EntityState.Deleted;
-                }
-
-                await _content.UpdateAsync(content);
+                ContentMedia media = await _db.ContentMedia.SingleOrDefaultAsync(m => m.Id == mediaId);
+                _db.Entry(media).State = EntityState.Deleted;
+                await _db.SaveChangesAsync();
                 return new Response(true, "The image has now been removed.");
             }
             catch (Exception ex)
@@ -588,27 +583,6 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("admin/content/media/{id}/setfeatured/{mediaId}")]
-        public async Task<Response> SetFeatured(int id, int mediaId)
-        {
-            try
-            {
-                Content content = await _content.GetContentByIdAsync(id, true);
-                ContentMedia media = content.Media.SingleOrDefault(m => m.Id == mediaId);
-                if (media != null)
-                {
-                    content.FeaturedImage = new MediaObject(media);
-                    await _content.UpdateAsync(content);
-                }
-                return new Response(true, "The image has now been set as the featured image. You may need to reload the page to see the change.");
-            }
-            catch (Exception ex)
-            {
-                await _logService.AddExceptionAsync<ContentController>("Error setting a featured image from the media list.", ex);
-                return new Response(ex);
-            }
-        }
         #endregion
 
         #region Helpers

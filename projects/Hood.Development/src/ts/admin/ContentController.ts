@@ -15,6 +15,8 @@ export class ContentController {
         $('body').on('click', '.content-categories-create,.content-categories-edit', this.createOrEditCategory.bind(this));
         $('body').on('change', '.content-categories-check', this.toggleCategory.bind(this));
 
+        $('body').on('click', '.content-media-delete', this.removeMedia.bind(this));
+
         $('body').on('keyup', '#Slug', function (this: HTMLElement) {
             let slugValue: string = $(this).val() as string;
             $('.slug-display').html(slugValue);
@@ -237,6 +239,32 @@ export class ContentController {
 
         }.bind(this));
     
+    }
+
+    removeMedia(this: ContentController, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        Alerts.confirm({
+            // Confirm options...
+            title: "Are you sure?",
+            html: "The media will be removed from the property, but will still be in the media collection."
+        }, function (this: ContentController, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: ContentController, data: Response) {
+
+                    Response.process(data, 5000);
+
+                    // reload the property media gallery, should be attached to #property-gallery-list
+                    let mediaGalleryEl = document.getElementById('content-gallery-list');
+                    if (mediaGalleryEl.hoodDataList) {
+                        mediaGalleryEl.hoodDataList.reload();
+                    }
+
+                }.bind(this));
+            }
+        }.bind(this))
+
     }
 
 }

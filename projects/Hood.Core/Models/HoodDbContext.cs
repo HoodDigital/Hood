@@ -39,6 +39,7 @@ namespace Hood.Models
         // Content
         public DbSet<Content> Content { get; set; }
         public DbSet<ContentMeta> ContentMetadata { get; set; }
+        public DbSet<ContentMedia> ContentMedia{ get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
 
 

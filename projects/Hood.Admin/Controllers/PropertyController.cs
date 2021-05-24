@@ -467,10 +467,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
-                PropertyMedia media = model.Media.Find(m => m.Id == mediaId);
+                PropertyMedia media = await _db.PropertyMedia.SingleOrDefaultAsync(m => m.Id == mediaId);
                 _db.Entry(media).State = EntityState.Deleted;
-                await _property.UpdateAsync(model);
+                await _db.SaveChangesAsync();
                 return new Response(true, $"The media has been removed.");
             }
             catch (Exception ex)
@@ -541,10 +540,9 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
-                PropertyFloorplan media = model.FloorPlans.Find(m => m.Id == mediaId);
-                _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-                await _property.UpdateAsync(model);
+                PropertyFloorplan media = await _db.PropertyFloorplans.SingleOrDefaultAsync(m => m.Id == mediaId);
+                _db.Entry(media).State = EntityState.Deleted;
+                await _db.SaveChangesAsync();
                 return new Response(true, $"The floorplan has been removed.");
             }
             catch (Exception ex)
