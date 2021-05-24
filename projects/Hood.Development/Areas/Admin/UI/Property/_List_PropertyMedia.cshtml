@@ -17,10 +17,6 @@
                         <div class="text-muted mb-2">
                             @media.FormattedSize
                         </div>
-                        @if (media.GenericFileType == GenericFileType.Image)
-                        {
-                            <a class="btn btn-sm btn-success hood-inline-task" asp-action="SetFeatured" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id">Set as featured</a>
-                        }
                         <a class="btn btn-sm btn-danger property-media-delete" asp-action="RemoveMedia" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id"><i class="fa fa-trash"></i></a>
                     </div>
                 </div>

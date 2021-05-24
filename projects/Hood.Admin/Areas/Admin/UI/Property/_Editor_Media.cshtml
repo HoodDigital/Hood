@@ -2,13 +2,11 @@
 <div id="media" class="tab-pane">
     <h5 class="mt-2 mb-0">Images &amp; Media</h5>
     <p>You can add images or PDFs to this, images will appear in a floorplan view in the template, or can be templated to appear however you want.</p>
-    <div id="property-gallery-list" class="refresh mb-3" data-url="@Url.Action("Gallery", new { id = Model.Id })">
-        <partial name="_List_PropertyMedia" />
-    </div>
+    <div id="property-gallery-list" class="refresh mb-3" data-url="@Url.Action("Gallery", new { id = Model.Id })"></div>
     <a class="btn btn-success text-white" 
         media-gallery="property-gallery-list"
-        media-url="@Url.Action("Gallery", new { id = Model.Id })">
-        <i class="fa fa-plus-circle mr-2"></i>
+        media-url="@Url.Action("UploadToGallery", new { id = Model.Id })">
+        <i class="fa fa-plus-circle me-2"></i>
         <span>Add files...</span>
     </a>
 </div>

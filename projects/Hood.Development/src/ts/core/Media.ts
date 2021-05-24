@@ -8,6 +8,7 @@ import { Inline } from "./Inline";
 import * as Dropzone from "dropzone";
 import { SweetAlertResult } from "sweetalert2";
 import { Editor } from "tinymce";
+import { KeyValue } from "../interfaces/KeyValue";
 
 const dz = Dropzone
 dz.autoDiscover = false;
@@ -207,13 +208,13 @@ export class MediaService {
 
         // Hide the total progress bar when nothing's uploading anymore
         this.dropzone.on("complete", function (this: MediaService, file: Dropzone.DropzoneFile) {
-            this.media.Reload();
+            this.media.reload();
         }.bind(this));
 
         // Hide the total progress bar when nothing's uploading anymore
         this.dropzone.on("queuecomplete", function (this: MediaService) {
             this.progressArea.classList.add('collapse');
-            this.media.Reload();
+            this.media.reload();
         }.bind(this));
     }
 
@@ -229,7 +230,7 @@ export class MediaService {
                         Response.process(response, 5000);
 
                         if (response.success) {
-                            this.media.Reload();
+                            this.media.reload();
                             createDirectoryModal.close();
                         }
 
@@ -255,7 +256,7 @@ export class MediaService {
                         var listUrl = document.createElement('a');
                         listUrl.href = $(this.element).data('url');
                         listUrl.search = `?dir=${response.data[0]}`;
-                        this.media.Reload(new URL(listUrl.href));
+                        this.media.reload(new URL(listUrl.href));
                     }
                 }.bind(this));
             }
@@ -273,11 +274,6 @@ export class MediaService {
 
         // Load media object from clicked item in the media list
         let mediaObject: MediaObject = $(e.currentTarget).data('json') as MediaObject;
-
-        // Run the callback for onAction
-        if (this.options.onAction) {
-            this.options.onAction(mediaObject);
-        }
 
         // Perform the chosen action, which is set on the service's options when loaded.
         switch (this.options.action) {
@@ -335,13 +331,23 @@ export class MediaService {
         if (this.options.refresh) {
             MediaService.refresh(mediaObject, this.options.refresh);
         }
+
+        // Run the callback for onAction
+        if (this.options.onAction) {
+            this.options.onAction(mediaObject);
+        }
     }
 
     insert(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
         // basic functionality to insert the correct string from the media response (from uploader) to given input element. 
         Alerts.log(`[MediaService.insert] Selecting media object id ${mediaObject.id} - ${mediaObject.filename} and inserting ${this.options.size} image to target editor: ${this.options.target}`);
         this.options.targetEditor.insertContent('<img alt="' + mediaObject.filename + '" src="' + mediaObject.url + '" class="img-fluid" />');
-    }
+
+        // Run the callback for onAction
+        if (this.options.onAction) {
+            this.options.onAction(mediaObject);
+        }
+   }
 
     attach(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
         // once file is uploaded to given directory, send media id to the given attach endpoint.
@@ -349,6 +355,10 @@ export class MediaService {
         $.post(this.options.url, { mediaId: mediaObject.id }, function (this: MediaService, response: Response) {
             Response.process(response, 5000);
             MediaService.refresh(response.media, this.options.refresh);
+            // Run the callback for onAction
+            if (this.options.onAction) {
+                this.options.onAction(mediaObject);
+            }
         }.bind(this));
     }
 
@@ -376,6 +386,27 @@ export class MediaService {
 
         // once file is uploaded to given directory, send media id to the given attach endpoint.
         Alerts.log(`[MediaService.galleryAdd] Adding ${this.selectedMedia.length} selected media objects  to url: ${this.options.url}`);
+
+        let mediaIds = this.selectedMedia.map(function (v: MediaObject) {
+            return v.id;
+        });
+
+        // create the url to send to (add media id's to it as query params)
+        $.post(this.options.url, { media: mediaIds }, function (this: MediaService, data: Response) {
+
+            Response.process(data);
+
+            // refresh the gallery - - 
+            let galleryEl = document.getElementById(this.options.target);
+            let gallery: DataList = galleryEl.hoodDataList as DataList;
+            gallery.reload();
+
+            // Run the callback for onAction
+            if (this.options.onAction) {
+                this.options.onAction(data.media);
+            }
+
+        }.bind(this));
 
     }
 
@@ -418,7 +449,7 @@ export class MediaService {
                 Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, response: Response) {
 
                     Response.process(response, 5000);
-                    this.media.Reload();
+                    this.media.reload();
                     if (this.currentBlade) {
                         this.currentBlade.close();
                     }
@@ -445,6 +476,22 @@ export class MediaModal {
     initUploaders () {
         $('body').on('click', '[data-hood-media=attach],[data-hood-media=select],[data-hood-media=gallery]', this.load.bind(this));
         $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
+        $('[data-hood-media=gallery]').each(this.initGallery.bind(this));
+    }
+
+    initGallery(this: MediaModal, index: number, element: HTMLElement): void {
+
+        // setup the gallery list also, just a simple list jobby, and attach it to the 
+        let el = document.getElementById(element.dataset.hoodMediaTarget);
+        if (el) {
+            new DataList(el, {
+                onComplete: function (this: MediaModal, data: string, sender: HTMLElement = null) {
+
+                    Alerts.log('Finished loading gallery media list.', 'info');
+
+                }.bind(this)
+            });
+        }
     }
 
     load(this: MediaModal, e: JQuery.ClickEvent): void {
@@ -452,6 +499,7 @@ export class MediaModal {
         e.stopPropagation();
 
         this.element = e.currentTarget;
+
         this.modal = new ModalController({
 
             onComplete: function (this: MediaModal, sender: HTMLElement) {
@@ -466,10 +514,10 @@ export class MediaModal {
                     beforeAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
                     }.bind(this),
                     onAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
-                        if (this.element.dataset.hoodMedia != 'gallery') {
-                            this.service.destroy();
-                            this.modal.close();
-                        }
+
+                        this.service.destroy();
+                        this.modal.close();
+
                     }.bind(this),
                     onListLoad: (sender: HTMLElement) => {
                     },
@@ -488,15 +536,15 @@ export class MediaModal {
         this.modal.show($(e.currentTarget).data('hood-media-list'), e.currentTarget);
     }
 
-    clear(this: MediaService, e: JQuery.ClickEvent) {
+    clear(this: MediaModal, e: JQuery.ClickEvent) {
         e.preventDefault();
         e.stopPropagation();
 
         Alerts.confirm({
 
-        }, function (this: MediaService, result: SweetAlertResult) {
+        }, function (this: MediaModal, result: SweetAlertResult) {
             if (result.isConfirmed) {
-                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, response: Response) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaModal, response: Response) {
 
                     Response.process(response, 5000);
                     MediaService.refresh(response.media, e.currentTarget.dataset.hoodMediaRefresh);

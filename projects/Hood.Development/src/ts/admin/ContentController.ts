@@ -81,7 +81,7 @@ export class ContentController {
                         Response.process(response, 5000);
 
                         if (this.list) {
-                            this.list.Reload();
+                            this.list.reload();
                         }
 
                         if (response.success) {
@@ -110,7 +110,7 @@ export class ContentController {
                     Response.process(data, 5000);
 
                     if (this.list) {
-                        this.list.Reload();
+                        this.list.reload();
                     }
 
                     if (e.currentTarget.dataset.redirect) {
@@ -143,7 +143,7 @@ export class ContentController {
                     Response.process(data, 5000);
 
                     if (this.list) {
-                        this.list.Reload();
+                        this.list.reload();
                     }
 
                 }.bind(this));
@@ -167,7 +167,7 @@ export class ContentController {
                     Response.process(data, 5000);
 
                     if (this.list) {
-                        this.list.Reload();
+                        this.list.reload();
                     }
 
                 }.bind(this));
@@ -188,11 +188,11 @@ export class ContentController {
                         Response.process(response, 5000);
 
                         if (this.list) {
-                            this.list.Reload();
+                            this.list.reload();
                         }
 
                         if (response.success) {
-                            this.categoryList.Reload();
+                            this.categoryList.reload();
                             createCategoryModal.close();
                         }
 
@@ -216,7 +216,7 @@ export class ContentController {
                     // category deleted...
                     Response.process(data, 5000);
 
-                    this.categoryList.Reload();
+                    this.categoryList.reload();
 
                 }.bind(this));
             }
@@ -232,7 +232,7 @@ export class ContentController {
             Response.process(response, 5000);
 
             if (this.categoryList) {
-                this.categoryList.Reload();
+                this.categoryList.reload();
             }
 
         }.bind(this));

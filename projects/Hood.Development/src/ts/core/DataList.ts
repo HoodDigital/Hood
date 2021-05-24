@@ -2,6 +2,12 @@
 import { Helpers } from "./Helpers";
 import { Inline } from "./Inline";
 
+declare global {
+    interface HTMLElement {
+        hoodDataList: DataList;
+    }
+}
+
 export interface DataListOptions {
 
     /**
@@ -40,6 +46,7 @@ export class DataList {
     constructor(element: HTMLElement, options: DataListOptions) {
 
         this.element = element;
+        this.element.hoodDataList = this;
         if (typeof(element) == 'undefined' || element == null) {
             Alerts.log('Could not DataList to element, element does not exist.', 'error');
             return;
@@ -56,7 +63,7 @@ export class DataList {
         if (!$(this.element).hasClass('refresh-only')) {
             var listUrl = document.createElement('a');
             listUrl.href = $(this.element).data('url');
-            this.Reload(new URL(listUrl.href));
+            this.reload(new URL(listUrl.href));
         }
 
         $(this.element).on('click', '.pagination a, a.hood-inline-list-target', function (e: JQuery.ClickEvent) {
@@ -100,7 +107,7 @@ export class DataList {
         //    });
     }
 
-    Reload(url: URL = null) {
+    reload(url: URL = null) {
         if (url) {
             if (history.pushState && $(this.element).hasClass('query')) {
                 let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + (url.href.contains('?') ? "?" + url.href.substring(url.href.indexOf('?') + 1) : '');

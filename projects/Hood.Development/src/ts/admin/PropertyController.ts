@@ -11,6 +11,9 @@ export class PropertyController {
         $('body').on('click', '.property-delete', this.delete.bind(this));
         $('body').on('click', '.property-set-status', this.setStatus.bind(this));
 
+        $('body').on('click', '.property-media-delete', this.removeMedia.bind(this));
+        $('body').on('click', '.property-floorplan-delete', this.removeMedia.bind(this));
+
         $('body').on('keyup', '#Slug', function (this: HTMLElement) {
             let slugValue: string = $(this).val() as string;
             $('.slug-display').html(slugValue);
@@ -56,7 +59,7 @@ export class PropertyController {
                         Response.process(response, 5000);
 
                         if (this.list) {
-                            this.list.Reload();
+                            this.list.reload();
                         }
 
                         if (response.success) {
@@ -85,7 +88,7 @@ export class PropertyController {
                     Response.process(data, 5000);
 
                     if (this.list) {
-                        this.list.Reload();
+                        this.list.reload();
                     }
 
                     if (e.currentTarget.dataset.redirect) {
@@ -118,7 +121,7 @@ export class PropertyController {
                     Response.process(data, 5000);
 
                     if (this.list) {
-                        this.list.Reload();
+                        this.list.reload();
                     }
 
                 }.bind(this));
@@ -127,4 +130,35 @@ export class PropertyController {
 
     }
 
+    removeMedia(this: PropertyController, e: JQuery.ClickEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        Alerts.confirm({
+            // Confirm options...
+            title: "Are you sure?",
+            html: "The media will be removed from the property, but will still be in the media collection."
+        }, function (this: PropertyController, result: SweetAlertResult) {
+            if (result.isConfirmed) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: PropertyController, data: Response) {
+
+                    Response.process(data, 5000);
+
+                    // reload the property media gallery, should be attached to #property-gallery-list
+                    let mediaGalleryEl = document.getElementById('property-gallery-list');
+                    if (mediaGalleryEl.hoodDataList) {
+                        mediaGalleryEl.hoodDataList.reload();
+                    }
+
+                    // reload the property media gallery, should be attached to #property-gallery-list
+                    let mfpGalleryEl = document.getElementById('property-floorplan-list');
+                    if (mfpGalleryEl && mfpGalleryEl.hoodDataList) {
+                        mfpGalleryEl.hoodDataList.reload();
+                    }
+
+                }.bind(this));
+            }
+        }.bind(this))
+
+    }
 }

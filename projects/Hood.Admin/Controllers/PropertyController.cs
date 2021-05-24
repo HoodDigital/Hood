@@ -414,61 +414,50 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Authorize]
+        [HttpPost]
         [Route("admin/property/{id}/gallery/upload/")]
-        public async Task<Response> UploadToGallery(List<IFormFile> files, int id)
+        public async Task<Response> UploadToGallery(List<int> media, int id)
         {
             try
             {
-                PropertyListing property = await _property.GetPropertyByIdAsync(id);
+                PropertyListing property = await _db.Properties
+                        .Include(p => p.Media)
+                        .FirstOrDefaultAsync(c => c.Id == id);
+
                 if (property == null)
                 {
                     throw new Exception("Property not found!");
                 }
 
-                MediaObject mediaResult = null;
-                if (files != null)
+                if (media != null)
                 {
-                    if (files.Count == 0)
+                    if (media.Count == 0)
                     {
-                        throw new Exception("There are no files attached!");
+                        throw new Exception("There are no files selected!");
                     }
 
                     var directory = await _property.GetDirectoryAsync();
-                    foreach (IFormFile file in files)
+                    foreach (int mediaId in media)
                     {
-                        mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
-                        await _property.AddMediaAsync(property, new PropertyMedia(mediaResult));
-                        mediaResult.DirectoryId = directory.Id;
-                        _db.Media.Add(mediaResult);
+                        // load the media object from db
+                        MediaObject mediaObject = _db.Media.AsNoTracking().SingleOrDefault(m => m.Id == mediaId);
+                        if (media == null)
+                        {
+                            throw new Exception("Could not load media to attach.");
+                        }
+                        var propertyMedia = new PropertyMedia(mediaObject);
+                        propertyMedia.PropertyId = property.Id;
+                        propertyMedia.Id = 0;
+                        _db.PropertyMedia.Add(propertyMedia);
                         await _db.SaveChangesAsync();
+                        
                     }
                 }
-                return new Response(true, mediaResult, "The image/media file has been attached successfully.");
+                return new Response(true, "The media has been attached successfully.");
             }
             catch (Exception ex)
             {
-                return await ErrorResponseAsync<PropertyController>($"Error uploading media to the gallery.", ex);
-            }
-        }
-
-        [HttpGet]
-        [Route("admin/property/{id}/media/setfeatured/{mediaId}")]
-        public async Task<Response> SetFeatured(int id, int mediaId)
-        {
-            try
-            {
-                PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
-                PropertyMedia media = property.Media.SingleOrDefault(m => m.Id == mediaId);
-                if (media != null)
-                {
-                    property.FeaturedImage = new MediaObject(media);
-                    await _property.UpdateAsync(property);
-                }
-                return new Response(true, $"Featured image has been updated. You may need to reload the page to see the change.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error setting featured image for property.", ex);
+                return await ErrorResponseAsync<PropertyController>($"Error attaching media to the gallery.", ex);
             }
         }
 
@@ -480,16 +469,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
                 PropertyMedia media = model.Media.Find(m => m.Id == mediaId);
-                if (media != null)
-                {
-                    var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == media.UniqueId);
-                    if (mediaItem != null)
-                    {
-                        _db.Entry(mediaItem).State = EntityState.Deleted;
-                    }
-                    await _media.DeleteStoredMedia(media);
-                    _db.Entry(media).State = EntityState.Deleted;
-                }
+                _db.Entry(media).State = EntityState.Deleted;
                 await _property.UpdateAsync(model);
                 return new Response(true, $"The media has been removed.");
             }
@@ -511,35 +491,44 @@ namespace Hood.Areas.Admin.Controllers
 
         [Authorize]
         [Route("admin/property/{id}/floorplans/upload")]
-        public async Task<Response> UploadFloorplan(List<IFormFile> files, int id)
+        public async Task<Response> UploadFloorplan(List<int> media, int id)
         {
             try
             {
-                PropertyListing property = await _property.GetPropertyByIdAsync(id);
+                PropertyListing property = await _db.Properties
+                        .Include(p => p.FloorPlans)
+                        .FirstOrDefaultAsync(c => c.Id == id);
+
                 if (property == null)
                 {
                     throw new Exception("Property not found!");
                 }
 
-                MediaObject mediaResult = null;
-                if (files != null)
+                if (media != null)
                 {
-                    if (files.Count == 0)
+                    if (media.Count == 0)
                     {
-                        throw new Exception("There are no files attached!");
+                        throw new Exception("There are no files selected!");
                     }
 
                     var directory = await _property.GetDirectoryAsync();
-                    foreach (IFormFile file in files)
+                    foreach (int mediaId in media)
                     {
-                        mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id)) as MediaObject;
-                        await _property.AddFloorplanAsync(property, new PropertyFloorplan(mediaResult));
-                        mediaResult.DirectoryId = directory.Id;
-                        _db.Media.Add(mediaResult);
+                        // load the media object from db
+                        MediaObject mediaObject = _db.Media.AsNoTracking().SingleOrDefault(m => m.Id == mediaId);
+                        if (media == null)
+                        {
+                            throw new Exception("Could not load media to attach.");
+                        }
+                        var propertyMedia = new PropertyFloorplan(mediaObject);
+                        propertyMedia.PropertyId = property.Id;
+                        propertyMedia.Id = 0;
+                        _db.PropertyFloorplans.Add(propertyMedia);
                         await _db.SaveChangesAsync();
+
                     }
                 }
-                return new Response(true, mediaResult, "The floorplan file has been attached successfully.");
+                return new Response(true, "The media has been attached successfully.");
             }
             catch (Exception ex)
             {
@@ -554,103 +543,8 @@ namespace Hood.Areas.Admin.Controllers
             {
                 PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
                 PropertyFloorplan media = model.FloorPlans.Find(m => m.Id == mediaId);
-                if (media != null)
-                {
-                    var mediaItem = await _db.Media.SingleOrDefaultAsync(m => m.UniqueId == media.UniqueId);
-                    if (mediaItem != null)
-                    {
-                        _db.Entry(mediaItem).State = EntityState.Deleted;
-                    }
-                    await _media.DeleteStoredMedia(media);
-                    _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
-                }
+                _db.Entry(media).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
                 await _property.UpdateAsync(model);
-                return new Response(true, $"The floorplan has been removed.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error removing floorplan from property.", ex);
-            }
-        }
-        #endregion
-
-        #region Floor Areas
-        [Route("admin/property/{id}/floorareas/")]
-        public async Task<IActionResult> FloorAreas(int id)
-        {
-            PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
-            return View("_List_PropertyFloorareas", model);
-        }
-
-        [Authorize]
-        [Route("admin/property/{id}/floorareas/create")]
-        public async Task<IActionResult> CreateFloorArea(int id)
-        {
-            PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
-            if (property == null)
-            {
-                throw new Exception("Property not found!");
-            }
-            var model = new FloorArea()
-            {
-                PropertyId = property.Id,
-                Number = property.FloorAreas.Count + 1
-            };
-            return View("_Blade_FloorArea", model);
-        }
-
-        [Authorize]
-        [HttpPost]
-        [Route("admin/property/{id}/floorareas/create")]
-        public async Task<Response> CreateFloorArea(FloorArea model)
-        {
-            try
-            {
-                PropertyListing property = await _property.GetPropertyByIdAsync(model.PropertyId);
-                if (property == null)
-                {
-                    throw new Exception("Property not found!");
-                }
-
-                var floorArea = property.FloorAreas.Find(m => m.Number == model.Number);
-                if (floorArea != null)
-                    throw new Exception("You cannot add multiple floor areas with the same floor number.");
-                else
-                {
-                    var fa = property.FloorAreas;
-                    fa.Add(model);
-                    property.FloorAreas = fa;
-                }
-
-                await _property.UpdateAsync(property);
-                return new Response(true, "Floor area added successfully.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error uploading a floor area.", ex);
-            }
-        }
-        [HttpPost]
-        [Route("admin/property/{id}/floorareas/remove/{number}")]
-        public async Task<Response> RemoveFloorArea(int id, int number)
-        {
-            try
-            {
-                PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
-                if (property == null)
-                {
-                    throw new Exception("Property not found!");
-                }
-
-                var floorArea = property.FloorAreas.Find(m => m.Number == number);
-                if (floorArea != null)
-                {
-                    var fa = property.FloorAreas;
-                    fa.Remove(floorArea);
-                    property.FloorAreas = fa;
-                }
-
-                await _property.UpdateAsync(property);
                 return new Response(true, $"The floorplan has been removed.");
             }
             catch (Exception ex)

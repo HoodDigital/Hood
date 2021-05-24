@@ -44,6 +44,8 @@ namespace Hood.Models
 
         // Property
         public DbSet<PropertyListing> Properties { get; set; }
+        public DbSet<PropertyMedia> PropertyMedia { get; set; }
+        public DbSet<PropertyFloorplan> PropertyFloorplans { get; set; }
         public DbSet<PropertyMeta> PropertyMetadata { get; set; }
 
         // Logs
