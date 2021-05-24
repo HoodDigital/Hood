@@ -59,7 +59,7 @@ export interface MediaOptions {
     size?: string;
 
     /**
-     * Select Only: Input field to insert image url to. 
+     * Select/Gallery Only: Input field to insert image url to. 
      */
     target?: string;
 
@@ -141,6 +141,13 @@ export class MediaService {
             onRender: this.options.onListRender,
             onComplete: function (this: MediaService, html: string, sender: HTMLElement) {
                 this.initUploader();
+
+                // if this is gallery type, add the "Add to gallery button" and hook it to the add function
+                if (this.options.action == 'gallery') {
+                    $('#media-select-modal .modal-footer').removeClass('d-none');
+                    $('#media-select-modal .modal-footer').on('click', this.galleryAdd.bind(this));
+                }
+
                 if (this.options.onListComplete) {
                     this.options.onListComplete(html, sender)
                 }
@@ -283,6 +290,9 @@ export class MediaService {
             case 'attach':
                 this.attach(mediaObject, e);
                 break;
+            case 'gallery':
+                this.galleryClick(mediaObject, e);
+                break;
             default:
                 this.show(mediaObject, e);
                 break;
@@ -300,7 +310,7 @@ export class MediaService {
     }
 
     select(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
-        Alerts.log(`[MediaService.select] Selecting media object id ${mediaObject.id} - ${mediaObject.filename} and inserting ${this.options.size} url to target: ${ this.options.target }`);
+        Alerts.log(`[MediaService.select] Selecting media object id ${mediaObject.id} - ${mediaObject.filename} and inserting ${this.options.size} url to target: ${this.options.target}`);
         if (this.options.target) {
             let target = $(this.options.target);
 
@@ -340,6 +350,43 @@ export class MediaService {
             Response.process(response, 5000);
             MediaService.refresh(response.media, this.options.refresh);
         }.bind(this));
+    }
+
+    selectedMedia: MediaObject[] = new Array();
+
+    galleryClick(this: MediaService, mediaObject: MediaObject, e: JQuery.ClickEvent): void {
+        // once file is uploaded to given directory, send media id to the given attach endpoint.
+        if (!this.isMediaSelected(mediaObject)) {
+            Alerts.log(`[MediaService.galleryClick] Adding to selected media objects - id ${mediaObject.id} - ${mediaObject.filename}.`);
+           this.selectedMedia.push(mediaObject);
+            $(e.currentTarget).parents('.media-item').addClass('active');
+        } else {
+            Alerts.log(`[MediaService.galleryClick] Removing media from selection - id ${mediaObject.id} - ${mediaObject.filename}.}`);
+            this.selectedMedia = this.selectedMedia.filter(function (obj: MediaObject) {
+                return obj.id !== mediaObject.id;
+            });
+            $(e.currentTarget).parents('.media-item').removeClass('active');
+        }
+    }
+
+    galleryAdd(this: MediaService, e: JQuery.ClickEvent): void {
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // once file is uploaded to given directory, send media id to the given attach endpoint.
+        Alerts.log(`[MediaService.galleryAdd] Adding ${this.selectedMedia.length} selected media objects  to url: ${this.options.url}`);
+
+    }
+
+    isMediaSelected(mediaObject: MediaObject): boolean {
+        let added: boolean = false;
+        this.selectedMedia.forEach(function (value: MediaObject, index: number, array: MediaObject[]) {
+            if (value.id == mediaObject.id) {
+                added = true;
+            }
+        });
+        return added;
     }
 
     static refresh(media: MediaObject, refresh: string): void {
@@ -396,11 +443,13 @@ export class MediaModal {
     }
 
     initUploaders () {
-        $('body').on('click', '[data-hood-media=attach],[data-hood-media=select]', this.load.bind(this));
+        $('body').on('click', '[data-hood-media=attach],[data-hood-media=select],[data-hood-media=gallery]', this.load.bind(this));
         $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
     }
 
     load(this: MediaModal, e: JQuery.ClickEvent): void {
+        e.preventDefault();
+        e.stopPropagation();
 
         this.element = e.currentTarget;
         this.modal = new ModalController({
@@ -417,8 +466,10 @@ export class MediaModal {
                     beforeAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
                     }.bind(this),
                     onAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
-                        this.service.destroy();
-                        this.modal.close();
+                        if (this.element.dataset.hoodMedia != 'gallery') {
+                            this.service.destroy();
+                            this.modal.close();
+                        }
                     }.bind(this),
                     onListLoad: (sender: HTMLElement) => {
                     },
@@ -440,6 +491,7 @@ export class MediaModal {
     clear(this: MediaService, e: JQuery.ClickEvent) {
         e.preventDefault();
         e.stopPropagation();
+
         Alerts.confirm({
 
         }, function (this: MediaService, result: SweetAlertResult) {

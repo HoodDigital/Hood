@@ -48,7 +48,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #region Edit
-        [Route("admin/property/edit/{id}/")]
+        [Route("admin/property/{id}/edit/")]
         public async Task<IActionResult> Edit(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
@@ -58,7 +58,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/property/edit/{id}/")]
+        [Route("admin/property/{id}/edit/")]
         public async Task<ActionResult> Edit(PropertyListing model)
         {
             try
@@ -66,7 +66,7 @@ namespace Hood.Areas.Admin.Controllers
                 var modelToUpdate = await _property.GetPropertyByIdAsync(model.Id, true);
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
-                modelToUpdate = modelToUpdate.UpdateFromFormModel(modelToUpdate, updatedFields);
+                modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
                 modelToUpdate = await _property.ReloadReferences(modelToUpdate);
 
@@ -156,6 +156,8 @@ namespace Hood.Areas.Admin.Controllers
 
                 SaveMessage = "Saved";
                 MessageType = AlertType.Success;
+
+                modelToUpdate = await LoadAgents(modelToUpdate);
 
                 return View(modelToUpdate);
 
@@ -281,23 +283,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Delete
-        [Authorize(Roles = "SuperUser,Admin")]
-        [HttpPost()]
-        [Route("admin/property/delete/all/")]
-        public async Task<Response> DeleteAll()
-        {
-            try
-            {
-                await _property.DeleteAllAsync();
-                return new Response(true, "The properties have been successfully deleted.");
-            }
-            catch (Exception ex)
-            {
-                return await ErrorResponseAsync<PropertyController>($"Error deleting all properties.", ex);
-            }
-        }
-
-        [Route("admin/property/delete/{id}")]
+        [Route("admin/property/{id}/delete")]
         [HttpPost()]
         public async Task<Response> Delete(int id)
         {
@@ -313,7 +299,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         #endregion
 
-        [Route("admin/property/set-status/{id}")]
+        [Route("admin/property/{id}/set-status")]
         [HttpPost()]
         public async Task<Response> SetStatus(int id, ContentStatus status)
         {
@@ -328,8 +314,99 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
+        #region Media
+        /// <summary>
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the media attach action.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/property/{id}/media/upload")]
+        public async Task<Response> UploadMedia(int id, AttachMediaModel model)
+        {
+            try
+            {
+                model.ValidateOrThrow();
+
+                // load the media object.
+                PropertyListing property = await _db.Properties.Where(p => p.Id == id).FirstOrDefaultAsync();
+                if (property == null)
+                {
+                    throw new Exception("Could not load property to attach media.");
+                }
+
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
+                if (media == null)
+                {
+                    throw new Exception("Could not load media to attach.");
+                }
+
+                switch (model.FieldName)
+                {
+                    case nameof(Models.PropertyListing.FeaturedImage):
+                        property.FeaturedImage = new PropertyMedia(media);
+                        break;
+                    case nameof(Models.PropertyListing.InfoDownload):
+                        property.InfoDownload = new PropertyMedia(media);
+                        break;
+                }
+
+                await _db.SaveChangesAsync();
+
+                string cacheKey = typeof(Content).ToString() + ".Single." + id;
+                _cache.Remove(cacheKey);
+
+                return new Response(true, media, $"The media has been attached successfully.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Remove media file from entity.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/property/{id}/media/remove")]
+        public async Task<Response> RemoveMedia(int id, AttachMediaModel model)
+        {
+            try
+            {
+                // load the media object.
+                PropertyListing property = await _db.Properties.Where(p => p.Id == id).FirstOrDefaultAsync();
+                if (property == null)
+                {
+                    throw new Exception("Could not load property to remove media.");
+                }
+
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
+
+                switch (model.FieldName)
+                {
+                    case nameof(Models.PropertyListing.FeaturedImage):
+                        property.FeaturedImageJson = null;
+                        break;
+                    case nameof(Models.PropertyListing.InfoDownload):
+                        property.InfoDownload = null;
+                        break;
+                }
+
+                await _db.SaveChangesAsync();
+
+                string cacheKey = typeof(PropertyListing).ToString() + ".Single." + id;
+                _cache.Remove(cacheKey);
+
+                return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error removing a media file from an entity.", ex);
+            }
+        }
+        #endregion
+
         #region Gallery
-        [Route("admin/property/gallery/{id}/")]
+        [Route("admin/property/{id}/gallery/")]
         public async Task<IActionResult> Gallery(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
@@ -337,7 +414,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Authorize]
-        [Route("admin/property/upload/gallery")]
+        [Route("admin/property/{id}/gallery/upload/")]
         public async Task<Response> UploadToGallery(List<IFormFile> files, int id)
         {
             try
@@ -375,7 +452,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Route("admin/property/media/setfeatured/{id}/{mediaId}")]
+        [Route("admin/property/{id}/media/setfeatured/{mediaId}")]
         public async Task<Response> SetFeatured(int id, int mediaId)
         {
             try
@@ -396,7 +473,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("admin/property/media/remove/{id}/{mediaId}")]
+        [Route("admin/property/{id}/media/remove/{mediaId}")]
         public async Task<Response> RemoveMedia(int id, int mediaId)
         {
             try
@@ -425,7 +502,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Floorplans
-        [Route("admin/property/floorplans/{id}/")]
+        [Route("admin/property/{id}/floorplans/")]
         public async Task<IActionResult> FloorPlans(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
@@ -433,7 +510,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Authorize]
-        [Route("admin/property/upload/floorplan")]
+        [Route("admin/property/{id}/floorplans/upload")]
         public async Task<Response> UploadFloorplan(List<IFormFile> files, int id)
         {
             try
@@ -470,7 +547,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
         [HttpPost]
-        [Route("admin/property/floorplan/remove/{id}/{mediaId}")]
+        [Route("admin/property/{id}/floorplans/remove/{mediaId}")]
         public async Task<Response> RemoveFloorplan(int id, int mediaId)
         {
             try
@@ -498,7 +575,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Floor Areas
-        [Route("admin/property/floorareas/{id}/")]
+        [Route("admin/property/{id}/floorareas/")]
         public async Task<IActionResult> FloorAreas(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
@@ -506,7 +583,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Authorize]
-        [Route("admin/property/floorareas/create/{id}")]
+        [Route("admin/property/{id}/floorareas/create")]
         public async Task<IActionResult> CreateFloorArea(int id)
         {
             PropertyListing property = await _property.GetPropertyByIdAsync(id, true);
@@ -524,7 +601,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Authorize]
         [HttpPost]
-        [Route("admin/property/floorareas/create/{id}")]
+        [Route("admin/property/{id}/floorareas/create")]
         public async Task<Response> CreateFloorArea(FloorArea model)
         {
             try
@@ -554,7 +631,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
         [HttpPost]
-        [Route("admin/property/floorplan/remove/{id}/{number}")]
+        [Route("admin/property/{id}/floorareas/remove/{number}")]
         public async Task<Response> RemoveFloorArea(int id, int number)
         {
             try
@@ -584,7 +661,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Features
-        [Route("admin/property/add-meta/{id}/")]
+        [Route("admin/property/{id}/add-meta/")]
         public async Task<IActionResult> AddMeta(int id, string name)
         {
             try
@@ -622,7 +699,7 @@ namespace Hood.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Edit), new { id });
         }
-        [Route("admin/property/delete-meta/{id}/")]
+        [Route("admin/property/{id}/delete-meta/")]
         public async Task<IActionResult> DeleteMeta(int id, int metaId)
         {
             try

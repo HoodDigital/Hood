@@ -13,30 +13,17 @@
     @if (!Model.ContentType.IsUnknown)
     {
         <a class="btn btn-success content-create" asp-action="Create" asp-route-type="@Model.ContentType.Slug">
-            <i class="fa fa-user-plus mr-2"></i>
+            <i class="fa fa-user-plus me-2"></i>
             Create New
         </a>
     }
-    <button type="button" class="btn btn-outline-dark" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fa fa-ellipsis-h"></i>
-    </button>
-    <div class="dropdown-menu dropdown-menu-right">
-        @if (Model.ContentType.IsPublic)
-        {
-            <a class="dropdown-item" href="@string.Format("/{0}/", Model.ContentType.Slug)" target="_blank">
-                <i class="fa fa-desktop"></i>
-                Preview
-            </a>
-        }
-        <div class="dropdown-divider"></div>
-        @if (User.IsAdminOrBetter())
-        {
-            <a class="dropdown-item warning-alert" asp-action="DeleteAll" data-warning="Are you sure?! This will delete ALL @Model.ContentType.TypeNamePlural.ToLower() from the site!">
-                <i class="fa fa-trash"></i>
-                Delete All
-            </a>
-        }
-    </div>
+    @if (Model.ContentType.IsPublic)
+    {
+        <a class="btn btn-outline-dark" href="@string.Format("/{0}/", Model.ContentType.Slug)" target="_blank">
+            <i class="fa fa-desktop me-2"></i>
+            Preview
+        </a>
+    }
 }
 @if (Model.SaveMessage.IsSet())
 {

@@ -38,7 +38,7 @@ namespace Hood.Models
         // Dates
         [FormUpdatable]
         [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddThh:mm}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
@@ -51,8 +51,10 @@ namespace Hood.Models
         public ContentStatus Status { get; set; }
 
         // Creator/Editor
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
 

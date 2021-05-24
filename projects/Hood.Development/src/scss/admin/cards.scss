@@ -7,4 +7,11 @@
             border-color: $gray-400;
         }
     }
+
+    &.media-item {
+        &.active {
+            border: 1px solid green;
+            background-color: #c9eacc;
+        }
+    }
 }

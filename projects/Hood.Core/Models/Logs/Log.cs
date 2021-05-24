@@ -2,6 +2,7 @@
 using Hood.Extensions;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
@@ -12,6 +13,7 @@ namespace Hood.Models
         /// <summary>
         /// Date and time of the logged event.
         /// </summary>
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime Time { get; set; }
 
         /// <summary>

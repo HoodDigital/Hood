@@ -9,21 +9,21 @@
     {
         <div class="row">
             <div class="col-sm-4">
-                <div class="form-group floating-label">
-                    <label asp-for="AskingPrice"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="AskingPrice" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <label asp-for="AskingPrice"></label>
                     <small asp-for="AskingPrice"></small>
                 </div>
             </div>
             <div class="col-sm-8">
-                <div class="form-group floating-label">
-                    <label asp-for="AskingPriceDisplay"></label>
-                    <select class="form-control" asp-for="AskingPriceDisplay">
+                <div class="form-floating mb-3">
+                    <select class="form-select" asp-for="AskingPriceDisplay">
                         @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PriceDisplays, "\r\n|\r|\n"))
                         {
                             <option value="@s">@string.Format(s, "£X")</option>
                         }
                     </select>
+                    <label asp-for="AskingPriceDisplay"></label>
                     <small asp-for="AskingPriceDisplay"></small>
                 </div>
             </div>
@@ -33,21 +33,21 @@
     {
         <div class="row">
             <div class="col-sm-4">
-                <div class="form-group floating-label">
-                    <label asp-for="Rent"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Rent" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <label asp-for="Rent"></label>
                     <small asp-for="Rent"></small>
                 </div>
             </div>
             <div class="col-sm-8">
-                <div class="form-group floating-label">
-                    <label asp-for="RentDisplay"></label>
-                    <select class="form-control" asp-for="RentDisplay" data-selected="@Model.RentDisplay">
+                <div class="form-floating mb-3">
+                    <select class="form-select" asp-for="RentDisplay" data-selected="@Model.RentDisplay">
                         @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.RentDisplays, "\r\n|\r|\n"))
                         {
                             <option value="@s">@string.Format(s, "£X")</option>
                         }
                     </select>
+                    <label asp-for="RentDisplay"></label>
                     <small asp-for="RentDisplay"></small>
                 </div>
             </div>
@@ -57,22 +57,22 @@
     {
         <div class="row">
             <div class="col-sm-4">
-                <div class="form-group floating-label">
-                    <label asp-for="Premium"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Premium" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <label asp-for="Premium"></label>
                     <small asp-for="Premium"></small>
                 </div>
             </div>
             <div class="col-sm-8">
-                <div class="form-group floating-label">
-                    <label asp-for="PremiumDisplay"></label>
-                    <select class="form-control" asp-for="PremiumDisplay">
+                <div class="form-floating mb-3">
+                    <select class="form-select" asp-for="PremiumDisplay">
                         @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.PriceDisplays, "\r\n|\r|\n"))
                         {
                             <option value="@s">@string.Format(s, "£X")</option>
                         }
                     </select>
-                    <small asp-for="PremiumDisplay"></small>
+                     <label asp-for="PremiumDisplay"></label>
+                   <small asp-for="PremiumDisplay"></small>
                 </div>
             </div>
         </div>
@@ -81,22 +81,22 @@
     {
         <div class="row">
             <div class="col-sm-4">
-                <div class="form-group floating-label">
-                    <label asp-for="Fees"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Fees" type="number" step="0.01" min="0" max="99999999999" class="form-control" />
+                    <label asp-for="Fees"></label>
                     <small asp-for="Fees"></small>
                 </div>
             </div>
             <div class="col-sm-8">
-                <div class="form-group floating-label">
-                    <label asp-for="FeesDisplay"></label>
-                    <select class="form-control" asp-for="FeesDisplay">
+                <div class="form-floating mb-3">
+                    <select class="form-select" asp-for="FeesDisplay">
                         @foreach (string s in System.Text.RegularExpressions.Regex.Split(_propertySettings.FeesDisplay, "\r\n|\r|\n"))
                         {
                             <option value="@s">@string.Format(s, "£X")</option>
                         }
                     </select>
-                    <small asp-for="FeesDisplay"></small>
+                     <label asp-for="FeesDisplay"></label>
+                   <small asp-for="FeesDisplay"></small>
                 </div>
             </div>
         </div>

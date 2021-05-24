@@ -13,6 +13,7 @@ import { MediaController } from './admin/MediaController';
 import { MediaModal } from './core/Media';
 import { ContentController } from './admin/ContentController';
 import * as bootstrap from 'bootstrap';
+import { PropertyController } from './admin/PropertyController';
 
 class Admin extends HoodController {
 
@@ -21,6 +22,7 @@ class Admin extends HoodController {
     home: HomeController;
     media: MediaController;
     content: ContentController;
+    property: PropertyController;
 
     constructor() {
         super();
@@ -33,8 +35,9 @@ class Admin extends HoodController {
         this.home = new HomeController();
         this.media = new MediaController();
         this.content = new ContentController();
+        this.property = new PropertyController();
 
-        if ($('page-tabs').length > 0) {
+        if ($('#page-tabs').length > 0) {
             this.CheckAndLoadTabs('#page-tabs');
         }
 

@@ -121,7 +121,6 @@ export class Editors {
     richTextEditors() {
 
 
-        console.error("Cannot load tinymce-full, Media.Actions.Load.Insert() is not implemented.");
         tinymce.init({
             selector: '.tinymce-full',
             height: 150,
@@ -158,7 +157,6 @@ export class Editors {
             image_dimensions: false
         });
 
-        console.error("Cannot load tinymce-full-content, Media.Actions.Load.Insert() is not implemented.");
         tinymce.init({
             selector: '.tinymce-full-content',
             height: 500,
