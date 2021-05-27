@@ -19,7 +19,9 @@ namespace Hood.Extensions
         public static bool IsValidEmail(this string email)
         {
             if (string.IsNullOrWhiteSpace(email))
+            {
                 return false;
+            }
 
             try
             {
@@ -30,10 +32,10 @@ namespace Hood.Extensions
                 string DomainMapper(Match match)
                 {
                     // Use IdnMapping class to convert Unicode domain names.
-                    var idn = new IdnMapping();
+                    IdnMapping idn = new IdnMapping();
 
                     // Pull out and process domain name (throws ArgumentException on invalid)
-                    var domainName = idn.GetAscii(match.Groups[2].Value);
+                    string domainName = idn.GetAscii(match.Groups[2].Value);
 
                     return match.Groups[1].Value + domainName;
                 }
@@ -84,31 +86,52 @@ namespace Hood.Extensions
         public static string ToTwitterUrl(this string url)
         {
             if (url.ToLower().Contains("twitter.com"))
+            {
                 return url.ToUrl();
+            }
+
             if (url.StartsWith("@"))
+            {
                 return ("https://twitter.com/" + url.Replace("@", "")).ToUrl();
+            }
+
             return ("https://twitter.com/" + url).ToUrl();
         }
         public static string ToInstagramUrl(this string url)
         {
             if (url.ToLower().Contains("instagram.com"))
+            {
                 return url.ToUrl();
+            }
+
             if (url.StartsWith("@"))
+            {
                 return ("https://www.instagram.com/" + url.Replace("@", "")).ToUrl();
+            }
+
             return ("https://www.instagram.com/" + url).ToUrl();
         }
         public static string ToFacebookUrl(this string url)
         {
             if (url.ToLower().Contains("facebook.com"))
+            {
                 return url.ToUrl();
+            }
+
             return ("https://www.facebook.com/" + url).ToUrl();
         }
         public static string ToGooglePlusUrl(this string url)
         {
             if (url.ToLower().Contains("plus.google.com"))
+            {
                 return url.ToUrl();
+            }
+
             if (url.StartsWith("+"))
+            {
                 return ("https://plus.google.com/" + url).ToUrl();
+            }
+
             return ("https://plus.google.com/+" + url).ToUrl();
         }
 
@@ -121,6 +144,10 @@ namespace Hood.Extensions
         /// <returns></returns>
         public static string ToHtml(this string str)
         {
+            if (!str.IsSet())
+            {
+                return str;
+            }
             return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br />").Replace("\r", "<br />").Replace("\n", "<br />");
         }
 
@@ -138,7 +165,7 @@ namespace Hood.Extensions
         /// </summary>
         public static string ToTitleCase(this string str)
         {
-            var asTitleCase = new string(CharsToTitleCaseArry(str).ToArray());
+            string asTitleCase = new string(CharsToTitleCaseArry(str).ToArray());
             return asTitleCase;
         }
 
@@ -148,7 +175,7 @@ namespace Hood.Extensions
         /// </summary>
         public static string ToTitleCase(this string str, string cultureInfoName)
         {
-            var cultureInfo = new CultureInfo(cultureInfoName);
+            CultureInfo cultureInfo = new CultureInfo(cultureInfoName);
             return cultureInfo.TextInfo.ToTitleCase(str.ToLower());
         }
 
@@ -165,7 +192,7 @@ namespace Hood.Extensions
         /// </summary>
         public static string ToPascalCase(this string str)
         {
-            var cultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture;
+            CultureInfo cultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture;
             return cultureInfo.TextInfo.ToTitleCase(str.ToLower()).StripSpaces();
         }
 
@@ -177,20 +204,26 @@ namespace Hood.Extensions
         public static string CamelCaseToString(this string str, bool titleCase = true)
         {
             if (str == null || str.Length == 0)
+            {
                 return null;
+            }
 
             StringBuilder retVal = new StringBuilder(32);
 
             retVal.Append(char.ToUpper(str[0]));
             for (int i = 1; i < str.Length; i++)
             {
-                if ((char.IsUpper(str[i]) && !char.IsUpper(str[i - 1])) || (char.IsNumber(str[i]) && !char.IsNumber(str[i-1])))
+                if ((char.IsUpper(str[i]) && !char.IsUpper(str[i - 1])) || (char.IsNumber(str[i]) && !char.IsNumber(str[i - 1])))
                 {
                     retVal.Append(" ");
                     if (titleCase)
+                    {
                         retVal.Append(char.ToUpper(str[i]));
+                    }
                     else
+                    {
                         retVal.Append(char.ToLower(str[i]));
+                    }
                 }
                 else
                 {
@@ -202,7 +235,7 @@ namespace Hood.Extensions
         }
         public static string StripLineBreaks(this string value)
         {
-            if (String.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
             {
                 return value;
             }
@@ -301,26 +334,35 @@ namespace Hood.Extensions
             bool newWord = true;
             foreach (char c in s)
             {
-                if (newWord) { yield return Char.ToUpper(c); newWord = false; }
-                else yield return Char.ToLower(c);
-                if (c == ' ') newWord = true;
+                if (newWord) { yield return char.ToUpper(c); newWord = false; }
+                else
+                {
+                    yield return char.ToLower(c);
+                }
+
+                if (c == ' ')
+                {
+                    newWord = true;
+                }
             }
         }
 
         public static string TruncateAtWord(this string value, int length)
         {
             if (value == null || value.Length < length || value.IndexOf(" ", length) == -1)
+            {
                 return value;
+            }
 
             return value.Substring(0, value.IndexOf(" ", length)) + "...";
         }
 
         public static string ToHexString(this string str)
         {
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
 
-            var bytes = Encoding.Unicode.GetBytes(str);
-            foreach (var t in bytes)
+            byte[] bytes = Encoding.Unicode.GetBytes(str);
+            foreach (byte t in bytes)
             {
                 sb.Append(t.ToString("X2"));
             }
@@ -330,8 +372,8 @@ namespace Hood.Extensions
 
         public static string FromHexString(this string hexString)
         {
-            var bytes = new byte[hexString.Length / 2];
-            for (var i = 0; i < bytes.Length; i++)
+            byte[] bytes = new byte[hexString.Length / 2];
+            for (int i = 0; i < bytes.Length; i++)
             {
                 bytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             }
@@ -342,12 +384,12 @@ namespace Hood.Extensions
         public static string ToFormattedJson(this string str)
         {
             string indentString = "    ";
-            var indent = 0;
-            var quoted = false;
-            var sb = new StringBuilder();
-            for (var i = 0; i < str.Length; i++)
+            int indent = 0;
+            bool quoted = false;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < str.Length; i++)
             {
-                var ch = str[i];
+                char ch = str[i];
                 switch (ch)
                 {
                     case '{':
@@ -371,11 +413,17 @@ namespace Hood.Extensions
                     case '"':
                         sb.Append(ch);
                         bool escaped = false;
-                        var index = i;
+                        int index = i;
                         while (index > 0 && str[--index] == '\\')
+                        {
                             escaped = !escaped;
+                        }
+
                         if (!escaped)
+                        {
                             quoted = !quoted;
+                        }
+
                         break;
                     case ',':
                         sb.Append(ch);
@@ -388,7 +436,10 @@ namespace Hood.Extensions
                     case ':':
                         sb.Append(ch);
                         if (!quoted)
+                        {
                             sb.Append(" ");
+                        }
+
                         break;
                     default:
                         sb.Append(ch);
@@ -441,7 +492,9 @@ namespace Hood.Extensions
         public static string ToFirstName(this string fullName)
         {
             if (!fullName.IsSet())
+            {
                 return fullName;
+            }
 
             List<string> names = fullName.Split(' ').ToList();
             return names.First();
@@ -449,7 +502,9 @@ namespace Hood.Extensions
         public static string ToLastName(this string fullName)
         {
             if (!fullName.IsSet())
+            {
                 return fullName;
+            }
 
             List<string> names = fullName.Split(' ').ToList();
             names.RemoveAt(0);

@@ -22,11 +22,6 @@ namespace Hood.Models
         }
         #endregion
 
-        #region View Model Stuff
-        [NotMapped]
-        public IList<IdentityRole> AllRoles { get; set; }
-        #endregion
-
         #region Prevent Mapping Sensitive Fields
         [NotMapped]
         public override DateTimeOffset? LockoutEnd { get; set; }

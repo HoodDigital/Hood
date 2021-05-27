@@ -66,7 +66,7 @@ export class DataList {
             this.reload(new URL(listUrl.href));
         }
 
-        $(this.element).on('click', '.pagination a, a.hood-inline-list-target', function (e: JQuery.ClickEvent) {
+        $(this.element).on('click', '.pagination a, a.hood-inline-list-target', function (this: DataList, e: JQuery.ClickEvent) {
 
             e.preventDefault();
 
@@ -77,11 +77,11 @@ export class DataList {
             listUrl.href = $(this.element).data('url');
             listUrl.search = url.search;
 
-            this.Reload(new URL(listUrl.href));
+            this.reload(new URL(listUrl.href));
 
         }.bind(this));
 
-        $('body').on('submit', `form.inline[data-target="#${this.element.id}"]`, function (e: JQuery.ClickEvent) {
+        $('body').on('submit', `form.inline[data-target="#${this.element.id}"]`, function (this: DataList, e: JQuery.ClickEvent) {
 
             e.preventDefault();
 
@@ -91,7 +91,7 @@ export class DataList {
             listUrl.href = $(this.element).data('url');
 
             listUrl.search = "?" + $form.serialize();
-            this.Reload(new URL(listUrl.href));
+            this.reload(new URL(listUrl.href));
 
         }.bind(this));
 
@@ -107,7 +107,7 @@ export class DataList {
         //    });
     }
 
-    reload(url: URL = null) {
+    reload(this: DataList, url: URL = null) {
         if (url) {
             if (history.pushState && $(this.element).hasClass('query')) {
                 let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + (url.href.contains('?') ? "?" + url.href.substring(url.href.indexOf('?') + 1) : '');

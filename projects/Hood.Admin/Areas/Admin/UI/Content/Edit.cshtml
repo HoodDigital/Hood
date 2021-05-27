@@ -37,32 +37,28 @@
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
-<div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="editor">
-        <form method="post" id="content-edit-form" data-id="@Model.Id" data-type="@Model.ContentType">
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="row align-items-center">
-                                <partial name="_Partial_Tabs" />
-                            </div>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="tab-content">
-                                <partial name="_Partial_TabContent" />
-                            </div>
-                        </div>
+<form method="post" id="content-edit-form" data-id="@Model.Id" data-type="@Model.ContentType">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <partial name="_Partial_Tabs" />
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <partial name="_Editor_Sidebar" />                    
-                    @if (Model.Type.ShowCategories)
-                    {
-                        <div id="content-categories-list" class="" data-url="@Url.Action("CategoriesContent", new { id = Model.Id })"></div>
-                    }
+                <div class="card-body p-4">
+                    <div class="tab-content">
+                        <partial name="_Partial_TabContent" />
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
+        <div class="col-md-4">
+            <partial name="_Editor_Sidebar" />                    
+            @if (Model.Type.ShowCategories)
+            {
+                <div id="content-categories-list" class="" data-url="@Url.Action("CategoriesContent", new { id = Model.Id })"></div>
+            }
+        </div>
     </div>
-</div>
+</form>

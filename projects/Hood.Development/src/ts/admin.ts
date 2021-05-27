@@ -1,44 +1,39 @@
 import 'jquery-slimscroll';
 
 export * from "./hood";
-import { Uploader } from "./core/Uploader";
-import { Editors } from "./core/Editors";
-import { HomeController } from "./admin/HomeController";
-import { Loader } from "./core/Loader";
-import { Alerts } from './hood';
-import { DataList } from "./core/DataList";
-
-import { HoodController } from './core/HoodController';
-import { MediaController } from './admin/MediaController';
-import { MediaModal } from './core/Media';
-import { ContentController } from './admin/ContentController';
 import * as bootstrap from 'bootstrap';
+
+import { BaseController } from './core/HoodController';
+
+import { HomeController } from "./admin/HomeController";
+import { MediaController } from './admin/MediaController';
+import { ContentController } from './admin/ContentController';
 import { PropertyController } from './admin/PropertyController';
+import { UsersController } from './admin/UsersController';
+import { ThemesController } from './admin/ThemesController';
 
-class Admin extends HoodController {
-
-    mediaModal: MediaModal;
+class Admin extends BaseController {
 
     home: HomeController;
     media: MediaController;
     content: ContentController;
     property: PropertyController;
+    themes: ThemesController;
+    users: UsersController;
 
     constructor() {
         super();
-
-        // Admin Services
-        this.mediaModal = new MediaModal();
-        this.mediaModal.initUploaders();
 
         // Admin Controllers
         this.home = new HomeController();
         this.media = new MediaController();
         this.content = new ContentController();
         this.property = new PropertyController();
+        this.themes = new ThemesController();
+        this.users = new UsersController();
 
         if ($('#page-tabs').length > 0) {
-            this.CheckAndLoadTabs('#page-tabs');
+            this.checkAndLoadTabs('#page-tabs');
         }
 
         // Admin Handlers
@@ -69,7 +64,7 @@ class Admin extends HoodController {
 
     }
 
-    CheckAndLoadTabs(tag: string): void  {
+    checkAndLoadTabs(tag: string): void  {
         $(tag + ' a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
             localStorage.setItem('tab-' + $(tag).data('hoodTabs'), $(e.target).attr('href'));
         });

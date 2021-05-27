@@ -1,12 +1,10 @@
-﻿import { Alerts } from "./Alerts";
-import { Editors } from "./Editors";
-import { Handlers } from "./Handlers";
-import { Uploader } from "./Uploader";
+﻿import { Alerts, Editors, Handlers, MediaModal, Uploader } from "../hood";
 
-export class HoodController {
+export class BaseController {
     editors: Editors;
     uploader: Uploader;
     handlers: Handlers;
+    mediaModal: MediaModal;
 
     constructor() {
 
@@ -17,6 +15,9 @@ export class HoodController {
 
         // Global Handlers
         this.setupLoaders();
+
+        // Media Modal Service
+        this.mediaModal = new MediaModal();
 
     }
 

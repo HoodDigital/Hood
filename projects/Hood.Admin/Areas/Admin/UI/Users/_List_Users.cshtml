@@ -23,11 +23,11 @@
                     <p class="card-text mb-1">
                         @foreach (var sub in user.Roles)
                         {
-                            <small class="badge badge-light">@sub.Name.CamelCaseToString()</small>
+                            <small class="badge bg-info">@sub.Name.CamelCaseToString()</small>
                         }
                         @if (user.Roles.Count == 0)
                         {
-                            <small class="badge badge-light">Not in any roles</small>
+                            <small class="badge bg-dark">Not in any roles</small>
                         }
                     </p>
                     <p class="card-text mb-1">

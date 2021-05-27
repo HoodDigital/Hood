@@ -120,6 +120,7 @@ export class MediaService {
     uploader: HTMLElement;
     progressArea: HTMLElement;
     dropzone: Dropzone;
+    galleryInitialised: boolean = false;
 
     constructor(element: HTMLElement, options: MediaOptions) {
         this.element = element;
@@ -144,9 +145,10 @@ export class MediaService {
                 this.initUploader();
 
                 // if this is gallery type, add the "Add to gallery button" and hook it to the add function
-                if (this.options.action == 'gallery') {
+                if (this.options.action == 'gallery' && !this.galleryInitialised) {
                     $('#media-select-modal .modal-footer').removeClass('d-none');
                     $('#media-select-modal .modal-footer').on('click', this.galleryAdd.bind(this));
+                    this.galleryInitialised = true;
                 }
 
                 if (this.options.onListComplete) {
@@ -471,9 +473,6 @@ export class MediaModal {
     element: HTMLElement;
 
     constructor() {
-    }
-
-    initUploaders () {
         $('body').on('click', '[data-hood-media=attach],[data-hood-media=select],[data-hood-media=gallery]', this.load.bind(this));
         $('body').on('click', '[data-hood-media=clear]', this.clear.bind(this));
         $('[data-hood-media=gallery]').each(this.initGallery.bind(this));

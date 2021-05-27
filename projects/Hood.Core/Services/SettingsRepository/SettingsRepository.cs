@@ -164,14 +164,6 @@ namespace Hood.Services
         public AccountSettings Account => Get<AccountSettings>();
         public MediaSettings Media => Get<MediaSettings>();
         public MailSettings Mail => Get<MailSettings>();
-        public UserProfile SiteOwner
-        {
-            get
-            {
-                string userId = Get("Hood.Settings.SiteOwner");
-                return _db.UserProfiles.SingleOrDefault(u => u.Id == userId);
-            }
-        }
 
         #endregion
 

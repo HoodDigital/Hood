@@ -45,85 +45,85 @@
     <div class="card-body p-4">
         <div class="tab-content">
             <div id="basics" class="tab-pane active" role="tabpanel" aria-labelledby="basics-tab">
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="Title" class="form-control" placeholder="Website Title">
                     <label asp-for="Title"></label>
                     <small asp-for="Title"></small>
                 </div>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="CompanyName" class="form-control">
                     <label asp-for="CompanyName"></label>
                     <small asp-for="CompanyName"></small>
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Phone" class="form-control">
                             <label asp-for="Phone"></label>
                             <small asp-for="Phone"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Email" class="form-control">
                             <label asp-for="Email"></label>
                             <small asp-for="Email"></small>
                         </div>
                     </div>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Homepage"></label>
-                    <select asp-for="Homepage" class="form-control">
+                <div class="form-floating mb-3">
+                    <select asp-for="Homepage" class="form-select">
                         <option value="">Default Homepage</option>
                         @foreach (var content in await _content.GetPages())
                         {
                             <option value="@content.Id">@content.Title</option>
                         }
                     </select>
+                    <label asp-for="Homepage"></label>
                     <small asp-for="Homepage"></small>
                 </div>
-                <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input asp-for="EnableThemes" class="custom-control-input">
-                        <label asp-for="EnableThemes" class="custom-control-label"></label>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="EnableThemes" class="form-check-input">
+                        <label asp-for="EnableThemes" class="form-check-label d-block"></label>
+                        <small asp-for="EnableThemes"></small>
                     </div>
-                    <small asp-for="EnableThemes"></small>
                 </div>
-                <mediaSelect asp-for="Logo" asp-background-size="contain"></mediaSelect>
-                <mediaSelect asp-for="LogoLight" asp-background-size="contain"></mediaSelect>
+                <div media-select="Logo" media-fit="contain"></div>
+                <div media-select="LogoLight" media-fit="contain"></div>
             </div>
             <div id="address" class="tab-pane" role="tabpanel" aria-labelledby="address-tab">
                 <div class="row">
                     <div class="col-3">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Address.Number" class="form-control">
                             <label asp-for="Address.Number"></label>
                             <small asp-for="Address.Number"></small>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Address.Address1" class="form-control">
                             <label asp-for="Address.Address1"></label>
                             <small asp-for="Address.Address1"></small>
                         </div>
                     </div>
                 </div>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="Address.Address2" class="form-control">
                     <label asp-for="Address.Address2"></label>
                     <small asp-for="Address.Address2"></small>
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Address.City" class="form-control">
                             <label asp-for="Address.City"></label>
                             <small asp-for="Address.City"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Address.County" class="form-control">
                             <label asp-for="Address.County"></label>
                             <small asp-for="Address.County"></small>
@@ -132,14 +132,14 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
-                            <select asp-for="Address.Country" class="form-control" asp-items="Countries.AsSelectListItems"></select>
+                        <div class="form-floating mb-3">
+                            <select asp-for="Address.Country" class="form-select" asp-items="Countries.AsSelectListItems"></select>
                             <label asp-for="Address.Country"></label>
                             <small asp-for="Address.Country"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Address.Postcode" class="form-control">
                             <label asp-for="Address.Postcode"></label>
                             <small asp-for="Address.Postcode"></small>
@@ -150,14 +150,14 @@
             <div id="owner" class="tab-pane" role="tabpanel" aria-labelledby="owner-tab">
                 <div class="row">
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Owner.FirstName" class="form-control">
                             <label asp-for="Owner.FirstName"></label>
                             <small asp-for="Owner.FirstName"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Owner.LastName" class="form-control">
                             <label asp-for="Owner.LastName"></label>
                             <small asp-for="Owner.LastName"></small>
@@ -166,14 +166,14 @@
                 </div>
                 <div class="row">
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Owner.Phone" class="form-control">
                             <label asp-for="Owner.Phone"></label>
                             <small asp-for="Owner.Phone"></small>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="form-group floating-label">
+                        <div class="form-floating mb-3">
                             <input asp-for="Owner.Email" class="form-control">
                             <label asp-for="Owner.Email"></label>
                             <small asp-for="Owner.Email"></small>
@@ -182,37 +182,37 @@
                 </div>
             </div>
             <div id="login" class="tab-pane" role="tabpanel" aria-labelledby="login-tab">
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="LoginAreaSettings.Title" class="form-control">
                     <label asp-for="LoginAreaSettings.Title"></label>
                     <small asp-for="LoginAreaSettings.Title"></small>
                 </div>
-                <mediaSelect asp-for="LoginAreaSettings.Logo" asp-background-size="contain"></mediaSelect>
-                <div class="form-group floating-label">
-                    <textarea asp-for="LoginAreaSettings.BackgroundImages" class="form-control"></textarea>
+                <div media-select="LoginAreaSettings.Logo"></div>
+                <div class="form-floating mb-3">
+                    <textarea asp-for="LoginAreaSettings.BackgroundImages" class="form-control" style="height:200px;"></textarea>
                     <label asp-for="LoginAreaSettings.BackgroundImages"></label>
                     <small asp-for="LoginAreaSettings.BackgroundImages"></small>
                 </div>
-                <div class="form-group">
-                    <div class="custom-control custom-checkbox">
-                        <input asp-for="LoginAreaSettings.RandomiseImages" class="custom-control-input">
-                        <label asp-for="LoginAreaSettings.RandomiseImages" class="custom-control-label"></label>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="LoginAreaSettings.RandomiseImages" class="form-check-input">
+                        <label asp-for="LoginAreaSettings.RandomiseImages" class="form-check-label d-block"></label>
+                        <small asp-for="LoginAreaSettings.RandomiseImages"></small>
                     </div>
-                    <small asp-for="LoginAreaSettings.RandomiseImages"></small>
                 </div>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed" class="form-control">
                     <label asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed"></label>
                     <small asp-for="LoginAreaSettings.BackgroundImagesFadeSpeed"></small>
                 </div>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="LoginAreaSettings.BackgroundImagesChangeDuration" class="form-control">
                     <label asp-for="LoginAreaSettings.BackgroundImagesChangeDuration"></label>
                     <small asp-for="LoginAreaSettings.BackgroundImagesChangeDuration"></small>
                 </div>
             </div>
             <div id="admin" class="tab-pane" role="tabpanel" aria-labelledby="admin-tab">
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="AdminAreaSettings.Title" class="form-control">
                     <label asp-for="AdminAreaSettings.Title"></label>
                     <small asp-for="AdminAreaSettings.Title"></small>

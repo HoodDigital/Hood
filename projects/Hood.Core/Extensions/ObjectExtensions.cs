@@ -14,7 +14,7 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="destination">The destination.</param>
-        public static T UpdateFromFormModel<T>(this T destination, T source, HashSet<string> allowedKeys)
+        public static T UpdateFromFormModel<T, TSource>(this T destination, TSource source, HashSet<string> allowedKeys)
         {
             // If any this null throw an exception
             if (source == null || destination == null)

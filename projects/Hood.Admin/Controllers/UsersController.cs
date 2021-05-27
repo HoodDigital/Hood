@@ -45,7 +45,8 @@ namespace Hood.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id);
-            await LoadAndCheckProfile(model);
+            model.AllRoles = await _account.GetAllRolesAsync();
+            model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
             return View(model);
         }
 
@@ -53,23 +54,23 @@ namespace Hood.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(UserProfile model)
         {
-            ApplicationUser user = await _account.GetUserByIdAsync(model.Id);
+            ApplicationUser modelToUpdate = await _account.GetUserByIdAsync(model.Id);
             try
             {
-                string email = user.Email;
+                string email = modelToUpdate.Email;
                 if (model.Email != email)
                 {
-                    IdentityResult setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+                    IdentityResult setEmailResult = await _userManager.SetEmailAsync(modelToUpdate, model.Email);
                     if (!setEmailResult.Succeeded)
                     {
                         throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
                     }
                 }
 
-                string phoneNumber = user.PhoneNumber;
+                string phoneNumber = modelToUpdate.PhoneNumber;
                 if (model.PhoneNumber != phoneNumber)
                 {
-                    IdentityResult setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+                    IdentityResult setPhoneResult = await _userManager.SetPhoneNumberAsync(modelToUpdate, model.PhoneNumber);
                     if (!setPhoneResult.Succeeded)
                     {
                         model.Email = phoneNumber;
@@ -77,28 +78,28 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
-                model.Notes = user.Notes;
-                await _account.UpdateProfileAsync(model);
+
+                var updatedFields = Request.Form.Keys.ToHashSet();
+                modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
+
                 return RedirectToAction(nameof(Edit), new { id = model.Id });
+
             }
             catch (Exception ex)
             {
                 SaveMessage = "There was an error while saving: " + ex.Message;
                 MessageType = AlertType.Danger;
 
-                await LoadAndCheckProfile(model);
-                return View(model);
             }
-        }
 
-        private async Task LoadAndCheckProfile(UserProfile model)
-        {
             model.AllRoles = await _account.GetAllRolesAsync();
             model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
+            return View(model);
         }
+
         #endregion
 
         #region Create
@@ -184,7 +185,7 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
                 await _logService.AddLogAsync<UsersController>($"A new user account has been created in the admin area for {user.Email}", type: LogType.Success);
-                return new Response(true, "Published successfully.");
+                return new Response(true, "Successfully created.");
             }
             catch (Exception ex)
             {
@@ -216,6 +217,82 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
         #endregion
+
+
+        #region Media
+        /// <summary>
+        /// Attach media file to entity. This is the action which handles the chosen attachment from the media attach action.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/users/{id}/media/upload")]
+        public async Task<Response> UploadMedia(string id, AttachMediaModel model)
+        {
+            try
+            {
+                model.ValidateOrThrow();
+
+                // load the media object.
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
+                if (user == null)
+                {
+                    throw new Exception("Could not load content to attach media.");
+                }
+
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
+                if (media == null)
+                {
+                    throw new Exception("Could not load media to attach.");
+                }
+
+                switch (model.FieldName)
+                {
+                    case nameof(Models.ApplicationUser.Avatar):
+                        user.Avatar = media;
+                        break;
+                }
+
+                await _db.SaveChangesAsync();
+
+                return new Response(true, media, $"The media has been attached successfully.");
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error attaching a media file to an entity.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Remove media file from entity.
+        /// </summary>
+        [HttpPost]
+        [Route("admin/users/{id}/media/remove")]
+        public async Task<Response> RemoveMedia(string id, AttachMediaModel model)
+        {
+            try
+            {
+                // load the media object.
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
+                MediaObject media = _db.Media.SingleOrDefault(m => m.Id == model.MediaId);
+
+                switch (model.FieldName)
+                {
+                    case nameof(Models.ApplicationUser.Avatar):
+                        user.Avatar = null;
+                        break;
+                }
+
+                await _db.SaveChangesAsync();
+
+                return new Response(true, MediaObject.Blank, $"The media file has been removed successfully.");
+
+            }
+            catch (Exception ex)
+            {
+                return await ErrorResponseAsync<MediaController>($"Error removing a media file from an entity.", ex);
+            }
+        }
+        #endregion
+
 
         #region MarkConfirmed
         [Route("admin/users/{id}/confirm-email/")]

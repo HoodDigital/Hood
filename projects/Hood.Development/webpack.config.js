@@ -4,11 +4,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 const plugins = [];
 plugins.push(new MiniCssExtractPlugin({
     filename: "css/[name].css"
 }));
+//plugins.push(new NodePolyfillPlugin());
 
 console.log('---------------------------------------------------------------------------')
 console.log('-                                                                         -')

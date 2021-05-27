@@ -97,19 +97,22 @@ namespace Hood.Services
         }
         public async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-            UserProfile siteOwner = Engine.Settings.SiteOwner;
-
-            if (userId == siteOwner.Id)
-            {
-                throw new Exception("You cannot delete the site owner, you must assign a new site owner (from the site owner account) before you can delete this account.");
-            }
-
             ApplicationUser user = await _db.Users
                 .Include(u => u.Content)
                 .Include(u => u.Properties)
                 .Include(u => u.Addresses)
                 .SingleOrDefaultAsync(u => u.Id == userId);
 
+            if (user.Email == Engine.Configuration.SuperAdminEmail)
+            {
+                throw new Exception("You cannot delete the site owner account, the owner is set via an environment variable and cannot be changed from the admin area.");
+            }
+
+            ApplicationUser siteOwner = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
+            if (siteOwner == null) 
+            {
+                throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
+            }
 
             if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetUserId() == user.Id)
             {
@@ -184,7 +187,7 @@ namespace Hood.Services
 
             if (model.RoleIds != null && model.RoleIds.Count > 0)
             {
-                query = query.Where(q => q.RoleIds != null && model.RoleIds.Any(m => q.RoleIds.Contains(m)));
+                query = query.Where(q => q.RoleIds != null && model.RoleIds.ToArray().Any(m => q.RoleIds.Contains(m)));
             }
 
             if (!string.IsNullOrEmpty(model.Search))
