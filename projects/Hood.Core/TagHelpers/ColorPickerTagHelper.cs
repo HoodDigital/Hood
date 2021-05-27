@@ -58,9 +58,9 @@ namespace Hood.TagHelpers
             string fieldValue = For.Model != null ? For.Model.ToString() : "";
 
             if (output.Attributes.ContainsName("class"))
-                output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} row no-gutter align-items-center");
+                output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} row align-items-center mb-3");
             else
-                output.Attributes.SetAttribute("class", $"row no-gutter align-items-center");
+                output.Attributes.SetAttribute("class", $"row align-items-center mb-3");
 
             string customAttributes = "";
             foreach (var attribute in output.Attributes)
@@ -72,13 +72,21 @@ namespace Hood.TagHelpers
             }
 
             output.Content.SetHtmlContent($@"
-                <div class='col-auto pr-0'>
-                    <figure class='{ImageClass} color-picker' data-target='#{fieldId}' {customAttributes}>
-                        <div class='{PickerClass}'></div>
-                    </figure>                        
+                <div class='col-auto' style='width:75px;'>
+                    <div class='img img-full img-square img-circle color-picker shadow' 
+                         data-target='#{fieldId}' {customAttributes}>
+                        <div class='pickr'></div>
+                    </div>                
                 </div>
                 <div class='col'>
-                    <input type='text' class='{InputClass}' placeholder='Choose a colour...' id='{fieldId}' name='{For.Name}' value='{fieldValue}' />
+                    <div class='form-floating'>
+                        <input id='{fieldId}'
+                               name='{For.Name}'
+                               value='{fieldValue}'
+                               placeholder='Choose a colour...'
+                               class='form-control' />
+                        <label for='{fieldId}'>{For.Name}</label>
+                    </div>
                 </div>
             ");
         }

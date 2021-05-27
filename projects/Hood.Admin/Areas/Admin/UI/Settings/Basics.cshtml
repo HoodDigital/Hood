@@ -187,7 +187,7 @@
                     <label asp-for="LoginAreaSettings.Title"></label>
                     <small asp-for="LoginAreaSettings.Title"></small>
                 </div>
-                <div media-select="LoginAreaSettings.Logo"></div>
+                <div media-select="LoginAreaSettings.Logo" media-fit="contain"></div>
                 <div class="form-floating mb-3">
                     <textarea asp-for="LoginAreaSettings.BackgroundImages" class="form-control" style="height:200px;"></textarea>
                     <label asp-for="LoginAreaSettings.BackgroundImages"></label>
@@ -217,7 +217,7 @@
                     <label asp-for="AdminAreaSettings.Title"></label>
                     <small asp-for="AdminAreaSettings.Title"></small>
                 </div>
-                <mediaSelect asp-for="AdminAreaSettings.Logo" asp-background-size="contain"></mediaSelect>
+                <div media-select="AdminAreaSettings.Logo" media-fit="contain"></div>
             </div>
         </div>
     </div>
