@@ -1,0 +1,14 @@
+@model PropertyListModel
+<script>var isIE = false;</script><!--[if IE]><script>isIE = true;</script><![endif]-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier/1.0.3/oms.min.js" asp-location="BeforeScripts"></script>
+<script src="~/hood/js/app/markerclusterer.min.js" asp-location="BeforeScripts"></script>
+<div id="clustered-map" class="google-map" style="height:500px;"
+     data-lat="@Model.CentrePoint.Latitude"
+     data-long="@Model.CentrePoint.Longitude"
+     data-zoom="3"
+     data-scrollwheel="false"
+     data-marker="https://cdn.jsdelivr.net/npm/hoodcms/images/maps/marker.png"
+     data-highlight="https://cdn.jsdelivr.net/npm/hoodcms/images/maps/marker.png"
+     data-click="openPropertyModal"
+     data-locations="@Newtonsoft.Json.JsonConvert.SerializeObject(Model.Locations)">
+</div>

@@ -1,0 +1,65 @@
+@inject IContentRepository _content
+@model HeaderModel
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<nav class="modal fade modal-left" id="account-menu" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <div class="modal-content">
+            <div class="modal-body p-5">
+                <h3>Account menu</h3>
+                <p>This is the account menu, manage your account, change your password or access premium areas of the site.</p>
+                <ul class="list-unstyled text-small">
+                    @if (User.IsEditorOrBetter())
+                    {
+                        <li>
+                            <a class="text-muted" asp-action="Index" asp-controller="Home" asp-area="Admin">
+                                <i class="fa fa-tachometer-alt mr-2"></i>Website Dashboard
+                            </a>
+                        </li>
+                    }
+                    @if (User.IsImpersonating())
+                    {
+                        <li>
+                            <a class="text-muted" asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin">
+                                <i class="fa fa-desktop mr-2"></i>Stop Impersonating
+                            </a>
+                        </li>
+                    }
+                    <li>
+                        <a class="text-muted" asp-action="Index" asp-controller="Manage">
+                            <i class="fa fa-cogs mr-2"></i>Manage Account
+                        </a>
+                    </li>
+                    <li>
+                        <a class="text-muted" asp-action="ChangePassword" asp-controller="Manage">
+                            <i class="fa fa-lock mr-2"></i>Change Password
+                        </a>
+                    </li>
+                    <li>
+                        <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm" class="navbar-right"></form>
+                        <a class="text-muted" href="javascript:document.getElementById('logoutForm').submit()">
+                            <i class="fa fa-sign-out-alt mr-2"></i>Log out
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer row align-items-center">
+                @if (Engine.Account != null)
+                {
+                    <div class="col-auto">
+                        <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs mb-0" />
+                    </div>
+                    <div class="col">
+                        <p class="text-muted mb-0">
+                            Logged in as <strong class="font-bold">@Engine.Account.ToDisplayName()</strong><br />
+                            <a href="javascript:document.getElementById('logoutForm').submit()">
+                                Log out
+                            </a>
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    </nav>

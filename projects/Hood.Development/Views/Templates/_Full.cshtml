@@ -1,0 +1,89 @@
+@inject IContentRepository _content
+@{
+    Layout = "_Blank";
+    Content currentContent = ViewData["Content"] as Content;
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+@if (ViewData.IsSet("Template.001.Narrow-Single-Section.Body"))
+{
+    <section class="padded">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    @Html.Raw(ViewData["Template.001.Narrow-Single-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.010.Full-Single-Section.Body"))
+{
+    <section class="padded">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    @Html.Raw(ViewData["Template.010.Full-Single-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.020.Image-Section-Left.Body"))
+{
+    <section id="next" class="padded">
+        <div class="container">
+            <div class="row row-center-sm">
+                <div class="col-xs-12 col-sm-6">
+                    <img src="@ViewData["Template.021.Image-Section-Left.ImageUrl"]" class="img-full" />
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    @Html.Raw(ViewData["Template.020.Image-Section-Left.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.030.Image-Section-Right.Body"))
+{
+    <section id="next" class="padded">
+        <div class="container">
+            <div class="row row-center-sm">
+                <div class="col-xs-12 col-sm-6">
+                    @Html.Raw(ViewData["Template.030.Image-Section-Right.Body"])
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <img src="@ViewData["Template.031.Image-Section-Right.ImageUrl"]" class="img-full" />
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.040.Narrow-Single-Section.Body"))
+{
+    <section class="padded">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2">
+                    @Html.Raw(ViewData["Template.040.Narrow-Single-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
+@if (ViewData.IsSet("Template.050.Full-Single-Section.Body"))
+{
+    <section class="padded">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    @Html.Raw(ViewData["Template.050.Full-Single-Section.Body"])
+                </div>
+            </div>
+        </div>
+    </section>
+}
