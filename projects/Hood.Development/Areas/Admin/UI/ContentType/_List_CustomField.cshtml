@@ -1,0 +1,33 @@
+@model ContentType
+@{
+    Layout = null;
+}
+@if (Model.CustomFields.Count > 0)
+{
+    @foreach (var customField in Model.CustomFields.OrderBy(cf => cf.Name))
+    {
+        <div class="card row p-2 mb-1">
+            <div class="d-flex align-items-center">
+                <div class="col"><strong>@customField.Name</strong> @customField.Type</div>
+                <div class="col-auto text-right align-center">
+                    @if (!customField.System)
+                    {
+                        <a class="btn btn-sm btn-danger content-custom-field-delete" asp-action="DeleteField" asp-route-id="@Model.Type" asp-route-name="@customField.Name">
+                            <i class="fa fa-trash me-1"></i>Delete
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="badge bg-dark">System Field</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <alert type="Info" icon="fa-info" size="Epic" class="text-center m-0">
+        There are no custom fields added to this type yet.
+    </alert>
+}

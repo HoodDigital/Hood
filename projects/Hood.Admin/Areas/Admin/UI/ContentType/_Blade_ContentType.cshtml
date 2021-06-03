@@ -1,0 +1,71 @@
+@model ContentType
+@{
+    Layout = null;
+}
+<div class="modal fade" id="content-type-create-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="content-type-create-form" action="@Url.Action("Create")" asp-antiforgery="true" autocomplete="off" class="modal-content" novalidate>
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">
+                        <i class="fa fa-plus-circle text-success me-2"></i> Create new content type
+                    </h5>
+                    <p class="m-0 text-muted">
+                        Add a new content type to the website.
+                    </p>
+                </div>
+                <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Type" class="form-control restrict-to-slug" required />
+                        <label asp-for="Type"></label>
+                        <small asp-for="Type"></small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Enabled" class="form-check-input">
+                            <label asp-for="Enabled" class="form-check-label d-block"></label>
+                            <small asp-for="Enabled"></small>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select asp-for="BaseName" class="form-select" required>
+                            <option value="Default">Basic Content (Default)</option>
+                            @foreach (var t in ContentTypes.All)
+                            {
+                                <option value="@t.BaseName">@t.BaseName</option>
+                            }
+                        </select>
+                        <label asp-for="BaseName"></label>
+                        <small asp-for="BaseName"></small>
+                    </div>
+                    <hr class="mt-4 mb-4" />
+                    <div class="form-floating mb-3">
+                        <input asp-for="Slug" class="form-control restrict-to-slug" required />
+                        <label asp-for="Slug"></label>
+                        <small asp-for="Slug"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Title" class="form-control" required />
+                        <label asp-for="Title"></label>
+                        <small asp-for="Title"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="TypeName" class="form-control" required />
+                        <label asp-for="TypeName"></label>
+                        <small asp-for="TypeName"></small>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="TypeNamePlural" class="form-control" required />
+                        <label asp-for="TypeNamePlural"></label>
+                        <small asp-for="TypeNamePlural"></small>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+                <button type="submit" id="content-type-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+           </div>
+        </form>
+    </div>
+</div>

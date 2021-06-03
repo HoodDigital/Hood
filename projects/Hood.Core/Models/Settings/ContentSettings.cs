@@ -16,7 +16,7 @@ namespace Hood.Models
 
         public ContentType GetContentType(string slug)
         {
-            var type = Types.Where(t => t.Slug == slug || t.Type == slug || t.TypeNamePlural.ToLower() == slug).FirstOrDefault();
+            var type = Types.Where(t => t.Slug.ToLower() == slug || t.Type.ToLower() == slug || t.TypeNamePlural.ToLower() == slug).FirstOrDefault();
             if (type != null)
                 return type;
             return ContentType.Null;

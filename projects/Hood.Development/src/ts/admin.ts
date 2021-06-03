@@ -11,12 +11,14 @@ import { ContentController } from './admin/ContentController';
 import { PropertyController } from './admin/PropertyController';
 import { UsersController } from './admin/UsersController';
 import { ThemesController } from './admin/ThemesController';
+import { ContentTypeController } from './admin/ContentTypeController';
 
 class Admin extends BaseController {
 
     home: HomeController;
     media: MediaController;
     content: ContentController;
+    contentType: ContentTypeController;
     property: PropertyController;
     themes: ThemesController;
     users: UsersController;
@@ -28,6 +30,7 @@ class Admin extends BaseController {
         this.home = new HomeController();
         this.media = new MediaController();
         this.content = new ContentController();
+        this.contentType = new ContentTypeController();
         this.property = new PropertyController();
         this.themes = new ThemesController();
         this.users = new UsersController();
@@ -65,18 +68,25 @@ class Admin extends BaseController {
     }
 
     checkAndLoadTabs(tag: string): void  {
+
         $(tag + ' a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-            localStorage.setItem('tab-' + $(tag).data('hoodTabs'), $(e.target).attr('href'));
+            let store: any = JSON.parse(localStorage.getItem('tabs-' + tag)) || {};
+            store['tab-' + $(tag).data('hoodTabs')] = $(e.target).attr('href');
+            localStorage.setItem('tabs-' + tag, JSON.stringify(store));
         });
 
-        let activeTab = localStorage.getItem('tab-' + $(tag).data('hoodTabs'));
+        let store: any = JSON.parse(localStorage.getItem('tabs-' + tag)) || {};
+        let activeTab = store['tab-' + $(tag).data('hoodTabs')];
         let triggerEl = $(tag + ' a[data-bs-toggle="tab"]')[0];
         if (activeTab) {
             triggerEl = document.querySelector(tag + ' a[href="' + activeTab + '"]')
         }
         let tabTrigger = new bootstrap.Tab(triggerEl);
         tabTrigger.show();
+
     }
+
+
 }
 
 new Admin();

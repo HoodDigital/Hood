@@ -8,6 +8,15 @@
         }
     }
 
+    &.active {
+        background-color: $green-100;
+        border-color: $green-600;
+
+        &:hover {
+            background-color: $green-300;
+        }
+    }
+
     &.media-item {
         &.active {
             border: 1px solid green;

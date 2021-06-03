@@ -18,6 +18,24 @@ export class Handlers {
         $('body').on('click', '.click-select.show-selected[data-target][data-value]', this.ClickSelect);
         $('body').on('click', '.click-select:not(.show-selected)[data-target][data-value]', this.ClickSelectClean);
 
+        $('[data-hood-icon]').each(this.IconSelector);
+
+    }
+
+    IconSelector(this: HTMLElement, index: number, element: HTMLElement) {
+        let input = $(this).find('input[data-hood-icon-input]')
+        let display = $(this).find('[data-hood-icon-display]')
+        let collapse = $(this).find('.collapse')
+
+        $(this).find('[data-hood-icon-key][data-hood-icon-value]').on('click', function () {
+            let key = $(this).data('hoodIconKey');
+            let value = $(this).data('hoodIconValue');
+            display.html(value);
+            input.val(key);
+            if (collapse) {
+                collapse.removeClass('show');
+            }
+        });
     }
 
     ScrollToTop(this: HTMLAnchorElement, e: JQuery.ClickEvent) {

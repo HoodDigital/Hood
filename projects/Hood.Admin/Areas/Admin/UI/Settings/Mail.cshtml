@@ -39,18 +39,18 @@
                     <div media-select="Logo" media-fit="contain"></div>
                     <colorSelect asp-for="BackgroundColour" data-default="#f7f7f7" data-opacity="true"></colorSelect>
                     <div class="form-floating mb-3">
-                        <label asp-for="FromName"></label>
                         <input asp-for="FromName" type="text" class="form-control" />
+                        <label asp-for="FromName"></label>
                         <small asp-for="FromName"></small>
                     </div>
                     <div class="form-floating mb-3">
-                        <label asp-for="FromEmail"></label>
                         <input asp-for="FromEmail" type="text" class="form-control" />
+                        <label asp-for="FromEmail"></label>
                         <small asp-for="FromEmail"></small>
                     </div>
                 </form>
                 <hr class="mt-4 mb-4" />
-                <alert type="Light" size="Medium" icon="fa-envelope-open-text" class="border-dark">
+                <alert type="Light" size="Large" icon="fa-envelope-open-text" class="border-dark">
                     <p class="h5 mb-3">Preview how your emails will look, these links will open in a new tab.</p>
                     <p class="m-0">
                         <a class="btn btn-outline-dark" asp-action="Plain" asp-controller="Mail" asp-area="Admin" target="_blank">Plain Message</a>
@@ -67,20 +67,20 @@
                 <form asp-action="Test" asp-controller="Mail" method="post">
                     <fieldset class="form-horizontal">
                         <div class="form-floating mb-3">
-                            <label for="email">Email address</label>
                             <input id="email" name="email" type="text" class="form-control" placeholder="Email address" />
+                            <label for="email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <label for="email">Template</label>
-                            <select id="template" name="template" type="text" class="form-control">
+                            <select id="template" name="template" type="text" class="form-select">
                                 <option value="@MailSettings.PlainTemplate">Plain</option>
                                 <option value="@MailSettings.SuccessTemplate">Success</option>
                                 <option value="@MailSettings.WarningTemplate">Warning</option>
                                 <option value="@MailSettings.DangerTemplate">Danger</option>
                             </select>
+                            <label for="email">Template</label>
                         </div>
                         <p>
-                            <button type="submit" class="btn btn-success m-t-md"><i class="fa fa-envelope mr-3"></i>Send Test</button>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-envelope me-3"></i>Send Test</button>
                         </p>
                     </fieldset>
                 </form>

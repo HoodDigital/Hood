@@ -26,28 +26,28 @@
                     </p>
                 </div>
                 <div class="card-body collapse show" aria-labelledby="content-type-filter-panel-heading" id="content-type-filter-panel">
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                @for (int i = 0; i < Model.Types.Count(); i++)
-                {
-                    <a class="nav-link d-flex justify-content-between align-items-center" href="@string.Format("#collapse_{0}", i.ToString())" aria-controls="@string.Format("collapse_{0}", i.ToString())" role="tab" data-toggle="pill" aria-selected="false">
-                        @Model.Types[i].Title
-                        @if (Model.Types[i].Enabled)
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        @for (int i = 0; i < Model.Types.Count(); i++)
                         {
-                            <span class="badge badge-success badge-pill">Enabled</span>
+                            <a class="nav-link d-flex justify-content-between align-items-center" href="@string.Format("#collapse_{0}", i.ToString())" aria-controls="@string.Format("collapse_{0}", i.ToString())" role="tab" data-bs-toggle="pill" aria-selected="false">
+                                @Model.Types[i].Title
+                                @if (Model.Types[i].Enabled)
+                                {
+                                    <span class="badge bg-success badge-pill">Enabled</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-dark badge-pill">Disabled</span>
+                                }
+                            </a>
                         }
-                        else
-                        {
-                            <span class="badge badge-dark badge-pill">Disabled</span>
-                        }
-                    </a>
-                }
-                <div class="mt-3">
-                    <a asp-action="AddContentType" class="nav-link btn btn-outline-success d-flex justify-content-between align-items-center" data-warning="This will add a blank content type to the site (cannot if you already have one with the type name 'blank'. Are you sure?">
-                        Add New Blank Type
-                        <i class="fa fa-plus-circle"></i>
-                    </a>
-                </div>
-            </div>
+                        <div class="mt-3">
+                            <a asp-action="AddContentType" class="nav-link btn btn-outline-success d-flex justify-content-between align-items-center" data-warning="This will add a blank content type to the site (cannot if you already have one with the type name 'blank'. Are you sure?">
+                                Add New Blank Type
+                                <i class="fa fa-plus-circle"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,15 +88,14 @@
                                     <div class="tab-content">
                                         <div id="@string.Format("type-{0}", i.ToString())" class="tab-pane active" role="tabpanel" aria-labelledby="@string.Format("fields-tab-{0}", i.ToString())">
                                             <input type="hidden" asp-for="Types[i].Search" />
-                                            <div class="form-group">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Types[i].Enabled" class="custom-control-input">
-                                                    <label asp-for="Types[i].Enabled" class="custom-control-label"></label>
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input asp-for="Types[i].Enabled" class="form-check-input">
+                                                    <label asp-for="Types[i].Enabled" class="form-check-label d-block"></label>
+                                                    <small asp-for="Types[i].Enabled"></small>
                                                 </div>
-                                                <small asp-for="Types[i].Enabled"></small>
                                             </div>
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].BaseName"></label>
+                                            <div class="form-floating mb-3">
                                                 @if (Model.Types[i].BaseName == "Page")
                                                 {
                                                     <input asp-for="Types[i].BaseName" class="form-control" type="hidden">
@@ -112,11 +111,11 @@
                                                         }
                                                     </select>
                                                 }
+                                                <label asp-for="Types[i].BaseName"></label>
                                                 <small asp-for="Types[i].BaseName"></small>
                                             </div>
                                             <hr class="mt-4 mb-4" />
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].Slug"></label>
+                                            <div class="form-floating mb-3">
                                                 @if (Model.Types[i].BaseName == "Page")
                                                 {
                                                     <input asp-for="Types[i].Slug" class="form-control" type="hidden">
@@ -126,26 +125,26 @@
                                                 {
                                                     <input asp-for="Types[i].Slug" class="form-control restrict-to-slug" />
                                                 }
+                                                <label asp-for="Types[i].Slug"></label>
                                                 <small asp-for="Types[i].Slug"></small>
                                             </div>
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].Title"></label>
+                                            <div class="form-floating mb-3">
                                                 <input asp-for="Types[i].Title" class="form-control" />
+                                                <label asp-for="Types[i].Title"></label>
                                                 <small asp-for="Types[i].Title"></small>
                                             </div>
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].TypeName"></label>
+                                            <div class="form-floating mb-3">
                                                 <input asp-for="Types[i].TypeName" class="form-control" />
+                                                <label asp-for="Types[i].TypeName"></label>
                                                 <small asp-for="Types[i].TypeName"></small>
                                             </div>
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].TypeNamePlural"></label>
+                                            <div class="form-floating mb-3">
                                                 <input asp-for="Types[i].TypeNamePlural" class="form-control" />
+                                                <label asp-for="Types[i].TypeNamePlural"></label>
                                                 <small asp-for="Types[i].TypeNamePlural"></small>
                                             </div>
                                             <hr class="mt-4 mb-4" />
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].Type"></label>
+                                            <div class="form-floating mb-3">
                                                 @if (Model.Types[i].BaseName == "Page")
                                                 {
                                                     <input asp-for="Types[i].Type" class="form-control" type="hidden">
@@ -155,41 +154,58 @@
                                                 {
                                                     <input asp-for="Types[i].Type" class="form-control restrict-to-slug" />
                                                 }
+                                                <label asp-for="Types[i].Type"></label>
                                                 <small asp-for="Types[i].Type"></small>
                                             </div>
-                                            <div class="form-group floating-label">
-                                                <label asp-for="Types[i].Icon"></label>
-                                                <input asp-for="Types[i].Icon" class="form-control" />
-                                                <small asp-for="Types[i].Icon"></small>
+                                            <label asp-for="Types[i].Icon"></label>
+                                            <div id="Types-IconDisplay-@i" class="p-3 border rounded" data-bs-toggle="collapse" href="#Types-IconSelector-@i">
+                                                Currently Selected: @Html.Raw($"<i class='fa {Model.Types[i].Icon}'></i> {Model.Types[i].Icon.Replace("fa-", "").Replace("-", " ").ToTitleCase()}")
+                                            </div>
+                                            <small asp-for="Types[i].Icon" class="text-info d-block mb-3"></small>
+                                            <div id="Types-IconSelector-@i" class="card bg-light collapse mb-3 p-3" style="max-height:400px;overflow-y:auto;overflow-x:hidden;">
+                                                <input asp-for="Types[i].Icon" type="hidden" id="Types-Icon-@i" />
+                                                <div class="row g-2">
+                                                    @foreach (var icon in FontAwesome.Icons)
+                                                    {
+                                                        <div class="col-3 col-sm-2 col-xl-1">
+                                                            <div class="card py-3 hover text-center mb-1 @(icon.Key == Model.Types[i].Icon ? "active" : "")" 
+                                                                 data-hood-icon="Types-Icon-@i"
+                                                                 data-hood-icon-value="@icon.Key" 
+                                                                 data-hood-icon-display="@icon.Value">
+                                                                <i class="fa-2x fa @icon.Key"></i>
+                                                            </div>
+                                                        </div>
+                                                    } 
+                                                </div>
                                             </div>
                                             <mediaSelect asp-for="Types[i].NoImage"></mediaSelect>
-                                            <div class="form-group">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Types[i].IsPublic" class="custom-control-input">
-                                                    <label asp-for="Types[i].IsPublic" class="custom-control-label"></label>
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input asp-for="Types[i].IsPublic" class="form-check-input">
+                                                    <label asp-for="Types[i].IsPublic" class="form-check-label d-block"></label>
+                                                    <small asp-for="Types[i].IsPublic"></small>
                                                 </div>
-                                                <small asp-for="Types[i].IsPublic"></small>
                                             </div>
-                                            <div class="form-group">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Types[i].HasPage" class="custom-control-input">
-                                                    <label asp-for="Types[i].HasPage" class="custom-control-label"></label>
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input asp-for="Types[i].HasPage" class="form-check-input">
+                                                    <label asp-for="Types[i].HasPage" class="form-check-label d-block"></label>
+                                                    <small asp-for="Types[i].HasPage"></small>
                                                 </div>
-                                                <small asp-for="Types[i].HasPage"></small>
                                             </div>
-                                            <div class="form-group">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Types[i].HideAuthor" class="custom-control-input">
-                                                    <label asp-for="Types[i].HideAuthor" class="custom-control-label"></label>
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input asp-for="Types[i].HideAuthor" class="form-check-input">
+                                                    <label asp-for="Types[i].HideAuthor" class="form-check-label d-block"></label>
+                                                    <small asp-for="Types[i].HideAuthor"></small>
                                                 </div>
-                                                <small asp-for="Types[i].HideAuthor"></small>
                                             </div>
-                                            <div class="form-group">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input asp-for="Types[i].CachedByType" class="custom-control-input">
-                                                    <label asp-for="Types[i].CachedByType" class="custom-control-label"></label>
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input asp-for="Types[i].CachedByType" class="form-check-input">
+                                                    <label asp-for="Types[i].CachedByType" class="form-check-label d-block"></label>
+                                                    <small asp-for="Types[i].CachedByType"></small>
                                                 </div>
-                                                <small asp-for="Types[i].CachedByType"></small>
                                             </div>
                                             <div class="card mt-4 border-danger">
                                                 <div class="card-body">
@@ -204,12 +220,12 @@
                                             </div>
                                         </div>
                                         <div id="@string.Format("editor-{0}", i.ToString())" class="tab-pane" role="tabpanel" aria-labelledby="@string.Format("editor-tab-{0}", i.ToString())">
-                                            <div class="form-group floating-label">
+                                            <div class="form-floating mb-3">
                                                 <label asp-for="Types[i].TitleName"></label>
                                                 <input asp-for="Types[i].TitleName" class="form-control" />
                                                 <small asp-for="Types[i].TitleName"></small>
                                             </div>
-                                            <div class="form-group floating-label">
+                                            <div class="form-floating mb-3">
                                                 <label asp-for="Types[i].ExcerptName"></label>
                                                 <input asp-for="Types[i].ExcerptName" class="form-control" />
                                                 <small asp-for="Types[i].ExcerptName"></small>
@@ -229,7 +245,7 @@
                                                 <small asp-for="Types[i].RichTextExcerpt"></small>
                                             </div>
                                             <hr class="mt-4 mb-4" />
-                                            <div class="form-group floating-label">
+                                            <div class="form-floating mb-3">
                                                 <label asp-for="Types[i].UrlFormatting"></label>
                                                 <select asp-for="Types[i].UrlFormatting" class="form-control">
                                                     <option value="">Default</option>
@@ -246,7 +262,7 @@
                                                 </div>
                                                 <small asp-for="Types[i].Templates"></small>
                                             </div>
-                                            <div class="form-group floating-label">
+                                            <div class="form-floating mb-3">
                                                 <label asp-for="Types[i].TemplateFolder"></label>
                                                 <select asp-for="Types[i].TemplateFolder" class="form-control">
                                                     <option value="Templates">General Templates</option>
@@ -308,12 +324,12 @@
                                             </div>
                                         </div>
                                         <div id="@string.Format("meta-{0}", i.ToString())" class="tab-pane" role="tabpanel" aria-labelledby="@string.Format("meta-tab-{0}", i.ToString())">
-                                            <div class="form-group floating-label">
+                                            <div class="form-floating mb-3">
                                                 <label asp-for="Types[i].MetaTitle"></label>
                                                 <input asp-for="Types[i].MetaTitle" class="form-control" />
                                                 <small asp-for="Types[i].MetaTitle"></small>
                                             </div>
-                                            <div class="form-group floating-label">
+                                            <div class="form-floating mb-3">
                                                 <label asp-for="Types[i].Description"></label>
                                                 <input asp-for="Types[i].Description" class="form-control" />
                                                 <small asp-for="Types[i].Description"></small>
@@ -326,11 +342,11 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <input asp-for="Types[i].CustomFieldsJson" type="hidden" id="custom-fields-@i" value="@Model.Types[i].CustomFieldsJson" />
-                                                    <div class="form-group floating-label">
+                                                    <div class="form-floating mb-3">
                                                         <label>Name</label>
                                                         <input id="custom-field-name-@i" type="text" class="form-control restrict-to-meta-slug" data-prefix="@string.Format("Custom.{0}.", Model.Types[i].Type.ToTitleCase())" placeholder="Name" />
                                                     </div>
-                                                    <div class="form-group floating-label">
+                                                    <div class="form-floating mb-3">
                                                         <label>Type</label>
                                                         <select id="custom-field-type-@i" type="text" class="form-control">
                                                             <option value="System.String">Single Line Text</option>
@@ -344,7 +360,7 @@
                                                             <option value="System.Decimal">Decimal Number</option>
                                                         </select>
                                                     </div>
-                                                    <div class="form-group floating-label">
+                                                    <div class="form-floating mb-3">
                                                         <label>Default Value</label>
                                                         <input id="custom-field-default-@i" type="text" class="form-control" placeholder="Default Value" />
                                                     </div>

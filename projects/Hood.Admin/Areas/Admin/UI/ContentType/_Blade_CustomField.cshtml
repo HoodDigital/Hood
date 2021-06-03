@@ -1,0 +1,49 @@
+@model CustomField
+@{
+    Layout = null;
+}
+<div class="modal fade" id="content-custom-field-create-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="content-custom-field-create-form" asp-antiforgery="true" autocomplete="off" class="modal-content" novalidate>
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">
+                        <i class="fa fa-plus-circle text-success me-2"></i> Create new custom field.
+                    </h5>
+                    <p class="m-0 text-muted">
+                        Add a new custom field to the content type.
+                    </p>
+                </div>
+                <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-floating mb-3">
+                    <input asp-for="Name" class="form-control restrict-to-meta-slug" placeholder="Name" required />
+                    <label asp-for="Name"></label>
+                </div>
+                <div class="form-floating mb-3">
+                    <select asp-for="Type" class="form-select">
+                        <option value="System.String">Single Line Text</option>
+                        <option value="Hood.MultiLineString">Multi-Line Text</option>
+                        <option value="Hood.WYSIWYG">Multi-Line Text (WYSIWYG)</option>
+                        <option value="Hood.ImageUrl">Image (Url)</option>
+                        <option value="System.DateTime">Date/Time</option>
+                        <option value="Hood.Date">Date</option>
+                        <option value="Hood.Time">Time</option>
+                        <option value="System.Int32">Integer</option>
+                        <option value="System.Decimal">Decimal Number</option>
+                    </select>
+                    <label asp-for="Type"></label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Default" class="form-control" />
+                    <label asp-for="Default"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+                <button type="submit" id="content-custom-field-create-submit" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+            </div>
+        </form>
+    </div>
+</div>
