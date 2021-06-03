@@ -10,31 +10,6 @@ namespace Hood.Models
 {
     public class ContentType : SaveableModel
     {
-        public ContentType()
-        {
-            BaseName = "Default";
-            Slug = "new-content";
-            Type = "new-content";
-            Search = "new-content";
-            Title = "New Content Type";
-            Icon = "fa-object-group";
-            Enabled = true;
-            IsPublic = false;
-            HasPage = false;
-            TitleName = "Title";
-            ExcerptName = "Excerpt";
-            MultiLineExcerpt = true;
-            ShowDesigner = false;
-            ShowEditor = true;
-            ShowCategories = true;
-            ShowBanner = true;
-            ShowImage = true;
-            Gallery = false;
-            Templates = false;
-            TemplateFolder = "Templates";
-            CustomFields = ContentTypes.BaseFields(new List<CustomField>());
-        }
-
         public static ContentType Null
         {
             get

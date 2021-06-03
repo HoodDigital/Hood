@@ -12,6 +12,8 @@ import { PropertyController } from './admin/PropertyController';
 import { UsersController } from './admin/UsersController';
 import { ThemesController } from './admin/ThemesController';
 import { ContentTypeController } from './admin/ContentTypeController';
+import { LogsController } from './admin/LogsController';
+import { PropertyImporter } from './admin/PropertyImporter';
 
 class Admin extends BaseController {
 
@@ -19,7 +21,9 @@ class Admin extends BaseController {
     media: MediaController;
     content: ContentController;
     contentType: ContentTypeController;
+    logs: LogsController;
     property: PropertyController;
+    propertyImporter: PropertyImporter;
     themes: ThemesController;
     users: UsersController;
 
@@ -31,7 +35,9 @@ class Admin extends BaseController {
         this.media = new MediaController();
         this.content = new ContentController();
         this.contentType = new ContentTypeController();
+        this.logs = new LogsController();
         this.property = new PropertyController();
+        this.propertyImporter = new PropertyImporter();
         this.themes = new ThemesController();
         this.users = new UsersController();
 

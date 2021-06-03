@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,6 +8,8 @@ namespace Hood.Caching
 {
     public interface IHoodCache
     {
+        ConcurrentDictionary<string, DateTime> Keys { get; }
+
         bool Exists(string key);
         Task<bool> ExistsAsync(string key);
 

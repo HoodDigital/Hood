@@ -21,6 +21,13 @@ namespace Hood.Caching
             _cache = cache;
         }
 
+        public ConcurrentDictionary<string, DateTime> Keys 
+        { 
+            get
+            {
+                return _entryKeys;
+            }                
+        }
 
         public bool Exists(string key)
         {
