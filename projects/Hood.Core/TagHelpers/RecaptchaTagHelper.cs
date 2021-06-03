@@ -44,7 +44,7 @@ namespace Hood.TagHelpers
             output.TagMode = TagMode.StartTagAndEndTag;
             string recaptchaId = Guid.NewGuid().ToString();
             _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://www.google.com/recaptcha/api.js?render={Engine.Settings.Integrations.GoogleRecaptchaSiteKey}", false);
-            _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/js/recaptcha.js", false);
+            _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://cdn.jsdelivr.net/npm/hoodcms/js/recaptcha.js", false);
             var scriptTemplate = $@"<script>hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');setInterval(function(){{hood__getReCaptcha('{Engine.Settings.Integrations.GoogleRecaptchaSiteKey}','{recaptchaId}','{Action}');}},150000);</script>";
             _htmlHelper.AddInlineScript(ResourceLocation.AfterScripts, scriptTemplate);
             output.Content.SetHtmlContent($@"<input id=""{recaptchaId}"" name=""g-recaptcha-response"" type=""hidden"" value="""" />");

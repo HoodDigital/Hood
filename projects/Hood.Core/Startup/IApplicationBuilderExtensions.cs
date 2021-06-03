@@ -58,7 +58,7 @@ namespace Hood.Startup
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
-            if (env.EnvironmentName == "Development")
+            if (env.EnvironmentName == "Development" || env.EnvironmentName == "Hood")
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();

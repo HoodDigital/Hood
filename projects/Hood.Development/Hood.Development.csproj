@@ -8,7 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="dist\**" />
+    <Compile Remove="src\css\**" />
+    <Compile Remove="src\js\**" />
+    <Content Remove="dist\**" />
+    <Content Remove="src\css\**" />
+    <Content Remove="src\js\**" />
+    <EmbeddedResource Remove="dist\**" />
+    <EmbeddedResource Remove="src\css\**" />
+    <EmbeddedResource Remove="src\js\**" />
+    <None Remove="dist\**" />
+    <None Remove="src\css\**" />
+    <None Remove="src\js\**" />
+    <TypeScriptCompile Remove="dist\**" />
     <TypeScriptCompile Remove="node_modules\**" />
+    <TypeScriptCompile Remove="src\css\**" />
+    <TypeScriptCompile Remove="src\js\**" />
   </ItemGroup>
 
   <ItemGroup>

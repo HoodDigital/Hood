@@ -11,12 +11,12 @@ namespace Hood.Models
     {
         public LoginAreaSettings()
         {
-            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/hood-cms.png";
+            Logo = "https://cdn.jsdelivr.net/npm/hoodcms/images/hood-cms.png";
             Title = "Hood CMS";
             BackgroundImages = "";
             for (int i = 1; i <= 9; i++)
             {
-                BackgroundImages += $"https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/bg/{i}.jpg{Environment.NewLine}";
+                BackgroundImages += $"https://cdn.jsdelivr.net/npm/hoodcms/images/bg/{i}.jpg{Environment.NewLine}";
             }
             BackgroundImagesFadeSpeed = 1000;
             BackgroundImagesChangeDuration = 3000;

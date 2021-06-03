@@ -1,6 +1,6 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
 @{     
-    bool production = _env.EnvironmentName != "Development";
+    bool production = _env.EnvironmentName == "Production";
 }
 
 <!DOCTYPE html>
@@ -8,7 +8,7 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewData["Title"] - @Engine.Settings.Basic.FullTitle - @Engine.Settings.Basic.AdminAreaSettings.Title</title>
-    <link type="image/png" href="https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/hood-square.png" rel="icon" />
+    <link type="image/png" href="https://cdn.jsdelivr.net/npm/hoodcms/images/hood-square.png" rel="icon" />
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)

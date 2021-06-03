@@ -1,10 +1,16 @@
 @inject IThemesService _themes
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/monolith.min.css"/>
-<environment include="development">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/monolith.min.css" />
+
+<environment include="Hood">
     <link rel="stylesheet" href="/src/css/admin.css">
 </environment>
-<environment include="staging">
-    <link rel="stylesheet" href="/dist/css/admin.css">
+<environment include="Development">
+    <link rel="stylesheet" href="/node_modules/hoodcms/css/admin.css">
 </environment>
-
+<environment include="Staging">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/src/css/admin.css" />
+</environment>
+<environment include="Production">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/dist/css/admin.css" />
+</environment>
