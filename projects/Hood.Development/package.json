@@ -75,9 +75,14 @@
     "webpack-cli": "4.7.0"
   },
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch",
-    "production": "webpack --config webpack.production.js",
+    "admin": "webpack --config src/webpack/admin.js",
+    "admin-watch": "webpack --config src/webpack/admin.js --watch",
+    "admin-production": "webpack --config src/webpack/admin.production.js",
+    "login": "webpack --config src/webpack/login.js",
+    "login-watch": "webpack --config src/webpack/login.js --watch",
+    "login-production": "webpack --config src/webpack/login.production.js",
+    "build": "npm-run-all admin login",
+    "production": "npm-run-all admin-production login-production",
     "clean": "gulp clean",
     "copy": "gulp copy",
     "publish": "npm-run-all clean build production copy",

@@ -30,4 +30,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="src\webpack\admin - Copy.production.js">
+      <DependentUpon>admin.production.js</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>

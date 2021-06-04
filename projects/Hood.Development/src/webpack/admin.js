@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 
 const plugins = [];
 plugins.push(new MiniCssExtractPlugin({
@@ -12,8 +13,8 @@ plugins.push(new MiniCssExtractPlugin({
 
 console.log('---------------------------------------------------------------------------')
 console.log('-                                                                         -')
-console.log('-                          Building Hood CMS                              -')
-console.log('-                              PRODUCTION                                 -')
+console.log('-                      Building Hood CMS - ADMIN                          -')
+console.log('-                             DEVELOPMENT                                 -')
 console.log('-                                                                         -')
 console.log('---------------------------------------------------------------------------')
 
@@ -22,19 +23,16 @@ module.exports = {
     plugins,
 
     entry: {
-        editor: './src/scss/editor.scss',
-        hood: './src/ts/hood.ts',
-        login: ['./src/ts/login.ts', './src/scss/login.scss'],
         admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
     },
 
-    mode: "production",
+    mode: "development",
 
-    devtool: false,
+    devtool: "source-map",
 
     module: {
         rules: [
-
+            
             {
                 test: /\.tsx?$/,
                 use: [
@@ -76,7 +74,7 @@ module.exports = {
 
     output: {
         filename: 'js/[name].js',
-        path: path.resolve(__dirname, "wwwroot/dist")
+        path: path.resolve("./wwwroot/src")
     },
 
     optimization: {

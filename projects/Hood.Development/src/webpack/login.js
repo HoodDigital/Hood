@@ -10,11 +10,10 @@ const plugins = [];
 plugins.push(new MiniCssExtractPlugin({
     filename: "css/[name].css"
 }));
-//plugins.push(new NodePolyfillPlugin());
 
 console.log('---------------------------------------------------------------------------')
 console.log('-                                                                         -')
-console.log('-                          Building Hood CMS                              -')
+console.log('-                      Building Hood CMS - LOGIN                          -')
 console.log('-                             DEVELOPMENT                                 -')
 console.log('-                                                                         -')
 console.log('---------------------------------------------------------------------------')
@@ -24,10 +23,7 @@ module.exports = {
     plugins,
 
     entry: {
-        editor: './src/scss/editor.scss',
-        hood: './src/ts/hood.ts',
-        login: ['./src/ts/login.ts', './src/scss/login.scss'],
-        admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
+        login: ['./src/ts/login.ts', './src/scss/login.scss']
     },
 
     mode: "development",
@@ -70,15 +66,12 @@ module.exports = {
 
     externals: {
         jquery: 'jQuery',
-        bootstrap: 'bootstrap',
-        dropzone: 'Dropzone',
-        'chart.js': 'Chart',
-        'tinymce/tinymce': 'tinymce',
+        bootstrap: 'bootstrap'
     },
 
     output: {
         filename: 'js/[name].js',
-        path: path.resolve(__dirname, "wwwroot/src")
+        path: path.resolve("./wwwroot/src")
     },
 
     optimization: {
