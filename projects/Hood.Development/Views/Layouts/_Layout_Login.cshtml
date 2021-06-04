@@ -1,15 +1,16 @@
 @inject IConfiguration Config
-
-<partial name="_Scripts_Login" />
-
 <!DOCTYPE html>
 <html>
 <head>
+
     <partial name="_Metas_Base" />
     <title>@ViewData["Title"] - @Engine.Settings.Basic.LoginAreaSettings.Title</title>
+
     @RenderSection("metas", required: false)
+
     <partial name="_Styles_Login" />
     @RenderSection("styles", required: false)
+
 </head>
 <body class="@ViewData["BodyClass"]">
     <div class="login-block">
@@ -24,28 +25,14 @@
         </footer>
     </div>
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
-
-    <partial name="_Scripts_JQuery" />
-    <partial name="_Scripts_Bootstrap" />
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
-
-    @Html.RenderScripts(Url, ResourceLocation.Vendors)
-
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
-    @Html.RenderScripts(Url, ResourceLocation.Scripts)
+    <partial name="_Scripts_Login" />
+    @RenderSection("scripts", required: false)
 
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
-
-    @RenderSection("scripts", required: false)
-
-    @Engine.Settings.Basic.LoginAreaSettings.BackgroundImagesScript
 
     @Html.Raw(Engine.Settings.Seo.GoogleAnalytics)
 

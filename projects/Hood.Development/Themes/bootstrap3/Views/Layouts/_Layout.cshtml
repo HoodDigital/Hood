@@ -12,12 +12,6 @@
 <html lang="en-gb" xml:lang="en">
 <head>
 
-    <partial name="_Scripts_Validation" />
-    <partial name="_Scripts_Vendors" />
-    <partial name="_Scripts_Hood" />
-    <partial name="_Scripts_Google" />
-    <partial name="_Scripts" />
-
     <partial name="_Metas_Base" />
     <title>@ViewData["Title"]</title>
 
@@ -59,21 +53,10 @@
 
     @RenderSection("includes", required: false)
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
-
-    <partial name="_Scripts_JQuery" />
-    <partial name="_Scripts_Bootstrap" />
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
-
-    @Html.RenderScripts(Url, ResourceLocation.Vendors)
-
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
-    @Html.RenderScripts(Url, ResourceLocation.Scripts)
+    <partial name="_Scripts" />
 
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)

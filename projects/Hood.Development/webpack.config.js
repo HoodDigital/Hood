@@ -26,6 +26,7 @@ module.exports = {
     entry: {
         editor: './src/scss/editor.scss',
         hood: './src/ts/hood.ts',
+        login: ['./src/ts/login.ts', './src/scss/login.scss'],
         admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
     },
 

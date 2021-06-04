@@ -63,18 +63,11 @@
         </div>
     </div>
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, production)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, production)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
-
-    @Html.RenderScripts(Url, ResourceLocation.Vendors, production)
-
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
     <partial name="_Scripts" />
+    @RenderSection("scripts", required: false)
 
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)

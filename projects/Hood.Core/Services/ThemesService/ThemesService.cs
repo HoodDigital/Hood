@@ -48,7 +48,6 @@ namespace Hood.Services
                     ["Description"] = "The default site theme, uses the default Bootstrap4 UI.",
                     ["PreviewImage"] = "https://hood.azureedge.net/hood/hood-theme.jpg",
                     ["Public"] = "true",
-                    ["UI"] = "Bootstrap4"
                 };
                 _configs.Add("default", new ConfigurationBuilder().AddInMemoryCollection(defaultConfig).Build());
             }

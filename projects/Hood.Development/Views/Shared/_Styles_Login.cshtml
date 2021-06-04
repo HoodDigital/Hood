@@ -1,1 +1,16 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/css/login.min.css">
+@inject IThemesService _themes
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/monolith.min.css" />
+
+<environment include="Hood">
+    <link rel="stylesheet" href="/src/css/login.css">
+</environment>
+<environment include="Development">
+    <link rel="stylesheet" href="/node_modules/hoodcms/css/login.css">
+</environment>
+<environment include="Staging">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/src/css/login.css" />
+</environment>
+<environment include="Production">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/dist/css/login.css" />
+</environment>

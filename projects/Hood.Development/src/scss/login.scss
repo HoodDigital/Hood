@@ -1,13 +1,7 @@
+@import url("https://cdn.jsdelivr.net/npm/chart.js@2.9.2/dist/Chart.min.css");
+@import "admin/variables";
 @import "bootstrap";
-$feathericon-font-path: "../../lib/feather/build/fonts/";
-@import "../../lib/feather/build/scss/feathericon";
-$fa-font-path: "../../lib/fontawesome/webfonts";
-@import "../../lib/fontawesome/scss/fontawesome";
-@import "../../lib/fontawesome/scss/brands";
-@import "../../lib/fontawesome/scss/regular";
-@import "../../lib/fontawesome/scss/solid";
-@import "core/validation-summary";
-@import "core/floating-label";
+
 html,
 body {
     height: 100%;
@@ -26,6 +20,7 @@ body {
     height: 100%;
     background: #444;
     background-color: #f5f5f5;
+
     .login-block {
         width: 100%;
         max-width: 450px;
@@ -35,6 +30,7 @@ body {
         border-top: solid 3px #fcc20d;
         border-radius: 4px;
         box-shadow: 0 0 75px rgba(0, 0, 0, .7);
+
         header {
             img {
                 display: block;
@@ -43,27 +39,33 @@ body {
                 margin: 25px auto;
             }
         }
+
         .header {
             text-align: center;
+
             h2 {
                 margin-bottom: 1em;
                 font-size: 1.5rem;
             }
         }
+
         .form-signin {
             input[type="text"] {
                 margin-bottom: -1px;
                 border-bottom-right-radius: 0;
                 border-bottom-left-radius: 0;
             }
+
             input[type="password"] {
                 margin-bottom: 10px;
                 border-top-left-radius: 0;
                 border-top-right-radius: 0;
             }
         }
+
         footer {
             text-align: center;
+
             small {
                 a {
                     font-weight: normal;
@@ -73,6 +75,7 @@ body {
             }
         }
     }
+
     &.install {
         .login-block {
             max-width: 996px;
