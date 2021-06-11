@@ -97,7 +97,7 @@ namespace Hood.Models
                 switch ((Enums.ContentStatus)Status)
                 {
                     case ContentStatus.Published:
-                        if (PublishDate > DateTime.Now)
+                        if (PublishDate > DateTime.UtcNow)
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         else
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
@@ -116,7 +116,7 @@ namespace Hood.Models
             get
             {
                 if (Status == ContentStatus.Published)
-                    return PublishDate > DateTime.Now;
+                    return PublishDate > DateTime.UtcNow;
                 else
                     return false;
             }

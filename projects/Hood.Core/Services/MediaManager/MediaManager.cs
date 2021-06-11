@@ -199,7 +199,7 @@ namespace Hood.Services
                 Filename = file.GetFilename(),
                 BlobReference = GetBlobReference(directoryPath, await GetSafeFilename(directoryPath, file.GetFilename())),
                 UniqueId = Guid.NewGuid().ToString(),
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 FileSize = file.Length,
                 FileType = file.ContentType,
                 Path = directoryPath
@@ -240,7 +240,7 @@ namespace Hood.Services
             media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
 
             // Process type, size etc.
-            media.CreatedOn = DateTime.Now;
+            media.CreatedOn = DateTime.UtcNow;
             media.FileSize = file.Length;
             media.FileType = filetype;
             media.GenericFileType = filetype.ToFileType();

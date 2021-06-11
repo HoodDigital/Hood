@@ -288,8 +288,8 @@ namespace Hood.Services
             clone.Id = 0;
             clone.Title += " - Copy";
             clone.Slug += "-copy";
-            clone.PublishDate = DateTime.Now;
-            clone.CreatedOn = DateTime.Now;
+            clone.PublishDate = DateTime.UtcNow;
+            clone.CreatedOn = DateTime.UtcNow;
 
             _db.Content.Add(clone);
             await _db.SaveChangesAsync();
@@ -673,8 +673,8 @@ namespace Hood.Services
         public async Task<ContentStatitsics> GetStatisticsAsync()
         {
             int totalPosts = await _db.Content.CountAsync();
-            int totalPublished = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
-            var data = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).Select(c => new { type = c.ContentType, date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
+            int totalPublished = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow).CountAsync();
+            var data = await _db.Content.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow).Select(c => new { type = c.ContentType, date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
@@ -684,7 +684,7 @@ namespace Hood.Services
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
-            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
+            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.UtcNow.AddDays(-89), DateTime.UtcNow))
             {
                 var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
                 int count = dayvalue != null ? dayvalue.count : 0;
@@ -697,7 +697,7 @@ namespace Hood.Services
 
             List<KeyValuePair<string, int>> months = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishMonths = new List<KeyValuePair<string, int>>();
-            for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
+            for (DateTime dt = DateTime.UtcNow.AddMonths(-11); dt <= DateTime.UtcNow; dt = dt.AddMonths(1))
             {
                 var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
                 int count = monthvalue != null ? monthvalue.count : 0;

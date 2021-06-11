@@ -12,7 +12,7 @@
         <div>
             @if (User.Identity.IsAuthenticated)
             {
-                <button class="btn btn-outline-dark btn-sm mr-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" data-target="#account-menu">
+                <button class="btn btn-outline-dark btn-sm mr-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#account-menu">
                     <i class="fas fa-user-alt mt-1 mb-1"></i>
                 </button>
                 <partial name="_Header_Menu_Account" />
@@ -23,7 +23,7 @@
                     <i class="fas fa-user-alt mt-1 mb-1"></i>
                 </a>
             }
-            <button class="btn btn-outline-dark btn-sm" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" data-target="#mobile-menu">
+            <button class="btn btn-outline-dark btn-sm" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#mobile-menu">
                 <i class="fas fa-ellipsis-h mt-1 mb-1"></i>
             </button>
             <partial name="_Header_Menu_Mobile" />

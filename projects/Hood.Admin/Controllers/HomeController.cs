@@ -34,7 +34,7 @@ namespace Hood.Areas.Admin.Controllers
             {
                 Id = Guid.NewGuid(),
                 CreatedBy = user.Id,
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 Note = "This account was loaded and checked via the debug page."
             });
             await _userManager.UpdateAsync(user);

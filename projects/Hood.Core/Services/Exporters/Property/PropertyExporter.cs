@@ -238,9 +238,9 @@ namespace Hood.Services
                 Status.Succeeded = true;
                 Status.Running = false;
                 Status.HasFile = true;
-                Status.Message = "Property export completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
+                Status.Message = "Property export completed at " + DateTime.UtcNow.ToShortTimeString() + " on " + DateTime.UtcNow.ToLongDateString() + ".";
                 Status.Download = downloadUrl;
-                Status.ExpireTime = DateTime.Now.AddDays(1).ToDisplay();
+                Status.ExpireTime = DateTime.UtcNow.AddDays(1).ToDisplay();
                 Lock.ReleaseWriterLock();
                 return;
             }

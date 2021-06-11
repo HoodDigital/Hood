@@ -388,7 +388,7 @@ namespace Hood.Models
                 switch (Status)
                 {
                     case ContentStatus.Published:
-                        if (PublishDate > DateTime.Now)
+                        if (PublishDate > DateTime.UtcNow)
                         {
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         }

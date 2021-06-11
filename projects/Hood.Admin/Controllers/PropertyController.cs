@@ -71,7 +71,7 @@ namespace Hood.Areas.Admin.Controllers
                 modelToUpdate = await _property.ReloadReferences(modelToUpdate);
 
                 modelToUpdate.LastEditedBy = User.Identity.Name;
-                modelToUpdate.LastEditedOn = DateTime.Now;
+                modelToUpdate.LastEditedOn = DateTime.UtcNow;
 
                 if (model.AutoGeocode)
                 {
@@ -192,7 +192,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PropertyListing model = new PropertyListing()
             {
-                PublishDate = DateTime.Now,
+                PublishDate = DateTime.UtcNow,
                 AgentId = User.GetUserId()
             };
             return View("_Blade_Property", model);
@@ -205,9 +205,9 @@ namespace Hood.Areas.Admin.Controllers
             {
                 model.AgentId = Engine.Account.Id;
                 model.CreatedBy = Engine.Account.UserName;
-                model.CreatedOn = DateTime.Now;
+                model.CreatedOn = DateTime.UtcNow;
                 model.LastEditedBy = Engine.Account.UserName;
-                model.LastEditedOn = DateTime.Now;
+                model.LastEditedOn = DateTime.UtcNow;
                 model.Confidential = false;
                 model.Featured = false;
                 model.AskingPrice = 0;

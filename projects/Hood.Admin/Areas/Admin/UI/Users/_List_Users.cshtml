@@ -21,6 +21,15 @@
                         <small class="ml-2 text-muted d-lg-inline">Last logged in @user.LastLogOn.ToHumaneDate()</small>
                     </div>
                     <p class="card-text mb-1">
+                        @if (user.Active)
+                        {
+                            <small class="badge bg-success">Active</small>
+                        }
+                        else
+                        {
+                            <small class="badge bg-danger">Inactive</small>
+
+                        }
                         @foreach (var sub in user.Roles)
                         {
                             <small class="badge bg-info">@sub.Name.CamelCaseToString()</small>

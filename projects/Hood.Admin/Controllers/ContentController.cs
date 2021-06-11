@@ -64,7 +64,7 @@ namespace Hood.Areas.Admin.Controllers
                 modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
 
                 modelToUpdate.LastEditedBy = User.Identity.Name;
-                modelToUpdate.LastEditedOn = DateTime.Now;
+                modelToUpdate.LastEditedOn = DateTime.UtcNow;
 
                 if (modelToUpdate.Slug.IsSet())
                 {
@@ -148,7 +148,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             Content model = new Content()
             {
-                PublishDate = DateTime.Now,
+                PublishDate = DateTime.UtcNow,
                 Type = Engine.Settings.Content.GetContentType(type),
                 Status = ContentStatus.Draft
             };
@@ -165,9 +165,9 @@ namespace Hood.Areas.Admin.Controllers
                 model.AuthorId = Engine.Account.Id;
                 model.Body = "";
                 model.CreatedBy = Engine.Account.UserName;
-                model.CreatedOn = DateTime.Now;
+                model.CreatedOn = DateTime.UtcNow;
                 model.LastEditedBy = Engine.Account.UserName;
-                model.LastEditedOn = DateTime.Now;
+                model.LastEditedOn = DateTime.UtcNow;
                 model.Public = true;
                 model.ShareCount = 0;
                 model.Views = 0;

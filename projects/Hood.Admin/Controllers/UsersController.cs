@@ -78,9 +78,10 @@ namespace Hood.Areas.Admin.Controllers
                     }
                 }
 
-
                 var updatedFields = Request.Form.Keys.ToHashSet();
                 modelToUpdate = modelToUpdate.UpdateFromFormModel(model, updatedFields);
+
+                await _account.UpdateUserAsync(modelToUpdate);
 
                 SaveMessage = "Saved!";
                 MessageType = AlertType.Success;
@@ -125,15 +126,15 @@ namespace Hood.Areas.Admin.Controllers
                     PhoneNumber = model.Phone,
                     JobTitle = model.JobTitle,
                     Anonymous = model.Anonymous,
-                    CreatedOn = DateTime.Now,
-                    LastLogOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
+                    LastLogOn = DateTime.UtcNow,
                     LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
                     LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
                 };
                 user.AddUserNote(new UserNote()
                 {
                     CreatedBy = User.GetUserId(),
-                    CreatedOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
                     Note = $"User created via admin panel by {User.Identity.Name}."
                 });
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
@@ -314,7 +315,7 @@ namespace Hood.Areas.Admin.Controllers
                 user.AddUserNote(new UserNote()
                 {
                     CreatedBy = User.GetUserId(),
-                    CreatedOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
                     Note = $"User email marked as confirmed via admin panel by {User.Identity.Name}."
                 });
                 await _userManager.UpdateAsync(user);
@@ -381,7 +382,7 @@ namespace Hood.Areas.Admin.Controllers
                     Id = Guid.NewGuid(),
                     Note = note,
                     CreatedBy = User.Identity.Name,
-                    CreatedOn = DateTime.Now
+                    CreatedOn = DateTime.UtcNow
                 });
                 await _account.UpdateUserAsync(user);
                 return new Response(true, "The note has been saved.");
@@ -502,7 +503,7 @@ namespace Hood.Areas.Admin.Controllers
                 impersonatedUser.AddUserNote(new UserNote()
                 {
                     CreatedBy = User.GetUserId(),
-                    CreatedOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
                     Note = $"User {impersonatedUser.UserName} was impersonated by {User.Identity.Name}."
                 });
                 await _userManager.UpdateAsync(impersonatedUser);
@@ -572,7 +573,7 @@ namespace Hood.Areas.Admin.Controllers
                     user.AddUserNote(new UserNote()
                     {
                         CreatedBy = User.GetUserId(),
-                        CreatedOn = DateTime.Now,
+                        CreatedOn = DateTime.UtcNow,
                         Note = $"User password reset via admin panel by {User.Identity.Name}."
                     });
                     await _userManager.UpdateAsync(user);

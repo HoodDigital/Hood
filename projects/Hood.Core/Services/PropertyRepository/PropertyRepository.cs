@@ -434,7 +434,7 @@ namespace Hood.Services
         public async Task<PropertyStatistics> GetStatisticsAsync()
         {
             int totalProperties = await _db.Properties.CountAsync();
-            int totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.Now).CountAsync();
+            int totalPublished = await _db.Properties.Where(c => c.Status == ContentStatus.Published && c.PublishDate < DateTime.UtcNow).CountAsync();
             var data = await _db.Properties.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month, pubdate = c.PublishDate.Date, pubmonth = c.PublishDate.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
@@ -444,7 +444,7 @@ namespace Hood.Services
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishDays = new List<KeyValuePair<string, int>>();
-            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
+            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.UtcNow.AddDays(-89), DateTime.UtcNow))
             {
                 var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
                 int count = dayvalue != null ? dayvalue.count : 0;
@@ -457,7 +457,7 @@ namespace Hood.Services
 
             List<KeyValuePair<string, int>> months = new List<KeyValuePair<string, int>>();
             List<KeyValuePair<string, int>> publishMonths = new List<KeyValuePair<string, int>>();
-            for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
+            for (DateTime dt = DateTime.UtcNow.AddMonths(-11); dt <= DateTime.UtcNow; dt = dt.AddMonths(1))
             {
                 var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
                 int count = monthvalue != null ? monthvalue.count : 0;

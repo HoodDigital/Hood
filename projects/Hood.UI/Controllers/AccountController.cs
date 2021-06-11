@@ -77,7 +77,7 @@ namespace Hood.Controllers
                 if (result.Succeeded)
                 {
                     ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
-                    user.LastLogOn = DateTime.Now;
+                    user.LastLogOn = DateTime.UtcNow;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
                     await _userManager.UpdateAsync(user);
@@ -208,6 +208,14 @@ namespace Hood.Controllers
 
                 await _userManager.UpdateSecurityStampAsync(user);
 
+                // mark account active etc etc.
+                user.EmailConfirmed = true;
+                user.LastLogOn = DateTime.UtcNow;
+                user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
+                user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
+
+                await _userManager.UpdateAsync(user);
+
                 await _signInManager.SignInAsync(user, true);
 
                 return RedirectToAction(nameof(MagicLoginSuccess), new { returnUrl = r });
@@ -294,8 +302,8 @@ namespace Hood.Controllers
                     PhoneNumber = model.Phone,
                     JobTitle = model.JobTitle,
                     Anonymous = model.Anonymous,
-                    CreatedOn = DateTime.Now,
-                    LastLogOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
+                    LastLogOn = DateTime.UtcNow,
                     LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
                     LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
                 };
@@ -305,7 +313,7 @@ namespace Hood.Controllers
                     await SendWelcomeEmail(user, Engine.Settings.Account.RequireEmailConfirmation);
 
                     user.Active = !Engine.Settings.Account.RequireEmailConfirmation;
-                    user.LastLogOn = DateTime.Now;
+                    user.LastLogOn = DateTime.UtcNow;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
 
@@ -385,8 +393,8 @@ namespace Hood.Controllers
                             PhoneNumber = model.Phone,
                             JobTitle = model.JobTitle,
                             Anonymous = model.Anonymous,
-                            CreatedOn = DateTime.Now,
-                            LastLogOn = DateTime.Now,
+                            CreatedOn = DateTime.UtcNow,
+                            LastLogOn = DateTime.UtcNow,
                             LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
                             LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
                         };
@@ -455,9 +463,11 @@ namespace Hood.Controllers
                 // mark account active etc etc.
                 user.Active = true;
                 user.EmailConfirmed = true;
-                user.LastLogOn = DateTime.Now;
+                user.LastLogOn = DateTime.UtcNow;
                 user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                 user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
+
+                await _userManager.UpdateAsync(user);
 
                 await _signInManager.SignInAsync(user, true);
 
@@ -641,7 +651,7 @@ namespace Hood.Controllers
                 message.AddCallToAction("Reset your password", callbackUrl);
                 message.Template = MailSettings.WarningTemplate;
                 await _emailSender.SendEmailAsync(message);
-                return View("ForgotPasswordConfirmation");
+                return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
             // If we got this far, something failed, redisplay form

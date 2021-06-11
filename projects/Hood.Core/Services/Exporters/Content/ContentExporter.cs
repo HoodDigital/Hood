@@ -220,7 +220,7 @@ namespace Hood.Services
                 Status.Succeeded = true;
                 Status.Running = false;
                 Status.HasFile = true;
-                Status.Message = "Export completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
+                Status.Message = "Export completed at " + DateTime.UtcNow.ToShortTimeString() + " on " + DateTime.UtcNow.ToLongDateString() + ".";
                 Status.Download = downloadUrl;
                 Status.ExpireTime = DateTime.UtcNow.AddHours(24).ToDisplay();
                 Lock.ReleaseWriterLock();

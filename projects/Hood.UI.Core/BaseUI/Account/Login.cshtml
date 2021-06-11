@@ -7,35 +7,23 @@
 <div id="login-page">
     <div class="header">
         <h2>Sign In</h2>
-        <partial name="_LoginSocials" />
+        <p>Enter your username and password to sign into your account.</p>
     </div>
     <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" id="signin-password" role="form">
         @Html.RenderHoneypotField()
         <recaptcha action="login" />
         <div class="d-grid gap-2">
             <div asp-validation-summary="All" class="validation-summary"></div>
-            <div class="grid g-2">
                 <div class="form-floating">
                     <input asp-for="Username" class="form-control" placeholder="Email address" />
                     <label asp-for="Username"></label>
-                    <span asp-validation-for="Username" class="text-danger text-center font-weight-bold d-block"></span>
+                    <span asp-validation-for="Username"></span>
                 </div>
                 <div class="form-floating">
-                    <input asp-for="Username" class="form-control" placeholder="Email address" />
-                    <label asp-for="Username"></label>
-                    <span asp-validation-for="Username" class="text-danger text-center font-weight-bold d-block"></span>
+                    <input asp-for="Password" class="form-control" placeholder="Email address" />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password"></span>
                 </div>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Username" class="form-control" placeholder="Email address" />
-                <label asp-for="Username"></label>
-                <span asp-validation-for="Username" class="text-danger text-center font-weight-bold d-block"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Password" class="form-control" placeholder="Password" />
-                <label asp-for="Password"></label>
-                <span asp-validation-for="Password" class="text-danger text-center font-weight-bold d-block"></span>
-            </div>
             <button type="submit" class="btn btn-success">Sign In</button>
             <span class="text-center">or</span>
             <a asp-action="Register" class="btn btn-outline-dark">Create an Account</a>
@@ -45,3 +33,4 @@
         </div>
     </form>
 </div>
+<partial name="_LoginSocials" />
