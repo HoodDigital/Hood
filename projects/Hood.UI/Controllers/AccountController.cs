@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Unsplasharp;
 
 namespace Hood.Controllers
 {
@@ -351,7 +352,7 @@ namespace Hood.Controllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         [Route("account/register/generate")]
-        public virtual async Task<IActionResult> MagicRegisterGenerate(RegisterViewModel model, string returnUrl = null)
+        public virtual async Task<IActionResult> MagicRegisterGenerate(MagicRegisterViewModel model, string returnUrl = null)
         {
             AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
@@ -710,6 +711,34 @@ namespace Hood.Controllers
         public virtual IActionResult ResetPasswordConfirmation()
         {
             return View();
+        }
+
+        #endregion
+
+        #region Login Page Backgrounds 
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("hood/images/random/{query?}")]
+        public virtual async Task<IActionResult> BackgroundImage(string query)
+        {
+            if (Engine.Settings.Integrations.UnsplashAccessKey.IsSet())
+            {
+                var client = new UnsplasharpClient(Engine.Settings.Integrations.UnsplashAccessKey);
+                var photosFound = await client.GetRandomPhoto(UnsplasharpClient.Orientation.Squarish, query: query);
+                return Json(photosFound);
+            }
+            else
+            {
+                try
+                {
+                    return Content(Engine.Settings.Basic.LoginAreaSettings.BackgroundImages.Split(Environment.NewLine).PickRandom());
+                }
+                catch
+                {
+                    return Content("https://source.unsplash.com/random");
+                }
+            }
         }
 
         #endregion

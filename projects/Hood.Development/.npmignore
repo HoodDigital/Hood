@@ -9,6 +9,7 @@ Controllers
 Migrations
 Models
 Themes
+Views
 app.config
 appsettings.json
 azure-pipelines.yml

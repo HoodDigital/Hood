@@ -1,6 +1,6 @@
 {
   "name": "hoodcms",
-  "version": "5.0.0-alpha1",
+  "version": "5.0.0-alpha2",
   "description": "Hood Digital's own content management system, built in ASP.NET Core 5, with JS and SCSS.",
   "dependencies": {
     "@popperjs/core": "2.9.2",
@@ -88,7 +88,7 @@
     "production": "npm-run-all admin-production login-production app-production",
     "clean": "gulp clean",
     "copy": "gulp copy",
-    "publish": "npm-run-all clean build production copy",
+    "pre-publish": "npm-run-all clean build production copy",
     "css-lint": "stylelint src/scss/ --fix",
     "server": "serve wwwroot",
     "start": "npm-run-all --parallel watch server",

@@ -1,6 +1,6 @@
 @model ContentModel
 <div class="row">
-    <div class="col-sm-8">
+    <div class="col">
         <div class="blog-post">
             <h2>@Model.Content.Title</h2>
             @if (Model.Content.ShowAuthor)
@@ -34,7 +34,7 @@
         </div>
         <partial name="_Author" />
     </div>
-    <div class="col-sm-4">
+    <div class="col col-sm-4 col-xl-3">
         <partial name="_Sidebar" />
     </div>
 </div>

@@ -1,15 +1,8 @@
 @model ContentModel
-<div class="card mb-4">
-    <div class="card-header">
-        <h6 class="m-0">Search</h6>
+<form action="/@Model.ContentType.Slug" class="d-flex gap-2 w-100 mb-3">
+    <div class="form-floating flex-fill">
+        <input class="form-control" type="text" value="@Model.Search" placeholder="Search for @Model.ContentType.TypeNamePlural.ToLower()" name="search" id="search">
+        <label for="search" class="hidden">Search</label>
     </div>
-    <div class="card-body">
-        <form action="/@Model.ContentType.Slug">
-            <div class="form-group">
-                <label for="search" class="hidden">Search</label>
-                <input class="form-control" type="text" value="@Model.Search" placeholder="Search for @Model.ContentType.TypeNamePlural.ToLower()" name="search" id="search">
-            </div>
-            <button class="btn btn-block btn-outline-dark" type="submit">Search</button>
-        </form>
-    </div>
-</div>
+    <button class="btn btn-block btn-outline-dark" type="submit">Search</button>
+</form>

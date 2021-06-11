@@ -2,17 +2,21 @@
 @inject IContentRepository _content
 @if (Model != null && Model.List.Count > 0)
 {
-            @foreach (Content content in Model.List)
-            {
-                <div class="card mb-3" style="max-width: 540px;">
-                    <div class="row no-gutters">
-                        <div class="col-md-3">
-                            <a href="@content.Url">
-                                <fixedImage src="@content.FeaturedImage.ThumbUrl" class="card-img mb-0 @string.Format("content-image-{0}", content.Id)" style="@content.GetImageStyle();height:100%;" />
-                            </a>
-                        </div>
-                        <div class="col-md-9">
-                            <div class="card-body">
+    @foreach (Content content in Model.List)
+    {
+        <fixedImage src="@content.FeaturedImage.ThumbUrl" class="ratio ratio-16x9 img d-flex align-items-center justify-content-center text-center" >
+            <div>16x9</div>
+        </fixedImage>
+
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-4">
+                    <a href="@content.Url">
+                        <img src="@content.FeaturedImage.ThumbUrl" class="img-fluid" />
+                    </a>
+                </div>
+                <div class="col">
+                    <div class="card-body">
                         <p class="media-heading mb-0"><a class="title-link" href="@content.Url"><strong>@content.Title</strong></a></p>
                         @switch (content.ContentType)
                         {
@@ -31,9 +35,9 @@
                                 </small>
                                 break;
                         }
-                            </div>
-                        </div>
                     </div>
                 </div>
-            }
+            </div>
+        </div>
+    }
 }

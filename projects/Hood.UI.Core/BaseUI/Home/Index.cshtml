@@ -6,11 +6,11 @@
     string title = "Home - " + _basicSettings.FullTitle;
     if (_seoSettings.Home != null)
     {
-        description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Home - " + _basicSettings.Address.ToFormat(AddressFormat.SingleLine);
-        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : "Home - " + _basicSettings.CompanyName;
+        description = _seoSettings.Home.Description.IsSet() ? _seoSettings.Home.Description : _seoSettings.Description.IsSet() ? _seoSettings.Description : "Welcome to Hood CMS. A fully customisable content management system built in ASP.NET Core 5 & Bootstrap 5.";
+        title = _seoSettings.Home.Title.IsSet() ? _seoSettings.Home.Title : _seoSettings.Title.IsSet() ? _seoSettings.Title : _basicSettings.Title;
     }
     ViewData["Title"] = title;
-    ViewData["SubTitle"] = "To change this page, you can create a new page in your admin area, and then set the homepage under Settings > Basic Settings";
+    ViewData["SubTitle"] = description;
 }
 
 @section metas {

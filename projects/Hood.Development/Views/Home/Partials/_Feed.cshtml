@@ -1,6 +1,6 @@
 @model ContentModel
 <div class="row">
-    <div class="col-sm-8">
+    <div class="col">
         @if (Model.List.Count == 0)
         {
             <partial name="_NoResults" />
@@ -53,7 +53,7 @@
             <partial name="_Pagination" />
         }
     </div>
-    <div class="col-sm-4">
+    <div class="col-lg mx-auto ms-md-5" style="max-width:400px">
         <partial name="_Sidebar" />
     </div>
 </div>
