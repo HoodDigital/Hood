@@ -24,7 +24,6 @@ namespace Hood.Controllers
     {
         public HomeController() : base() { }
 
-        [ResponseCache(CacheProfileName = "Day")]
         [Route("/")]
         public virtual async Task<IActionResult> Index()
         {
@@ -44,7 +43,6 @@ namespace Hood.Controllers
 
         #region "Content"
 
-        [ResponseCache(CacheProfileName = "Hour")]
         [Route("{type:contentTypeSlug}/")]
         public virtual async Task<IActionResult> Feed(ContentModel model)
         {
@@ -62,7 +60,6 @@ namespace Hood.Controllers
             return View("Feed", model);
         }
 
-        [ResponseCache(CacheProfileName = "Hour")]
         [Route("{type:contentTypeSlug}/author/{author}/")]
         public virtual async Task<IActionResult> Author(ContentModel model)
         {
@@ -75,7 +72,6 @@ namespace Hood.Controllers
             return View("Feed", model);
         }
 
-        [ResponseCache(CacheProfileName = "Hour")]
         [Route("{type:contentTypeSlug}/category/{category}/")]
         public virtual async Task<IActionResult> Category(ContentModel model)
         {
@@ -89,7 +85,6 @@ namespace Hood.Controllers
             return View("Feed", model);
         }
 
-        [ResponseCache(CacheProfileName = "Day")]
         [Route("{type:contentTypeSlug}/{id:int}/{title?}")]
         [Route("{url:pageSlug}/{urlSlug1?}/{urlSlug2?}/{urlSlug3?}/{urlSlug4?}", Order = 2)]
         [Route("content/show/{id}", Order = 3)]

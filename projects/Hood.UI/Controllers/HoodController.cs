@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Unsplasharp;
 
 namespace Hood.Controllers
 {
@@ -114,5 +115,14 @@ namespace Hood.Controllers
         {
             return Json(new { version = Engine.Version });
         }
+
+        [Route("hood/images/random/{query?}")]
+        public virtual async Task<JsonResult> GetRandomImage(string query)
+        {
+            var client = new UnsplasharpClient("xowCrNqbBdHb_6ifp98OSEhf2IDpuyZY1ulhwnx2_mU");
+            var photosFound = await client.GetRandomPhoto(UnsplasharpClient.Orientation.Squarish, query: query);
+            return Json(photosFound);
+        }
+
     }
 }

@@ -14,4 +14,11 @@ namespace Hood.ViewModels
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
+
+    public class MagicLoginViewModel : HoneyPotFormModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+    }
 }

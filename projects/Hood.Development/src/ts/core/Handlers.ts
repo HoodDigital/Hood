@@ -2,27 +2,43 @@
 
 export class Handlers {
     constructor() {
+    }
 
-        $('body').on('click', '.scroll-top, .scroll-to-top', this.ScrollToTop);
-        $('body').on('click', '.scroll-target, .scroll-to-target', this.ScrollToTarget);
-        $('body').on('click', '.slide-link', this.SlideToAnchor);
+    defaults() {
 
-        $('body').on('change', '.submit-on-change', this.SubmitOnChange);
-        $('body').on('change', '.inline-date', this.DateChange);
-        $('body').on('change', 'input[type=checkbox][data-input]', this.CheckboxChange);
-
-        $('select[data-selected]').each(this.SelectSetup);
-
-        $('body').on('click', '.select-text', this.SelectTextContent);
-        $('body').on('click', '.btn.click-select[data-target][data-value]', this.ClickSelect);
-        $('body').on('click', '.click-select.show-selected[data-target][data-value]', this.ClickSelect);
-        $('body').on('click', '.click-select:not(.show-selected)[data-target][data-value]', this.ClickSelectClean);
-
-        $('[data-hood-icon]').each(this.IconSelector);
+        this.checkboxToCsvInput();
+        this.iconSelector();
+        this.initSelectValues();
+        this.scrollHandlers();
+        this.selectText();
+        this.setValueOnClick();
+        this.submitOnChange();
 
     }
 
-    IconSelector(this: HTMLElement, index: number, element: HTMLElement) {
+    /**
+     * Sets values of any selects that have the value set in data-selected, useful for 
+     */
+    initSelectValues(tag: string = 'body') {
+        $(tag).find('select[data-selected]').each(this.initSelectValuesHandler);
+    }
+
+    initSelectValuesHandler(this: HTMLElement, index: number, element: HTMLElement) {
+        let sel = $(this).data('selected');
+        if (sel !== 'undefined' && sel !== '') {
+            let selected = String(sel);
+            $(this).val(selected);
+        }
+    }
+
+    /**
+     * Sets up any Hood Icon selector fields, requires the correct HTML setup.
+     */
+    iconSelector(tag: string = 'body') {
+        $(tag).find('[data-hood-icon]').each(this.iconSelectorHandler);
+    }
+
+    iconSelectorHandler(this: HTMLElement, index: number, element: HTMLElement) {
         let input = $(this).find('input[data-hood-icon-input]')
         let display = $(this).find('[data-hood-icon-display]')
         let collapse = $(this).find('.collapse')
@@ -38,13 +54,41 @@ export class Handlers {
         });
     }
 
-    ScrollToTop(this: HTMLAnchorElement, e: JQuery.ClickEvent) {
+    /**
+     * Submits the form when input is changed, mark inputs with .submit-on-change class.
+     */
+    selectText(tag: string = 'body') {
+        $(tag).on('click', '.select-text', this.selectTextHandler);
+    }
+
+    selectTextHandler(this: HTMLInputElement) {
+        let $this = $(this);
+        $this.select();
+        // Work around Chrome's little problem
+        $this.mouseup(function () {
+            // Prevent further mouseup intervention
+            $this.unbind("mouseup");
+            return false;
+        });
+    }
+
+    /**
+     * Attaches handlers for default scrolling functions, scroll to top, scroll to target (with header.header offset calculated)
+     * and scroll to target direct (with no calculated offset).
+     */
+    scrollHandlers(tag: string = 'body') {
+        $(tag).on('click', '.scroll-top, .scroll-to-top', this.scrollTop);
+        $(tag).on('click', '.scroll-target, .scroll-to-target', this.scrollTarget);
+        $(tag).on('click', '.scroll-target-direct, .scroll-to-target-direct', this.scrollTargetDirect);
+    }
+
+    scrollTop(this: HTMLAnchorElement, e: JQuery.ClickEvent) {
         if (e) e.preventDefault();
         $('html, body').animate({ scrollTop: 0 }, 800);
         return false;
     }
 
-    ScrollToTarget(this: HTMLAnchorElement, e: JQuery.ClickEvent) {
+    scrollTarget(this: HTMLAnchorElement, e: JQuery.ClickEvent) {
         if (e) e.preventDefault();
         let url = $(this).attr('href').split('#')[0];
         if (url !== window.location.pathname && url !== "") {
@@ -67,7 +111,7 @@ export class Handlers {
             }, 900, 'swing');
     }
 
-    SlideToAnchor(this: HTMLAnchorElement) {
+    scrollTargetDirect(this: HTMLAnchorElement) {
         let scrollTop = $('body').scrollTop();
         let top = $($(this).attr('href')).offset().top;
 
@@ -77,34 +121,19 @@ export class Handlers {
         return false;
     }
 
-    SubmitOnChange(this: HTMLFormElement, e: JQuery.ChangeEvent) {
-        if (e) e.preventDefault();
-        $(this).parents('form').submit();
+    /**
+    * Compiles any selected checkboxes with matching data-hood-csv-input tags,
+    * then saves the CSV list of the values to the input given in the tag.
+    */
+    checkboxToCsvInput(tag: string = 'body') {
+        $(tag).on('change', 'input[type=checkbox][data-hood-csv-input]', this.checkboxToCsvInputHandler);
     }
 
-    DateChange(this: HTMLInputElement, e: JQuery.ChangeEvent) {
-        if (e) e.preventDefault();
-        // update the date element attached to the field's attach
-        let $field = $(this).parents('.hood-date').find('.date-output');
-        let date: string = $field.parents('.hood-date').find('.date-value').val() as string;
-        let pattern = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
-        if (!pattern.test(date))
-            date = "01/01/2001";
-        let hour = $field.parents('.hood-date').find('.hour-value').val();
-        if (!$.isNumeric(hour))
-            hour = "00";
-        let minute = $field.parents('.hood-date').find('.minute-value').val();
-        if (!$.isNumeric(minute))
-            minute = "00";
-        $field.val(date + " " + hour + ":" + minute + ":00");
-        $field.attr("value", date + " " + hour + ":" + minute + ":00");
-    }
-
-    CheckboxChange(this: HTMLInputElement, e: JQuery.ChangeEvent<HTMLElement>) {
+    checkboxToCsvInputHandler(this: HTMLInputElement, e: JQuery.ChangeEvent<HTMLElement>) {
         if (e) e.preventDefault();
         // when i change - create an array, with any other checked of the same data-input checkboxes. and add to the data-input referenced tag.
         let items = new Array();
-        $('input[data-input="' + $(this).data('input') + '"]').each(function () {
+        $('input[data-hood-csv-input="' + $(this).data('hoodCsvInput') + '"]').each(function () {
             if ($(this).is(":checked"))
                 items.push($(this).val());
         });
@@ -113,35 +142,26 @@ export class Handlers {
         $(id).val(vals);
     }
 
-    SelectSetup(this: HTMLElement, index: number, element: HTMLElement) {
-        let sel = $(this).data('selected');
-        if (sel !== 'undefined' && sel !== '') {
-            let selected = String(sel);
-            $(this).val(selected);
-        }
+    /**
+    * Submits the form when input is changed, mark inputs with .submit-on-change class.
+    */
+    submitOnChange(tag: string = 'body') {
+        $(tag).on('change', '.submit-on-change', this.submitOnChangeHandler);
     }
 
-    SelectTextContent(this: HTMLInputElement) {
-        let $this = $(this);
-        $this.select();
-        // Work around Chrome's little problem
-        $this.mouseup(function () {
-            // Prevent further mouseup intervention
-            $this.unbind("mouseup");
-            return false;
-        });
+    submitOnChangeHandler(this: HTMLFormElement, e: JQuery.ChangeEvent) {
+        if (e) e.preventDefault();
+        $(this).parents('form').submit();
     }
 
-    ClickSelect(this: HTMLElement) {
-        let $this = $(this);
-        let targetId = '#' + $this.data('target');
-        $(targetId).val($this.data('value'));
-        $(targetId).trigger('change');
-        $('.click-select[data-target="' + $this.data('target') + '"]').each(function () { $(this).html($(this).data('temp')).removeClass('active'); });
-        $('.click-select[data-target="' + $this.data('target') + '"][data-value="' + $this.data('value') + '"]').each(function () { $(this).data('temp', $(this).html()).html('Selected').addClass('active'); });
+    /**
+    * Sets the value of the input [data-target] when clicked to the value in [data-value]
+    */
+    setValueOnClick(tag: string = 'body') {
+        $(tag).on('click', '.click-select[data-target][data-value]', this.setValueOnClickHandler);
     }
 
-    ClickSelectClean(this: HTMLElement) {
+    setValueOnClickHandler(this: HTMLElement) {
         let $this = $(this);
         let targetId = '#' + $this.data('target');
         $(targetId).val($this.data('value'));

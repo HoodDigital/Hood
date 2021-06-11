@@ -1,6 +1,9 @@
-@inject IConfiguration Config
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
+@{     
+    bool production = _env.EnvironmentName == "Production";
+}
 <!DOCTYPE html>
-<html>
+<html class="h-100">
 <head>
 
     <partial name="_Metas_Base" />
@@ -12,17 +15,31 @@
     @RenderSection("styles", required: false)
 
 </head>
-<body class="@ViewData["BodyClass"]">
-    <div class="login-block">
-        <header>
+
+<body class="@(!production ? "dev-mode" : "") d-flex h-100 bg-dark">
+
+    <div class="login-container d-flex w-100 h-100 p-3 px-5 mx-auto flex-column bg-white">
+
+        <header class="mb-auto">
             <a href="/">
                 <img src="@Engine.Settings.Basic.LoginAreaSettings.Logo" alt="@Engine.Settings.Basic.LoginAreaSettings.Title" />
             </a>
         </header>
-        @RenderBody()
-        <footer>
+
+        <div class="login-content">
+            @RenderBody()
+        </div>
+
+        <footer class="mt-auto">
             <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
         </footer>
+
+    </div>
+
+    <div id="image-container" class="h-100 w-100 position-relative" data-image-url="@Url.Action("GetRandomImage", "Hood", new { query = "food" })">
+        <small id="image-credit" class="position-absolute bottom-0 start-0 rounded p-2 m-3">
+            <span></span>
+        </small>
     </div>
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)

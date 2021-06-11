@@ -1,0 +1,12 @@
+@model LoginSuccessModel
+@{
+    ViewData["Title"] = "Logged in. Redirecting...";
+}
+<div class="header">
+    <h2>Logged in</h2>
+    <p>Thank you for logging in via email link.</p>
+    <i class="fa fa-spinner fa-spin fa-2x mt-4 text-muted mb-2"></i>
+    <p>Please wait, just redirecting you...</p>
+    <small class="d-block">If you are not redirected within 10 seconds, click <a id="returnUrl" href="@Model.returnUrl">here</a>.</small>
+    <script>setTimeout(function (){let r = document.getElementById('returnUrl');window.location = r.href;},2000)</script>
+</div>

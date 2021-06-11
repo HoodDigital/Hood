@@ -5,8 +5,5 @@
 <div class="header">
     <h2>One more thing...</h2>
     <p>We just need to confirm your email address.</p>
-    <alert icon="fa-info" size="Epic">
-        <p>Check your email now and click the link inside to complete your account registration and log in.</p>
-        <p class="m-0"><a class="btn btn-outline-success" asp-action="SendVerificationEmail" asp-controller="Manage">Resend Email Verification</a></p>
-    </alert>
+    <p>Check your email now and click the link inside to complete your account registration and log in, to resend the email click <a asp-action="ResendConfirm" asp-route-userId="@Model.UserId">here</a>.</p>
 </div>

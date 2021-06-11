@@ -29,3 +29,45 @@
         }
     }
 }
+
+.field-validation-error {
+    text-align: center;
+    color: $red;
+    font-size: $font-size-sm;
+    padding: 0.25rem !important;
+    display: block !important;
+}
+
+.form-select,
+.form-control {
+    &.input-validation-error {
+        border-color: $red;
+    }
+
+    &.valid {
+        border-color: $green;
+    }
+}
+
+.validation-summary {
+    position: relative;
+    padding: 1rem;
+    display: none;
+    border-radius: $border-radius;
+
+    &.validation-summary-errors {
+        border: 1px solid $danger;
+        background-color: $red-100;
+        color: $red-700;
+        display: block;
+    }
+
+    &.validation-summary-valid {
+        display: none;
+    }
+
+    ul {
+        margin-bottom: 0;
+        padding-left: 1rem;
+    }
+}

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Remove="node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.2.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,17 +27,5 @@
     <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="Views\Layouts\_Layout.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="src\webpack\admin - Copy.production.js">
-      <DependentUpon>admin.production.js</DependentUpon>
-    </None>
-  </ItemGroup>
 
 </Project>

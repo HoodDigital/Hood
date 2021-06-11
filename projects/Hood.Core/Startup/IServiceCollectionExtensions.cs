@@ -206,7 +206,8 @@ namespace Hood.Startup
                 o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
             })
             .AddEntityFrameworkStores<HoodDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddMagicLoginTokenProvider();
 
             string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
