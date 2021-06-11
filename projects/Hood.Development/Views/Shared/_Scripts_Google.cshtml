@@ -13,7 +13,7 @@
 <environment include="Production">
     <script src="https://cdn.jsdelivr.net/npm/hoodcms/dist/js/google.js" asp-append-version="true"></script>
 </environment>
-<partial name="_Scripts_Google" />@if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
+@if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {
     <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
 }

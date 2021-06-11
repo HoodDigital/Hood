@@ -7,9 +7,23 @@
 @section metas {
     @RenderSection("metas", required: false)
 }
-<div class="container">
-    <div class="py-5">
-        <h1>@ViewData["Title"]</h1>
-        <p>@Html.Raw(ViewData["SubTitle"])</p>
+<fixedImage src="https://source.unsplash.com/random" class="jumbotron py-5 text-white bg-dark rounded-0 img img-full">
+    <div class="container">
+        <div class="px-0">
+            <h1 class="display-4">
+                @if (ViewData.ContainsKey("PageTitle")) 
+                {
+                    @ViewData["PageTitle"]
+                }
+                else
+                {
+                    @ViewData["Title"]
+                }
+            </h1>
+            <p class="lead my-3">@Html.Raw(ViewData["SubTitle"])</p>
+        </div>
     </div>
-</div>
+</fixedImage>
+<section class="container">
+    @RenderBody()
+</section>

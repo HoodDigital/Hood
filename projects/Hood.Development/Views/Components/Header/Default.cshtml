@@ -3,7 +3,7 @@
 }
 <nav class="navbar navbar-fixed-top navbar-expand-md navbar-light bg-light">
     <div class="container">
-        <a class="navbar-brand mr-5" href="/" title="@_basicSettings.FullTitle">
+        <a class="navbar-brand me-5" href="/" title="@_basicSettings.FullTitle">
             <img src="@_basicSettings.LogoLight" style="height:40px;" />
         </a>
         <div class="navbar-collapse collapse">
@@ -12,14 +12,14 @@
         <div>
             @if (User.Identity.IsAuthenticated)
             {
-                <button class="btn btn-outline-dark btn-sm mr-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#account-menu">
+                <button class="btn btn-outline-dark btn-sm me-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#account-menu">
                     <i class="fas fa-user-alt mt-1 mb-1"></i>
                 </button>
                 <partial name="_Header_Menu_Account" />
             }
             else
             {
-                <a class="btn btn-outline-dark btn-sm mr-2" asp-action="Login" asp-controller="Account">
+                <a class="btn btn-outline-dark btn-sm me-2" asp-action="Login" asp-controller="Account">
                     <i class="fas fa-user-alt mt-1 mb-1"></i>
                 </a>
             }

@@ -1,3 +1,15 @@
 @inject IThemesService _themes
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+<environment include="Hood">
+    <link rel="stylesheet" href="/src/css/app.css">
+</environment>
+<environment include="Development">
+    <link rel="stylesheet" href="/node_modules/hoodcms/css/app.css">
+</environment>
+<environment include="Staging">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/src/css/app.css" />
+</environment>
+<environment include="Production">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms/dist/css/app.css" />
+</environment>
