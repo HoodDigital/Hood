@@ -44,7 +44,7 @@ namespace Hood.TagHelpers
         public ViewContext ViewContext { get; set; }
 
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.Attributes.Add("data-hood-media", "attach");
             output.Attributes.Add("data-hood-media-url", Url);
@@ -99,7 +99,7 @@ namespace Hood.TagHelpers
         public ViewContext ViewContext { get; set; }
 
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        public override void Process(TagHelperContext context, TagHelperOutput output)
         {
 
             string fieldName = For.Name;
@@ -108,7 +108,7 @@ namespace Hood.TagHelpers
             if (For.ModelExplorer.Metadata.DisplayName.IsSet())
                 fieldDisplayName = For.ModelExplorer.Metadata.DisplayName;
 
-            string fieldDescription = "";
+            string fieldDescription;
             if (For.ModelExplorer.Metadata.Description.IsSet())
                 fieldDescription = $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
 

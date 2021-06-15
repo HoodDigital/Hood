@@ -1,9 +1,10 @@
 ﻿using Hood.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.WindowsAzure.Storage.Blob;
+using Azure.Storage.Blobs;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs.Specialized;
 
 namespace Hood.Services
 {
@@ -26,7 +27,7 @@ namespace Hood.Services
         /// <param name="file">IFormFile object (Http File Request object)</param>
         /// <param name="path">Path on Azure storage.</param>
         /// <returns></returns>
-        Task<CloudBlockBlob> Upload(Stream file, string blobReference);
+        Task<BlockBlobClient> Upload(Stream file, string blobReference);
 
         /// <summary>
         /// Check if the blob exists currently on Azure storage.
@@ -78,7 +79,8 @@ namespace Hood.Services
         /// <returns></returns>
         Task<IMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, string directoryPath);
 
-        Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read);
+        #warning Todo: Redo the Upload to shared access/ download via shared access on media service.  
+        //Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read);
 
         /// <summary>
         /// Deletes any stored files associated with the TMediaItem object.

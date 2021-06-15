@@ -39,6 +39,7 @@ namespace Hood.Startup
                 if (configureDatabase)
                 {
                     services.ConfigureHoodDatabase<TContext>(config);
+                    services.AddDatabaseDeveloperPageExceptionFilter();
                 }
                 services.ConfigureHoodServices();
                 services.ConfigureCache(config);
@@ -99,8 +100,6 @@ namespace Hood.Startup
             services.AddScoped<ISmsSender, SmsSender>();
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRecaptchaService, RecaptchaService>();
-            services.AddScoped<IPropertyExporter, PropertyExporter>();
-            services.AddScoped<IContentExporter, ContentExporter>();
 
             return services;
         }
@@ -199,10 +198,10 @@ namespace Hood.Startup
                 o.SignIn.RequireConfirmedEmail = false;
                 o.SignIn.RequireConfirmedPhoneNumber = false;
 
-                o.Password.RequireDigit = config["Identity:Password:RequireDigit"].IsSet() ? bool.Parse(config["Identity:Password:RequireDigit"]) : true;
-                o.Password.RequireLowercase = config["Identity:Password:RequireLowercase"].IsSet() ? bool.Parse(config["Identity:Password:RequireLowercase"]) : false;
-                o.Password.RequireUppercase = config["Identity:Password:RequireUppercase"].IsSet() ? bool.Parse(config["Identity:Password:RequireUppercase"]) : false;
-                o.Password.RequireNonAlphanumeric = config["Identity:Password:RequireNonAlphanumeric"].IsSet() ? bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]) : true;
+                o.Password.RequireDigit = !config["Identity:Password:RequireDigit"].IsSet() || bool.Parse(config["Identity:Password:RequireDigit"]);
+                o.Password.RequireLowercase = config["Identity:Password:RequireLowercase"].IsSet() && bool.Parse(config["Identity:Password:RequireLowercase"]);
+                o.Password.RequireUppercase = config["Identity:Password:RequireUppercase"].IsSet() && bool.Parse(config["Identity:Password:RequireUppercase"]);
+                o.Password.RequireNonAlphanumeric = !config["Identity:Password:RequireNonAlphanumeric"].IsSet() || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
                 o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
             })
             .AddEntityFrameworkStores<HoodDbContext>()

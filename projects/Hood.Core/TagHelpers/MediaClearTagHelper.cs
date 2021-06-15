@@ -29,7 +29,7 @@ namespace Hood.TagHelpers
         [ViewContext]
         public ViewContext ViewContext { get; set; }
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.Attributes.Add("data-hood-media", "clear");
 

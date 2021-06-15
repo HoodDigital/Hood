@@ -61,7 +61,7 @@ namespace Hood.Startup
             if (env.EnvironmentName == "Development" || env.EnvironmentName == "Hood")
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseMigrationsEndPoint();
             }
             else
             {
