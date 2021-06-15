@@ -48,6 +48,15 @@ namespace Hood.Controllers
             return View("Login");
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("account/login/password")]
+        public virtual IActionResult LoginPassword(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View("Login");
+        }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -55,11 +64,6 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             AccountSettings accountSettings = Engine.Settings.Account;
-            if (accountSettings.MagicLinkLogin)
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
             ViewData["ReturnUrl"] = returnUrl;
 
             if (ModelState.IsValid && ModelState.IsNotSpam(model))
@@ -280,7 +284,7 @@ namespace Hood.Controllers
 
             if (!model.Consent)
             {
-                ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process");
+                ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process.");
             }
 
             if (ModelState.IsValid && ModelState.IsNotSpam(model))
@@ -376,6 +380,12 @@ namespace Hood.Controllers
                         ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
                         return View("MagicRegister", model);
                     }
+
+                    if (!model.Consent)
+                    {
+                        ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process.");
+                    }
+
 
                     // This doesn't count login failures towards account lockout
                     // To enable password failures to trigger account lockout, set lockoutOnFailure: true
