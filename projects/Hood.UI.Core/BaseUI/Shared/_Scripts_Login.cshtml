@@ -10,10 +10,7 @@
 <environment include="Hood">
     <script src="/src/js/login.js" asp-append-version="true"></script>
 </environment>
-<environment include="Development">
-    <script src="/node_modules/hoodcms/src/js/login.js" asp-append-version="true"></script>
-</environment>
-<environment include="Staging">
+<environment include="Development,Staging">
     <script src="https://cdn.jsdelivr.net/npm/hoodcms/src/js/login.js" asp-append-version="true"></script>
 </environment>
 <environment include="Production">

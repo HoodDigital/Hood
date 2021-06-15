@@ -25,7 +25,6 @@
     
     <ProjectReference Include="..\Hood.UI\Hood.UI.csproj" />
     <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
-    <ProjectReference Include="..\Hood.UI.Bootstrap4\Hood.UI.Bootstrap4.csproj" />
   </ItemGroup>
 
 </Project>
