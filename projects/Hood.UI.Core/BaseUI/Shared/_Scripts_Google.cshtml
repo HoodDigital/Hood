@@ -5,10 +5,10 @@
     <script src="/src/js/google.js" asp-append-version="true"></script>
 </environment>
 <environment include="Development,Staging">
-    <script src="https://cdn.jsdelivr.net/npm/hoodcms@latest/src/js/google.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hoodcms@latest/src/js/google.js"></script>
 </environment>
 <environment include="Production">
-    <script src="https://cdn.jsdelivr.net/npm/hoodcms@latest/dist/js/google.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hoodcms@latest/dist/js/google.js"></script>
 </environment>
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {

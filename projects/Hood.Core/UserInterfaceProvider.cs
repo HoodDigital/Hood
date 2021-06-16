@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,6 +25,10 @@ namespace Hood
         {
             basePath = ReWritePath(basePath);
             EmbeddedFileProvider provider = GetProvider(Engine.Services.Resolve<IConfiguration>());
+            if (provider == null)
+            {
+                return new List<string>().ToArray();
+            }
             IDirectoryContents contents = provider.GetDirectoryContents("");
             System.Collections.Generic.IEnumerable<IFileInfo> dir = contents.Where(p => p.Name.StartsWith(basePath));
             return dir.Select(f => f.Name.Replace(basePath, "")).ToArray();

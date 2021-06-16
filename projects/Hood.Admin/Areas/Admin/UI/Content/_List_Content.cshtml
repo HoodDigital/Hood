@@ -14,9 +14,7 @@
                 {
                     <div class="col-md-3 col-lg-2 mb-3 mb-md-0 me-md-3">
                         <a asp-action="Edit" asp-route-id="@content.Id">
-                            <div class="ratio ratio-4x3">
-                                <fixedImage src="@content.FeaturedImage.MediumUrl" class="rounded" alt="@content.Title"></fixedImage>
-                            </div>
+                            <fixedImage src="@content.FeaturedImage.MediumUrl" class="img img-full img-4x3 rounded" alt="@content.Title"></fixedImage>
                         </a>
                     </div>
                 }

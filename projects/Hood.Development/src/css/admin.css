@@ -12828,31 +12828,39 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-end, body.swal2-toast-shown
   display: block;
   width: 100%;
 }
-.hood-image.img-square::after, .hood-image.img-standard::after, .hood-image.img-wide::after, .hood-image.img-mobile-card::after,
+.hood-image.img-4x3::after, .hood-image.img-3x1::after, .hood-image.img-16x9::after, .hood-image.img-9x16::after, .hood-image.img-1x1::after, .hood-image.img-square::after, .hood-image.img-standard::after, .hood-image.img-wide::after, .hood-image.img-mobile-card::after,
+.img.img-4x3::after,
+.img.img-3x1::after,
+.img.img-16x9::after,
+.img.img-9x16::after,
+.img.img-1x1::after,
 .img.img-square::after,
 .img.img-standard::after,
 .img.img-wide::after,
 .img.img-mobile-card::after {
-  /* 16:9 ratio */
   display: block;
   padding-top: 100%;
   content: "";
   background-size: contain;
 }
-.hood-image.img-standard::after,
+.hood-image.img-4x3::after,
+.img.img-4x3::after {
+  padding-top: 75%;
+}
+.hood-image.img-3x1::after, .hood-image.img-standard::after,
+.img.img-3x1::after,
 .img.img-standard::after {
   padding-top: 33%;
-  /* tall */
 }
-.hood-image.img-wide::after,
+.hood-image.img-16x9::after, .hood-image.img-wide::after,
+.img.img-16x9::after,
 .img.img-wide::after {
   padding-top: 56.25%;
-  /* 16:9 ratio */
 }
-.hood-image.img-mobile-card::after,
+.hood-image.img-9x16::after, .hood-image.img-mobile-card::after,
+.img.img-9x16::after,
 .img.img-mobile-card::after {
   padding-top: 151.3%;
-  /* tall */
 }
 .hood-image.img-circle,
 .img.img-circle {

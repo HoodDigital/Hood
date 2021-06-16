@@ -126,9 +126,11 @@ namespace Hood.Areas.Admin.Controllers
                 SaveMessage = "There was a problem saving: " + ex.Message;
                 MessageType = AlertType.Danger;
                 await _logService.AddExceptionAsync<ContentController>(SaveMessage, ex);
+                model.Metadata = await _db.ContentMetadata.Where(cm => cm.ContentId == model.Id).ToListAsync();
+                model = await GetEditorModel(model);
+                return View(model);
             }
 
-            return View(model);
         }
 
         private async Task GenerateNewSlug(Content model)

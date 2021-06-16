@@ -9,6 +9,21 @@
         ViewBag.Title = "All Content";
     }
 }
+@section breadcrumbs {
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item text-decoration-none active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
+            @if (Model.ContentType.IsUnknown)
+            {
+                <li class="breadcrumb-item text-decoration-none active" aria-current="page"><i class="fa fa-archive me-2"></i>All Content</li>
+            }
+            else
+            {
+                <li class="breadcrumb-item text-decoration-none active" aria-current="page"><i class="fa @Model.ContentType.Icon me-2"></i>@Model.ContentType.TypeNamePlural</li>
+            }
+        </ol>
+    </nav>
+}
 @section buttons {
     @if (!Model.ContentType.IsUnknown)
     {
