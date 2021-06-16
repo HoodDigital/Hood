@@ -22,7 +22,7 @@ module.exports = {
     plugins,
 
     entry: {
-        admin: ['./src/ts/admin.ts', './src/scss/admin.scss']
+        admin: ['./src/scss/admin.scss']
     },
 
     mode: "production",

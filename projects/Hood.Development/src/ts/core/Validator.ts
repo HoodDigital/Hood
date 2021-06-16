@@ -13,7 +13,7 @@ export interface ValidatorOptions {
     /**
      * Called when submit is complete.
      */
-    onComplete?: (sender: Validator, data: Response) => void;
+    onComplete?: (data: Response, sender?: Validator) => void;
 
     /**
      * Called when an error occurs.
@@ -78,7 +78,7 @@ export class Validator {
 
             $.post(this.element.action, formData, function (this: Validator, data: any) {
                 if (this.options.onComplete) {
-                    this.options.onComplete(this, data);
+                    this.options.onComplete(data, this);
                 }
             }.bind(this))
                 .fail(this.options.onError ?? Inline.handleError);

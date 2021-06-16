@@ -1,6 +1,4 @@
-﻿import * as $ from 'jquery';
-
-import { SweetAlertResult } from 'sweetalert2';
+﻿import { SweetAlertResult } from 'sweetalert2';
 import { Alerts } from '../core/Alerts';
 import { DataList } from "../core/DataList";
 

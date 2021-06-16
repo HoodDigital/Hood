@@ -1,4 +1,4 @@
-import Swal, { SweetAlertIcon, SweetAlertInput, SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
+import Swal, { SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
 import 'jquery-toast-plugin';
 
 const BootstrapSwal = Swal.mixin({

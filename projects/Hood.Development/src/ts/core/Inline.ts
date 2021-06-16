@@ -1,6 +1,5 @@
 ﻿import { Alerts } from "./Alerts";
 import { Response } from "./Response";
-import { Loader } from "./Loader";
 
 export interface InlineOptions {
 

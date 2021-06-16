@@ -117,8 +117,8 @@ export class PropertyImporter {
 
                 if (result.importer.warnings.length) {
                     let warningHtml = "";
-                    for (let i = result.importer.warnings.length - 1; i >= 0; i--) {
-                        warningHtml += '<div class="text-warning">' + result.importer.warnings[i] + '</div>';
+                    for (let j = result.importer.warnings.length - 1; j >= 0; j--) {
+                        warningHtml += '<div class="text-warning">' + result.importer.warnings[j] + '</div>';
                     }
                     $('#import-property-warnings').html(warningHtml);
                 } else {

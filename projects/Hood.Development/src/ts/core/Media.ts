@@ -1,17 +1,12 @@
-﻿import { Alerts } from "./Alerts";
+﻿import { SweetAlertResult } from "sweetalert2";
+
+import { Alerts } from "./Alerts";
 import { Response } from "./Response";
-import { DataList, DataListOptions } from "./DataList";
+import { DataList } from "./DataList";
 import { ModalController } from "./Modal";
 import { Validator } from "./Validator";
-import { Modal } from "bootstrap";
 import { Inline } from "./Inline";
-import * as Dropzone from "dropzone";
-import { SweetAlertResult } from "sweetalert2";
 import { Editor } from "tinymce";
-import { KeyValue } from "../interfaces/KeyValue";
-
-const dz = Dropzone
-dz.autoDiscover = false;
 
 export declare interface MediaObject {
 
@@ -119,7 +114,7 @@ export class MediaService {
     uploadButton: HTMLElement;
     uploader: HTMLElement;
     progressArea: HTMLElement;
-    dropzone: Dropzone;
+    dropzone: any;
     galleryInitialised: boolean = false;
 
     constructor(element: HTMLElement, options: MediaOptions) {
@@ -172,7 +167,8 @@ export class MediaService {
         this.progressText.appendTo(this.progressArea);
         this.progress.appendTo(this.progressArea);
 
-        this.dropzone = new Dropzone("#media-upload", {
+        var dz: Dropzone = null;
+        $("#media-upload").dropzone({
             url: $("#media-upload").data('url') + "?directoryId=" + $("#media-list > #upload-directory-id").val(),
             thumbnailWidth: 80,
             thumbnailHeight: 80,
@@ -183,25 +179,28 @@ export class MediaService {
             previewsContainer: false, // Define the container to display the previews
             clickable: "#media-add", // Define the element that should be used as click trigger to select files.
             dictDefaultMessage: '<span><i class="fa fa-cloud-upload fa-4x"></i><br />Drag and drop files here, or simply click me!</div>',
-            dictResponseError: 'Error while uploading file!'
+            dictResponseError: 'Error while uploading file!',
+            init: function () {
+                dz = this;
+            }
         });
 
-        this.dropzone.on("success", function (this: MediaService, file: Dropzone.DropzoneFile, data: Response) {
+        dz.on("success", function (this: MediaService, file: Dropzone.DropzoneFile, data: Response) {
             Response.process(data);
         }.bind(this));
 
-        this.dropzone.on("addedfile", function (this: MediaService, file: Dropzone.DropzoneFile) {
+        dz.on("addedfile", function (this: MediaService, file: Dropzone.DropzoneFile) {
             this.progress.find('.progress-bar').css({ width: 0 + "%" });
             this.progressText.find('span').html(0 + "%");
         }.bind(this));
 
         // Update the total progress bar
-        this.dropzone.on("totaluploadprogress", function (this: MediaService, totalProgress: number, totalBytes: number, totalBytesSent: number) {
+        dz.on("totaluploadprogress", function (this: MediaService, totalProgress: number, totalBytes: number, totalBytesSent: number) {
             this.progress.find('.progress-bar').css({ width: totalProgress + "%" });
-            this.progressText.find('span').html(totalProgress + "%");
+            this.progressText.find('span').html(Math.round(totalProgress) + "% - " + totalBytesSent.formatKilobytes() + " / " + totalBytes.formatKilobytes());
         }.bind(this));
 
-        this.dropzone.on("sending", function (this: MediaService, file: Dropzone.DropzoneFile) {
+        dz.on("sending", function (this: MediaService, file: Dropzone.DropzoneFile) {
             // Show the total progress bar when upload starts
             this.progressArea.classList.remove('collapse');
             this.progress.find('.progress-bar').css({ width: 0 + "%" });
@@ -209,12 +208,12 @@ export class MediaService {
         }.bind(this));
 
         // Hide the total progress bar when nothing's uploading anymore
-        this.dropzone.on("complete", function (this: MediaService, file: Dropzone.DropzoneFile) {
+        dz.on("complete", function (this: MediaService, file: Dropzone.DropzoneFile) {
             this.media.reload();
         }.bind(this));
 
         // Hide the total progress bar when nothing's uploading anymore
-        this.dropzone.on("queuecomplete", function (this: MediaService) {
+        dz.on("queuecomplete", function (this: MediaService) {
             this.progressArea.classList.add('collapse');
             this.media.reload();
         }.bind(this));
@@ -226,8 +225,8 @@ export class MediaService {
         let createDirectoryModal: ModalController = new ModalController({
             onComplete: function (this: MediaService) {
                 let form = document.getElementById('content-directories-edit-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: MediaService, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: MediaService, response: Response) {
 
                         Response.process(response, 5000);
 
@@ -461,9 +460,6 @@ export class MediaService {
         }.bind(this))
     }
 
-    destroy(this: MediaService) {
-        this.dropzone.destroy();
-    }
 }
 
 export class MediaModal {
@@ -514,7 +510,6 @@ export class MediaModal {
                     }.bind(this),
                     onAction: function (this: MediaModal, sender: HTMLElement, mediaObject: MediaObject) {
 
-                        this.service.destroy();
                         this.modal.close();
 
                     }.bind(this),

@@ -1,10 +1,5 @@
-﻿import * as $ from 'jquery';
-import { Response } from './Response';
-import * as Dropzone from "dropzone";
+﻿import { Response } from './Response';
 import { Alerts } from './Alerts';
-
-const dz = Dropzone
-dz.autoDiscover = false;
 
 export class Uploader {
     constructor() {
@@ -29,7 +24,8 @@ export class Uploader {
 
         let jsontag = '#' + $(this).attr('json');
 
-        let avatarDropzone = new Dropzone(tag, {
+        let avatarDropzone: Dropzone = null;
+        $tag.dropzone({
             url: $tag.data('url'),
             maxFiles: 1,
             paramName: 'file',
@@ -37,7 +33,10 @@ export class Uploader {
             acceptedFiles: $tag.data('types') || ".png,.jpg,.jpeg,.gif",
             autoProcessQueue: true, // Make sure the files aren't queued until manually added
             previewsContainer: false, // Define the container to display the previews
-            clickable: tag // Define the element that should be used as click trigger to select files.
+            clickable: tag,
+            init: function () {
+                avatarDropzone = this;
+            }
         });
 
         avatarDropzone.on("addedfile", function () {
@@ -72,6 +71,7 @@ export class Uploader {
             avatarDropzone.removeFile(file);
             $($tag.data('preview')).removeClass('loading');
         });
+
     }
 
     gallery(this: HTMLElement) {
@@ -84,7 +84,9 @@ export class Uploader {
         let previewTemplate = (<HTMLElement>previewNode.parentNode).innerHTML;
         previewNode.parentNode.removeChild(previewNode);
 
-        let galleryDropzone = new Dropzone(tag, {
+        let galleryDropzone: Dropzone = null;
+
+        $tag.dropzone({
             url: $tag.data('url'),
             thumbnailWidth: 80,
             thumbnailHeight: 80,
@@ -94,9 +96,10 @@ export class Uploader {
             acceptedFiles: $tag.data('types') || ".png,.jpg,.jpeg,.gif",
             autoProcessQueue: true, // Make sure the files aren't queued until manually added
             previewsContainer: "#previews", // Define the container to display the previews
-            clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
-            dictDefaultMessage: '<span><i class="fa fa-cloud-upload fa-4x"></i><br />Drag and drop files here, or simply click me!</div>',
-            dictResponseError: 'Error while uploading file!'
+            clickable: ".fileinput-button",
+            init: function () {
+                galleryDropzone = this;
+            }
         });
 
         $(tag + " .cancel").hide();

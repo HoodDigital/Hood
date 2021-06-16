@@ -1,6 +1,4 @@
-﻿import * as $ from 'jquery';
-
-export class Handlers {
+﻿export class Handlers {
     constructor() {
     }
 

@@ -1,6 +1,10 @@
-import { Alerts, DataList, Inline, MediaService, ModalController, Validator } from "../hood";
 import { SweetAlertResult } from "sweetalert2";
+import { Alerts } from "../core/Alerts";
+import { DataList } from "../core/DataList";
+import { Inline } from "../core/Inline";
+import { ModalController } from "../core/Modal";
 import { Response } from "../core/Response";
+import { Validator } from "../core/Validator";
 
 export class PropertyController {
 
@@ -53,8 +57,8 @@ export class PropertyController {
         let createPropertyModal: ModalController = new ModalController({
             onComplete: function (this: PropertyController) {
                 let form = document.getElementById('property-create-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: PropertyController, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: PropertyController, response: Response) {
 
                         Response.process(response, 5000);
 

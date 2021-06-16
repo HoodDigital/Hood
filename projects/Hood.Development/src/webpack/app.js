@@ -12,10 +12,8 @@ plugins.push(new MiniCssExtractPlugin({
 }));
 
 console.log('---------------------------------------------------------------------------')
-console.log('-                                                                         -')
 console.log('-                       Building Hood CMS - APP                           -')
 console.log('-                             DEVELOPMENT                                 -')
-console.log('-                                                                         -')
 console.log('---------------------------------------------------------------------------')
 
 module.exports = {
@@ -23,7 +21,7 @@ module.exports = {
     plugins,
 
     entry: {
-        app: ['./src/ts/app.ts', './src/scss/app.scss']
+        app: ['./src/scss/app.scss']
     },
 
     mode: "development",
@@ -34,7 +32,7 @@ module.exports = {
         rules: [
             
             {
-                test: /\.tsx?$/,
+                test: /\.ts?$/,
                 use: [
                     {
                         loader: 'ts-loader'
@@ -66,7 +64,8 @@ module.exports = {
 
     externals: {
         jquery: 'jQuery',
-        bootstrap: 'bootstrap'
+        bootstrap: 'bootstrap',
+        dropzone: 'Dropzone'
     },
 
     output: {

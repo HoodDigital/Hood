@@ -12,5 +12,5 @@
 </environment>
 @if (_plugins.GoogleMapsApiKey.IsSet() && (_plugins.EnableGoogleMaps || _plugins.EnableGoogleGeocoding))
 {
-    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=initGoogleMapsComplete{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
+    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=hood.google.initMaps{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
 }

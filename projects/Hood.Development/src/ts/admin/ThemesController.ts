@@ -1,5 +1,8 @@
 import { SweetAlertResult } from "sweetalert2";
-import { Alerts, DataList, Inline, Response } from "../hood";
+import { Alerts } from "../core/Alerts";
+import { DataList } from "../core/DataList";
+import { Inline } from "../core/Inline";
+import { Response } from "../core/Response";
 
 export class ThemesController {
     element: HTMLElement;

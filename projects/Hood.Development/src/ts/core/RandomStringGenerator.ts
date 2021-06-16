@@ -5,7 +5,7 @@
     numSpecial?: number;
 }
 
-export default class RandomStringGenerator {
+export class RandomStringGenerator {
     options: RandomStringGeneratorOptions = {
         specials: '!@#$&*',
         alpha: 'abcdefghijklmnopqrstuvwxyz',
@@ -28,7 +28,7 @@ export default class RandomStringGenerator {
             password += this.options.numeric.charAt(Math.floor(Math.random() * this.options.numeric.length));
         }
 
-        for (let i = 0; i < this.options.numSpecial; i++)
+        for (let j = 0; j < this.options.numSpecial; j++)
             password += this.options.specials.charAt(Math.floor(Math.random() * this.options.specials.length));
 
         password = password.split('').sort(function () { return 0.5 - Math.random() }).join('');

@@ -1,5 +1,3 @@
-import { Alerts } from "./hood";
-
 class Login {
     constructor() {
         this.loadBackground();

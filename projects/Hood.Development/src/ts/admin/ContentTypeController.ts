@@ -1,6 +1,10 @@
-import { Alerts, DataList, Inline, ModalController, Validator } from "../hood";
 import { SweetAlertResult } from "sweetalert2";
+import { Alerts } from "../core/Alerts";
+import { DataList } from "../core/DataList";
+import { Inline } from "../core/Inline";
+import { ModalController } from "../core/Modal";
 import { Response } from "../core/Response";
+import { Validator } from "../core/Validator";
 
 export class ContentTypeController {
 
@@ -62,8 +66,8 @@ export class ContentTypeController {
         let createContentModal: ModalController = new ModalController({
             onComplete: function (this: ContentTypeController) {
                 let form = document.getElementById('content-type-create-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: ContentTypeController, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: ContentTypeController, response: Response) {
 
                         Response.process(response, 5000);
 
@@ -147,8 +151,8 @@ export class ContentTypeController {
         let createContentModal: ModalController = new ModalController({
             onComplete: function (this: ContentTypeController) {
                 let form = document.getElementById('content-custom-field-create-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: ContentTypeController, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: ContentTypeController, response: Response) {
 
                         Response.process(response, 5000);
 

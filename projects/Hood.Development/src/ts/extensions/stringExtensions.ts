@@ -1,5 +1,3 @@
-import * as $ from "jquery";
-
 declare global {
     interface String {
         isUrlExternal(): boolean;

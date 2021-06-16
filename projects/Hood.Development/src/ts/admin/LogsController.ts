@@ -1,4 +1,5 @@
-import { Alerts, DataList } from "../hood";
+import { Alerts } from "../core/Alerts";
+import { DataList } from "../core/DataList";
 
 export class LogsController {
     element: HTMLElement;

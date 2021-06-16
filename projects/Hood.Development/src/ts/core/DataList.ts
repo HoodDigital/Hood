@@ -1,5 +1,4 @@
 ﻿import { Alerts } from "./Alerts";
-import { Helpers } from "./Helpers";
 import { Inline } from "./Inline";
 
 declare global {

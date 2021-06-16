@@ -1,3 +1,36 @@
-/*! For license information please see login.js.LICENSE.txt */
-(()=>{"use strict";var e={r:e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})}},r={};e.r({}),new(function(){function e(){this.loadBackground()}return e.prototype.loginPage=function(){},e.prototype.loadBackground=function(){$("#image-container").length>0&&$.get($("#image-container").data("imageUrl"),this.renderImage.bind(this))},e.prototype.renderImage=function(e){"string"==typeof e?($("#image-container").css({"background-image":"url("+e+")"}),$("#image-credit").hide()):e.length>0?($("#image-container").attr("title",e[0].description),$("#image-container").css({"background-image":"url("+e[0].urls.regular+")"}),$("#image-credit").html("Image by <a href='"+e[0].user.links.html+"?utm_source=Hood%20CMS&utm_medium=referral'>"+e[0].user.name+"</a> on <a href='https://unsplash.com/?utm_source=Hood%20CMS&utm_medium=referral'>Unsplash</a>")):$("#image-credit").hide()},e}()),e.r(r)})();
+(function () {
+    'use strict';
+
+    var Login = /** @class */ (function () {
+        function Login() {
+            this.loadBackground();
+        }
+        Login.prototype.loginPage = function () {
+        };
+        Login.prototype.loadBackground = function () {
+            if ($('#image-container').length > 0) {
+                $.get($('#image-container').data('imageUrl'), this.renderImage.bind(this));
+            }
+        };
+        Login.prototype.renderImage = function (images) {
+            if (typeof images == "string") {
+                $('#image-container').css({ 'background-image': "url(" + images + ")" });
+                $('#image-credit').hide();
+            }
+            else {
+                if (images.length > 0) {
+                    $('#image-container').attr('title', images[0].description);
+                    $('#image-container').css({ 'background-image': "url(" + images[0].urls.regular + ")" });
+                    $('#image-credit').html("Image by <a href='" + images[0].user.links.html + "?utm_source=Hood%20CMS&utm_medium=referral'>" + images[0].user.name + "</a> on <a href='https://unsplash.com/?utm_source=Hood%20CMS&utm_medium=referral'>Unsplash</a>");
+                }
+                else {
+                    $('#image-credit').hide();
+                }
+            }
+        };
+        return Login;
+    }());
+    new Login();
+
+}());
 //# sourceMappingURL=login.js.map

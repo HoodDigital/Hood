@@ -14,6 +14,8 @@ import { ThemesController } from './admin/ThemesController';
 import { ContentTypeController } from './admin/ContentTypeController';
 import { LogsController } from './admin/LogsController';
 import { PropertyImporter } from './admin/PropertyImporter';
+import { Editors } from './core/Editors';
+import { ColorPickers } from './core/ColorPicker';
 
 class Admin extends BaseController {
 
@@ -40,6 +42,9 @@ class Admin extends BaseController {
         this.propertyImporter = new PropertyImporter();
         this.themes = new ThemesController();
         this.users = new UsersController();
+
+        new Editors();
+        new ColorPickers();
 
         if ($('#page-tabs').length > 0) {
             this.checkAndLoadTabs('#page-tabs');
@@ -95,4 +100,4 @@ class Admin extends BaseController {
 
 }
 
-new Admin();
+export var app = new Admin();

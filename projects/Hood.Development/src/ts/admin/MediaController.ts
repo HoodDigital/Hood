@@ -1,9 +1,5 @@
-import { KeyValue } from "../interfaces/KeyValue";
-import { ContentStatistics } from "./models/Content";
-import { PropertyStatistics } from "./models/Property";
-import { UserStatistics } from "./models/Users";
-import { Chart } from 'chart.js';
-import { Alerts, MediaObject, MediaService } from "../hood";
+import { MediaObject, MediaService } from "../core/Media";
+import { Alerts } from "../core/Alerts";
 
 export class MediaController {
 

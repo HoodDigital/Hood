@@ -22,7 +22,7 @@ module.exports = {
     plugins,
 
     entry: {
-        app: ['./src/ts/app.ts', './src/scss/app.scss']
+        app: ['./src/scss/app.scss']
     },
 
     mode: "production",

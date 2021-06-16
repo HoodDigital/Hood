@@ -22,7 +22,7 @@ module.exports = {
     plugins,
 
     entry: {
-        login: ['./src/ts/login.ts', './src/scss/login.scss']
+        login: ['./src/scss/login.scss']
     },
 
     mode: "production",

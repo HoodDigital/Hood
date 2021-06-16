@@ -1,6 +1,10 @@
-import { Alerts, DataList, Inline, MediaService, ModalController, Validator } from "../hood";
 import { SweetAlertResult } from "sweetalert2";
+import { Alerts } from "../core/Alerts";
+import { DataList } from "../core/DataList";
+import { Inline } from "../core/Inline";
+import { ModalController } from "../core/Modal";
 import { Response } from "../core/Response";
+import { Validator } from "../core/Validator";
 
 export class ContentController {
 
@@ -77,8 +81,8 @@ export class ContentController {
         let createContentModal: ModalController = new ModalController({
             onComplete: function (this: ContentController) {
                 let form = document.getElementById('content-create-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: ContentController, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: ContentController, response: Response) {
 
                         Response.process(response, 5000);
 
@@ -184,8 +188,8 @@ export class ContentController {
         let createCategoryModal: ModalController = new ModalController({
             onComplete: function (this: ContentController) {
                 let form = document.getElementById('content-categories-edit-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: ContentController, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: ContentController, response: Response) {
 
                         Response.process(response, 5000);
 

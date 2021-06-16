@@ -7,9 +7,8 @@
     "jsx": "react",
     "allowJs": false,
     "moduleResolution": "node",
-    "sourceMap": false
-  },
-  "files": [
-    "src/ts/recaptcha.ts"
-  ]
+    "sourceMap": true,
+    "inlineSources": true,
+    "noEmit": true
+  }
 }

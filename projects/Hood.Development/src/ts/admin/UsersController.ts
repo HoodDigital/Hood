@@ -1,7 +1,13 @@
 ﻿import { SweetAlertResult } from "sweetalert2";
-import RandomStringGenerator from "../core/RandomStringGenerator";
-import { Alerts, DataList, Helpers, Inline, ModalController, Response, Validator } from "../hood";
 import swal from 'sweetalert2';
+
+import { Alerts } from "../core/Alerts";
+import { Inline } from "../core/Inline";
+import { DataList } from "../core/DataList";
+import { RandomStringGenerator } from "../core/RandomStringGenerator";
+import { Response } from "../core/Response";
+import { ModalController } from "../core/Modal";
+import { Validator } from "../core/Validator";
 
 export class UsersController {
     element: HTMLElement;
@@ -56,8 +62,8 @@ export class UsersController {
         let createUserModal: ModalController = new ModalController({
             onComplete: function (this: UsersController) {
                 let form = document.getElementById('user-create-form') as HTMLFormElement;
-                let validator = new Validator(form, {
-                    onComplete: function (this: UsersController, sender: Validator, response: Response) {
+                new Validator(form, {
+                    onComplete: function (this: UsersController, response: Response) {
 
                         Response.process(response, 5000);
 
