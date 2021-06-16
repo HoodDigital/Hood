@@ -1,6 +1,6 @@
 {
   "name": "hoodcms",
-  "version": "5.0.0-alpha3",
+  "version": "5.0.0-beta1",
   "description": "Hood Digital's own content management system, built in ASP.NET Core 5, with JS and SCSS.",
   "dependencies": {
     "@popperjs/core": "2.9.2",

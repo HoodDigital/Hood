@@ -12726,9 +12726,6 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-end, body.swal2-toast-shown
 
 .hood-image,
 .img {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: middle;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -12737,27 +12734,6 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-end, body.swal2-toast-shown
 .hood-image img,
 .img img {
   display: none !important;
-}
-.hood-image.loading i,
-.img.loading i {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  transform: translateY(-50%);
-  transform: translateY(-50%);
-  transform: translateY(-50%);
-}
-.hood-image.loading::before,
-.img.loading::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  content: "";
-  background-color: rgba(255, 255, 255, 0.5);
 }
 .hood-image.darkened::before,
 .img.darkened::before {
@@ -12773,6 +12749,27 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-end, body.swal2-toast-shown
 }
 .hood-image.lightened::before,
 .img.lightened::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: "";
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.hood-image.loading i,
+.img.loading i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transform: translateY(-50%);
+  transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.hood-image.loading::before,
+.img.loading::before {
   position: absolute;
   top: 0;
   right: 0;
@@ -12872,36 +12869,7 @@ body.swal2-toast-shown .swal2-container.swal2-bottom-end, body.swal2-toast-shown
   max-width: 100%;
 }
 
-img.user-image {
-  display: block;
-  max-width: 100%;
-}
-img.user-image.full {
-  width: 100%;
-}
-img.user-image.left {
-  margin: 0 auto;
-  margin-left: 0;
-}
-img.user-image.center {
-  margin: 0 auto;
-}
-img.user-image.right {
-  margin: 0 auto;
-  margin-right: 0;
-}
-img.user-image.inline {
-  display: inline-block;
-  vertical-align: middle;
-}
-img.user-image.inline.top {
-  vertical-align: top;
-}
-img.user-image.inline.bottom {
-  vertical-align: top;
-}
-
-.bg-img {
+.hood-bg-image {
   position: absolute;
   top: 0;
   right: 0;
@@ -12913,13 +12881,8 @@ img.user-image.inline.bottom {
           backface-visibility: hidden;
   backface-visibility: hidden;
 }
-.bg-img img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  min-width: 100%;
-  min-height: 100%;
+.hood-bg-image img {
+  display: none !important;
 }
 
 .nav-pills.nav-buttons .nav-link {
