@@ -38,13 +38,13 @@ namespace Hood.Models
             ContactFormTitle = "Send us a message";
             ContactFormMessage = "Someone will be in touch very soon...";
             ThankYouTitle = "Enquiry Sent!";
-            ThankYouMessage = "<p>Thank you for contacting us! Your enquiry has been successfully sent, and we are currently digesting it.</p><p>We will be in touch once we have had a read.<p><p>Thanks!</p>";
+            ThankYouMessage = "<p>Thank you for contacting us! Your enquiry has been successfully sent.</p>";
             Subject = "Your enquiry has been submitted to {{Site.Title}}.";
             Title = "Enquiry on it's way!";
-            Message = "<p>Thank you for contacting us! Your enquiry has been successfully sent, and we are currently digesting it.</p><p>We will be in touch once we have had a read.<p><p>Thanks!</p>";
+            Message = "<p>Thank you for contacting us! Your enquiry has been successfully sent.</p>";
             AdminNoficationSubject = "A new enquiry from {{Site.Title}}.";
             AdminNoficationTitle = "Enquiry received";
-            AdminNoficationMessage = "<p>A new enquiry has been received from the <strong>{{Site.Title}}</strong> website.</p><p>Your website team.</p>";
+            AdminNoficationMessage = "<p>A new enquiry has been received from the <strong>{{Site.Title}}</strong> website.</p>";
         }
     }
 }

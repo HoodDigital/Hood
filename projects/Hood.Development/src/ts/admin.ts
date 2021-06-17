@@ -1,6 +1,7 @@
 import 'jquery-slimscroll';
 
 export * from "./hood";
+
 import * as bootstrap from 'bootstrap';
 
 import { BaseController } from './core/HoodController';
@@ -31,6 +32,9 @@ class Admin extends BaseController {
 
     constructor() {
         super();
+
+        // Hook up default handlers.
+        this.handlers.initDefaultHandlers();
 
         // Admin Controllers
         this.home = new HomeController();

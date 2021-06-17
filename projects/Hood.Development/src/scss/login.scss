@@ -6,24 +6,24 @@
 body {
 
     .login-container {
+        flex-shrink: 0;
         max-width: 42rem;
         overflow-y: auto;
-        flex-shrink: 0;
 
         .login-content {
             width: 100%;
-            margin: auto;
             max-width: 22.5rem;
+            margin: auto;
         }
     }
-
+     
     #image-container {
-        background-size: cover;
         background-position: center;
+        background-size: cover;
 
         #image-credit {
-            background-color: rgba(0,0,0,0.5);
             color: $white;
+            background-color: rgba(0, 0, 0, .5);
 
             a {
                 color: $white;

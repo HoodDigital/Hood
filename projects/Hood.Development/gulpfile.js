@@ -1,15 +1,13 @@
 /// <binding BeforeBuild='views' />
 
 var gulp = require('gulp');
-var babel = require('gulp-babel');
-var less = require('gulp-less');
-var rimraf = require('gulp-rimraf');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
 var cssnano = require('gulp-cssnano');
-var rename = require('gulp-rename');
 var imagemin = require('gulp-imagemin');
+var less = require('gulp-less');
 var path = require('path');
+var rename = require('gulp-rename');
+var rimraf = require('gulp-rimraf');
+var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('clean', function (cb) {
@@ -23,6 +21,7 @@ gulp.task('clean', function (cb) {
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });
+
 gulp.task('copy:src', function () {
     return gulp.src('./wwwroot/src/**/*.*')
         .pipe(gulp.dest('./src/'));
@@ -36,7 +35,6 @@ gulp.task('copy:images', function () {
         .pipe(imagemin())
         .pipe(gulp.dest('./images/'));
 });
-
 gulp.task('copy',
     gulp.series(
         'copy:src',
@@ -45,38 +43,30 @@ gulp.task('copy',
     )
 );
 
-gulp.task('themes:bootstrap3:less', function () {
-    lss = less({ relativeUrls: true });
-    lss.on('error', function (e) {
-        console.log(e);
-        lss.end();
-    });
-
+gulp.task('scss', function () {
     return gulp.src([
-        './wwwroot/themes/bootstrap3/less/styles.less',
-        './wwwroot/themes/bootstrap3/less/preload.less'
+        './src/scss/*.scss'
     ])
         .pipe(sourcemaps.init())
-        .pipe(lss)
-        .pipe(sourcemaps.write())
-        .pipe(rename({ suffix: '.bs3' }))
-        .pipe(gulp.dest('./wwwroot/hood/css/'));
+        .pipe(sass({
+            outputStyle: 'expanded',
+            indentType: 'tab',
+            indentWidth: 1
+        }).on('error', sass.logError))
+        .pipe(sourcemaps.write(''))
+        .pipe(gulp.dest('./wwwroot/src/css/'));
 });
-gulp.task('themes:bootstrap3:button', function () {
-    lss = less({ relativeUrls: true });
-    lss.on('error', function (e) {
-        console.log(e);
-        lss.end();
-    });
-
+gulp.task('cssnano', function () {
     return gulp.src([
-        './wwwroot/hood/less/button/button.less'
+        './wwwroot/src/css/*.css'
     ])
-        .pipe(sourcemaps.init())
-        .pipe(lss)
-        .pipe(sourcemaps.write())
-        .pipe(rename({ suffix: '.bs3' }))
-        .pipe(gulp.dest('./wwwroot/hood/css/'));
+        .pipe(cssnano({
+            discardComments: {
+                removeAll: true
+            }
+        }))
+        //.pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest('./wwwroot/src/dist/'));
 });
 
 gulp.task('views:clean', function (cb) {
@@ -117,11 +107,26 @@ gulp.task('views',
     )
 );
 
+
+
 gulp.task('themes:clean', function (cb) {
     return gulp.src([
         './wwwroot/themes/*/css/'
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
+});
+gulp.task('themes:scss', function () {
+    return gulp.src([
+        './wwwroot/themes/*/scss/*.scss'
+    ])
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'expanded', indentType: 'tab', indentWidth: 1 }).on('error', sass.logError))
+        .pipe(sourcemaps.write())
+        .pipe(rename(function (filePath) {
+            let parentFolder = path.dirname(filePath.dirname);
+            filePath.dirname = path.join(parentFolder, 'css');
+        }))
+        .pipe(gulp.dest('./wwwroot/themes/'));
 });
 
 gulp.task('themes:less', function () {

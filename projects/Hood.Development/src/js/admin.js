@@ -856,7 +856,7 @@ var hood = (function (exports, swal, bootstrap, chart_js, tinymce, Pickr) {
     var Handlers = /** @class */ (function () {
         function Handlers() {
         }
-        Handlers.prototype.defaults = function () {
+        Handlers.prototype.initDefaultHandlers = function () {
             this.checkboxToCsvInput();
             this.iconSelector();
             this.initSelectValues();
@@ -2907,6 +2907,8 @@ var hood = (function (exports, swal, bootstrap, chart_js, tinymce, Pickr) {
         __extends(Admin, _super);
         function Admin() {
             var _this = _super.call(this) || this;
+            // Hook up default handlers.
+            _this.handlers.initDefaultHandlers();
             // Admin Controllers
             _this.home = new HomeController();
             _this.media = new MediaController();

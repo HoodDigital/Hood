@@ -1,9 +1,9 @@
 .hood-image,
 .img {
+    position: relative;
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    position: relative;
 
     img {
         display: none !important;

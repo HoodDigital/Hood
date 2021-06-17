@@ -65,7 +65,7 @@ $.hood.App = {
     ContactForms: {
         Init: function () {
             $('.contact-form .thank-you').hide();
-            $('.contact-form .form-submit').show();
+            $('.contact-form .form-content').show();
             $('body').on('submit', '.contact-form', function (e) {
                 e.preventDefault();
                 $(this).addClass('loading');

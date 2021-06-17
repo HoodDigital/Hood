@@ -1,4 +1,4 @@
-var hood = (function (exports, Swal, bootstrap) {
+var hood = (function (exports, google_maps, Swal, bootstrap) {
     'use strict';
 
     function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -188,7 +188,7 @@ var hood = (function (exports, Swal, bootstrap) {
     var Handlers = /** @class */ (function () {
         function Handlers() {
         }
-        Handlers.prototype.defaults = function () {
+        Handlers.prototype.initDefaultHandlers = function () {
             this.checkboxToCsvInput();
             this.iconSelector();
             this.initSelectValues();
@@ -1118,6 +1118,93 @@ var hood = (function (exports, Swal, bootstrap) {
         return BaseController;
     }());
 
+    var PropertyController = /** @class */ (function () {
+        function PropertyController() {
+            this.map = null;
+            this.center = { lat: 30, lng: -110 };
+            this.initList();
+        }
+        PropertyController.prototype.initList = function () {
+            this.element = document.getElementById('property-list');
+            if (!this.element) {
+                return;
+            }
+            this.list = new DataList(this.element, {
+                onComplete: function (data, sender) {
+                    Alerts.log('Finished loading property list.', 'info');
+                }.bind(this)
+            });
+        };
+        PropertyController.prototype.initMapList = function () {
+            this.mapListElement = document.getElementById('property-map-list');
+            if (!this.mapElement) {
+                return;
+            }
+            this.mapList = new DataList(this.mapListElement, {
+                onComplete: function (data, sender) {
+                    Alerts.log('Finished loading map list.', 'info');
+                    this.reloadMarkers();
+                }.bind(this)
+            });
+        };
+        PropertyController.prototype.initMap = function (mapElementId) {
+            if (mapElementId === void 0) { mapElementId = 'property-map'; }
+            this.mapElement = document.getElementById(mapElementId);
+            if (!this.mapElement) {
+                return;
+            }
+            this.center = { lat: +this.mapElement.dataset.lat, lng: +this.mapElement.dataset.long };
+            this.map = new google.maps.Map(this.mapElement, {
+                zoom: +this.mapElement.dataset.zoom || 15,
+                center: this.center,
+                scrollwheel: false
+            });
+            $(window).resize(function () {
+                google.maps.event.trigger(this.map, 'resize');
+            }.bind(this));
+            google.maps.event.trigger(this.map, 'resize');
+            this.initMapList();
+        };
+        PropertyController.prototype.reloadMarkers = function () {
+            var infowindow = null;
+            if (!this.mapElement) {
+                return;
+            }
+            var map = this.map;
+            if (this.markers) {
+                for (var i = 0; i < this.markers.length; i++) {
+                    this.markers[i].setMap(null);
+                }
+            }
+            this.markers = [];
+            var locations = $("#property-map-locations").data('locations');
+            locations.map(function (location, i) {
+                var marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(+location.Latitude, +location.Longitude),
+                    map: this.map,
+                    optimized: true // makes SVG icons work in IE
+                });
+                //marker.setIcon({
+                //    url: '/images/marker.png',
+                //    size: new google.maps.Size(30, 41),
+                //    scaledSize: new google.maps.Size(30, 41)
+                //});
+                marker.info = "<div class=\"card border-0\" style=\"max-width:300px\">\n    <div style=\"background-image:url(" + location.ImageUrl + ")\" class=\"rounded img-full img img-wide\"></div>\n    <div class=\"card-body border-0\">\n        <p style=\"overflow: hidden;text-overflow: ellipsis;white-space: nowrap;\">\n            <strong>" + location.Address1 + ", " + location.Postcode + "</strong>\n        </p>\n        <p>" + location.Description + "</p>\n        <a href=\"" + location.MarkerUrl + "\" class=\"btn btn-block btn-primary\">Find out more...</a>\n    </div>\n</div>";
+                google.maps.event.addListener(marker, 'click', function () {
+                    if (infowindow) {
+                        infowindow.close();
+                    }
+                    infowindow = new google.maps.InfoWindow({
+                        content: this.info
+                    });
+                    infowindow.open(map, this);
+                }.bind(this));
+                this.markers.push(marker);
+            }.bind(this));
+        };
+        return PropertyController;
+    }());
+
     $.fn.exists = function () {
         return $(this).length;
     };
@@ -1291,10 +1378,70 @@ var hood = (function (exports, Swal, bootstrap) {
     var App = /** @class */ (function (_super) {
         __extends(App, _super);
         function App() {
-            return _super.call(this) || this;
+            var _this = _super.call(this) || this;
+            // Hook up default handlers.
+            _this.handlers.initDefaultHandlers();
+            // Admin Controllers
+            _this.propertyController = new PropertyController();
+            return _this;
         }
-        App.prototype.saySomethingGrate = function (something) {
-            Alerts.success('This is ' + something);
+        App.prototype.initGoogleMaps = function (tag) {
+            if (tag === void 0) { tag = '.google-map'; }
+            $(tag).each(function () {
+                var myLatLng = new google.maps.LatLng($(this).data('lat'), $(this).data('long'));
+                console.log('Loading map at: ' + $(this).data('lat') + ', ' + $(this).data('long'));
+                var map = new google.maps.Map(this, {
+                    zoom: $(this).data('zoom') || 15,
+                    center: myLatLng,
+                    scrollwheel: false
+                });
+                new google.maps.Marker({
+                    position: myLatLng,
+                    map: map,
+                    title: $(this).data('marker')
+                });
+                $(window).resize(function () {
+                    google.maps.event.trigger(map, 'resize');
+                });
+                google.maps.event.trigger(map, 'resize');
+            });
+        };
+        App.prototype.initContactForms = function (tag) {
+            if (tag === void 0) { tag = '.contact-form'; }
+            var $form = $(tag);
+            $form.find('.thank-you').hide();
+            $form.find('.form-content').show();
+            $('body').on('submit', tag, this.submitContactForm);
+            var form = $(tag)[0];
+            new Validator(form, {
+                onComplete: function (response) {
+                    Response.process(response, 5000);
+                    if (response.success) {
+                        if ($form.attr('data-redirect'))
+                            window.location.href = $form.attr('data-redirect');
+                        if ($form.attr('data-alert-message'))
+                            Alerts.success($form.attr('data-alert-message'), "Success");
+                        $form.find('.form').hide();
+                        $form.find('.thank-you').show();
+                    }
+                    else {
+                        if ($form.attr('data-alert-error'))
+                            Alerts.error($form.attr('data-alert-error'), "Error");
+                        else
+                            Alerts.error("There was an error sending the message: " + response.errors, "Error");
+                    }
+                }.bind(this)
+            });
+        };
+        App.prototype.submitContactForm = function (e) {
+            e.preventDefault();
+            $(this).addClass('loading');
+            var $form = $(this);
+            if ($form.valid()) {
+                $.post($form.attr('action'), $form.serialize(), function (data) {
+                });
+            }
+            return false;
         };
         return App;
     }(BaseController));
@@ -1308,5 +1455,5 @@ var hood = (function (exports, Swal, bootstrap) {
 
     return exports;
 
-}({}, Swal, bootstrap));
+}({}, null, Swal, bootstrap));
 //# sourceMappingURL=app.js.map

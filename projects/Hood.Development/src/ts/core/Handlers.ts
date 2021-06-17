@@ -2,7 +2,7 @@
     constructor() {
     }
 
-    defaults() {
+    initDefaultHandlers() {
 
         this.checkboxToCsvInput();
         this.iconSelector();

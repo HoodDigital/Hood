@@ -1,4 +1,5 @@
 @{
+    Layout = "_Layout";
     var _basicSettings = Engine.Settings.Basic;
     var _integrations = Engine.Settings.Integrations;
     var _seoSettings = Engine.Settings.Seo;
@@ -24,4 +25,20 @@
     <meta name="twitter:description" content="@description" />
     <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
 }
-<div id="map" style="height:50vh;"></div>
+<fixedImage src="https://source.unsplash.com/random" style="min-height:70vh;" class="d-flex align-items-center justify-content-center text-center darkened">
+    <div class="container position-relative">
+        <div class="px-0">
+            <h1 class="display-4 text-white">
+                @if (ViewData.ContainsKey("PageTitle")) 
+                {
+                    @ViewData["PageTitle"]
+                }
+                else
+                {
+                    @ViewData["Title"]
+                }
+            </h1>
+            <p class="lead my-3 text-white">@Html.Raw(ViewData["SubTitle"])</p>
+        </div>
+    </div>
+</fixedImage>

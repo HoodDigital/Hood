@@ -31,11 +31,11 @@
 }
 
 .field-validation-error {
-    text-align: center;
-    color: $red;
-    font-size: $font-size-sm;
-    padding: 0.25rem !important;
     display: block !important;
+    padding: .25rem !important;
+    font-size: $font-size-sm;
+    color: $red;
+    text-align: center;
 }
 
 .form-select,
@@ -51,15 +51,15 @@
 
 .validation-summary {
     position: relative;
-    padding: 1rem;
     display: none;
+    padding: 1rem;
     border-radius: $border-radius;
 
     &.validation-summary-errors {
-        border: 1px solid $danger;
-        background-color: $red-100;
-        color: $red-700;
         display: block;
+        color: $red-700;
+        background-color: $red-100;
+        border: 1px solid $danger;
     }
 
     &.validation-summary-valid {
@@ -67,7 +67,7 @@
     }
 
     ul {
-        margin-bottom: 0;
         padding-left: 1rem;
+        margin-bottom: 0;
     }
 }

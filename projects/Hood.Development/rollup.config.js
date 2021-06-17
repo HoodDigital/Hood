@@ -1,7 +1,6 @@
 ﻿import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import uglify from "@lopatnov/rollup-plugin-uglify";
-import scss from 'rollup-plugin-scss'
 
 export default commandLineArgs => {
 
@@ -130,6 +129,7 @@ export default commandLineArgs => {
                     sweetalert2: 'Swal',
                     jQuery: '$',
                     bootstrap: 'bootstrap',
+                    'google.maps': 'google.maps'
                 },
                 sourcemap: sourcemaps,
                 compact: compact
@@ -138,28 +138,7 @@ export default commandLineArgs => {
                 'jQuery',
                 'bootstrap',
                 'sweetalert2',
-                'hood'
-            ],
-            plugins: plugins
-        },
-        {
-            input: 'src/ts/google.ts',
-            output: {
-                file: destination + 'js/google.js',
-                format: 'iife',
-                name: 'hood.google',
-                globals: {
-                    sweetalert2: 'Swal',
-                    jQuery: '$',
-                    bootstrap: 'bootstrap',
-                },
-                sourcemap: sourcemaps,
-                compact: compact
-            },
-            external: [
-                'jQuery',
-                'bootstrap',
-                'sweetalert2',
+                'google.maps',
                 'hood'
             ],
             plugins: plugins

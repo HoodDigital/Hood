@@ -148,7 +148,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/content/create/{type}")]
         public IActionResult Create(string type)
         {
-            Content model = new Content()
+            Content model = new()
             {
                 PublishDate = DateTime.UtcNow,
                 Type = Engine.Settings.Content.GetContentType(type),
