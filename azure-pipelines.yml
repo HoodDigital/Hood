@@ -27,6 +27,12 @@ steps:
       echo "##vso[task.setvariable variable=version;isOutput=true]$version"
   name: Version
   
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Write-Host "Using version: $($env:version)"'
+  name: VersionEcho
+
 - task: NuGetCommand@2
   inputs:
     command: 'pack'
