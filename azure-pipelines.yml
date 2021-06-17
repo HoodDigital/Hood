@@ -38,7 +38,7 @@ steps:
     command: 'pack'
     packagesToPack: '**/*.csproj'
     versioningScheme: 'byEnvVar'
-    versionEnvVar: '$version'
+    versionEnvVar: 'version'
 
 - task: NuGetCommand@2
   inputs:
