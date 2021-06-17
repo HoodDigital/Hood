@@ -1,8 +1,8 @@
 # Hood CMS
+[![Build Status](https://dev.azure.com/hooddigital/Hood/_apis/build/status/HoodDigital.Hood)](https://dev.azure.com/hooddigital/Hood/_build/latest?definitionId=4)
 [![npm Package](https://img.shields.io/npm/v/hoodcms)](https://www.npmjs.com/package/hoodcms)
 [![NuGet](https://img.shields.io/nuget/v/Hood.svg?label=NuGet)](https://www.nuget.org/packages/Hood/)
 [![MyGet Latest](https://img.shields.io/myget/hood/vpre/hood.svg?label=MyGet%20Latest&colorB=97ca00)](https://www.myget.org/feed/hood/package/nuget/Hood)
-[![Demo](https://img.shields.io/badge/dynamic/json.svg?label=Demo&url=http%3A%2F%2Fcms.hooddigital.com%2Fhood%2Fversion&query=%24.version&colorB=%23eab92d&prefix=v)](http://cms.hooddigital.com/)
 
 You can download and use the full ASP.NET Core Source Code form Hood CMS here: 
 https://github.com/HoodDigital/Hood
