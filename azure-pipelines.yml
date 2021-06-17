@@ -16,19 +16,6 @@ variables:
 
 steps:
 
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
@@ -36,20 +23,60 @@ steps:
       $file = ".\projects\Hood.Development\package.json"
       $json = Get-Content $file | ConvertFrom-Json
       $version = "$($json.version)"
+
+      $exec = "dotnet restore"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+
+      $exec = "dotnet build .\projects\Hood.Core\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.Admin\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.UI\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.UI.Core\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.UI.Bootstrap3\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.UI.Bootstrap4\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
       
       Write-Host "##vso[task.setvariable variable=version;]$version"
-  name: Version
-  
-- task: NuGetCommand@2
-  inputs:
-    command: 'pack'
-    packagesToPack: '**/*.csproj'
-    versioningScheme: 'byEnvVar'
-    versionEnvVar: 'version'
+      $exec = "dotnet pack .\projects\Hood.Core\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.Admin\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.UI\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.UI.Core\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.UI.Bootstrap3\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.UI.Bootstrap4\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+  name: BuildAndPack
 
 - task: NuGetCommand@2
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    packagesToPush: '**/*.nupkg;!**/*.symbols.nupkg'
     nuGetFeedType: 'external'
     publishFeedCredentials: 'MyGet'
