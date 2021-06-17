@@ -40,12 +40,6 @@ steps:
       Write-Host "##vso[task.setvariable variable=version;]$version"
   name: Version
   
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Write-Host "Using version: $($env:version)"'
-  name: VersionEcho
-
 - task: NuGetCommand@2
   inputs:
     command: 'pack'
@@ -57,5 +51,5 @@ steps:
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-    nuGetFeedType: 'internal'
-    publishVstsFeed: 'dd5ee0fe-a1c8-4d99-a4cd-6f602dbe0651'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'MyGet'
