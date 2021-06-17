@@ -33,18 +33,23 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $file = ".\projects\Hood.Development\wwwroot\hood\package.json"
+      $file = ".\projects\Hood.Development\package.json"
       $json = Get-Content $file | ConvertFrom-Json
       $version = "$($json.version)"
       
       echo "##vso[task.setvariable variable=name;isOutput=true]$version"
   name: Version
-
-- task: AzureFileCopy@4
+  
+- task: NuGetCommand@2
   inputs:
-    SourcePath: '.\projects\Hood.Development\wwwroot\hood\*'
-    azureSubscription: 'HoodData'
-    Destination: 'AzureBlob'
-    storage: 'hooddigital'
-    ContainerName: 'cdn'
-    BlobPrefix: '$(Version.name)'
+    command: 'pack'
+    packagesToPack: '**/*.csproj'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'version'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'dd5ee0fe-a1c8-4d99-a4cd-6f602dbe0651'
