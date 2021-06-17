@@ -16,19 +16,6 @@ variables:
 
 steps:
 
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
@@ -37,7 +24,7 @@ steps:
       $json = Get-Content $file | ConvertFrom-Json
       $version = "$($json.version)"
       
-      echo "##vso[task.setvariable variable=name;isOutput=true]$version"
+      echo "##vso[task.setvariable variable=version;isOutput=true]$version"
   name: Version
   
 - task: NuGetCommand@2
