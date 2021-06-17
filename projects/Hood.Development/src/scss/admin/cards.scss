@@ -1,0 +1,26 @@
+.card {
+    &.hover {
+        background-color: white;
+
+        &:hover {
+            background-color: $gray-100;
+            border-color: $gray-400;
+        }
+    }
+
+    &.active {
+        background-color: $green-100;
+        border-color: $green-600;
+
+        &:hover {
+            background-color: $green-300;
+        }
+    }
+
+    &.media-item {
+        &.active {
+            background-color: #c9eacc;
+            border: 1px solid green;
+        }
+    }
+}

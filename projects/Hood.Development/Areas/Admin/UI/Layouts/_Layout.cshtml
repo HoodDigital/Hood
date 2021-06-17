@@ -1,16 +1,14 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
 @{     
-    bool bundleScripts = _env.EnvironmentName != "Development";
+    bool production = _env.EnvironmentName == "Production";
 }
-
-<partial name="_Scripts" />
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewData["Title"] - @Engine.Settings.Basic.FullTitle - @Engine.Settings.Basic.AdminAreaSettings.Title</title>
-    <link type="image/png" href="https://cdn.jsdelivr.net/npm/hoodcms@4.1.5/images/hood-square.png" rel="icon" />
+    <link type="image/png" href="https://cdn.jsdelivr.net/npm/hoodcms/images/hood-square.png" rel="icon" />
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)
@@ -22,7 +20,7 @@
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
 </head>
-<body>
+<body class="@(!production ? "dev-mode" : "")">
     <div class="wrapper">
         <partial name="_Mobile_Header" />
         <nav class="navbar navbar-expand-md sidebar">
@@ -31,7 +29,7 @@
         <div class="content">
             <div class="title">
                 <div class="row align-items-center">
-                    <div class="col-lg text-center text-md-left">
+                    <div class="col-lg text-center text-md-start">
                         @if (!IsSectionDefined("breadcrumbs"))
                         {
                             <nav aria-label="breadcrumb">
@@ -47,7 +45,7 @@
                         }
                         <h1 class="m-0">@ViewBag.Title</h1>
                     </div>
-                    <div class="col-lg text-center text-md-left text-lg-right mt-3 mt-lg-0">
+                    <div class="col-lg text-center text-md-start text-lg-end mt-3 mt-lg-0">
                         @RenderSection("buttons", false)
                     </div>
                 </div>
@@ -57,7 +55,7 @@
             </div>
             <footer class="footer">
                 <div>
-                    <strong>&copy; @DateTime.Now.Year Hood Digital Ltd.</strong><br />
+                    <strong>&copy; @DateTime.UtcNow.Year Hood Digital Ltd.</strong><br />
                     <small>Powered by HoodCMS @($"v{Engine.Version}") &#8226; Made with <i class="fa fa-heart"></i> by <a target="_blank" href="https://github.com/JorjeRedemption/">George Whysall</a> and <a target="_blank" href="http://hooddigital.com">Hood Digital</a>.</small>
                 </div>
             </footer>
@@ -65,23 +63,13 @@
         </div>
     </div>
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery, bundleScripts)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
-
-    <partial name="_Scripts_JQuery" />
-    <partial name="_Scripts_Bootstrap" />
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors, bundleScripts)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
-
-    @Html.RenderScripts(Url, ResourceLocation.Vendors, bundleScripts)
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
-    @Html.RenderScripts(Url, ResourceLocation.Scripts, bundleScripts)
+    <partial name="_Scripts" />
+    @RenderSection("scripts", required: false)
 
-    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, bundleScripts)
+    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
 </body>
 </html>

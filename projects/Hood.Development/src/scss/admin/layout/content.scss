@@ -1,0 +1,24 @@
+div.content {
+    position: absolute;
+    top: 59px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $grid-gutter-width / 2;
+    overflow: scroll;
+    overflow-x: hidden;
+
+    @media (min-width: 768px) {
+        padding: $grid-gutter-width;
+    }
+
+    @media (min-width: 768px) {
+        top: 0;
+        left: $sidebar-width;
+    }
+
+    @import "content/title";
+    @import "content/footer";
+    @import "content/breadcrumb";
+    @import "content/body";
+}

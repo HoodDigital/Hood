@@ -12,14 +12,14 @@
 <div class="card">
     <div class="card-header">
         <div class="row align-items-center">
-            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs" data-hood-tabs="@($"tabs-settings-mail")">
                 <li class="nav-item">
-                    <a class="nav-link active" id="mail-tab" data-toggle="tab" href="#mail" role="tab" aria-controls="mail" aria-selected="true">
+                    <a class="nav-link active" id="mail-tab" data-bs-toggle="tab" href="#mail" role="tab" aria-controls="mail" aria-selected="true">
                         Mail Settings
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="test-tab" data-toggle="tab" href="#test" role="tab" aria-controls="test" aria-selected="false">
+                    <a class="nav-link" id="test-tab" data-bs-toggle="tab" href="#test" role="tab" aria-controls="test" aria-selected="false">
                         Send a Test E-Mail
                     </a>
                 </li>
@@ -30,31 +30,27 @@
         <div class="tab-content">
             <div id="mail" class="tab-pane active" role="tabpanel" aria-labelledby="mail-tab">
                 <form method="post" id="settings-form">
-                    <div class="form-group floating-label">
-                        <label asp-for="SendGridKey"></label>
+                    <div class="form-floating mb-3">
                         <input asp-for="SendGridKey" type="text" class="form-control" />
+                        <label asp-for="SendGridKey"></label>
                         <small asp-for="SendGridKey"></small>
                     </div>
                     <hr class="mt-4 mb-4" />
-                    <mediaSelect asp-for="Logo"></mediaSelect>
-                    <div class="form-group">
-                        <label asp-for="BackgroundColour"></label>
-                        <small asp-for="BackgroundColour"></small>
-                        <colorSelect asp-for="BackgroundColour" data-default="#f7f7f7" data-opacity="true"></colorSelect>
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="FromName"></label>
+                    <div media-select="Logo" media-fit="contain"></div>
+                    <colorSelect asp-for="BackgroundColour" data-default="#f7f7f7" data-opacity="true"></colorSelect>
+                    <div class="form-floating mb-3">
                         <input asp-for="FromName" type="text" class="form-control" />
+                        <label asp-for="FromName"></label>
                         <small asp-for="FromName"></small>
                     </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="FromEmail"></label>
+                    <div class="form-floating mb-3">
                         <input asp-for="FromEmail" type="text" class="form-control" />
+                        <label asp-for="FromEmail"></label>
                         <small asp-for="FromEmail"></small>
                     </div>
                 </form>
                 <hr class="mt-4 mb-4" />
-                <alert type="Light" size="Medium" icon="fa-envelope-open-text" class="border-dark">
+                <alert type="Light" size="Large" icon="fa-envelope-open-text" class="border-dark">
                     <p class="h5 mb-3">Preview how your emails will look, these links will open in a new tab.</p>
                     <p class="m-0">
                         <a class="btn btn-outline-dark" asp-action="Plain" asp-controller="Mail" asp-area="Admin" target="_blank">Plain Message</a>
@@ -70,21 +66,21 @@
                 </alert>
                 <form asp-action="Test" asp-controller="Mail" method="post">
                     <fieldset class="form-horizontal">
-                        <div class="form-group floating-label">
-                            <label for="email">Email address</label>
+                        <div class="form-floating mb-3">
                             <input id="email" name="email" type="text" class="form-control" placeholder="Email address" />
+                            <label for="email">Email address</label>
                         </div>
-                        <div class="form-group floating-label">
-                            <label for="email">Template</label>
-                            <select id="template" name="template" type="text" class="form-control">
+                        <div class="form-floating mb-3">
+                            <select id="template" name="template" type="text" class="form-select">
                                 <option value="@MailSettings.PlainTemplate">Plain</option>
                                 <option value="@MailSettings.SuccessTemplate">Success</option>
                                 <option value="@MailSettings.WarningTemplate">Warning</option>
                                 <option value="@MailSettings.DangerTemplate">Danger</option>
                             </select>
+                            <label for="email">Template</label>
                         </div>
                         <p>
-                            <button type="submit" class="btn btn-success m-t-md"><i class="fa fa-envelope mr-3"></i>Send Test</button>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-envelope me-3"></i>Send Test</button>
                         </p>
                     </fieldset>
                 </form>

@@ -1,0 +1,24 @@
+@model ContentTypeListModel
+@{
+    ViewBag.Title = "Content Types";
+}
+@section buttons {
+    <a class="btn btn-success content-type-create" asp-action="Create">
+        <i class="fa fa-user-plus me-2"></i>
+        Create New
+    </a>
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType" size="Medium">@Model.SaveMessage</alert>
+}
+<form class="inline" data-target="#content-type-list">
+    <div class="row">
+        <div class="col-lg-8 mb-3">
+            <div id="content-type-list" class="query" data-url="@Url.Action("List")"></div>
+        </div>
+        <div class="col-lg-4">
+            <partial name="_Filters" />
+        </div>
+    </div>
+</form>

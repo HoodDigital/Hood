@@ -1,0 +1,60 @@
+@model Content
+<div class="card-img-top">
+    @switch (Model.GetMetaValue<string>("Settings.SubType"))
+    {
+        case "Video":
+            @if (Model.GetMetaValue<string>("Content.News.Video").IsSet())
+            {
+                @Html.Raw(Model.GetMetaValue<string>("Content.News.Video"));
+            }
+            break;
+        case "Slides":
+            if (Model.Media.Count > 0)
+            {
+                <div class="owl-carousel owl-slider">
+                    @foreach (var media in Model.Media)
+                    {
+                        <div class="item">
+                            <a href="@Model.Url">
+                                <fixedImage src="@media.MediumUrl" class="img-wide img-full content-feature-@Model.Id" />
+                            </a>
+                        </div>
+                    }
+                </div>
+            }
+            break;
+        default:
+            if (Model.FeaturedImage != null)
+            {
+                <a href="@Model.Url">
+                    @switch (Model.GetMeta("Settings.Image.Featured.Fit").GetStringValue())
+                    {
+                        case "100%":
+                            <div>
+                                <img src="@Model.FeaturedImage.LargeUrl" class="img-full content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        case "center":
+                            <div class="text-center">
+                                <img src="@Model.FeaturedImage.LargeUrl" class="content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        case "left":
+                            <div class="text-left">
+                                <img src="@Model.FeaturedImage.LargeUrl" class="content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        case "right":
+                            <div class="text-right">
+                                <img src="@Model.FeaturedImage.LargeUrl" class="content-feature-@Model.Id" />
+                            </div>
+                            break;
+                        default:
+                            <fixedImage src="@Model.FeaturedImage.MediumUrl" class="img-wide img-full content-feature-@Model.Id" style="@Model.GetImageStyle()" />
+                            break;
+                    }
+                </a>
+            }
+            break;
+    }
+</div>

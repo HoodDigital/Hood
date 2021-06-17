@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./wwwroot/dist/js/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": false,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "noEmit": true
+  }
+}

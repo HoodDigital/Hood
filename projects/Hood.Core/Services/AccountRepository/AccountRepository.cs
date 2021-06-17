@@ -97,19 +97,22 @@ namespace Hood.Services
         }
         public async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-            UserProfile siteOwner = Engine.Settings.SiteOwner;
-
-            if (userId == siteOwner.Id)
-            {
-                throw new Exception("You cannot delete the site owner, you must assign a new site owner (from the site owner account) before you can delete this account.");
-            }
-
             ApplicationUser user = await _db.Users
                 .Include(u => u.Content)
                 .Include(u => u.Properties)
                 .Include(u => u.Addresses)
                 .SingleOrDefaultAsync(u => u.Id == userId);
 
+            if (user.Email == Engine.Configuration.SuperAdminEmail)
+            {
+                throw new Exception("You cannot delete the site owner account, the owner is set via an environment variable and cannot be changed from the admin area.");
+            }
+
+            ApplicationUser siteOwner = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
+            if (siteOwner == null) 
+            {
+                throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
+            }
 
             if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetUserId() == user.Id)
             {
@@ -184,7 +187,7 @@ namespace Hood.Services
 
             if (model.RoleIds != null && model.RoleIds.Count > 0)
             {
-                query = query.Where(q => q.RoleIds != null && model.RoleIds.Any(m => q.RoleIds.Contains(m)));
+                query = query.Where(q => q.RoleIds != null && model.RoleIds.ToArray().Any(m => q.RoleIds.Contains(m)));
             }
 
             if (!string.IsNullOrEmpty(model.Search))
@@ -313,7 +316,7 @@ namespace Hood.Services
         #endregion
 
         #region Statistics
-        public async Task<object> GetStatisticsAsync()
+        public async Task<UserStatistics> GetStatisticsAsync()
         {
             int totalUsers = await _db.Users.CountAsync();
             int totalAdmins = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
@@ -323,7 +326,7 @@ namespace Hood.Services
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });
 
             List<KeyValuePair<string, int>> days = new List<KeyValuePair<string, int>>();
-            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.Now.AddDays(-89), DateTime.Now))
+            foreach (DateTime day in DateTimeExtensions.EachDay(DateTime.UtcNow.AddDays(-89), DateTime.UtcNow))
             {
                 var dayvalue = createdByDate.SingleOrDefault(c => c.name == day.Date);
                 int count = dayvalue != null ? dayvalue.count : 0;
@@ -332,16 +335,32 @@ namespace Hood.Services
             }
 
             List<KeyValuePair<string, int>> months = new List<KeyValuePair<string, int>>();
-            for (DateTime dt = DateTime.Now.AddMonths(-11); dt <= DateTime.Now; dt = dt.AddMonths(1))
+            for (DateTime dt = DateTime.UtcNow.AddMonths(-11); dt <= DateTime.UtcNow; dt = dt.AddMonths(1))
             {
                 var monthvalue = createdByMonth.SingleOrDefault(c => c.name == dt.Month);
                 int count = monthvalue != null ? monthvalue.count : 0;
                 months.Add(new KeyValuePair<string, int>(dt.ToString("dd MMM"), count));
             }
 
-            return new { totalUsers, totalAdmins, days, months };
+            return new UserStatistics(totalUsers, totalAdmins, days, months);
         }
         #endregion
 
+    }
+
+    public class UserStatistics
+    {
+        public UserStatistics(int totalUsers, int totalAdmins, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months)
+        {
+            TotalUsers = totalUsers;
+            TotalAdmins = totalAdmins;
+            Days = days;
+            Months = months;
+        }
+
+        public int TotalUsers { get; }
+        public int TotalAdmins { get; }
+        public List<KeyValuePair<string, int>> Days { get; }
+        public List<KeyValuePair<string, int>> Months { get; }
     }
 }

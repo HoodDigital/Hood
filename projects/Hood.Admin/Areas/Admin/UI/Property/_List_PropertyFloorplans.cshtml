@@ -4,23 +4,21 @@
 }
 @if (Model.FloorPlans != null && Model.FloorPlans.Count > 0)
 {
-    <div class="card-deck card-deck-4">
+    <div class="row row-cols-2 row-cols-md-4 row-cols-xl-5 g-2">
         @foreach (var media in Model.FloorPlans)
         {
-            <div class="card text-center hover">
-                <fixedImage src="@media.Icon" class="img img-full img-square card-img-top" />
-                <div class="card-body p-1">
-                    <p class="m-0 font-weight-bold text-truncate">
-                        @media.Filename
-                    </p>
-                    <p>
-                        <small>@media.FormattedSize</small>
-                    </p>
-                    @if (media.GenericFileType == GenericFileType.Image)
-                    {
-                        <a class="btn btn-sm btn-success hood-inline-task" asp-action="SetFeatured" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id">Set as featured</a>
-                    }
-                    <a class="btn btn-sm btn-danger property-media-delete" asp-action="RemoveFloorplan" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id"><i class="fa fa-trash"></i></a>
+            <div class="col">
+                <div class="card media-item text-center hover">
+                    <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top" />
+                    <div class="card-body p-1">
+                        <div class="fw-bold small text-truncate">
+                            @media.Filename
+                        </div>
+                        <div class="text-muted mb-2">
+                            @media.FormattedSize
+                        </div>
+                        <a class="btn btn-sm btn-danger property-floorplan-delete" asp-action="RemoveFloorplan" asp-route-id="@Model.Id" asp-route-mediaId="@media.Id"><i class="fa fa-trash"></i></a>
+                    </div>
                 </div>
             </div>
         }

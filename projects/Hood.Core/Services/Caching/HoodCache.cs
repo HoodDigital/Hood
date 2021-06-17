@@ -21,6 +21,13 @@ namespace Hood.Caching
             _cache = cache;
         }
 
+        public ConcurrentDictionary<string, DateTime> Keys 
+        { 
+            get
+            {
+                return _entryKeys;
+            }                
+        }
 
         public bool Exists(string key)
         {
@@ -117,20 +124,20 @@ namespace Hood.Caching
             if (_entryKeys.TryGetValue(key, out DateTime priorEntry))
             {
                 // Try to update with the new entry if a previous entries exist.
-                bool entryAdded = _entryKeys.TryUpdate(key, DateTime.Now, priorEntry);
+                bool entryAdded = _entryKeys.TryUpdate(key, DateTime.UtcNow, priorEntry);
 
                 if (!entryAdded)
                 {
                     // The update will fail if the previous entry was removed after retrival.
                     // Adding the new entry will succeed only if no entry has been added since.
                     // This guarantees removing an old entry does not prevent adding a new entry.
-                    _entryKeys.TryAdd(key, DateTime.Now);
+                    _entryKeys.TryAdd(key, DateTime.UtcNow);
                 }
             }
             else
             {
                 // Try to add the new entry if no previous entries exist.
-                _entryKeys.TryAdd(key, DateTime.Now);
+                _entryKeys.TryAdd(key, DateTime.UtcNow);
             }
         }
 

@@ -400,7 +400,7 @@ namespace Hood.Services
                 Lock.AcquireWriterLock(Timeout.Infinite);
                 Succeeded = true;
                 Running = false;
-                StatusMessage = "Update completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
+                StatusMessage = "Update completed at " + DateTime.UtcNow.ToShortTimeString() + " on " + DateTime.UtcNow.ToLongDateString() + ".";
                 Lock.ReleaseWriterLock();
 
                 await _logService.AddLogAsync<BlmFileImporter>("Sucessfully imported properties via BLM.", "Process completed!", LogType.Success);
@@ -980,12 +980,12 @@ namespace Hood.Services
             property.Reference = data["AGENT_REF"];
 
             property.LastEditedBy = User.UserName;
-            property.LastEditedOn = DateTime.Now;
+            property.LastEditedOn = DateTime.UtcNow;
 
             if (property.UserVars != "IMPORTED")
             {
                 property.CreatedBy = User.UserName;
-                property.CreatedOn = DateTime.Now;
+                property.CreatedOn = DateTime.UtcNow;
             }
 
             int bedrooms = 0;
@@ -1079,7 +1079,7 @@ namespace Hood.Services
             property.Description = data["DESCRIPTION"];
             property.Postcode = data["POSTCODE1"] + " " + data["POSTCODE2"];
             property.Public = true;
-            property.PublishDate = DateTime.Now;
+            property.PublishDate = DateTime.UtcNow;
             property.ShareCount = 0;
             property.ShortDescription = data["SUMMARY"];
             property.Size = "";
@@ -1142,10 +1142,10 @@ namespace Hood.Services
         {
             if (property != null)
             {
-                return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
+                return string.Format("<strong>[{0} {1}] [Property {2} - {3}]</strong>: {4}", DateTime.UtcNow.ToShortDateString(), DateTime.UtcNow.ToShortTimeString(), property.Id, property.Postcode, statusMessage);
             }
 
-            return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString(), statusMessage);
+            return string.Format("<strong>[{0} {1}]</strong>: {2}", DateTime.UtcNow.ToShortDateString(), DateTime.UtcNow.ToShortTimeString(), statusMessage);
         }
         private async Task<PropertyListing> UpdateMetadataAsync(PropertyListing property, Dictionary<string, string> data)
         {

@@ -1,0 +1,61 @@
+ul.navbar-nav {
+    flex-direction: column;
+    margin-right: -1.5rem;
+    margin-left: -1.5rem;
+
+    li {
+        display: block;
+
+        h4 {
+            display: flex;
+            align-items: center;
+            padding: .5rem 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 0;
+            font-size: small;
+            color: $gray-400;
+            text-transform: uppercase;
+        }
+
+        a.nav-link {
+            display: flex;
+            align-items: center;
+            padding: .5rem 1.5rem;
+            color: $gray-600;
+            cursor: pointer;
+
+            i {
+                width: 25px;
+                margin-right: 10px;
+                text-align: center;
+                vertical-align: middle;
+
+                @media (min-width: 768px) {
+                    display: inline-block;
+                }
+            }
+
+            &:hover {
+                color: $black;
+            }
+        }
+
+        ul.nav {
+            li {
+                a.nav-link {
+                    padding: .4rem 2rem;
+                    font-size: .9em;
+                }
+            }
+
+            ul.nav {
+                li {
+                    a.nav-link {
+                        padding: .3rem 2.5rem;
+                        font-size: .8em;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,128 @@
+@model AddressListModel
+@{
+    Layout = null;
+}
+@if (Model.UserProfile != null)
+{
+    <div class="row">
+        @if (Model.UserProfile.BillingAddress != null)
+        {
+            <div class="col-sm-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="m-0">Billing Address</h6>
+                            </div>
+                            <div class="col-auto">
+                                @if (Model.UserProfile.BillingAddress.IsGeoLocated())
+                                {
+                                    <a class="btn btn-info btn-sm float-right m-t-xs"
+                                       title="@Model.UserProfile.BillingAddress.Latitude, @Model.UserProfile.BillingAddress.Longitude"
+                                       target="_blank"
+                                       href="@string.Format("https://www.google.com/maps/@{0},{1},20z", Model.UserProfile.BillingAddress.Latitude, Model.UserProfile.BillingAddress.Longitude)">
+                                        View in maps
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @Html.FormatAddress(Model.UserProfile.BillingAddress, AddressFormat.MultiLine)
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.UserProfile.DeliveryAddress != null)
+        {
+            <div class="col-sm-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="m-0">Delivery Address</h6>
+                            </div>
+                            <div class="col-auto">
+                                @if (Model.UserProfile.DeliveryAddress.IsGeoLocated())
+                                {
+                                    <a class="btn btn-info btn-sm float-right m-t-xs"
+                                       title="@Model.UserProfile.DeliveryAddress.Latitude, @Model.UserProfile.DeliveryAddress.Longitude"
+                                       target="_blank"
+                                       href="@string.Format("https://www.google.com/maps/@{0},{1},20z", Model.UserProfile.DeliveryAddress.Latitude, Model.UserProfile.DeliveryAddress.Longitude)">
+                                        View in maps
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @Html.FormatAddress(Model.UserProfile.DeliveryAddress, AddressFormat.MultiLine)
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+<div class="m-t-lg">
+    @if (Model.TotalCount > 0)
+    {
+        @foreach (Address address in Model.List)
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="m-0">
+                                @if (address.QuickName.IsSet())
+                                {
+                                    @address.QuickName
+                                }
+                                else
+                                {
+                                    @address.Address1
+                                }
+                            </h6>
+                        </div>
+                        <div class="col-auto">
+                            @if (address.IsGeoLocated())
+                            {
+                                <a class="btn btn-info btn-sm" title="@address.Latitude, @address.Longitude" target="_blank"
+                                   href="@string.Format("https://www.google.com/maps/@{0},{1},20z", address.Latitude, address.Longitude)">
+                                    Mapped
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>@address.ToFormat(AddressFormat.SingleLine)</p>
+                    <div>
+                        @if (address.Id == Model.UserProfile?.BillingAddress?.Id)
+                        {
+                            <a class="btn btn-success btn-sm address-set-billing" asp-action="SetBilling" asp-route-id="@address.Id"><i class="fa fa-check m-r-xs"></i>Billing Address</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-dark btn-sm address-set-billing" asp-action="SetBilling" asp-route-id="@address.Id">Set Billing</a>
+                        }
+                        @if (address.Id == Model.UserProfile?.DeliveryAddress?.Id)
+                        {
+                            <a class="btn btn-success btn-sm address-set-delivery" asp-action="SetDelivery" asp-route-id="@address.Id"><i class="fa fa-check m-r-xs"></i>Delivery Address</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-dark btn-sm address-set-delivery" asp-action="SetDelivery" asp-route-id="@address.Id">Set Delivery</a>
+                        }
+                        <a class="btn btn-warning btn-sm hood-modal" asp-action="Edit" asp-route-id="@address.Id" data-complete="$.hood.Addresses.CreateOrEdit">Edit</a>
+                        <a class="btn btn-danger btn-sm address-delete" asp-action="Delete" asp-route-id="@address.Id">Delete</a>
+                    </div>
+                </div>
+            </div>
+        }
+        <partial name="_Pagination" />
+    }
+    else
+    {
+        <div class="alert alert-info text-center">No addresses to display.</div>
+    }
+</div>

@@ -224,7 +224,7 @@ namespace Hood.Services
                 PercentComplete = 100;
                 Succeeded = true;
                 Running = false;
-                StatusMessage = "Update completed at " + DateTime.Now.ToShortTimeString() + " on " + DateTime.Now.ToLongDateString() + ".";
+                StatusMessage = "Update completed at " + DateTime.UtcNow.ToShortTimeString() + " on " + DateTime.UtcNow.ToLongDateString() + ".";
                 Lock.ReleaseWriterLock();
 
                 return;

@@ -1,22 +1,21 @@
 @model Content
-<h5 class="mt-2 mb-0">Choose a Template</h5>
+<h5 class="mb-0">Choose a Template</h5>
 <p>Customise your content with templates.</p>
-<div class="form-group floating-label">
-    <label for="Meta:Settings.Template" class="col-sm-3 control-label">
-        Template
-    </label>
-    <select class="form-control" data-selected="@Model.GetMeta("Settings.Template").GetStringValue()" id="Meta:Settings.Template" name="Meta:Settings.Template">
+<div class="form-floating mb-3">
+    <select class="form-select" data-selected="@Model.GetMeta("Settings.Template").GetStringValue()" id="Meta:Settings.Template" name="Meta:Settings.Template">
         <option value="">Default Template</option>
         @foreach (var template in Model.Templates)
         {
             <option value="@template.Key">@template.Value</option>
         }
     </select>
-    <small class="text-warning form-text"><i class="fa fa-exclamation-triangle mr-2"></i>Be careful! Changing the template will reset all template settings!</small>
+    <label for="Meta:Settings.Template" class="col-sm-3 control-label">
+        Template
+    </label>
+    <small class="text-warning form-text"><i class="fa fa-exclamation-triangle me-2"></i>Be careful! Changing the template will reset all template settings!</small>
 </div>
-<alert icon="fa fa-info">You can add more templates to your Templates folder: <code>/Themes/{your-theme}/Views/Templates/</code></alert>
-<hr class="mt-4 mb-4" />
-<h5 class="mb-3">Template Fields</h5>
+<alert icon="fa fa-info" size="Medium">You can add more templates to your Templates folder: <code>/Themes/{your-theme}/Views/Templates/</code></alert>
+<h5 class="mt-5 mb-0">Template Fields</h5>
 <p>You can add custom templates for your content, and here you can enter content into the fields created in your templates.</p>
 @if (Model.Metadata.Where(c => c.Name.StartsWith("Template.")).Count() > 0)
 {
@@ -35,9 +34,9 @@
 }
 else
 {
-    <alert icon="fa fa-info" size="Medium">
-        <p class="m-0 font-weight-bold">Choose a template...</p>
-        <p class="m-0">Change your template above, once you save, the new template will be loaded and you can edit the content of the template here.</p>
-        <p class="m-0"><em><i class="fa fa-exclamation-triangle mr-2"></i>Some templates do not contain any customisable fields. More templating documentation coming soon.</em></p>
+    <alert icon="fa fa-info" size="Large">
+        <p class="m-0 fw-bold">Choose a template...</p>
+        <p class="mb-1">Change your template above, once you save, the new template will be loaded and you can edit the content of the template here.</p>
+        <p class="m-0"><em><i class="fa fa-exclamation-triangle me-2"></i>Some templates do not contain any customisable fields.</em></p>
     </alert>
 }

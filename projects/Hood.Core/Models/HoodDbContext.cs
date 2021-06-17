@@ -39,11 +39,14 @@ namespace Hood.Models
         // Content
         public DbSet<Content> Content { get; set; }
         public DbSet<ContentMeta> ContentMetadata { get; set; }
+        public DbSet<ContentMedia> ContentMedia{ get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
 
 
         // Property
         public DbSet<PropertyListing> Properties { get; set; }
+        public DbSet<PropertyMedia> PropertyMedia { get; set; }
+        public DbSet<PropertyFloorplan> PropertyFloorplans { get; set; }
         public DbSet<PropertyMeta> PropertyMetadata { get; set; }
 
         // Logs
@@ -126,14 +129,14 @@ namespace Hood.Models
                     ApplicationUser userToInsert = new ApplicationUser
                     {
                         CompanyName = "",
-                        CreatedOn = DateTime.Now,
+                        CreatedOn = DateTime.UtcNow,
                         FirstName = "Website",
                         LastName = "Administrator",
                         EmailConfirmed = true,
                         Anonymous = false,
                         PhoneNumber = "",
                         JobTitle = "Website Administrator",
-                        LastLogOn = DateTime.Now,
+                        LastLogOn = DateTime.UtcNow,
                         LastLoginIP = "127.0.0.1",
                         LastLoginLocation = "UK",
                         Email = ownerEmail,

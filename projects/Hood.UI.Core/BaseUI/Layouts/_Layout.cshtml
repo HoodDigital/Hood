@@ -1,12 +1,6 @@
-@{
-    BasicSettings _basicSettings = Engine.Settings.Basic;
-    SeoSettings _seoSettings = Engine.Settings.Seo;
-
-    var pageTitle = ViewData["PageTitle"] as string;
-    if (pageTitle.IsSet())
-    {
-        ViewData["Title"] += " - " + pageTitle;
-    }
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
+@{     
+    bool production = _env.EnvironmentName == "Production";
 }
 <!DOCTYPE html>
 <html lang="en-gb" xml:lang="en">
@@ -15,7 +9,7 @@
     <partial name="_Metas_Base" />
     <title>@ViewData["Title"]</title>
 
-    @Html.Raw(_seoSettings.HeadTags)
+    @Html.Raw(Engine.Settings.Seo.HeadTags)
 
     @if (!IsSectionDefined("metas"))
     {
@@ -33,46 +27,39 @@
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterCss)
 
 </head>
-<body class="@ViewData["BodyClass"]">
-    @Html.Raw(_seoSettings.BodyTags)
+<body class="@(!production ? "dev-mode" : "")">
+    @Html.Raw(Engine.Settings.Seo.BodyTags)
 
     @RenderSection("afterbody", required: false)
+
+    <partial name="_NoScript" />
+
     @RenderSection("beforecontent", required: false)
 
-    <div style="text-align:center;padding:50px;">
-        <h1>Hood CMS: @Engine.Settings.Basic.FullTitle</h1>
-        <p>No theme could be loaded, you should add a theme or switch to a system theme.</p>
+    <div class="wrapper" id="wrapper">
+        @await Component.InvokeAsync(nameof(Hood.ViewComponents.Header))
+        @RenderBody()
     </div>
 
     @RenderSection("beforefooter", required: false)
-    <partial name="_CookieConsentPartial" />
+    <partial name="_Footer" />
 
     @RenderSection("afterfooter", required: false)
     <partial name="_AdminEditor" />
 
     @RenderSection("includes", required: false)
 
-    @Html.RenderScripts(Url, ResourceLocation.BeforeJquery)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeJquery)
 
-    <partial name="_Scripts_JQuery" />
-    <partial name="_Scripts_Bootstrap" />
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeVendors)
-    @Html.RenderInlineScripts(Url, ResourceLocation.BeforeVendors)
-
-    @Html.RenderScripts(Url, ResourceLocation.Vendors)
-
-    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts)
+    @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
-    @Html.RenderScripts(Url, ResourceLocation.Scripts)
+    <partial name="_Scripts" />
 
-    @Html.RenderScripts(Url, ResourceLocation.AfterScripts)
+    @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.AfterScripts)
 
     @RenderSection("scripts", required: false)
 
-    @Html.Raw(_seoSettings.GoogleAnalytics)
+    @Html.Raw(Engine.Settings.Seo.GoogleAnalytics)
 </body>
 </html>

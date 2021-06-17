@@ -12,29 +12,29 @@
 <div class="card">
     <div class="card-header">
         <div class="row align-items-center">
-            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs" data-hood-tabs="@($"tabs-settings-seo")">
                 <li class="nav-item">
-                    <a class="nav-link active" id="basics-tab" data-toggle="tab" href="#basics" role="tab" aria-controls="basics" aria-selected="true">
+                    <a class="nav-link active" id="basics-tab" data-bs-toggle="tab" href="#basics" role="tab" aria-controls="basics" aria-selected="true">
                         Basics
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="standard-tab" data-toggle="tab" href="#standard" role="tab" aria-controls="standard" aria-selected="false">
+                    <a class="nav-link" id="standard-tab" data-bs-toggle="tab" href="#standard" role="tab" aria-controls="standard" aria-selected="false">
                         Page Defaults
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="socials-tab" data-toggle="tab" href="#socials" role="tab" aria-controls="socials" aria-selected="false">
+                    <a class="nav-link" id="socials-tab" data-bs-toggle="tab" href="#socials" role="tab" aria-controls="socials" aria-selected="false">
                         Social Media
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="opengraph-tab" data-toggle="tab" href="#opengraph" role="tab" aria-controls="opengraph" aria-selected="false">
+                    <a class="nav-link" id="opengraph-tab" data-bs-toggle="tab" href="#opengraph" role="tab" aria-controls="opengraph" aria-selected="false">
                         OG Tags
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="twitter-tab" data-toggle="tab" href="#twitter" role="tab" aria-controls="twitter" aria-selected="false">
+                    <a class="nav-link" id="twitter-tab" data-bs-toggle="tab" href="#twitter" role="tab" aria-controls="twitter" aria-selected="false">
                         Twitter Card
                     </a>
                 </li>
@@ -57,56 +57,56 @@
                     </ul>
                 </alert>
                 <hr class="mt-4 mb-4" />
-                <mediaSelect asp-for="SiteIconUrl"></mediaSelect>
+                <div media-select="SiteIconUrl" media-fit="contain"></div>
                 <hr class="mt-4 mb-4" />
                 <h6 class="mb-3">Custom HTML tags</h6>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
+                    <textarea asp-for="HeadTags" class="form-control" style="height:200px;"></textarea>
                     <label asp-for="HeadTags"></label>
-                    <textarea asp-for="HeadTags" class="form-control" rows="4"></textarea>
                     <small asp-for="HeadTags"></small>
                 </div>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
+                    <textarea asp-for="BodyTags" class="form-control" style="height:200px;"></textarea>
                     <label asp-for="BodyTags"></label>
-                    <textarea asp-for="BodyTags" class="form-control" rows="4"></textarea>
                     <small asp-for="BodyTags"></small>
                 </div>
-                 <div class="form-group floating-label">
+                <div class="form-floating mb-3">
+                    <textarea asp-for="GoogleAnalytics" class="form-control" style="height:200px;"></textarea>
                     <label asp-for="GoogleAnalytics"></label>
-                    <textarea asp-for="GoogleAnalytics" class="form-control" rows="4"></textarea>
                     <small asp-for="GoogleAnalytics"></small>
                 </div>
-               <hr class="mt-4 mb-4" />
+                <hr class="mt-4 mb-4" />
                 <h6 class="mb-3">SEO Page Fallbacks</h6>
-                <div class="form-group floating-label">
-                    <label asp-for="Title"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Title" class="form-control" />
+                    <label asp-for="Title"></label>
                     <small asp-for="Title"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Description"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Description" class="form-control" />
+                    <label asp-for="Description"></label>
                     <small asp-for="Description"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Keywords"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Keywords" class="form-control" />
+                    <label asp-for="Keywords"></label>
                     <small asp-for="Keywords"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="CanonicalUrl"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="CanonicalUrl" class="form-control" />
+                    <label asp-for="CanonicalUrl"></label>
                     <small asp-for="CanonicalUrl"></small>
                 </div>
                 <hr class="mt-4 mb-4" />
                 <h6 class="mb-3">Other General Metas</h6>
-                <div class="form-group floating-label">
-                    <label asp-for="Publisher"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Publisher" class="form-control" />
+                    <label asp-for="Publisher"></label>
                     <small asp-for="Publisher"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="FacebookAppId"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="FacebookAppId" class="form-control" />
+                    <label asp-for="FacebookAppId"></label>
                     <small asp-for="FacebookAppId"></small>
                 </div>
             </div>
@@ -123,46 +123,46 @@
                 </alert>
                 <hr class="mt-4 mb-4" />
                 <h6 class="mb-3">Home Page</h6>
-                <div class="form-group floating-label">
-                    <label asp-for="Home.Title"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Home.Title" class="form-control" />
+                    <label asp-for="Home.Title"></label>
                     <small asp-for="Home.Title"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Home.Description"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Home.Description" class="form-control" />
+                    <label asp-for="Home.Description"></label>
                     <small asp-for="Home.Description"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Home.Keywords"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Home.Keywords" class="form-control" />
+                    <label asp-for="Home.Keywords"></label>
                     <small asp-for="Home.Keywords"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Home.CanonicalUrl"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Home.CanonicalUrl" class="form-control" />
+                    <label asp-for="Home.CanonicalUrl"></label>
                     <small asp-for="Home.CanonicalUrl"></small>
                 </div>
                 <hr class="mt-4 mb-4" />
                 <h6 class="mb-3">Contact Page</h6>
-                <div class="form-group floating-label">
-                    <label asp-for="Contact.Title"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Contact.Title" class="form-control" />
+                    <label asp-for="Contact.Title"></label>
                     <small asp-for="Contact.Title"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Contact.Description"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Contact.Description" class="form-control" />
+                    <label asp-for="Contact.Description"></label>
                     <small asp-for="Contact.Description"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Contact.Keywords"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Contact.Keywords" class="form-control" />
+                    <label asp-for="Contact.Keywords"></label>
                     <small asp-for="Contact.Keywords"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Contact.CanonicalUrl"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Contact.CanonicalUrl" class="form-control" />
+                    <label asp-for="Contact.CanonicalUrl"></label>
                     <small asp-for="Contact.CanonicalUrl"></small>
                 </div>
             </div>
@@ -178,44 +178,44 @@
                     </ul>
                 </alert>
                 <hr class="mt-4 mb-4" />
-                <div class="form-group floating-label">
-                    <label asp-for="Twitter"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Twitter" class="form-control" />
+                    <label asp-for="Twitter"></label>
                     <small asp-for="Twitter"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="TwitterHandle"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="TwitterHandle" class="form-control" />
+                    <label asp-for="TwitterHandle"></label>
                     <small asp-for="TwitterHandle"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Facebook"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Facebook" class="form-control" />
+                    <label asp-for="Facebook"></label>
                     <small asp-for="Facebook"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="LinkedIn"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="LinkedIn" class="form-control" />
+                    <label asp-for="LinkedIn"></label>
                     <small asp-for="LinkedIn"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="TripAdvisor"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="TripAdvisor" class="form-control" />
+                    <label asp-for="TripAdvisor"></label>
                     <small asp-for="TripAdvisor"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Instagram"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Instagram" class="form-control" />
+                    <label asp-for="Instagram"></label>
                     <small asp-for="Instagram"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="Pinterest"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="Pinterest" class="form-control" />
+                    <label asp-for="Pinterest"></label>
                     <small asp-for="Pinterest"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="GitHub"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="GitHub" class="form-control" />
+                    <label asp-for="GitHub"></label>
                     <small asp-for="GitHub"></small>
                 </div>
             </div>
@@ -231,26 +231,26 @@
                     </ul>
                 </alert>
                 <hr class="mt-4 mb-4" />
-                <div class="form-group floating-label">
-                    <label asp-for="OgTitle"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="OgTitle" class="form-control" />
+                    <label asp-for="OgTitle"></label>
                     <small asp-for="OgTitle"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="OgDescription"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="OgDescription" class="form-control" />
+                    <label asp-for="OgDescription"></label>
                     <small asp-for="OgDescription"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="OgAuthor"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="OgAuthor" class="form-control" />
+                    <label asp-for="OgAuthor"></label>
                     <small asp-for="OgAuthor"></small>
                 </div>
                 <mediaSelect asp-for="OgImageUrl"></mediaSelect>
                 <mediaSelect asp-for="OgSecureImageUrl"></mediaSelect>
-                <div class="form-group floating-label">
-                    <label asp-for="OgLocale"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="OgLocale" class="form-control" />
+                    <label asp-for="OgLocale"></label>
                     <small asp-for="OgLocale"></small>
                 </div>
                 <input type="hidden" asp-for="OgUrl" class="form-control">
@@ -269,25 +269,25 @@
                         </li>
                     </ul>
                 </alert>
-                <div class="form-group floating-label">
-                    <label asp-for="TwitterCardTitle"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="TwitterCardTitle" class="form-control" />
+                    <label asp-for="TwitterCardTitle"></label>
                     <small asp-for="TwitterCardTitle"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="TwitterCardDescription"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="TwitterCardDescription" class="form-control" />
+                    <label asp-for="TwitterCardDescription"></label>
                     <small asp-for="TwitterCardDescription"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="TwitterCardCreator"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="TwitterCardCreator" class="form-control" />
+                    <label asp-for="TwitterCardCreator"></label>
                     <small asp-for="TwitterCardCreator"></small>
                 </div>
                 <mediaSelect asp-for="TwitterCardImageUrl"></mediaSelect>
-                <div class="form-group floating-label">
-                    <label asp-for="TwitterCardSite"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="TwitterCardSite" class="form-control" />
+                    <label asp-for="TwitterCardSite"></label>
                     <small asp-for="TwitterCardSite"></small>
                 </div>
             </div>

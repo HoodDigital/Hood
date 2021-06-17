@@ -33,9 +33,3 @@
         <partial name="_Editor_SEO" />
     </div>
 }
-@if (Model.Metadata.Where(c => c.Name.StartsWith("Settings.Security.")).Count() > 0)
-{
-    <div id="security" class="tab-pane" role="tabpanel" aria-labelledby="security-tab">
-        <partial name="_Editor_Security" />
-    </div>
-}

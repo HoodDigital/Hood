@@ -39,15 +39,10 @@
 <div class="card">
     <div class="card-header">
         <div class="row align-items-center">
-            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs" data-hood-tabs="@($"tabs-settings-media")">
                 <li class="nav-item">
-                    <a class="nav-link active" id="mail-tab" data-toggle="tab" href="#mail" role="tab" aria-controls="mail" aria-selected="true">
+                    <a class="nav-link active" id="mail-tab" data-bs-toggle="tab" href="#mail" role="tab" aria-controls="mail" aria-selected="true">
                         Azure Storage
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="image-tab" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="true">
-                        Images
                     </a>
                 </li>
             </ul>
@@ -56,33 +51,32 @@
     <div class="card-body p-4">
         <div class="tab-content">
             <div id="mail" class="tab-pane active" role="tabpanel" aria-labelledby="mail-tab">
-                <div class="form-group floating-label">
-                    <label asp-for="AzureKey"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="AzureKey" type="text" class="form-control" />
+                    <label asp-for="AzureKey"></label>
                     <small asp-for="AzureKey"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="AzureHost"></label>
+                <div class="form-floating mb-3">
                     <input asp-for="AzureHost" type="text" class="form-control" />
+                    <label asp-for="AzureHost"></label>
                     <small asp-for="AzureHost"></small>
                 </div>
-                <div class="form-group floating-label">
-                    <label asp-for="AzureScheme"></label>
-                    <select asp-for="AzureScheme" class="form-control">
+                <div class="form-floating mb-3">
+                    <select asp-for="AzureScheme" class="form-select">
                         <option value="https">HTTPS (Secure)</option>
                         <option value="http">HTTP (Insecure)</option>
                     </select>
+                    <label asp-for="AzureScheme"></label>
                     <small asp-for="AzureScheme"></small>
                 </div>
-                <div class="form-group floating-label">
+                <div class="form-floating mb-3">
                     <input asp-for="ContainerName" type="text" class="form-control" />
+                    <label asp-for="ContainerName"></label>
                     <small asp-for="ContainerName"></small>
                 </div>
-                </div>
-                        <div id="image" class="tab-pane" role="tabpanel" aria-labelledby="image-tab">
-                <mediaSelect asp-for="NoImage"></mediaSelect>
-                <mediaSelect asp-for="NoProfileImage" asp-></mediaSelect>
-        </div>
+                <div media-select="NoImage" media-fit="cover"></div>
+                <div media-select="NoProfileImage" media-fit="cover"></div>
+            </div>
         </div>
     </div>
 </div>

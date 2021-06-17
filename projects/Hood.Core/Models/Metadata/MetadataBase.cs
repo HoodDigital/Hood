@@ -57,7 +57,7 @@ namespace Hood.Models
                     }
                     else
                     {
-                        BaseValue = JsonConvert.SerializeObject(DateTime.Now);
+                        BaseValue = JsonConvert.SerializeObject(DateTime.UtcNow);
                     }
                     break;
                 case "System.Int32":

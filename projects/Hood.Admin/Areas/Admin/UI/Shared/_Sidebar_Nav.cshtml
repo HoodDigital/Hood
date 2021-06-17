@@ -6,13 +6,13 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" asp-action="Index" asp-controller="Home" asp-area="Admin">
-                <i class="fe fe-home"></i>
+                <i class="fa fa-home"></i>
                 Home
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link dropdown collapsed" href="#sidebar-content" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-content">
-                <i class="fas fa-pen-fancy"></i>
+            <a class="nav-link dropdown collapsed" href="#sidebar-content" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-content">
+                <i class="fa fa-pen-fancy"></i>
                 Content
             </a>
             <div class="collapse" id="sidebar-content">
@@ -70,7 +70,7 @@
             <h4>Import/Export</h4>
         </li>
         <li class="nav-item">
-            <a class="nav-link dropdown collapsed" href="#sidebar-import" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-import">
+            <a class="nav-link dropdown collapsed" href="#sidebar-import" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-import">
                 <i class="fa fa-building"></i>
                 Property
             </a>
@@ -134,7 +134,7 @@
             </li>
         }
         <li class="nav-item">
-            <a class="nav-link dropdown collapsed" href="#sidebar-settings" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-settings">
+            <a class="nav-link dropdown collapsed" href="#sidebar-settings" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebar-settings">
                 <i class="fa fa-wrench"></i>Advanced Settings
             </a>
             <div class="collapse" id="sidebar-settings">
@@ -169,8 +169,8 @@
                     @if (User.IsAdminOrBetter())
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-action="Content" asp-controller="Settings" asp-route-area="Admin">
-                                <i class="fa fa-tag"></i>Content Settings
+                            <a class="nav-link" asp-action="Index" asp-controller="ContentType" asp-route-area="Admin">
+                                <i class="fa fa-tag"></i>Content Types
                             </a>
                         </li>
                     }

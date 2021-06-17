@@ -1,4 +1,5 @@
-﻿using Hood.Core;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
@@ -7,8 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -20,7 +19,6 @@ namespace Hood.Services
 {
     public class MediaManager : IMediaManager
     {
-        private CloudStorageAccount _storageAccount;
         private MediaSettings _mediaSettings;
         private string _container;
         private string _key;
@@ -31,39 +29,41 @@ namespace Hood.Services
         {
             _env = env;
             _config = config;
-            Initialise();
         }
 
-        private void CheckStorage()
-        {
-            Initialise();
-            if (_storageAccount == null)
-            {
-                throw new Exception("Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and add a valid Azure Storage Key.");
-            }
-        }
-
-        private void Initialise()
+        private async Task<BlobContainerClient> GetClientAsync()
         {
             if (_mediaSettings == null)
             {
-                DbContextOptionsBuilder<HoodDbContext> options = new DbContextOptionsBuilder<HoodDbContext>();
+                DbContextOptionsBuilder<HoodDbContext> options = new();
                 options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-                var db = new HoodDbContext(options.Options);
-                var msOption = db.Options.SingleOrDefault(o => o.Id == typeof(MediaSettings).ToString());
-                _mediaSettings = JsonConvert.DeserializeObject<MediaSettings>(msOption.Value);                
+                HoodDbContext db = new(options.Options);
+                Option option = db.Options.SingleOrDefault(o => o.Id == typeof(MediaSettings).ToString());
+                _mediaSettings = JsonConvert.DeserializeObject<MediaSettings>(option.Value);
             }
 
             _container = _mediaSettings.ContainerName.ToSeoUrl();
+            if (!_container.IsSet())
+            {
+                throw new Exception("Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and ensure you have set a storage connection string.");
+            }
+
             _key = _mediaSettings.AzureKey;
-            try
+            if (!_key.IsSet())
             {
-                _storageAccount = CloudStorageAccount.Parse(_key);
+                throw new Exception("Storage account is not set up, please go to your administration panel, and visit Settings > Media Settings, and ensure you have set a valid container name.");
             }
-            catch (Exception)
+
+            BlobContainerClient blobContainerClient = new(_key, _container);
+
+            if (!await blobContainerClient.ExistsAsync())
             {
-                _storageAccount = null;
+                await blobContainerClient.CreateIfNotExistsAsync();
+                await blobContainerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
             }
+
+            return blobContainerClient;
+
         }
 
         #region "Helpers"
@@ -106,10 +106,8 @@ namespace Hood.Services
 
         public async Task<bool> Exists(string blobReference)
         {
-            CheckStorage();
-            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(_container);
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(blobReference);
+            BlobContainerClient client = await GetClientAsync();
+            BlockBlobClient blockBlob = client.GetBlockBlobClient(blobReference);
             try
             {
                 return await blockBlob.ExistsAsync();
@@ -120,6 +118,7 @@ namespace Hood.Services
             }
         }
 
+
         public async Task<bool> Exists(string directory, string filename)
         {
             return await Exists(GetBlobReference(directory, filename));
@@ -127,10 +126,8 @@ namespace Hood.Services
 
         public async Task<bool> Delete(string blobReference)
         {
-            CheckStorage();
-            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(_container);
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(blobReference);
+            BlobContainerClient client = await GetClientAsync();
+            BlockBlobClient blockBlob = client.GetBlockBlobClient(blobReference);
             return await blockBlob.DeleteIfExistsAsync();
         }
         public async Task<bool> Delete(string directory, string filename)
@@ -142,7 +139,7 @@ namespace Hood.Services
             // if there is an old file
             if (string.IsNullOrEmpty(blobReference))
             {
-                throw new ArgumentNullException("blobReference");
+                throw new ArgumentNullException(nameof(blobReference));
             }
 
             // check if it is a full url - if so strip the bollocks.
@@ -156,39 +153,27 @@ namespace Hood.Services
             return await Delete(blobReference);
         }
 
-        public async Task<CloudBlockBlob> GetBlob(string blobReference)
+        public async Task<BlockBlobClient> GetBlob(string blobReference)
         {
-            CheckStorage();
-            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(_container);
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(blobReference);
+            BlobContainerClient client = await GetClientAsync();
+            BlockBlobClient blockBlob = client.GetBlockBlobClient(blobReference);
             if (await blockBlob.ExistsAsync())
             {
                 return blockBlob;
             }
             return null;
         }
-        public async Task<CloudBlockBlob> GetBlob(string directory, string filename)
+
+        public async Task<BlockBlobClient> GetBlob(string directory, string filename)
         {
             return await GetBlob(GetBlobReference(directory, filename));
         }
 
-        public async Task<CloudBlockBlob> Upload(Stream stream, string blobReference)
+        public async Task<BlockBlobClient> Upload(Stream stream, string blobReference)
         {
-            CheckStorage();
-            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(_container);
-
-            // If container doesn’t exist, create it.
-            await blobContainer.CreateIfNotExistsAsync();
-            await blobContainer.SetPermissionsAsync(new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Blob
-            });
-
-            // Get a reference to the blob named blobReference
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(blobReference);
-            await blockBlob.UploadFromStreamAsync(stream);
+            BlobContainerClient client = await GetClientAsync();
+            BlockBlobClient blockBlob = client.GetBlockBlobClient(blobReference);
+            await blockBlob.UploadAsync(stream);
             return blockBlob;
         }
 
@@ -199,7 +184,7 @@ namespace Hood.Services
                 Filename = file.GetFilename(),
                 BlobReference = GetBlobReference(directoryPath, await GetSafeFilename(directoryPath, file.GetFilename())),
                 UniqueId = Guid.NewGuid().ToString(),
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 FileSize = file.Length,
                 FileType = file.ContentType,
                 Path = directoryPath
@@ -207,10 +192,10 @@ namespace Hood.Services
             media.GenericFileType = media.FileType.ToFileType();
 
             // Upload the media, filename as the name, check it doesn't already exist first.
-            CloudBlockBlob uploadResult = await Upload(file.OpenReadStream(), media.BlobReference);
+            BlockBlobClient uploadResult = await Upload(file.OpenReadStream(), media.BlobReference);
 
             // Attach to the entity
-            media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
+            media.Url = uploadResult.Uri.AbsoluteUri;
 
             // Process type, size etc.
 
@@ -234,13 +219,13 @@ namespace Hood.Services
             };
 
             // Upload the media, filename as the name, check it doesn't already exist first.
-            CloudBlockBlob uploadResult = await Upload(file, media.BlobReference);
+            BlockBlobClient uploadResult = await Upload(file, media.BlobReference);
 
             // Attach to the entity
-            media.Url = uploadResult.StorageUri.PrimaryUri.ToUrlString();
+            media.Url = uploadResult.Uri.AbsoluteUri;
 
             // Process type, size etc.
-            media.CreatedOn = DateTime.Now;
+            media.CreatedOn = DateTime.UtcNow;
             media.FileSize = file.Length;
             media.FileType = filetype;
             media.GenericFileType = filetype.ToFileType();
@@ -256,45 +241,46 @@ namespace Hood.Services
             return media;
         }
 
-        public async Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read)
-        {
-            string sasBlobToken;
+        #warning Todo: Redo the Upload to shared access/ download via shared access on media service.  
 
-            // Upload the media, filename as the name, check it doesn't already exist first.
-            CheckStorage();
-            CloudBlobClient blobClient = _storageAccount.CreateCloudBlobClient();
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference(_container + "-secure");
+        //public async Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read)
+        //{
+        //    string sasBlobToken;
 
-            // If container doesn’t exist, create it.
-            await blobContainer.CreateIfNotExistsAsync();
-            await blobContainer.SetPermissionsAsync(new BlobContainerPermissions
-            {
-                PublicAccess = BlobContainerPublicAccessType.Off
-            });
+        //    // Upload the media, filename as the name, check it doesn't already exist first.
+        //    var client = await GetClientAsync();
+        //    var blockBlob = client.GetBlockBlobClient(blobReference);
 
-            // Get a reference to the blob named blobReference
-            CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(filename);
-            await blockBlob.UploadFromStreamAsync(file);
+        //    // If container doesn’t exist, create it.
+        //    await blobContainer.CreateIfNotExistsAsync();
+        //    await blobContainer.SetPermissionsAsync(new BlobContainerPermissions
+        //    {
+        //        PublicAccess = BlobContainerPublicAccessType.Off
+        //    });
 
-            // Create a new access policy and define its constraints.
-            // Note that the SharedAccessBlobPolicy class is used both to define the parameters of an ad-hoc SAS, and
-            // to construct a shared access policy that is saved to the container's shared access policies.
-            SharedAccessBlobPolicy adHocSAS = new SharedAccessBlobPolicy()
-            {
-                // When the start time for the SAS is omitted, the start time is assumed to be the time when the storage service receives the request.
-                // Omitting the start time for a SAS that is effective immediately helps to avoid clock skew.
-                SharedAccessExpiryTime = expiry ?? DateTime.UtcNow.AddHours(24),
-                Permissions = permissions
-            };
+        //    // Get a reference to the blob named blobReference
+        //    CloudBlockBlob blockBlob = blobContainer.GetBlockBlobReference(filename);
+        //    await blockBlob.UploadFromStreamAsync(file);
 
-            // Generate the shared access signature on the blob, setting the constraints directly on the signature.
-            sasBlobToken = blockBlob.GetSharedAccessSignature(adHocSAS);
+        //    // Create a new access policy and define its constraints.
+        //    // Note that the SharedAccessBlobPolicy class is used both to define the parameters of an ad-hoc SAS, and
+        //    // to construct a shared access policy that is saved to the container's shared access policies.
+        //    SharedAccessBlobPolicy adHocSAS = new SharedAccessBlobPolicy()
+        //    {
+        //        // When the start time for the SAS is omitted, the start time is assumed to be the time when the storage service receives the request.
+        //        // Omitting the start time for a SAS that is effective immediately helps to avoid clock skew.
+        //        SharedAccessExpiryTime = expiry ?? DateTime.UtcNow.AddHours(24),
+        //        Permissions = permissions
+        //    };
 
-            Console.WriteLine("SAS for blob (ad hoc): {0}", sasBlobToken);
-            Console.WriteLine();
+        //    // Generate the shared access signature on the blob, setting the constraints directly on the signature.
+        //    sasBlobToken = blockBlob.GetSharedAccessSignature(adHocSAS);
 
-            return blockBlob.Uri + sasBlobToken;
-        }
+        //    Console.WriteLine("SAS for blob (ad hoc): {0}", sasBlobToken);
+        //    Console.WriteLine();
+
+        //    return blockBlob.Uri + sasBlobToken;
+        //}
 
 
 
@@ -310,10 +296,12 @@ namespace Hood.Services
             // create three thumbnailed versions, and add to the array of files to upload.
 
             if (!Directory.Exists(tempDir))
+            {
                 Directory.CreateDirectory(tempDir);
+            }
 
             // download the file.
-            using (var client = new WebClient())
+            using (WebClient client = new())
             {
                 client.DownloadFile(media.Url, tempFileName);
             }
@@ -361,7 +349,7 @@ namespace Hood.Services
                 // foreach, file in the list of thumbnails
                 // upload to the thumbLocation
                 string url = "";
-                using (var fs = File.OpenRead(tempThumbFile))
+                using (FileStream fs = File.OpenRead(tempThumbFile))
                 {
                     url = Upload(fs, thumbFilename).Result.Uri.ToUrlString();
                 }
@@ -395,12 +383,12 @@ namespace Hood.Services
         public async Task<IMediaObject> RefreshMedia(IMediaObject media, string tempDirectory)
         {
             // copy record of original files into new object
-            MediaObject old = new MediaObject();
+            MediaObject old = new();
             media.CopyProperties(old);
 
             // download the orignal file, and save it to temp.
             string tempFile = tempDirectory + media.UniqueId;
-            using (WebClient client = new WebClient())
+            using (WebClient client = new())
             {
                 client.DownloadFile(new Uri(media.Url), tempFile);
             }

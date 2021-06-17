@@ -1,0 +1,27 @@
+div.title {
+    position: relative;
+    padding-bottom: $grid-gutter-width / 2;
+    margin-bottom: $grid-gutter-width / 2;
+    border: 0;
+    border-bottom: 1px solid $gray-200;
+
+    @media (min-width: 768px) {
+        padding-bottom: $grid-gutter-width;
+        margin-bottom: $grid-gutter-width;
+    }
+
+    ul.dropdown-menu {
+        right: 0;
+        left: auto;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        text-shadow: rgba(0, 0, 0, .01) 0 0 1px;
+        letter-spacing: -.05rem;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+}

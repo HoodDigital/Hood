@@ -28,7 +28,7 @@ namespace Hood.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            output.TagName = "figure";
+            output.TagName = "div";
             output.TagMode = TagMode.StartTagAndEndTag;
 
             string styleValue = "";

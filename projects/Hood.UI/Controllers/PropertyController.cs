@@ -42,6 +42,14 @@ namespace Hood.Controllers
             return View(viewName, model);
         }
 
+        [Route("{slug:propertySlug}/map")]
+        public async Task<IActionResult> Map(PropertyListModel model)
+        {
+            var locations = await _property.GetLocationsAsync(model);
+            return View("_Map_Properties", locations);
+        }
+
+
         [Route("{slug:propertySlug}/{id:int}/{city?}/{postcode?}/{title?}")]
         public virtual async Task<IActionResult> Show(int id)
         {

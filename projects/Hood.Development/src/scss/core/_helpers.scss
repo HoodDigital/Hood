@@ -1,0 +1,47 @@
+@each $color, $value in $colors {
+    .bg-#{$color} {
+        background-color: $value !important;
+    }
+
+    a.bg-#{$color},
+    button.bg-#{$color} {
+        &:hover {
+            background-color: darken($value, 10%) !important;
+        }
+    }
+}
+@each $color, $value in $colors {
+    .badge-#{$color} {
+        background-color: $value;
+    }
+}
+
+.tiny-mce-body {
+    padding: 15px;
+}
+
+.no-wrap {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.word-wrap,
+.pre-line,
+.user-text {
+    white-space: pre-line;
+}
+
+a.full-box-link {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    overflow: hidden;
+    text-indent: -10000px;
+    cursor: pointer;
+}

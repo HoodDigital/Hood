@@ -1,0 +1,39 @@
+@model ContentModel
+@{
+    string title = Model.ContentType.MetaTitle.IsSet() ? Model.ContentType.MetaTitle : Model.ContentType.Title;
+    ViewData["Title"] = title;
+    var Feed = "_Feed";
+
+    @switch (Model.ContentType.BaseName)
+    {
+        case "Custom":
+            Feed = $"_Feed_{Model.ContentType.TypeName}";
+            Layout = $"_Layout_{Model.ContentType.TypeName}";
+            break;
+        default:
+            Feed = $"_Feed_{Model.ContentType.BaseName}";
+            Layout = $"_Layout_{Model.ContentType.BaseName}";
+            break;
+    }
+
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+    string url = Context.GetSiteUrl(true, true);
+    if (_seoSettings.CanonicalUrl.IsSet())
+    {
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+    }
+
+}
+@section metas {
+    <meta name="description" content="@Model.ContentType.Description" />
+    <meta property="og:author" content="@_seoSettings.OgAuthor" />
+    <meta property="og:title" content="@title" />
+    <meta property="og:image" content="@_seoSettings.OgImageUrl" />
+    <meta property="og:image:secure_url" content="@_seoSettings.OgSecureImageUrl" />
+    <meta property="og:description" content="@Model.ContentType.Description" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:description" content="@Model.ContentType.Description" />
+    <meta name="twitter:image" content="@_seoSettings.TwitterCardImageUrl" />
+}
+<partial name="@Feed" />

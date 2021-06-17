@@ -153,7 +153,7 @@ namespace Hood.Services
         {
             var logger = Hood.Core.Engine.Services.Resolve<ILogService>();
             var logWriter = new System.IO.StringWriter();
-            logWriter.WriteLine($"Bundle errors from {e.Result.FileName} - {DateTime.Now.ToDisplay()}");
+            logWriter.WriteLine($"Bundle errors from {e.Result.FileName} - {DateTime.UtcNow.ToDisplay()}");
             foreach (var error in e.Result.Errors)
             {
                 logWriter.WriteLine($"Line {error.LineNumber} and column {error.ColumnNumber}: {error.Message}");

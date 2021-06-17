@@ -89,7 +89,7 @@ namespace Hood.Services
                     Type = type,
                     Source = source,
                     Detail = detail,
-                    Time = DateTime.Now,
+                    Time = DateTime.UtcNow,
                     Title = message,
                     UserId = userId,
                     SourceUrl = url

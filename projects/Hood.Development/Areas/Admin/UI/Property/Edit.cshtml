@@ -4,7 +4,7 @@
 }
 @section buttons {
     <a href="javascript:document.getElementById('property-edit-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save</a>
-    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-outline-dark" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fa fa-ellipsis-h"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right">
@@ -17,7 +17,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item" aria-current="page"><a href="/admin">Home</a></li>
-            <li class="breadcrumb-item" aria-current="page"><a asp-action="Index" asp-controller="Property" asp-route-area="Admin"><i class="fa fa-building mr-1"></i>All Properties</a></li>
+            <li class="breadcrumb-item" aria-current="page"><a asp-action="Index" asp-controller="Property" asp-route-area="Admin"><i class="fa fa-building me-2"></i>All Properties</a></li>
             <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
         </ol>
     </nav>

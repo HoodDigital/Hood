@@ -18,99 +18,88 @@ else
 }
 <div class="card mb-3 d-none d-md-block">
     <div class="card-body p-2">
-        <i class="fa fa-folder-open mr-2 text-warning"></i>
-        @_directoryManager.GetBreadcrumb(Model)
+        <div class="d-flex align-items-center">
+            <div div class="flex-fill">
+                <i class="fa fa-folder-open mx-2 text-warning"></i>
+                @_directoryManager.GetBreadcrumb(Model)
+            </div>
+            <div>
+                @if (Model.DirectoryId.HasValue)
+                {
+                    <a class="btn btn-outline-danger btn-sm media-delete-directory" asp-action="DeleteDirectory" asp-route-id="@Model.DirectoryId" title="Delete directory">
+                        <i class="fa fa-trash me-1"></i> Directory
+                    </a>
+                }
+                <a class="btn btn-outline-success btn-sm media-create-directory" asp-action="CreateDirectory" title="Create directory">
+                    <i class="fa fa-plus-circle me-1"></i> Directory
+                </a>
+                <a class="btn btn-success btn-sm" id="media-add">
+                    <i class="fa fa-plus-circle me-1"></i>
+                    <span>Upload files...</span>
+                </a>
+
+            </div>
+        </div>
     </div>
 </div>
-<div class="card-deck card-deck-5">
+<div id="media-upload" class="media-upload text-center" data-url="@Url.Action("UploadToDirectory")"></div>
+<div id="media-progress" class="card p-3 mb-3 collapse"></div>
+<form class="inline" data-target="#media-list">
+<partial name="_Media_Filters" />
+    </form>
+
+<div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 g-1">
     @foreach (var dir in rootDirs)
     {
         rootDirModel.DirectoryId = dir.Id;
         var link = rootDirModel.GetPageUrl(rootDirModel.PageIndex);
         var href = $"{Context.Request.Path}{link}";
-        <div class="card text-center hover">
-            <div class="card-body text-center">
-                <i class="fa fa-3x fa-folder-open mr-2 text-warning"></i>
-            </div>
-            <div class="card-footer p-1">
-                <p class="m-0 font-weight-bold text-truncate">
-                    @dir.DisplayName
-                </p>
-                <a class="full-box-link hood-inline-list-target" data-target="#media-list" href="@href">@dir.DisplayName</a>
+        <div class="col mb-3">
+            <div class="card media-directory-item text-center hover">
+                <div class="card-body text-center">
+                    <i class="fa fa-3x fa-folder-open me-2 text-warning"></i>
+                </div>
+                <div class="card-footer p-1">
+                    <p class="m-0 font-weight-bold text-truncate">
+                        @if (dir.DisplayName.IsSet())
+                        {
+                            @dir.DisplayName
+                        }
+                        else
+                        {
+                            <span>Untitled</span>
+                        }
+                    </p>
+                    <a class="full-box-link hood-inline-list-target" data-target="#media-list" href="@href">@dir.DisplayName</a>
+                </div>
             </div>
         </div>
     }
 </div>
 @if (Model.TotalCount > 0)
 {
-    <div class="card-deck card-deck-5">
+    <div class="mb-3"><partial name="_Pagination" /></div>
+    <div class="row row-cols-2 row-cols-lg-4 row-cols-xl-6 g-1 mb-3">
         @foreach (var media in Model.List)
         {
-            var attachUrl = Url.Action("Attach", new { media = media.Id, tag = Model.Tag, id = Model.Id, entity = Model.Entity, field = Model.Field });
-            <div class="card text-center hover">
-                @switch (Model.Action)
-                {
-                    case MediaWindowAction.Select:
-                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top media-select" data-tag="@Model.Tag" data-url="@media.Url" />
-                        break;
-                    case MediaWindowAction.Insert:
-                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top media-insert" data-url="@media.Url" />
-                        break;
-                    case MediaWindowAction.Attach:
-                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top media-attach" data-url="@attachUrl" />
-                        break;
-                    default:
-                        <fixedImage src="@media.Icon" class="img img-full img-wide card-img-top" />
-                        break;
-                }
-                <div class="card-body p-1">
-                    <p class="m-0 font-weight-bold text-truncate">
-                        @media.Filename
-                    </p>
-                    <p>
-                        <small>@media.FormattedSize</small>
-                    </p>
-                    @switch (Model.Action)
-                    {
-                        case MediaWindowAction.Select:
-                            <p>
-                                <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.SmallUrl" href="javascript:void(0);">
-                                    Small
-                                </a>
-                                <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.MediumUrl" href="javascript:void(0);">
-                                    Medium
-                                </a>
-                                <a class="media-select btn btn-sm btn-outline-dark" data-tag="@Model.Tag" data-url="@media.LargeUrl" href="javascript:void(0);">
-                                    Large
-                                </a>
-                            </p>
-                            break;
-                        case MediaWindowAction.Insert:
-                            <p>
-                                <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.SmallUrl" data-title="@media.Filename" href="javascript:void(0);">
-                                    Small
-                                </a>
-                                <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.MediumUrl" data-title="@media.Filename" href="javascript:void(0);">
-                                    Medium
-                                </a>
-                                <a class="media-insert btn btn-sm btn-outline-dark" data-url="@media.LargeUrl" data-title="@media.Filename" href="javascript:void(0);">
-                                    Large
-                                </a>
-                            </p>
-                            break;
-                        case MediaWindowAction.Attach:
-                            <p class="no-margin">
-                                <a class="media-insert btn btn-sm btn-outline-success" data-url="@attachUrl">
-                                    <i class="fa fa-link mr-2"></i>
-                                    Attach
-                                </a>
-                            </p>
-                            break;
-                        default:
-                            <a class="full-box-link hood-modal" asp-action="Blade" asp-route-id="@media.Id" data-complete="$.hood.Media.BladeLoaded">@media.Filename</a>
-                            break;
-                    }
-
+            var contract = new Newtonsoft.Json.Serialization.DefaultContractResolver()
+            {
+                NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy()
+            };
+            <div class="col">
+                <div class="card media-item text-center hover">
+                    <fixedImage src="@media.Icon" class="img img-full img-wide m-0 card-img-top" />
+                    <div class="card-body p-1">
+                        <div class="fw-bold small text-truncate">
+                            @media.Filename
+                        </div>
+                        <div class="text-muted">
+                            @media.FormattedSize
+                        </div>
+                    </div>
+                    <a class="full-box-link media-item" data-id="@media.Id"
+                         data-blade="@Url.Action("Blade", new { id = media.Id })"
+                         data-json="@Newtonsoft.Json.JsonConvert.SerializeObject(media, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = contract })"></a>
                 </div>
             </div>
         }

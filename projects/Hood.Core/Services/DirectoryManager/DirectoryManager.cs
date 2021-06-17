@@ -152,14 +152,15 @@ namespace Hood.Services
             {
                 linkModel.DirectoryId = directory.Id;
                 link = linkModel.GetPageUrl(linkModel.PageIndex);
-                links.Add($"<a class=\"hood-inline-list-target\" data-target=\"{targetListDOMObject}\" href=\"{baseUrl}{link}\">{directory.DisplayName}</a>");
+                var linkTitle = directory.DisplayName.IsSet() ? directory.DisplayName : "Untitled";
+                links.Add($"<a class=\"hood-inline-list-target\" data-target=\"{targetListDOMObject}\" href=\"{baseUrl}{link}\">{linkTitle}</a>");
             }
             return FormatBreadcrumbLinks(links);
         }
 
         private static IHtmlContent FormatBreadcrumbLinks(List<string> links)
         {
-            string htmlOutput = string.Join(" <i class=\"fa fa-caret-right ml-2 mr-2\"></i> ", links.ToArray());
+            string htmlOutput = string.Join(" <i class=\"fa fa-caret-right mx-2\"></i> ", links.ToArray());
             HtmlString builder = new HtmlString(htmlOutput);
             return builder;
         }

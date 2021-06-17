@@ -1,0 +1,37 @@
+@{
+    BasicSettings _basicSettings  = Engine.Settings.Basic;
+    IntegrationSettings _plugins = Engine.Settings.Integrations;
+    Layout = "_Layout";
+    Content currentContent = ViewData["Content"] as Content;
+}
+@section styles {
+    @RenderSection("styles", required: false)
+}
+@section metas {
+    @RenderSection("metas", required: false)
+}
+<fixedImage src="https://source.unsplash.com/random" style="min-height:70vh;" class="d-flex align-items-center justify-content-center text-center darkened">
+    <div class="container position-relative">
+        <div class="px-0">
+            <h1 class="display-4 text-white">
+                @if (ViewData.ContainsKey("PageTitle")) 
+                {
+                    @ViewData["PageTitle"]
+                }
+                else
+                {
+                    @ViewData["Title"]
+                }
+            </h1>
+            <p class="lead my-3 text-white">@Html.Raw(ViewData["SubTitle"])</p>
+        </div>
+    </div>
+</fixedImage>
+<div class="py-5 mx-auto" style="max-width:500px">
+    <partial name="_ContactForm" model="new ContactFormModel(true, true)" />
+</div>
+@if (_plugins.EnableGoogleMaps && _plugins.GoogleMapsApiKey.IsSet() && _basicSettings.Address.IsGeoLocated())
+{
+    <div class="google-map vh-100" data-lat="@_basicSettings.Address?.Latitude" data-long="@_basicSettings.Address?.Longitude" data-marker="@Engine.Settings.Basic.FullTitle" data-zoom="12"></div>
+    <partial name="_Scripts_GoogleMaps" />
+}

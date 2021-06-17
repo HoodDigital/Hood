@@ -1,4 +1,5 @@
-﻿using Hood.Core;
+﻿using Hood.Attributes;
+using Hood.Core;
 using Hood.Entities;
 using Hood.Enums;
 using Hood.Extensions;
@@ -17,12 +18,16 @@ namespace Hood.Models
     {
         // Content
         [Required]
+        [FormUpdatable]
         public string Title { get; set; }
 
         [Required]
+        [FormUpdatable]
         public string Excerpt { get; set; }
+        [FormUpdatable]
         public string Body { get; set; }
 
+        [FormUpdatable]
         [Display(Name = "URL Slug", Description = "Do not start your url slug with reserved words as they will not reach this page.<br />These include: <strong>account, about, store, admin, api, services.</strong>")]
         public string Slug { get; set; }
         
@@ -31,8 +36,9 @@ namespace Hood.Models
         public int? ParentId { get; set; }
 
         // Dates
+        [FormUpdatable]
         [Display(Name = "Publish Date", Description = "The content will only appear on the site after this date, when set to published.")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddThh:mm}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime PublishDate { get; set; }
 
         // Content Type
@@ -41,11 +47,14 @@ namespace Hood.Models
         public ContentType Type { get; set; }
 
         // Publish Status
+        [FormUpdatable]
         public ContentStatus Status { get; set; }
 
         // Creator/Editor
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-ddTHH:mm}")]
         public DateTime LastEditedOn { get; set; }
         public string LastEditedBy { get; set; }
 
@@ -72,52 +81,14 @@ namespace Hood.Models
             }
         }
 
+        [FormUpdatable]
+        [Display(Name = "Protected", Description = "This will only be available to logged in users.")]
         public bool Public { get; set; }
 
-        [Display(Name = "Featured Content", Description = "This will appear in the 'featured' lists on the homepage and other areas of the site.")]
+        [FormUpdatable]
+        [Display(Name = "Featured Content", Description = "This will appear in the featured lists on which can be displayed in templates.")]
         public bool Featured { get; set; }
-
-        // MVVM Helpers
-        [NotMapped]
-        public string PublishDatePart
-        {
-            get
-            {
-                return PublishDate.ToShortDateString();
-            }
-            set
-            {
-                if (DateTime.TryParse(value, out DateTime dt))
-                {
-                    PublishDate = new DateTime(dt.Year, dt.Month, dt.Day, PublishDate.Hour, PublishDate.Minute, PublishDate.Second);
-                }
-            }
-        }
-        [NotMapped]
-        public int PublishHours
-        {
-            get
-            {
-                return PublishDate.Hour;
-            }
-            set
-            {
-                PublishDate = new DateTime(PublishDate.Year, PublishDate.Month, PublishDate.Day, value, PublishDate.Minute, PublishDate.Second);
-            }
-        }
-        [NotMapped]
-        public int PublishMinutes
-        {
-            get
-            {
-                return PublishDate.Minute;
-            }
-            set
-            {
-                PublishDate = new DateTime(PublishDate.Year, PublishDate.Month, PublishDate.Day, PublishDate.Hour, value, PublishDate.Second);
-            }
-        }
-        
+       
         // Formatted Members
         public string StatusString
         {
@@ -126,7 +97,7 @@ namespace Hood.Models
                 switch ((Enums.ContentStatus)Status)
                 {
                     case ContentStatus.Published:
-                        if (PublishDate > DateTime.Now)
+                        if (PublishDate > DateTime.UtcNow)
                             return "Will publish on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
                         else
                             return "Published on: " + PublishDate.ToShortDateString() + " at " + PublishDate.ToShortTimeString();
@@ -145,7 +116,7 @@ namespace Hood.Models
             get
             {
                 if (Status == ContentStatus.Published)
-                    return PublishDate > DateTime.Now;
+                    return PublishDate > DateTime.UtcNow;
                 else
                     return false;
             }
@@ -203,6 +174,7 @@ namespace Hood.Models
         [NotMapped]
         public IEnumerable<ContentCategory> AllowedCategories { get; set; }
         // Author 
+        [FormUpdatable]
         [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]
         public string AuthorId { get; set; }
         [Display(Name = "Author/Owner", Description = "The author or creator of this content.")]

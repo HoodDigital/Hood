@@ -1,59 +1,40 @@
 ﻿using Hood.Core;
 using Hood.Enums;
+using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System;
 using System.Threading.Tasks;
 
 namespace Hood.TagHelpers
 {
-    [HtmlTargetElement("mediaAttach")]
+    [HtmlTargetElement("a", Attributes = "media-attach")]
+    [HtmlTargetElement("button", Attributes = "media-attach")]
+    [HtmlTargetElement("div", Attributes = "media-attach")]
+    [HtmlTargetElement("img", Attributes = "media-attach")]
+    [HtmlTargetElement("input", Attributes = "media-attach")]
     public class MediaAttachTagHelper : TagHelper
     {
         /// <summary>
         /// The field which this editor is bound to.
         /// </summary>
-        [HtmlAttributeName("asp-for")]
+        [HtmlAttributeName("media-attach")]
         public ModelExpression For { get; set; }
-        /// <summary>
-        /// The json field which this editor is bound to.
-        /// </summary>
-        [HtmlAttributeName("asp-json")]
-        public ModelExpression Json { get; set; }
 
-        [HtmlAttributeName("asp-id")]
-        public string Id { get; set; }
+        [HtmlAttributeName("media-url")]
+        public string Url { get; set; }
 
-        [HtmlAttributeName("asp-entity")]
-        public string Entity { get; set; }
+        [HtmlAttributeName("media-list")]
+        public string List { get; set; }
 
-        /// <summary>
-        /// Default: form-control
-        /// </summary>
-        [HtmlAttributeName("asp-filetype")]
-        public GenericFileType FileType { get; set; } = GenericFileType.Image;
+        [HtmlAttributeName("media-refresh")]
+        public string Refresh { get; set; }
 
-        /// <summary>
-        /// Default: btn btn-sm btn-info mr-1
-        /// </summary>
-        [HtmlAttributeName("asp-attach-class")]
-        public string AttachButtonClass { get; set; } = "btn btn-sm btn-info mr-1";
-        /// <summary>
-        /// Default: btn btn-sm btn-info mr-1
-        /// </summary>
-        [HtmlAttributeName("asp-delete-class")]
-        public string DeleteButtonClass { get; set; } = "btn btn-sm btn-danger mr-1";
-
-        [HtmlAttributeName("asp-area")]
-        public string Area { get; set; } = "Admin";
-        [HtmlAttributeName("asp-controller")]
-        public string Controller { get; set; } = "Media";
-        [HtmlAttributeName("asp-action")]
-        public string Action { get; set; } = "Action";
-        [HtmlAttributeName("asp-clear")]
-        public string Clear { get; set; } = "Clear";
+        [HtmlAttributeName("media-types")]
+        public string Types { get; set; }
 
         /// <summary>
         /// ViewContext
@@ -63,35 +44,118 @@ namespace Hood.TagHelpers
         public ViewContext ViewContext { get; set; }
 
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            output.TagName = "span";
-            output.TagMode = TagMode.StartTagAndEndTag;
+            output.Attributes.Add("data-hood-media", "attach");
+            output.Attributes.Add("data-hood-media-url", Url);
+            output.Attributes.Add("data-hood-media-types", Types);
 
-            string contentTemplate = (await output.GetChildContentAsync()).GetContent();
-
-            var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
-            var attachUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action(Action, Controller, new
+            if (!List.IsSet())
             {
-                area = Area,
-                doAction = MediaWindowAction.Attach.ToString(),
-                entity = Entity,
-                field = For.Name,
-                id = Id,
-                fileType = FileType
-            });
-            var attachButton = $"<a class='{AttachButtonClass} hood-image-attach' data-url='{attachUrl}' data-tag='.{For.Name}' data-json='#{Json.Name}' href='javascript:void(0);'>{contentTemplate}</a>";
-            output.Content.SetHtmlContent(attachButton);
+                var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
+                List = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new{ area = "Admin" });
+            }
+            output.Attributes.Add("data-hood-media-list", List);
 
-            var clearUrl = _urlHelperFactory.GetUrlHelper(ViewContext).Action(Clear, Controller, new
+            if (Refresh.IsSet())
             {
-                area = Area,
-                entity = Entity,
-                field = For.Name,
-                id = Id
-            });
-            var clearButton = $"<a class='{DeleteButtonClass} hood-image-clear' data-url='{clearUrl}' data-tag='.{For.Name}' data-json='#{Json.Name}' href='javascript:void(0);'><i class='fa fa-trash'></i></a>";
-            output.PostContent.SetHtmlContent(clearButton);
+                output.Attributes.Add("data-hood-media-refresh", Refresh);
+            }
         }
     }
+
+    [HtmlTargetElement("div", Attributes = "media-select")]
+    public class MediaSelectTagHelper : TagHelper
+    {
+        /// <summary>
+        /// The field which this editor is bound to.
+        /// </summary>
+        [HtmlAttributeName("media-select")]
+        public ModelExpression For { get; set; }
+
+        [HtmlAttributeName("media-url")]
+        public string Url { get; set; }
+
+        [HtmlAttributeName("media-list")]
+        public string List { get; set; }
+
+        [HtmlAttributeName("media-refresh")]
+        public string Refresh { get; set; }
+
+        [HtmlAttributeName("media-types")]
+        public string Types { get; set; }
+
+        [HtmlAttributeName("media-size")]
+        public string Size { get; set; } = "large";
+
+        [HtmlAttributeName("media-fit")]
+        public string Fit { get; set; } = "cover";
+
+        /// <summary>
+        /// ViewContext
+        /// </summary>
+        [HtmlAttributeNotBound]
+        [ViewContext]
+        public ViewContext ViewContext { get; set; }
+
+
+        public override void Process(TagHelperContext context, TagHelperOutput output)
+        {
+
+            string fieldName = For.Name;
+
+            string fieldDisplayName = For.Name;
+            if (For.ModelExplorer.Metadata.DisplayName.IsSet())
+                fieldDisplayName = For.ModelExplorer.Metadata.DisplayName;
+
+            string fieldDescription;
+            if (For.ModelExplorer.Metadata.Description.IsSet())
+                fieldDescription = $"<small class='form-text text-info'>{For.ModelExplorer.Metadata.Description}</small>";
+
+            string fieldId = Guid.NewGuid().ToString();
+
+            string fieldValue = For.Model != null ? For.Model.ToString() : "";
+
+            if (!List.IsSet())
+            {
+                var _urlHelperFactory = Engine.Services.Resolve<IUrlHelperFactory>();
+                List = _urlHelperFactory.GetUrlHelper(ViewContext).Action("Action", "Media", new { area = "Admin" });
+            }
+
+            var template = $@"
+<div class='image-editor mb-3'>
+    <div class='row align-items-center'>
+        <div class='col-auto' style='width:75px;'>
+            <div class='img img-full img-square img-circle bg-light shadow {fieldId}' style='background-image:url({fieldValue});background-size:{Fit};'></div>
+        </div>
+        <div class='col'>
+            <div class='form-floating'>
+                <input type='url' class='form-control'
+                        placeholder='{fieldDisplayName}'
+                        id='{fieldId}'
+                        name='{fieldName}'
+                        value='{fieldValue}'>
+                <label for='Logo'>{fieldDisplayName}</label>
+            </div>
+        </div>
+        <div class='col-auto pl-0'>
+            <button class='btn btn-dark btn-lg'
+                    data-hood-media='select'
+                    data-hood-media-size='{Size}'
+                    data-hood-media-list='{List}'
+                    data-hood-media-types='{Types}'
+                    data-hood-media-target='#{fieldId}'
+                    data-hood-media-refresh='.{fieldId}'
+                    type='button'>
+                <i class='fa fa-camera fa-2x'></i>
+            </button>
+        </div>
+    </div>
+</div>";
+
+            output.Content.SetHtmlContent(template);
+
+        }
+    }
+
 }

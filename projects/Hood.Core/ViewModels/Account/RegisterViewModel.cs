@@ -5,22 +5,21 @@ namespace Hood.ViewModels
 {
     public class AdminCreateUserViewModel : RegisterViewModel
     {
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
         [Display(Name = "Create Validated Account", Description = "Create the user, and mark the email address and phone number as valid. This will override the requirement for the user to validate their email when logging in. This is not recommended to maintain account security.")]
         public bool CreateValidated { get; set; } = false;
+
+        [Display(Name = "Notify the user", Description = "Email the new account access information to the user.")]
+        public bool NotifyUser { get; set; }
     }
 
-    public class RegisterViewModel : HoneyPotFormModel, IName, IAddress, IPerson
+    public class PasswordRegisterViewModel : RegisterViewModel
     {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-        [Display(Name = "Phone Number")]
-        public string PhoneNumber { get; set; }
-
-        [Display(Name = "Username")]
-        public string Username { get; set; }
-
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
@@ -31,36 +30,76 @@ namespace Hood.ViewModels
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+    }
 
-        [Display(Name = "Consent")]
-        public bool Consent { get; set; }
-        public bool Anonymous { get; set; }
-        public string FullName { get; set; }
-        [Display(Name = "Display Name")]
-        public string DisplayName { get; set; }
+    public class MagicRegisterViewModel : RegisterViewModel
+    {
+        [Required]
         [Display(Name = "First Name")]
-        public string FirstName { get; set; }
+        public override string FirstName { get; set; }
+
+        [Required]
         [Display(Name = "Last Name")]
-        public string LastName { get; set; }
+        public override string LastName { get; set; }
+    }
+
+    public class RegisterViewModel : HoneyPotFormModel, IName, IAddress, IPerson
+    {
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public virtual string Email { get; set; }
+
         [Display(Name = "Phone Number")]
-        public string Phone { get; set; }
+        public virtual string PhoneNumber { get; set; }
+
+        [Display(Name = "Username")]
+        public virtual string Username { get; set; }
+
+        [Required]
+        [Display(Name = "Consent")]
+        public virtual bool Consent { get; set; }
+
+        public virtual bool Anonymous { get; set; }
+
+        public virtual string FullName { get; set; }
+
+        [Display(Name = "Display Name")]
+        public virtual string DisplayName { get; set; }
+
+        [Display(Name = "First Name")]
+        public virtual string FirstName { get; set; }
+
+        [Display(Name = "Last Name")]
+        public virtual string LastName { get; set; }
+
+        [Display(Name = "Phone Number")]
+        public virtual string Phone { get; set; }
+
         [Display(Name = "Job Title")]
-        public string JobTitle { get; set; }
+        public virtual string JobTitle { get; set; }
 
         [Display(Name = "Contact Name")]
-        public string ContactName { get => this.ToFullName(); set { } }
-        public string Number { get; set; }
+        public virtual string ContactName { get => this.ToFullName(); set { } }
+
+        public virtual string Number { get; set; }
+
         [Display(Name = "Address 1")]
-        public string Address1 { get; set; }
+        public virtual string Address1 { get; set; }
+
         [Display(Name = "Address 2")]
-        public string Address2 { get; set; }
-        public string City { get; set; }
-        public string County { get; set; }
-        public string Country { get; set; }
-        public string Postcode { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-        [Display(Name = "Notify the user", Description = "Email the new account access information to the user.")]
-        public bool NotifyUser { get; set; }
+        public virtual string Address2 { get; set; }
+
+        public virtual string City { get; set; }
+
+        public virtual string County { get; set; }
+
+        public virtual string Country { get; set; }
+
+        public virtual string Postcode { get; set; }
+
+        public virtual double Latitude { get; set; }
+
+        public virtual double Longitude { get; set; }
     }
 }

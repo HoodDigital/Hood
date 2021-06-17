@@ -29,7 +29,6 @@ namespace Hood.ViewModels
         [FromQuery(Name = "type")]
         public List<string> Type { get; set; } = new List<string>();
 
-
         /// <summary>
         /// Filter by availability for the lease or listing - Available/Sold/Sold STC/Reserved/Let etc.
         /// </summary>
@@ -96,6 +95,8 @@ namespace Hood.ViewModels
         public Dictionary<string, string> PlanningTypes { get; set; }
         public List<MapMarker> Locations { get; set; }
         public GeoCoordinate CentrePoint { get; set; }
+
+        [FromQuery(Name = "publish")]
         public ContentStatus? PublishStatus { get; set; }
 
         #endregion

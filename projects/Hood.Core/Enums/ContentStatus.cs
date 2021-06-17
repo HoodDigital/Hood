@@ -19,17 +19,17 @@ namespace Hood.Enums
             switch (status)
             {
                 case ContentStatus.Published:
-                    return new HtmlString($"<span class='badge badge-pill badge-success'>{status.ToString()}</span>");
+                    return new HtmlString($"<span class='badge rounded-pill bg-success'>{status.ToString()}</span>");
                 case ContentStatus.Draft:
-                    return new HtmlString($"<span class='badge badge-pill badge-warning'>{status.ToString()}</span>");
+                    return new HtmlString($"<span class='badge rounded-pill bg-warning'>{status.ToString()}</span>");
                 case ContentStatus.Archived:
-                    return new HtmlString($"<span class='badge badge-pill badge-info'>{status.ToString()}</span>");
+                    return new HtmlString($"<span class='badge rounded-pill bg-info'>{status.ToString()}</span>");
                 case ContentStatus.Private:
-                    return new HtmlString($"<span class='badge badge-pill badge-dark'><i class='fa fa-lock mr-2'></i>{status.ToString()}</span>");
+                    return new HtmlString($"<span class='badge rounded-pill bg-dark'><i class='fa fa-lock mr-2'></i>{status.ToString()}</span>");
                 case ContentStatus.Deleted:
-                    return new HtmlString($"<span class='badge badge-pill badge-danger'>{status.ToString()}</span>");
+                    return new HtmlString($"<span class='badge rounded-pill bg-danger'>{status.ToString()}</span>");
                 default:
-                    return new HtmlString($"<span class='badge badge-pill badge-light'>{status.ToString()}</span>");
+                    return new HtmlString($"<span class='badge rounded-pill bg-light'>{status.ToString()}</span>");
             }
         }
     }

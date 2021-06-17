@@ -1,0 +1,33 @@
+nav.mobile {
+    background-color: white;
+    border-bottom: 1px solid $gray-200;
+
+    @media (min-width: 768px) {
+        display: none;
+    }
+
+    .logo {
+        display: inline-block;
+        padding: 5px;
+        font-size: 18px;
+        font-weight: 600;
+
+        img {
+            max-width: 90%;
+            height: 32px;
+        }
+    }
+
+    button.mobile-sidebar-toggle {
+        color: $gray-800;
+        background-color: white;
+        border: 1px solid white;
+        border-radius: 4px;
+        box-shadow: none;
+
+        &.hover {
+            color: $black;
+            border: 1px solid #eee;
+        }
+    }
+}

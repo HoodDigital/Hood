@@ -5,7 +5,7 @@
 }
 @section buttons {
     <a href="javascript:document.getElementById('edit-user-form').submit()" class="btn btn-success"><i class="fa fa-save"></i> Save Profile</a>
-    <button type="button" class="btn btn-outline-dark" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-outline-dark" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fa fa-ellipsis-h"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-right">
@@ -25,253 +25,241 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Home" asp-route-area="Admin">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Users" asp-route-area="Admin"><i class="fa fa-users"></i> Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a asp-action="Index" asp-controller="Users" asp-route-area="Admin"><i class="fa fa-users me-2"></i>Users</a></li>
             <li class="breadcrumb-item active" aria-current="page">@ViewBag.Title</li>
         </ol>
     </nav>
 }
 <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
-<form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="edit-user-form" data-id="@Model.Id" class="container ml-md-0 p-0">
-
-    <div class="card">
-        <div class="card-header">
-            <div class="row align-items-center">
-                <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">
-                            Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="roles-tab" data-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="false">
-                            Roles
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="address-tab" data-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
-                            Addresses
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="codes-tab" data-toggle="tab" href="#codes" role="tab" aria-controls="codes" aria-selected="false">
-                            Access codes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">
-                            Info
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="notes-tab" data-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">
-                            Notes
-                        </a>
-                    </li>
-                </ul>
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" id="edit-user-form" data-id="@Model.Id" data-hood-tabs="@($"tabs-content-{Model.Id}")">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist" id="page-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="true">
+                                    Profile
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="roles-tab" data-bs-toggle="tab" href="#roles" role="tab" aria-controls="roles" aria-selected="false">
+                                    Roles
+                                </a>
+                            </li>
+                            @*<li class="nav-item">
+                                    <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab" aria-controls="address" aria-selected="false">
+                                        Addresses
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="codes-tab" data-bs-toggle="tab" href="#codes" role="tab" aria-controls="codes" aria-selected="false">
+                                        Access codes
+                                    </a>
+                                </li>*@
+                            <li class="nav-item">
+                                <a class="nav-link" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">
+                                    Notes
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="tab-content">
+                        <div id="profile" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="UserName">
+                                <label asp-for="UserName"></label>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" asp-for="FirstName">
+                                        <label asp-for="FirstName"></label>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" asp-for="LastName">
+                                        <label asp-for="LastName"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" asp-for="Email">
+                                        <label asp-for="Email"></label>
+                                        @if (Model.EmailConfirmed)
+                                        {
+                                            <small class="text-success"><i class="fa fa-info-circle me-2"></i>This email is confirmed.</small>
+                                        }
+                                        else
+                                        {
+                                            <small class="text-danger"><i class="fa fa-info-circle me-2"></i>This email is not confirmed.</small>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" asp-for="PhoneNumber">
+                                        <label asp-for="PhoneNumber"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input asp-for="Anonymous" class="form-check-input">
+                                    <label asp-for="Anonymous" class="form-check-label d-block"></label>
+                                    <small asp-for="Anonymous"></small>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input asp-for="MarketingEmails" class="form-check-input">
+                                    <label asp-for="MarketingEmails" class="form-check-label d-block"></label>
+                                    <small asp-for="MarketingEmails"></small>
+                                </div>
+                            </div>
+                            <hr class="mt-4 mb-4" />
+                            <div class="form-group row align-items-center g-3 mb-3">
+                                <div class="col-2">
+                                    <div style="background-image:url(@Model.Avatar.SmallUrl)" class="img img-full img-square rounded m-0 Avatar" id="users-feature-image"
+                                         media-attach="Avatar"
+                                         media-refresh=".Avatar"
+                                         media-url="@Url.Action("UploadMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })"></div>
+                                </div>
+                                <div class="col">
+                                    <h6>Avatar Image</h6>
+                                    <p>Set an avatar for this user.</p>
+                                    <a class="btn btn-success btn-sm"
+                                       media-attach="Avatar"
+                                       media-refresh=".Avatar"
+                                       media-url="@Url.Action("UploadMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })">
+                                        Choose...
+                                    </a>
+                                    <a class="btn btn-danger btn-sm"
+                                       media-clear="Avatar"
+                                       media-refresh=".Avatar"
+                                       media-url="@Url.Action("RemoveMedia", "Users", new { id = Model.Id, field = nameof(Model.Avatar) })">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <hr class="mt-4 mb-4" />
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="CompanyName">
+                                <label asp-for="CompanyName"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="JobTitle">
+                                <label asp-for="JobTitle"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <textarea type="text" class="form-control" asp-for="Bio" style="height:100px"></textarea>
+                                <label class="control-label" asp-for="Bio"></label>
+                            </div>
+                            <hr class="mt-4 mb-4" />
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="Facebook">
+                                <label asp-for="Facebook"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="Instagram">
+                                <label asp-for="Instagram"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="LinkedIn">
+                                <label asp-for="LinkedIn"></label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="Twitter">
+                                <label asp-for="Twitter"></label>
+                            </div>
+                            <hr class="mt-4 mb-4" />
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" asp-for="TwitterHandle">
+                                <label asp-for="TwitterHandle"></label>
+                            </div>
+                            <div class="form-floating">
+                                <input type="text" class="form-control" asp-for="WebsiteUrl">
+                                <label asp-for="WebsiteUrl"></label>
+                            </div>
+                        </div>
+                        <div id="address" class="tab-pane fade p-4" role="tabpanel" aria-labelledby="address-tab">
+                        </div>
+                        <div id="roles" class="tab-pane fade" role="tabpanel" aria-labelledby="roles-tab">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item p-4">
+                                    <h5 class="m-0">User Roles</h5>
+                                </div>
+                                @foreach (var role in Model.AllRoles)
+                                {
+                                    <div class="list-group-item list-group-item-action p-4 pt-2 pb-2">
+                                        <div class="form-group m-0">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input user-role-check"
+                                                       id="role-check-@role.Id"
+                                                       name="role-check-@role.Id"
+                                                       type="checkbox"
+                                                       data-url="@Url.Action("SetRole", new { id = Model.Id })"
+                                                       value="@role"
+                                                       @(Model.Roles.Any(r => r.Name == role.Name) ? "checked" : "") />
+                                                <label class="form-check-label d-block" for="role-check-@role.Id">
+                                                    @role.Name.CamelCaseToString()
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="list-group-item list-group-item-action">
+                                    <a class="stretched-link text-success text-decoration-none" href="CreateRole"><i class="fa fa-plus-circle me-2"></i>Add new site role</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="notes" class="tab-pane" role="tabpanel" aria-labelledby="notes-tab">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item p-4">
+                                    <h5 class="m-0">User Notes</h5>
+                                </div>
+                                <div id="user-notes" class="hood-inline" data-url="@Url.Action("Notes", new { id = Model.Id })"></div>
+                                <div class="list-group-item list-group-item-action">
+                                    <a class="stretched-link text-success text-decoration-none user-notes-add" asp-action="AddNote" asp-route-id="@Model.Id"><i class="fa fa-plus-circle me-2"></i>Add note</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="card-body p-0">
-            <div class="tab-content">
-                <div id="profile" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="profile-tab">
-                    <div class="form-group floating-label">
-                        <label asp-for="UserName"></label>
-                        <input type="text" class="form-control" asp-for="UserName">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="Email"></label>
-                        <input type="text" class="form-control" asp-for="Email">
-                        @if (Model.EmailConfirmed)
-                        {
-                            <small class="text-success"><i class="fa fa-info-circle mr-2"></i>This email is confirmed.</small>
-                        }
-                        else
-                        {
-                            <small class="text-danger"><i class="fa fa-info-circle mr-2"></i>This email is not confirmed.</small>
-                        }
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="PhoneNumber"></label>
-                        <input type="text" class="form-control" asp-for="PhoneNumber">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="FirstName"></label>
-                        <input type="text" class="form-control" asp-for="FirstName">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="LastName"></label>
-                        <input type="text" class="form-control" asp-for="LastName">
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input asp-for="Anonymous" class="custom-control-input">
-                            <label asp-for="Anonymous" class="custom-control-label"></label>
-                        </div>
-                        <small asp-for="Anonymous"></small>
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input asp-for="MarketingEmails" class="custom-control-input">
-                            <label asp-for="MarketingEmails" class="custom-control-label"></label>
-                        </div>
-                        <small asp-for="MarketingEmails"></small>
-                    </div>
-                    <hr class="mt-4 mb-4" />
-                    <input type="hidden" asp-for="AvatarJson">
-                    <div class="form-group row align-items-center">
-                        <div class="col-auto">
-                            <fixedImage src="@Model.Avatar.SmallUrl" class="img-sm img-circle m-0 Avatar" id="user-edit-avatar" />
-                        </div>
-                        <div class="col">
-                            <h6>Avatar</h6>
-                            <p class="m-0">
-                                <mediaAttach asp-for="Avatar" asp-entity="@nameof(ApplicationUser)" asp-id="@Model.Id" asp-filetype="Image" asp-json="AvatarJson">
-                                    Choose profile image...
-                                </mediaAttach>
-                            </p>
-                        </div>
-                    </div>
-                    <hr class="mt-4 mb-4" />
-                    <div class="form-group floating-label">
-                        <label asp-for="CompanyName"></label>
-                        <input type="text" class="form-control" asp-for="CompanyName">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="JobTitle"></label>
-                        <input type="text" class="form-control" asp-for="JobTitle">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label class="control-label" asp-for="Bio"></label>
-                        <textarea type="text" class="form-control" asp-for="Bio"></textarea>
-                    </div>
-                    <hr class="mt-4 mb-4" />
-                    <div class="form-group floating-label">
-                        <label asp-for="Facebook"></label>
-                        <input type="text" class="form-control" asp-for="Facebook">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="Instagram"></label>
-                        <input type="text" class="form-control" asp-for="Instagram">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="LinkedIn"></label>
-                        <input type="text" class="form-control" asp-for="LinkedIn">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="Twitter"></label>
-                        <input type="text" class="form-control" asp-for="Twitter">
-                    </div>
-                    <hr class="mt-4 mb-4" />
-                    <div class="form-group floating-label">
-                        <label asp-for="TwitterHandle"></label>
-
-                        <input type="text" class="form-control" asp-for="TwitterHandle">
-                    </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="WebsiteUrl"></label>
-                        <input type="text" class="form-control" asp-for="WebsiteUrl">
-                    </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header position-relative" id="content-access-panel-heading">
+                    <p class="card-title m-0 font-weight-bold">
+                        <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#content-access-panel" href="#content-access-panel" aria-expanded="true" aria-controls="content-access-panel">
+                            Key Information
+                            <i class="fe fe-arrow-up mt-1"></i>
+                        </a>
+                    </p>
                 </div>
-                <div id="address" class="tab-pane p-4" role="tabpanel" aria-labelledby="address-tab">
-                </div>
-                <div id="roles" class="tab-pane" role="tabpanel" aria-labelledby="roles-tab">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item">
-                            <h5 class="m-0 text-success">User Roles</h5>
-                        </div>
-                        @foreach (var role in Model.AllRoles)
-                        {
-                            <div class="list-group-item list-group-item-action p-3 pt-2 pb-2">
-                                <div class="form-group m-0">
-                                    <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input user-role-check"
-                                               id="role-check-@role.Id"
-                                               name="role-check-@role.Id"
-                                               type="checkbox"
-                                               data-url="@Url.Action("SetRole", new { id = Model.Id })"
-                                               value="@role"
-                                               @(Model.Roles.Any(r => r.Name == role.Name) ? "checked" : "") />
-                                        <label class="custom-control-label d-block" for="role-check-@role.Id">
-                                            @role.Name.CamelCaseToString()
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        <div class="list-group-item list-group-item-action">
-                            <a class="stretched-link text-success text-decoration-none" href="CreateRole"><i class="fa fa-plus-circle mr-2"></i>Add new site role</a>
-                        </div>
-                    </div>
-                </div>
-                <div id="codes" class="tab-pane" role="tabpanel" aria-labelledby="codes-tab">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item">
-                            <h5 class="m-0 text-success">Access Codes</h5>
-                        </div>
-                        @foreach (var code in Model.AccessCodes)
-                        {
-                            <div class="list-group-item list-group-item-action">
-                                <div class=" row align-items-center">
-                                    <div class="col">
-                                        <p class=" m-0">
-                                            <strong>@code.Code</strong> <small class="text-info">Expires @code.Expiry.ToDisplay()</small>
-                                        </p>
-                                        <p class="mb-0">
-                                            @if (code.Used)
-                                            {
-                                                <span class="badge-success badge">Used on @code.DateUsed.ToDisplay()</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge badge-warning">Unused</span>
-                                            }
-                                            <span class="badge badge-default">Type: @code.Type</span>
-                                        </p>
-                                    </div>
-                                    <div class="col-auto">
-                                        <a class="btn btn-danger btn-sm" target="_blank" asp-action="DeleteAccessCode" asp-route-id="@code.Id">
-                                            <i class="fa fa-external-link-alt mr-2"></i>Delete
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        @if (Model.AccessCodes.Count() == 0)
-                        {
-                            <div class="list-group-item">
-                                <p class="m-0 text-muted">No access codes created.</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-                <div id="info" class="tab-pane p-4 active" role="tabpanel" aria-labelledby="info-tab">
-                    <div class="form-group floating-label">
-                        <label asp-for="CreatedOn"></label>
+                <div class="card-body collapse show" aria-labelledby="content-access-panel-heading" id="content-access-panel">
+                    <div class="form-floating mb-3">
                         <input type="text" class="form-control disabled" asp-for="CreatedOn" disabled />
+                        <label asp-for="CreatedOn"></label>
                     </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="LastLogOn"></label>
+                    <div class="form-floating mb-3">
                         <input type="text" class="form-control disabled" asp-for="LastLogOn" disabled />
+                        <label asp-for="LastLogOn"></label>
                     </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="LastLoginIP"></label>
+                    <div class="form-floating mb-3">
                         <input type="text" class="form-control disabled" asp-for="LastLoginIP" disabled />
+                        <label asp-for="LastLoginIP"></label>
                     </div>
-                    <div class="form-group floating-label">
-                        <label asp-for="LastLoginLocation"></label>
+                    <div class="form-floating">
                         <input type="text" class="form-control disabled" asp-for="LastLoginLocation" disabled />
-                    </div>
-                </div>
-                <div id="notes" class="tab-pane" role="tabpanel" aria-labelledby="notes-tab">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item">
-                            <h5 class="m-0 text-success">User Notes</h5>
-                        </div>
-                        <div id="user-notes" class="hood-inline" data-url="@Url.Action("Notes", new { id = Model.Id })">
-                            <partial name="_Inline_Notes" />
-                        </div>
-                        <div class="list-group-item list-group-item-action">
-                            <a class="stretched-link text-success text-decoration-none user-notes-add" asp-action="AddNote" asp-route-id="@Model.Id"><i class="fa fa-plus-circle mr-2"></i>Add note</a>
-                        </div>
+                        <label asp-for="LastLoginLocation"></label>
                     </div>
                 </div>
             </div>

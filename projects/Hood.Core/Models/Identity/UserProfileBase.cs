@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Attributes;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -32,19 +33,30 @@ namespace Hood.Models
         #endregion
 
         #region IName 
+
+        [FormUpdatable]
         [Display(Name = "Anonymous", Description = "If set, user will details will not show up in public areas of the site.")]
         public virtual bool Anonymous { get; set; }
+
         [NotMapped]
         public virtual string FullName { get; set; }
+
+        [FormUpdatable]
         [Display(Name = "First name")]
         [ProtectedPersonalData]
         public virtual string FirstName { get; set; }
+
+        [FormUpdatable]
         [Display(Name = "Last name")]
         [ProtectedPersonalData]
         public virtual string LastName { get; set; }
+
+        [FormUpdatable]
         [ProtectedPersonalData]
         [Display(Name = "Display name")]
         public virtual string DisplayName { get; set; }
+  
+        
         public virtual string ToAdminName()
         {
             if (this.ToFullName().IsSet())
@@ -128,26 +140,38 @@ namespace Hood.Models
         #endregion
 
         #region Socials 
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Website URL")]
         public virtual string WebsiteUrl { get => this[nameof(WebsiteUrl)]; set => this[nameof(WebsiteUrl)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Twitter URL")]
         public virtual string Twitter { get => this[nameof(Twitter)]; set => this[nameof(Twitter)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Twitter Handle (@yourname)")]
         public virtual string TwitterHandle { get => this[nameof(TwitterHandle)]; set => this[nameof(TwitterHandle)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Facebook URL")]
         public virtual string Facebook { get => this[nameof(Facebook)]; set => this[nameof(Facebook)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Instagram URL")]
         public virtual string Instagram { get => this[nameof(Instagram)]; set => this[nameof(Instagram)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "LinkedIn URL")]
@@ -155,14 +179,20 @@ namespace Hood.Models
         #endregion
 
         #region Extra Profile Fields
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Company name")]
         public virtual string CompanyName { get => this[nameof(CompanyName)]; set => this[nameof(CompanyName)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Bio")]
         public virtual string Bio { get => this[nameof(Bio)]; set => this[nameof(Bio)] = value; }
+
+        [FormUpdatable]
         [NotMapped]
         [PersonalData]
         [Display(Name = "Job Title")]
@@ -170,18 +200,21 @@ namespace Hood.Models
         #endregion
 
         #region Notes 
+       
         [NotMapped]
         public virtual List<UserNote> Notes
         {
             get { return this[nameof(Notes)] != null ? JsonConvert.DeserializeObject<List<UserNote>>(this[nameof(Notes)]) : new List<UserNote>(); }
             set { this[nameof(Notes)] = JsonConvert.SerializeObject(value); }
         }
+   
         public virtual void AddUserNote(UserNote note)
         {
             var notes = this.Notes;
             notes.Add(note);
             this.Notes = notes;
         }
+  
         #endregion
 
         #region ISaveableModel
@@ -192,5 +225,11 @@ namespace Hood.Models
         [JsonIgnore]
         public virtual string SaveMessage { get; set; }
         #endregion
+
+        #region View Model Stuff
+        [NotMapped]
+        public IList<IdentityRole> AllRoles { get; set; }
+        #endregion
+
     }
 }

@@ -1,0 +1,32 @@
+@model ContentModel
+<div class="col-md-8 offset-md-2">
+    <blockquote class="blockquote d-flex align-items-center mb-5 mt-5">
+        @{
+            string jobTitle = Model.Content.GetMetaValue<string>("Content.Testimonial.JobTitle");
+            string companyName = Model.Content.GetMetaValue<string>("Content.Testimonial.CompanyName");
+        }
+        @if (Model.Content.FeaturedImageJson.IsSet())
+        {
+            <div>
+                <fixedImage src="@Model.Content.FeaturedImage.MediumUrl" class="img img-sm mr-5" style="@Model.Content.GetImageStyle()"></fixedImage>
+            </div>
+        }
+        <div class="flex-grow-1">
+            <p class="mb-0">@Model.Content.Excerpt</p>
+            <footer class="blockquote-footer">
+                @Model.Content.Title
+                @if (jobTitle.IsSet())
+                {
+                    <small><cite title="@(jobTitle)">@(jobTitle)</cite></small>
+                }
+                @if (companyName.IsSet())
+                {
+                    <small>from <cite title="@(companyName)">@(companyName)</cite></small>
+                }
+            </footer>
+        </div>
+    </blockquote>
+</div>
+<div class="m-t-lg">
+    <partial name="_NeighbourPosts" />
+</div>

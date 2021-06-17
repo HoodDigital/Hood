@@ -9,6 +9,7 @@ using Hood.Models;
 using System.Linq;
 using Hood.Interfaces;
 using Hood.Core;
+using Newtonsoft.Json;
 
 namespace Hood.Services
 {
@@ -48,6 +49,11 @@ namespace Hood.Services
 
         public async Task<int> SendEmailAsync(MailObject message, EmailAddress from = null, EmailAddress replyTo = null)
         {
+            if (!Engine.Settings.Mail.SendGridKey.IsSet())
+            {
+                throw new System.Exception("SendGrid is not setup. Create a free account and set up an API key to send emails.");
+            }
+
             SendGridClient client = GetMailClient();
             if (from == null)
                 from = GetSiteFromEmail();
@@ -60,10 +66,15 @@ namespace Hood.Services
             if (response.StatusCode == HttpStatusCode.Accepted || response.StatusCode == HttpStatusCode.OK)
                 return 1;
 
-            return 0;
+            throw new System.Exception("The email could not be sent, check your SendGrid settings.");
         }
         public async Task<int> SendEmailAsync(EmailAddress[] emails, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
         {
+            if (!Engine.Settings.Mail.SendGridKey.IsSet())
+            {
+                throw new System.Exception("SendGrid is not setup. Create a free account and set up an API key to send emails.");
+            }
+
             SendGridClient client = GetMailClient();
             if (from == null)
                 from = GetSiteFromEmail();

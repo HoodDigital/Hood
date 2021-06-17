@@ -1,0 +1,68 @@
+﻿
+@{
+    SeoSettings _seoSettings = Engine.Settings.Seo;
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+    string url = Context.GetSiteUrl(true, true);
+    if (_seoSettings.CanonicalUrl.IsSet())
+    {
+        url = string.Format("{0}{1}", _seoSettings.CanonicalUrl.TrimEnd('/'), Context.Request.Path);
+    }
+}
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+@if (_seoSettings.FacebookAppId.IsSet())
+{
+    <meta name="fb:app_id" content="@_seoSettings.FacebookAppId" />
+}
+@if (_seoSettings.Keywords.IsSet())
+{
+    <meta name="keywords" content="@_seoSettings.Keywords" />
+}
+<meta property="og:url" content="@url" />
+<meta property="og:type" content="website" />
+@if (_seoSettings.OgLocale.IsSet())
+{
+    <meta property="og:locale" content="@_seoSettings.OgLocale" />
+}
+
+<meta name="twitter:card" content="summary_large_image">
+@if (_seoSettings.TwitterCardSite.IsSet())
+{
+    <meta name="twitter:site" content="@_seoSettings.TwitterCardSite">
+}
+@if (_seoSettings.TwitterCardCreator.IsSet())
+{
+    <meta name="twitter:creator" content="@_seoSettings.TwitterCardCreator" />
+}
+@if (_seoSettings.SiteIconUrl.IsSet())
+{
+    <link type="image/png" href="@_seoSettings.SiteIconUrl" rel="icon" />
+}
+@if (_seoSettings.Publisher.IsSet())
+{
+    <link href="@_seoSettings.Publisher" rel="publisher" />
+}
+<link href="@url" rel="canonical" />
+
+<script type="application/ld+json">
+    {
+        "@@context": "http://schema.org",
+        "@@type": "Organization",
+        "url": "@_seoSettings.CanonicalUrl",
+        "sameAs" : [
+            "@_seoSettings.Twitter",
+            "@_seoSettings.Facebook",
+            "@_seoSettings.LinkedIn"
+        ],
+        "name" : "@_basicSettings.CompanyName",
+        "logo": "@_seoSettings.SiteIconUrl",
+        "contactPoint" : [{
+            "@@type" : "ContactPoint",
+            "telephone" : "@_basicSettings.Phone",
+            "contactType" : "customer service"
+        }]
+    }
+</script>

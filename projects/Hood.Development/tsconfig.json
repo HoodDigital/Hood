@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "./wwwroot/dist/js/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": false,
+    "moduleResolution": "Node"
+  },
+  "files": [
+    "src/ts/recaptcha.ts"
+  ]
+}

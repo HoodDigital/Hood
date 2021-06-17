@@ -1,0 +1,184 @@
+.hood-image,
+.img {
+    position: relative;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+
+    img {
+        display: none !important;
+    }
+
+    &.darkened {
+        &::before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: "";
+            background-color: rgba(0, 0, 0, .5);
+        }
+    }
+
+    &.lightened {
+        &::before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: "";
+            background-color: rgba(255, 255, 255, .5);
+        }
+    }
+
+    &.loading {
+        i {
+            position: absolute;
+            top: 50%;
+            @include transform(translateY(-50%));
+        }
+
+        &::before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: "";
+            background-color: rgba(255, 255, 255, .5);
+        }
+    }
+
+    &.contain {
+        background-size: contain;
+    }
+
+    &.auto {
+        background-size: auto;
+    }
+
+    &.img-xxs {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    &.img-xs {
+        width: 3.25rem;
+        height: 3.25rem;
+    }
+
+    &.img-sm {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    &.img-md {
+        width: 10rem;
+        height: 10rem;
+    }
+
+    &.img-lg {
+        width: 20rem;
+        height: 20rem;
+    }
+
+    &.img-xl {
+        width: 40rem;
+        height: 40rem;
+    }
+
+    &.img-full {
+        display: block;
+        width: 100%;
+    }
+
+    &.img-4x3,
+    &.img-3x1,
+    &.img-16x9,
+    &.img-9x16,
+    &.img-1x1,
+    &.img-square,
+    &.img-standard,
+    &.img-wide,
+    &.img-mobile-card {
+        &::after {
+            display: block;
+            padding-top: 100%;
+            content: "";
+            background-size: contain;
+        }
+    }
+
+    &.img-4x3 {
+        &::after {
+            padding-top: 75%;
+        }
+    }
+
+    &.img-3x1,
+    &.img-standard {
+        &::after {
+            padding-top: 33%;
+        }
+    }
+
+    &.img-16x9,
+    &.img-wide {
+        &::after {
+            padding-top: 56.25%;
+        }
+    }
+
+    &.img-9x16,
+    &.img-mobile-card {
+        &::after {
+            padding-top: 151.3%;
+        }
+    }
+
+    &.img-circle {
+        border-radius: 50%;
+    }
+}
+
+.post-content,
+#post-content {
+
+    &::before,
+    &::after {
+        display: table;
+        content: " ";
+    }
+
+    &::after {
+        clear: both;
+    }
+
+    img {
+        max-width: 100%;
+    }
+}
+
+.hood-bg-image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    background-size: cover;
+    backface-visibility: hidden;
+    backface-visibility: hidden;
+
+    img {
+        display: none !important;
+    }
+}

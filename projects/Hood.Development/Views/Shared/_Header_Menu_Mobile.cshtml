@@ -1,0 +1,51 @@
+@inject IContentRepository _content
+@model HeaderModel
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<nav class="modal fade modal-right" id="mobile-menu" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-blade" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center bg-dark">
+                <a class="" href="/" title="@_basicSettings.FullTitle">
+                    <img src="@_basicSettings.LogoLight" style="height:40px;" />
+                </a>
+            </div>
+            <div class="modal-body p-5">
+                <h5>Content</h5>
+                <ul class="list-unstyled text-small">
+                    @{
+                        var _propertySettings = Engine.Settings.Property;
+                        var sideTypes = Engine.Settings.Content.AllowedTypes;
+                        if (_propertySettings.Enabled)
+                        {
+                            sideTypes.Add(new ContentType() { Type = "property", Title = _propertySettings.Title, TypeNamePlural = _propertySettings.Plural, Slug = _propertySettings.Slug, IsPublic = true });
+                        }
+                        sideTypes = sideTypes.OrderBy(t => t.TypeNamePlural).ToList();
+                    }
+                    @foreach (ContentType ct in sideTypes)
+                    {
+                        if (ct.IsPublic)
+                        {
+                            <li><a class="text-muted" href="@string.Format("/{0}/", ct.Slug)">@ct.Title</a></li>
+                        }
+                    }
+                </ul>
+                <h5>Resources</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="https://hooddigital.atlassian.net/servicedesk/customer/portals">Help &amp; Support</a></li>
+                    <li><a class="text-muted" href="https://github.com/HoodDigital/Hood">View on <i class="fab fa-github"></i> GitHub</a></li>
+                    <li><a class="text-muted" href="https://hooddigital.atlassian.net/servicedesk/customer/portal/1/group/-1">Contact Hood Support</a></li>
+                </ul>
+                <h5>Hood CMS</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="https://hooddigital.com/cms/download">Download</a></li>
+                    <li><a class="text-muted" href="https://github.com/HoodDigital/Hood">Demo Site</a></li>
+                    <li><a class="text-muted" href="https://hooddigital.com/cms/pricing">Pricing</a></li>
+                    <li><a class="text-muted" href="https://hooddigital.com/cms/buy">Purchase</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+

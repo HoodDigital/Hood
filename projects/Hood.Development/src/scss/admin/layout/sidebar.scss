@@ -1,0 +1,75 @@
+nav.sidebar {
+    position: fixed;
+    top: 59px;
+    bottom: 0;
+    z-index: 9;
+    display: block;
+    width: 100%;
+    max-width: 250px;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+    overflow-y: auto;
+    background: white;
+    border-right: 1px solid $gray-200;
+    @include transition(all .2s ease-in-out);
+    @include transform(translateX(-100%));
+
+    > [class*="container"] {
+        flex-direction: column;
+        align-items: stretch;
+        min-height: 100%;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    &.open {
+        @include transform(translateX(0%));
+    }
+
+    @media (min-width: 768px) {
+        @include transform(translateX(0%));
+        top: 0;
+    }
+
+    .logo {
+        display: none;
+        padding: 26px 0;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+
+        @media (min-width: 768px) {
+            display: block;
+        }
+
+        img {
+            max-width: 90%;
+            height: 45px;
+
+            @media (min-width: 768px) {
+                height: auto;
+            }
+        }
+    }
+
+    @import "../../core/navbars";
+
+    .navbar-user {
+        padding: .75rem 1rem .5rem;
+        margin-right: -1.5rem;
+        margin-left: -1.5rem;
+        border-top: 1px solid $gray-200;
+
+        a.icon-link {
+            color: $gray-700;
+
+            i {
+                font-size: 1.25rem;
+            }
+        }
+
+        .dropup .dropdown-menu {
+            min-width: 217.5px;
+        }
+    }
+}

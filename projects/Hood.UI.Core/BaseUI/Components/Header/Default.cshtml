@@ -1,0 +1,32 @@
+@{
+    BasicSettings _basicSettings = Engine.Settings.Basic;
+}
+<nav class="navbar navbar-fixed-top navbar-expand-md navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand me-5" href="/" title="@_basicSettings.FullTitle">
+            <img src="@_basicSettings.Logo" style="height:40px;" />
+        </a>
+        <div class="navbar-collapse collapse">
+            <partial name="_Header_Menu_Main" />
+        </div>
+        <div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <button class="btn btn-outline-dark btn-sm me-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#account-menu">
+                    <i class="fas fa-user-alt me-1"></i> Account
+                </button>
+                <partial name="_Header_Menu_Account" />
+            }
+            else
+            {
+                <a class="btn btn-outline-dark btn-sm me-2" asp-action="Login" asp-controller="Account">
+                    <i class="fas fa-user-alt me-1"></i> Sign in
+                </a>
+            }
+            <button class="btn btn-outline-dark btn-sm" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#mobile-menu">
+                <i class="fas fa-ellipsis-h mt-1 mb-1"></i>
+            </button>
+            <partial name="_Header_Menu_Mobile" />
+        </div>
+    </div>
+</nav>

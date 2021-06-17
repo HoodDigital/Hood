@@ -1,0 +1,218 @@
+@model PropertyListModel
+
+@{
+    PropertySettings _propertySettings = Engine.Settings.Property;
+}
+<form method="get" class="inline" data-target="#property-list">
+    <div class="card mb-3">
+        <div class="card-header position-relative" id="property-filters-search-panel-heading">
+            <p class="card-title m-0 font-weight-bold">
+                <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#property-filters-search-panel" href="#property-filters-search-panel" aria-expanded="false" aria-controls="property-filters-search-panel">
+                    Search
+                    <i class="fe fe-arrow-up mt-1"></i>
+                </a>
+            </p>
+        </div>
+        <div class="card-body collapse" aria-labelledby="property-filters-search-panel-heading" id="property-filters-search-panel">
+            <input type="text" class="form-control m-t-lg" placeholder="Search properties..." asp-for="Search" />
+        </div>
+    </div>
+    @if (_propertySettings.ShowBedrooms)
+    {
+        <div class="card mb-3">
+            <div class="card-header position-relative" id="property-filters-bedrooms-panel-heading">
+                <p class="card-title m-0 font-weight-bold">
+                    <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#property-filters-bedrooms-panel" href="#property-filters-bedrooms-panel" aria-expanded="false" aria-controls="property-filters-bedrooms-panel">
+                        Bedrooms
+                        <i class="fe fe-arrow-up mt-1"></i>
+                    </a>
+                </p>
+            </div>
+            <div class="card-body collapse" aria-labelledby="property-filters-bedrooms-panel-heading" id="property-filters-bedrooms-panel">
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label asp-for="Bedrooms" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="Bedrooms">
+                            <option value="">Show All</option>
+                            @for (int i = 0; i < 13; i++)
+                            {
+                                <option value="@i">@(i)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label asp-for="MaxBedrooms" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MaxBedrooms">
+                            <option value="">Show All</option>
+                            @for (int i = 0; i < 13; i++)
+                            {
+                                <option value="@i">@(i)</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (_propertySettings.ShowRent)
+    {
+        <div class="card mb-3">
+            <div class="card-header position-relative" id="property-filters-rent-panel-heading">
+                <p class="card-title m-0 font-weight-bold">
+                    <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#property-filters-rent-panel" href="#property-filters-rent-panel" aria-expanded="false" aria-controls="property-filters-rent-panel">
+                        Rent
+                        <i class="fe fe-arrow-up mt-1"></i>
+                    </a>
+                </p>
+            </div>
+            <div class="card-body collapse" aria-labelledby="property-filters-rent-panel-heading" id="property-filters-rent-panel">
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label asp-for="MinRent" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MinRent">
+                            <option value="">Show All</option>
+                            <option value="0">£ 0</option>
+                            <option value="100">£ 100</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label asp-for="MaxRent" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MaxRent">
+                            <option value="">Show All</option>
+                            <option value="0">£ 0</option>
+                            <option value="100">£ 100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (_propertySettings.ShowAskingPrice)
+    {
+        <div class="card mb-3">
+            <div class="card-header position-relative" id="property-filters-asking-price-panel-heading">
+                <p class="card-title m-0 font-weight-bold">
+                    <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#property-filters-asking-price-panel" href="#property-filters-asking-price-panel" aria-expanded="false" aria-controls="property-filters-asking-price-panel">
+                        Asking Price
+                        <i class="fe fe-arrow-up mt-1"></i>
+                    </a>
+                </p>
+            </div>
+            <div class="card-body collapse" aria-labelledby="property-filters-asking-price-panel-heading" id="property-filters-asking-price-panel">
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label asp-for="MinPrice" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MinPrice">
+                            <option value="">Show All</option>
+                            <option value="0">£ 0</option>
+                            <option value="100">£ 100</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label asp-for="MaxPrice" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MaxPrice">
+                            <option value="">Show All</option>
+                            <option value="0">£ 0</option>
+                            <option value="100">£ 100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (_propertySettings.ShowPremium)
+    {
+        <div class="card mb-3">
+            <div class="card-header position-relative" id="property-filters-premium-panel-heading">
+                <p class="card-title m-0 font-weight-bold">
+                    <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#property-filters-premium-panel" href="#property-filters-premium-panel" aria-expanded="false" aria-controls="property-filters-premium-panel">
+                        Premium
+                        <i class="fe fe-arrow-up mt-1"></i>
+                    </a>
+                </p>
+            </div>
+            <div class="card-body collapse" aria-labelledby="property-filters-premium-panel-heading" id="property-filters-premium-panel">
+                <div class="row">
+                    <div class="form-group col-6">
+                        <label asp-for="MinPremium" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MinPremium">
+                            <option value="">Show All</option>
+                            <option value="0">£ 0</option>
+                            <option value="100">£ 100</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label asp-for="MaxPremium" class="text-uppercase font-weight-bold text-muted"></label>
+                        <select class="form-control m-t-lg half" asp-for="MaxPremium">
+                            <option value="">Show All</option>
+                            <option value="0">£ 0</option>
+                            <option value="100">£ 100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="card mb-3">
+        <div class="card-header position-relative" id="property-filters-types-panel-heading">
+            <p class="card-title m-0 font-weight-bold">
+                <a class="stretched-link text-dark text-decoration-none" data-bs-toggle="collapse" data-target="#property-filters-types-panel" href="#property-filters-types-panel" aria-expanded="false" aria-controls="property-filters-types-panel">
+                    Other Filters
+                    <i class="fe fe-arrow-up mt-1"></i>
+                </a>
+            </p>
+        </div>
+        <div class="card-body collapse" aria-labelledby="property-filters-types-panel-heading" id="property-filters-types-panel">
+            @foreach (var type in Model.AvailableTypes)
+            {
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input id="Type_@type" name="type" class="custom-control-input submit-on-change" type="checkbox" value="@type" />
+                        <label for="Type_@type" class="custom-control-label">@type</label>
+                    </div>
+                </div>
+            }
+            @foreach (var type in Model.AvailableStatuses)
+            {
+                <div class="form-group">
+                    <div class="custom-control custom-checkbox">
+                        <input id="Availability_@type" name="status" class="custom-control-input submit-on-change" type="checkbox" value="@type" />
+                        <label for="Availability_@type" class="custom-control-label">@type</label>
+                    </div>
+                </div>
+            }
+            <div class="form-group">
+                <label asp-for="PlanningType" class="text-uppercase font-weight-bold text-muted"></label>
+                <select class="form-control m-t-lg" asp-items="Model.PlanningTypes.Select(c => new SelectListItem() { Value = c.Key, Text = c.Value })" asp-for="PlanningType">
+                    <option value="">Show All</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Order" class="text-uppercase font-weight-bold text-muted"></label>
+                <select class="form-control m-t-lg" asp-for="Order">
+                    <optgroup label="Property">
+                        <option value="name">Name (A-Z)</option>
+                        <option value="name+desc">Name (Z-A)</option>
+                        <option value="date+desc">Added Date (Newest)</option>
+                        <option value="date">Added Date (Oldest)</option>
+                        <option value="area">Area (A-Z)</option>
+                        <option value="area+desc">Area (Z-A)</option>
+                    </optgroup>
+                    <optgroup label="Price">
+                        <option value="rent+desc">Rent (£££-£)</option>
+                        <option value="rent">Rent (£-£££)</option>
+                        <option value="premium+desc">Premium (£££-£)</option>
+                        <option value="premium">Premium (£-£££)</option>
+                    </optgroup>
+                    <optgroup label="Listings">
+                        <option value="planning">Planning (A-Z)</option>
+                        <option value="planning+desc">Planning (Z-A)</option>
+                        <option value="type">Listing Type (A-Z)</option>
+                        <option value="type+desc">Listing Type (Z-A)</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-block btn-primary"><i class="fa fa-refresh mr-2"></i>Reload Results...</button>
+</form>

@@ -1,0 +1,27 @@
+@model MagicLoginViewModel
+@inject IContentRepository _content
+@{
+    ViewData["Title"] = "Sign in";
+
+}
+<div class="header">
+    <h2>Sign In</h2>
+    <p>We'll email you a magic link to sign in.</p>
+</div>
+<form asp-controller="Account" asp-action="MagicLoginGenerate" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" id="signin-magic" role="form">
+    @Html.RenderHoneypotField()
+    <recaptcha action="login" />
+    <div class="d-grid gap-2">
+        <div asp-validation-summary="All" class="validation-summary"></div>
+        <div class="form-floating">
+            <input asp-for="Email" class="form-control" placeholder="Email address" autocomplete="email" />
+            <label asp-for="Email"></label>
+            <span asp-validation-for="Email"></span>
+        </div>
+        <button type="submit" class="btn btn-success"><i class="fa fa-magic me-2"></i>Get a magic link</button>
+        <span class="text-center">or</span>
+        <a asp-action="Register" class="btn btn-outline-dark">Create an Account</a>
+        <small class="text-center"><a asp-action="LoginPassword" asp-route-returnurl="@ViewData["ReturnUrl"]" class="text-muted">Log in with password</a></small>
+    </div>
+</form>
+<partial name="_LoginSocials" />

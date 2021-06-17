@@ -1,0 +1,8 @@
+@model ContentModel
+<form action="/@Model.ContentType.Slug" class="d-flex gap-2 w-100 mb-3">
+    <div class="form-floating flex-fill">
+        <input class="form-control" type="text" value="@Model.Search" placeholder="Search for @Model.ContentType.TypeNamePlural.ToLower()" name="search" id="search">
+        <label for="search" class="hidden">Search</label>
+    </div>
+    <button class="btn btn-block btn-outline-dark" type="submit">Search</button>
+</form>

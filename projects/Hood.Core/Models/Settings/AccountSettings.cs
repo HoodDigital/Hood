@@ -13,6 +13,9 @@ namespace Hood.Models
     [Serializable]
     public class AccountSettings : SaveableModel
     {
+        [Display(Name = "Magic Link Login", Description = "Allow users to log in with a magic link, this can also be used to create accounts, they will be asked for name when logging in for the first time.")]
+        public bool MagicLinkLogin { get; set; }
+
         [Display(Name = "Registration Open", Description = "Disabling registration will prevent users signing up to your site, you will have to add users manually.")]
         public bool EnableRegistration { get; set; }
 
