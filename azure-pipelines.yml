@@ -37,7 +37,7 @@ steps:
       $json = Get-Content $file | ConvertFrom-Json
       $version = "$($json.version)"
       
-      echo "##vso[task.setvariable variable=name;isOutput=true]$version"
+      Write-Host "##vso[task.setvariable variable=version;]$version"
   name: Version
   
 - task: NuGetCommand@2
