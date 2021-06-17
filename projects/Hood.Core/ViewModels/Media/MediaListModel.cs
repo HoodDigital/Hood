@@ -13,6 +13,7 @@ namespace Hood.ViewModels
         {
             PageSize = 20;
             PageIndex = 1;
+            Restrict = ".pdf,.gif,.png,.jpg,.jpeg";
         }
 
         [FromQuery(Name = "user")]

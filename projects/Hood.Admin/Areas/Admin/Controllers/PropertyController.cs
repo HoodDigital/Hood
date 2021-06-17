@@ -182,6 +182,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             PropertyListing model = new PropertyListing()
             {
+                PublishDate = DateTime.Now,
                 AgentId = User.GetUserId()
             };
             return View("_Blade_Property", model);
