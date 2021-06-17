@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hood\Hood.csproj" />
+   <PackageReference Include="Hood" Version="5.0.0-beta1" />
   </ItemGroup>
 
 </Project>
