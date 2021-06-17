@@ -149,7 +149,7 @@ $.hood.Inline = {
                     }
                 });
             });
-            $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form', function (e) {
+            $('body').on('change', 'form.inline .refresh-on-change, .hood-inline-list form .refresh-on-change', function (e) {
                 e.preventDefault();
                 $.hood.Loader(true);
                 let $form = $(this).parents('form');
