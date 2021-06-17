@@ -1,5 +1,3 @@
-/// <binding BeforeBuild='views' />
-
 var gulp = require('gulp');
 var cssnano = require('gulp-cssnano');
 var imagemin = require('gulp-imagemin');
@@ -9,6 +7,7 @@ var rename = require('gulp-rename');
 var rimraf = require('gulp-rimraf');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
+
 
 gulp.task('clean', function (cb) {
     return gulp.src([
@@ -21,6 +20,7 @@ gulp.task('clean', function (cb) {
     ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });
+
 
 gulp.task('copy:src', function () {
     return gulp.src('./wwwroot/src/**/*.*')
@@ -43,6 +43,7 @@ gulp.task('copy',
     )
 );
 
+
 gulp.task('scss', function () {
     return gulp.src([
         './src/scss/*.scss'
@@ -56,6 +57,8 @@ gulp.task('scss', function () {
         .pipe(sourcemaps.write(''))
         .pipe(gulp.dest('./wwwroot/src/css/'));
 });
+
+
 gulp.task('cssnano', function () {
     return gulp.src([
         './wwwroot/src/css/*.css'
@@ -68,6 +71,7 @@ gulp.task('cssnano', function () {
         //.pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest('./wwwroot/src/dist/'));
 });
+
 
 gulp.task('views:clean', function (cb) {
     return gulp.src([
@@ -94,7 +98,6 @@ gulp.task('views:admin', function () {
     return gulp.src('./Areas/Admin/UI/**/*.*')
         .pipe(gulp.dest('./../Hood.Admin/Areas/Admin/UI/'));
 });
-
 gulp.task('views',
     gulp.series(
         'views:clean',
@@ -106,7 +109,6 @@ gulp.task('views',
         )
     )
 );
-
 
 
 gulp.task('themes:clean', function (cb) {
@@ -128,7 +130,6 @@ gulp.task('themes:scss', function () {
         }))
         .pipe(gulp.dest('./wwwroot/themes/'));
 });
-
 gulp.task('themes:less', function () {
     lss = less({ relativeUrls: true });
     lss.on('error', function (e) {
@@ -159,7 +160,6 @@ gulp.task('themes:cssnano', function () {
         .pipe(rename({ suffix: '.min' }))
         .pipe(gulp.dest('./wwwroot/themes/'));
 });
-
 gulp.task('themes',
     gulp.series('themes:clean',
         'themes:less',
