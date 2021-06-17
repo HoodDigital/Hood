@@ -10,7 +10,7 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: 'Hood.Development.sln'
+  solution: 'Hood.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
