@@ -11,14 +11,9 @@ package-lock.json
 /wwwroot/dist
 /wwwroot/src
 
-/wwwroot/bundles
-/wwwroot/js/**/*.min.js
-/wwwroot/js/**/*.packaged.js
-
 # Ignore Theme Libraries & Compiled Client Files
 /wwwroot/themes/**/css
 /wwwroot/themes/**/*.min.js
-/wwwroot/themes/**/*.packaged.js
 /wwwroot/themes/**/lib
 
 # Ignore local settings files, apart from the base settings
