@@ -69,7 +69,7 @@ gulp.task('cssnano', function () {
             }
         }))
         //.pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('./wwwroot/src/dist/'));
+        .pipe(gulp.dest('./wwwroot/dist/css/'));
 });
 
 
