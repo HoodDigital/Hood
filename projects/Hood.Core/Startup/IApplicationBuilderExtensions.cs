@@ -20,41 +20,9 @@ namespace Hood.Startup
 
     public static class IApplicationBuilderExtensions
     {
-        /// <summary>
-        /// Configure Hood, using the default setup, can be configured to add custom routes and priority routes if required.
-        /// </summary>
-        /// <param name="app">The application builder object.</param>
-        /// <param name="env">The app's hosting enviromnent object.</param>
-        /// <param name="loggerFactory">The app's logger factory object.</param>
-        /// <param name="config">Your app configuration root object.</param>
-        /// <param name="customRoutes">Define custom routes, these will replace the Default Routes (so you will need to include a catch-all or default route), but will be added after the page finder routes, and the basic HoodCMS routes.</param>
-        /// <param name="priorityRoutes">Define priority routes, these will be added before the page finder routes, and any basic HoodCMS routes.</param>
-        /// <returns></returns>
         public static IApplicationBuilder UseHood(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
         {
-            if (app == null)
-                throw new ArgumentNullException(nameof(app));
-            if (env == null)
-                throw new ArgumentNullException(nameof(env));
-            if (config == null)
-                throw new ArgumentNullException(nameof(config));
 
-            // Register all Hood Components
-            var typeFinder = Engine.Services.Resolve<ITypeFinder>();
-            var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
-
-            var instances = dependencies
-                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
-                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
-
-            foreach (var dependency in instances)
-                dependency.Configure(app, env, config);
-
-            return app;
-        }
-
-        public static IApplicationBuilder UseHoodDefaults(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
-        {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.GetCultureInfo("en-GB");
             CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-GB");
 
@@ -105,6 +73,32 @@ namespace Hood.Startup
                     Cookie = builder
                 });
             }
+
+            app.UseHoodComponents(env, config);
+            app.UseHoodDefaultRoutes(config);
+
+            return app;
+        }
+
+        public static IApplicationBuilder UseHoodComponents(this IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
+        {
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
+            if (env == null)
+                throw new ArgumentNullException(nameof(env));
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
+            // Register all Hood Components
+            var typeFinder = Engine.Services.Resolve<ITypeFinder>();
+            var dependencies = typeFinder.FindClassesOfType<IHoodComponent>();
+
+            var instances = dependencies
+                                .Select(dependencyRegistrar => (IHoodComponent)Activator.CreateInstance(dependencyRegistrar))
+                                .OrderBy(dependencyRegistrar => dependencyRegistrar.ServiceConfigurationOrder);
+
+            foreach (var dependency in instances)
+                dependency.Configure(app, env, config);
 
             return app;
         }
