@@ -40,7 +40,7 @@ namespace Hood.Services
             {
                 properties = properties
                     .Include(p => p.Media)
-                    .Include(p => p.FloorAreas);
+                    .Include(p => p.FloorPlans);
             }
 
             if (model.PublishStatus.HasValue)
