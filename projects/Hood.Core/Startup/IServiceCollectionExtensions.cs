@@ -28,23 +28,24 @@ namespace Hood.Startup
     /// </summary>
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config, bool configureDatabase = true)
+        public static IServiceCollection ConfigureHood<TContext>(this IServiceCollection services, IConfiguration config)
           where TContext : HoodDbContext
         {
 
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
 
-            if (config.IsDatabaseConnected())
+            if (!config.IsDatabaseConnected())
             {
-                if (configureDatabase)
-                {
-                    services.ConfigureHoodDatabase<TContext>(config);
-                    services.AddDatabaseDeveloperPageExceptionFilter();
-                }
-                services.ConfigureHoodServices();
-                services.ConfigureCache(config);
-                services.ConfigureAuthentication(config);
+                throw new StartupException("No database connected.", StartupError.DatabaseConnectionFailed);
             }
+
+            services.ConfigureHoodDatabase<TContext>(config);
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.ConfigureHoodServices();
+
+            services.ConfigureCache(config);
+            services.ConfigureAuthentication(config);
 
             services.ConfigureViewEngine(config);
             services.ConfigureHoodAntiForgery(config);
@@ -70,6 +71,8 @@ namespace Hood.Startup
                 .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
 
             services.AddRazorPages();
+            
+            services.ConfigureHoodEngine(config);
 
             return services;
         }
@@ -127,7 +130,7 @@ namespace Hood.Startup
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration root of the application</param>
         /// <returns>Configured service provider</returns>
-        public static IServiceProvider AddHood(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceProvider ConfigureHoodEngine(this IServiceCollection services, IConfiguration configuration)
         {
             //add accessor to HttpContext
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
