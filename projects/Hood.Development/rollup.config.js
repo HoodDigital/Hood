@@ -36,7 +36,6 @@ export default commandLineArgs => {
         sourcemaps = false;
         compact = true;
         destination = 'wwwroot/dist/';
-        scssOutputStyle = 'compressed';
 
         console.log('---------------------------------------------------------------------------')
         console.log('-                       Building Hood CMS - APP                           -')
