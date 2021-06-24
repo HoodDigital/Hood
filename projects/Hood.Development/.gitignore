@@ -4,6 +4,11 @@ package-lock.json
 /Feed
 /Temporary
 
+# Ignore dist/src/images folders used when publishing NPM package.
+/dist
+/src
+/images
+
 # Ignore Libraries
 /wwwroot/lib
 
