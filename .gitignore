@@ -243,3 +243,4 @@ ModelManifest.xml
 .fake/
 
 /bower_components
+.vscode

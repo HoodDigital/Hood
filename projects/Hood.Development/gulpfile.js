@@ -1,3 +1,4 @@
+var autoprefixer = require('gulp-autoprefixer');
 var gulp = require('gulp');
 var cssnano = require('gulp-cssnano');
 var imagemin = require('gulp-imagemin');
@@ -5,7 +6,7 @@ var less = require('gulp-less');
 var path = require('path');
 var rename = require('gulp-rename');
 var rimraf = require('gulp-rimraf');
-var sass = require('gulp-sass');
+var sass = require('gulp-dart-sass');
 var sourcemaps = require('gulp-sourcemaps');
 
 
@@ -49,6 +50,7 @@ gulp.task('scss', function () {
         './src/scss/*.scss'
     ])
         .pipe(sourcemaps.init())
+        .pipe(autoprefixer())
         .pipe(sass({
             outputStyle: 'expanded',
             indentType: 'tab',
