@@ -1,10 +1,10 @@
-import 'jquery-slimscroll';
+/// <reference types="jquery.slimscroll" />
 
 export * from "./hood";
 
 import * as bootstrap from 'bootstrap';
 
-import { BaseController } from './core/HoodController';
+import { HoodApi } from './core/HoodApi';
 
 import { HomeController } from "./admin/HomeController";
 import { MediaController } from './admin/MediaController';
@@ -18,7 +18,7 @@ import { PropertyImporter } from './admin/PropertyImporter';
 import { Editors } from './core/Editors';
 import { ColorPickers } from './core/ColorPicker';
 
-class Admin extends BaseController {
+class Admin extends HoodApi {
 
     home: HomeController;
     media: MediaController;
@@ -74,12 +74,6 @@ class Admin extends BaseController {
             $(".alert.auto-dismiss").slideUp(500);
         });
 
-        $('.sidebar-scroll').slimScroll({
-            height: '100%',
-            railOpacity: 0.4,
-            wheelStep: 10
-        });
-
     }
 
     checkAndLoadTabs(tag: string): void  {
@@ -104,4 +98,4 @@ class Admin extends BaseController {
 
 }
 
-export var app = new Admin();
+window.hood = new Admin();

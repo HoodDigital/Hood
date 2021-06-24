@@ -2,6 +2,11 @@
     constructor() {
     }
 
+
+    
+    /**
+     * Initialise all default Hood CMS handlers.
+     */
     initDefaultHandlers() {
 
         this.checkboxToCsvInput();

@@ -1,6 +1,6 @@
-import 'google.maps'
+/// <reference types="google.maps" />
 
-import { BaseController } from "./core/HoodController";
+import { HoodApi } from "./core/HoodApi";
 import { PropertyController } from './app/PropertyController';
 import { Validator } from './core/Validator';
 import { Response } from './core/Response';
@@ -8,7 +8,7 @@ import { Alerts } from './core/Alerts';
 
 export * from "./hood";
 
-export class App extends BaseController {
+export class App extends HoodApi {
     propertyController: PropertyController;
 
     constructor() {
@@ -16,6 +16,7 @@ export class App extends BaseController {
 
         // Hook up default handlers.
         this.handlers.initDefaultHandlers();
+        this.initContactForms();
 
 
         // Admin Controllers
@@ -50,14 +51,16 @@ export class App extends BaseController {
         });
 
     }
-
+    /**
+     * Initialisation function for contact forms on the site, will add validator, and submit/functionality to any forms matching the given tag selector string.
+     * @param  {string='.contact-form'} tag
+     */
     initContactForms(tag: string = '.contact-form') {
 
         let $form = $(tag);
 
         $form.find('.thank-you').hide();
         $form.find('.form-content').show();
-        $('body').on('submit', tag, this.submitContactForm);
 
         let form: HTMLFormElement = $(tag)[0] as HTMLFormElement;
         new Validator(form, {
@@ -87,21 +90,6 @@ export class App extends BaseController {
 
     }
 
-    submitContactForm(this: HTMLElement, e: JQuery.SubmitEvent) {
-        e.preventDefault();
-
-        $(this).addClass('loading');
-
-        var $form: JQuery<HTMLElement> = $(this);
-
-        if ($form.valid()) {
-            $.post($form.attr('action'), $form.serialize(), function (data) {
-            });
-        }
-        return false;
-
-    }
-
 }
 
-export var app = new App();
+window.hood = new App();

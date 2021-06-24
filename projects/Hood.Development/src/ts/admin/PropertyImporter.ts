@@ -39,7 +39,7 @@ export declare interface PropertyImporterStatistics {
 }
 
 export class PropertyImporter {
-    updateInterval: NodeJS.Timeout;
+    updateInterval: number;
 
     constructor() {
         if ($('#import-property-start').length > 0) {
@@ -77,7 +77,7 @@ export class PropertyImporter {
                 if (result.importer.running) {
                     this.showInfo();
                     clearInterval(this.updateInterval);
-                    this.updateInterval = setTimeout(this.update, 250);
+                    this.updateInterval = window.setTimeout(this.update, 250);
                 } else {
                     clearInterval(this.updateInterval);
                     this.hideInfo();
