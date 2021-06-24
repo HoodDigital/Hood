@@ -108,11 +108,11 @@ namespace Hood.Models
                 try
                 {
                     MediaSettings mediaSettings = Engine.Settings.Media;
-                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/no-image.jpg";
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/no-image.jpg";
                 }
                 catch
                 {
-                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/no-image.jpg";
+                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/no-image.jpg";
                 }
                 return noImage;
             }
@@ -125,11 +125,11 @@ namespace Hood.Models
                 try
                 {
                     MediaSettings mediaSettings = Engine.Settings.Media;
-                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/no-image.jpg";
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/no-image.jpg";
                 }
                 catch
                 {
-                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/no-image.jpg";
+                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/no-image.jpg";
                 }
                 MediaObject ret = new MediaObject
                 {
@@ -153,11 +153,11 @@ namespace Hood.Models
                 try
                 {
                     MediaSettings mediaSettings = Engine.Settings.Media;
-                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/no-avatar.jpg";
+                    noImage = mediaSettings.NoImage.IsSet() ? mediaSettings.NoImage : "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/no-avatar.jpg";
                 }
                 catch
                 {
-                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/no-avatar.jpg";
+                    noImage = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/no-avatar.jpg";
                 }
                 MediaObject ret = new MediaObject
                 {
