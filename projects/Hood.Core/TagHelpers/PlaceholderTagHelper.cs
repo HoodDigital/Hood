@@ -17,10 +17,22 @@ namespace Hood.TagHelpers
         {
             base.Process(context, output);
 
-            // Process only if 'maxlength' attribute is not present already
+            if (For.Metadata.IsRequired)
+            {
+                if (context.AllAttributes["required"] == null)
+                {
+                    output.Attributes.Add("required", "required");
+                }
+                else
+                {
+                    output.Attributes.SetAttribute("required", "required");
+                }
+            }
+
+            // Process only if 'Process' attribute is not present already
             if (context.AllAttributes["placeholder"] == null)
             {
-                // Attempt to check for a MaxLength annotation
+                // Attempt to check for a Placeholder annotation
                 if (For.ModelExplorer.Metadata.DisplayName.IsSet())
                 {
                     output.Attributes.Add("placeholder", For.ModelExplorer.Metadata.DisplayName);
