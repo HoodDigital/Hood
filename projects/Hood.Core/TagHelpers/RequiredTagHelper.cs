@@ -1,12 +1,12 @@
-﻿using Hood.Extensions;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
 {
+    [HtmlTargetElement("select", Attributes = "asp-for")]
     [HtmlTargetElement("input", Attributes = "asp-for")]
     [HtmlTargetElement("textarea", Attributes = "asp-for")]
-    public class PlaceholderTagHelper : TagHelper
+    public class RequiredTagHelper : TagHelper
     {
         public override int Order { get; } = int.MaxValue;
 
@@ -26,20 +26,6 @@ namespace Hood.TagHelpers
                 else
                 {
                     output.Attributes.SetAttribute("required", "required");
-                }
-            }
-
-            // Process only if 'Process' attribute is not present already
-            if (context.AllAttributes["placeholder"] == null)
-            {
-                // Attempt to check for a Placeholder annotation
-                if (For.ModelExplorer.Metadata.DisplayName.IsSet())
-                {
-                    output.Attributes.Add("placeholder", For.ModelExplorer.Metadata.DisplayName);
-                }
-                else
-                {
-                    output.Attributes.Add("placeholder", For.Name);
                 }
             }
         }

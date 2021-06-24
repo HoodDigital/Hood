@@ -2,6 +2,20 @@
 import resolve from '@rollup/plugin-node-resolve';
 import uglify from "@lopatnov/rollup-plugin-uglify";
 
+const packageJson = require('./package.json')
+const version = process.env.VERSION || packageJson.version
+
+const banner = `/*!
+* ${packageJson.name} v${version}
+* Released under the ${packageJson.license} License.
+*/`;
+
+const footer = `\
+if (typeof this !== 'undefined' && this.hood){\
+  this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
+}`;
+
+
 export default commandLineArgs => {
 
     let plugins = [
@@ -12,7 +26,6 @@ export default commandLineArgs => {
     let sourcemaps = true;
     let compact = false;
     let destination = 'wwwroot/src/';
-    let scssOutputStyle = 'nested';
 
     if (commandLineArgs.debug !== true) {
 
@@ -23,7 +36,6 @@ export default commandLineArgs => {
         sourcemaps = false;
         compact = true;
         destination = 'wwwroot/dist/';
-        scssOutputStyle = 'compressed';
 
         console.log('---------------------------------------------------------------------------')
         console.log('-                       Building Hood CMS - APP                           -')
@@ -43,36 +55,15 @@ export default commandLineArgs => {
 
     }
 
- //   function loadSassPlugins(output) {
- //       return [
- //           resolve({
- //               moduleDirectories: ['node_modules']
- //           }),
- //           scss({
- //               output: destination + output,
- //               prefix: `/*!
- //* Hood CMS Compiled CSS
- //* To customise, please modify the SCSS and rebuild.
- //* Compiled on {{{compile_date}}}
- //* Copyright 2014 - {{{copyright_year}}} George Whysall & Hood Digital Ltd.
- //*/`,
- //               processor: css => postcss([autoprefixer({ overrideBrowserslist: "Edge 18" })]),
- //               processor: css => css.replace('{{{compile_date}}}', new Date().toLocaleString()).replace('{{{copyright_year}}}', new Date().getFullYear()),
- //               outputStyle: scssOutputStyle,
- //               sourceMapEmbed: true,
- //               sourceMapRoot: './src'
- //           }),
- //           uglify()
- //       ]
- //   }
-
     return [
         {
             input: 'src/ts/app.ts',
             output: {
                 file: destination + 'js/app.js',
-                format: 'iife',
-                name: 'hood',
+                format: 'umd',
+                name: 'HoodCMS',
+                banner: banner,
+                footer: footer,
                 globals: {
                     jQuery: '$',
                     bootstrap: 'bootstrap',
@@ -81,6 +72,12 @@ export default commandLineArgs => {
                 },
                 sourcemap: sourcemaps,
                 compact: compact
+            },
+            // https://github.com/rollup/rollup/issues/2271
+            onwarn(warning, rollupWarn) {
+                if (warning.code !== 'CIRCULAR_DEPENDENCY') {
+                    rollupWarn(warning)
+                }
             },
             external: [
                 'jQuery',
@@ -94,8 +91,10 @@ export default commandLineArgs => {
             input: 'src/ts/admin.ts',
             output: {
                 file: destination + 'js/admin.js',
-                format: 'iife',
-                name: 'hood',
+                format: 'umd',
+                name: 'HoodCMS',
+                banner: banner,
+                footer: footer,
                 globals: {
                     jQuery: '$',
                     bootstrap: 'bootstrap',
@@ -123,8 +122,10 @@ export default commandLineArgs => {
             input: 'src/ts/login.ts',
             output: {
                 file: destination + 'js/login.js',
-                format: 'iife',
-                name: 'hood.google',
+                format: 'umd',
+                name: 'HoodCMS',
+                banner: banner,
+                footer: footer,
                 globals: {
                     sweetalert2: 'Swal',
                     jQuery: '$',
@@ -143,21 +144,5 @@ export default commandLineArgs => {
             ],
             plugins: plugins
         }
-    //    ,{
-    //        input: 'src/scss/admin.scss',
-    //        plugins: loadSassPlugins('css/admin.css'),
-    //    },
-    //    {
-    //        input: 'src/scss/app.scss',
-    //        plugins: loadSassPlugins('css/app.css'),
-    //    },
-    //    {
-    //        input: 'src/scss/editor.scss',
-    //        plugins: loadSassPlugins('css/editor.css'),
-    //    },
-    //    {
-    //        input: 'src/scss/login.scss',
-    //        plugins: loadSassPlugins('css/login.css'),
-    //    }
     ];
 }

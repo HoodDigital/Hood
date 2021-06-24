@@ -1,9 +1,17 @@
 @if (User.IsEditorOrBetter())
 {
-    <link href="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/dist/css/button.css" rel="stylesheet" />
+    <environment include="Hood">
+        <link rel="stylesheet" href="/src/css/button.css" asp-append-version="true">
+    </environment>
+    <environment include="Development,Staging">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/src/css/button.css" />
+    </environment>
+    <environment include="Production">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/dist/css/button.css" />
+    </environment>
     <div class="hood-admin-editor dropup">
         <button type="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <img src="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/hood-square.png" />
+            <img src="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/hood-square.png" />
         </button>
         <div class="dropdown-menu">
             <a asp-action="Index" asp-controller="Home" asp-area="Admin" class="dropdown-item active">

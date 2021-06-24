@@ -11,8 +11,8 @@ namespace Hood.Models
         public BasicSettings()
         {
             Title = "New Website";
-            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/hood-cms.png";
-            LogoLight = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc2/images/hood-cms-white.png";
+            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/hood-cms.png";
+            LogoLight = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/hood-cms-white.png";
             Owner = new Person();
             Address = new SiteAddress();
             LoginAreaSettings = new LoginAreaSettings();

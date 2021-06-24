@@ -1,4 +1,5 @@
-import 'google.maps';
+/// <reference types="google.maps" />
+
 import { Alerts } from "../core/Alerts";
 import { DataList } from "../core/DataList";
 

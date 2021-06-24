@@ -3,22 +3,27 @@ import { Handlers } from "./Handlers";
 import { MediaModal } from "./Media";
 import { Uploader } from "./Uploader";
 
-export class BaseController {
-    uploader: Uploader;
-    handlers: Handlers;
-    mediaModal: MediaModal;
+declare global {
+    interface Hood {
+        alerts: Alerts;
+        uploader: Uploader;
+        handlers: Handlers;
+    }
+
+    interface Window {
+        hood: Hood;
+    }
+}
+
+export class HoodApi implements Hood {
+    alerts: Alerts = new Alerts();
+    uploader: Uploader = new Uploader();
+    handlers: Handlers = new Handlers();
+    private mediaModal: MediaModal = new MediaModal();
 
     constructor() {
-
-        // Global Services
-        this.uploader = new Uploader();
-        this.handlers = new Handlers();
-
         // Global Handlers
         this.setupLoaders();
-
-        // Media Modal Service
-        this.mediaModal = new MediaModal();
     }
 
     setupLoaders(): void {

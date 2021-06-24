@@ -146,4 +146,41 @@ export class Alerts {
 
         Alerts.sweetAlert({...baseOptions, ...options}, callback);
     }
+
+    log(message: string, type: 'message' | 'error' | 'warning' | 'info' = 'message') {
+        Alerts.log(message, type);
+    }
+
+    error(message: string, title: string = null, hideAfter: number = null) {
+        Alerts.error(message, title, hideAfter);
+    }
+
+    warning(message: string, title: string = null, hideAfter: number = null) {
+        Alerts.warning(message, title, hideAfter);
+    }
+
+    message(message: string, title: string = null, hideAfter: number = null) {
+        Alerts.message(message, title, hideAfter);
+    }
+
+    success(message: string, title: string = null, hideAfter: number = null) {
+        Alerts.success(message, title, hideAfter);
+    }
+
+    alert(message: string, title: string = null, icon: string = 'info', hideAfter: number = 10000) {
+        Alerts.alert(message, message, icon, hideAfter);
+    }
+
+    sweetAlert(options: SweetAlertOptions, callback: (result: SweetAlertResult<any>) => void) {
+        Alerts.sweetAlert(options, callback);
+    }
+
+    confirm(options: SweetAlertOptions, callback: (result: SweetAlertResult<any>) => void) {
+        Alerts.confirm(options, callback);
+    }
+
+    prompt(options: SweetAlertOptions, callback: (result: SweetAlertResult<any>) => void) {
+        Alerts.prompt(options, callback);
+    }
+
 }

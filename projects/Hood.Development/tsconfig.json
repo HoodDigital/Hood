@@ -6,7 +6,8 @@
     "target": "es5",
     "jsx": "react",
     "allowJs": false,
-    "moduleResolution": "Node"
+    "moduleResolution": "node",
+    "sourceMap": false
   },
   "files": [
     "src/ts/recaptcha.ts"
