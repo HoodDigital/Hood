@@ -1,4 +1,4 @@
-﻿import { KeyValue } from "../../interfaces/KeyValue";
+﻿import { KeyValue } from "../interfaces/KeyValue";
 
 export class PropertyStatistics {
     totalProperties: number;

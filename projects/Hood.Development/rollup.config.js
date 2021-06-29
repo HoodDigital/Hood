@@ -23,6 +23,7 @@ export default commandLineArgs => {
             moduleDirectories: ['node_modules']
         })
     ]
+
     let sourcemaps = true;
     let compact = false;
     let destination = 'wwwroot/src/';
@@ -33,6 +34,7 @@ export default commandLineArgs => {
         plugins.push(typescript({
             tsconfig: "tsconfig.production.json"
         }));
+
         sourcemaps = false;
         compact = true;
         destination = 'wwwroot/dist/';

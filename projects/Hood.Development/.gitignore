@@ -6,7 +6,8 @@ package-lock.json
 
 # Ignore dist/src/images folders used when publishing NPM package.
 /dist
-/src
+/src/js
+/src/css
 /images
 
 # Ignore Libraries

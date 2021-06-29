@@ -1,13 +1,13 @@
 import { KeyValue } from "../interfaces/KeyValue";
-import { ContentStatistics } from "./models/Content";
-import { PropertyStatistics } from "./models/Property";
-import { UserStatistics } from "./models/Users";
+import { ContentStatistics } from "../models/Content";
+import { PropertyStatistics } from "../models/Property";
+import { UserStatistics } from "../models/Users";
 import { Chart } from 'chart.js';
 
 export class HomeController {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
-    chart: Chart<"bar", any[], any>;
+    chart: any;
 
     constructor() {
 
@@ -104,7 +104,7 @@ export class HomeController {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
+                    ticks: {
                         beginAtZero: true
                     }
                 }

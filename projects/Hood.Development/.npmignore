@@ -20,3 +20,5 @@ libman.json
 *.cs
 *.csproj
 *.csproj.user
+
+!src/ts/**/*
