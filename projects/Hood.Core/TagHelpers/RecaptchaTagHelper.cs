@@ -53,10 +53,6 @@ namespace Hood.TagHelpers
                 case "Hood":
                     _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"/dist/js/recaptcha.js", false);
                     break;
-                case "Development":
-                case "Staging":
-                    _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/src/js/recaptcha.js", false);
-                    break;
                 default:
                     _htmlHelper.AddScript(ResourceLocation.BeforeScripts, $"https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/dist/js/recaptcha.js", false);
                     break;
