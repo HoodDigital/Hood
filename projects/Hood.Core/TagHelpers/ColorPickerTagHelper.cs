@@ -57,6 +57,15 @@ namespace Hood.TagHelpers
 
             string fieldValue = For.Model != null ? For.Model.ToString() : "";
 
+            // Attempt to check for a Placeholder annotation
+            string fieldName = For.Name;
+
+            if (For.ModelExplorer.Metadata.DisplayName.IsSet())
+            {
+                fieldName = For.ModelExplorer.Metadata.DisplayName;
+            }
+
+
             if (output.Attributes.ContainsName("class"))
                 output.Attributes.SetAttribute("class", $"{output.Attributes["class"].Value} row align-items-center mb-3");
             else
@@ -83,9 +92,9 @@ namespace Hood.TagHelpers
                         <input id='{fieldId}'
                                name='{For.Name}'
                                value='{fieldValue}'
-                               placeholder='Choose a colour...'
+                               placeholder='{fieldName}'
                                class='form-control' />
-                        <label for='{fieldId}'>{For.Name}</label>
+                        <label for='{fieldId}'>{fieldName}</label>
                     </div>
                 </div>
             ");
