@@ -79,7 +79,11 @@ namespace Hood.Services
         /// <returns></returns>
         Task<IMediaObject> ProcessUpload(Stream file, string filename, string filetype, long size, string directoryPath);
 
-        #warning Todo: Redo the Upload to shared access/ download via shared access on media service.  
+        Task<BlockBlobClient> GetBlob(string blobReference);
+
+        Task<BlockBlobClient> GetBlob(string directory, string filename);
+
+#warning Todo: Redo the Upload to shared access/ download via shared access on media service.  
         //Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read);
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace Hood.Services
         /// <param name="media">The media item to remove all associated media from Azure.</param>
         /// <returns></returns>
         Task DeleteStoredMedia(IMediaObject media);
-       
+
 
         /// <summary>
         /// Refreshes image data for all files stored on the media item, reuploading to the current storage account, CDN and folder structure etc.
