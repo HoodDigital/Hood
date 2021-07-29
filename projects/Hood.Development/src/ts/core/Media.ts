@@ -249,7 +249,7 @@ export class MediaService {
 
         }, function (this: MediaService, result: SweetAlertResult) {
             if (result.isConfirmed) {
-                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, sender: HTMLElement, response: Response) {
+                Inline.post(e.currentTarget.href, e.currentTarget, function (this: MediaService, response: Response, sender: HTMLElement) {
                     // Refresh the list, using the parent directory id - stored in the response's data array.
                     Response.process(response, 5000);
 
@@ -494,6 +494,10 @@ export class MediaModal {
         e.stopPropagation();
 
         this.element = e.currentTarget;
+
+        if (this.modal && this.modal.isOpen) {
+            return;
+        }
 
         this.modal = new ModalController({
 

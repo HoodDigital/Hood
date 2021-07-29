@@ -157,13 +157,43 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/media/directory/create/")]
-        public IActionResult CreateDirectory()
+        public async Task<IActionResult> CreateDirectoryAsync(int id)
         {
-            MediaDirectory model = new MediaDirectory
+            try
             {
-                TopLevelDirectories = GetDirectoriesForCurrentUser()
-            };
-            return View("_Blade_Directory", model);
+                MediaDirectory parentDirectory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.Id == id);
+                if (parentDirectory == null)
+                {
+                    throw new Exception($"The parent directory could not be found.");
+                }
+
+                MediaDirectory root = _directoryManager.GetTopLevelDirectory(parentDirectory.Id);
+
+                if (!User.IsEditorOrBetter())
+                {
+                    if (root.Type != DirectoryType.System || root.Slug != MediaManager.UserDirectorySlug)
+                    {
+                        throw new Exception("You cannot create directories outside the user folders folders.");
+                    }
+
+                    if (parentDirectory.OwnerId != User.GetUserId())
+                    {
+                        throw new Exception("You cannot create directories outside your own folder.");
+                    }
+                }
+
+                MediaDirectory model = new MediaDirectory
+                {
+                    TopLevelDirectories = GetDirectoriesForCurrentUser(),
+                    ParentId = id
+                };
+                return View("_Blade_Directory", model);
+
+            }
+            catch (Exception ex)
+            {
+                return View("_Blade_DirectoryDenied", ex);
+            }
         }
 
         [HttpPost]
@@ -184,22 +214,14 @@ namespace Hood.Areas.Admin.Controllers
                 }
 
                 MediaDirectory root = _directoryManager.GetTopLevelDirectory(parentDirectory.Id);
-                if (root.Type != DirectoryType.System || root.Slug != MediaManager.SiteDirectorySlug)
+                if (!User.IsEditorOrBetter() && root.Slug != MediaManager.UserDirectorySlug)
                 {
-                    throw new Exception("You cannot create directories outside the site media folders.");
+                    throw new Exception("You cannot create directories outside the user folders folders.");
                 }
 
-                if (!User.IsEditorOrBetter())
+                if (!User.IsEditorOrBetter() && parentDirectory.OwnerId != User.GetUserId())
                 {
-                    if (root.Type != DirectoryType.System || root.Slug != MediaManager.UserDirectorySlug)
-                    {
-                        throw new Exception("You cannot create directories outside the user folders folders.");
-                    }
-
-                    if (parentDirectory.OwnerId != User.GetUserId())
-                    {
-                        throw new Exception("You cannot create directories outside your own folder.");
-                    }
+                    throw new Exception("You cannot create directories outside your own folder.");
                 }
 
                 model.OwnerId = User.GetUserId();

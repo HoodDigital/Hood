@@ -1,0 +1,27 @@
+@model Exception
+@{
+    Layout = null;
+}
+<div class="modal fade" id="media-create-directory-failed" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title">
+                        <i class="fa fa-folder text-success me-2"></i> Cannot create directory
+                    </h5>
+                    <p class="m-0 text-muted">
+                        There was a problem creating a directory here.
+                    </p>
+                </div>
+                <button type="button" class="btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Model.Message
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fa fa-ban"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

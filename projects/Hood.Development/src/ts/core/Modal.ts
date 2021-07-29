@@ -21,6 +21,11 @@ export interface ModalOptions {
     /**
      * Called when loading and rendering is complete.
      */
+    onHidden?: (sender: HTMLElement) => void;
+
+    /**
+     * Called when loading and rendering is complete.
+     */
     onError?: (jqXHR: any, textStatus: any, errorThrown: any) => void;
 
     closePrevious?: boolean;
@@ -30,6 +35,7 @@ export interface ModalOptions {
 export class ModalController {
     element: HTMLElement;
     modal: Modal;
+    isOpen: boolean = false;
     options: ModalOptions = {
         closePrevious: true
     }
@@ -42,6 +48,11 @@ export class ModalController {
         if (this.options.onLoad) {
             this.options.onLoad(this.element);
         }
+
+        if (this.isOpen) {
+            return;
+        }
+        this.isOpen = true;
 
         $.get(url as string, function (data: string) {
 
@@ -65,12 +76,18 @@ export class ModalController {
                 $(document).off('focusin.modal');
             }.bind(this));
             this.element.addEventListener('hidden.bs.modal', function (this: ModalController) {
+                if (this.options.onHidden) {
+                    this.options.onHidden(this.element);
+                }
                 this.dispose();
+                this.isOpen = false;
             }.bind(this));
 
             if (this.options.onComplete) {
                 this.options.onComplete(this.element);
             }
+
+
         }.bind(this))
             .fail(this.options.onError ?? Inline.handleError);
     }
