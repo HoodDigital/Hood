@@ -25,7 +25,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/media/list/")]
-        public async Task<IActionResult> List(MediaListModel model, string viewName = "_List_Media")
+        public virtual async Task<IActionResult> List(MediaListModel model, string viewName = "_List_Media")
         {
             IQueryable<MediaObject> media = _db.Media.AsQueryable();
 
@@ -95,19 +95,19 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/media/")]
-        public async Task<IActionResult> Index(MediaListModel model)
+        public virtual async Task<IActionResult> Index(MediaListModel model)
         {
             return await List(model, "Index");
         }
 
         [Route("admin/media/action/")]
-        public async Task<IActionResult> Action(MediaListModel model)
+        public virtual async Task<IActionResult> Action(MediaListModel model)
         {
             return await List(model, "Action");
         }
 
         [Route("admin/media/blade/")]
-        public async Task<IActionResult> Blade(int id)
+        public virtual async Task<IActionResult> Blade(int id)
         {
             MediaObject media = await _db.Media.Include(m => m.Directory).SingleOrDefaultAsync(u => u.Id == id);
             return View("_Blade_Media", media);
@@ -115,7 +115,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/media/delete/")]
-        public async Task<Response> Delete(int id)
+        public virtual async Task<Response> Delete(int id)
         {
             try
             {
@@ -134,13 +134,13 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Directories
         [Route("admin/media/directories/list/")]
-        public IActionResult Directories(MediaListModel model)
+        public virtual IActionResult Directories(MediaListModel model)
         {
             model.TopLevelDirectories = GetDirectoriesForCurrentUser();
             return View("_List_Directories", model);
         }
 
-        private IEnumerable<MediaDirectory> GetDirectoriesForCurrentUser()
+        protected virtual IEnumerable<MediaDirectory> GetDirectoriesForCurrentUser()
         {
             if (User.IsAdminOrBetter())
             {
@@ -157,7 +157,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/media/directory/create/")]
-        public async Task<IActionResult> CreateDirectoryAsync(int id)
+        public virtual async Task<IActionResult> CreateDirectoryAsync(int id)
         {
             try
             {
@@ -198,7 +198,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/media/directory/create/")]
-        public async Task<Response> CreateDirectory(MediaDirectory model)
+        public virtual async Task<Response> CreateDirectory(MediaDirectory model)
         {
             try
             {
@@ -242,7 +242,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/media/directory/delete/")]
-        public async Task<Response> DeleteDirectory(int id)
+        public virtual async Task<Response> DeleteDirectory(int id)
         {
             try
             {
@@ -315,7 +315,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/media/attach/")]
-        public async Task<Response> Attach(MediaListModel model)
+        public virtual async Task<Response> Attach(MediaListModel model)
         {
             try
             {
@@ -401,7 +401,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/media/clear/")]
-        public async Task<Response> Clear(MediaListModel model)
+        public virtual async Task<Response> Clear(MediaListModel model)
         {
             try
             {
@@ -483,7 +483,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Uploads 
         [HttpPost]
         [Route("admin/media/upload/simple/")]
-        public async Task<Response> UploadToDirectory(IEnumerable<IFormFile> files, int? directoryId)
+        public virtual async Task<Response> UploadToDirectory(IEnumerable<IFormFile> files, int? directoryId)
         {
             try
             {

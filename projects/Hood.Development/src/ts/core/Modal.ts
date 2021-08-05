@@ -89,7 +89,13 @@ export class ModalController {
 
 
         }.bind(this))
-            .fail(this.options.onError ?? Inline.handleError);
+            .fail(function (this: ModalController, xhr: { status: string | number; }, textStatus: any, errorThrown: any) {
+                this.isOpen = false;
+                if (this.options.onError) {
+                    this.options.onError(xhr, textStatus, errorThrown);
+                }
+                Inline.handleError(xhr, textStatus, errorThrown);
+            }.bind(this));
     }
 
     close() {

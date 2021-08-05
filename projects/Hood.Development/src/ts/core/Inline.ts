@@ -90,13 +90,13 @@ export class Inline {
 
     }
 
-    static handleError(xhr: { status: string | number; }) {
+    static handleError(xhr: { status: string | number; }, textStatus: any, errorThrown: any) {
         if (xhr.status === 500) {
-            Alerts.error("There was an error processing the content, please contact an administrator if this continues.", "Error " + xhr.status);
+            Alerts.error("There was an error processing the content, please contact an administrator if this continues.", "Error " + xhr.status, 10000);
         } else if (xhr.status === 404) {
-            Alerts.error("The content could not be found.", "Error " + xhr.status);
+            Alerts.error("The content could not be found.", "Error " + xhr.status, 10000);
         } else if (xhr.status === 401) {
-            Alerts.error("You are not allowed to view this resource, are you logged in correctly?", "Error " + xhr.status);
+            Alerts.error("You are not allowed to view this resource, are you logged in correctly?", "Error " + xhr.status, 10000);
             window.location = window.location;
         }
     }

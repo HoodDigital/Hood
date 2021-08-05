@@ -20,14 +20,17 @@ export interface ValidatorOptions {
      */
     onError?: (jqXHR: any, textStatus: any, errorThrown: any) => void;
 
-    serializationFunction?: () => string; 
+    serializationFunction?: () => string;
+
+    useAjax?: boolean;
 
 }
 
 export class Validator {
     element: HTMLFormElement;
     options: ValidatorOptions = {
-        errorAlert: 'There are errors, please check the form.'
+        errorAlert: 'There are errors, please check the form.',
+        useAjax: true
     };
 
     /**
@@ -52,6 +55,23 @@ export class Validator {
             e.stopImmediatePropagation();
             this.submitForm();
         }.bind(this));
+        var tag = '[data-submit="#' + this.element.id + '"]';
+        let submitButtons = $(tag);
+        if (submitButtons) {
+            submitButtons.on('click', function (this: Validator, e: Event) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                let exit = $(e.currentTarget).data('exit');                
+                if (exit) {
+                    $(this.element).find("input#exit").remove();
+                    $("<input id='exit' />").attr("type", "hidden")
+                        .attr("name", "exit")
+                        .attr("value", "true")
+                        .appendTo(this.element);
+                }
+                this.submitForm();
+            }.bind(this));
+        }
     }
 
     submitForm() {
@@ -74,14 +94,22 @@ export class Validator {
                 this.options.onSubmit(this);
             }
 
-            let formData = this.options.serializationFunction();
+            if (this.options.useAjax) {
 
-            $.post(this.element.action, formData, function (this: Validator, data: any) {
-                if (this.options.onComplete) {
-                    this.options.onComplete(data, this);
-                }
-            }.bind(this))
-                .fail(this.options.onError ?? Inline.handleError);
+                let formData = this.options.serializationFunction();
+
+                $.post(this.element.action, formData, function (this: Validator, data: any) {
+                    if (this.options.onComplete) {
+                        this.options.onComplete(data, this);
+                    }
+                }.bind(this))
+                    .fail(this.options.onError ?? Inline.handleError);
+
+            } else {
+
+                this.element.submit();
+
+            }
 
         } else {
 

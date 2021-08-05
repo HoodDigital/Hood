@@ -94,16 +94,6 @@ export class DataList {
 
         }.bind(this));
 
-        //    $('body').on('submit', '.hood-inline-list form', function (e) {
-        //        e.preventDefault();
-        //        $.hood.Loader(true);
-        //        let $form = $(this);
-        //        let $list = $form.parents('.hood-inline-list');
-        //        var url = document.createElement('a');
-        //        url.href = $list.data('url');
-        //        url.search = "?" + $form.serialize();
-        //        $.hood.Inline.DataList.Reload($list, url);
-        //    });
     }
 
     reload(this: DataList, url: URL = null) {

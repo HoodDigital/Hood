@@ -3,8 +3,8 @@ import 'jquery-toast-plugin';
 
 const BootstrapSwal = Swal.mixin({
     customClass: {
-        confirmButton: 'btn btn-success btn-lg m-1 pl-4 pr-4',
-        cancelButton: 'btn btn-danger btn-lg m-1'
+        confirmButton: 'btn btn-success m-1 px-3',
+        cancelButton: 'btn btn-danger m-1 px-3'
     },
     buttonsStyling: false
 });
@@ -120,7 +120,7 @@ export class Alerts {
 
         let baseOptions: SweetAlertOptions = {
             showCancelButton: true,
-            footer: '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> This cannot be undone.</span>',
+            footer: null,
             title: 'Are you sure?',
             html: 'Are you sure you want to do this?',
             confirmButtonText: 'Ok', 
