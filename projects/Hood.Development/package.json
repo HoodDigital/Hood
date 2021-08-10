@@ -1,6 +1,6 @@
 {
   "name": "hoodcms",
-  "version": "5.0.0-rc4",
+  "version": "5.0.0",
   "description": "A fully customisable content management system built in ASP.NET Core 5 & Bootstrap 5.",
   "dependencies": {
     "@popperjs/core": "^2.9.2",
