@@ -72,7 +72,7 @@ namespace Hood.Controllers
                 Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
                 if (!recaptcha.Success)
                 {
-                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
+                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
                     return View(model);
                 }
 
@@ -146,7 +146,7 @@ namespace Hood.Controllers
                     Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
                     if (!recaptcha.Success)
                     {
-                        ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
+                        ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
                         return View("MagicLogin", model);
                     }
 
@@ -293,7 +293,7 @@ namespace Hood.Controllers
                 Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
                 if (!recaptcha.Success)
                 {
-                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
+                    ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
                     return View(model);
                 }
 
@@ -377,7 +377,7 @@ namespace Hood.Controllers
                     Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
                     if (!recaptcha.Success)
                     {
-                        ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check.");
+                        ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
                         return View("MagicRegister", model);
                     }
 
