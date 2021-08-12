@@ -157,7 +157,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/media/directory/create/")]
-        public virtual async Task<IActionResult> CreateDirectoryAsync(int id)
+        public virtual async Task<IActionResult> CreateDirectory(int id)
         {
             try
             {
