@@ -42,13 +42,17 @@
     }
 
     iconSelectorHandler(this: HTMLElement, index: number, element: HTMLElement) {
-        let input = $(this).find('input[data-hood-icon-input]')
-        let display = $(this).find('[data-hood-icon-display]')
-        let collapse = $(this).find('.collapse')
+        let $tag = $(this);
+        let input = $tag.find('input[data-hood-icon-input]')
+        let display = $tag.find('[data-hood-icon-display]')
+        let collapse = $tag.find('.collapse')
 
-        $(this).find('[data-hood-icon-key][data-hood-icon-value]').on('click', function () {
+        $tag.find('[data-hood-icon-key][data-hood-icon-value]').on('click', function () {
+            $tag.find('[data-hood-icon-key][data-hood-icon-value]').removeClass('active');
+            $(this).addClass('active');
             let key = $(this).data('hoodIconKey');
             let value = $(this).data('hoodIconValue');
+            $(this)
             display.html(value);
             input.val(key);
             if (collapse) {
