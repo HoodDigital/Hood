@@ -4,11 +4,11 @@ namespace Hood.Extensions
 {
     public static class ViewDataDictionaryExtensions
     {
-        public static bool IsSet(this ViewDataDictionary<dynamic> data, string key)
+        public static bool IsSet<T>(this ViewDataDictionary<T> data, string key)
         {
             try
             {
-                string str = data[key] as string;
+                string str = data[key].ToString();
                 if (str.IsSet())
                     return true;
                 return false;

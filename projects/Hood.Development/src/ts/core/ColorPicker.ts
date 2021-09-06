@@ -51,7 +51,7 @@ export class ColorPickers {
                 .on('init', function (instance: any) {
                     let elemId = $(instance._root.button).parent().data('target');
                     let value = $(elemId).val();
-                    $(instance._root.button).on('click', $.proxy(function () {
+                    $(instance._root.button).parent().on('click', $.proxy(function () {
                         this.show();
                     }, instance));
                     $(elemId).on('click', $.proxy(function () {
