@@ -1,15 +1,120 @@
-// SweetAlert 2
-$swal2-success: $success !default;
-$swal2-error: $danger !default;
-$swal2-warning: $warning !default;
-$swal2-info: $info !default;
-$swal2-question: $info !default;
-
-@import "../../../node_modules/sweetalert2/src/sweetalert2";
-
-.swal2-footer {
-    text-align: center;
+.alerts {
+    .alert {
+        margin-bottom: 0;
+        border-radius: 0;
+        border: 0;
+    }
 }
+
+.alert.callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid $gray-200;
+    border-left-width: 5px;
+    border-radius: 3px;
+    background-color: $white;
+    margin-top: 0px;
+
+    h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    code {
+        border-radius: 3px;
+    }
+
+    &.alert-success {
+        border-left-color: $success;
+
+        p {
+            color: $black;
+        }
+
+        h4 {
+            color: $success;
+        }
+    }
+
+    &.alert-dark {
+        border-left-color: $gray-600;
+
+        p {
+            color: $black;
+        }
+
+        h4 {
+            color: $gray-600;
+        }
+    }
+
+    &.alert-info {
+        border-left-color: $info;
+
+        p {
+            color: $black;
+        }
+
+        h4 {
+            color: $info;
+        }
+    }
+
+    &.alert-warning {
+        border-left-color: $warning;
+
+        p {
+            color: $black;
+        }
+
+        h4 {
+            color: $warning;
+        }
+    }
+
+    &.alert-danger {
+        border-left-color: $danger;
+
+        p {
+            color: $black;
+        }
+
+        h4 {
+            color: $danger;
+        }
+    }
+}
+
+.alert {
+    button.close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+.copy-to-clipboard {
+    @include transition(none);
+    background-color: $gray-200;
+
+    &.flash {
+        background-color: lighten($success, 50);
+
+        &.fade {
+            background-color: $gray-200;
+            @include transition(background-color .75s ease-in-out);
+        }
+    }
+}
+
+// Sweetalert 2
+
 
 // Jquery Toasts
 
