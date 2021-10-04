@@ -5,13 +5,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.2/min/dropzone.min.js" integrity="sha512-9WciDs0XP20sojTJ9E7mChDXy6pcO0qHpwbEJID1YVavz2H6QBz5eLoDD8lseZOb2yGT8xDNIV7HIe1ZbuiDWg==" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.13.0/dist/sweetalert2.all.min.js" integrity="sha256-J9avsZWTdcAPp1YASuhlEH42nySYLmm0Jw1txwkuqQw=" crossorigin="anonymous"></script>
-    
-<environment include="Hood">
-    <script src="/src/js/app.js" asp-append-version="true"></script>
-</environment>
-<environment include="Development,Staging">
-    <script src="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/src/js/app.js"></script>
-</environment>
-<environment include="Production">
-    <script src="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/dist/js/app.js"></script>
-</environment>
+  
+<script src="@Engine.Resource("/src/js/app.js")" asp-append-version="true"></script>

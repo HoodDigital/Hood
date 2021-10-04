@@ -6,13 +6,13 @@
 <html>
 <head>
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="https://hood.azureedge.net/cdn/3.0.0/css/install.min.css" />
+    <link rel="stylesheet" href="@Engine.Resource("/css/install.min.css")" />
 </head>
 <body class="install @ViewData["BodyClass"]">
     <div class="login-block">
         <header>
             <a href="/">
-                <img src="https://hood.azureedge.net/cdn/3.0.0/images/hood-cms.png" alt="Hood CMS" />
+                <img src="@Engine.Resource("/images/hood-cms.png")" alt="Hood CMS" />
             </a>
         </header>
 

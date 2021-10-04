@@ -16,5 +16,6 @@ namespace Hood.Core
         public bool SeedOnStart { get; set; }
         public LogLevel LogLevel { get; set; }
         public bool ScheduledTasks { get; set; }
+        public bool BypassCDN { get; set; }
     }
 }

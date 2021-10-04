@@ -3,6 +3,7 @@ using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -178,23 +179,23 @@ namespace Hood.Core
                 return Services.Resolve<IEventsService>();
             }
         }
-        /// <summary>
-        /// <para>Gets the location for the Hood Client Side library folder containing all CSS/JS for the app.</para>
-        /// <para>Default is "/hood/".</para>
-        /// <para>Should always start with '/' and end with '/'.</para>
-        /// <para>Config section Hood:LibraryFolder</para>
-        /// </summary>
-        public static string LibraryFolder
+
+        public static string Resource(string localPath)
         {
-            get
+            var env = Engine.Services.Resolve<IWebHostEnvironment>();
+            switch (env.EnvironmentName)
             {
-                if (Configuration != null)
-                {
-                    return Configuration.LibraryFolder;
-                }
-                return "/hood";
+                case "Hood":
+                    return localPath;
+                default:
+                    if (Configuration.BypassCDN)
+                    {
+                        return localPath;
+                    }
+                    return $"https://cdn.jsdelivr.net/npm/hoodcms@{Version}{localPath}";
             }
         }
+
         /// <summary>
         /// <para>Gets the location for the Hood Client Side library folder containing all CSS/JS for the app.</para>
         /// <para>Default is "/hood/".</para>
@@ -212,19 +213,13 @@ namespace Hood.Core
                 return "admin@hooddigital.com";
             }
         }
+
         public static string Version
         {
             get
             {
                 var version = typeof(Engine).Assembly.GetName().Version;
-                if (version.Revision != 0)
-                {
-                    return $"{version.Major}.{version.Minor}.{version.Build}-pre{version.Revision}";
-                }
-                else
-                {
-                    return $"{version.Major}.{version.Minor}.{version.Build}";
-                }
+                return $"{version.Major}.{version.Minor}.{version.Build}";
             }
         }
 

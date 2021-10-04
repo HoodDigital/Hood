@@ -10,12 +10,4 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@@simonwep/pickr@1.8.1/dist/pickr.min.js" integrity="sha256-GW0RBRvOPP+M4VKudADgFKWB9nFldnYTPKfrRjq+cJ0=" crossorigin="anonymous"></script>
 
-<environment include="Hood">
-    <script src="/src/js/admin.js" asp-append-version="true"></script>
-</environment>
-<environment include="Development,Staging">
-    <script src="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/src/js/admin.js"></script>
-</environment>
-<environment include="Production">
-    <script src="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/dist/js/admin.js"></script>
-</environment>
+<script src="@Engine.Resource("/src/js/admin.js")" asp-append-version="true"></script>

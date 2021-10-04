@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Hood.Core;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.Models
 {
@@ -6,7 +7,7 @@ namespace Hood.Models
     {
         public AdminAreaSettings()
         {
-            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/hood-cms.png";
+            Logo = Engine.Resource("/images/hood-cms.png");
             Title = "Hood CMS";
         }
 

@@ -1,13 +1,4 @@
 @inject IThemesService _themes
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/monolith.min.css" />
-
-<environment include="Hood">
-    <link rel="stylesheet" href="/src/css/login.css" asp-append-version="true">
-</environment>
-<environment include="Development,Staging">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/src/css/login.css" />
-</environment>
-<environment include="Production">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/dist/css/login.css" />
-</environment>
+<link rel="stylesheet" href="@Engine.Resource("/src/css/login.css")" asp-append-version="true">

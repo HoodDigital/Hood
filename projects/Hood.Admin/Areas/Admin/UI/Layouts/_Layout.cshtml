@@ -8,7 +8,7 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewData["Title"] - @Engine.Settings.Basic.FullTitle - @Engine.Settings.Basic.AdminAreaSettings.Title</title>
-    <link type="image/png" href="https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/hood-square.png" rel="icon" />
+    <link type="image/png" href="@Engine.Resource("/images/hood-square.png")" rel="icon" />
 
     @Html.RenderScripts(Url, ResourceLocation.BeforeCss)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeCss)

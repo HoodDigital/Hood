@@ -52,13 +52,6 @@ namespace Hood.Controllers
         public string SaveMessage { get; set; }
         [TempData]
         public AlertType MessageType { get; set; }
-        protected string CurrentUrl
-        {
-            get
-            {
-                return CurrentUrl;
-            }
-        }
 
         public BaseController()
         {

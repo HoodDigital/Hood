@@ -1,4 +1,5 @@
-﻿using Hood.Extensions;
+﻿using Hood.Core;
+using Hood.Extensions;
 using Microsoft.AspNetCore.Html;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Hood.Models
     {
         public LoginAreaSettings()
         {
-            Logo = "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/hood-cms.png";
+            Logo = Engine.Resource("/images/hood-cms.png");
             Title = "Hood CMS";
         }
 

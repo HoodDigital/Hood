@@ -22,7 +22,7 @@
 
         <header class="mb-auto">
             <a href="/">
-                <img src="@Engine.Settings.Basic.LoginAreaSettings.Logo" alt="@Engine.Settings.Basic.LoginAreaSettings.Title" />
+                <img src="@(Engine.Settings.Basic.LoginAreaSettings.Logo.IsSet() ? Engine.Settings.Basic.LoginAreaSettings.Logo : Engine.Resource("/images/hood-cms.png"))" alt="@Engine.Settings.Basic.LoginAreaSettings.Title" />
             </a>
         </header>
 
