@@ -8,7 +8,7 @@ namespace Hood.Models
 {
     public class VerifyEmailModel : IEmailSendable
     {
-        public VerifyEmailModel(ApplicationUser user, string confirmationLink = null)
+        public VerifyEmailModel(ApplicationUser user, string confirmationLink)
         {
             User = user;
             ConfirmLink = confirmationLink;
@@ -43,26 +43,24 @@ namespace Hood.Models
             if (_accountSettings.VerifySubject.IsSet())
                 message.Subject = _accountSettings.VerifySubject.ReplaceUserVariables(User).ReplaceSiteVariables();
             else
-                message.Subject = "Validate your email address: {Site.Title}.".ReplaceUserVariables(User).ReplaceSiteVariables();
+                message.Subject = "Confirm your email address for {Site.Title}.".ReplaceUserVariables(User).ReplaceSiteVariables();
 
             if (_accountSettings.VerifyTitle.IsSet())
                 message.PreHeader = _accountSettings.VerifyTitle.ReplaceUserVariables(User).ReplaceSiteVariables();
             else
-                message.PreHeader = "Validate your email address.";
+                message.PreHeader = "Confirm your email address.";
 
             if (_accountSettings.VerifyMessage.IsSet())
                 message.AddDiv(_accountSettings.VerifyMessage.ReplaceSiteVariables().ReplaceUserVariables(User));
             else
-                message.AddParagraph("You have been sent this in order to validate your email.");
+                message.AddParagraph("You have been sent this in order to confirm your email.");
 
             message.AddParagraph("Your username: <strong>" + User.UserName + "</strong>");
 
-            if (ConfirmLink.IsSet())
-            {
-                message.AddParagraph("Please click the link below to confirm your email.");
-                message.AddCallToAction("Confirm your Email", ConfirmLink);
-                message.AddParagraph($"Or visit the following URL: {ConfirmLink}");
-            }
+            message.AddParagraph("Please click the link below to confirm your email.");
+            message.AddCallToAction("Confirm your Email", ConfirmLink);
+            message.AddParagraph($"Or visit the following URL: {ConfirmLink}");
+
             return message;
         }
 

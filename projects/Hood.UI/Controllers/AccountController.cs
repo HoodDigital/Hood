@@ -82,6 +82,12 @@ namespace Hood.Controllers
                 if (result.Succeeded)
                 {
                     ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
+                    if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
+                    {
+                        await SendConfirmEmail(user);
+                        return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
+                    }
+
                     user.LastLogOn = DateTime.UtcNow;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
@@ -89,11 +95,6 @@ namespace Hood.Controllers
 
                     await _logService.AddLogAsync<AccountController<TContext>>($"User ({model.Username}) logged in.");
 
-                    if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
-                    {
-                        await SendWelcomeEmail(user, true);
-                        return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
-                    }
 
                     return RedirectToLocal(returnUrl);
                 }
@@ -213,7 +214,8 @@ namespace Hood.Controllers
 
                 await _userManager.UpdateSecurityStampAsync(user);
 
-                // mark account active etc etc.
+                // mark account active as this is from an email, so no confirmation is required.
+                user.Active = true;
                 user.EmailConfirmed = true;
                 user.LastLogOn = DateTime.UtcNow;
                 user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
@@ -254,7 +256,7 @@ namespace Hood.Controllers
             AccountSettings accountSettings = Engine.Settings.Account;
             if (!accountSettings.EnableRegistration)
             {
-                return RegistrationClosed();
+                return RedirectToAction(nameof(RegistrationClosed));
             }
             if (accountSettings.MagicLinkLogin)
             {
@@ -315,9 +317,14 @@ namespace Hood.Controllers
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SendWelcomeEmail(user, Engine.Settings.Account.RequireEmailConfirmation);
+                    if (Engine.Settings.Account.RequireEmailConfirmation) {
+                        await SendConfirmEmail(user);
+                    } else {                        
+                        await SendWelcomeEmail(user);
+                    }
 
-                    user.Active = !Engine.Settings.Account.RequireEmailConfirmation;
+                    user.Active = !Engine.Settings.Account.RequireEmailConfirmation;                    
+                    user.EmailConfirmed = !Engine.Settings.Account.RequireEmailConfirmation;
                     user.LastLogOn = DateTime.UtcNow;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
@@ -458,6 +465,12 @@ namespace Hood.Controllers
         [Route("account/register/code")]
         public virtual async Task<IActionResult> MagicRegister(string t, string u, string r = "/")
         {
+            AccountSettings accountSettings = Engine.Settings.Account;
+            if (!accountSettings.EnableRegistration)
+            {
+                return RedirectToAction(nameof(RegistrationClosed));
+            }
+            
             try
             {
                 var user = await _userManager.FindByIdAsync(u);
@@ -468,9 +481,6 @@ namespace Hood.Controllers
                 }
                 await _userManager.UpdateSecurityStampAsync(user);
 
-                // send welcome email, email already confirmed so no confirm email link.
-                await SendWelcomeEmail(user, false);
-
                 // mark account active etc etc.
                 user.Active = true;
                 user.EmailConfirmed = true;
@@ -479,6 +489,9 @@ namespace Hood.Controllers
                 user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
 
                 await _userManager.UpdateAsync(user);
+
+                // send welcome email, email already confirmed so no confirm email link.
+                await SendWelcomeEmail(user);
 
                 await _signInManager.SignInAsync(user, true);
 
@@ -600,23 +613,10 @@ namespace Hood.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("account/confirm/resend")]
-        public virtual async Task<IActionResult> ResendConfirm(ConfirmRequiredModel model)
+        public virtual async Task<IActionResult> ResendConfirm()
         {
-            var user = await _userManager.FindByIdAsync(model.UserId);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{model.UserId}'.");
-            }
-
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-            var verifyModel = new VerifyEmailModel(user, callbackUrl)
-            {
-                SendToRecipient = true
-            };
-
-            await _mailService.ProcessAndSend(verifyModel);
-
+            var user = await _userManager.GetUserAsync(User);
+            await SendConfirmEmail(user);
             return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
         }
 
@@ -755,19 +755,27 @@ namespace Hood.Controllers
 
         #region Helpers
 
-        protected async Task SendWelcomeEmail(ApplicationUser user, bool confirmEmail)
+        protected async Task SendWelcomeEmail(ApplicationUser user)
         {
-            if ((Engine.Settings.Account.EnableWelcome || Engine.Settings.Account.RequireEmailConfirmation) && Engine.Settings.Mail.IsSetup)
+            string loginLink = Url.Action("Login", "Account", null, protocol: HttpContext.Request.Scheme);
+            WelcomeEmailModel welcomeModel = new WelcomeEmailModel(user, loginLink)
             {
-                string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                string callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-                WelcomeEmailModel welcomeModel = new WelcomeEmailModel(user, confirmEmail ? callbackUrl : null)
-                {
-                    SendToRecipient = true,
-                    NotifyRole = Engine.Settings.Account.NotifyNewAccount ? "NewAccountNotifications" : null
-                };
-                await _mailService.ProcessAndSend(welcomeModel);
-            }
+                SendToRecipient = true,
+                NotifyRole = Engine.Settings.Account.NotifyNewAccount ? "NewAccountNotifications" : null
+            };
+            await _mailService.ProcessAndSend(welcomeModel);
+        }
+
+        protected async Task SendConfirmEmail(ApplicationUser user)
+        {
+            string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            string confirmLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+            VerifyEmailModel confirmEmailModel = new VerifyEmailModel(user, confirmLink)
+            {
+                SendToRecipient = true,
+                NotifyRole = Engine.Settings.Account.NotifyNewAccount ? "NewAccountNotifications" : null
+            };
+            await _mailService.ProcessAndSend(confirmEmailModel);
         }
 
         protected void AddErrors(IdentityResult result)
