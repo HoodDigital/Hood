@@ -17,6 +17,12 @@ azure-pipelines.yml
 gulpfile.js
 libman.json
 .config
+rollup.config.js
+tsconfig.json
+tsconfig.production.json
+tsconfig.rollup.json
+.stylelintignore
+.stylelintrc
 
 *.cs
 *.csproj
