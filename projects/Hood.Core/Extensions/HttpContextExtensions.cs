@@ -78,39 +78,6 @@ namespace Hood.Extensions
             return value == null ? default : JsonConvert.DeserializeObject<T>(value);
         }
 
-        public static bool IsLockedOut(this HttpContext context, List<string> allowedCodes)
-        {
-            if (context.User.IsAdminOrBetter())
-                return false;
-
-            if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
-                return true;
-
-            var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
-
-            if (allowedCodes.Contains(betaCode))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public static bool MatchesAccessCode(this HttpContext context, string code)
-        {
-            if (context.User.IsAdminOrBetter())
-                return true;
-
-            if (!context.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
-                return false;
-            var betaCode = System.Text.Encoding.Default.GetString(betaCodeBytes);
-
-            if (betaCode.Equals(code, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return true;
-            }
-            return false;
-        }
-
         public static bool IsLocalhost(this HttpContext context)
         {
             string url = context.Request.Headers["HOST"];

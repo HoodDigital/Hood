@@ -83,7 +83,7 @@ namespace Hood.Services
 
         Task<BlockBlobClient> GetBlob(string directory, string filename);
 
-#warning Todo: Redo the Upload to shared access/ download via shared access on media service.  
+#warning Todo: Redo the Upload to shared access/ download via shared access on media service.
         //Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read);
 
         /// <summary>

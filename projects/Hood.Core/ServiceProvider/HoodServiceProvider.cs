@@ -24,7 +24,8 @@ namespace Hood.Core
         {
             get
             {
-                return !DatabaseConnectionFailed &&
+                return ViewsInstalled &&
+                    !DatabaseConnectionFailed &&
                     !DatabaseMigrationsMissing &&
                     !DatabaseSeedFailed &&
                     !MigrationNotApplied &&

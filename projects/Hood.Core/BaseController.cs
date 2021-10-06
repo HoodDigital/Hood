@@ -1,6 +1,7 @@
 ﻿using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
+using Hood.Filters;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -21,6 +22,8 @@ namespace Hood.Controllers
 
         }
     }
+    
+    [Installed]
     public abstract class BaseController<TContext, TUser, TRole> : Controller
          where TContext : HoodDbContext
          where TUser : ApplicationUser
@@ -55,6 +58,10 @@ namespace Hood.Controllers
 
         public BaseController()
         {
+            if (!Engine.Services.Installed) {
+                // throw here, send to install page.
+                
+            }
             _userManager = Engine.Services.Resolve<UserManager<TUser>>();
             _signInManager = Engine.Services.Resolve<SignInManager<TUser>>();
             _roleManager = Engine.Services.Resolve<RoleManager<TRole>>();

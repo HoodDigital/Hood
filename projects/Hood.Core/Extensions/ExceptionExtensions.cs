@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Hood.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,32 +44,68 @@ namespace Hood.Extensions
     public class StartupException : Exception
     {
         public StartupError Error { get; set; }
-        
-        public StartupException()
-        {
-        }
 
         public StartupException(string message, StartupError error) : base(message)
         {
-            Error = error;
+            ProcessError(error);
         }
 
         public StartupException(string message, Exception innerException, StartupError error) : base(message, innerException)
         {
-            Error = error;
+            ProcessError(error);
         }
 
         protected StartupException(SerializationInfo info, StreamingContext context, StartupError error) : base(info, context)
         {
+            ProcessError(error);
+        }
+
+        private void ProcessError(StartupError error)
+        {
             Error = error;
+            switch (Error)
+            {
+                case StartupError.MigrationMissing:
+                    Engine.Services.DatabaseConnectionFailed = false;
+                    Engine.Services.DatabaseMigrationsMissing = true;
+                    break;
+                case StartupError.MigrationNotApplied:
+                    Engine.Services.DatabaseMigrationsMissing = false;
+                    Engine.Services.DatabaseConnectionFailed = false;
+                    Engine.Services.MigrationNotApplied = true;
+                    break;
+                case StartupError.AdminUserSetupError:
+                    Engine.Services.DatabaseConnectionFailed = false;
+                    Engine.Services.DatabaseMigrationsMissing = false;
+                    Engine.Services.MigrationNotApplied = false;
+                    Engine.Services.AdminUserSetupError = true;
+                    break;
+                case StartupError.DatabaseConnectionFailed:
+                    Engine.Services.DatabaseConnectionFailed = true;
+                    Engine.Services.DatabaseMigrationsMissing = true;
+                    Engine.Services.MigrationNotApplied = true;
+                    Engine.Services.AdminUserSetupError = true;
+                    break;
+                case StartupError.DatabaseMediaError:
+                    Engine.Services.DatabaseConnectionFailed = false;
+                    Engine.Services.DatabaseMigrationsMissing = false;
+                    Engine.Services.MigrationNotApplied = false;
+                    Engine.Services.AdminUserSetupError = false;
+                    Engine.Services.DatabaseMediaTimeout = true;
+                    break;
+                case StartupError.DatabaseViewsNotInstalled: 
+                    Engine.Services.ViewsInstalled = false;
+                    break;
+            }
         }
     }
     public enum StartupError
     {
-        MigrationMissing, 
+        MigrationMissing,
         MigrationNotApplied,
         DatabaseConnectionFailed,
         AdminUserSetupError,
-        DatabaseMediaError
+        DatabaseMediaError,
+        DatabaseViewsNotInstalled
     }
 }

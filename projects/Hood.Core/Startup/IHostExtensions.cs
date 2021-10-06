@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Linq;
 
 namespace Hood.Startup
 {
@@ -28,6 +29,12 @@ namespace Hood.Startup
                         throw new StartupException("No database connection could be established.", StartupError.DatabaseConnectionFailed);
                     }
 
+                    Engine.Services.DatabaseConnectionFailed = false;
+                    Engine.Services.DatabaseMigrationsMissing = false;
+                    Engine.Services.MigrationNotApplied = false;
+                    Engine.Services.AdminUserSetupError = false;
+                    Engine.Services.DatabaseMediaTimeout = false;
+                    
                     if (Engine.Configuration.SeedOnStart)
                     {
                         // Seed the database
@@ -35,48 +42,22 @@ namespace Hood.Startup
                         RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
                         db.Seed(userManager, roleManager);
                     }
+                    else
+                    {
+                        // Ensure the database is seeded, or throw issue.
+                        if (!db.Options.Any(o => o.Id == "Hood.Version"))
+                        {
+                            // No version set in the database... this means unseeded.
+                            throw new Exception("Database is not initialised.");
+                        }
+                    }
 
-                    Engine.Services.DatabaseConnectionFailed = false;
-                    Engine.Services.DatabaseMigrationsMissing = false;
-                    Engine.Services.MigrationNotApplied = false;
-                    Engine.Services.AdminUserSetupError = false;
-                    Engine.Services.DatabaseMediaTimeout = false;
+
                     Engine.Services.DatabaseSeedFailed = false;
 
                 }
-                catch (StartupException startupException)
+                catch (StartupException)
                 {
-                    switch (startupException.Error)
-                    {
-                        case StartupError.MigrationMissing:
-                            Engine.Services.DatabaseConnectionFailed = false;
-                            Engine.Services.DatabaseMigrationsMissing = true;
-                            break;
-                        case StartupError.MigrationNotApplied:
-                            Engine.Services.DatabaseMigrationsMissing = false;
-                            Engine.Services.DatabaseConnectionFailed = false;
-                            Engine.Services.MigrationNotApplied = true;
-                            break;
-                        case StartupError.AdminUserSetupError:
-                            Engine.Services.DatabaseConnectionFailed = false;
-                            Engine.Services.DatabaseMigrationsMissing = false;
-                            Engine.Services.MigrationNotApplied = false;
-                            Engine.Services.AdminUserSetupError = true;
-                            break;
-                        case StartupError.DatabaseConnectionFailed:
-                            Engine.Services.DatabaseConnectionFailed = true;
-                            Engine.Services.DatabaseMigrationsMissing = true;
-                            Engine.Services.MigrationNotApplied = true;
-                            Engine.Services.AdminUserSetupError = true;
-                            break;
-                        case StartupError.DatabaseMediaError:
-                            Engine.Services.DatabaseConnectionFailed = false;
-                            Engine.Services.DatabaseMigrationsMissing = false;
-                            Engine.Services.MigrationNotApplied = false;
-                            Engine.Services.AdminUserSetupError = false;
-                            Engine.Services.DatabaseMediaTimeout = true;
-                            break;
-                    }
                     Engine.Services.DatabaseSeedFailed = true;
                 }
                 catch (Exception)

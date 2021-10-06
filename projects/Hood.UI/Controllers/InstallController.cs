@@ -11,14 +11,20 @@ namespace Hood.Controllers
     {
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IConfiguration _config;
+        
         public InstallController(IHostApplicationLifetime applicationLifetime, IConfiguration config)
         {
             _applicationLifetime = applicationLifetime;
             _config = config;
         }
 
+        [Route("/install")]
         public IActionResult Install()
         {
+            if (Engine.Services.Installed && !User.IsAdminOrBetter())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var model = new InstallModel()
             {
                 DatabaseConfigured = _config.IsDatabaseConnected(),
@@ -33,15 +39,5 @@ namespace Hood.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken()]
-        public IActionResult Install(string reason)
-        {
-            if (!_config.IsDatabaseConfigured())
-                _applicationLifetime.StopApplication();
-
-            ViewData["Restarting"] = "App is restarting... please do not refresh the page.";
-            return View();
-        }
     }
 }

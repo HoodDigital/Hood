@@ -15,6 +15,9 @@ namespace Hood.Core
         {
             try
             {
+                if (!Engine.Services.Installed) {
+                    return false;
+                }
                 string type = null;
                 if (values.ContainsKey("slug"))
                 {

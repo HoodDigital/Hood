@@ -55,6 +55,9 @@ namespace Hood.Caching
 
         public void ResetCache()
         {
+            if (!Engine.Services.Installed) {
+                return;
+            }
             var options = new DbContextOptionsBuilder<HoodDbContext>();
             options.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
             var db = new HoodDbContext(options.Options);

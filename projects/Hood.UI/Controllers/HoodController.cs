@@ -83,37 +83,12 @@ namespace Hood.Controllers
             return Content(xml, "text/xml", Encoding.UTF8);
         }
 
-        [Route("enter-access-code")]
-        public virtual IActionResult LockoutModeEntrance(string returnUrl)
-        {
-            if (ControllerContext.HttpContext.Session.TryGetValue("LockoutModeToken", out byte[] betaCodeBytes))
-            {
-                ViewData["token"] = Encoding.Default.GetString(betaCodeBytes);
-                ViewData["error"] = "The token you have entered is not valid.";
-            }
-            ViewData["returnUrl"] = returnUrl;
-            return View();
-        }
-
-        [Route("enter-access-code")]
-        [HttpPost]
-        public virtual IActionResult LockoutModeEntrance(string token, string returnUrl)
-        {
-            if (token.IsSet())
-            {
-                ControllerContext.HttpContext.Session.Set("LockoutModeToken", Encoding.ASCII.GetBytes(token));
-                return Redirect(returnUrl);
-            }
-            ViewData["returnUrl"] = returnUrl;
-            ViewData["token"] = token;
-            ViewData["error"] = "The token you have entered is not valid.";
-            return View();
-        }
-
         [Route("hood/version/")]
-        public virtual JsonResult Version()
+        public virtual JsonResult Version()        
         {
             return Json(new { version = Engine.Version });
         }
+
+
     }
 }

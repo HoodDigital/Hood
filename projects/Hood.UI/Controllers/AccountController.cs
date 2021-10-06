@@ -725,34 +725,6 @@ namespace Hood.Controllers
 
         #endregion
 
-        #region Login Page Backgrounds 
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("hood/images/random/{query?}")]
-        public virtual async Task<IActionResult> BackgroundImage(string query)
-        {
-            if (Engine.Settings.Integrations.UnsplashAccessKey.IsSet())
-            {
-                var client = new UnsplasharpClient(Engine.Settings.Integrations.UnsplashAccessKey);
-                var photosFound = await client.GetRandomPhoto(UnsplasharpClient.Orientation.Squarish, query: query);
-                return Json(photosFound);
-            }
-            else
-            {
-                try
-                {
-                    return Content(Engine.Settings.Basic.LoginAreaSettings.BackgroundImages.Split(Environment.NewLine).PickRandom());
-                }
-                catch
-                {
-                    return Content("https://source.unsplash.com/random");
-                }
-            }
-        }
-
-        #endregion
-
         #region Helpers
 
         protected async Task SendWelcomeEmail(ApplicationUser user)

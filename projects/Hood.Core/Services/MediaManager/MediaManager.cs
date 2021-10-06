@@ -241,7 +241,7 @@ namespace Hood.Services
             return media;
         }
 
-        #warning Todo: Redo the Upload to shared access/ download via shared access on media service.  
+        #warning Todo: Redo the Upload to shared access/ download via shared access on media service.
 
         //public async Task<string> UploadToSharedAccess(Stream file, string filename, DateTimeOffset? expiry, SharedAccessBlobPermissions permissions = SharedAccessBlobPermissions.Read)
         //{

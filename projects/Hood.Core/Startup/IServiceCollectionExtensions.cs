@@ -61,7 +61,8 @@ namespace Hood.Startup
 
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation()
-                .AddNewtonsoftJson(options => {
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver()
                     {
                         NamingStrategy = new CamelCaseNamingStrategy()
@@ -71,7 +72,7 @@ namespace Hood.Startup
                 .AddApplicationPart(typeof(IServiceCollectionExtensions).Assembly);
 
             services.AddRazorPages();
-            
+
             services.ConfigureHoodEngine(config);
 
             return services;
@@ -120,7 +121,7 @@ namespace Hood.Startup
             //    services.AddSingleton<IHoodCache, HoodCache>();
             //}
             services.AddSingleton<IHoodCache, HoodCache>();
-            
+
             return services;
         }
 
@@ -346,10 +347,13 @@ namespace Hood.Startup
             {
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(Engine).Assembly, "ComponentLib"));
                 options.FileProviders.Add(new EmbeddedFileProvider(typeof(IServiceCollectionExtensions).Assembly, "ComponentLib"));
-                EmbeddedFileProvider defaultUI = UserInterfaceProvider.GetProvider(config);
-                if (defaultUI != null)
+                if (Engine.Services.Installed)
                 {
-                    options.FileProviders.Add(defaultUI);
+                    EmbeddedFileProvider defaultUI = UserInterfaceProvider.GetProvider(config);
+                    if (defaultUI != null)
+                    {
+                        options.FileProviders.Add(defaultUI);
+                    }
                 }
             });
             services.Configure<RazorViewEngineOptions>(options =>

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "./wwwroot/dist/js/",
+    "rootDir": "./src/",
+    "noImplicitAny": true,
+    "module": "esnext",
+    "target": "es5",
+    "jsx": "react",
+    "allowJs": false,
+    "moduleResolution": "Node",
+    "sourceMap": false,
+    "noEmit": true
+  },
+  "exclude": [
+    "./src/hood"
+  ]
+}

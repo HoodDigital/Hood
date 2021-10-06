@@ -36,6 +36,7 @@ namespace Hood
 
         public static EmbeddedFileProvider GetProvider(IConfiguration config)
         {
+            
             // load the theme from the options.
             string ui = config["Hood:UI"];
 

@@ -1,4 +1,5 @@
 ﻿using Hood.BaseTypes;
+using Hood.Core;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -34,17 +35,17 @@ namespace Hood.Models
 
         public ContactSettings()
         {
-            Email = "info@hooddigital.com";
+            Email = Engine.Configuration.SuperAdminEmail;
             ContactFormTitle = "Send us a message";
             ContactFormMessage = "Someone will be in touch very soon...";
             ThankYouTitle = "Enquiry Sent!";
             ThankYouMessage = "<p>Thank you for contacting us! Your enquiry has been successfully sent.</p>";
-            Subject = "Your enquiry has been submitted to {{Site.Title}}.";
+            Subject = "Your enquiry has been submitted to {Site.Title}.";
             Title = "Enquiry on it's way!";
             Message = "<p>Thank you for contacting us! Your enquiry has been successfully sent.</p>";
-            AdminNoficationSubject = "A new enquiry from {{Site.Title}}.";
+            AdminNoficationSubject = "A new enquiry from {Site.Title}.";
             AdminNoficationTitle = "Enquiry received";
-            AdminNoficationMessage = "<p>A new enquiry has been received from the <strong>{{Site.Title}}</strong> website.</p>";
+            AdminNoficationMessage = "<p>A new enquiry has been received from the <strong>{Site.Title}</strong> website.</p>";
         }
     }
 }

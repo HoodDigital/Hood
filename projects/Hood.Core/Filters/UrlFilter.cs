@@ -1,6 +1,8 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 
 namespace Hood.Filters
@@ -19,6 +21,11 @@ namespace Hood.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
+            if (!Engine.Services.Installed)
+            {
+                return;
+            }
+
             if (Engine.Url == null)
             {
                 if (_config["Hood.SiteUrl"] == null)
@@ -37,10 +44,35 @@ namespace Hood.Filters
                     Engine.Settings["Hood.SiteUrl"] = context.HttpContext.GetSiteUrl();
                 }
             }
+
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
         }
+    }
+
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class InstalledAttribute : ActionFilterAttribute
+    {
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+
+            if (!Engine.Services.Installed)
+            {
+                context.Result = new RedirectToRouteResult(
+                    new RouteValueDictionary(
+                        new
+                        {
+                            controller = "Install",
+                            action = "Install"
+                        }
+                    )
+                );
+            }
+        }
+
     }
 }

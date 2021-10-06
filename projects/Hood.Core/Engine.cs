@@ -196,12 +196,6 @@ namespace Hood.Core
             }
         }
 
-        /// <summary>
-        /// <para>Gets the location for the Hood Client Side library folder containing all CSS/JS for the app.</para>
-        /// <para>Default is "/hood/".</para>
-        /// <para>Should always start with '/' and end with '/'.</para>
-        /// <para>Config section Hood:LibraryFolder</para>
-        /// </summary>
         public static string SiteOwnerEmail
         {
             get

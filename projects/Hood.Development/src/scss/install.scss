@@ -1,0 +1,77 @@
+@import "../../node_modules/bootstrap/scss/bootstrap";
+@import "core/_alerts.scss";
+@import "core/_forms.scss";
+body {
+    .login-container {
+        flex-shrink: 0;
+        max-width: 42rem;
+        overflow-y: auto;
+        .login-content {
+            width: 100%;
+            max-width: 22.5rem;
+            margin: auto;
+        }
+    }
+    #image-container {
+        background-position: center;
+        background-size: cover;
+        #image-credit {
+            color: $white;
+            background-color: rgba(0, 0, 0, .5);
+            a {
+                color: $white;
+                &:hover {
+                    color: $gray-200;
+                }
+            }
+        }
+    }
+    header {
+        img {
+            display: block;
+            max-width: 15rem;
+            max-height: 60px;
+            margin: 25px auto;
+        }
+    }
+    .header {
+        text-align: center;
+        h2 {
+            margin-bottom: .5em;
+            font-size: 1.5rem;
+        }
+    }
+    footer {
+        text-align: center;
+        small {
+            a {
+                font-weight: normal;
+                color: #939393;
+                text-decoration: none;
+            }
+        }
+    }
+    &.install {
+        .login-block {
+            max-width: 996px;
+        }
+    }
+    .accordion-button {
+        &.error {
+            background-color: lighten($danger, 30%);
+            color: $danger;
+            box-shadow: none;
+            &::after {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23dc3545'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            }
+        }
+        &.success {
+            background-color: lighten($success, 50%);
+            color: $success;
+            box-shadow: none;
+            &::after {
+                background-image: none;
+            }
+        }
+    }
+}

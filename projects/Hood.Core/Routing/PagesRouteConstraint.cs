@@ -17,6 +17,9 @@ namespace Hood.Core
         {
             try
             {
+                if (!Engine.Services.Installed) {
+                    return false;
+                }
                 string fullUrl = httpContext.Request.Path;
                 if (fullUrl.IsSet())
                 {

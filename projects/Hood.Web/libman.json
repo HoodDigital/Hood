@@ -1,0 +1,9 @@
+{
+    "version": "1.0",
+    "defaultProvider": "cdnjs",
+    "libraries": [{
+        "destination": "src/hood",
+        "library": "hoodcms@5.0.3",
+        "provider": "jsdelivr"
+    }]
+}

@@ -106,35 +106,21 @@ namespace Hood.Startup
         {
             try
             {
-                if (!config.IsDatabaseConfigured())
-                    throw new StartupException();
-                var context = Engine.Services.Resolve<HoodDbContext>();
-                try
-                {
-                    var profile = context.UserProfiles.FirstOrDefault();
-                    Engine.Services.ViewsInstalled = true;
-                }
-                catch (SqlException ex)
-                {
-                    if (ex.Message.Contains("Invalid object name 'HoodUserProfiles'"))
+                if (config.IsDatabaseConfigured()) {
+                    var context = Engine.Services.Resolve<HoodDbContext>();
+                    try
                     {
-                        Engine.Services.ViewsInstalled = false;
+                        var profile = context.UserProfiles.FirstOrDefault();
+                        Engine.Services.ViewsInstalled = true;
                     }
-                    throw new StartupException();
+                    catch (Microsoft.Data.SqlClient.SqlException)
+                    {
+                        throw new StartupException("Database views are not installed.", StartupError.DatabaseViewsNotInstalled);
+                    }
                 }
             }
             catch (StartupException)
-            {
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllerRoute(
-                        name: "SiteNotInstalled",
-                        pattern: "{*url}",
-                        defaults: new { controller = "Install", action = "Install" }
-                    );
-                });
-                return app;
-            }
+            { }
 
             app.UseEndpoints(endpoints =>
             {
