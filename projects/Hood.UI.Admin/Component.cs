@@ -31,7 +31,7 @@ namespace Hood.Admin
                 // Create an EmbeddedFileProvider for that assembly
                 EmbeddedFileProvider embeddedFileProvider = new EmbeddedFileProvider(
                     assembly,
-                    "Hood.Admin"
+                    "Hood.UI.Admin"
                 );
                 options.FileProviders.Add(embeddedFileProvider);
             });
