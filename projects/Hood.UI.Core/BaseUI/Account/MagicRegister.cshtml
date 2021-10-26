@@ -5,8 +5,9 @@
 
 }
 <div class="header">
-    <h2>Create an Account</h2>
+    <h2>@ViewData["Title"]</h2>
     <p>We'll email you a magic link to sign in.</p>
+    <p>Already have an account?<br />Click here to <a asp-action="Login">log in</a>.</p>
 </div>
 <form asp-controller="Account" asp-action="MagicRegisterGenerate" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" id="register-magic" role="form">
     @Html.RenderHoneypotField()

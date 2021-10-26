@@ -1,230 +1,347 @@
 @model InstallModel
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
 @{
+    bool production = _env.EnvironmentName == "Production";
     Layout = null;
 }
 <!DOCTYPE html>
-<html>
+<html class="h-100">
+
 <head>
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="@Engine.Resource("/css/install.min.css")" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+    <link rel="stylesheet" href="@Engine.Resource("/src/css/install.css")" />
 </head>
-<body class="install @ViewData["BodyClass"]">
-    <div class="login-block">
-        <header>
+
+<body class="@(!production ? "dev-mode" : "") d-flex h-100 bg-dark">
+
+    <div class="login-container d-flex w-100 h-100 p-3 px-5 mx-auto flex-column bg-white">
+
+        <header class="mb-auto">
             <a href="/">
-                <img src="@Engine.Resource("/images/hood-cms.png")" alt="Hood CMS" />
+                <img src="@Engine.Resource("/images/hood-cms.png")" alt="HoodCMS - Install" />
             </a>
         </header>
 
-        <div class="header">
-            <h2>Install</h2>
-            <p>The CMS Setup is currently incomplete. Please correct the errors below before restarting the service, once you have done this the application will start up correctly.</p>
-            <p><strong>Once you have updated the settings, you MUST restart the web application for them to take effect.</strong></p>
+        <div class="login-content" style="max-width:100%;">
+
+
+            @if (Model.Installed)
+            {
+                <div class="text-center">
+                    <h4>
+                        Your website is ready to roll!
+                    </h4>
+                </div>
+            }
+            else
+            {
+                <div class="header mb-5">
+                    <h2>Install</h2>
+                    <p>The CMS Setup is currently incomplete.</p>
+                    <p><strong>Once you have updated the settings, please restart the application for changes to take effect.</strong></p>
+                </div>
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (!Model.DatabaseConfigured)
+                    {
+                        <h2 class="accordion-header" id="heading-cstring">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-cstring" aria-expanded="true" aria-controls="collapse-cstring">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Database not configured</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-cstring" class="accordion-collapse collapse show" aria-labelledby="heading-cstring" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <p>
+                                    No database connection has been detected. Please ensure you have set set the database connection
+                                    string inside your appsettings.json file, or your ConnectionStrings in your environment variables.
+                                </p>
+                                <p>
+                                    If you are using an Azure SQL database, please follow this guide to set up a contained database
+                                    user for your database.
+                                    <a href="https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins#non-administrator-users" target="_blank">
+                                        https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins
+                                    </a>
+                                </p>
+                                <p class="m-0">
+                                    If you are using Azure, please follow this guide to add a database connection string to yourWeb App slot.
+                                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-common#configure-connection-strings" target="_blank">
+                                        https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0" id="heading-cstring">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Database connection string is set</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (Model.DatabaseConnectionFailed)
+                    {
+                        <h2 class="accordion-header" id="heading-connfail">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-connfail" aria-expanded="false" aria-controls="collapse-connfail">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Could not connect to the database</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-connfail" class="accordion-collapse collapse" aria-labelledby="heading-connfail">
+                            <div class="accordion-body">
+                                <p>
+                                    No database connection has been established. Please ensure you have set set the database
+                                    connecion
+                                    string correctly inside your appsettings.json file, or your ConnectionStrings in your
+                                    environment
+                                    variables. Also ensure that the SQL server allows connections to this site and the user has
+                                    appropriate
+                                    access to modify the database.
+                                </p>
+                                <p>
+                                    If you are using an Azure SQL database, please follow this guide to set up a contained
+                                    database user
+                                    for
+                                    your database.
+                                    <a href="https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins#non-administrator-users" target="_blank">
+                                        https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins
+                                    </a>
+                                </p>
+                                <p class="m-0">
+                                    If you are using Azure, please follow this guide to add a database connection string to your
+                                    Web App
+                                    slot.
+                                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-common#configure-connection-strings" target="_blank">
+                                        https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Database connection established</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (Model.DatabaseMigrationsMissing)
+                    {
+                        <h2 class="accordion-header" id="heading-migrationsmissing">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-migrationsmissing" aria-expanded="false" aria-controls="collapse-migrationsmissing">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Database migrations are missing</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-migrationsmissing" class="accordion-collapse collapse" aria-labelledby="heading-migrationsmissing">
+                            <div class="accordion-body">
+                                <p>
+                                    The database seed has failed, this usually means that migrations have not been created or applied to
+                                    the
+                                    database yet. You will need to add a migration to your project
+                                    if you have upgraded from an existing project or added the Hood Framework to a standard ASP.NET Core
+                                    Web
+                                    project.
+                                </p>
+                                <p>To add an up to date migration to your code use the following CLI command:</p>
+                                <p>
+                                    <code>dotnet ef migrations add NewMigrationName --context ApplicationDbContext</code><br />
+                                    <code>dotnet ef database update --context ApplicationDbContext</code>
+                                </p>
+                                <p class="m-0">
+                                    If you are updating, or have modified the DbContext you will need to add a new migration to the
+                                    database, you can follow the guide to create and apply a database migration here:
+                                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Database migrations added</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (Model.MigrationNotApplied)
+                    {
+                        <h2 class="accordion-header" id="heading-migrationsnotapplied">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-migrationsnotapplied" aria-expanded="false" aria-controls="collapse-migrationsnotapplied">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Database migrations have not been applied</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-migrationsnotapplied" class="accordion-collapse collapse" aria-labelledby="heading-migrationsnotapplied">
+                            <div class="accordion-body">
+                                <p>
+                                    The database seed has failed because migrations have not been applied to the database yet.
+                                </p>
+                                <p>
+                                    You will need to run the following CLI command to apply all the migrations to the database:
+                                </p>
+                                <p><code>dotnet ef database update --context ApplicationDbContext</code></p>
+                                <p class="m-0">
+                                    If you are updating, or have modified the DbContext you will need to add a new migration to the
+                                    database, you can follow the guide to create and apply a database migration here:
+                                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Database migrations applied</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (Model.DatabaseSeedFailed)
+                    {
+                        <h2 class="accordion-header" id="heading-seedfailed">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-seedfailed" aria-expanded="false" aria-controls="collapse-seedfailed">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Database not migrated/seeded correctly</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-seedfailed" class="accordion-collapse collapse" aria-labelledby="heading-seedfailed">
+                            <div class="accordion-body">
+                                <p>
+                                    The database is not fully initialised, this could be because initial data has not been seeded to the database
+                                    the database.
+                                </p>
+                                <p>
+                                    If this is the first time starting the website, ensure that you set "Hood:SeedOnStart" in your appsettings.json. 
+                                    This will only need to be set for the first startup, once initialised you can set this back to false.
+                                </p>
+                                <p class="m-0">
+                                    If you are updating, or have modified the DbContext you will need to add a new migration to the
+                                    database, you can follow the guide here:
+                                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Database successfully seeded</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+
+                @if (Model.DatabaseMediaTimeout)
+                {
+                    <div class="accordion-item border-0 mb-3">
+                        <h2 class="accordion-header" id="heading-seedfailed">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-seedfailed" aria-expanded="false" aria-controls="collapse-seedfailed">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Media table could not be upgraded</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-seedfailed" class="accordion-collapse collapse" aria-labelledby="heading-seedfailed">
+                            <div class="accordion-body">
+
+                                <p class="m-0">
+                                    The database seed failed, due to a timeout while updating the media tables. This is usually due to
+                                    an
+                                    excessively large number of media items, and can be fixed by manually updating the databse with an
+                                    SQL
+                                    script.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (Model.AdminUserSetupError)
+                    {
+                        <h2 class="accordion-header" id="heading-adminusererror">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-adminusererror" aria-expanded="false" aria-controls="collapse-adminusererror">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Admin user could not be created/loaded</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-adminusererror" class="accordion-collapse collapse" aria-labelledby="heading-adminusererror">
+                            <div class="accordion-body">
+                                <p class="m-0">
+                                    There is an issue creating the admin user account set in your appSettings.json. Please ensure the
+                                    setting Hood:SuperAdminEmail is set to a valid email address.
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Admin user created and loaded</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+
+                <div class="accordion-item border-0 mb-3">
+                    @if (!Model.ViewsInstalled)
+                    {
+                        <h2 class="accordion-header" id="heading-viewsInstalled">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-viewsInstalled" aria-expanded="false" aria-controls="collapse-viewsInstalled">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Database SQL Views not setup</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-viewsInstalled" class="accordion-collapse collapse" aria-labelledby="heading-viewsInstalled">
+                            <div class="accordion-body">
+                                <p>
+                                    You have not correctly installed the views for the database.
+                                </p>
+                                <p class="m-0">
+                                    In order to install the custom view required for Hood CMS, you need to run the SQL script
+                                    <code>InstallViews.sql</code> which can be found here:
+                                    <a href="https://github.com/HoodDigital/Hood/blob/master/sql/InstallViews.sql" target="_blank">Get
+                                        Installation Script</a>.
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="accordion-header border-0">
+                            <button class="accordion-button border-0 success" type="button">
+                                <i class="fa fa-check-circle me-2"></i><strong>Database SQL Views installed</strong>
+                            </button>
+                        </h2>
+                    }
+                </div>
+            }
         </div>
 
-        @if (!Model.DatabaseConfigured)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Database not configured
-                </h6>
-                <p>
-                    No database connection has been detected. Please ensure you have set set the database connecion string inside your appsettings.json file, or your ConnectionStrings in your environment variables.
-                </p>
-                <p>
-                    If you are using an Azure SQL database, please follow this guide to set up a contained database user for your database.
-                    <a href="https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins#non-administrator-users" target="_blank">
-                        https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins
-                    </a>
-                </p>
-                <p class="m-0">
-                    If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
-                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-common#configure-connection-strings" target="_blank">
-                        https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure
-                    </a>
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Database connection string is set.
-            </alert>
-        }
-
-        @if (Model.DatabaseConnectionFailed)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Could not connect to the database
-                </h6>
-                <p>
-                    No database connection has been established. Please ensure you have set set the database connecion string correctly inside your appsettings.json file, or your ConnectionStrings in your environment variables. Also ensure that the SQL server allows connections to this site and the user has appropriate access to modify the database.
-                </p>
-                <p>
-                    If you are using an Azure SQL database, please follow this guide to set up a contained database user for your database.
-                    <a href="https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins#non-administrator-users" target="_blank">
-                        https://docs.microsoft.com/en-us/azure/sql-database/sql-database-manage-logins
-                    </a>
-                </p>
-                <p class="m-0">
-                    If you are using Azure, please follow this guide to add a database connection string to your Web App slot.
-                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-common#configure-connection-strings" target="_blank">
-                        https://docs.microsoft.com/en-us/azure/app-service-web/web-sites-configure
-                    </a>
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Database connection established.
-            </alert>
-        }
-
-        @if (Model.DatabaseMigrationsMissing)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Database migrations are missing
-                </h6>
-                <p>
-                    The database seed has failed, this usually means that migrations have not been created or applied to the database yet. You will need to add a migration to your project
-                    if you have upgraded from an existing project or added the Hood Framework to a standard ASP.NET Core Web project.
-                </p>
-                <p>To add an up to date migration to your code use the following CLI command:</p>
-                <p>
-                    <code>dotnet ef migrations add NewMigrationName --context ApplicationDbContext</code><br />
-                    <code>dotnet ef database update --context ApplicationDbContext</code>
-                </p>
-                <p class="m-0">
-                    If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide to create and apply a database migration here:
-                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Database migrations found.
-            </alert>
-        }
-
-        @if (Model.MigrationNotApplied)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Database migrations have not been applied
-                </h6>
-                <p>
-                    The database seed has failed because migrations have not been applied to the database yet.
-                </p>
-                <p>
-                    You will need to run the following CLI command to apply all the migrations to the database:
-                </p>
-                <p><code>dotnet ef database update --context ApplicationDbContext</code></p>
-                <p class="m-0">
-                    If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide to create and apply a database migration here:
-                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Database migrations applied.
-            </alert>
-        }
-
-        @if (Model.DatabaseSeedFailed)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Database not migrated/seeded correctly
-                </h6>
-                <p>
-                    The database seed or migration has failed, perhaps you have not correctly installed the migrations for the database.
-                </p>
-                <p class="m-0">
-                    If you are updating, or have modified the DbContext you will need to add a new migration to the database, you can follow the guide here:
-                    <a href="https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/#customize-migration-code" target="_blank">Updating database migration code</a>.
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Database successfully seeded.
-            </alert>
-        }
-
-        @if (Model.DatabaseMediaTimeout)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Media table could not be upgraded.
-                </h6>
-                <p>
-                    The database seed failed, due to a timeout while updating the media tables. This is usually due to an excessively large number of media items, and can be fixed by manually updating the databse with an SQL script.
-                </p>
-            </alert>
-        }
-
-        @if (Model.AdminUserSetupError)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Admin user could not be created/loaded
-                </h6>
-                <p class="m-0">
-                    There is an issue creating the admin user account set in your appSettings.json. Please ensure the setting Hood:SuperAdminEmail is set to a valid email address.
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Admin user created and loaded.
-            </alert>
-        }
-        
-        @if (!Model.ViewsInstalled)
-        {
-            <alert type="Danger" size="Medium">
-                <h6>
-                    Database SQL Views not setup
-                </h6>
-                <p>
-                    You have not correctly installed the views for the database.
-                </p>
-                <p class="m-0">
-                    In order to install the custom view required for Hood CMS, you need to run the SQL script <code>InstallViews.sql</code> which can be found here:
-                    <a href="https://github.com/HoodDigital/Hood/blob/master/sql/InstallViews.sql" target="_blank">Get Installation Script</a>.
-                </p>
-            </alert>
-        }
-        else
-        {
-            <alert type="Success" size="Medium">
-                Database SQL Views installed.
-            </alert>
-        }
-
-        @if (Model.Installed)
-        {
-            <alert type="Success" size="Medium">
-                <h6>
-                    Your database and site is ready to roll!
-                </h6>
-                <p class="m-0">
-                    You will need to restart the application in order to start the site and complete the startup process.
-                </p>
-            </alert>
-        }
-
-        <footer>
-            <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood Digital</a></small>
+        <footer class="mt-auto">
+            <small><a href="http://hooddigital.com/">Powered by HoodCMS @($"v{Engine.Version}") by Hood
+                    Digital</a></small>
         </footer>
+
     </div>
+
+    <div id="image-container" class="h-100 w-100 position-relative" data-image-url="@Url.Action("BackgroundImage", "Images")">
+        <small id="image-credit" class="position-absolute bottom-0 start-0 rounded p-2 m-3">
+            <span></span>
+        </small>
+    </div>
+
+    <partial name="_Scripts_Login" />
+
 </body>
+
 </html>
