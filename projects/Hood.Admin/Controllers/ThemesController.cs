@@ -13,17 +13,25 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class ThemesController : BaseController
+    public class ThemesController : BaseThemesController
     {
         public ThemesController()
             : base()
         {
         }
+    }
+
+    public abstract class BaseThemesController : BaseController
+    {
+        public BaseThemesController()
+            : base()
+        {
+        }
 
         [Route("admin/theme/")]
-        public IActionResult Index(ThemeListView model) => List(model, "Index");
+        public virtual IActionResult Index(ThemeListView model) => List(model, "Index");
         [Route("admin/theme/list/")]
-        public IActionResult List(ThemeListView model, string viewName = "_List_Themes")
+        public virtual IActionResult List(ThemeListView model, string viewName = "_List_Themes")
         {
             model.Reload(_themeService.Themes);
             return View(viewName, model);
@@ -31,7 +39,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost()]
         [Route("admin/themes/activate/")]
-        public async Task<Response> Activate(string name)
+        public virtual async Task<Response> Activate(string name)
         {
             try
             {

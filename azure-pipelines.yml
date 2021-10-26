@@ -37,6 +37,9 @@ steps:
       $exec = "dotnet build .\projects\Hood.UI\ -c Release /p:Version=$version"
       Write-Host "$exec"
       Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.UI.Admin\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
       $exec = "dotnet build .\projects\Hood.UI.Core\ -c Release /p:Version=$version"
       Write-Host "$exec"
       Invoke-Expression $exec
@@ -58,6 +61,9 @@ steps:
       Write-Host "$exec"
       Invoke-Expression $exec
       $exec = "dotnet pack .\projects\Hood.UI\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.UI.Admin\ -c Release /p:Version=$version"
       Write-Host "$exec"
       Invoke-Expression $exec
       $exec = "dotnet pack .\projects\Hood.UI.Core\ -c Release /p:Version=$version"

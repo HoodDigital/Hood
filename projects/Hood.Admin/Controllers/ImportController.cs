@@ -13,33 +13,32 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class ImportController : BaseController
+
+    public class ImportController : BaseImportController
+    {
+        public ImportController()
+            : base()
+        {
+        }
+    }
+
+    public abstract class BaseImportController : BaseController
     {
         private readonly IFTPService _ftp;
         private readonly IPropertyImporter _blm;
 
-        //private readonly IContentExporter _contentExporter;
-        //private readonly IPropertyExporter _propertyExporter;
-
-        public ImportController(
-            IFTPService ftp, 
-            IPropertyImporter blm
-            //IContentExporter contentExporter, 
-            //IPropertyExporter propertyExporter
-            )
+        public BaseImportController()
             : base()
         {
-            _ftp = ftp;
-            _blm = blm;
-            //_contentExporter = contentExporter;
-            //_propertyExporter = propertyExporter;
+            _ftp = Engine.Services.Resolve<IFTPService>();
+            _blm = Engine.Services.Resolve<IPropertyImporter>();
         }
 
         #region "BlmPropertyImporter"
 
         [Route("admin/property/import/blm/trigger")]
         [AllowAnonymous]
-        public async Task<IActionResult> BlmPropertyImporterTrigger()
+        public virtual async Task<IActionResult> BlmPropertyImporterTrigger()
         {
             var triggerAuth = Engine.Settings.Property.TriggerAuthKey;
             if (Request.Headers.ContainsKey("Auth") && Request.Headers["Auth"] == triggerAuth && !_blm.IsRunning())
@@ -64,14 +63,14 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/property/import/blm/")]
-        public IActionResult BlmImporter()
+        public virtual IActionResult BlmImporter()
         {
             return View();
         }
 
         [HttpPost]
         [Route("admin/property/import/blm/start/")]
-        public IActionResult BlmImporterStart()
+        public virtual IActionResult BlmImporterStart()
         {
             _blm.Kill();
             _blm.RunUpdate(HttpContext);
@@ -80,14 +79,14 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/property/import/blm/cancel/")]
-        public IActionResult BlmImporterCancel()
+        public virtual IActionResult BlmImporterCancel()
         {
             _blm.Kill();
             return Json(new { success = true });
         }
 
         [Route("admin/property/import/blm/status/")]
-        public IActionResult BlmImporterStatus()
+        public virtual IActionResult BlmImporterStatus()
         {
             return Json(new
             {
@@ -97,73 +96,6 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         #endregion
-
-        //#region "Content"
-
-        //[Route("admin/content/export/")]
-        //public IActionResult ContentExport()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //[Route("admin/content/export/start/")]
-        //public IActionResult ContentExportStart()
-        //{
-        //    _contentExporter.Kill();
-        //    _contentExporter.ExportContent(HttpContext);
-        //    return Json(new { success = true });
-        //}
-
-        //[HttpPost]
-        //[Route("admin/content/export/cancel/")]
-        //public IActionResult ContentExportCancel()
-        //{
-        //    _contentExporter.Kill();
-        //    return Json(new { success = true });
-        //}
-
-        //[Route("admin/content/export/status/")]
-        //public IActionResult ContentExportStatus()
-        //{
-        //    return Json(_contentExporter.Report());
-        //}
-
-        //#endregion
-
-        //#region "Properties"
-
-        //[Route("admin/properties/export/")]
-        //public IActionResult PropertiesExport()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //[Route("admin/properties/export/start/")]
-        //public IActionResult PropertiesExportStart()
-        //{
-        //    _propertyExporter.Kill();
-        //    _propertyExporter.ExportProperties(HttpContext);
-        //    return Json(new { success = true });
-        //}
-
-        //[HttpPost]
-        //[Route("admin/properties/export/cancel/")]
-        //public IActionResult PropertiesExportCancel()
-        //{
-        //    _propertyExporter.Kill();
-        //    return Json(new { success = true });
-        //}
-
-        //[Route("admin/properties/export/status/")]
-        //public IActionResult PropertiesExportStatus()
-        //{
-        //    return Json(_propertyExporter.Report());
-        //}
-
-        //#endregion
-
 
     }
 }

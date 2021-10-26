@@ -14,40 +14,49 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles="SuperUser,Admin")]
-    public class MailController : BaseController
+
+    public class MailController : BaseMailController
     {
         public MailController()
             : base()
         {
         }
+    }
+
+    public abstract class BaseMailController : BaseController
+    {
+        public BaseMailController()
+            : base()
+        {
+        }
 
         [Route("admin/mail/preview/plain/")]
-        public IActionResult Plain()
+        public virtual IActionResult Plain()
         {
             return View(GetDemoMail());
         }
 
         [Route("admin/mail/preview/warning/")]
-        public IActionResult Warning()
+        public virtual IActionResult Warning()
         {
             return View(GetDemoMail());
         }
 
         [Route("admin/mail/preview/danger/")]
-        public IActionResult Danger()
+        public virtual IActionResult Danger()
         {
             return View(GetDemoMail());
         }
 
         [Route("admin/mail/preview/success/")]
-        public IActionResult Success()
+        public virtual IActionResult Success()
         {
             return View(GetDemoMail());
         }
 
         [HttpPost]
         [Route("admin/mail/test/")]
-        public async Task<IActionResult> Test(string email = "info@hooddigital.com", string template = Models.MailSettings.PlainTemplate)
+        public virtual async Task<IActionResult> Test(string email = "info@hooddigital.com", string template = Models.MailSettings.PlainTemplate)
         {
             try
             {
@@ -71,7 +80,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("hood/test-email-full/")]
-        public IActionResult Terms()
+        public virtual IActionResult Terms()
         {
             var mailSettings = Engine.Settings.Mail;
             var mail = GetDemoMail();
@@ -97,7 +106,7 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        protected MailObject GetDemoMail()
+        protected virtual MailObject GetDemoMail()
         {
             MailObject mail = new MailObject()
             {

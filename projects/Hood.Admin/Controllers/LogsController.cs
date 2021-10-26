@@ -13,18 +13,27 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class LogsController : BaseController
+
+    public class LogsController : BaseLogsController
     {
         public LogsController()
             : base()
         {
         }
+    }
 
-        public async Task<IActionResult> Index(LogListModel model)
+    public abstract class BaseLogsController : BaseController
+    {
+        public BaseLogsController()
+            : base()
+        {
+        }
+
+        public virtual async Task<IActionResult> Index(LogListModel model)
         {
             return await Show(model);
         }
-        public async Task<IActionResult> Clear()
+        public virtual async Task<IActionResult> Clear()
         {
             try
             {
@@ -43,7 +52,7 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Show(LogListModel model)
+        public virtual async Task<IActionResult> Show(LogListModel model)
         {
             var logs = _db.Logs
                 .Where(l => l.Time > DateTime.MinValue);

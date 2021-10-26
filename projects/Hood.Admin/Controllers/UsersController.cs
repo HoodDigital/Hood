@@ -20,21 +20,29 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class UsersController : BaseController
+    public class UsersController : BaseUsersController
     {
         public UsersController()
+            : base()
+        {
+        }
+    }
+
+    public abstract class BaseUsersController : BaseController
+    {
+        public BaseUsersController()
             : base()
         { }
 
         [Route("admin/users/")]
-        public async Task<IActionResult> Index(UserListModel model)
+        public virtual async Task<IActionResult> Index(UserListModel model)
         {
             return await List(model, "Index");
         }
 
         [HttpGet]
         [Route("admin/users/list/")]
-        public async Task<IActionResult> List(UserListModel model, string viewName = "_List_Users")
+        public virtual async Task<IActionResult> List(UserListModel model, string viewName = "_List_Users")
         {
             model = await _account.GetUserProfilesAsync(model);
             return View(viewName, model);
@@ -42,7 +50,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Edit
         [Route("admin/users/{id}/edit/")]
-        public async Task<IActionResult> Edit(string id)
+        public virtual async Task<IActionResult> Edit(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id);
             model.AllRoles = await _account.GetAllRolesAsync();
@@ -52,7 +60,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/users/{id}/edit/")]
         [HttpPost]
-        public async Task<IActionResult> Edit(UserProfile model)
+        public virtual async Task<IActionResult> Edit(UserProfile model)
         {
             ApplicationUser modelToUpdate = await _account.GetUserByIdAsync(model.Id);
             try
@@ -105,14 +113,14 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Create
         [Route("admin/users/create/")]
-        public IActionResult Create()
+        public virtual IActionResult Create()
         {
             return View();
         }
 
         [Route("admin/users/create/")]
         [HttpPost]
-        public async Task<Response> Create(AdminCreateUserViewModel model)
+        public virtual async Task<Response> Create(AdminCreateUserViewModel model)
         {
             try
             {
@@ -198,7 +206,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Delete
         [Route("admin/users/{id}/delete/")]
         [HttpPost]
-        public async Task<Response> Delete(string id)
+        public virtual async Task<Response> Delete(string id)
         {
             try
             {
@@ -226,7 +234,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/users/{id}/media/upload")]
-        public async Task<Response> UploadMedia(string id, AttachMediaModel model)
+        public virtual async Task<Response> UploadMedia(string id, AttachMediaModel model)
         {
             try
             {
@@ -267,7 +275,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/users/{id}/media/remove")]
-        public async Task<Response> RemoveMedia(string id, AttachMediaModel model)
+        public virtual async Task<Response> RemoveMedia(string id, AttachMediaModel model)
         {
             try
             {
@@ -297,7 +305,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region MarkConfirmed
         [Route("admin/users/{id}/confirm-email/")]
-        public async Task<Response> MarkEmailConfirmed(string id)
+        public virtual async Task<Response> MarkEmailConfirmed(string id)
         {
             try
             {
@@ -328,6 +336,7 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<UsersController>($"Error confirming email for user via the admin panel.", ex);
             }
         }
+
         //[Route("admin/users/{id}/confirm-phone/")]
         //public async Task<Response> MarkPhoneConfirmed(string id)
         //{
@@ -364,7 +373,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Notes 
         [Route("admin/users/{id}/notes/")]
-        public async Task<IActionResult> Notes(string id)
+        public virtual async Task<IActionResult> Notes(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id);
             return View("_Inline_Notes", model);
@@ -372,7 +381,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/users/{id}/notes/add/")]
         [HttpPost]
-        public async Task<Response> AddNote(string id, string note)
+        public virtual async Task<Response> AddNote(string id, string note)
         {
             try
             {
@@ -394,7 +403,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/users/{id}/notes/delete/")]
-        public async Task<Response> DeleteNote(string id, Guid noteId)
+        public virtual async Task<Response> DeleteNote(string id, Guid noteId)
         {
             try
             {
@@ -420,7 +429,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Roles
         [Route("admin/users/{id}/get-roles/")]
         [HttpGet]
-        public async Task<JsonResult> GetRoles(string id)
+        public virtual async Task<JsonResult> GetRoles(string id)
         {
             ApplicationUser user = await _userManager.FindByIdAsync(id);
             IList<string> roles = await _userManager.GetRolesAsync(user);
@@ -428,7 +437,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [Route("admin/users/{id}/set-role/")]
         [HttpPost]
-        public async Task<Response> SetRole(string id, string role, bool add)
+        public virtual async Task<Response> SetRole(string id, string role, bool add)
         {
             try
             {
@@ -485,7 +494,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Impersonation
-        public async Task<IActionResult> Impersonate(string id)
+        public virtual async Task<IActionResult> Impersonate(string id)
         {
             try
             {
@@ -524,7 +533,7 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction(nameof(Edit), new { id });
         }
         [AllowAnonymous]
-        public async Task<IActionResult> StopImpersonation()
+        public virtual async Task<IActionResult> StopImpersonation()
         {
             try
             {
@@ -561,7 +570,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Password
         [Route("admin/users/{id}/reset/")]
         [HttpPost]
-        public async Task<Response> ResetPassword(string id, string password)
+        public virtual async Task<Response> ResetPassword(string id, string password)
         {
             try
             {

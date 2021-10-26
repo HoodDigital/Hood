@@ -21,18 +21,27 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class ContentTypeController : BaseController
+
+    public class ContentTypeController : BaseContentTypeController
     {
         public ContentTypeController()
             : base()
         {
         }
+    }
+
+    public abstract class BaseContentTypeController : BaseController
+    {
+        public BaseContentTypeController()
+            : base()
+        {
+        }
 
         [Route("admin/content-types/manage/")]
-        public IActionResult Index(ContentTypeListModel model) => List(model, "Index");
+        public virtual IActionResult Index(ContentTypeListModel model) => List(model, "Index");
 
         [Route("admin/content-types/list/")]
-        public IActionResult List(ContentTypeListModel model, string viewName = "_List_ContentType")
+        public virtual IActionResult List(ContentTypeListModel model, string viewName = "_List_ContentType")
         {
             // get das list and shit.
             _cache.Remove(typeof(ContentSettings).ToString());
@@ -73,21 +82,21 @@ namespace Hood.Areas.Admin.Controllers
         #region Fields 
 
         [Route("admin/content-types/{id}/fields")]
-        public IActionResult FieldList(string id, string viewName = "_List_CustomField")
+        public virtual IActionResult FieldList(string id, string viewName = "_List_CustomField")
         {
             var model = Engine.Settings.Content.GetContentType(id);
             return View(viewName, model);
         }
 
         [Route("admin/content-types/{id}/fields/add")]
-        public IActionResult CreateField()
+        public virtual IActionResult CreateField()
         {
             return View("_Blade_CustomField");
         }
 
         [HttpPost]
         [Route("admin/content-types/{id}/fields/add")]
-        public async Task<Response> CreateField(string id, CustomField model)
+        public virtual async Task<Response> CreateField(string id, CustomField model)
         {
             try
             {
@@ -118,7 +127,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content-types/{id}/fields/delete")]
-        public async Task<Response> DeleteField(string id, string name)
+        public virtual async Task<Response> DeleteField(string id, string name)
         {
             try
             {
@@ -143,14 +152,14 @@ namespace Hood.Areas.Admin.Controllers
         #region Create
 
         [Route("admin/content-types/create")]
-        public IActionResult Create()
+        public virtual IActionResult Create()
         {
             return View("_Blade_ContentType");
         }
 
         [HttpPost]
         [Route("admin/content-types/create")]
-        public async Task<Response> Create(ContentType model)
+        public virtual async Task<Response> Create(ContentType model)
         {
             try
             {
@@ -190,7 +199,7 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
 
-        private async Task RefreshAllMetasAsync()
+        protected virtual async Task RefreshAllMetasAsync()
         {
             foreach (var content in _db.Content.Include(p => p.Metadata).AsNoTracking().ToList())
             {
@@ -220,7 +229,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Edit
 
         [Route("admin/content-types/{id}/edit/")]
-        public IActionResult Edit(string id)
+        public virtual IActionResult Edit(string id)
         {
             var model = Engine.Settings.Content.GetContentType(id);
             return View(model);
@@ -228,7 +237,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost()]
         [Route("admin/content-types/{id}/edit/")]
-        public async Task<ActionResult> Edit(ContentType model, string id)
+        public virtual async Task<ActionResult> Edit(ContentType model, string id)
         {
             try
             {
@@ -254,7 +263,7 @@ namespace Hood.Areas.Admin.Controllers
             return View(model);
         }
 
-        private ContentType SaveContentType(ContentType model, string id)
+        protected virtual ContentType SaveContentType(ContentType model, string id)
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings contentSettings = Engine.Settings.Content;
@@ -281,7 +290,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/content-types/{id}/delete/")]
-        public async Task<IActionResult> Delete(string id)
+        public virtual async Task<IActionResult> Delete(string id)
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;
@@ -316,7 +325,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/content/reset/")]
-        public async Task<IActionResult> ResetContent()
+        public virtual async Task<IActionResult> ResetContent()
         {
             var model = new ContentSettings();
 

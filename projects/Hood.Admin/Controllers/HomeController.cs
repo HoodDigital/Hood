@@ -12,22 +12,31 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-    public class HomeController : BaseController
+
+    public class HomeController : BaseHomeController
     {
         public HomeController()
             : base()
         {
         }
+    }
+
+    public abstract class BaseHomeController : BaseController
+    {
+        public BaseHomeController()
+            : base()
+        {
+        }
 
         [Route("admin/")]
-        public IActionResult Index()
+        public virtual IActionResult Index()
         {
             return View();
         }
 
         [Route("admin/debug")]
         [Authorize(Roles = "SuperUser")]
-        public async Task<IActionResult> Debug()
+        public virtual async Task<IActionResult> Debug()
         {
             ApplicationUser user = await _userManager.GetUserAsync(User);
             user.AddUserNote(new UserNote()
@@ -43,7 +52,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/stats/")]
-        public async Task<IActionResult> StatsAsync()
+        public virtual async Task<IActionResult> StatsAsync()
         {
             ContentStatitsics content = await _content.GetStatisticsAsync();
             UserStatistics users = await _account.GetStatisticsAsync();

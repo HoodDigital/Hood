@@ -19,24 +19,33 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin,Editor")]
-    public class PropertyController : BaseController
+
+    public class PropertyController : BasePropertyController
+    {
+        public PropertyController()
+            : base()
+        {
+        }
+    }
+
+    public abstract class BasePropertyController : BaseController
     {
         protected readonly PropertySettings _propertySettings;
 
-        public PropertyController()
+        public BasePropertyController()
             : base()
         {
             _propertySettings = Engine.Settings.Property;
         }
 
         [Route("admin/property/manage/")]
-        public async Task<IActionResult> Index(PropertyListModel model)
+        public virtual async Task<IActionResult> Index(PropertyListModel model)
         {
             return await List(model, "Index");
         }
 
         [Route("admin/property/list/")]
-        public async Task<IActionResult> List(PropertyListModel model, string viewName = "_List_Property")
+        public virtual async Task<IActionResult> List(PropertyListModel model, string viewName = "_List_Property")
         {
             PropertySettings propertySettings = Engine.Settings.Property;
             if (!propertySettings.Enabled || !propertySettings.ShowList)
@@ -49,7 +58,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Edit
         [Route("admin/property/{id}/edit/")]
-        public async Task<IActionResult> Edit(int id)
+        public virtual async Task<IActionResult> Edit(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
             model = await LoadAgents(model);
@@ -59,7 +68,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/property/{id}/edit/")]
-        public async Task<ActionResult> Edit(PropertyListing model)
+        public virtual async Task<ActionResult> Edit(PropertyListing model)
         {
             try
             {
@@ -176,7 +185,7 @@ namespace Hood.Areas.Admin.Controllers
             }
 
         }
-        private async Task<PropertyListing> LoadAgents(PropertyListing listing)
+        protected virtual async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
             IList<ApplicationUser> admins = await _userManager.GetUsersInRoleAsync("Admin");
             IList<ApplicationUser> editors = await _userManager.GetUsersInRoleAsync("Editor");
@@ -188,7 +197,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Create
         [Route("admin/property/create/")]
-        public IActionResult Create()
+        public virtual IActionResult Create()
         {
             PropertyListing model = new PropertyListing()
             {
@@ -199,7 +208,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/property/create/")]
-        public async Task<Response> Create(PropertyListing model)
+        public virtual async Task<Response> Create(PropertyListing model)
         {
             try
             {
@@ -285,7 +294,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Delete
         [Route("admin/property/{id}/delete")]
         [HttpPost()]
-        public async Task<Response> Delete(int id)
+        public virtual async Task<Response> Delete(int id)
         {
             try
             {
@@ -301,7 +310,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/property/{id}/set-status")]
         [HttpPost()]
-        public async Task<Response> SetStatus(int id, ContentStatus status)
+        public virtual async Task<Response> SetStatus(int id, ContentStatus status)
         {
             try
             {
@@ -320,7 +329,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/property/{id}/media/upload")]
-        public async Task<Response> UploadMedia(int id, AttachMediaModel model)
+        public virtual async Task<Response> UploadMedia(int id, AttachMediaModel model)
         {
             try
             {
@@ -367,7 +376,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/property/{id}/media/remove")]
-        public async Task<Response> RemoveMedia(int id, AttachMediaModel model)
+        public virtual async Task<Response> RemoveMedia(int id, AttachMediaModel model)
         {
             try
             {
@@ -407,7 +416,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Gallery
         [Route("admin/property/{id}/gallery/")]
-        public async Task<IActionResult> Gallery(int id)
+        public virtual async Task<IActionResult> Gallery(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
             return View("_List_PropertyMedia", model);
@@ -416,7 +425,7 @@ namespace Hood.Areas.Admin.Controllers
         [Authorize]
         [HttpPost]
         [Route("admin/property/{id}/gallery/upload/")]
-        public async Task<Response> UploadToGallery(List<int> media, int id)
+        public virtual async Task<Response> UploadToGallery(List<int> media, int id)
         {
             try
             {
@@ -463,7 +472,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/property/{id}/media/remove/{mediaId}")]
-        public async Task<Response> RemoveMedia(int id, int mediaId)
+        public virtual async Task<Response> RemoveMedia(int id, int mediaId)
         {
             try
             {
@@ -482,7 +491,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Floorplans
         [Route("admin/property/{id}/floorplans/")]
-        public async Task<IActionResult> FloorPlans(int id)
+        public virtual async Task<IActionResult> FloorPlans(int id)
         {
             PropertyListing model = await _property.GetPropertyByIdAsync(id, true);
             return View("_List_PropertyFloorplans", model);
@@ -490,7 +499,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Authorize]
         [Route("admin/property/{id}/floorplans/upload")]
-        public async Task<Response> UploadFloorplan(List<int> media, int id)
+        public virtual async Task<Response> UploadFloorplan(List<int> media, int id)
         {
             try
             {
@@ -536,7 +545,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/property/{id}/floorplans/remove/{mediaId}")]
-        public async Task<Response> RemoveFloorplan(int id, int mediaId)
+        public virtual async Task<Response> RemoveFloorplan(int id, int mediaId)
         {
             try
             {
@@ -554,7 +563,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Features
         [Route("admin/property/{id}/add-meta/")]
-        public async Task<IActionResult> AddMeta(int id, string name)
+        public virtual async Task<IActionResult> AddMeta(int id, string name)
         {
             try
             {
@@ -592,7 +601,7 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction(nameof(Edit), new { id });
         }
         [Route("admin/property/{id}/delete-meta/")]
-        public async Task<IActionResult> DeleteMeta(int id, int metaId)
+        public virtual async Task<IActionResult> DeleteMeta(int id, int metaId)
         {
             try
             {

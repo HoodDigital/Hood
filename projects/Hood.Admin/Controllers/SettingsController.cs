@@ -19,20 +19,25 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "SuperUser,Admin")]
-    public class SettingsController : BaseController
+    public class SettingsController : BaseSettingsController
     {
-        protected IMediaRefreshService _mediaRefresh;
-
-        public SettingsController(
-            IMediaRefreshService mediaRefresh
-            )
+        public SettingsController()
             : base()
         {
-            _mediaRefresh = mediaRefresh;
+        }
+    }
+
+    public abstract class BaseSettingsController : BaseController
+    {
+        protected IMediaRefreshService _mediaRefresh;
+        public BaseSettingsController()
+            : base()
+        {
+            _mediaRefresh = Engine.Services.Resolve<IMediaRefreshService>();
         }
 
         [Route("admin/settings/basics/")]
-        public IActionResult Basics()
+        public virtual IActionResult Basics()
         {
             _cache.Remove(typeof(BasicSettings).ToString());
             BasicSettings model = Engine.Settings.Basic;
@@ -43,7 +48,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/settings/basics/")]
-        public IActionResult Basics(BasicSettings model)
+        public virtual IActionResult Basics(BasicSettings model)
         {
             try
             {
@@ -99,7 +104,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/basics/reset/")]
-        public IActionResult ResetBasics()
+        public virtual IActionResult ResetBasics()
         {
             var model = new BasicSettings();
             Engine.Settings.Set(model);
@@ -107,7 +112,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/integrations/")]
-        public IActionResult Integrations()
+        public virtual IActionResult Integrations()
         {
             _cache.Remove(typeof(IntegrationSettings).ToString());
             IntegrationSettings model = Engine.Settings.Integrations;
@@ -118,7 +123,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/integrations/")]
-        public IActionResult Integrations(IntegrationSettings model)
+        public virtual IActionResult Integrations(IntegrationSettings model)
         {
             try
             {
@@ -135,7 +140,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/integrations/reset/")]
-        public IActionResult ResetIntegrations()
+        public virtual IActionResult ResetIntegrations()
         {
             var model = new IntegrationSettings();
             Engine.Settings.Set(model);
@@ -144,7 +149,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/contact/")]
-        public IActionResult Contact()
+        public virtual IActionResult Contact()
         {
             _cache.Remove(typeof(ContactSettings).ToString());
             ContactSettings model = Engine.Settings.Contact;
@@ -155,7 +160,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/settings/contact/")]
-        public IActionResult Contact(ContactSettings model)
+        public virtual IActionResult Contact(ContactSettings model)
         {
             try
             {
@@ -172,7 +177,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/contact/reset/")]
-        public IActionResult ResetContact()
+        public virtual IActionResult ResetContact()
         {
             var model = new ContactSettings();
             Engine.Settings.Set(model);
@@ -181,7 +186,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/content/")]
-        public IActionResult Content()
+        public virtual IActionResult Content()
         {
             _cache.Remove(typeof(ContentSettings).ToString());
             ContentSettings model = Engine.Settings.Content;
@@ -192,7 +197,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/settings/content/")]
-        public async Task<IActionResult> Content(ContentSettings model)
+        public virtual async Task<IActionResult> Content(ContentSettings model)
         {
             try
             {
@@ -217,7 +222,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/property/")]
-        public IActionResult Property()
+        public virtual IActionResult Property()
         {
             _cache.Remove(typeof(PropertySettings).ToString());
             PropertySettings model = Engine.Settings.Property;
@@ -227,7 +232,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/property/")]
-        public IActionResult Property(PropertySettings model)
+        public virtual IActionResult Property(PropertySettings model)
         {
             try
             {
@@ -244,7 +249,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/property/reset/")]
-        public IActionResult ResetProperty()
+        public virtual IActionResult ResetProperty()
         {
             var model = new PropertySettings();
             Engine.Settings.Set(model);
@@ -252,7 +257,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/account/")]
-        public IActionResult AccountSettings()
+        public virtual IActionResult AccountSettings()
         {
             _cache.Remove(typeof(AccountSettings).ToString());
             AccountSettings model = Engine.Settings.Account;
@@ -262,7 +267,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/account/")]
-        public IActionResult AccountSettings(AccountSettings model)
+        public virtual IActionResult AccountSettings(AccountSettings model)
         {
             try
             {
@@ -279,7 +284,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/account/reset/")]
-        public IActionResult ResetAccount()
+        public virtual IActionResult ResetAccount()
         {
             var model = new AccountSettings();
             Engine.Settings.Set(model);
@@ -289,7 +294,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [Route("admin/settings/seo/")]
 
-        public IActionResult Seo()
+        public virtual IActionResult Seo()
         {
             _cache.Remove(typeof(SeoSettings).ToString());
             SeoSettings model = Engine.Settings.Seo;
@@ -299,7 +304,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/seo/")]
-        public IActionResult Seo(SeoSettings model)
+        public virtual IActionResult Seo(SeoSettings model)
         {
             try
             {
@@ -316,7 +321,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/seo/reset/")]
-        public IActionResult ResetSeo()
+        public virtual IActionResult ResetSeo()
         {
             var model = new SeoSettings();
             Engine.Settings.Set(model);
@@ -325,7 +330,7 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/media/")]
-        public IActionResult Media()
+        public virtual IActionResult Media()
         {
             _cache.Remove(typeof(MediaSettings).ToString());
             MediaSettings model = Engine.Settings.Media;
@@ -338,7 +343,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/media/")]
-        public IActionResult Media(MediaSettings model)
+        public virtual IActionResult Media(MediaSettings model)
         {
             try
             {
@@ -358,14 +363,14 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/media/reset/")]
-        public IActionResult ResetMedia()
+        public virtual IActionResult ResetMedia()
         {
             var model = new MediaSettings();
             Engine.Settings.Set(model);
             return RedirectWithResetMessage("Media");
         }
         [Route("admin/settings/media/refresh/")]
-        public IActionResult RefreshMedia()
+        public virtual IActionResult RefreshMedia()
         {
             _mediaRefresh.Kill();
             _mediaRefresh.RunUpdate(HttpContext);
@@ -377,14 +382,14 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/media/refresh/cancel/")]
-        public IActionResult RefreshMediaKillAsync()
+        public virtual IActionResult RefreshMediaKillAsync()
         {
             _mediaRefresh.Kill();
             return Json(new { success = true });
         }
 
         [Route("admin/settings/mail/")]
-        public IActionResult Mail()
+        public virtual IActionResult Mail()
         {
             _cache.Remove(typeof(MailSettings).ToString());
             MailSettings model = Engine.Settings.Mail;
@@ -394,7 +399,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [HttpPost]
         [Route("admin/settings/mail/")]
-        public IActionResult Mail(MailSettings model)
+        public virtual IActionResult Mail(MailSettings model)
         {
             try
             {
@@ -411,7 +416,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/settings/mail/reset/")]
-        public IActionResult ResetMail()
+        public virtual IActionResult ResetMail()
         {
             var model = new MailSettings();
             Engine.Settings.Set(model);
@@ -420,14 +425,14 @@ namespace Hood.Areas.Admin.Controllers
 
 
         [Route("admin/settings/advanced/")]
-        public IActionResult Advanced()
+        public virtual IActionResult Advanced()
         {
             return View(new SaveableModel());
         }
 
         #region Caching 
         [Route("admin/settings/removecacheitem/")]
-        public IActionResult RemoveCacheItem(string key)
+        public virtual IActionResult RemoveCacheItem(string key)
         {
             _cache.Remove(key);
             SaveMessage = $"The item {key} has been cleared from the cache.";
@@ -435,7 +440,7 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Advanced");
         }
         [Route("admin/settings/resetcache/")]
-        public IActionResult ResetCache()
+        public virtual IActionResult ResetCache()
         {
             _cache.ResetCache();
             SaveMessage = $"The site cache has been cleared.";
@@ -445,14 +450,14 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         #region Helpers 
-        public IActionResult RedirectWithResetMessage(string actionName)
+        public virtual IActionResult RedirectWithResetMessage(string actionName)
         {
             SaveMessage = $"The settings have been reset to their default values.";
             MessageType = AlertType.Success;
             return RedirectToAction(actionName);
         }
 
-        public async Task RefreshAllMetasAsync()
+        public virtual async Task RefreshAllMetasAsync()
         {
             foreach (var content in _db.Content.Include(p => p.Metadata).AsNoTracking().ToList())
             {

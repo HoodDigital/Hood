@@ -21,18 +21,27 @@ namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = "Admin,Editor")]
-    public class ContentController : BaseController
+
+    public class ContentController : BaseContentController
     {
         public ContentController()
             : base()
         {
         }
+    }
+
+    public abstract class BaseContentController : BaseController
+    {
+        public BaseContentController()
+            : base()
+        {
+        }
 
         [Route("admin/content/manage/{type?}/")]
-        public async Task<IActionResult> Index(ContentModel model) => await List(model, "Index");
+        public virtual async Task<IActionResult> Index(ContentModel model) => await List(model, "Index");
 
         [Route("admin/content/list/{type?}/")]
-        public async Task<IActionResult> List(ContentModel model, string viewName = "_List_Content")
+        public virtual async Task<IActionResult> List(ContentModel model, string viewName = "_List_Content")
         {
             model = await _content.GetContentAsync(model);
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
@@ -41,7 +50,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Edit
         [Route("admin/content/{id}/edit/")]
-        public async Task<IActionResult> Edit(int id)
+        public virtual async Task<IActionResult> Edit(int id)
         {
             var model = await _content.GetContentByIdAsync(id, true, false);
             model = await GetEditorModel(model);
@@ -53,7 +62,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost()]
         [Route("admin/content/{id}/edit/")]
-        public async Task<ActionResult> Edit(Content model)
+        public virtual async Task<ActionResult> Edit(Content model)
         {
             try
             {
@@ -133,7 +142,7 @@ namespace Hood.Areas.Admin.Controllers
 
         }
 
-        private async Task GenerateNewSlug(Content model)
+        protected virtual async Task GenerateNewSlug(Content model)
         {
             KeyGenerator generator = new KeyGenerator();
             model.Slug = generator.UrlSlug();
@@ -146,7 +155,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Create
         [Route("admin/content/create/{type}")]
-        public IActionResult Create(string type)
+        public virtual IActionResult Create(string type)
         {
             Content model = new()
             {
@@ -159,7 +168,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/create/{type}")]
-        public async Task<Response> Create(Content model)
+        public virtual async Task<Response> Create(Content model)
         {
             try
             {
@@ -186,7 +195,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Content Categories
         [Route("admin/content/{id}/categories/")]
-        public async Task<IActionResult> ContentCategories(int id)
+        public virtual async Task<IActionResult> ContentCategories(int id)
         {
             Content content = await _content.GetContentByIdAsync(id);
             EditContentModel model = new EditContentModel()
@@ -199,7 +208,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/{id}/categories/toggle/")]
-        public async Task<Response> ToggleCategory(int id, int categoryId, bool add)
+        public virtual async Task<Response> ToggleCategory(int id, int categoryId, bool add)
         {
             try
             {
@@ -223,7 +232,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/categories/suggestions/{type}/")]
-        public IActionResult CategorySuggestions(string type)
+        public virtual IActionResult CategorySuggestions(string type)
         {
             var suggestions = _contentCategoryCache.GetSuggestions(type).Select(c => new { id = c.Id, displayName = c.DisplayName, slug = c.Slug });
             return Json(suggestions.ToArray());
@@ -232,7 +241,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Manage Categories        
         [Route("admin/content/categories/list/{type}/")]
-        public IActionResult Categories(string type)
+        public virtual IActionResult Categories(string type)
         {
             ContentModel model = new ContentModel
             {
@@ -242,14 +251,14 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/categories/list-content/{id}/")]
-        public async Task<IActionResult> CategoriesContentAsync(int id)
+        public virtual async Task<IActionResult> CategoriesContentAsync(int id)
         {
             var model = await _content.GetContentByIdAsync(id, true, false);
             return View("_List_Categories_Content", model);
         }
 
         [Route("admin/content/categories/add/{type}/")]
-        public IActionResult CreateCategory(string type)
+        public virtual IActionResult CreateCategory(string type)
         {
             ContentCategory model = new ContentCategory()
             {
@@ -261,7 +270,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/categories/add/{type}/")]
-        public async Task<Response> CreateCategory(ContentCategory category)
+        public virtual async Task<Response> CreateCategory(ContentCategory category)
         {
             try
             {
@@ -282,7 +291,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/categories/edit/{id}/")]
-        public async Task<IActionResult> EditCategory(int id, string type)
+        public virtual async Task<IActionResult> EditCategory(int id, string type)
         {
             ContentCategory model = await _content.GetCategoryByIdAsync(id);
             model.Categories = _contentCategoryCache.TopLevel(type);
@@ -291,7 +300,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/categories/edit/{id}/")]
-        public async Task<Response> EditCategory(ContentCategory model)
+        public virtual async Task<Response> EditCategory(ContentCategory model)
         {
             try
             {
@@ -320,7 +329,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/categories/delete/{id}/")]
-        public async Task<Response> DeleteCategory(int id)
+        public virtual async Task<Response> DeleteCategory(int id)
         {
             try
             {
@@ -337,7 +346,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Set Status
         [Route("admin/content/set-status/{id}")]
         [HttpPost()]
-        public async Task<Response> SetStatus(int id, ContentStatus status)
+        public virtual async Task<Response> SetStatus(int id, ContentStatus status)
         {
             try
             {
@@ -355,7 +364,7 @@ namespace Hood.Areas.Admin.Controllers
         #region Delete
         [HttpPost()]
         [Route("admin/content/delete/{id}")]
-        public async Task<Response> Delete(int id)
+        public virtual async Task<Response> Delete(int id)
         {
             try
             {
@@ -369,7 +378,7 @@ namespace Hood.Areas.Admin.Controllers
         }
         [Authorize(Roles = "SuperUser,Admin")]
         [Route("admin/content/{type}/delete/all/")]
-        public async Task<IActionResult> DeleteAll(string type)
+        public virtual async Task<IActionResult> DeleteAll(string type)
         {
             try
             {
@@ -390,7 +399,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Duplicate
         [Route("admin/content/duplicate/{id}")]
-        public async Task<IActionResult> Duplicate(int id)
+        public virtual async Task<IActionResult> Duplicate(int id)
         {
             try
             {
@@ -409,7 +418,7 @@ namespace Hood.Areas.Admin.Controllers
         #endregion
 
         [Route("admin/pages/set-home/{id}")]
-        public async Task<Response> SetHomepage(int id)
+        public virtual async Task<Response> SetHomepage(int id)
         {
             try
             {
@@ -431,7 +440,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/content/{id}/media/upload")]
-        public async Task<Response> UploadMedia(int id, AttachMediaModel model)
+        public virtual async Task<Response> UploadMedia(int id, AttachMediaModel model)
         {
             try
             {
@@ -478,7 +487,7 @@ namespace Hood.Areas.Admin.Controllers
         /// </summary>
         [HttpPost]
         [Route("admin/content/{id}/media/remove")]
-        public async Task<Response> RemoveMedia(int id, AttachMediaModel model)
+        public virtual async Task<Response> RemoveMedia(int id, AttachMediaModel model)
         {
             try
             {
@@ -511,7 +520,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Gallery
         [Route("admin/content/{id}/gallery")]
-        public async Task<IActionResult> Gallery(int id)
+        public virtual async Task<IActionResult> Gallery(int id)
         {
             Content model = await _content.GetContentByIdAsync(id, true);
             if (model == null)
@@ -524,7 +533,7 @@ namespace Hood.Areas.Admin.Controllers
         }
 
         [Route("admin/content/media/{id}/upload/gallery")]
-        public async Task<Response> UploadToGallery(List<int> media, int id)
+        public virtual async Task<Response> UploadToGallery(List<int> media, int id)
         {
 
             try
@@ -569,7 +578,7 @@ namespace Hood.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("admin/content/media/{id}/remove/{mediaId}")]
-        public async Task<Response> RemoveMedia(int id, int mediaId)
+        public virtual async Task<Response> RemoveMedia(int id, int mediaId)
         {
             try
             {
@@ -589,7 +598,7 @@ namespace Hood.Areas.Admin.Controllers
 
         #region Helpers
 
-        protected async Task<Content> GetEditorModel(Content model)
+        protected virtual async Task<Content> GetEditorModel(Content model)
         {
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
@@ -609,7 +618,7 @@ namespace Hood.Areas.Admin.Controllers
             return model;
         }
 
-        protected Content GetTemplates(Content model, string templateDirectory)
+        protected virtual Content GetTemplates(Content model, string templateDirectory)
         {
             Dictionary<string, string> templates = new Dictionary<string, string>();
 
