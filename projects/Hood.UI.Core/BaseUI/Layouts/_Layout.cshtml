@@ -36,6 +36,15 @@
 
     @RenderSection("beforecontent", required: false)
 
+    @if (User.Identity.IsAuthenticated && !Engine.Account.EmailConfirmed)
+    {
+        <div class="alert alert-warning border-0 rounded-0 m-0">
+            <div class="d-flex align-items-center">
+                <div>Your account is not confirmed. Click <a asp-action="ResendConfirm" asp-controller="Account">here</a> to resend confirmation email.</div>
+            </div>
+        </div>
+    }
+
     <div class="wrapper" id="wrapper">
         @await Component.InvokeAsync(nameof(Hood.ViewComponents.Header))
         @RenderBody()

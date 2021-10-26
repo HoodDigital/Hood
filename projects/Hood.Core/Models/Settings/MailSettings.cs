@@ -31,6 +31,8 @@ namespace Hood.Models
         public string BackgroundColour { get; set; }
         [Display(Name = "Logo")]
         public string Logo { get; set; }
+        [Display(Name = "Hero Image")]
+        public string HeroImage { get; set; }
         public bool IsSetup
         {
             get

@@ -11,7 +11,7 @@ const BootstrapSwal = Swal.mixin({
 
 export class Alerts {
 
-    static log(message: string, type: 'message' | 'error' | 'warning' | 'info' = 'message') {
+    static log(message: any, type: 'message' | 'error' | 'warning' | 'info' = 'message') {
         if (!document.body.classList.contains('dev-mode')) {
             return;
         }
