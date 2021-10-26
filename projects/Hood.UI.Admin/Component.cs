@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
-namespace Hood.Admin
+namespace Hood.UI.Admin
 {
     public class Component : Hood.Interfaces.IHoodComponent
     {
