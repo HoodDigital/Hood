@@ -201,6 +201,26 @@ namespace Hood.Services
                 );
             }
 
+            if (model.Active) {
+                query = query.Where(q => q.Active);
+            }            
+
+            if (model.Inactive) {
+                query = query.Where(q => !q.Active);
+            }            
+            
+            if (model.PhoneUnconfirmed) {                
+                query = query.Where(q => !q.PhoneNumberConfirmed);
+            }            
+            
+            if (model.EmailUnconfirmed) {                
+                query = query.Where(q => !q.EmailConfirmed);
+            }
+
+            if (model.Unused) {                
+                query = query.Where(q => q.LastLoginLocation == null || q.LastLoginLocation == null || q.LastLogOn == DateTime.MinValue);
+            }
+
             switch (model.Order)
             {
                 case "UserName":
