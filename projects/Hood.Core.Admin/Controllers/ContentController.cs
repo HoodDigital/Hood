@@ -365,7 +365,7 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<BaseContentController>($"Error deleting content with Id: {id}", ex);
             }
         }
-        [Authorize(Roles = "SuperUser,Admin")]
+
         [Route("admin/content/{type}/delete/all/")]
         public virtual async Task<IActionResult> DeleteAll(string type)
         {

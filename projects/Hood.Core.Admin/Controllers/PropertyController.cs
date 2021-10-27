@@ -411,7 +411,6 @@ namespace Hood.Areas.Admin.Controllers
             return View("_List_PropertyMedia", model);
         }
 
-        [Authorize]
         [HttpPost]
         [Route("admin/property/{id}/gallery/upload/")]
         public virtual async Task<Response> UploadToGallery(List<int> media, int id)
@@ -486,7 +485,6 @@ namespace Hood.Areas.Admin.Controllers
             return View("_List_PropertyFloorplans", model);
         }
 
-        [Authorize]
         [Route("admin/property/{id}/floorplans/upload")]
         public virtual async Task<Response> UploadFloorplan(List<int> media, int id)
         {
