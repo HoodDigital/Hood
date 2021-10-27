@@ -176,9 +176,12 @@ namespace Hood.Services
         #endregion
 
         #region Profiles 
-        public async Task<UserListModel> GetUserProfilesAsync(UserListModel model)
+        public async Task<IUserListModel> GetUserProfilesAsync(IUserListModel model, IQueryable<UserProfile> query = null)
         {
-            IQueryable<UserProfile> query = _db.UserProfiles.AsQueryable();
+            if (query == null) 
+            {                            
+                query = _db.UserProfiles.AsQueryable();
+            }
 
             if (model.Role.IsSet())
             {
@@ -340,7 +343,7 @@ namespace Hood.Services
         {
             int totalUsers = await _db.Users.CountAsync();
             int totalAdmins = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
-            var data = await _db.Users.Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month }).ToListAsync();
+            var data = await _db.Users.Where(p => p.CreatedOn >= DateTime.Now.AddYears(-1)).Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
             var createdByMonth = data.GroupBy(p => p.month).Select(g => new { name = g.Key, count = g.Count() });

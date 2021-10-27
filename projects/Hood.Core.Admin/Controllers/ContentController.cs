@@ -592,7 +592,7 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
-            UserListModel authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
+            IUserListModel authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
             model.Authors = authors.List;
 
             if (model.Type != null)

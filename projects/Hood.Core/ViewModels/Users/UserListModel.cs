@@ -7,27 +7,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
-    public class UserListModel : PagedList<UserProfile>, IPageableModel
+    public class UserListModel : PagedList<UserProfile>, IPageableModel, IUserListModel
     {
         [FromQuery(Name = "role")]
         public string Role { get; set; }
-                     
+
         [FromQuery(Name = "unused")]
-        [Display(Name = "Unused Accounts", Description = "Accounts which do not have last log in infomation saved.")]        
+        [Display(Name = "Unused Accounts", Description = "Accounts which do not have last log in infomation saved.")]
         public bool Unused { get; set; }
-             
+
         [FromQuery(Name = "inactive")]
         [Display(Name = "Inactive Only")]
-        public bool Inactive { get; set; }        
-             
+        public bool Inactive { get; set; }
+
         [FromQuery(Name = "active")]
         [Display(Name = "Active Only")]
         public bool Active { get; set; }
-             
+
         [FromQuery(Name = "phone")]
         [Display(Name = "Unconfirmed Phone Numbers Only")]
         public bool PhoneUnconfirmed { get; set; }
-             
+
         [FromQuery(Name = "email")]
         [Display(Name = "Unconfirmed Emails Only")]
         public bool EmailUnconfirmed { get; set; }

@@ -24,6 +24,7 @@ namespace Hood.Areas.Admin.Controllers
             : base()
         { }
 
+
         [Route("admin/users/")]
         public virtual async Task<IActionResult> Index(UserListModel model)
         {
@@ -34,7 +35,7 @@ namespace Hood.Areas.Admin.Controllers
         [Route("admin/users/list/")]
         public virtual async Task<IActionResult> List(UserListModel model, string viewName = "_List_Users")
         {
-            model = await _account.GetUserProfilesAsync(model);
+            model = await _account.GetUserProfilesAsync(model) as UserListModel;
             return View(viewName, model);
         }
 
