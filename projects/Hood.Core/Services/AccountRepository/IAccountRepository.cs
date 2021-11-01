@@ -21,7 +21,7 @@ namespace Hood.Services
         #endregion
 
         #region Profiles
-        Task<IUserListModel> GetUserProfilesAsync(IUserListModel model, IQueryable<UserProfile> query = null);
+        Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null);
         Task<UserProfile> GetProfileAsync(string id);
         Task UpdateProfileAsync(UserProfile user);
         #endregion        

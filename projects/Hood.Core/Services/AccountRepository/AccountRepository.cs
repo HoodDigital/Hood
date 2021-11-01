@@ -176,7 +176,7 @@ namespace Hood.Services
         #endregion
 
         #region Profiles 
-        public async Task<IUserListModel> GetUserProfilesAsync(IUserListModel model, IQueryable<UserProfile> query = null)
+        public async Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null)
         {
             if (query == null) 
             {                            
