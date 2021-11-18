@@ -1,4 +1,6 @@
 ﻿import { Alerts } from "./Alerts";
+import { ColorPickers } from "./ColorPicker";
+import { Editors } from "./Editors";
 import { Handlers } from "./Handlers";
 import { MediaModal } from "./Media";
 import { Uploader } from "./Uploader";
@@ -19,6 +21,9 @@ export class HoodApi implements Hood {
     alerts: Alerts = new Alerts();
     uploader: Uploader = new Uploader();
     handlers: Handlers = new Handlers();
+    editors: Editors = new Editors();
+    colorPickers: ColorPickers = new ColorPickers();
+
     private mediaModal: MediaModal = new MediaModal();
 
     constructor() {

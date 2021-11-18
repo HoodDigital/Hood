@@ -40,7 +40,6 @@ export class Editors {
 
     constructor(options?: EditorOptions) {
         this.options = { ...this.options, ...options };
-        this.richTextEditors();
     }
 
     richTextEditors() {
@@ -53,9 +52,9 @@ export class Editors {
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code'
+                'insertdatetime media contextmenu paste code textcolor'
             ],
-            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image media hoodimage | code',
+            toolbar: "fullscreen | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
@@ -75,7 +74,7 @@ export class Editors {
                 'insertdatetime media contextmenu paste code'
             ],
             menubar: false,
-            toolbar: 'bold italic | bullist numlist | undo redo | link',
+            toolbar: 'fullscreen | bold italic | bullist numlist | undo redo | link',
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
@@ -89,9 +88,9 @@ export class Editors {
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor media',
                 'searchreplace visualblocks code fullscreen',
-                'insertdatetime media contextmenu paste code'
+                'insertdatetime media contextmenu paste code textcolor'
             ],
-            toolbar: 'styleselect | bold italic | alignleft aligncenter alignright | bullist numlist | link image media hoodimage | code',
+            toolbar: "fullscreen | styleselect forecolor backcolor | hoodimage link media image | bold italic | alignleft aligncenter alignright | bullist numlist | table | undo redo",
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             setup: this.setupCommands.bind(this),
@@ -107,7 +106,7 @@ export class Editors {
                 'insertdatetime media contextmenu paste code'
             ],
             menubar: false,
-            toolbar: 'bold italic | bullist numlist | undo redo | link',
+            toolbar: 'fullscreen | bold italic | bullist numlist | undo redo | link',
             link_class_list: this.options.linkClasses,
             image_class_list: this.options.imageClasses,
             image_dimensions: false

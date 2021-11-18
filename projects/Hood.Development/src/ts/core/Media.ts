@@ -185,6 +185,10 @@ export class MediaService {
             }
         });
 
+        dz.on("error", function (this: MediaService, file: Dropzone.DropzoneFile, errormessage: any) {
+            Alerts.warning(errormessage);
+        }.bind(this));
+
         dz.on("success", function (this: MediaService, file: Dropzone.DropzoneFile, data: Response) {
             Response.process(data);
         }.bind(this));

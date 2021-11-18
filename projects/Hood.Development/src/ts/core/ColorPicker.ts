@@ -2,7 +2,11 @@
 import '@simonwep/pickr';
 
 export class ColorPickers {
-    constructor(tag: string = '.color-picker') {
+    constructor() {
+        
+    }
+
+    loadColorPickers(tag: string = '.color-picker') {
 
         let updateColorFieldValue = function (color: Pickr.HSVaColor, eventSource: any, instance: any) {
             let elemId = $(instance._root.button).parent().data('target');
