@@ -1,6 +1,7 @@
 ﻿import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import uglify from "@lopatnov/rollup-plugin-uglify";
+import commonjs from "@rollup/plugin-commonjs";
 
 const packageJson = require('./package.json')
 const version = process.env.VERSION || packageJson.version
@@ -21,7 +22,8 @@ export default commandLineArgs => {
     let plugins = [
         resolve({
             moduleDirectories: ['node_modules']
-        })
+        }),
+        commonjs()
     ]
 
     let sourcemaps = true;
@@ -57,8 +59,7 @@ export default commandLineArgs => {
 
     }
 
-    return [
-        {
+    return [{
             input: 'src/ts/app.ts',
             output: {
                 file: destination + 'js/app.js',

@@ -1,4 +1,6 @@
-﻿using Hood.Core;
+﻿using Hood.BaseTypes;
+using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
@@ -558,6 +560,7 @@ namespace Hood.Controllers
         [Route("account/access-denied")]
         public virtual IActionResult AccessDenied()
         {
+            Response.StatusCode = 403;
             return View();
         }
 

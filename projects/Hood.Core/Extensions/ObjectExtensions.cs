@@ -1,8 +1,12 @@
 ﻿using Hood.Attributes;
 using Hood.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Hood.Extensions
@@ -83,7 +87,15 @@ namespace Hood.Extensions
         {
             try
             {
-                return JsonConvert.SerializeObject(element);
+                DefaultContractResolver contractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                };
+                return JsonConvert.SerializeObject(element, new JsonSerializerSettings
+                {
+                    ContractResolver = contractResolver,
+                    Formatting = Formatting.None
+                });
             }
             catch (Exception ex)
             {
@@ -168,6 +180,35 @@ namespace Hood.Extensions
                     targetProperty.SetValue(destination, newValue, null);
                 }
             }
+        }
+
+        public static RouteValueDictionary ToRouteValueDictionary(this object obj)
+        {
+            var routeParms = obj.GetType().GetProperties();
+            var routeValues = new RouteValueDictionary();
+            routeParms.ForEach(p =>
+            {
+                if (!p.GetCustomAttributes(typeof(RouteIgnoreAttribute), false).Any())
+                {
+                    var name = p.Name;
+                    var queryAttr = p.GetCustomAttributes(typeof(FromQueryAttribute), false).FirstOrDefault() as FromQueryAttribute;
+                    if (queryAttr != null)
+                    {
+                        name = queryAttr.Name;
+                    }
+                    var routeAttr = p.GetCustomAttributes(typeof(FromRouteAttribute), false).FirstOrDefault() as FromRouteAttribute;
+                    if (routeAttr != null)
+                    {
+                        name = routeAttr.Name;
+                    }
+                    var value = p.GetValue(obj, null);
+                    if (value != null)
+                    {
+                        routeValues.Add(name, value);
+                    }
+                }
+            });
+            return routeValues;
         }
     }
 }

@@ -47,8 +47,11 @@ class Admin extends HoodApi {
         this.themes = new ThemesController();
         this.users = new UsersController();
 
-        new Editors();
-        new ColorPickers();
+        // Hook up rich text editors
+        this.editors.richTextEditors();
+
+        // Hook up colour pickers
+        this.colorPickers.loadColorPickers();
 
         if ($('#page-tabs').length > 0) {
             this.checkAndLoadTabs('#page-tabs');

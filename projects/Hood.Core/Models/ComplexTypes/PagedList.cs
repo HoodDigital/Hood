@@ -1,9 +1,11 @@
-﻿using Hood.BaseTypes;
+﻿using Hood.Attributes;
+using Hood.BaseTypes;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace System.Collections.Generic
 {
@@ -15,6 +17,7 @@ namespace System.Collections.Generic
     public partial class PagedList<T> : SaveableModel, IPagedList<T>
     {
         private List<T> _list;
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -35,29 +38,33 @@ namespace System.Collections.Generic
             Reload(source, pageIndex, pageSize);
         }
 
-
         /// <summary>
         /// Page index
         /// </summary>
         [FromQuery(Name = "page")]
         [Display(Name = "Current Page")]
         public int PageIndex { get; set; }
+
         /// <summary>
         /// Page size
         /// </summary>
         [FromQuery(Name = "pageSize")]
         [Display(Name = "Page Size")]
         public int PageSize { get; set; }
+
         /// <summary>
         /// Total count
         /// </summary>
+        [RouteIgnore]
         [Display(Name = "Total Records", Description = "Total number of results returned from this set.")]
-        public int TotalCount { get; private set; }
+        public int TotalCount { get; set; }
+
         /// <summary>
         /// Total pages
         /// </summary>
+        [RouteIgnore]
         [Display(Name = "Total Pages", Description = "Total number of pages.")]
-        public int TotalPages { get; private set; }
+        public int TotalPages { get; set; }
 
         /// <summary>
         /// Sorting Order - Used with <see cref="Hood.Interfaces.IPageableModel"/> sorting functions.
@@ -75,10 +82,12 @@ namespace System.Collections.Generic
         /// <summary>
         /// Has previous page
         /// </summary>
+        [RouteIgnore]
         public bool HasPreviousPage => (PageIndex > 0);
         /// <summary>
         /// Has next page
         /// </summary>
+        [RouteIgnore]
         public bool HasNextPage => (PageIndex + 1 < TotalPages);
 
 

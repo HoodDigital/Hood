@@ -2,6 +2,7 @@
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hood.Services
@@ -20,7 +21,7 @@ namespace Hood.Services
         #endregion
 
         #region Profiles
-        Task<UserListModel> GetUserProfilesAsync(UserListModel model);
+        Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null);
         Task<UserProfile> GetProfileAsync(string id);
         Task UpdateProfileAsync(UserProfile user);
         #endregion        

@@ -5,7 +5,7 @@
 @section buttons {
     <a class="btn btn-success user-create" asp-action="Create"><i class="fa fa-user-plus me-2"></i>Create New User</a>
 }
-<form class="inline" data-target="#user-list">
+<form class="inline" data-target="#user-list" novalidate>
     <div class="row">
         <div class="col-sm">
             <div id="user-list" class="query" data-url="@Url.Action("List")">
@@ -26,7 +26,7 @@
                     <input type="hidden" asp-for="PageIndex" />
                     <input type="hidden" asp-for="PageSize" />
                     <div class="form-floating mb-3">
-                        <select class="form-select" asp-for="Order">
+                        <select class="form-select submit-on-change" asp-for="Order">
                             <option value="DateDesc">Newest First</option>
                             <option value="Date">Oldest First</option>
                             <option value="LastLogOn">By Log in time</option>
@@ -45,6 +45,41 @@
                         <label asp-for="Search"></label>
                         <small asp-for="Search"></small>
                     </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Active" class="form-check-input submit-on-change" />
+                            <label asp-for="Active" class="form-check-label d-block"></label>
+                            <small asp-for="Active"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Inactive" class="form-check-input submit-on-change" />
+                            <label asp-for="Inactive" class="form-check-label d-block"></label>
+                            <small asp-for="Inactive"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="EmailUnconfirmed" class="form-check-input submit-on-change" />
+                            <label asp-for="EmailUnconfirmed" class="form-check-label d-block"></label>
+                            <small asp-for="EmailUnconfirmed"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="PhoneUnconfirmed" class="form-check-input submit-on-change" />
+                            <label asp-for="PhoneUnconfirmed" class="form-check-label d-block"></label>
+                            <small asp-for="PhoneUnconfirmed"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="Unused" class="form-check-input submit-on-change" />
+                            <label asp-for="Unused" class="form-check-label d-block"></label>
+                            <small asp-for="Unused"></small>
+                        </div>
+                    </div>                    
                     <button type="submit" class="btn btn-success btn-block"> Search</button>
                 </div>
             </div>

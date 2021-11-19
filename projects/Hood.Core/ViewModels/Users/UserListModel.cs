@@ -3,13 +3,38 @@ using System.Collections.Generic;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hood.ViewModels
 {
-    public class UserListModel : PagedList<UserProfile>, IPageableModel
+    public class UserListModel : UserListModel<UserProfile> 
+    { }
+
+    public class UserListModel<TUserProfile> : PagedList<TUserProfile>, IPageableModel where TUserProfile : UserProfileBase
     {
         [FromQuery(Name = "role")]
         public string Role { get; set; }
+
+        [FromQuery(Name = "unused")]
+        [Display(Name = "Unused Accounts", Description = "Accounts which do not have last log in infomation saved.")]
+        public bool Unused { get; set; }
+
+        [FromQuery(Name = "inactive")]
+        [Display(Name = "Inactive Only")]
+        public bool Inactive { get; set; }
+
+        [FromQuery(Name = "active")]
+        [Display(Name = "Active Only")]
+        public bool Active { get; set; }
+
+        [FromQuery(Name = "phone")]
+        [Display(Name = "Unconfirmed Phone Numbers Only")]
+        public bool PhoneUnconfirmed { get; set; }
+
+        [FromQuery(Name = "email")]
+        [Display(Name = "Unconfirmed Emails Only")]
+        public bool EmailUnconfirmed { get; set; }
+
         [FromQuery(Name = "sub")]
         public string Subscription { get; set; }
         [FromQuery(Name = "roles")]
@@ -21,6 +46,12 @@ namespace Hood.ViewModels
         {
             var query = base.GetPageUrl(pageIndex);
 
+            query += Active ? "&active=true" : "";
+            query += Inactive ? "&inactive=true" : "";
+            query += EmailUnconfirmed ? "&email=true" : "";
+            query += PhoneUnconfirmed ? "&phone=true" : "";
+            query += Unused ? "&unused=true" : "";
+
             query += Role.IsSet() ? "&role=" + Role : "";
             if (RoleIds != null)
                 foreach (var roleId in RoleIds)
@@ -30,6 +61,7 @@ namespace Hood.ViewModels
             if (SubscriptionIds != null)
                 foreach (var subId in SubscriptionIds)
                     query += "&subs=" + subId;
+
 
             return query;
         }

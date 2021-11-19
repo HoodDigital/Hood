@@ -5,7 +5,7 @@
     <AssemblyName>Hood.Admin</AssemblyName>
     <PackageId>Hood.Admin</PackageId>
 
-    <Version>5.0.5</Version>
+    <Version>5.0.6</Version>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
@@ -30,7 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
+    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />    
+    <ProjectReference Include="..\Hood.Core.Admin\Hood.Core.Admin.csproj" />
+    <ProjectReference Include="..\Hood.UI.Admin\Hood.UI.Admin.csproj" />
   </ItemGroup>
 
 </Project>

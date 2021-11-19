@@ -56,7 +56,7 @@
                     <div class="form-floating mb-3">
                         @if (Model.BaseName == "Page")
                         {
-                            <input asp-for="Type" class="form-control" type="hidden">
+                            <input asp-for="Type" class="form-control" type="hidden" />
                             <input asp-for="Type" class="form-control" disabled>
                         }
                         else
@@ -69,7 +69,7 @@
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-switch">
-                            <input asp-for="Enabled" class="form-check-input">
+                            <input asp-for="Enabled" class="form-check-input" />
                             <label asp-for="Enabled" class="form-check-label d-block"></label>
                             <small asp-for="Enabled"></small>
                         </div>

@@ -1,14 +1,13 @@
+@use 'sass:math';
 .media-list {
     padding-top: $grid-gutter-width;
-    padding-right: $grid-gutter-width / 2;
-    padding-left: $grid-gutter-width / 2;
+    padding-right: math.div($grid-gutter-width, 2);
+    padding-left: math.div($grid-gutter-width, 2);
     background-color: $gray-200;
     border-radius: $border-radius;
-
     figure.attach-media-select {
         cursor: pointer;
     }
-
     .thumbnail {
         display: block;
         padding: $thumbnail-padding;
@@ -19,14 +18,12 @@
         border: 0;
         border-radius: $thumbnail-border-radius;
         @include transition(border .2s ease-in-out);
-
         &:hover {
             background-color: #f6f6f6;
         }
-
-        > img,
-        > .img,
-        a > img {
+        >img,
+        >.img,
+        a>img {
             width: auto !important;
             max-width: none !important;
             margin-top: -$thumbnail-padding;
@@ -36,16 +33,15 @@
         }
         // Image captions
         .caption {
-            padding: $grid-gutter-width / 2;
+            padding: math.div($grid-gutter-width, 2);
         }
     }
-
     .k-loading-mask {
         position: relative;
         display: block;
         width: auto !important;
-        padding: $grid-gutter-width / 2 $grid-gutter-width;
-        margin: $grid-gutter-width / 2;
+        padding: math.div($grid-gutter-width, 2) $grid-gutter-width;
+        margin: math.div($grid-gutter-width, 2);
         margin-top: 0;
         margin-bottom: $grid-gutter-width;
         color: #000;
@@ -53,13 +49,11 @@
         border: 1px solid $primary;
         border-radius: $border-radius;
     }
-
     &::before,
     &::after {
         display: table;
         content: " ";
     }
-
     &::after {
         clear: both;
     }
@@ -74,22 +68,19 @@ span.no-items {
 
 .directories {
     .nav-pills {
-        > li {
-            > a {
+        >li {
+            >a {
                 background-color: #ccc;
                 border-radius: $nav-pills-border-radius;
-
                 &:hover,
                 &:focus {
                     color: black;
                     background-color: #bbb;
                 }
             }
-
-            &.active > a {
+            &.active>a {
                 color: white;
                 background-color: $primary;
-
                 &:hover,
                 &:focus {
                     color: white;

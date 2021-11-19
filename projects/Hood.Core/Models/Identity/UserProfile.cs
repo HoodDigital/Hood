@@ -14,7 +14,7 @@ namespace Hood.Models
         public string RoleIds { get; set; }
 
         public int RoleCount { get; set; }
-        internal string RolesJson { get; set; }
+        public string RolesJson { get; set; }
         public List<IdentityRole> Roles
         {
             get { return !RolesJson.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(RolesJson); }

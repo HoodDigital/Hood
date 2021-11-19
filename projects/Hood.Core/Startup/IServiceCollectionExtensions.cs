@@ -176,19 +176,18 @@ namespace Hood.Startup
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.AccessDeniedPath = "/Account/AccessDenied";
                 options.Cookie.Name = $".{cookieName}.Authentication";
-
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
-
-                options.Cookie.HttpOnly = true;
+                options.Cookie.HttpOnly = true;    
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
+                options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
+
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
+                options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
+                options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
                 options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;
-                options.SlidingExpiration = true;
+                options.SlidingExpiration = true;                
             });
             return services;
         }
@@ -216,14 +215,18 @@ namespace Hood.Startup
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.AccessDeniedPath = "/Account/AccessDenied";
                 options.Cookie.Name = $".{cookieName}.Authentication";
-                options.Cookie.HttpOnly = true;
+                options.Cookie.HttpOnly = true;    
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
+
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
-                options.LoginPath = "/Account/Login";
-                options.LogoutPath = "/Account/Logout";
+                options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
+                options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
                 options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;
-                options.SlidingExpiration = true;
+                options.SlidingExpiration = true;   
             });
             return services;
         }
