@@ -8,7 +8,7 @@ var rename = require('gulp-rename');
 var rimraf = require('gulp-rimraf');
 var sass = require('gulp-dart-sass');
 var sourcemaps = require('gulp-sourcemaps');
-
+var tilde = require('node-sass-tilde-importer');
 
 gulp.task('clean', function(cb) {
     return gulp.src([
@@ -17,7 +17,8 @@ gulp.task('clean', function(cb) {
             './dist/',
             './images/',
             './src/js/',
-            './src/css/'
+            './src/css/',
+            './src/ts/**/*.d.ts'
         ], { read: false, allowEmpty: true })
         .pipe(rimraf({ force: true }));
 });
@@ -54,7 +55,8 @@ gulp.task('scss', function() {
         .pipe(sass({
             outputStyle: 'expanded',
             indentType: 'tab',
-            indentWidth: 1
+            indentWidth: 1,
+            importer: tilde
         }).on('error', sass.logError))
         .pipe(sourcemaps.write(''))
         .pipe(gulp.dest('./wwwroot/src/css/'));

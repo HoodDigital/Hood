@@ -1,13 +1,15 @@
-{
+{ 
+  "include": ["src/ts/index.ts"],
+  "exclude": [],
   "compilerOptions": {
-    "outDir": "./wwwroot/dist/js/",
+    "outDir": "./dist/js/",
     "noImplicitAny": true,
     "module": "es6",
-    "target": "es5",
+    "target": "es6",
     "jsx": "react",
     "allowJs": false,
     "moduleResolution": "Node",
-    "sourceMap": false,
-    "noEmit": true
+    "declaration": true,
+    "sourceMap": false
   }
 }
