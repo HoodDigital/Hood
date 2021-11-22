@@ -22,13 +22,18 @@ steps:
     script: |
       $file = ".\projects\Hood.Development\package.json"
       $json = Get-Content $file | ConvertFrom-Json
-      $version = "$($json.version)"
+      $version = "$($json.version)"      
+      
+      Write-Host "##vso[task.setvariable variable=version;]$version"
 
       $exec = "dotnet restore"
       Write-Host "$exec"
       Invoke-Expression $exec
 
       $exec = "dotnet build .\projects\Hood.Core\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet build .\projects\Hood.Core.Admin\ -c Release /p:Version=$version"
       Write-Host "$exec"
       Invoke-Expression $exec
       $exec = "dotnet build .\projects\Hood.Admin\ -c Release /p:Version=$version"
@@ -52,9 +57,10 @@ steps:
       $exec = "dotnet build .\projects\Hood\ -c Release /p:Version=$version"
       Write-Host "$exec"
       Invoke-Expression $exec
-      
-      Write-Host "##vso[task.setvariable variable=version;]$version"
       $exec = "dotnet pack .\projects\Hood.Core\ -c Release /p:Version=$version"
+      Write-Host "$exec"
+      Invoke-Expression $exec
+      $exec = "dotnet pack .\projects\Hood.Core.Admin\ -c Release /p:Version=$version"
       Write-Host "$exec"
       Invoke-Expression $exec
       $exec = "dotnet pack .\projects\Hood.Admin\ -c Release /p:Version=$version"
