@@ -1,40 +1,31 @@
-@import "../../node_modules/bootstrap/scss/bootstrap";
-
+@import "~bootstrap/scss/bootstrap";
 @import "core/_alerts.scss";
 @import "core/_forms.scss";
-
 body {
-
     .login-container {
         flex-shrink: 0;
         max-width: 42rem;
         overflow-y: auto;
-
         .login-content {
             width: 100%;
             max-width: 22.5rem;
             margin: auto;
         }
     }
-     
     #image-container {
         background-position: center;
         background-size: cover;
-
         #image-credit {
             color: $white;
             background-color: rgba(0, 0, 0, .5);
-
             a {
                 color: $white;
-
                 &:hover {
                     color: $gray-200;
                 }
             }
         }
     }
-
     header {
         img {
             display: block;
@@ -43,19 +34,15 @@ body {
             margin: 25px auto;
         }
     }
-
     .header {
         text-align: center;
-
         h2 {
             margin-bottom: .5em;
             font-size: 1.5rem;
         }
     }
-
     footer {
         text-align: center;
-
         small {
             a {
                 font-weight: normal;
@@ -64,7 +51,6 @@ body {
             }
         }
     }
-
     &.install {
         .login-block {
             max-width: 996px;

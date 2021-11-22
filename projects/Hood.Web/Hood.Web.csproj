@@ -3,22 +3,24 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>Hood.Web</UserSecretsId>
-    <TypeScriptToolsVersion>4.2</TypeScriptToolsVersion>
-    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.2.4">
+    <PackageReference Include="Hood.Core.Admin" Version="5.0.6" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.5.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hood.Core\Hood.Core.csproj" />
     <ProjectReference Include="..\Hood.Admin\Hood.Admin.csproj" />
     <ProjectReference Include="..\Hood.UI\Hood.UI.csproj" />
-    <ProjectReference Include="..\Hood.UI.Core\Hood.UI.Core.csproj" />
   </ItemGroup>
+  
+  <!-- <ItemGroup>
+    <PackageReference Include="Hood.Admin" Version="5.0.5" />
+    <PackageReference Include="Hood.UI" Version="5.0.5" />
+  </ItemGroup> -->
 
 </Project>

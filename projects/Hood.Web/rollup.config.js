@@ -3,20 +3,30 @@ import resolve from '@rollup/plugin-node-resolve';
 import uglify from "@lopatnov/rollup-plugin-uglify";
 import commonjs from "@rollup/plugin-commonjs";
 
+const d = new Date();
+let year = d.getFullYear();
 const packageJson = require('./package.json')
 const version = process.env.VERSION || packageJson.version
 
-const banner = `/*
- * Copyright (C) Hood Digital Ltd. - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by George Whysall <george@connectmyevent.com>, 2021
- */`;
+let license = 'Proprietary and confidential. Unauthorized copying of this file, via any medium is strictly prohibited.';
+if (packageJson.license) {
+    license = `Released under the ${packageJson.license} License.`;
+}
+let description = '';
+if (packageJson.description) {
+    description = `\n* ${packageJson.description}`;
+}
 
-const footer = `\
-if (typeof this !== 'undefined' && this.HoodDigital){\
-  this.HoodDigital = this.Hood = this.hood = this.hood\
-}`;
+let author = 'George Whysall';
+if (packageJson.author) {
+    author = `${packageJson.author}`;
+}
+
+const banner = `/*!
+* ${packageJson.name} v${version}${description}
+* Written by ${author}, ${year}
+* ${license}
+*/`;
 
 export default commandLineArgs => {
 
@@ -55,17 +65,19 @@ export default commandLineArgs => {
             format: 'umd',
             name: 'hood',
             banner: banner,
-            footer: footer,
+            footer: '',
             globals: {
                 jQuery: '$',
                 bootstrap: 'bootstrap',
                 sweetalert2: 'Swal',
-                dropzone: 'Dropzone'
+                dropzone: 'Dropzone',
+                '@simonwep/pickr': 'Pickr',
+                'tinymce/tinymce': 'tinymce',
+                'chart.js': 'Chart'
             },
             sourcemap: sourcemaps,
             compact: compact
         },
-        // https://github.com/rollup/rollup/issues/2271
         onwarn(warning, rollupWarn) {
             if (warning.code !== 'CIRCULAR_DEPENDENCY') {
                 rollupWarn(warning)
@@ -77,7 +89,10 @@ export default commandLineArgs => {
             'jQuery',
             'bootstrap',
             'sweetalert2',
-            'dropzone'
+            'dropzone',
+            '@simonwep/pickr',
+            'tinymce/tinymce',
+            'chart.js'
         ],
         plugins: plugins
     }];

@@ -1,10 +1,7 @@
 /// <reference types="jquery.slimscroll" />
-
-export * from "./hood";
-
 import * as bootstrap from 'bootstrap';
 
-import { HoodApi } from './core/HoodApi';
+import './index';
 
 import { HomeController } from "./admin/HomeController";
 import { MediaController } from './admin/MediaController';
@@ -15,8 +12,7 @@ import { ThemesController } from './admin/ThemesController';
 import { ContentTypeController } from './admin/ContentTypeController';
 import { LogsController } from './admin/LogsController';
 import { PropertyImporter } from './admin/PropertyImporter';
-import { Editors } from './core/Editors';
-import { ColorPickers } from './core/ColorPicker';
+import { HoodApi } from './core/HoodApi';
 
 class Admin extends HoodApi {
 

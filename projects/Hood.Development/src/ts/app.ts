@@ -6,8 +6,6 @@ import { Validator } from './core/Validator';
 import { Response } from './core/Response';
 import { Alerts } from './core/Alerts';
 
-export * from "./hood";
-
 export class App extends HoodApi {
     propertyController: PropertyController;
 

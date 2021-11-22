@@ -3,18 +3,30 @@ import resolve from '@rollup/plugin-node-resolve';
 import uglify from "@lopatnov/rollup-plugin-uglify";
 import commonjs from "@rollup/plugin-commonjs";
 
+const d = new Date();
+let year = d.getFullYear();
 const packageJson = require('./package.json')
 const version = process.env.VERSION || packageJson.version
 
-const banner = `/*!
-* ${packageJson.name} v${version}
-* Released under the ${packageJson.license} License.
-*/`;
+let license = 'Proprietary and confidential. Unauthorized copying of this file, via any medium is strictly prohibited.';
+if (packageJson.license) {
+    license = `Released under the ${packageJson.license} License.`;
+}
+let description = '';
+if (packageJson.description) {
+    description = `\n* ${packageJson.description}`;
+}
 
-const footer = `\
-if (typeof this !== 'undefined' && this.hood){\
-  this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
-}`;
+let author = 'George Whysall';
+if (packageJson.author) {
+    author = `${packageJson.author}`;
+}
+
+const banner = `/*!
+* ${packageJson.name} v${version}${description}
+* Written by ${author}, ${year}
+* ${license}
+*/`;
 
 
 export default commandLineArgs => {
@@ -41,21 +53,11 @@ export default commandLineArgs => {
         compact = true;
         destination = 'wwwroot/dist/';
 
-        console.log('---------------------------------------------------------------------------')
-        console.log('-                       Building Hood CMS - APP                           -')
-        console.log('-                              PRODUCTION                                 -')
-        console.log('---------------------------------------------------------------------------')
-
     } else {
 
         plugins.push(typescript({
             tsconfig: "tsconfig.rollup.json"
         }));
-
-        console.log('---------------------------------------------------------------------------')
-        console.log('-                       Building Hood CMS - APP                           -')
-        console.log('-                             DEVELOPMENT                                 -')
-        console.log('---------------------------------------------------------------------------')
 
     }
 
@@ -66,7 +68,10 @@ export default commandLineArgs => {
                 format: 'umd',
                 name: 'HoodCMS',
                 banner: banner,
-                footer: footer,
+                footer: `\
+                if (typeof this !== 'undefined' && this.hood){\
+                  this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
+                }`,
                 globals: {
                     jQuery: '$',
                     bootstrap: 'bootstrap',
@@ -76,7 +81,6 @@ export default commandLineArgs => {
                 sourcemap: sourcemaps,
                 compact: compact
             },
-            // https://github.com/rollup/rollup/issues/2271
             onwarn(warning, rollupWarn) {
                 if (warning.code !== 'CIRCULAR_DEPENDENCY') {
                     rollupWarn(warning)
@@ -97,7 +101,10 @@ export default commandLineArgs => {
                 format: 'umd',
                 name: 'HoodCMS',
                 banner: banner,
-                footer: footer,
+                footer: `\
+                if (typeof this !== 'undefined' && this.hood){\
+                  this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
+                }`,
                 globals: {
                     jQuery: '$',
                     bootstrap: 'bootstrap',
@@ -128,7 +135,7 @@ export default commandLineArgs => {
                 format: 'umd',
                 name: 'HoodCMS',
                 banner: banner,
-                footer: footer,
+                footer: '',
                 globals: {
                     sweetalert2: 'Swal',
                     jQuery: '$',

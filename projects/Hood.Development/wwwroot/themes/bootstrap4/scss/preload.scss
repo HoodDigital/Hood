@@ -1,5 +1,5 @@
 // Bootstrap imports - need the grids, so sizings are not buggered when loading JS.
-@import "../../../../node_modules/bootstrap/scss/bootstrap-grid.scss";
+@import "~bootstrap/scss/bootstrap-grid.scss";
 div#preloader {
     position: fixed;
     top: 0;
@@ -8,7 +8,6 @@ div#preloader {
     bottom: 0;
     z-index: 99999;
     background-color: white;
-
     div#loader {
         position: absolute;
         top: 50%;
@@ -17,7 +16,6 @@ div#preloader {
         margin-top: -50px;
         width: 100px;
         height: 100px;
-
         img {
             width: 100px;
             height: 100px;

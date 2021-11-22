@@ -62,6 +62,7 @@
     @Html.RenderScripts(Url, ResourceLocation.BeforeScripts, production)
     @Html.RenderInlineScripts(Url, ResourceLocation.BeforeScripts)
 
+    <partial name="_Scripts_Vendors" />    
     <partial name="_Scripts" />
 
     @Html.RenderScripts(Url, ResourceLocation.AfterScripts, production)
