@@ -10,7 +10,14 @@
 <head>
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-    <link rel="stylesheet" href="@Engine.Resource("/src/css/install.css")" />
+
+    <environment exclude="Production">
+        <link rel="stylesheet" href="@Engine.Resource("/src/css/install.css")" asp-append-version="true">
+    </environment>
+    <environment exclude="Production">
+        <link rel="stylesheet" href="@Engine.Resource("/dist/css/install.css")" asp-append-version="true">
+    </environment>
+
 </head>
 
 <body class="@(!production ? "dev-mode" : "") d-flex h-100 bg-dark">
@@ -222,7 +229,7 @@
                                     the database.
                                 </p>
                                 <p>
-                                    If this is the first time starting the website, ensure that you set "Hood:SeedOnStart" in your appsettings.json. 
+                                    If this is the first time starting the website, ensure that you set "Hood:SeedOnStart" in your appsettings.json.
                                     This will only need to be set for the first startup, once initialised you can set this back to false.
                                 </p>
                                 <p class="m-0">

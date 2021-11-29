@@ -10,4 +10,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@@simonwep/pickr@1.8.1/dist/pickr.min.js" integrity="sha256-GW0RBRvOPP+M4VKudADgFKWB9nFldnYTPKfrRjq+cJ0=" crossorigin="anonymous"></script>
 
-<script src="@Engine.Resource("/src/js/admin.js")" asp-append-version="true"></script>
+<environment exclude="Production">
+    <script src="@Engine.Resource("/src/js/admin.js")" asp-append-version="true"></script>
+</environment>
+<environment exclude="Production">
+    <script src="@Engine.Resource("/dist/js/admin.js")" asp-append-version="true"></script>
+</environment>

@@ -28,6 +28,15 @@ const banner = `/*!
 * ${license}
 */`;
 
+const external = [
+    'jQuery',
+    'bootstrap',
+    'sweetalert2',
+    'dropzone',
+    '@simonwep/pickr',
+    'tinymce/tinymce',
+    'chart.js'
+];
 
 export default commandLineArgs => {
 
@@ -66,18 +75,12 @@ export default commandLineArgs => {
             output: {
                 file: destination + 'js/app.js',
                 format: 'umd',
-                name: 'HoodCMS',
+                name: 'hood',
                 banner: banner,
                 footer: `\
                 if (typeof this !== 'undefined' && this.hood){\
                   this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
                 }`,
-                globals: {
-                    jQuery: '$',
-                    bootstrap: 'bootstrap',
-                    sweetalert2: 'Swal',
-                    dropzone: 'Dropzone'
-                },
                 sourcemap: sourcemaps,
                 compact: compact
             },
@@ -86,12 +89,7 @@ export default commandLineArgs => {
                     rollupWarn(warning)
                 }
             },
-            external: [
-                'jQuery',
-                'bootstrap',
-                'sweetalert2',
-                'dropzone'
-            ],
+            external: external,
             plugins: plugins
         },
         {
@@ -99,33 +97,16 @@ export default commandLineArgs => {
             output: {
                 file: destination + 'js/admin.js',
                 format: 'umd',
-                name: 'HoodCMS',
+                name: 'hood',
                 banner: banner,
                 footer: `\
                 if (typeof this !== 'undefined' && this.hood){\
                   this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
                 }`,
-                globals: {
-                    jQuery: '$',
-                    bootstrap: 'bootstrap',
-                    sweetalert2: 'Swal',
-                    dropzone: 'Dropzone',
-                    '@simonwep/pickr': 'Pickr',
-                    'tinymce/tinymce': 'tinymce',
-                    'chart.js': 'Chart'
-                },
                 sourcemap: sourcemaps,
                 compact: compact
             },
-            external: [
-                'jQuery',
-                'bootstrap',
-                'sweetalert2',
-                'dropzone',
-                '@simonwep/pickr',
-                'tinymce/tinymce',
-                'chart.js'
-            ],
+            external: external,
             plugins: plugins
         },
         {
@@ -133,25 +114,13 @@ export default commandLineArgs => {
             output: {
                 file: destination + 'js/login.js',
                 format: 'umd',
-                name: 'HoodCMS',
+                name: 'hood',
                 banner: banner,
                 footer: '',
-                globals: {
-                    sweetalert2: 'Swal',
-                    jQuery: '$',
-                    bootstrap: 'bootstrap',
-                    'google.maps': 'google.maps'
-                },
                 sourcemap: sourcemaps,
                 compact: compact
             },
-            external: [
-                'jQuery',
-                'bootstrap',
-                'sweetalert2',
-                'google.maps',
-                'hood'
-            ],
+            external: external,
             plugins: plugins
         }
     ];
