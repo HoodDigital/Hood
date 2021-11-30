@@ -1,5 +1,5 @@
 # Hood CMS
-[![Build Status](https://dev.azure.com/hooddigital/Hood/_apis/build/status/HoodDigital.Hood)](https://dev.azure.com/hooddigital/Hood/_build/latest?definitionId=4)
+[![Build Status](https://dev.azure.com/hooddigital/Hood/_apis/build/status/HoodDigital.Hood?branchName=refs%2Fpull%2F21%2Fmerge)](https://dev.azure.com/hooddigital/Hood/_build/latest?definitionId=4&branchName=refs%2Fpull%2F21%2Fmerge)
 [![GitHub release (Latest by date including pre-releases)](https://img.shields.io/github/v/release/HoodDigital/Hood?include_prereleases&label=Latest%20Release)](https://github.com/HoodDigital/Hood/releases)
 
 A fully customisable content management system built in ASP.NET Core 5 & Bootstrap 5.
@@ -27,6 +27,10 @@ https://www.npmjs.com/package/hoodcms
 To install Hood CMS client side code via NPM.
 ```
 > npm install hoodcms
+```
+or
+```
+> yarn add hoodcms
 ```
 
 > To use your own client side code, you will also need to update script/link references in your theme's HTML or Razor C# files to use your own version of the code, rather than the CDN.
