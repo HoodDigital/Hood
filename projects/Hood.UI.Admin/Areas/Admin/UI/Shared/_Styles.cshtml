@@ -2,4 +2,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@simonwep/pickr/dist/themes/monolith.min.css" />
 
-<link rel="stylesheet" href="@Engine.Resource("/src/css/admin.css")" asp-append-version="true">
+<environment exclude="Production">
+    <link rel="stylesheet" href="@Engine.Resource("/src/css/admin.css")" asp-append-version="true">
+</environment>
+<environment exclude="Production">
+    <link rel="stylesheet" href="@Engine.Resource("/dist/css/admin.css")" asp-append-version="true">
+</environment>

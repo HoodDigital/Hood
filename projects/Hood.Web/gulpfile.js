@@ -8,7 +8,6 @@ var tilde = require('node-sass-tilde-importer');
 
 gulp.task('clean', function(cb) {
     return gulp.src([
-            './wwwroot/css/',
             './wwwroot/src/',
             './wwwroot/dist/'
         ], { read: false, allowEmpty: true })

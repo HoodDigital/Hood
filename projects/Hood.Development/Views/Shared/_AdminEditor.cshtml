@@ -1,9 +1,6 @@
 @if (User.IsEditorOrBetter())
 {
-    <environment include="Hood">
-        <link rel="stylesheet" href="/src/css/button.css" asp-append-version="true">
-    </environment>
-    <environment include="Development,Staging">
+    <environment exclude="Production">
         <link rel="stylesheet" href="@Engine.Resource("/src/css/button.css")" />
     </environment>
     <environment include="Production">

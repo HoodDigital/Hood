@@ -1,1 +1,6 @@
-<script src="@Engine.Resource("/src/js/site.js")" asp-append-version="true"></script>
+<environment exclude="Production">
+    <script src="/src/js/site.js" asp-append-version="true"></script>
+</environment>
+<environment include="Production">
+    <script src="/dist/js/site.js" asp-append-version="true"></script>
+</environment>

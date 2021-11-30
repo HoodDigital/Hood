@@ -169,6 +169,7 @@ namespace Hood.Core
                 return Services.Resolve<IThemesService>();
             }
         }
+
         /// <summary>
         /// Gets the current resolvable version of the IEventsService.
         /// </summary>
@@ -180,20 +181,16 @@ namespace Hood.Core
             }
         }
 
+        /// <summary>
+        /// Loads a Hood CMS resource, if BypassCDN is not set in appsettings.json, the resource will load from jsdelivr. Otherwise it will load from the given local path.
+        /// </summary>
         public static string Resource(string localPath)
         {
-            var env = Engine.Services.Resolve<IWebHostEnvironment>();
-            switch (env.EnvironmentName)
+            if (Configuration.BypassCDN)
             {
-                case "Hood":
-                    return localPath;
-                default:
-                    if (Configuration.BypassCDN)
-                    {
-                        return localPath;
-                    }
-                    return $"https://cdn.jsdelivr.net/npm/hoodcms@{Version}{localPath}";
+                return localPath;
             }
+            return $"https://cdn.jsdelivr.net/npm/hoodcms@{Version}{localPath}";
         }
 
         public static string SiteOwnerEmail

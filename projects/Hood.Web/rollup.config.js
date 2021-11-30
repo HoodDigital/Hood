@@ -66,15 +66,6 @@ export default commandLineArgs => {
             name: 'hood',
             banner: banner,
             footer: '',
-            globals: {
-                jQuery: '$',
-                bootstrap: 'bootstrap',
-                sweetalert2: 'Swal',
-                dropzone: 'Dropzone',
-                '@simonwep/pickr': 'Pickr',
-                'tinymce/tinymce': 'tinymce',
-                'chart.js': 'Chart'
-            },
             sourcemap: sourcemaps,
             compact: compact
         },
