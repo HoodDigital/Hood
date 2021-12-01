@@ -1,8 +1,6 @@
 ﻿export class Handlers {
     constructor() {
     }
-
-
     
     /**
      * Initialise all default Hood CMS handlers.
