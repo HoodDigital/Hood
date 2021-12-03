@@ -592,8 +592,14 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
-            UserListModel authors = await _account.GetUserProfilesAsync(new UserListModel() { PageSize = 50 });
-            model.Authors = authors.List;
+            var editors = await _userManager.GetUsersInRoleAsync("Editor");
+            model.Authors = editors.Select(u => new UserProfile()
+            {
+                UserName = u.UserName,
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName
+            }).ToList();
 
             if (model.Type != null)
             {
