@@ -246,8 +246,8 @@
                     <label asp-for="OgAuthor"></label>
                     <small asp-for="OgAuthor"></small>
                 </div>
-                <mediaSelect asp-for="OgImageUrl"></mediaSelect>
-                <mediaSelect asp-for="OgSecureImageUrl"></mediaSelect>
+                <div media-select="OgImageUrl" media-fit="contain"></div>
+                <div media-select="OgSecureImageUrl" media-fit="contain"></div>
                 <div class="form-floating mb-3">
                     <input asp-for="OgLocale" class="form-control" />
                     <label asp-for="OgLocale"></label>
@@ -284,7 +284,7 @@
                     <label asp-for="TwitterCardCreator"></label>
                     <small asp-for="TwitterCardCreator"></small>
                 </div>
-                <mediaSelect asp-for="TwitterCardImageUrl"></mediaSelect>
+                <div media-select="TwitterCardImageUrl" media-fit="contain"></div>
                 <div class="form-floating mb-3">
                     <input asp-for="TwitterCardSite" class="form-control" />
                     <label asp-for="TwitterCardSite"></label>
