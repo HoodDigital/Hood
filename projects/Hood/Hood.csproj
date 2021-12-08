@@ -6,7 +6,7 @@
     <PackageId>Hood</PackageId>
     <Description>Complete Hood CMS Package, includes all default controllers for basic setup, packaged with the Bootstrap 4 default theme.</Description>
 
-    <Version>5.0.12</Version>
+    <Version>5.0.13</Version>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
