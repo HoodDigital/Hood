@@ -103,6 +103,15 @@ export default commandLineArgs => {
                 if (typeof this !== 'undefined' && this.hood){\
                   this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
                 }`,
+                globals: {
+                    jQuery: '$',
+                    bootstrap: 'bootstrap',
+                    sweetalert2: 'Swal',
+                    dropzone: 'Dropzone',
+                    '@simonwep/pickr': 'Pickr',
+                    'tinymce/tinymce': 'tinymce',
+                    'chart.js': 'Chart'
+                },
                 sourcemap: sourcemaps,
                 compact: compact
             },
