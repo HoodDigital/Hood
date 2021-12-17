@@ -29,6 +29,7 @@ namespace Hood.Controllers
         [HttpPost]
         [Route("hood/contact/send/")]
         [Route("hood/process-contact-form/")]
+        [ValidateAntiForgeryToken]
         public virtual async Task<Response> ProcessContactForm(ContactFormModel model)
         {
             try
