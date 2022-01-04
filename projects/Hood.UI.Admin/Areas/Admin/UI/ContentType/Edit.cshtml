@@ -176,6 +176,11 @@
                             <small asp-for="CachedByType"></small>
                         </div>
                     </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="DefaultPageSize" type="number" step="1" class="form-control" />
+                        <label asp-for="DefaultPageSize"></label>
+                        <small asp-for="DefaultPageSize"></small>
+                    </div>
                     <div class="card mt-4 border-danger">
                         <div class="card-body">
                             <h4 class="text-danger mb-2">Delete this type?</h4>
