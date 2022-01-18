@@ -63,7 +63,7 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException("This endpoint is only available when using Auth0.");
             }
-            
+
             var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
                 .WithRedirectUri(returnUrl)
                 .Build();
@@ -243,27 +243,44 @@ namespace Hood.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/logout")]
-        public virtual async Task<IActionResult> LogOff()
+        public virtual async Task<IActionResult> LogOff(string returnUrl = "/")
         {
             if (Engine.Auth0Enabled)
             {
-                var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
-                    // Indicate here where Auth0 should redirect the user after a logout.
-                    // Note that the resulting absolute Uri must be added to the
-                    // **Allowed Logout URLs** settings for the app.
-                    .WithRedirectUri(Url.Action("Index", "Home"))
-                    .Build();
-
-                await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                return RedirectToAction(nameof(SignOut), new { returnUrl });
             }
-            System.Security.Principal.IIdentity user = User.Identity;
-            var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-            await signInManager.SignOutAsync();
-            await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.Name}) logged out.");
-            return RedirectToAction("Index", "Home");
+            else
+            {
+                System.Security.Principal.IIdentity user = User.Identity;
+                var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                await signInManager.SignOutAsync();
+                await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.Name}) logged out.");
+                return RedirectToAction("Index", "Home");
+            }
         }
 
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("account/signout")]
+        public async Task SignOut(string returnUrl = "/")
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                throw new ApplicationException("This endpoint is only available when using Auth0.");
+            }
+
+            var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
+                // Indicate here where Auth0 should redirect the user after a logout.
+                // Note that the resulting absolute Uri must be added to the
+                // **Allowed Logout URLs** settings for the app.
+                .WithRedirectUri(Url.Action("Index", "Home"))
+                .Build();
+
+            await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
         #endregion
 
         #region Lockout / Access Denied / Registration Closed
