@@ -15,6 +15,6 @@ namespace Hood.Interfaces
         DbSet<Option> Options { get; set; }
         DbSet<PropertyListing> Properties { get; set; }
         bool AllMigrationsApplied();
-        void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager);
+        void Seed();
     }
 }

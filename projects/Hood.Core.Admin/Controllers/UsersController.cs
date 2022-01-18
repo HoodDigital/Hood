@@ -20,10 +20,14 @@ namespace Hood.Areas.Admin.Controllers
 {
     public abstract class BaseUsersController : BaseController
     {
+        protected readonly UserManager<ApplicationUser> _userManager;
+        protected readonly SignInManager<ApplicationUser> _signInManager;
         public BaseUsersController()
             : base()
-        { }
-
+        {
+            _userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
+            _signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+        }
 
         [Route("admin/users/")]
         public virtual async Task<IActionResult> Index(UserListModel model)
@@ -45,7 +49,6 @@ namespace Hood.Areas.Admin.Controllers
         {
             UserProfile model = await _account.GetProfileAsync(id);
             model.AllRoles = await _account.GetAllRolesAsync();
-            model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
             return View(model);
         }
 
@@ -59,22 +62,13 @@ namespace Hood.Areas.Admin.Controllers
                 string email = modelToUpdate.Email;
                 if (model.Email != email)
                 {
-                    IdentityResult setEmailResult = await _userManager.SetEmailAsync(modelToUpdate, model.Email);
-                    if (!setEmailResult.Succeeded)
-                    {
-                        throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
-                    }
+                    await _account.SetEmailAsync(modelToUpdate, model.Email);
                 }
 
                 string phoneNumber = modelToUpdate.PhoneNumber;
                 if (model.PhoneNumber != phoneNumber)
                 {
-                    IdentityResult setPhoneResult = await _userManager.SetPhoneNumberAsync(modelToUpdate, model.PhoneNumber);
-                    if (!setPhoneResult.Succeeded)
-                    {
-                        model.Email = phoneNumber;
-                        throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
-                    }
+                    await _account.SetPhoneNumberAsync(modelToUpdate, model.PhoneNumber);
                 }
 
                 var updatedFields = Request.Form.Keys.ToHashSet();
@@ -96,7 +90,6 @@ namespace Hood.Areas.Admin.Controllers
             }
 
             model.AllRoles = await _account.GetAllRolesAsync();
-            model.AccessCodes = await _account.GetAccessCodesAsync(model.Id);
             return View(model);
         }
 
@@ -433,9 +426,9 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _userManager.FindByIdAsync(id);
-                if (!await _roleManager.RoleExistsAsync(role))
+                if (!await _account.RoleExistsAsync(role))
                 {
-                    await _roleManager.CreateAsync(new IdentityRole(role));
+                    await _account.CreateRoleAsync(new IdentityRole(role));
                 }
 
                 IdentityResult result;

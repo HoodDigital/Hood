@@ -5,6 +5,7 @@ namespace Hood.ViewModels
     public class LoginViewModel : HoneyPotFormModel
     {
         [Required]
+        [EmailAddress]
         public string Username { get; set; }
 
         [Required]

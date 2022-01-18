@@ -72,6 +72,18 @@ namespace Hood.Core
 
             return null;
         }
+        public static bool Auth0Enabled
+        {
+            get
+            {
+                var config = Services.Resolve<IConfiguration>();
+                if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
 
         public static HoodConfiguration Configuration
         {

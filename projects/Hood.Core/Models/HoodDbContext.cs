@@ -39,7 +39,7 @@ namespace Hood.Models
         // Content
         public DbSet<Content> Content { get; set; }
         public DbSet<ContentMeta> ContentMetadata { get; set; }
-        public DbSet<ContentMedia> ContentMedia{ get; set; }
+        public DbSet<ContentMedia> ContentMedia { get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
 
 
@@ -85,7 +85,7 @@ namespace Hood.Models
             return base.Set<TEntity>();
         }
 
-        public virtual void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public virtual void Seed()
         {
             try
             {
@@ -113,60 +113,63 @@ namespace Hood.Models
                 throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
             }
 
-            foreach (string role in Models.Roles.All)
+            if (!Engine.Auth0Enabled)
             {
-                if (!roleManager.RoleExistsAsync(role).Result)
-                {
-                    IdentityResult irAdmin = roleManager.CreateAsync(new IdentityRole(role)).Result;
-                }
-            }
 
-            try
-            {
-                string ownerEmail = Engine.SiteOwnerEmail;
-                if (!Users.Any(u => u.UserName == ownerEmail))
+                #warning Auth0 - Setup roles??
+                // foreach (string role in Models.Roles.All)
+                // {
+                //     if (!roleManager.RoleExistsAsync(role).Result)
+                //     {
+                //         IdentityResult irAdmin = roleManager.CreateAsync(new IdentityRole(role)).Result;
+                //     }
+                // }
+
+                try
                 {
-                    ApplicationUser userToInsert = new ApplicationUser
+                    string ownerEmail = Engine.SiteOwnerEmail;
+                    if (!Users.Any(u => u.UserName == ownerEmail))
                     {
-                        CompanyName = "",
-                        CreatedOn = DateTime.UtcNow,
-                        FirstName = "Website",
-                        LastName = "Administrator",
-                        EmailConfirmed = true,
-                        Anonymous = false,
-                        PhoneNumber = "",
-                        JobTitle = "Website Administrator",
-                        LastLogOn = DateTime.UtcNow,
-                        LastLoginIP = "127.0.0.1",
-                        LastLoginLocation = "UK",
-                        Email = ownerEmail,
-                        UserName = ownerEmail,
-                        Active = true
-                    };
-                    IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
-                    if (!ir.Succeeded)
-                    {
-                        throw new StartupException("Could not create the admin user.", StartupError.AdminUserSetupError);
+                        ApplicationUser userToInsert = new ApplicationUser
+                        {
+                            CompanyName = "",
+                            CreatedOn = DateTime.UtcNow,
+                            FirstName = "Website",
+                            LastName = "Administrator",
+                            EmailConfirmed = true,
+                            Anonymous = false,
+                            PhoneNumber = "",
+                            JobTitle = "Website Administrator",
+                            LastLogOn = DateTime.UtcNow,
+                            LastLoginIP = "127.0.0.1",
+                            LastLoginLocation = "UK",
+                            Email = ownerEmail,
+                            UserName = ownerEmail,
+                            Active = true
+                        };
+                        Users.Add(userToInsert);
+                        SaveChangesAsync();
                     }
+
                 }
-
-            }
-            catch (Exception)
-            {
-                throw new StartupException("An error occurred while loading or creating the admin user.", StartupError.AdminUserSetupError);
-            }
-
-            ApplicationUser siteAdmin = userManager.FindByEmailAsync(Engine.SiteOwnerEmail).Result;
-            if (userManager.SupportsUserRole)
-            {
-                foreach (string role in Models.Roles.All)
+                catch (Exception)
                 {
-                    if (!userManager.IsInRoleAsync(siteAdmin, role.ToUpper()).Result)
-                    {
-                        IdentityResult addToRole = userManager.AddToRoleAsync(siteAdmin, role).Result;
-                    }
+                    throw new StartupException("An error occurred while loading or creating the admin user.", StartupError.AdminUserSetupError);
                 }
             }
+
+            ApplicationUser siteAdmin = Users.SingleOrDefault(u => u.Email == Engine.SiteOwnerEmail);
+            #warning Auth0 - Check user admin account roles?
+            // if (userManager.SupportsUserRole)
+            // {
+            //     foreach (string role in Models.Roles.All)
+            //     {
+            //         if (!userManager.IsInRoleAsync(siteAdmin, role.ToUpper()).Result)
+            //         {
+            //             IdentityResult addToRole = userManager.AddToRoleAsync(siteAdmin, role).Result;
+            //         }
+            //     }
+            // }
 
             if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
             {

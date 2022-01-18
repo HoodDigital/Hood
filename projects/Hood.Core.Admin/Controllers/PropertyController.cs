@@ -176,8 +176,8 @@ namespace Hood.Areas.Admin.Controllers
         }
         protected virtual async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
-            IList<ApplicationUser> admins = await _userManager.GetUsersInRoleAsync("Admin");
-            IList<ApplicationUser> editors = await _userManager.GetUsersInRoleAsync("Editor");
+            IList<ApplicationUser> admins = await _account.GetUsersInRole("Admin");
+            IList<ApplicationUser> editors = await _account.GetUsersInRole("Editor");
             listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
             return listing;
         }

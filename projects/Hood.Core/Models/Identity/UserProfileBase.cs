@@ -27,9 +27,6 @@ namespace Hood.Models
         public virtual string Latitude { get; set; }
         [ProtectedPersonalData]
         public virtual string Longitude { get; set; }
-        [NotMapped]
-        [JsonIgnore]
-        public List<UserAccessCode> AccessCodes { get; set; }
         #endregion
 
         #region IName 

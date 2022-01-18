@@ -20,7 +20,6 @@ namespace Hood.Extensions
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
-            builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
 
             // Media
             builder.Entity<MediaObject>().ToTable("HoodMedia");

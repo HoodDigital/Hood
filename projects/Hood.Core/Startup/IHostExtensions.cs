@@ -38,9 +38,7 @@ namespace Hood.Startup
                     if (Engine.Configuration.SeedOnStart)
                     {
                         // Seed the database
-                        UserManager<ApplicationUser> userManager = services.GetService<UserManager<ApplicationUser>>();
-                        RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
-                        db.Seed(userManager, roleManager);
+                        db.Seed();
                     }
                     else
                     {

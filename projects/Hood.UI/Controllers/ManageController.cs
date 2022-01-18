@@ -1,4 +1,5 @@
-﻿using Hood.BaseTypes;
+﻿using Hood.Attributes;
+using Hood.BaseTypes;
 using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
@@ -32,18 +33,13 @@ namespace Hood.Controllers
     {
         public ManageController()
             : base()
-        {
-        }
+        { }
 
         [HttpGet]
         [Route("account/manage")]
         public virtual async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+            ApplicationUser user = await GetCurrentUserOrThrow();
             var model = new UserViewModel
             {
                 UserId = user.Id,
@@ -54,7 +50,7 @@ namespace Hood.Controllers
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
                 Profile = User.GetUserProfile(),
-                Roles = await _userManager.GetRolesAsync(user)
+                Roles = await _account.GetRolesForUser(user)
             };
             return View(model);
         }
@@ -64,41 +60,25 @@ namespace Hood.Controllers
         [Route("account/manage")]
         public virtual async Task<IActionResult> Index(UserViewModel model)
         {
-            var user = await _userManager.GetUserAsync(User);
+            ApplicationUser user = await GetCurrentUserOrThrow();
             try
             {
-
-                if (user == null)
-                {
-                    throw new Exception($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-                }
-
-
                 if (!ModelState.IsValid)
                 {
-                    model.Roles = await _userManager.GetRolesAsync(user);
+                    model.Roles = await _account.GetRolesForUser(user);
                     return View(model);
                 }
 
                 var email = user.Email;
                 if (model.Email != email)
                 {
-                    var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
-                    if (!setEmailResult.Succeeded)
-                    {
-                        throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
-                    }
+                    await _account.SetEmailAsync(user, model.Email);
                 }
 
                 var phoneNumber = user.PhoneNumber;
                 if (model.PhoneNumber != phoneNumber)
                 {
-                    var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-                    if (!setPhoneResult.Succeeded)
-                    {
-                        model.Email = phoneNumber;
-                        throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
-                    }
+                    await _account.SetPhoneNumberAsync(user, model.PhoneNumber);
                 }
 
                 model.Profile.Id = user.Id;
@@ -110,10 +90,6 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                if (user == null)
-                {
-                    throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-                }
                 SaveMessage = "Something went wrong: " + ex.Message;
                 MessageType = AlertType.Danger;
             }
@@ -125,13 +101,9 @@ namespace Hood.Controllers
         public virtual async Task<Response> UploadAvatar(IFormFile file, string userId)
         {
             // User must have an organisation.
-
             try
             {
-                var user = await _account.GetUserByIdAsync(userId);
-                if (user == null)
-                    throw new Exception("Could not locate the user to add an avatar to.");
-
+                ApplicationUser user = await GetCurrentUserOrThrow();
                 IMediaObject mediaResult = null;
                 if (file != null)
                 {
@@ -144,7 +116,7 @@ namespace Hood.Controllers
                         await _media.DeleteStoredMedia((MediaObject)user.Avatar);
                     }
                     var directory = await Engine.AccountManager.GetDirectoryAsync(User.GetUserId());
-                    mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));                    
+                    mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));
                     user.Avatar = mediaResult;
                     await _account.UpdateUserAsync(user);
                     _db.Media.Add(new MediaObject(mediaResult, directory.Id));
@@ -161,22 +133,12 @@ namespace Hood.Controllers
         [Route("account/manage/verify-email")]
         public virtual async Task<IActionResult> SendVerificationEmail()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
 
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-            var verifyModel = new VerifyEmailModel(user, callbackUrl)
-            {
-                SendToRecipient = true
-            };
-
-            await _mailService.ProcessAndSend(verifyModel);
+            ApplicationUser user = await GetCurrentUserOrThrow();
+            await _account.SendVerificationEmail(user);
 
             SaveMessage = "Verification email sent. Please check your email.";
+            MessageType = AlertType.Success;
 
             if (user.Active)
                 return RedirectToAction(nameof(Index));
@@ -188,17 +150,18 @@ namespace Hood.Controllers
         [Route("account/manage/change-password")]
         public virtual async Task<IActionResult> ChangePassword()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            ApplicationUser user = await GetCurrentUserOrThrow();
+            if (Engine.Auth0Enabled)
             {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+#warning Auth0 - ChangePassword - send reset link and redirect back to manage page.
+                throw new NotImplementedException();
             }
-
             var model = new ChangePasswordViewModel { StatusMessage = SaveMessage };
             return View(model);
         }
 
         [HttpPost]
+        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/manage/change-password")]
         public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
@@ -207,21 +170,20 @@ namespace Hood.Controllers
             {
                 return View(model);
             }
-
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            ApplicationUser user = await GetCurrentUserOrThrow();
+            var changePasswordResult = await _account.ChangePassword(user, model.OldPassword, model.NewPassword);
             if (!changePasswordResult.Succeeded)
             {
-                AddErrors(changePasswordResult);
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
                 return View(model);
             }
 
-            await _signInManager.SignInAsync(user, isPersistent: false);
+            var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+            await signInManager.SignInAsync(user, isPersistent: false);
+
             await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.");
             SaveMessage = "Your password has been changed.";
 
@@ -242,13 +204,19 @@ namespace Hood.Controllers
         {
             try
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null)
-                    throw new Exception("User not found.");
-
+                ApplicationUser user = await GetCurrentUserOrThrow();
                 await _account.DeleteUserAsync(user.Id, User);
 
-                await _signInManager.SignOutAsync();
+                if (Engine.Auth0Enabled)
+                {
+#warning Auth0 - ConfirmDelete - log user out and redirect back to deleted page. 
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                    await signInManager.SignOutAsync();
+                }
 
                 await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.");
                 return RedirectToAction(nameof(Deleted));
@@ -269,16 +237,5 @@ namespace Hood.Controllers
             return View(nameof(Deleted));
         }
 
-        #region Helpers
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
-
-        #endregion
     }
 }

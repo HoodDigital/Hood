@@ -15,17 +15,15 @@ namespace Hood.Extensions
             {
                 return null;
             }
-
-            principal.GetUserId();
+            
             IHttpContextAccessor contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
-
             UserProfile profile = contextAccessor.HttpContext.Items[nameof(UserProfile)] as UserProfile;
             if (profile == null)
             {
                 HoodDbContext context = Engine.Services.Resolve<HoodDbContext>();
                 try
                 {
-                    profile = context.UserProfiles.SingleOrDefault(us => us.Id == principal.GetUserId());
+                    profile = context.UserProfiles.SingleOrDefault(us => us.Email == principal.Identity.Name);
                 }
                 catch (Exception)
                 {

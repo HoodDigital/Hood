@@ -20,9 +20,9 @@ namespace Hood.Web
             base.OnModelCreating(builder);
         }
 
-        public override void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public override void Seed()
         {
-            base.Seed(userManager, roleManager);
+            base.Seed();
         }
     }
 }

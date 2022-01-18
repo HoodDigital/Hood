@@ -1,10 +1,14 @@
-﻿using Hood.BaseTypes;
+﻿using Auth0.AspNetCore.Authentication;
+using Hood.Attributes;
+using Hood.BaseTypes;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -39,28 +43,37 @@ namespace Hood.Controllers
         [Route("account/login")]
         public virtual IActionResult Login(string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
-            AccountSettings accountSettings = Engine.Settings.Account;
-            if (accountSettings.MagicLinkLogin)
+            if (Engine.Auth0Enabled)
             {
-                return View("MagicLogin");
+                return RedirectToAction(nameof(Authorize), new { returnUrl });
             }
-
-            return View("Login");
+            else
+            {
+                ViewData["ReturnUrl"] = returnUrl;
+                return View("Login");
+            }
         }
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("account/login/password")]
-        public virtual IActionResult LoginPassword(string returnUrl = null)
+        [Route("account/auth")]
+        public async Task Authorize(string returnUrl = "/")
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View("Login");
+            if (!Engine.Auth0Enabled)
+            {
+                throw new ApplicationException("This endpoint is only available when using Auth0.");
+            }
+            
+            var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+                .WithRedirectUri(returnUrl)
+                .Build();
+
+            await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
         }
 
         [HttpPost]
         [AllowAnonymous]
+        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/login")]
         public virtual async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
@@ -79,24 +92,24 @@ namespace Hood.Controllers
                 }
 
                 // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true                
+                var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
+                    ApplicationUser user = await _account.GetUserByEmailAsync(model.Username);
                     if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
-                        await SendConfirmEmail(user);
+                        await _account.SendVerificationEmail(user);
                         return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
                     }
 
                     user.LastLogOn = DateTime.UtcNow;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
-                    await _userManager.UpdateAsync(user);
+                    await _account.UpdateUserAsync(user);
 
                     await _logService.AddLogAsync<AccountController<TContext>>($"User ({model.Username}) logged in.");
-
 
                     return RedirectToLocal(returnUrl);
                 }
@@ -118,136 +131,6 @@ namespace Hood.Controllers
 
         #endregion
 
-        #region Magic Link Login
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("account/login/generate")]
-        public virtual IActionResult MagicLoginGenerate()
-        {
-            return RedirectToAction(nameof(Login));
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        [Route("account/login/generate")]
-        public virtual async Task<IActionResult> MagicLoginGenerate(MagicLoginViewModel model, string returnUrl = null)
-        {
-            AccountSettings accountSettings = Engine.Settings.Account;
-            if (!accountSettings.MagicLinkLogin)
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            ViewData["ReturnUrl"] = returnUrl;
-            try
-            {
-                if (ModelState.IsValid && ModelState.IsNotSpam(model))
-                {
-
-                    Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
-                    if (!recaptcha.Success)
-                    {
-                        ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
-                        return View("MagicLogin", model);
-                    }
-
-                    // This doesn't count login failures towards account lockout
-                    // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-
-                    var user = await _userManager.FindByEmailAsync(model.Email);
-
-                    if (user == null)
-                    {
-                        throw new Exception("Your email address was not recognised.");
-                    }
-
-                    var token = await _userManager.GenerateUserTokenAsync(user, "MagicLoginTokenProvider", "hood-login");
-
-                    string callbackUrl = Url.Action("MagicLogin", "Account", new { u = user.Id, t = token, r = returnUrl }, protocol: HttpContext.Request.Scheme);
-
-                    MailObject message = new MailObject()
-                    {
-                        To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                        PreHeader = $"Log in to {Engine.Settings.Basic.Title}",
-                        Subject = $"Log in to {Engine.Settings.Basic.Title}"
-                    };
-                    message.AddParagraph($"Click the button below to log into your account.");
-                    message.AddCallToAction("Log in", callbackUrl);
-                    message.Template = MailSettings.PlainTemplate;
-                    await _emailSender.SendEmailAsync(message);
-
-                    return RedirectToAction(nameof(MagicLoginSent));
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View("MagicLogin", model);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("account/login/sent")]
-        public virtual IActionResult MagicLoginSent(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-        [AllowAnonymous]
-        [Route("account/login/code")]
-        public virtual async Task<IActionResult> MagicLogin(string t, string u, string r = "/")
-        {
-            try
-            {
-                var user = await _userManager.FindByIdAsync(u);
-                var isValid = await _userManager.VerifyUserTokenAsync(user, "MagicLoginTokenProvider", "hood-login", t);
-                if (!isValid)
-                {
-                    throw new UnauthorizedAccessException("The token " + t + " is not valid for the user " + u);
-                }
-
-                await _userManager.UpdateSecurityStampAsync(user);
-
-                // mark account active as this is from an email, so no confirmation is required.
-                user.Active = true;
-                user.EmailConfirmed = true;
-                user.LastLogOn = DateTime.UtcNow;
-                user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
-                user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
-
-                await _userManager.UpdateAsync(user);
-
-                await _signInManager.SignInAsync(user, true);
-
-                return RedirectToAction(nameof(MagicLoginSuccess), new { returnUrl = r });
-            }
-            catch (Exception ex)
-            {
-                throw new UnauthorizedAccessException(ex.Message);
-            }
-        }
-
-        [AllowAnonymous]
-        [Route("account/login/success")]
-        public virtual IActionResult MagicLoginSuccess(LoginSuccessModel model)
-        {
-            if (!Url.IsLocalUrl(model.returnUrl))
-            {
-                model.returnUrl = "/";
-            }
-            return View(model);
-        }
-
-        #endregion
-
         #region Password Registration
 
         [HttpGet]
@@ -259,10 +142,6 @@ namespace Hood.Controllers
             if (!accountSettings.EnableRegistration)
             {
                 return RedirectToAction(nameof(RegistrationClosed));
-            }
-            if (accountSettings.MagicLinkLogin)
-            {
-                return View("MagicRegister");
             }
 
             return View();
@@ -278,10 +157,6 @@ namespace Hood.Controllers
             if (!accountSettings.EnableRegistration)
             {
                 return RedirectToAction(nameof(RegistrationClosed));
-            }
-            if (accountSettings.MagicLinkLogin)
-            {
-                return RedirectToAction(nameof(Register));
             }
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -316,24 +191,36 @@ namespace Hood.Controllers
                     LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
                     LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
                 };
-                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await _account.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    if (Engine.Settings.Account.RequireEmailConfirmation) {
-                        await SendConfirmEmail(user);
-                    } else {                        
+                    if (Engine.Settings.Account.RequireEmailConfirmation)
+                    {
+                        await _account.SendVerificationEmail(user);
+                    }
+                    else
+                    {
                         await SendWelcomeEmail(user);
                     }
 
-                    user.Active = !Engine.Settings.Account.RequireEmailConfirmation;                    
+                    user.Active = !Engine.Settings.Account.RequireEmailConfirmation;
                     user.EmailConfirmed = !Engine.Settings.Account.RequireEmailConfirmation;
                     user.LastLogOn = DateTime.UtcNow;
                     user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
                     user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
 
-                    await _userManager.UpdateAsync(user);
+                    await _account.UpdateUserAsync(user);
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    if (Engine.Auth0Enabled)
+                    {
+#warning Auth0 - Register - sign in user and redirect to return url - does this need a roundtrip to Auth0?
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                        await signInManager.SignInAsync(user, isPersistent: false);
+                    }
 
                     if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
@@ -351,173 +238,6 @@ namespace Hood.Controllers
 
         #endregion
 
-        #region Magic Link Registration
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("account/register/generate")]
-        public virtual IActionResult MagicRegisterGenerate()
-        {
-            return RedirectToAction(nameof(Register));
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        [Route("account/register/generate")]
-        public virtual async Task<IActionResult> MagicRegisterGenerate(MagicRegisterViewModel model, string returnUrl = null)
-        {
-            AccountSettings accountSettings = Engine.Settings.Account;
-            if (!accountSettings.EnableRegistration)
-            {
-                return RedirectToAction(nameof(RegistrationClosed));
-            }
-            if (!accountSettings.MagicLinkLogin)
-            {
-                return RedirectToAction(nameof(Register));
-            }
-
-            ViewData["ReturnUrl"] = returnUrl;
-            try
-            {
-                if (ModelState.IsValid && ModelState.IsNotSpam(model))
-                {
-
-                    Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
-                    if (!recaptcha.Success)
-                    {
-                        ModelState.AddModelError(string.Empty, "You have failed to pass the reCaptcha check. Please refresh your page and try again.");
-                        return View("MagicRegister", model);
-                    }
-
-                    if (!model.Consent)
-                    {
-                        ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process.");
-                    }
-
-
-                    // This doesn't count login failures towards account lockout
-                    // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-
-                    var user = await _userManager.FindByEmailAsync(model.Email);
-                    if (user == null)
-                    {
-                        // create the user
-                        user = new ApplicationUser()
-                        {
-                            UserName = model.Username.IsSet() ? model.Username : model.Email,
-                            Email = model.Email,
-                            FirstName = model.FirstName,
-                            LastName = model.LastName,
-                            DisplayName = model.DisplayName,
-                            PhoneNumber = model.Phone,
-                            JobTitle = model.JobTitle,
-                            Anonymous = model.Anonymous,
-                            CreatedOn = DateTime.UtcNow,
-                            LastLogOn = DateTime.UtcNow,
-                            LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
-                            LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
-                        };
-                        IdentityResult createUserResult = await _userManager.CreateAsync(user);
-                        if (!createUserResult.Succeeded)
-                        {
-                            throw new Exception("Could not create new user.");
-                        }
-                    }
-
-                    var token = await _userManager.GenerateUserTokenAsync(user, "MagicLoginTokenProvider", "hood-registration");
-
-                    string callbackUrl = Url.Action("MagicRegister", "Account", new { u = user.Id, t = token, r = returnUrl }, protocol: HttpContext.Request.Scheme);
-
-                    MailObject message = new MailObject()
-                    {
-                        To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                        PreHeader = $"Finish setting up account for {Engine.Settings.Basic.Title}",
-                        Subject = $"Finish setting up account for {Engine.Settings.Basic.Title}"
-                    };
-                    message.AddParagraph($"Your account is ready, simply click the button below to confirm your email and log in.");
-                    message.AddCallToAction("Finish & Login", callbackUrl);
-                    message.Template = MailSettings.PlainTemplate;
-                    await _emailSender.SendEmailAsync(message);
-
-                    return RedirectToAction(nameof(MagicRegisterSent));
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-            }
-
-            // If we got this far, something failed, redisplay form
-            return View("MagicRegister", model);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("account/register/sent")]
-        public virtual IActionResult MagicRegisterSent(string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-        [AllowAnonymous]
-        [Route("account/register/code")]
-        public virtual async Task<IActionResult> MagicRegister(string t, string u, string r = "/")
-        {
-            AccountSettings accountSettings = Engine.Settings.Account;
-            if (!accountSettings.EnableRegistration)
-            {
-                return RedirectToAction(nameof(RegistrationClosed));
-            }
-            
-            try
-            {
-                var user = await _userManager.FindByIdAsync(u);
-                var isValid = await _userManager.VerifyUserTokenAsync(user, "MagicLoginTokenProvider", "hood-registration", t);
-                if (!isValid)
-                {
-                    throw new UnauthorizedAccessException("The token " + t + " is not valid for the user " + u);
-                }
-                await _userManager.UpdateSecurityStampAsync(user);
-
-                // mark account active etc etc.
-                user.Active = true;
-                user.EmailConfirmed = true;
-                user.LastLogOn = DateTime.UtcNow;
-                user.LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString();
-                user.LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString();
-
-                await _userManager.UpdateAsync(user);
-
-                // send welcome email, email already confirmed so no confirm email link.
-                await SendWelcomeEmail(user);
-
-                await _signInManager.SignInAsync(user, true);
-
-                return RedirectToAction(nameof(MagicRegisterSuccess), new { returnUrl = r });
-            }
-            catch (Exception ex)
-            {
-                throw new UnauthorizedAccessException(ex.Message);
-            }
-        }
-
-        [AllowAnonymous]
-        [Route("account/register/success")]
-        public virtual IActionResult MagicRegisterSuccess(RegisterSuccessModel model)
-        {
-            if (!Url.IsLocalUrl(model.returnUrl))
-            {
-                model.returnUrl = "/";
-            }
-            return View(model);
-        }
-
-        #endregion
-
         #region Log Off
 
         [HttpPost]
@@ -525,8 +245,21 @@ namespace Hood.Controllers
         [Route("account/logout")]
         public virtual async Task<IActionResult> LogOff()
         {
+            if (Engine.Auth0Enabled)
+            {
+                var authenticationProperties = new LogoutAuthenticationPropertiesBuilder()
+                    // Indicate here where Auth0 should redirect the user after a logout.
+                    // Note that the resulting absolute Uri must be added to the
+                    // **Allowed Logout URLs** settings for the app.
+                    .WithRedirectUri(Url.Action("Index", "Home"))
+                    .Build();
+
+                await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
             System.Security.Principal.IIdentity user = User.Identity;
-            await _signInManager.SignOutAsync();
+            var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+            await signInManager.SignOutAsync();
             await _logService.AddLogAsync<AccountController<TContext>>($"User ({user.Name}) logged out.");
             return RedirectToAction("Index", "Home");
         }
@@ -570,6 +303,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/confirm/required")]
         public virtual IActionResult ConfirmRequired(ConfirmRequiredModel model)
         {
@@ -578,6 +312,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/confirm")]
         public virtual async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
@@ -585,13 +320,13 @@ namespace Hood.Controllers
             {
                 return RedirectToAction(nameof(HomeController<TContext>.Index), "Home");
             }
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            ApplicationUser user = await _account.GetUserByIdAsync(userId);
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load user with ID '{userId}'.");
             }
 
-            IdentityResult result = await _userManager.ConfirmEmailAsync(user, code);
+            IdentityResult result = await _account.ConfirmEmailAsync(user, code);
             if (!result.Succeeded)
             {
                 throw new Exception("Your email address could not be confirmed, the link you have clicked is invalid, perhaps it has expired. You can log in to resend a new verification email.");
@@ -608,18 +343,19 @@ namespace Hood.Controllers
             else
             {
                 user.Active = true;
-                await _userManager.UpdateAsync(user);
+                await _account.UpdateUserAsync(user);
             }
             return View("ConfirmEmail");
         }
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/confirm/resend")]
         public virtual async Task<IActionResult> ResendConfirm()
         {
-            var user = await _userManager.GetUserAsync(User);
-            await SendConfirmEmail(user);
+            ApplicationUser user = await GetCurrentUserOrThrow();
+            await _account.SendVerificationEmail(user);
             return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
         }
 
@@ -629,6 +365,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/forgot-password")]
         public virtual IActionResult ForgotPassword()
         {
@@ -637,34 +374,22 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/forgot-password")]
         public virtual async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
+                ApplicationUser user = await _account.GetUserByEmailAsync(model.Email);
                 if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                // Send an email with this link
-                string code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                string callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
+                await _account.SendPasswordResetToken(user);
 
-                MailObject message = new MailObject()
-                {
-                    To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
-                    PreHeader = "Reset your password.",
-                    Subject = "Reset your password."
-                };
-                message.AddParagraph($"Please reset your password by clicking here:");
-                message.AddCallToAction("Reset your password", callbackUrl);
-                message.Template = MailSettings.WarningTemplate;
-                await _emailSender.SendEmailAsync(message);
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             }
 
@@ -674,6 +399,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/forgot-password/confirm")]
         public virtual IActionResult ForgotPasswordConfirmation()
         {
@@ -682,6 +408,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/reset-password")]
         public virtual IActionResult ResetPassword(string code = null)
         {
@@ -695,6 +422,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/reset-password")]
         public virtual async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
@@ -703,13 +431,13 @@ namespace Hood.Controllers
             {
                 return View(model);
             }
-            ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
+            ApplicationUser user = await _account.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
                 // Don't reveal that the user does not exist
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
             }
-            IdentityResult result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
+            IdentityResult result = await _account.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
                 return RedirectToAction("ResetPasswordConfirmation", "Account");
@@ -720,6 +448,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [DisableForAuth0]
         [Route("account/reset-password/confirm")]
         public virtual IActionResult ResetPasswordConfirmation()
         {
@@ -741,29 +470,12 @@ namespace Hood.Controllers
             await _mailService.ProcessAndSend(welcomeModel);
         }
 
-        protected async Task SendConfirmEmail(ApplicationUser user)
-        {
-            string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            string confirmLink = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code }, protocol: HttpContext.Request.Scheme);
-            VerifyEmailModel confirmEmailModel = new VerifyEmailModel(user, confirmLink)
-            {
-                SendToRecipient = true,
-                NotifyRole = Engine.Settings.Account.NotifyNewAccount ? "NewAccountNotifications" : null
-            };
-            await _mailService.ProcessAndSend(confirmEmailModel);
-        }
-
         protected void AddErrors(IdentityResult result)
         {
             foreach (IdentityError error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
-        }
-
-        protected Task<ApplicationUser> GetCurrentUserAsync()
-        {
-            return _userManager.GetUserAsync(HttpContext.User);
         }
 
         protected IActionResult RedirectToLocal(string returnUrl)

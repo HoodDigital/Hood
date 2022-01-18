@@ -20,6 +20,7 @@ using StackExchange.Redis;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Auth0.AspNetCore.Authentication;
 
 namespace Hood.Startup
 {
@@ -45,7 +46,15 @@ namespace Hood.Startup
             services.ConfigureHoodServices();
 
             services.ConfigureCache(config);
-            services.ConfigureAuthentication(config);
+
+            if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
+            {
+                services.ConfigureAuth0(config);
+            }
+            else
+            {
+                services.ConfigureAuthentication(config);
+            }
 
             services.ConfigureViewEngine(config);
             services.ConfigureHoodAntiForgery(config);
@@ -94,7 +103,6 @@ namespace Hood.Startup
 
             // Register scoped.
             services.AddScoped<ISettingsRepository, SettingsRepository>();
-            services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<IContentRepository, ContentRepository>();
 
@@ -102,7 +110,6 @@ namespace Hood.Startup
             services.AddScoped<IPageBuilder, PageBuilder>();
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ISmsSender, SmsSender>();
-            services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRecaptchaService, RecaptchaService>();
 
             return services;
@@ -173,22 +180,6 @@ namespace Hood.Startup
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.ConsentCookie.Name = $".{cookieName}.Consent";
             });
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Cookie.Name = $".{cookieName}.Authentication";
-                options.Cookie.HttpOnly = true;    
-                options.Cookie.SameSite = SameSiteMode.Strict;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-
-                options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
-
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
-                options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
-                options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
-                options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;
-                options.SlidingExpiration = true;                
-            });
             return services;
         }
         public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration config)
@@ -207,16 +198,16 @@ namespace Hood.Startup
                 o.Password.RequireNonAlphanumeric = !config["Identity:Password:RequireNonAlphanumeric"].IsSet() || bool.Parse(config["Identity:Password:RequireNonAlphanumeric"]);
                 o.Password.RequiredLength = config["Identity:Password:RequiredLength"].IsSet() ? int.Parse(config["Identity:Password:RequiredLength"]) : 6;
             })
-            .AddEntityFrameworkStores<HoodDbContext>()
-            .AddDefaultTokenProviders()
-            .AddMagicLoginTokenProvider();
+                .AddEntityFrameworkStores<HoodDbContext>()
+                .AddDefaultTokenProviders()
+                .AddMagicLoginTokenProvider();
 
             string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
 
             services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = $".{cookieName}.Authentication";
-                options.Cookie.HttpOnly = true;    
+                options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 
@@ -226,9 +217,50 @@ namespace Hood.Startup
                 options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
                 options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
                 options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;
-                options.SlidingExpiration = true;   
-            });
+                options.SlidingExpiration = true;
+            });            
+                
+            services.AddScoped<IAccountRepository, Auth0AccountRepository>();
+            services.AddScoped<IEmailSender, Auth0EmailSender>();
+
             return services;
+        }
+
+        public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config)
+        {
+            services.ConfigureSameSiteNoneCookies();
+
+            services
+                .AddAuth0WebAppAuthentication(options =>
+                {
+                    options.Domain = config["Identity:Auth0:Domain"];
+                    options.ClientId = config["Identity:Auth0:ClientId"];
+                });
+                
+            services.AddScoped<IAccountRepository, Auth0AccountRepository>();
+            services.AddScoped<IEmailSender, Auth0EmailSender>();
+
+            return services;
+        }
+
+        public static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
+        {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+                options.OnAppendCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext => CheckSameSite(cookieContext.CookieOptions);
+            });
+
+            return services;
+        }
+
+        private static void CheckSameSite(CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None && options.Secure == false)
+            {
+                options.SameSite = SameSiteMode.Unspecified;
+            }
         }
         public static IServiceCollection ConfigureSession(this IServiceCollection services, IConfiguration config)
         {

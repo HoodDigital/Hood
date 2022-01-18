@@ -592,7 +592,7 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
-            var editors = await _userManager.GetUsersInRoleAsync("Editor");
+            var editors = await _account.GetUsersInRole("Editor");
             model.Authors = editors.Select(u => new UserProfile()
             {
                 UserName = u.UserName,

@@ -28,6 +28,10 @@ namespace Hood.Controllers
         public virtual async Task<IActionResult> Index()
         {
 
+            if (User.Identity.IsAuthenticated) {
+                //do sommat
+            }
+
             BasicSettings basicSettings = Engine.Settings.Basic;
 
             if (basicSettings.Homepage.HasValue)

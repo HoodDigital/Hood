@@ -84,7 +84,7 @@ namespace Hood.Controllers
         public ActionResult Create(string userId)
         {
             if (!userId.IsSet())
-                userId = _userManager.GetUserId(User);
+                userId = User.GetUserId();
             Address add = new Address() { UserId = userId };
             return View(add);
         }
@@ -110,7 +110,7 @@ namespace Hood.Controllers
                     }
                 }
 
-                var user = await _account.GetCurrentUserAsync(false);
+                var user = await _account.GetUserByIdAsync(User.GetUserId());
                 address.UserId = user.Id;
                 user.Addresses.Add(address);
                 await _account.UpdateUserAsync(user);
@@ -186,7 +186,7 @@ namespace Hood.Controllers
         {
             try
             {
-                string userId = _userManager.GetUserId(User);
+                string userId = User.GetUserId();
                 await _account.SetBillingAddressAsync(userId, id);
                 return new Response(true, $"The billing address has been updated.");
             }
@@ -201,7 +201,7 @@ namespace Hood.Controllers
         {
             try
             {
-                string userId = _userManager.GetUserId(User);
+                string userId = User.GetUserId();
                 await _account.SetDeliveryAddressAsync(userId, id);
                 return new Response(true, $"The delivery address has been updated.");
             }

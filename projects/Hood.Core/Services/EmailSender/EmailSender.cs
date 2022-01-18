@@ -15,29 +15,27 @@ namespace Hood.Services
 {
     public class EmailSender : IEmailSender
     {
-        private readonly IHttpContextAccessor _contextAccessor;
-        private Models.MailSettings _mail;
-        private Models.BasicSettings _info;
-        private readonly IRazorViewRenderer _renderer;
-        private readonly UserManager<ApplicationUser> _userManager;
+        protected readonly IHttpContextAccessor _contextAccessor;
+        protected Models.MailSettings _mail;
+        protected Models.BasicSettings _info;
+        protected readonly IRazorViewRenderer _renderer;        
+        private UserManager<ApplicationUser> UserManager => Engine.Services.Resolve<UserManager<ApplicationUser>>();
+ 
 
-        public EmailSender(IHttpContextAccessor contextAccessor,
-            UserManager<ApplicationUser> userManager,
-            IRazorViewRenderer renderer)
+        public EmailSender()
         {
-            _contextAccessor = contextAccessor;
-            _userManager = userManager;
-            _renderer = renderer;
+            _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
+            _renderer = Engine.Services.Resolve<IRazorViewRenderer>();
         }
 
-        private SendGridClient GetMailClient()
+        protected SendGridClient GetMailClient()
         {
             _info = Engine.Settings.Basic;
             _mail = Engine.Settings.Mail;
             return new SendGridClient(_mail.SendGridKey);
         }
 
-        public EmailAddress GetSiteFromEmail()
+        public virtual EmailAddress GetSiteFromEmail()
         {
             _info = Engine.Settings.Basic;
             _mail = Engine.Settings.Mail;
@@ -47,7 +45,7 @@ namespace Hood.Services
             return new EmailAddress(fromEmail, fromName);
         }
 
-        public async Task<int> SendEmailAsync(MailObject message, EmailAddress from = null, EmailAddress replyTo = null)
+        public virtual async Task<int> SendEmailAsync(MailObject message, EmailAddress from = null, EmailAddress replyTo = null)
         {
             if (!Engine.Settings.Mail.SendGridKey.IsSet())
             {
@@ -68,7 +66,7 @@ namespace Hood.Services
 
             throw new System.Exception("The email could not be sent, check your SendGrid settings.");
         }
-        public async Task<int> SendEmailAsync(EmailAddress[] emails, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
+        public virtual async Task<int> SendEmailAsync(EmailAddress[] emails, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
         {
             if (!Engine.Settings.Mail.SendGridKey.IsSet())
             {
@@ -91,9 +89,9 @@ namespace Hood.Services
             return sent;
         }
 
-        public async Task<int> NotifyRoleAsync(MailObject message, string roleName, EmailAddress from = null, EmailAddress replyTo = null)
+        public virtual async Task<int> NotifyRoleAsync(MailObject message, string roleName, EmailAddress from = null, EmailAddress replyTo = null)
         {
-            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            var users = await UserManager.GetUsersInRoleAsync(roleName);
             int sent = 0;
             foreach (var user in users)
             {
@@ -103,9 +101,9 @@ namespace Hood.Services
             }
             return sent;
         }
-        public async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
+        public virtual async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
         {
-            var users = await _userManager.GetUsersInRoleAsync(roleName);
+            var users = await UserManager.GetUsersInRoleAsync(roleName);
             var emails = users.Select(u => new EmailAddress(u.Email, u.ToFullName())).ToArray();
             return await SendEmailAsync(emails, subject, htmlContent, textContent, from, replyTo);
         }
