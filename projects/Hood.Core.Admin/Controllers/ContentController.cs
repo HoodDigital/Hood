@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
+    [Authorize]
     public abstract class BaseContentController : BaseController
     {
         public BaseContentController()
@@ -162,11 +163,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 model.AllowComments = true;
-                model.AuthorId = Engine.Account.Id;
+                model.AuthorId = User.GetUserId();
                 model.Body = "";
-                model.CreatedBy = Engine.Account.UserName;
+                model.CreatedBy = User.Identity.Name;
                 model.CreatedOn = DateTime.UtcNow;
-                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.UtcNow;
                 model.Public = true;
                 model.ShareCount = 0;

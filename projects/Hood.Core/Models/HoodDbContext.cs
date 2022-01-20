@@ -27,8 +27,10 @@ namespace Hood.Models
         }
 
         // Identity
-        public DbSet<UserAccessCode> AccessCodes { get; set; }
-        public DbSet<Address> Addresses { get; set; }
+        public DbSet<Address> Addresses { get; set; }    
+        public DbSet<Auth0User> Auth0Users { get; set; }
+
+        // Media
         public DbSet<MediaObject> Media { get; set; }
         public DbSet<MediaDirectory> MediaDirectories { get; set; }
 
@@ -52,8 +54,10 @@ namespace Hood.Models
         // Logs
         public DbSet<Log> Logs { get; set; }
 
-        // Views
+
+        // Auth0
         public DbSet<UserProfile> UserProfiles { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

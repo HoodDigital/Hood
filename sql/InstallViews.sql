@@ -26,34 +26,25 @@ SELECT
 	AspNetUsers.Longitude,	
 	AspNetUsers.UserVars,
 	COUNT(AspNetRoles.Name) AS RoleCount,
-	CONCAT
 	(
-		'[',
-		STRING_AGG
-		(
-			ISNULL
-			(
-				CASE 
-				WHEN 
-					AspNetRoles.Id IS NOT NULL
-				THEN 
-					CONCAT
-					(
-						'{', 
-							'Id:', '"', AspNetRoles.Id, '",', 
-							'Name:', '"', AspNetRoles.Name, '",', 
-							'NormalizedName:', '"', AspNetRoles.NormalizedName, '"', 
-						'}'
-					)
-				ELSE 
-					NULL 
-				END,
-				NULL
-			)
-			, ','
-		),
-		']'
-	) AS Roles,
+		SELECT 
+			*
+		FROM 
+			AspNetAuth0Users
+		WHERE 
+			AspNetAuth0Users.UserId = AspNetUsers.Id
+		FOR JSON AUTO
+	) AS Auth0UsersJson,
+	(
+		SELECT 
+			AspNetRoles.Id, AspNetRoles.Name, AspNetRoles.NormalizedName 
+		FROM 
+			AspNetUserRoles INNER JOIN
+			AspNetRoles ON AspNetUserRoles.RoleId = AspNetRoles.Id
+		WHERE 
+			AspNetUserRoles.UserId = AspNetUsers.Id
+		FOR JSON AUTO
+	) AS RolesJson,
 	STRING_AGG
 		(
 			ISNULL
@@ -71,7 +62,7 @@ SELECT
 			, ','
 		)
 	AS RoleIds
-FROM            
+FROM
 	AspNetUserRoles INNER JOIN
 	AspNetRoles ON AspNetUserRoles.RoleId = AspNetRoles.Id RIGHT OUTER JOIN
 	AspNetUsers ON AspNetUserRoles.UserId = AspNetUsers.Id

@@ -49,7 +49,7 @@ namespace Hood.Controllers
                 IsEmailConfirmed = user.EmailConfirmed,
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
-                Profile = User.GetUserProfile(),
+                Profile = await _account.GetUserProfileByIdAsync(user.Id),
                 Roles = await _account.GetRolesForUser(user)
             };
             return View(model);

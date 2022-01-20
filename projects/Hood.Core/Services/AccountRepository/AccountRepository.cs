@@ -17,11 +17,11 @@ namespace Hood.Services
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly HoodDbContext _db;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly LinkGenerator _linkGenerator;
-        private readonly IMailService _mailService;
-        private readonly IEmailSender _emailSender;
+        protected readonly HoodDbContext _db;
+        protected readonly IHttpContextAccessor _contextAccessor;
+        protected readonly LinkGenerator _linkGenerator;
+        protected readonly IMailService _mailService;
+        protected readonly IEmailSender _emailSender;
 
         public AccountRepository()
         {
@@ -33,7 +33,7 @@ namespace Hood.Services
         }
 
         #region Helpers 
-        private IQueryable<ApplicationUser> UserQuery
+        protected virtual IQueryable<ApplicationUser> UserQuery
         {
             get
             {
@@ -84,6 +84,10 @@ namespace Hood.Services
             }
 
             return await query.SingleOrDefaultAsync(u => u.Email == email);
+        }
+        public virtual Task<ApplicationUser> GetUserByAuth0Id(string userId)
+        {
+            throw new ApplicationException("This feature is disabled when using not Auth0.");
         }
         public virtual async Task UpdateUserAsync(ApplicationUser user)
         {
@@ -219,6 +223,14 @@ namespace Hood.Services
             message.Template = MailSettings.WarningTemplate;
             await _emailSender.SendEmailAsync(message);
         }
+        public virtual async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        {
+            return await UserManager.CreateAsync(user, password);
+        }
+        public virtual async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code)
+        {
+            return await UserManager.ConfirmEmailAsync(user, code);
+        }        
         #endregion
 
         #region Profiles 
@@ -429,14 +441,6 @@ namespace Hood.Services
             }
 
             return new UserStatistics(totalUsers, totalAdmins, days, months);
-        }
-        public virtual async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
-        {
-            return await UserManager.CreateAsync(user, password);
-        }
-        public virtual async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code)
-        {
-            return await UserManager.ConfirmEmailAsync(user, code);
         }
         #endregion
 

@@ -6,7 +6,7 @@ namespace Hood.Interfaces
 {
     public interface IHoodDbContext : IDbContext
     {
-        DbSet<UserAccessCode> AccessCodes { get; set; }
+        DbSet<Auth0User> Auth0Users { get; set; }
         DbSet<Address> Addresses { get; set; }
         DbSet<Content> Content { get; set; }
         DbSet<ContentCategory> ContentCategories { get; set; }

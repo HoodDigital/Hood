@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
+    [Authorize]
     public abstract class BasePropertyController : BaseController
     {
         protected readonly PropertySettings _propertySettings;
@@ -201,10 +202,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                model.AgentId = Engine.Account.Id;
-                model.CreatedBy = Engine.Account.UserName;
+                model.AgentId = User.GetUserId();
+                model.CreatedBy = User.Identity.Name;
                 model.CreatedOn = DateTime.UtcNow;
-                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.UtcNow;
                 model.Confidential = false;
                 model.Featured = false;

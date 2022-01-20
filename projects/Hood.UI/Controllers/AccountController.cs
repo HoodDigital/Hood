@@ -238,8 +238,7 @@ namespace Hood.Controllers
 
         #endregion
 
-        #region Log Off
-
+        #region Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/logout")]
@@ -258,9 +257,9 @@ namespace Hood.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+        #endregion
 
-
-
+        #region Auth0 
         [HttpGet]
         [AllowAnonymous]
         [Route("account/signout")]
@@ -275,11 +274,34 @@ namespace Hood.Controllers
                 // Indicate here where Auth0 should redirect the user after a logout.
                 // Note that the resulting absolute Uri must be added to the
                 // **Allowed Logout URLs** settings for the app.
-                .WithRedirectUri(Url.Action("Index", "Home"))
+                .WithRedirectUri(returnUrl.IsSet() ? returnUrl : Url.Action("Index", "Home"))
                 .Build();
 
             await HttpContext.SignOutAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("account/auth/failed")]
+        public IActionResult RemoteSigninFailed(string r)
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                throw new ApplicationException("This endpoint is only available when using Auth0.");
+            }
+            switch (r) {
+                case "signup-disabled":
+                    ViewData["Reason"] = "Sign up is not allowed at the moment.";
+                    break;
+                case "auth-failed":
+                    ViewData["Reason"] = "Authentication failed, likely just a loose wire. Please try again.";
+                    break;
+                case "remote-failed":
+                    ViewData["Reason"] = "We could not sign you in due to a techical issue, likely just a loose wire. Please try again.";
+                    break;
+            }
+            return View();
         }
         #endregion
 

@@ -21,6 +21,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Auth0.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Collections.Generic;
 
 namespace Hood.Startup
 {
@@ -34,6 +39,7 @@ namespace Hood.Startup
         {
 
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
+            services.Configure<Auth0Configuration>(config.GetSection("Identity:Auth0"));
 
             if (!config.IsDatabaseConnected())
             {
@@ -218,8 +224,20 @@ namespace Hood.Startup
                 options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
                 options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
-            });            
-                
+
+                options.Events = new CookieAuthenticationEvents()
+                {
+                    OnSignedIn = async e =>
+                    {
+                        // get the user profile and store important bits on the claim.
+                        var repo = Engine.Services.Resolve<IAccountRepository>();
+                        var user = await repo.GetUserByIdAsync(e.Principal.GetUserId());
+                        e.Principal.SetUserClaims(user);
+                        await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+                    }
+                };
+            });
+
             services.AddScoped<IAccountRepository, Auth0AccountRepository>();
             services.AddScoped<IEmailSender, Auth0EmailSender>();
 
@@ -235,14 +253,55 @@ namespace Hood.Startup
                 {
                     options.Domain = config["Identity:Auth0:Domain"];
                     options.ClientId = config["Identity:Auth0:ClientId"];
+
+                    options.OpenIdConnectEvents = new OpenIdConnectEvents()
+                    {
+                        OnTicketReceived = async e =>
+                        {
+                            var auth0Service = new Auth0Service();
+                            var user = await auth0Service.OnTicketReceived(e);
+                            if (user == null)
+                            {
+                                // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
+                                var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+                                var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "signup-disabled" });
+                                e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                                e.HandleResponse();
+                            }
+
+                            e.Principal.SetUserClaims(user);
+                            await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+                        },
+
+                        OnAuthenticationFailed = e =>
+                        {
+                            // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
+                            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+                            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "auth-failed" });
+                            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                            e.HandleResponse();
+                            return Task.CompletedTask;
+                        },
+
+                        OnRemoteFailure = e =>
+                        {
+                            // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
+                            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+                            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "remote-failed" });
+                            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                            e.HandleResponse();
+                            return Task.CompletedTask;
+                        }
+
+                    };
                 });
-                
+
             services.AddScoped<IAccountRepository, Auth0AccountRepository>();
             services.AddScoped<IEmailSender, Auth0EmailSender>();
 
             return services;
-        }
 
+        }
         public static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>

@@ -48,7 +48,7 @@
                 @if (Engine.Account != null)
                 {
                     <div class="col-auto">
-                        <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs mb-0" />
+                        <fixedImage src="@User.GetAvatar()" class="img-xs mb-0" />
                     </div>
                     <div class="col">
                         <p class="text-muted mb-0">

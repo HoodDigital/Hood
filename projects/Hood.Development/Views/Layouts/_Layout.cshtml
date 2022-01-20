@@ -36,7 +36,7 @@
 
     @RenderSection("beforecontent", required: false)
 
-    @if (User.Identity.IsAuthenticated && !Engine.Account.EmailConfirmed && Engine.Settings.Account.RequireEmailConfirmation)
+    @if (User.Identity.IsAuthenticated && !User.IsEmailConfirmed() && Engine.Settings.Account.RequireEmailConfirmation)
     {
         <div class="alert alert-warning border-0 rounded-0 m-0">
             <div class="d-flex align-items-center">

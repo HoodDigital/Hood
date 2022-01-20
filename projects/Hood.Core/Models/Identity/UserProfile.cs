@@ -12,13 +12,23 @@ namespace Hood.Models
     {
         #region Roles
         public string RoleIds { get; set; }
-
         public int RoleCount { get; set; }
         public string RolesJson { get; set; }
+        [NotMapped]
         public List<IdentityRole> Roles
         {
             get { return !RolesJson.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(RolesJson); }
             set { RolesJson = JsonConvert.SerializeObject(value); }
+        }
+        #endregion
+
+        #region Auth0 
+        public string Auth0UsersJson { get; set; }
+        [NotMapped]
+        public List<Auth0User> Auth0Users
+        {
+            get { return !Auth0UsersJson.IsSet() ? new List<Auth0User>() : JsonConvert.DeserializeObject<List<Auth0User>>(Auth0UsersJson); }
+            set { Auth0UsersJson = JsonConvert.SerializeObject(value); }
         }
         #endregion
 

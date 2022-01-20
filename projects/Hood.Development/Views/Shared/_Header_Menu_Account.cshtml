@@ -45,10 +45,10 @@
                 </ul>
             </div>
             <div class="modal-footer row align-items-center">
-                @if (Engine.Account != null)
+                @if (User.Identity.IsAuthenticated)
                 {
                     <div class="col-auto">
-                        <fixedImage src="@Engine.Account.Avatar.SmallUrl" class="img-xs mb-0" />
+                        <fixedImage src="@User.GetAvatar()" class="img-xs mb-0" />
                     </div>
                     <div class="col">
                         <p class="text-muted mb-0">

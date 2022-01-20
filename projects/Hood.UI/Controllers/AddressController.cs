@@ -40,9 +40,9 @@ namespace Hood.Controllers
                 addresses = addresses.Where(a => a.UserId == model.UserId);
             }
             else
-            {
-                model.UserProfile = Engine.Account;
-                addresses = addresses.Where(a => a.UserId == Engine.Account.Id);
+            {                
+                model.UserProfile = await _account.GetUserProfileByIdAsync(User.GetUserId());
+                addresses = addresses.Where(a => a.UserId == User.GetUserId());
             }
 
             if (!string.IsNullOrEmpty(model.Search))

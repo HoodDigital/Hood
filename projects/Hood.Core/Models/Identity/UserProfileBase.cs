@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hood.Models
 {
-    public abstract class UserProfileBase : IdentityUser, IUserProfile
+    public abstract class UserProfileBase : IdentityUser, IUserProfile, IName
     {
 
         #region LogOn Information
@@ -52,8 +52,8 @@ namespace Hood.Models
         [ProtectedPersonalData]
         [Display(Name = "Display name")]
         public virtual string DisplayName { get; set; }
-  
-        
+
+
         public virtual string ToAdminName()
         {
             if (this.ToFullName().IsSet())
@@ -197,21 +197,21 @@ namespace Hood.Models
         #endregion
 
         #region Notes 
-       
+
         [NotMapped]
         public virtual List<UserNote> Notes
         {
             get { return this[nameof(Notes)] != null ? JsonConvert.DeserializeObject<List<UserNote>>(this[nameof(Notes)]) : new List<UserNote>(); }
             set { this[nameof(Notes)] = JsonConvert.SerializeObject(value); }
         }
-   
+
         public virtual void AddUserNote(UserNote note)
         {
             var notes = this.Notes;
             notes.Add(note);
             this.Notes = notes;
         }
-  
+
         #endregion
 
         #region ISaveableModel
@@ -228,5 +228,6 @@ namespace Hood.Models
         public IList<IdentityRole> AllRoles { get; set; }
         #endregion
 
+        public IList<Auth0User> ConnectedAuth0Accounts { get; set; }
     }
 }

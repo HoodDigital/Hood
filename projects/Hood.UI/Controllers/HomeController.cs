@@ -2,6 +2,7 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
+using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,10 @@ namespace Hood.Controllers
         [Route("/")]
         public virtual async Task<IActionResult> Index()
         {
+            // var service = new Auth0Service();
+            // var roles = await service.GetRoles();
+            // var users = await service.GetUsers("admin");
+            // var user = await service.GetUserByEmail("admin@hooddigital.com");            
 
             if (User.Identity.IsAuthenticated) {
                 //do sommat

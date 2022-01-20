@@ -13,10 +13,11 @@ namespace Hood.Extensions
         public static void CreateHoodModels(this ModelBuilder builder)
         {
             // Identity
+            builder.Entity<Auth0User>().ToTable("AspNetAuth0Users");
+
             builder.Entity<Option>().ToTable("HoodOptions");
             builder.Entity<Log>().ToTable("HoodLogs");
             builder.Entity<Address>().ToTable("HoodAddresses");
-            builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
@@ -69,7 +70,6 @@ namespace Hood.Extensions
             builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
 
             builder.Entity<UserProfile>().HasNoKey().ToView("HoodUserProfiles");
-            builder.Entity<UserProfile>().HasNoKey().Property(b => b.RolesJson).HasColumnName("Roles");
         }
     }
 }

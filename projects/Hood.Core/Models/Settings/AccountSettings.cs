@@ -19,6 +19,9 @@ namespace Hood.Models
         [Display(Name = "Registration Open", Description = "Disabling registration will prevent users signing up to your site, you will have to add users manually.")]
         public bool EnableRegistration { get; set; }
 
+        [Display(Name = "Allow Remote Signups", Description = "Users who create an account via Auth0 without an account, will have an account created automatically and be forwarded to the account profile completion page.")]
+        public bool AllowRemoteSignups { get; set; }
+
 
         [Display(Name = "Send a Welcome Email", Description = "This will send a formatted welcome email to new account holders.")]
         public bool EnableWelcome { get; set; }
