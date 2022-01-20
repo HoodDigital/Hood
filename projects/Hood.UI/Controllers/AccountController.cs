@@ -65,6 +65,7 @@ namespace Hood.Controllers
             }
 
             var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+
                 .WithRedirectUri(returnUrl)
                 .Build();
 
@@ -290,7 +291,8 @@ namespace Hood.Controllers
             {
                 throw new ApplicationException("This endpoint is only available when using Auth0.");
             }
-            switch (r) {
+            switch (r)
+            {
                 case "signup-disabled":
                     ViewData["Reason"] = "Sign up is not allowed at the moment.";
                     break;
@@ -400,6 +402,51 @@ namespace Hood.Controllers
 
         #endregion
 
+        #region Change Password
+        [HttpGet]
+        [Route("account/manage/change-password")]
+        public virtual IActionResult ChangePassword()
+        {
+            if (Engine.Auth0Enabled)
+            {
+                return View("ChangePasswordAuth0");
+            }
+            var model = new ChangePasswordViewModel { StatusMessage = SaveMessage };
+            return View(model);
+        }
+
+        [HttpPost]
+        [DisableForAuth0]
+        [ValidateAntiForgeryToken]
+        [Route("account/manage/change-password")]
+        public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            ApplicationUser user = await GetCurrentUserOrThrow();
+            var changePasswordResult = await _account.ChangePassword(user, model.OldPassword, model.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View(model);
+            }
+
+            var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+            await signInManager.SignInAsync(user, isPersistent: false);
+
+            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.");
+            SaveMessage = "Your password has been changed.";
+
+            return RedirectToAction(nameof(ChangePassword));
+        }
+
+        #endregion
+
         #region Forgot / Reset Password
 
         [HttpGet]
@@ -494,6 +541,55 @@ namespace Hood.Controllers
             return View();
         }
 
+        #endregion
+
+        #region Delete Account
+        [HttpGet]
+        [Route("account/delete")]
+        public virtual IActionResult Delete()
+        {
+            return View(nameof(Delete), new SaveableModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("account/delete/confirm")]
+        public virtual async Task<IActionResult> ConfirmDelete()
+        {
+            try
+            {
+                ApplicationUser user = await GetCurrentUserOrThrow();
+                await _account.DeleteUserAsync(user.Id, User);
+
+                if (Engine.Auth0Enabled)
+                {
+#warning Auth0 - ConfirmDelete - log user out and redirect back to deleted page. 
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                    await signInManager.SignOutAsync();
+                }
+
+                await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.");
+                return RedirectToAction(nameof(Deleted));
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"Error deleting your account: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ManageController>($"Error when user attemted to delete their account.", ex);
+            }
+            return RedirectToAction(nameof(Delete));
+        }
+
+        [AllowAnonymous]
+        [Route("account/deleted")]
+        public virtual IActionResult Deleted()
+        {
+            return View(nameof(Deleted));
+        }
         #endregion
 
         #region Helpers

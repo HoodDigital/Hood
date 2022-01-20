@@ -45,14 +45,14 @@
                 </ul>
             </div>
             <div class="modal-footer row align-items-center">
-                @if (Engine.Account != null)
+                @if (User.Identity.IsAuthenticated)
                 {
                     <div class="col-auto">
                         <fixedImage src="@User.GetAvatar()" class="img-xs mb-0" />
                     </div>
                     <div class="col">
                         <p class="text-muted mb-0">
-                            Logged in as <strong class="font-bold">@Engine.Account.ToDisplayName()</strong><br />
+                            Logged in as <strong class="font-bold">@User.ToDisplayName()</strong><br />
                             <a href="javascript:document.getElementById('logoutForm').submit()">
                                 Log out
                             </a>

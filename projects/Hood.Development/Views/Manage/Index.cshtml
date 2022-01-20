@@ -8,6 +8,14 @@
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
+@if (Model.NewAccount)
+{
+    <alert type="Info" size="Epic" icon="fa-save">
+        <h2>Welcome to your new account!</h2>
+        <p>You can customise your profile here. Click below to dismiss this message.</p>
+        <p><a asp-action="Index">Ok</a></p>
+    </alert>
+}
 <nav class="nav nav-tabs nav-justified" role="tablist">
     <a class="nav-item nav-link active" href="#basics" aria-controls="password" role="tab" data-bs-toggle="tab">Basic Details</a>
     <a class="nav-item nav-link" href="#roles" aria-controls="socials" role="tab" data-bs-toggle="tab">Roles</a>
@@ -22,11 +30,11 @@
     <div class="tabs">
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="basics">
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Username"></label>
                     <input asp-for="Username" class="form-control" disabled />
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Email"></label>
                     @if (Model.IsEmailConfirmed)
                     {
@@ -42,38 +50,38 @@
                         <div class="input-group">
                             <input asp-for="Email">
                             <div class="input-group-append">
-                                <a class="btn btn-outline-secondary" asp-action="SendVerificationEmail">Button</a>
+                                <a class="btn btn-outline-secondary" asp-action="SendVerificationEmail">Request Verification Email</a>
                             </div>
                         </div>
                     }
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="PhoneNumber"></label>
                     <input type="text" class="form-control" asp-for="PhoneNumber">
                     <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.DisplayName"></label>
                     <input type="text" class="form-control" asp-for="Profile.DisplayName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.FirstName"></label>
                     <input type="text" class="form-control" asp-for="Profile.FirstName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.LastName"></label>
                     <input type="text" class="form-control" asp-for="Profile.LastName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.JobTitle"></label>
                     <input type="text" class="form-control" asp-for="Profile.JobTitle">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.CompanyName"></label>
                     <input type="text" class="form-control" asp-for="Profile.CompanyName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <div class="custom-control custom-checkbox">
                         <input asp-for="Profile.Anonymous" class="custom-control-input">
                         <label asp-for="Profile.Anonymous" class="custom-control-label"></label>
@@ -82,12 +90,12 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="roles">
-                @if (Model.Roles.Count > 0)
+                @if (Model.Profile.Roles.Count > 0)
                 {
                     <p>Your account has been assigned the following roles:</p>
-                    @foreach (var role in Model.Roles)
+                    @foreach (var role in Model.Profile.Roles)
                     {
-                        <p><i class="fa fa-check-circle mr-2"></i>@role.CamelCaseToString()</p>
+                        <p><i class="fa fa-check-circle mr-2"></i>@role.Name.CamelCaseToString()</p>
                     }
                 }
                 else
@@ -99,27 +107,27 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="socials">
                 <h4>Social Media Accounts</h4>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Facebook"></label>
                     <input type="text" class="form-control" asp-for="Profile.Facebook">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Instagram"></label>
                     <input type="text" class="form-control" asp-for="Profile.Instagram">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.LinkedIn"></label>
                     <input type="text" class="form-control" asp-for="Profile.LinkedIn">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Twitter"></label>
                     <input type="text" class="form-control" asp-for="Profile.Twitter">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.TwitterHandle"></label>
                     <input type="text" class="form-control" asp-for="Profile.TwitterHandle">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.WebsiteUrl"></label>
                     <input type="text" class="form-control" asp-for="Profile.WebsiteUrl">
                 </div>
@@ -144,7 +152,7 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="bio">
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Bio"></label>
                     <textarea type="text" class="form-control" asp-for="Profile.Bio" rows="10"></textarea>
                 </div>

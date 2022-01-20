@@ -253,6 +253,7 @@ namespace Hood.Startup
                 {
                     options.Domain = config["Identity:Auth0:Domain"];
                     options.ClientId = config["Identity:Auth0:ClientId"];
+                    options.Scope = "openid profile email";
 
                     options.OpenIdConnectEvents = new OpenIdConnectEvents()
                     {
@@ -267,6 +268,7 @@ namespace Hood.Startup
                                 var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "signup-disabled" });
                                 e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
                                 e.HandleResponse();
+                                return;
                             }
 
                             e.Principal.SetUserClaims(user);
@@ -400,6 +402,7 @@ namespace Hood.Startup
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add(typeof(UrlFilter));
+                options.Filters.Add(typeof(AccountSetupFilter));
             });
 
             return services;

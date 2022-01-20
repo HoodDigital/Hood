@@ -163,7 +163,7 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 model.AllowComments = true;
-                model.AuthorId = User.GetUserId();
+                model.AuthorId = User.GetLocalUserId();
                 model.Body = "";
                 model.CreatedBy = User.Identity.Name;
                 model.CreatedOn = DateTime.UtcNow;

@@ -1,4 +1,5 @@
 ﻿using Hood.Core;
+using Hood.Identity;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -11,10 +12,27 @@ namespace Hood.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-
-        public static void SetUserClaims(this ClaimsPrincipal principal, ApplicationUser user)
+        public static void SetUserClaims(this ClaimsPrincipal principal, IUserProfile user)
         {
             var identity = (ClaimsIdentity)principal.Identity;
+
+            // ensure the local user id is stored in case we are using an external auth account
+            var userId = principal.GetUserId();
+            if (user.Id != userId)
+            {
+                identity.AddClaim(new Claim(HoodClaimTypes.LocalUserId, user.Id));
+            }
+
+            if (!identity.Name.IsValidEmail())
+            {
+                // social login has put the name as the auth0 id.                
+                var username = identity.FindFirst("name");
+                if (username != null)
+                {
+                    identity.RemoveClaim(username);
+                }
+                identity.AddClaim(new Claim("name", user.Email));
+            }
 
             // Set the picture -if one is set in the user, then add the url to picture claim.
             if (user.AvatarJson.IsSet())
@@ -54,8 +72,9 @@ namespace Hood.Extensions
                 identity.AddClaim(new Claim("nickname", user.DisplayName));
             }
 
-            identity.AddClaim(new Claim("adminname", user.ToAdminName()));
-            identity.AddClaim(new Claim("displayname", user.ToDisplayName()));
+            identity.AddClaim(new Claim(HoodClaimTypes.InternalName, user.ToAdminName()));
+            identity.AddClaim(new Claim(HoodClaimTypes.DisplayName, user.ToDisplayName()));
+
         }
         public static string GetAvatar(this ClaimsPrincipal principal)
         {
@@ -83,9 +102,32 @@ namespace Hood.Extensions
             {
                 throw new ArgumentNullException(nameof(principal));
             }
-            Claim claim = principal.FindFirst("displayname");
+            Claim claim = principal.FindFirst(HoodClaimTypes.DisplayName);
 
             return claim?.Value;
+        }
+        public static string ToInternalName(this ClaimsPrincipal principal)
+        {
+            if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+            Claim claim = principal.FindFirst(HoodClaimTypes.InternalName);
+
+            return claim?.Value;
+        }
+        public static string GetLocalUserId(this ClaimsPrincipal principal)
+        {
+            if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal));
+            }
+            Claim claim = principal.FindFirst(HoodClaimTypes.LocalUserId);
+            if (claim != null)
+            {
+                return claim.Value;
+            }
+            return principal.GetUserId();
         }
         public static string GetUserId(this ClaimsPrincipal principal)
         {
@@ -97,7 +139,16 @@ namespace Hood.Extensions
 
             return claim?.Value;
         }
-
+        public static bool IsNotSetup(this ClaimsPrincipal principal)
+        {
+            var identity = (ClaimsIdentity)principal.Identity;
+            var username = identity.FindFirst(HoodClaimTypes.AccountNotConnected);
+            if (username != null)
+            {
+                return true;
+            }
+            return false;
+        }
         public static bool IsImpersonating(this ClaimsPrincipal principal)
         {
             if (principal == null)
@@ -106,7 +157,6 @@ namespace Hood.Extensions
             }
 
             bool isImpersonating = principal.HasClaim("IsImpersonating", "true");
-
             return isImpersonating;
         }
         public static bool IsForumModerator(this ClaimsPrincipal principal)

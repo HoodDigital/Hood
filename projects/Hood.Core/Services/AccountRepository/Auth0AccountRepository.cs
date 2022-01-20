@@ -42,15 +42,6 @@ namespace Hood.Services
             }
             return null;
         }
-        public override async Task<UserProfile> GetUserProfileByIdAsync(string id)
-        {
-            var auth0user = await GetUserByAuth0Id(id);
-            if (auth0user != null)
-            {
-                return await base.GetUserProfileByIdAsync(auth0user.Id);
-            }
-            return null;
-        }
         public override async Task UpdateUserAsync(ApplicationUser user)
         {
 #warning Auth0 - UpdateUserAsync - send relevant changes to Auth0

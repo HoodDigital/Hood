@@ -22,7 +22,7 @@ namespace Hood.Filters
             {
                 return;
             }
-            if (context.HttpContext.User.Identity.IsAuthenticated && context.HttpContext.User.HasClaim(Auth0Service.RequiresSetup))
+            if (context.HttpContext.User.IsNotSetup())
             {
                 context.Result = new RedirectToActionResult("CompleteSetup", "Account", new { });
             }

@@ -73,7 +73,7 @@ namespace Hood.Services
             string userId = null;
             if (Engine.Account != null)
             {
-                userId = Engine.Account.GetUserId();
+                userId = Engine.Account.GetLocalUserId();
             }
 
             string url = null;

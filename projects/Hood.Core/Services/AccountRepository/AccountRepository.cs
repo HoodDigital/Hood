@@ -113,7 +113,7 @@ namespace Hood.Services
                 throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
             }
 
-            if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetUserId() == user.Id)
+            if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetLocalUserId() == user.Id)
             {
 
                 IList<UserLoginInfo> logins = await UserManager.GetLoginsAsync(user);

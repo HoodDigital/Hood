@@ -1,16 +1,7 @@
-@inject SignInManager<ApplicationUser> SignInManager
-@{
-    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
-}
-
 <nav class="nav nav-pills flex-column">
     <a class="nav-item nav-link @ManageNavPages.IndexNavClass(ViewContext)" asp-action="Index" asp-controller="Manage">Profile</a>
-    <a class="nav-item nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-action="ChangePassword" asp-controller="Manage">Password</a>
-    @if (hasExternalLogins)
-    {
-        <a class="nav-item nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-action="ExternalLogins" asp-controller="Manage">External logins</a>
-    }
+    <a class="nav-item nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-action="ChangePassword" asp-controller="Account">Password</a>
     <a class="nav-item nav-link @ManageNavPages.AddressNavClass(ViewContext)" asp-action="Index" asp-controller="Address">Addresses</a>
-    <a class="nav-item nav-link @ManageNavPages.DeleteAccountNavClass(ViewContext)" asp-action="Delete" asp-controller="Manage">Delete Account</a>
+    <a class="nav-item nav-link @ManageNavPages.DeleteAccountNavClass(ViewContext)" asp-action="Delete" asp-controller="Account">Delete Account</a>
 </nav>
 

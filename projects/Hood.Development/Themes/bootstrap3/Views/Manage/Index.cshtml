@@ -100,12 +100,12 @@
                 </fieldset>
             </div>
             <div role="tabpanel" class="tab-pane" id="roles">
-                @if (Model.Roles.Count > 0)
+                @if (Model.Profile.Roles.Count > 0)
                 {
                     <p>Your account has been assigned the following roles:</p>
-                    @foreach (var role in Model.Roles)
+                    @foreach (var role in Model.Profile.Roles)
                     {
-                        <p><i class="fa fa-check m-r-sm"></i>@role.CamelCaseToString()</p>
+                        <p><i class="fa fa-check m-r-sm"></i>@role.Name.CamelCaseToString()</p>
                     }
                 }
                 else

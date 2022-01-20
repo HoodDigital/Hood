@@ -1,0 +1,13 @@
+using Newtonsoft.Json;
+
+namespace Hood.Services
+{
+    public class AuthToken
+    {
+        [JsonProperty("access_token")]
+        public string Token { get; set; }
+        [JsonProperty("token_type")]
+        public string Type { get; set; }
+        public string ToAuthHeader() { return $"{Type} {Token}"; }
+    }
+}

@@ -192,7 +192,7 @@ namespace Hood.Areas.Admin.Controllers
             PropertyListing model = new PropertyListing()
             {
                 PublishDate = DateTime.UtcNow,
-                AgentId = User.GetUserId()
+                AgentId = User.GetLocalUserId()
             };
             return View("_Blade_Property", model);
         }
@@ -202,7 +202,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                model.AgentId = User.GetUserId();
+                model.AgentId = User.GetLocalUserId();
                 model.CreatedBy = User.Identity.Name;
                 model.CreatedOn = DateTime.UtcNow;
                 model.LastEditedBy = User.Identity.Name;

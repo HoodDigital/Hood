@@ -125,7 +125,7 @@ namespace Hood.Areas.Admin.Controllers
                 };
                 user.AddUserNote(new UserNote()
                 {
-                    CreatedBy = User.GetUserId(),
+                    CreatedBy = User.GetLocalUserId(),
                     CreatedOn = DateTime.UtcNow,
                     Note = $"User created via admin panel by {User.Identity.Name}."
                 });
@@ -306,7 +306,7 @@ namespace Hood.Areas.Admin.Controllers
                 }
                 user.AddUserNote(new UserNote()
                 {
-                    CreatedBy = User.GetUserId(),
+                    CreatedBy = User.GetLocalUserId(),
                     CreatedOn = DateTime.UtcNow,
                     Note = $"User email marked as confirmed via admin panel by {User.Identity.Name}."
                 });
@@ -490,12 +490,12 @@ namespace Hood.Areas.Admin.Controllers
                 ApplicationUser impersonatedUser = await _userManager.FindByIdAsync(id);
                 ClaimsPrincipal userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
 
-                userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetUserId()));
+                userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetLocalUserId()));
                 userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
 
                 impersonatedUser.AddUserNote(new UserNote()
                 {
-                    CreatedBy = User.GetUserId(),
+                    CreatedBy = User.GetLocalUserId(),
                     CreatedOn = DateTime.UtcNow,
                     Note = $"User {impersonatedUser.UserName} was impersonated by {User.Identity.Name}."
                 });
@@ -565,7 +565,7 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     user.AddUserNote(new UserNote()
                     {
-                        CreatedBy = User.GetUserId(),
+                        CreatedBy = User.GetLocalUserId(),
                         CreatedOn = DateTime.UtcNow,
                         Note = $"User password reset via admin panel by {User.Identity.Name}."
                     });

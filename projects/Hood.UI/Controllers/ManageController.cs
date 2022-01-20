@@ -8,6 +8,7 @@ using Hood.Interfaces;
 using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -37,7 +38,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/manage")]
-        public virtual async Task<IActionResult> Index()
+        public virtual async Task<IActionResult> Index(string r)
         {
             ApplicationUser user = await GetCurrentUserOrThrow();
             var model = new UserViewModel
@@ -50,7 +51,7 @@ namespace Hood.Controllers
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
                 Profile = await _account.GetUserProfileByIdAsync(user.Id),
-                Roles = await _account.GetRolesForUser(user)
+                NewAccount = r == "new-account-connection"
             };
             return View(model);
         }
@@ -65,7 +66,6 @@ namespace Hood.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    model.Roles = await _account.GetRolesForUser(user);
                     return View(model);
                 }
 
@@ -84,6 +84,9 @@ namespace Hood.Controllers
                 model.Profile.Id = user.Id;
                 model.Profile.Notes = user.Notes;
                 await _account.UpdateProfileAsync(model.Profile);
+
+                User.SetUserClaims(model.Profile);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
 
                 SaveMessage = "Your profile has been updated.";
                 MessageType = AlertType.Success;
@@ -115,12 +118,15 @@ namespace Hood.Controllers
                             _db.Entry(mediaItem).State = EntityState.Deleted;
                         await _media.DeleteStoredMedia((MediaObject)user.Avatar);
                     }
-                    var directory = await Engine.AccountManager.GetDirectoryAsync(User.GetUserId());
+                    var directory = await _account.GetDirectoryAsync(User.GetLocalUserId());
                     mediaResult = await _media.ProcessUpload(file, _directoryManager.GetPath(directory.Id));
                     user.Avatar = mediaResult;
                     await _account.UpdateUserAsync(user);
                     _db.Media.Add(new MediaObject(mediaResult, directory.Id));
                     await _db.SaveChangesAsync();
+
+                    User.SetUserClaims(user);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
                 }
                 return new Response(true, mediaResult, $"The media has been set for attached successfully.");
             }
@@ -146,96 +152,6 @@ namespace Hood.Controllers
                 return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
         }
 
-        [HttpGet]
-        [Route("account/manage/change-password")]
-        public virtual async Task<IActionResult> ChangePassword()
-        {
-            ApplicationUser user = await GetCurrentUserOrThrow();
-            if (Engine.Auth0Enabled)
-            {
-#warning Auth0 - ChangePassword - send reset link and redirect back to manage page.
-                throw new NotImplementedException();
-            }
-            var model = new ChangePasswordViewModel { StatusMessage = SaveMessage };
-            return View(model);
-        }
-
-        [HttpPost]
-        [DisableForAuth0]
-        [ValidateAntiForgeryToken]
-        [Route("account/manage/change-password")]
-        public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            ApplicationUser user = await GetCurrentUserOrThrow();
-            var changePasswordResult = await _account.ChangePassword(user, model.OldPassword, model.NewPassword);
-            if (!changePasswordResult.Succeeded)
-            {
-                foreach (var error in changePasswordResult.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-                return View(model);
-            }
-
-            var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-            await signInManager.SignInAsync(user, isPersistent: false);
-
-            await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.");
-            SaveMessage = "Your password has been changed.";
-
-            return RedirectToAction(nameof(ChangePassword));
-        }
-
-        [HttpGet]
-        [Route("account/delete")]
-        public virtual IActionResult Delete()
-        {
-            return View(nameof(Delete), new SaveableModel());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Route("account/delete/confirm")]
-        public virtual async Task<IActionResult> ConfirmDelete()
-        {
-            try
-            {
-                ApplicationUser user = await GetCurrentUserOrThrow();
-                await _account.DeleteUserAsync(user.Id, User);
-
-                if (Engine.Auth0Enabled)
-                {
-#warning Auth0 - ConfirmDelete - log user out and redirect back to deleted page. 
-                    throw new NotImplementedException();
-                }
-                else
-                {
-                    var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-                    await signInManager.SignOutAsync();
-                }
-
-                await _logService.AddLogAsync<ManageController>($"User with Id {user.Id} has deleted their account.");
-                return RedirectToAction(nameof(Deleted));
-            }
-            catch (Exception ex)
-            {
-                SaveMessage = $"Error deleting your account: {ex.Message}";
-                MessageType = AlertType.Danger;
-                await _logService.AddExceptionAsync<ManageController>($"Error when user attemted to delete their account.", ex);
-            }
-            return RedirectToAction(nameof(Delete));
-        }
-
-        [AllowAnonymous]
-        [Route("account/deleted")]
-        public virtual IActionResult Deleted()
-        {
-            return View(nameof(Deleted));
-        }
 
     }
 }

@@ -7,54 +7,27 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Hood.Core;
 using Hood.Extensions;
+using Hood.Identity;
 using Hood.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 using RestSharp;
 
 namespace Hood.Services
 {
-    public class AuthToken
-    {
-        [JsonProperty("access_token")]
-        public string Token { get; set; }
-        [JsonProperty("token_type")]
-        public string Type { get; set; }
-        public string ToAuthHeader() { return $"{Type} {Token}"; }
-    }
-
-    public class Auth0TokenRequestParameter
-    {
-        [JsonProperty("client_id")]
-        public string ClientId { get; set; }
-        [JsonProperty("client_secret")]
-        public string ClientSecret { get; set; }
-        [JsonProperty("audience")]
-        public string Audience { get; set; }
-        [JsonProperty("grant_type")]
-        public string GrantType { get; set; }
-    }
 
     public class Auth0Service
     {
-        public static Claim RequiresSetupClaim = new Claim("account-setup", "account-setup");
-        public static bool RequiresSetup(Claim claim)
-        {
-            if (claim == RequiresSetupClaim)
-            {
-                return true;
-            }
-            return false;
-        }
 
         public async Task<ApplicationUser> OnTicketReceived(TicketReceivedContext e)
         {
             // check if user exists - if so, and signups are allowed via remote, redirect to complete profile page.
             var repo = Engine.Services.Resolve<IAccountRepository>();
             var principal = e.Principal;
-
-            var user = await repo.GetUserByAuth0Id(e.Principal.GetUserId());
+            var userId = e.Principal.GetUserId();
+            var user = await repo.GetUserByAuth0Id(userId);
             if (user != null)
             {
                 // user exists and has auth0 account linked to it.
@@ -64,8 +37,10 @@ namespace Hood.Services
             user = await repo.GetUserByEmailAsync(e.Principal.Identity.Name);
             if (user != null)
             {
-                // user exists, but the current Auth0 signin method is not saved.
-                await CreateAuth0User(e.Principal.GetUserId(), user);
+                // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
+                var identity = (ClaimsIdentity)principal.Identity;
+                identity.AddClaim(new Claim(HoodClaimTypes.AccountNotConnected, "true"));
+                await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                 return user;
             }
 
@@ -73,7 +48,7 @@ namespace Hood.Services
             {
                 // user does not exist, create and send them to the complete signup page.
                 var authService = new Auth0Service();
-                var authUser = await authService.GetUserById(e.Principal.GetUserId());
+                var authUser = await authService.GetUserById(userId);
                 if (authUser == null)
                 {
                     throw new ApplicationException("Something went wrong while authorizing your account.");
@@ -95,16 +70,13 @@ namespace Hood.Services
 
                 await CreateAuth0User(e.Principal.GetUserId(), user);
 
-                //set the new principal, adding the claim to mark required setup.
-                var identity = (ClaimsIdentity)principal.Identity;
-                identity.AddClaim(RequiresSetupClaim);
-                await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
-
-                e.Response.Redirect("/account/auth/complete-signup");
+                var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+                var returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { r = "new-account-connection" });
+                e.Response.Redirect(returnUrl);
                 e.HandleResponse();
 
             }
-            
+
             return user;
         }
 
@@ -151,17 +123,21 @@ namespace Hood.Services
                 parameters.ForEach(p => request.AddParameter(p));
             }
             var response = await client.ExecuteAsync(request);
-            return response;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                return response;
+            }
+            else
+            {
+                throw new ApplicationException($"Remote Auth0 service returned a {response.StatusCode.ToString().CamelCaseToString().ToLower()} status from https://{Engine.Auth0Configuration.Domain}/{path}.");
+            }
         }
 
         public async Task<List<Auth0Role>> GetRoles(string userId = null)
         {
             var response = await CallApi("api/v2/roles");
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                return JsonConvert.DeserializeObject<List<Auth0Role>>(response.Content);
-            }
-            return null;
+            return JsonConvert.DeserializeObject<List<Auth0Role>>(response.Content);
         }
 
         public async Task<PagedList<Auth0User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
@@ -172,32 +148,24 @@ namespace Hood.Services
                 new Parameter("per_page", pageSize, ParameterType.QueryString),
                 new Parameter("q", search, ParameterType.QueryString)
             });
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            var userList = JsonConvert.DeserializeObject<Auth0UserList>(response.Content);
+            var pagedList = new PagedList<Auth0User>()
             {
-                var userList = JsonConvert.DeserializeObject<Auth0UserList>(response.Content);
-                var pagedList = new PagedList<Auth0User>()
-                {
-                    List = userList.Users,
-                    TotalCount = userList.Total,
-                    Search = search,
-                    PageIndex = page,
-                    PageSize = pageSize,
-                    TotalPages = pageSize == 0 ? 0 : (int)(userList.Total / pageSize) + 1
-                };
-                return pagedList;
-            }
-            return new PagedList<Auth0User>();
+                List = userList.Users,
+                TotalCount = userList.Total,
+                Search = search,
+                PageIndex = page,
+                PageSize = pageSize,
+                TotalPages = pageSize == 0 ? 0 : (int)(userList.Total / pageSize) + 1
+            };
+            return pagedList;
         }
 
         public async Task<Auth0User> GetUserById(string userId)
         {
             var response = await CallApi($"api/v2/users/{userId}");
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                var user = JsonConvert.DeserializeObject<Auth0User>(response.Content);
-                return user;
-            }
-            return null;
+            var user = JsonConvert.DeserializeObject<Auth0User>(response.Content);
+            return user;
         }
 
         public async Task<Auth0User> GetUserByEmail(string email = "")
@@ -206,14 +174,12 @@ namespace Hood.Services
             {
                 new Parameter("email", email.ToLower(), ParameterType.QueryString)
             });
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            var users = JsonConvert.DeserializeObject<List<Auth0User>>(response.Content);
+            if (users.Count == 1)
             {
-                var users = JsonConvert.DeserializeObject<List<Auth0User>>(response.Content);
-                if (users.Count == 1)
-                {
-                    return users.SingleOrDefault();
-                }
+                return users.SingleOrDefault();
             }
+
             return null;
         }
     }

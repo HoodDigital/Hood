@@ -25,7 +25,7 @@
             <a asp-action="Index" asp-controller="Manage" class="dropdown-item">
                 <i class="fa fa-cogs"></i>Manage Account
             </a>
-            <a asp-action="ChangePassword" asp-controller="Manage" class="dropdown-item">
+            <a asp-action="ChangePassword" asp-controller="Account" class="dropdown-item">
                 <i class="fa fa-user-lock"></i>Change Password
             </a>
             @if (User.IsImpersonating())

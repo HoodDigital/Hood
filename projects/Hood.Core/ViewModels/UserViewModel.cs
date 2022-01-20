@@ -29,7 +29,7 @@ namespace Hood.ViewModels
 
         public IMediaObject Avatar { get; set; }
 
-        public IList<string> Roles { get; set; }
         public IList<IdentityRole> AllRoles { get; set; }
+        public bool NewAccount { get; set; }
     }
 }
