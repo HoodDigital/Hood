@@ -20,7 +20,7 @@ namespace Hood.Extensions
                 .Replace("{Site.Logo}", settings.Logo)
                 .Replace("{Site.LogoLight}", settings.LogoLight)
                 .Replace("{Site.Address}", settings.Address.ToFormat(Enums.AddressFormat.SingleLine))
-                .Replace("{Site.Owner.Name}", settings.Owner.ToFullName())
+                .Replace("{Site.Owner.Name}", settings.Owner.ToInternalName())
                 .Replace("{Site.Owner.Phone}", settings.Owner.Phone)
                 .Replace("{Site.Owner.Email}", settings.Owner.Email);
         }
@@ -38,8 +38,8 @@ namespace Hood.Extensions
                 .Replace("{User.Twitter}", user.Twitter)
                 .Replace("{User.Instagram}", user.Instagram)
                 .Replace("{User.WebsiteUrl}", user.WebsiteUrl)
-                .Replace("{User.FullName}", user.ToFullName())
-                .Replace("{FULLNAME}", user.ToFullName())
+                .Replace("{User.FullName}", user.ToInternalName())
+                .Replace("{FULLNAME}", user.ToInternalName())
                 .Replace("{User.FirstName}", user.FirstName)
                 .Replace("{User.LastName}", user.LastName);
         }

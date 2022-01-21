@@ -1,5 +1,6 @@
 @model UserViewModel
 @{
+    Layout = "_Layout_Account";
     ViewData["Title"] = "Update your profile";
     ViewData["SubTitle"] = "This is the user profile page, update your profile and add images, social media links and a Bio. These can be used in templates around the site.";
     ViewData.AddActivePage(ManageNavPages.Index);
@@ -10,26 +11,28 @@
 }
 @if (Model.NewAccount)
 {
-    <alert type="Info" size="Epic" icon="fa-save">
+    <alert type="Info" size="Epic">
         <h2>Welcome to your new account!</h2>
         <p>You can customise your profile here. Click below to dismiss this message.</p>
-        <p><a asp-action="Index">Ok</a></p>
+        <p><a class="btn btn-info" asp-action="Index">Dismiss</a></p>
     </alert>
 }
-<nav class="nav nav-tabs nav-justified" role="tablist">
-    <a class="nav-item nav-link active" href="#basics" aria-controls="password" role="tab" data-bs-toggle="tab">Basic Details</a>
-    <a class="nav-item nav-link" href="#roles" aria-controls="socials" role="tab" data-bs-toggle="tab">Roles</a>
+<nav class="nav nav-tabs" role="tablist">
+    <a class="nav-item nav-link active ms-3" href="#basics" aria-controls="password" role="tab" data-bs-toggle="tab">Basic Details</a>
+    <a class="nav-item nav-link" href="#accounts" aria-controls="accounts" role="tab" data-bs-toggle="tab">Accounts</a>
+    <a class="nav-item nav-link" href="#roles" aria-controls="roles" role="tab" data-bs-toggle="tab">Roles</a>
     <a class="nav-item nav-link" href="#socials" aria-controls="socials" role="tab" data-bs-toggle="tab">Socials</a>
     <a class="nav-item nav-link" href="#avatar" aria-controls="avatar" role="tab" data-bs-toggle="tab">Avatar</a>
     <a class="nav-item nav-link" href="#bio" aria-controls="bio" role="tab" data-bs-toggle="tab">Bio</a>
 </nav>
-<form method="post">
+<form method="post" class="card rounded-0 border-top-0 p-5 shadow">
 
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="tabs">
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="basics">
+
                 <div class="mb-3">
                     <label asp-for="Username"></label>
                     <input asp-for="Username" class="form-control" disabled />
@@ -89,13 +92,47 @@
                     <small asp-for="Profile.Anonymous"></small>
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane" id="roles">
-                @if (Model.Profile.Roles.Count > 0)
+            <div role="tabpanel" class="tab-pane" id="accounts">
+                @{
+                    var accounts = Model.Accounts;
+                }
+                @if (accounts.Count > 0)
+                {
+                    <p>Your account can be accessed with the following external accounts:</p>
+                    @foreach (var role in accounts)
+                    {
+                        <div class="card p-2">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <fixedImage class="img img-xs" src="@role.PictureUrl"></fixedImage>
+                                </div>
+                                <div class="flex-fill">
+                                    <div><strong>@role.Email</strong></div>
+                                    <div>Created: @role.CreatedAt.ToDisplay()</div>
+                                </div>
+                                <div class="">
+                                    <a class="btn btn-sm btn-danger">Disconnect</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        Your account has not been assigned to any roles just yet.
+                    </div>
+                }
+            </div>
+            <div role="tabpanel" class="tab-pane" id="roles"> @{
+                var roles = User.GetRoles();
+                }
+                @if (roles.Count > 0)
                 {
                     <p>Your account has been assigned the following roles:</p>
-                    @foreach (var role in Model.Profile.Roles)
+                    @foreach (var role in roles)
                     {
-                        <p><i class="fa fa-check-circle mr-2"></i>@role.Name.CamelCaseToString()</p>
+                        <p><i class="fa fa-check-circle me-3"></i>@role.CamelCaseToString()</p>
                     }
                 }
                 else
@@ -135,13 +172,14 @@
             <div role="tabpanel" class="tab-pane" id="avatar">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <fixedImage src="@Model.Profile.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
+                        <fixedImage src="@User.GetAvatar()" class="img-sm rounded @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
                     </div>
                     <div class="col">
                         <h4 class="media-heading">Change your profile image</h4>
                         <p>You can set your own profile image, click the upload button below to begin.</p>
                         <p>
-                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })" data-preview="@string.Format(".avatar-{0}", Model.UserId)">
+                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })"
+                                data-preview="@string.Format(".avatar-{0}", Model.UserId)">
                                 Upload
                             </button>
                         </p>
@@ -159,6 +197,5 @@
             </div>
         </div>
     </div>
-    <hr class="m-b-lg" />
-    <button type="submit" class="btn btn-success">Save Profile</button>
+    <button type="submit" class="btn btn-success mt-5">Save Profile</button>
 </form>

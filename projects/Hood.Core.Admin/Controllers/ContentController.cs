@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
-    [Authorize]
     public abstract class BaseContentController : BaseController
     {
         public BaseContentController()

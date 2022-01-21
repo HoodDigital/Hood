@@ -136,7 +136,7 @@
                             <label>User</label>
                             <p>
                                 <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
-                                    @Model.User.ToFullName()
+                                    @Model.User.ToInternalName()
                                 </a>
                             </p>
                         </div>

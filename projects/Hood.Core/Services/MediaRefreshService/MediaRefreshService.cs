@@ -196,7 +196,7 @@ namespace Hood.Services
                     if (user.Avatar != null)
                     {
                         user.Avatar = Database.Media.Find(user.Avatar.Id);
-                        StatusMessage = string.Format("Refreshing user avatar: {0} {1}", user.Id, user.ToFullName());
+                        StatusMessage = string.Format("Refreshing user avatar: {0} {1}", user.Id, user.ToInternalName());
                     }
                 }
                 await Database.SaveChangesAsync();

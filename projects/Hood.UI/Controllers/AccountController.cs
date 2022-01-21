@@ -4,6 +4,7 @@ using Hood.BaseTypes;
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Identity;
 using Hood.Models;
 using Hood.Services;
 using Hood.ViewModels;
@@ -22,13 +23,11 @@ using Unsplasharp;
 
 namespace Hood.Controllers
 {
-    [Authorize]
     public abstract class AccountController : AccountController<HoodDbContext>
     {
         public AccountController() : base() { }
     }
 
-    [Authorize]
     public abstract class AccountController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
          where TContext : HoodDbContext
     {
@@ -52,24 +51,6 @@ namespace Hood.Controllers
                 ViewData["ReturnUrl"] = returnUrl;
                 return View("Login");
             }
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("account/auth")]
-        public async Task Authorize(string returnUrl = "/")
-        {
-            if (!Engine.Auth0Enabled)
-            {
-                throw new ApplicationException("This endpoint is only available when using Auth0.");
-            }
-
-            var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
-
-                .WithRedirectUri(returnUrl)
-                .Build();
-
-            await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
         }
 
         [HttpPost]
@@ -241,6 +222,7 @@ namespace Hood.Controllers
 
         #region Logout
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         [Route("account/logout")]
         public virtual async Task<IActionResult> LogOff(string returnUrl = "/")
@@ -263,7 +245,25 @@ namespace Hood.Controllers
         #region Auth0 
         [HttpGet]
         [AllowAnonymous]
-        [Route("account/signout")]
+        [Route("account/authorize")]
+        public async Task Authorize(string returnUrl = "/")
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                throw new ApplicationException("This endpoint is only available when using Auth0.");
+            }
+
+            var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+
+                .WithRedirectUri(returnUrl)
+                .Build();
+
+            await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("account/auth/signout")]
         public async Task SignOut(string returnUrl = "/")
         {
             if (!Engine.Auth0Enabled)
@@ -305,10 +305,21 @@ namespace Hood.Controllers
             }
             return View();
         }
+
+        [HttpGet]
+        [Authorize(Hood.Identity.Policies.AccountNotConnected)]
+        [Route("account/auth/connect-account")]
+        public IActionResult ConnectAccount()
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                throw new ApplicationException("This endpoint is only available when using Auth0.");
+            }
+            return View();
+        }
         #endregion
 
         #region Lockout / Access Denied / Registration Closed
-
         [HttpGet]
         [AllowAnonymous]
         [Route("account/registration-closed")]
@@ -331,9 +342,18 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("account/access-denied")]
-        public virtual IActionResult AccessDenied()
+        public virtual IActionResult AccessDenied(string returnUrl)
         {
+            if (User.Identity.IsAuthenticated && User.RequiresConnection())
+            {
+                return RedirectToAction(nameof(ConnectAccount));
+            }
+            if (User.Identity.IsAuthenticated && !User.IsActive())
+            {
+                return RedirectToAction(nameof(ConfirmRequired));
+            }
             Response.StatusCode = 403;
             return View();
         }
@@ -343,11 +363,14 @@ namespace Hood.Controllers
         #region Confirm Email
 
         [HttpGet]
-        [AllowAnonymous]
-        [DisableForAuth0]
+        [Authorize]
         [Route("account/confirm/required")]
         public virtual IActionResult ConfirmRequired(ConfirmRequiredModel model)
         {
+            if (Engine.Auth0Enabled)
+            {
+                return View("ConfirmRequiredAuth0");
+            }
             return View(model);
         }
 
@@ -404,6 +427,7 @@ namespace Hood.Controllers
 
         #region Change Password
         [HttpGet]
+        [Authorize(Hood.Identity.Policies.Active)]
         [Route("account/manage/change-password")]
         public virtual IActionResult ChangePassword()
         {
@@ -411,12 +435,12 @@ namespace Hood.Controllers
             {
                 return View("ChangePasswordAuth0");
             }
-            var model = new ChangePasswordViewModel { StatusMessage = SaveMessage };
-            return View(model);
+            return View(new ChangePasswordViewModel());
         }
 
         [HttpPost]
         [DisableForAuth0]
+        [Authorize(Hood.Identity.Policies.Active)]
         [ValidateAntiForgeryToken]
         [Route("account/manage/change-password")]
         public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
@@ -440,6 +464,8 @@ namespace Hood.Controllers
             await signInManager.SignInAsync(user, isPersistent: false);
 
             await _logService.AddLogAsync<ManageController>($"User ({user.UserName}) changed their password successfully.");
+
+            MessageType = AlertType.Success;
             SaveMessage = "Your password has been changed.";
 
             return RedirectToAction(nameof(ChangePassword));
@@ -545,6 +571,7 @@ namespace Hood.Controllers
 
         #region Delete Account
         [HttpGet]
+        [Authorize]
         [Route("account/delete")]
         public virtual IActionResult Delete()
         {
@@ -552,6 +579,7 @@ namespace Hood.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         [Route("account/delete/confirm")]
         public virtual async Task<IActionResult> ConfirmDelete()
@@ -563,8 +591,7 @@ namespace Hood.Controllers
 
                 if (Engine.Auth0Enabled)
                 {
-#warning Auth0 - ConfirmDelete - log user out and redirect back to deleted page. 
-                    throw new NotImplementedException();
+                    return RedirectToAction(nameof(SignOut));
                 }
                 else
                 {

@@ -28,9 +28,9 @@ namespace Hood.Interfaces
                 return "Anonymous";
             if (name.DisplayName.IsSet())
                 return name.DisplayName;
-            return name.ToFullName();
+            return name.ToInternalName();
         }
-        public static string ToFullName(this IName name)
+        public static string ToInternalName(this IName name)
         {
             if (name.FullName.IsSet())
                 return name.FullName;

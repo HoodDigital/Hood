@@ -163,7 +163,7 @@ namespace Hood.Areas.Admin.Controllers
                         };
                         message.AddH1("Account Created!");
                         message.AddParagraph("Your new account has been set up on the " + Engine.Settings.Basic.FullTitle + " website.");
-                        message.AddParagraph("Name: <strong>" + user.ToFullName() + "</strong>");
+                        message.AddParagraph("Name: <strong>" + user.ToInternalName() + "</strong>");
                         message.AddParagraph("Username: <strong>" + model.Username + "</strong>");
                         message.AddParagraph("Password: <strong>" + model.Password + "</strong>");
                         message.AddCallToAction("Log in here", ControllerContext.HttpContext.GetSiteUrl() + "/account/login", "#32bc4e", "center");

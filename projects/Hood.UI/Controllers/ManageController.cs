@@ -22,13 +22,13 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    [Authorize]
+    [Authorize(Hood.Identity.Policies.Active)]
     public abstract class ManageController : ManageController<HoodDbContext>
     {
         public ManageController() : base() { }
     }
 
-    [Authorize]
+    [Authorize(Hood.Identity.Policies.Active)]
     public abstract class ManageController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
          where TContext : HoodDbContext
     {
@@ -51,6 +51,7 @@ namespace Hood.Controllers
                 StatusMessage = SaveMessage,
                 Avatar = user.Avatar,
                 Profile = await _account.GetUserProfileByIdAsync(user.Id),
+                Accounts = user.ConnectedAuth0Accounts,
                 NewAccount = r == "new-account-connection"
             };
             return View(model);

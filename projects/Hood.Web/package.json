@@ -1,6 +1,6 @@
 {
     "name": "hood.blank",
-    "version": "5.0.14",
+    "version": "6.0.0",
     "description": "Demo project for Hood CMS. Uses Nuget packages.",
     "author": "George Whysall",
     "scripts": {

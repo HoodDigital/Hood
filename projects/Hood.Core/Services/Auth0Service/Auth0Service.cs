@@ -21,7 +21,8 @@ namespace Hood.Services
     public class Auth0Service
     {
 
-        public async Task<ApplicationUser> OnTicketReceived(TicketReceivedContext e)
+        #region Login/Logout
+        public async Task<ApplicationUser> GetLocalUserForSignIn(TicketReceivedContext e)
         {
             // check if user exists - if so, and signups are allowed via remote, redirect to complete profile page.
             var repo = Engine.Services.Resolve<IAccountRepository>();
@@ -31,15 +32,23 @@ namespace Hood.Services
             if (user != null)
             {
                 // user exists and has auth0 account linked to it.
+                var emailVerifiedClaim = e.Principal.FindFirst("email_verified");
+                if (user.Active || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true"))
+                {
+                    var identity = (ClaimsIdentity)principal.Identity;
+                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
+                    await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
+                }
                 return user;
+
             }
             // check if the user has an account, via email                           
-            user = await repo.GetUserByEmailAsync(e.Principal.Identity.Name);
+            user = await repo.GetUserByEmailAsync(e.Principal.GetEmail());
             if (user != null)
             {
                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
                 var identity = (ClaimsIdentity)principal.Identity;
-                identity.AddClaim(new Claim(HoodClaimTypes.AccountNotConnected, "true"));
+                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountNotConnected, "true"));
                 await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                 return user;
             }
@@ -61,6 +70,8 @@ namespace Hood.Services
                     LastName = authUser.LastName,
                     DisplayName = authUser.DisplayName,
                     PhoneNumber = authUser.PhoneNumber,
+                    EmailConfirmed = authUser.EmailVeriried,
+                    Active = authUser.EmailVeriried,
                     CreatedOn = DateTime.UtcNow,
                     LastLogOn = DateTime.UtcNow,
                     LastLoginLocation = authUser.LastLoginIp,
@@ -69,6 +80,13 @@ namespace Hood.Services
                 await repo.CreateAsync(user, null);
 
                 await CreateAuth0User(e.Principal.GetUserId(), user);
+
+                if (user.Active)
+                {
+                    var identity = (ClaimsIdentity)principal.Identity;
+                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
+                    await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
+                }
 
                 var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
                 var returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { r = "new-account-connection" });
@@ -80,6 +98,10 @@ namespace Hood.Services
             return user;
         }
 
+
+        #endregion
+
+        #region Data CRUD
         private async Task<Auth0User> CreateAuth0User(string authUserId, ApplicationUser user)
         {
             var newAuthUser = await GetUserById(authUserId);
@@ -89,7 +111,9 @@ namespace Hood.Services
             await db.SaveChangesAsync();
             return newAuthUser;
         }
+        #endregion
 
+        #region Auth0 API - Helpers
         private async Task<AuthToken> GetTokenAsync()
         {
             var client = new RestClient($"https://{Engine.Auth0Configuration.Domain}/oauth/token");
@@ -124,22 +148,25 @@ namespace Hood.Services
             }
             var response = await client.ExecuteAsync(request);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            switch (response.StatusCode)
             {
-                return response;
-            }
-            else
-            {
-                throw new ApplicationException($"Remote Auth0 service returned a {response.StatusCode.ToString().CamelCaseToString().ToLower()} status from https://{Engine.Auth0Configuration.Domain}/{path}.");
+                case System.Net.HttpStatusCode.OK:
+                case System.Net.HttpStatusCode.Created:
+                case System.Net.HttpStatusCode.Accepted:
+                case System.Net.HttpStatusCode.NonAuthoritativeInformation:
+                case System.Net.HttpStatusCode.NoContent:
+                case System.Net.HttpStatusCode.ResetContent:
+                case System.Net.HttpStatusCode.PartialContent:
+                case System.Net.HttpStatusCode.MultiStatus:
+                case System.Net.HttpStatusCode.AlreadyReported:
+                    return response;
+                default:
+                    throw new Exception($"Remote Auth0 service returned a {response.StatusCode.ToString().CamelCaseToString().ToLower()} status from https://{Engine.Auth0Configuration.Domain}/{path}.");
             }
         }
+        #endregion
 
-        public async Task<List<Auth0Role>> GetRoles(string userId = null)
-        {
-            var response = await CallApi("api/v2/roles");
-            return JsonConvert.DeserializeObject<List<Auth0Role>>(response.Content);
-        }
-
+        #region Auth0 API - Users
         public async Task<PagedList<Auth0User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
         {
             var response = await CallApi("api/v2/users?include_totals=true", parameters: new List<Parameter>
@@ -182,5 +209,19 @@ namespace Hood.Services
 
             return null;
         }
+
+        public async Task DeleteUser(string userId)
+        {
+            await CallApi($"api/v2/users/{userId}", Method.DELETE);
+        }
+        #endregion
+
+        #region Auth0 API - Roles
+        public async Task<List<Auth0Role>> GetRoles(string userId = null)
+        {
+            var response = await CallApi("api/v2/roles");
+            return JsonConvert.DeserializeObject<List<Auth0Role>>(response.Content);
+        }
+        #endregion
     }
 }

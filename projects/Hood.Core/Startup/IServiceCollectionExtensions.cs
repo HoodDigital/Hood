@@ -26,6 +26,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections.Generic;
+using Hood.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hood.Startup
 {
@@ -63,7 +65,7 @@ namespace Hood.Startup
             }
 
             services.ConfigureViewEngine(config);
-            services.ConfigureHoodAntiForgery(config);
+            services.ConfigureAntiForgery(config);
 
             services.AddDistributedMemoryCache();
 
@@ -88,7 +90,7 @@ namespace Hood.Startup
 
             services.AddRazorPages();
 
-            services.ConfigureHoodEngine(config);
+            services.ConfigureEngine(config);
 
             return services;
         }
@@ -144,7 +146,7 @@ namespace Hood.Startup
         /// <param name="services">Collection of service descriptors</param>
         /// <param name="configuration">Configuration root of the application</param>
         /// <returns>Configured service provider</returns>
-        public static IServiceProvider ConfigureHoodEngine(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceProvider ConfigureEngine(this IServiceCollection services, IConfiguration configuration)
         {
             //add accessor to HttpContext
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -164,19 +166,18 @@ namespace Hood.Startup
             services.AddDbContext<HoodDbContext>(options => options.UseSqlServer(config["ConnectionStrings:DefaultConnection"]));
             return services;
         }
-        public static IServiceCollection ConfigureHoodAntiForgery(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection ConfigureAntiForgery(this IServiceCollection services, IConfiguration config)
         {
-            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
-
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : Constants.CookieDefaultName;
             services.AddAntiforgery(options =>
             {
-                options.Cookie.Name = $".{cookieName}.Antiforgery";
+                options.Cookie.Name = $"{cookieName}_af";
             });
             return services;
         }
         public static IServiceCollection ConfigureCookies(this IServiceCollection services, IConfiguration config)
         {
-            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : Constants.CookieDefaultName;
             bool consentRequired = config.GetValue("Cookies:ConsentRequired", true);
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -184,7 +185,7 @@ namespace Hood.Startup
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => consentRequired;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
-                options.ConsentCookie.Name = $".{cookieName}.Consent";
+                options.ConsentCookie.Name = $"{cookieName}_consent";
             });
             return services;
         }
@@ -208,21 +209,13 @@ namespace Hood.Startup
                 .AddDefaultTokenProviders()
                 .AddMagicLoginTokenProvider();
 
-            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
-
             services.ConfigureApplicationCookie(options =>
             {
-                options.Cookie.Name = $".{cookieName}.Authentication";
-                options.Cookie.HttpOnly = true;
+                SetAuthenticationCookieDefaults(config, options);
+
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-
-                options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
-
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
-                options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
-                options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
-                options.ReturnUrlParameter = Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
 
                 options.Events = new CookieAuthenticationEvents()
@@ -243,7 +236,6 @@ namespace Hood.Startup
 
             return services;
         }
-
         public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config)
         {
             services.ConfigureSameSiteNoneCookies();
@@ -260,7 +252,7 @@ namespace Hood.Startup
                         OnTicketReceived = async e =>
                         {
                             var auth0Service = new Auth0Service();
-                            var user = await auth0Service.OnTicketReceived(e);
+                            var user = await auth0Service.GetLocalUserForSignIn(e);
                             if (user == null)
                             {
                                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
@@ -301,8 +293,31 @@ namespace Hood.Startup
             services.AddScoped<IAccountRepository, Auth0AccountRepository>();
             services.AddScoped<IEmailSender, Auth0EmailSender>();
 
+            services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+                .Configure(options =>
+                {
+                    SetAuthenticationCookieDefaults(config, options);
+                });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
+                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
+            });
             return services;
 
+        }
+        private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)
+        {
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : Constants.CookieDefaultName;
+
+            options.Cookie.Name = $"{cookieName}_auth";
+            options.Cookie.HttpOnly = true;
+
+            options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
+            options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
+            options.LogoutPath = config["Identity:LogoutPath"].IsSet() ? config["Identity:LogoutPath"] : "/account/logout";
+            options.ReturnUrlParameter = Constants.ReturnUrlParameter;
         }
         public static IServiceCollection ConfigureSameSiteNoneCookies(this IServiceCollection services)
         {
@@ -315,7 +330,6 @@ namespace Hood.Startup
 
             return services;
         }
-
         private static void CheckSameSite(CookieOptions options)
         {
             if (options.SameSite == SameSiteMode.None && options.Secure == false)
@@ -325,13 +339,17 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureSession(this IServiceCollection services, IConfiguration config)
         {
-            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+
+            string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : Constants.CookieDefaultName;
+            services.Configure<CookieTempDataProviderOptions>(options =>
+                options.Cookie.Name = $"{cookieName}_td"
+            );
 
             int sessionTimeout = 60;
             services.AddSession(options =>
             {
                 options.Cookie.IsEssential = true;
-                options.Cookie.Name = $".{cookieName}.Session";
+                options.Cookie.Name = $"{cookieName}_session";
                 options.Cookie.HttpOnly = true;
                 if (int.TryParse(config["Session:Timeout"], out sessionTimeout))
                 {
@@ -402,7 +420,6 @@ namespace Hood.Startup
             services.Configure<MvcOptions>(options =>
             {
                 options.Filters.Add(typeof(UrlFilter));
-                options.Filters.Add(typeof(AccountSetupFilter));
             });
 
             return services;

@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
 
-    [Authorize]
+    [Authorize(Hood.Identity.Policies.Active)]
     public abstract class AddressController : AddressController<HoodDbContext>
     {
         public AddressController() : base() { }
     }
 
-    [Authorize]
+    [Authorize(Hood.Identity.Policies.Active)]
     public abstract class AddressController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
          where TContext : HoodDbContext
     {

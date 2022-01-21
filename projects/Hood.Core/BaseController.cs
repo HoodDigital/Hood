@@ -50,9 +50,9 @@ namespace Hood.Controllers
         protected readonly IRecaptchaService _recaptcha;
 
         [TempData]
-        protected string SaveMessage { get; set; }
+        public string SaveMessage { get; set; }
         [TempData]
-        protected AlertType MessageType { get; set; }
+        public AlertType MessageType { get; set; }
 
         public BaseController()
         {

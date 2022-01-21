@@ -104,7 +104,7 @@ namespace Hood.Services
         public virtual async Task<int> NotifyRoleAsync(string roleName, string subject, string htmlContent, string textContent = null, EmailAddress from = null, EmailAddress replyTo = null)
         {
             var users = await UserManager.GetUsersInRoleAsync(roleName);
-            var emails = users.Select(u => new EmailAddress(u.Email, u.ToFullName())).ToArray();
+            var emails = users.Select(u => new EmailAddress(u.Email, u.ToInternalName())).ToArray();
             return await SendEmailAsync(emails, subject, htmlContent, textContent, from, replyTo);
         }
     }

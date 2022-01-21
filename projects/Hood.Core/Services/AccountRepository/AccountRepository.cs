@@ -96,6 +96,30 @@ namespace Hood.Services
         }
         public virtual async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
+            var user = await PrepareUserForDelete(userId, adminUser);
+
+            IList<UserLoginInfo> logins = await UserManager.GetLoginsAsync(user);
+            foreach (UserLoginInfo li in logins)
+            {
+                await UserManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
+            }
+
+            IList<string> roles = await UserManager.GetRolesAsync(user);
+            foreach (string role in roles)
+            {
+                await UserManager.RemoveFromRoleAsync(user, role);
+            }
+
+            IList<System.Security.Claims.Claim> claims = await UserManager.GetClaimsAsync(user);
+            foreach (System.Security.Claims.Claim claim in claims)
+            {
+                await UserManager.RemoveClaimAsync(user, claim);
+            }
+
+            await UserManager.DeleteAsync(user);
+        }
+        protected virtual async Task<ApplicationUser> PrepareUserForDelete(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
+        {
             ApplicationUser user = await _db.Users
                 .Include(u => u.Content)
                 .Include(u => u.Properties)
@@ -113,40 +137,20 @@ namespace Hood.Services
                 throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
             }
 
-            if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetLocalUserId() == user.Id)
-            {
-
-                IList<UserLoginInfo> logins = await UserManager.GetLoginsAsync(user);
-                foreach (UserLoginInfo li in logins)
-                {
-                    await UserManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
-                }
-
-                IList<string> roles = await UserManager.GetRolesAsync(user);
-                foreach (string role in roles)
-                {
-                    await UserManager.RemoveFromRoleAsync(user, role);
-                }
-
-                IList<System.Security.Claims.Claim> claims = await UserManager.GetClaimsAsync(user);
-                foreach (System.Security.Claims.Claim claim in claims)
-                {
-                    await UserManager.RemoveClaimAsync(user, claim);
-                }
-
-                // Set any site content as owned by the site owner, instead of the user.
-                user.Content.ForEach(c => c.AuthorId = siteOwner.Id);
-                user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
-
-                _db.Logs.Where(l => l.UserId == userId).ForEach(f => f.UserId = siteOwner.Id);
-
-                await _db.SaveChangesAsync();
-                await UserManager.DeleteAsync(user);
-            }
-            else
+            if (!adminUser.IsAdminOrBetter() && adminUser.GetLocalUserId() != user.Id)
             {
                 throw new Exception("You do not have permission to delete this user.");
             }
+
+            // Set any site content as owned by the site owner, instead of the user.
+            user.Content.ForEach(c => c.AuthorId = siteOwner.Id);
+            user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
+
+            _db.Logs.Where(l => l.UserId == userId).ForEach(f => f.UserId = siteOwner.Id);
+
+            await _db.SaveChangesAsync();
+
+            return user;
         }
         public virtual async Task<MediaDirectory> GetDirectoryAsync(string id)
         {
@@ -230,7 +234,7 @@ namespace Hood.Services
         public virtual async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code)
         {
             return await UserManager.ConfirmEmailAsync(user, code);
-        }        
+        }
         #endregion
 
         #region Profiles 

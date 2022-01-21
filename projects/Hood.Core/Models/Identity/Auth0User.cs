@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Hood.Entities;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ namespace Hood.Models
     public class Auth0User : BaseEntity<string>
     {
         [JsonProperty("user_id")]
+        [Key]
         public override string Id { get; set; }
 
         [JsonIgnore]

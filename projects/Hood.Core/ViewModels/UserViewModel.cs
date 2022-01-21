@@ -31,5 +31,6 @@ namespace Hood.ViewModels
 
         public IList<IdentityRole> AllRoles { get; set; }
         public bool NewAccount { get; set; }
+        public IList<Auth0User> Accounts { get; set; }
     }
 }

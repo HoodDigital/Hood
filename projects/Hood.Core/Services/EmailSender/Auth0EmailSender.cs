@@ -38,7 +38,7 @@ namespace Hood.Services
 #warning Auth0 - NotifyRoleAsync
             throw new NotImplementedException();
             // var users = await UserManager.GetUsersInRoleAsync(roleName);
-            // var emails = users.Select(u => new EmailAddress(u.Email, u.ToFullName())).ToArray();
+            // var emails = users.Select(u => new EmailAddress(u.Email, u.ToInternalName())).ToArray();
             // return await SendEmailAsync(emails, subject, htmlContent, textContent, from, replyTo);
         }
     }

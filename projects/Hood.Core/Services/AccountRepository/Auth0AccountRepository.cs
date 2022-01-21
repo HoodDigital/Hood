@@ -48,10 +48,28 @@ namespace Hood.Services
             _db.Entry(user).State = EntityState.Modified;
             await _db.SaveChangesAsync();
         }
-        public override Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
+        public override async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
-#warning Auth0 - DeleteUserAsync
-            throw new NotImplementedException();
+            // go through all the auth0 accounts and remove them from the system.
+            var accounts = await _db.Auth0Users.Where(u => u.UserId == userId).ToListAsync();
+            foreach (var account in accounts)
+            {
+                //remove from auth0
+                var auth0Service = new Auth0Service();
+                await auth0Service.DeleteUser(account.Id);
+                _db.Entry(account).State = EntityState.Deleted;
+            }
+            await _db.SaveChangesAsync();
+            
+            var user = await PrepareUserForDelete(userId, adminUser);
+
+            _db.Auth0Users.Where(l => l.UserId == userId).ForEach(f => _db.Entry(f).State = EntityState.Deleted);
+            await _db.SaveChangesAsync();
+
+            // now delete the user
+            _db.Entry(user).State = EntityState.Deleted;
+            await _db.SaveChangesAsync();
+
         }
         public override Task SendVerificationEmail(ApplicationUser user)
         {

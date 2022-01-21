@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 
 namespace Hood.Areas.Admin.Controllers
 {
-    [Authorize]
     public abstract class BasePropertyController : BaseController
     {
         protected readonly PropertySettings _propertySettings;

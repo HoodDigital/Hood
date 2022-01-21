@@ -80,7 +80,7 @@ namespace Hood.ViewModels
         public virtual string JobTitle { get; set; }
 
         [Display(Name = "Contact Name")]
-        public virtual string ContactName { get => this.ToFullName(); set { } }
+        public virtual string ContactName { get => this.ToInternalName(); set { } }
 
         public virtual string Number { get; set; }
 

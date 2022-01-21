@@ -56,8 +56,8 @@ namespace Hood.Models
 
         public virtual string ToAdminName()
         {
-            if (this.ToFullName().IsSet())
-                return this.ToFullName();
+            if (this.ToInternalName().IsSet())
+                return this.ToInternalName();
             if (UserName.IsSet())
                 return UserName;
             if (Email.IsSet())
