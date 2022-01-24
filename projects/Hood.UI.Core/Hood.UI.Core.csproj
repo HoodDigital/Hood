@@ -5,7 +5,7 @@
     <AssemblyName>Hood.UI.Core</AssemblyName>
     <PackageId>Hood.UI.Core</PackageId>
 
-    <Version>5.0.14</Version>
+    <Version>5.0.15</Version>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>Hood Digital;George Whysall;</Authors>
     <OutputType>Library</OutputType>
