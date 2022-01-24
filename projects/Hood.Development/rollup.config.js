@@ -71,66 +71,97 @@ export default commandLineArgs => {
     }
 
     return [{
-            input: 'src/ts/app.ts',
-            output: {
-                file: destination + 'js/app.js',
-                format: 'umd',
-                name: 'hood',
-                banner: banner,
-                footer: `\
+        input: 'src/ts/app.ts',
+        output: {
+            file: destination + 'js/app.js',
+            format: 'umd',
+            name: 'hood',
+            banner: banner,
+            footer: `\
+            if (typeof this !== 'undefined' && this.hood){\
+              this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
+            }`,
+            sourcemap: sourcemaps,
+            compact: compact
+        },
+        onwarn(warning, rollupWarn) {
+            if (warning.code !== 'CIRCULAR_DEPENDENCY') {
+                rollupWarn(warning)
+            }
+        },
+        external: [
+            'jQuery',
+            'bootstrap',
+            'sweetalert2',
+            'dropzone'
+        ],
+        plugins: plugins
+    }, {
+        input: 'src/ts/app.property.ts',
+        output: {
+            file: destination + 'js/app.property.js',
+            format: 'umd',
+            name: 'hood',
+            banner: banner,
+            footer: `\
+            if (typeof this !== 'undefined' && this.hood){\
+              this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
+            }`,
+            sourcemap: sourcemaps,
+            compact: compact
+        },
+        onwarn(warning, rollupWarn) {
+            if (warning.code !== 'CIRCULAR_DEPENDENCY') {
+                rollupWarn(warning)
+            }
+        },
+        external: external,
+        plugins: plugins
+    },
+    {
+        input: 'src/ts/admin.ts',
+        output: {
+            file: destination + 'js/admin.js',
+            format: 'umd',
+            name: 'hood',
+            banner: banner,
+            footer: `\
                 if (typeof this !== 'undefined' && this.hood){\
                   this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
                 }`,
-                sourcemap: sourcemaps,
-                compact: compact
+            globals: {
+                jQuery: '$',
+                bootstrap: 'bootstrap',
+                sweetalert2: 'Swal',
+                dropzone: 'Dropzone',
+                '@simonwep/pickr': 'Pickr',
+                'tinymce/tinymce': 'tinymce',
+                'chart.js': 'Chart'
             },
-            onwarn(warning, rollupWarn) {
-                if (warning.code !== 'CIRCULAR_DEPENDENCY') {
-                    rollupWarn(warning)
-                }
-            },
-            external: external,
-            plugins: plugins
+            sourcemap: sourcemaps,
+            compact: compact
         },
-        {
-            input: 'src/ts/admin.ts',
-            output: {
-                file: destination + 'js/admin.js',
-                format: 'umd',
-                name: 'hood',
-                banner: banner,
-                footer: `\
-                if (typeof this !== 'undefined' && this.hood){\
-                  this.hoodCMS = this.Hood = this.hoodCMS = this.HoodCMS = this.hood\
-                }`,
-                globals: {
-                    jQuery: '$',
-                    bootstrap: 'bootstrap',
-                    sweetalert2: 'Swal',
-                    dropzone: 'Dropzone',
-                    '@simonwep/pickr': 'Pickr',
-                    'tinymce/tinymce': 'tinymce',
-                    'chart.js': 'Chart'
-                },
-                sourcemap: sourcemaps,
-                compact: compact
-            },
-            external: external,
-            plugins: plugins
+        external: [
+            'jQuery',
+            'bootstrap',
+            'sweetalert2',
+            'dropzone'
+        ],
+        plugins: plugins
+    },
+    {
+        input: 'src/ts/login.ts',
+        output: {
+            file: destination + 'js/login.js',
+            format: 'umd',
+            name: 'hood',
+            banner: banner,
+            footer: '',
+            sourcemap: sourcemaps,
+            compact: compact
         },
-        {
-            input: 'src/ts/login.ts',
-            output: {
-                file: destination + 'js/login.js',
-                format: 'umd',
-                name: 'hood',
-                banner: banner,
-                footer: '',
-                sourcemap: sourcemaps,
-                compact: compact
-            },
-            external: external,
-            plugins: plugins
-        }
+        external: external,
+        plugins: plugins
+    }
     ];
 }

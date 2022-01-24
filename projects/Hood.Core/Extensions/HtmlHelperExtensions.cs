@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text.Encodings.Web;
+using System.Web.Helpers;
 
 namespace Hood.Extensions
 {
@@ -50,11 +51,18 @@ namespace Hood.Extensions
         #endregion
 
         public static IHtmlContent RenderHoneypotField<TModel>(this IHtmlHelper<TModel> html)
-            where TModel : HoneyPotFormModel
+            where TModel : SpamPreventionModel
         {
+            // Format the datetime in an inventive way
+            var timestamp = DateTime.UtcNow.ToString("ffffHHMMyytssddmm");
+            var hash = Crypto.HashPassword(timestamp);            
             var keygen = new KeyGenerator(false, true, true, false);
             var hp_key = keygen.Generate(4);
-            var output = $@"<div class='comments_or_notes hidden d-none'><label for='comments_or_notes_{hp_key}'>Comments:</label><input name='comments_or_notes_{hp_key}' id='comments_or_notes_{hp_key}' type='text' tabindex='-1' autocomplete='off' /></div>";
+            var output = $@"<div class='comments_or_notes hidden d-none'><label for='comments_or_notes_{hp_key}'>Comments:</label><input name='{SpamPreventionModel.HoneypotFieldName}' id='comments_or_notes_{hp_key}' type='text' tabindex='-1' autocomplete='off' /></div>";
+            output += $@"<input name='{SpamPreventionModel.TimestampFieldName}' id='ts_{hp_key}' value='{timestamp}' type='hidden' tabindex='-1' autocomplete='off' />";            
+            output += $@"<input name='{SpamPreventionModel.HashFieldName}' id='hs_{hp_key}' value='{hash}' type='hidden' tabindex='-1' autocomplete='off' />";
+            //output += html.Hidden("Timestamp", timestamp).RenderHtmlContent();
+            //output += html.Hidden("Hash", hash).RenderHtmlContent();
             return new HtmlString(output);
         }
 

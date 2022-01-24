@@ -5,7 +5,6 @@ export * from './models/Property'
 export * from './models/Users'
 
 export * from './core/Alerts'
-export * from './core/BaseSite'
 export * from './core/ColorPicker'
 export * from './core/DataList'
 export * from './core/Editors'

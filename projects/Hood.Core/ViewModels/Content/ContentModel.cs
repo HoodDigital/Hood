@@ -13,6 +13,20 @@ namespace Hood.ViewModels
         {
         }
 
+        public override int PageSize
+        {
+            get
+            {
+                if (ContentType != null && ContentType.DefaultPageSize.HasValue)
+                {
+                    return ContentType.DefaultPageSize.Value;
+                }
+                else
+                    return base.PageSize;
+            }
+            set => base.PageSize = value;
+        }
+
         // Params
         [FromQuery(Name = "category")]
         public string Category { get; set; }

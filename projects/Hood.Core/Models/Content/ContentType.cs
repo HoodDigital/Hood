@@ -201,8 +201,12 @@ namespace Hood.Models
         [Display(Name = "Cached By Type", Description = "Cache this type for speedy reuse. Only recommended for items that are rendered a lot, not recommended on large content sets such as news.")]
         public bool CachedByType { get; set; }
 
+        [Display(Name = "Default Page Size", Description = "")]
+        public int? DefaultPageSize { get; set; }
+
         [Display(Name = "Custom Fields Json", Description = "")]
         public string CustomFieldsJson { get; set; }
+
 
         public List<CustomField> CustomFields
         {

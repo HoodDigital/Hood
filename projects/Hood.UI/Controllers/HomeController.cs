@@ -49,7 +49,8 @@ namespace Hood.Controllers
             model.ContentType = Engine.Settings.Content.GetContentType(model.Type);
             if (!model.ContentType.Enabled || !model.ContentType.IsPublic)
                 return NotFound();
-
+                
+            
             model.Status = ContentStatus.Published;
             model = await _content.GetContentAsync(model);
             model.Recent = await _content.GetRecentAsync(model.Type);

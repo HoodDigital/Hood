@@ -81,6 +81,21 @@
         break;
 
     default:
+        var dateTime = DateTime.Now;
+        try
+        {                 
+            dateTime = Model.GetValue<DateTime>();
+        }
+        catch (System.Exception)
+        { 
+            try
+            {
+                var dateTimeString = Model.GetValue<string>();
+                dateTime = DateTime.Parse(dateTimeString);
+            }
+            catch (System.Exception)
+            { }
+        }
 
         switch (Model.InputType)
         {
@@ -89,7 +104,7 @@
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="datetime-local"
-                           value="@(Model.GetValue<DateTime>().ToString("yyyy-MM-ddThh:mm"))"
+                           value="@(dateTime.ToString("yyyy-MM-ddThh:mm"))"
                            placeholder="@Model.InputDisplayName"
                            class="form-control" />
                     <label for="@Model.InputId">@Model.InputDisplayName</label>
@@ -104,7 +119,7 @@
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="time"
-                           value="@(Model.GetValue<DateTime>().ToString("hh:mm"))"
+                           value="@(dateTime.ToString("hh:mm"))"
                            placeholder="@Model.InputDisplayName"
                            class="form-control" />
                     <label for="@Model.InputId">@Model.InputDisplayName</label>
@@ -119,7 +134,7 @@
                     <input id="@Model.InputId"
                            name="@Model.InputName"
                            type="date"
-                           value="@(Model.GetValue<DateTime>().ToString("yyyy-MM-dd"))"
+                           value="@(dateTime.ToString("yyyy-MM-dd"))"
                            placeholder="@Model.InputDisplayName"
                            class="form-control" />
                     <label for="@Model.InputId">@Model.InputDisplayName</label>

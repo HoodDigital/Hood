@@ -1,6 +1,6 @@
 {
     "name": "hoodcms",
-    "version": "5.0.13",
+    "version": "5.0.15",
     "description": "A fully customisable content management system built in ASP.NET Core 5 & Bootstrap 5.",
     "keywords": [
         "hood",

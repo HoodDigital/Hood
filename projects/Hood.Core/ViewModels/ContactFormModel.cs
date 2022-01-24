@@ -8,7 +8,7 @@ using SendGrid.Helpers.Mail;
 
 namespace Hood.ViewModels
 {
-    public class ContactFormModel : HoneyPotFormModel, IEmailSendable
+    public class ContactFormModel : SpamPreventionModel, IEmailSendable
     {
         public EmailAddress From { get; set; } = null;
         public EmailAddress ReplyTo { get; set; } = null;

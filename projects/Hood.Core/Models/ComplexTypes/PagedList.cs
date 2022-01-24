@@ -43,14 +43,14 @@ namespace System.Collections.Generic
         /// </summary>
         [FromQuery(Name = "page")]
         [Display(Name = "Current Page")]
-        public int PageIndex { get; set; }
+        public virtual int PageIndex { get; set; }
 
         /// <summary>
         /// Page size
         /// </summary>
         [FromQuery(Name = "pageSize")]
         [Display(Name = "Page Size")]
-        public int PageSize { get; set; }
+        public virtual int PageSize { get; set; }
 
         /// <summary>
         /// Total count
