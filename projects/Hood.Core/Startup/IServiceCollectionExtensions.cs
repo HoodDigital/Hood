@@ -158,7 +158,6 @@ namespace Hood.Startup
 
             return serviceProvider;
         }
-
         public static IServiceCollection ConfigureHoodDatabase<TContext>(this IServiceCollection services, IConfiguration config)
             where TContext : HoodDbContext
         {
@@ -226,6 +225,12 @@ namespace Hood.Startup
                         var repo = Engine.Services.Resolve<IAccountRepository>();
                         var user = await repo.GetUserByIdAsync(e.Principal.GetUserId());
                         e.Principal.SetUserClaims(user);
+                        if (user.Active && Engine.Settings.Account.RequireEmailConfirmation)
+                        {
+                            #warning -you were working on this bit 24/01/2022
+                            var identity = (ClaimsIdentity)e.Principal.Identity;
+                            identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
+                        }
                         await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
                     }
                 };
@@ -233,6 +238,12 @@ namespace Hood.Startup
 
             services.AddScoped<IAccountRepository, Auth0AccountRepository>();
             services.AddScoped<IEmailSender, Auth0EmailSender>();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
+                options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
+            });
 
             return services;
         }
