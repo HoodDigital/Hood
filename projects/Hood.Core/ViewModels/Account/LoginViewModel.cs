@@ -2,7 +2,7 @@
 
 namespace Hood.ViewModels
 {
-    public class LoginViewModel : HoneyPotFormModel
+    public class LoginViewModel : SpamPreventionModel
     {
         [Required]
         [EmailAddress]
@@ -16,7 +16,7 @@ namespace Hood.ViewModels
         public bool RememberMe { get; set; }
     }
 
-    public class MagicLoginViewModel : HoneyPotFormModel
+    public class MagicLoginViewModel : SpamPreventionModel
     {
         [Required]
         [EmailAddress]

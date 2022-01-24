@@ -29,7 +29,7 @@ export interface ValidatorOptions {
 export class Validator {
     element: HTMLFormElement;
     options: ValidatorOptions = {
-        errorAlert: 'There are errors, please check the form.',
+        errorAlert: 'There are errors on the form, please check your answers and try again.',
         useAjax: true
     };
 
