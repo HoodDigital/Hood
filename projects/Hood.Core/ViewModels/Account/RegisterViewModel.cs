@@ -43,7 +43,7 @@ namespace Hood.ViewModels
         public override string LastName { get; set; }
     }
 
-    public class RegisterViewModel : HoneyPotFormModel, IName, IAddress, IPerson
+    public class RegisterViewModel : SpamPreventionModel, IName, IAddress, IPerson
     {
         [Required]
         [EmailAddress]

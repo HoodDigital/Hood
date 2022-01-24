@@ -35,10 +35,9 @@ namespace Hood.Controllers
             try
             {
                 if (!ModelState.IsValid)
+                {
                     return new Response("The submitted information is not valid.");
-
-                if (model.IsSpambot)
-                    return new Response("You have been flagged as a spam bot. If this is not true, please contact us via email.");
+                }
 
                 var recaptcha = await _recaptcha.Validate(Request);
                 if (!recaptcha.Success)
@@ -85,7 +84,7 @@ namespace Hood.Controllers
         }
 
         [Route("hood/version/")]
-        public virtual JsonResult Version()        
+        public virtual JsonResult Version()
         {
             return Json(new { version = Engine.Version });
         }

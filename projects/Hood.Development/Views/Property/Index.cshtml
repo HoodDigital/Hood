@@ -71,5 +71,5 @@
 </div>
 @if (maps)
 {
-    <script async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=hood.app.propertyController.initMap{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
+    <script asp-location="AfterScripts" async defer src="@string.Format("https://maps.googleapis.com/maps/api/js?key={0}&callback=hood.property.initMap{1}", _plugins.GoogleMapsApiKey, _plugins.EnableGoogleGeocoding ? "&libraries=places" : "")"></script>
 }

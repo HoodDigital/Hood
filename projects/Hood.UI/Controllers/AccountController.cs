@@ -68,7 +68,7 @@ namespace Hood.Controllers
             AccountSettings accountSettings = Engine.Settings.Account;
             ViewData["ReturnUrl"] = returnUrl;
 
-            if (ModelState.IsValid && ModelState.IsNotSpam(model))
+            if (ModelState.IsValid)
             {
 
                 Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
@@ -143,7 +143,7 @@ namespace Hood.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
-                if (ModelState.IsValid && ModelState.IsNotSpam(model))
+                if (ModelState.IsValid)
                 {
 
                     Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
@@ -291,7 +291,7 @@ namespace Hood.Controllers
                 ModelState.AddModelError(string.Empty, "You did not give consent for us to store your data, therefore we cannot complete the signup process.");
             }
 
-            if (ModelState.IsValid && ModelState.IsNotSpam(model))
+            if (ModelState.IsValid)
             {
 
                 Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
@@ -380,7 +380,7 @@ namespace Hood.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             try
             {
-                if (ModelState.IsValid && ModelState.IsNotSpam(model))
+                if (ModelState.IsValid)
                 {
 
                     Services.RecaptchaResponse recaptcha = await _recaptcha.Validate(Request);
