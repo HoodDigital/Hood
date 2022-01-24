@@ -2,6 +2,7 @@
 using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Identity;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -490,8 +491,8 @@ namespace Hood.Areas.Admin.Controllers
                 ApplicationUser impersonatedUser = await _userManager.FindByIdAsync(id);
                 ClaimsPrincipal userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
 
-                userPrincipal.Identities.First().AddClaim(new Claim("OriginalUserId", User.GetLocalUserId()));
-                userPrincipal.Identities.First().AddClaim(new Claim("IsImpersonating", "true"));
+                userPrincipal.Identities.First().AddClaim(new Claim(HoodClaimTypes.OriginalUserId, User.GetLocalUserId()));
+                userPrincipal.Identities.First().AddClaim(new Claim(HoodClaimTypes.IsImpersonating, "true"));
 
                 impersonatedUser.AddUserNote(new UserNote()
                 {
@@ -531,7 +532,7 @@ namespace Hood.Areas.Admin.Controllers
                     throw new Exception("You are not impersonating.");
                 }
 
-                string originalUserId = User.FindFirst("OriginalUserId").Value;
+                string originalUserId = User.FindFirst(HoodClaimTypes.OriginalUserId).Value;
 
                 ApplicationUser originalUser = await _userManager.FindByIdAsync(originalUserId);
 

@@ -219,19 +219,20 @@ namespace Hood.Startup
 
                 options.Events = new CookieAuthenticationEvents()
                 {
-                    OnSignedIn = async e =>
+                    OnValidatePrincipal = async e =>
                     {
                         // get the user profile and store important bits on the claim.
                         var repo = Engine.Services.Resolve<IAccountRepository>();
                         var user = await repo.GetUserByIdAsync(e.Principal.GetUserId());
                         e.Principal.SetUserClaims(user);
-                        if (user.Active && Engine.Settings.Account.RequireEmailConfirmation)
+                        if (user.EmailConfirmed)
                         {
-                            #warning -you were working on this bit 24/01/2022
-                            var identity = (ClaimsIdentity)e.Principal.Identity;
-                            identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
+                            e.Principal.AddOrUpdateClaim(HoodClaimTypes.EmailConfirmed, "true");
                         }
-                        await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+                        if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
+                        {
+                            e.Principal.AddOrUpdateClaim(HoodClaimTypes.Active, "true");
+                        }
                     }
                 };
             });
@@ -247,6 +248,12 @@ namespace Hood.Startup
 
             return services;
         }
+
+        private static int SignInManager<T>()
+        {
+            throw new NotImplementedException();
+        }
+
         public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config)
         {
             services.ConfigureSameSiteNoneCookies();
@@ -442,8 +449,8 @@ namespace Hood.Startup
                 options.ValidationInterval = TimeSpan.FromMinutes(1);  // new property name
                 options.OnRefreshingPrincipal = context =>             // new property name
                 {
-                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst("OriginalUserId");
-                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst("IsImpersonating");
+                    System.Security.Claims.Claim originalUserIdClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.OriginalUserId);
+                    System.Security.Claims.Claim isImpersonatingClaim = context.CurrentPrincipal.FindFirst(HoodClaimTypes.IsImpersonating);
                     if (originalUserIdClaim != null && isImpersonatingClaim.Value == "true")
                     {
                         context.NewPrincipal.Identities.First().AddClaim(originalUserIdClaim);

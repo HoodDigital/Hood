@@ -9,37 +9,37 @@
             <div class="modal-body p-5">
                 <h3>Account menu</h3>
                 <p>This is the account menu, manage your account, change your password or access premium areas of the site.</p>
-                <ul class="list-unstyled text-small">
+                <ul class="nav flex-column">
                     @if (User.IsEditorOrBetter())
                     {
-                        <li>
-                            <a class="text-muted" asp-action="Index" asp-controller="Home" asp-area="Admin">
-                                <i class="fa fa-tachometer-alt me-2"></i>Website Dashboard
+                        <li class="nav-item">
+                            <a class="nav-link text-muted" asp-action="Index" asp-controller="Home" asp-area="Admin">
+                                <i class="fa fa-tachometer-alt me-3"></i>Website Dashboard
                             </a>
                         </li>
                     }
                     @if (User.IsImpersonating())
                     {
-                        <li>
-                            <a class="text-muted" asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin">
-                                <i class="fa fa-desktop me-2"></i>Stop Impersonating
+                        <li class="nav-item">
+                            <a class="nav-link text-muted" asp-action="StopImpersonation" asp-controller="Users" asp-area="Admin">
+                                <i class="fa fa-desktop me-3"></i>Stop Impersonating
                             </a>
                         </li>
                     }
-                    <li>
-                        <a class="text-muted" asp-action="Index" asp-controller="Manage">
-                            <i class="fa fa-cogs me-2"></i>Manage Account
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" asp-action="Index" asp-controller="Manage">
+                            <i class="fa fa-cogs me-3"></i>Manage Account
                         </a>
                     </li>
-                    <li>
-                        <a class="text-muted" asp-action="ChangePassword" asp-controller="Account">
-                            <i class="fa fa-lock me-2"></i>Change Password
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" asp-action="ChangePassword" asp-controller="Account">
+                            <i class="fa fa-lock me-3"></i>Change Password
                         </a>
                     </li>
-                    <li>
-                        <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm" class="navbar-right"></form>
-                        <a class="text-muted" href="javascript:document.getElementById('logoutForm').submit()">
-                            <i class="fa fa-sign-out-alt me-2"></i>Log out
+                    <li class="nav-item">
+                        <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm"></form>
+                        <a class="nav-link text-muted" href="javascript:document.getElementById('logoutForm').submit()">
+                            <i class="fa fa-sign-out-alt me-3"></i>Log out
                         </a>
                     </li>
                 </ul>
@@ -48,18 +48,21 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <div class="col-auto">
-                        <fixedImage src="@User.GetAvatar()" class="img-xs mb-0" />
+                        <fixedImage src="@User.GetAvatar()" class="img-xs mb-0 ms-3" />
                     </div>
                     <div class="col">
-                        <p class="text-muted mb-0">
-                            Logged in as <strong class="font-bold">@User.ToDisplayName()</strong><br />
-                            <a href="javascript:document.getElementById('logoutForm').submit()">
-                                Log out
-                            </a>
+                        <p class="text-muted mb-0 mt-2">
+                            Logged in as <strong class="font-bold">@User.ToInternalName()</strong>
                         </p>
+                        <div>
+                            <form asp-controller="Account" asp-action="LogOff" asp-area="" method="post" id="logoutForm2"></form>
+                            <a class="nav-link text-muted" href="javascript:document.getElementById('logoutForm2').submit()">
+                                <i class="fa fa-sign-out-alt me-3"></i>Log out
+                            </a>
+                        </div>
                     </div>
                 }
             </div>
         </div>
     </div>
-    </nav>
+</nav>
