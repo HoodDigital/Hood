@@ -1,0 +1,13 @@
+@model DisconnectAccountModel
+@{
+    ViewData["Title"] = "Account disconnected";
+}
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <p>
+        The account is now disconnected, click below to return to your account management.
+    </p>
+    <div>
+        <a class="btn btn-info" asp-action="Index" asp-controller="Manage">Manage Account</a>
+    </div>
+</div>

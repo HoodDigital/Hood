@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hood.Development.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220119152042_Hood_v6")]
+    [Migration("20220125192654_Hood_v6")]
     partial class Hood_v6
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -208,7 +208,7 @@ namespace Hood.Development.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("EmailVeriried")
+                    b.Property<bool>("EmailVerified")
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
@@ -951,6 +951,9 @@ namespace Hood.Development.Migrations
                     b.Property<bool>("Anonymous")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Auth0UsersJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AvatarJson")
                         .HasColumnType("nvarchar(max)");
 
@@ -1012,8 +1015,7 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RolesJson")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Roles");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");

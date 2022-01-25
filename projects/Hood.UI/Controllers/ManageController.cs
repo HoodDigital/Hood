@@ -84,9 +84,12 @@ namespace Hood.Controllers
 
                 model.Profile.Id = user.Id;
                 model.Profile.Notes = user.Notes;
+
                 await _account.UpdateProfileAsync(model.Profile);
 
-                User.SetUserClaims(model.Profile);
+                user = await GetCurrentUserOrThrow();
+
+                User.SetUserClaims(user);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
 
                 SaveMessage = "Your profile has been updated.";
@@ -136,23 +139,5 @@ namespace Hood.Controllers
                 return await ErrorResponseAsync<ManageController>($"There was an error setting the avatar.", ex);
             }
         }
-
-        [Route("account/manage/verify-email")]
-        public virtual async Task<IActionResult> SendVerificationEmail()
-        {
-
-            ApplicationUser user = await GetCurrentUserOrThrow();
-            await _account.SendVerificationEmail(user);
-
-            SaveMessage = "Verification email sent. Please check your email.";
-            MessageType = AlertType.Success;
-
-            if (user.Active)
-                return RedirectToAction(nameof(Index));
-            else
-                return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
-        }
-
-
     }
 }

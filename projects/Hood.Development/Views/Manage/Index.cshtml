@@ -101,7 +101,7 @@
                     <p>Your account can be accessed with the following external accounts:</p>
                     @foreach (var role in accounts)
                     {
-                        <div class="card p-2">
+                        <div class="card p-2 mb-2">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
                                     <fixedImage class="img img-xs" src="@role.PictureUrl"></fixedImage>
@@ -111,7 +111,7 @@
                                     <div>Created: @role.CreatedAt.ToDisplay()</div>
                                 </div>
                                 <div class="">
-                                    <a class="btn btn-sm btn-danger">Disconnect</a>
+                                    <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@role.Id">Disconnect</a>
                                 </div>
                             </div>
                         </div>
@@ -120,7 +120,7 @@
                 else
                 {
                     <div class="alert alert-info">
-                        Your account has not been assigned to any roles just yet.
+                        Your account has no connected external accounts.
                     </div>
                 }
             </div>
@@ -172,7 +172,7 @@
             <div role="tabpanel" class="tab-pane" id="avatar">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <fixedImage src="@User.GetAvatar()" class="img-sm rounded @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
+                        <fixedImage src="@User.GetAvatar()" class="img-md rounded @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
                     </div>
                     <div class="col">
                         <h4 class="media-heading">Change your profile image</h4>

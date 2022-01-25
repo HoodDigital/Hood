@@ -82,7 +82,7 @@ namespace Hood.Controllers
                     ApplicationUser user = await _account.GetUserByEmailAsync(model.Username);
                     if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
-                        await _account.SendVerificationEmail(user);
+                        await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
                         return RedirectToAction(nameof(ConfirmRequired), new { user = user.Id });
                     }
 
@@ -178,7 +178,7 @@ namespace Hood.Controllers
                 {
                     if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
-                        await _account.SendVerificationEmail(user);
+                        await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
                     }
                     else
                     {
@@ -289,7 +289,7 @@ namespace Hood.Controllers
         {
             if (!Engine.Auth0Enabled)
             {
-                throw new ApplicationException("This endpoint is only available when using Auth0.");
+                return NotFound();
             }
             switch (r)
             {
@@ -307,14 +307,156 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [Authorize(Hood.Identity.Policies.AccountNotConnected)]
-        [Route("account/auth/connect-account")]
-        public IActionResult ConnectAccount()
+        [Authorize(Policies.AccountNotConnected)]
+        [Route("account/auth/connect")]
+        public async Task<IActionResult> ConnectAccount(string returnUrl)
         {
             if (!Engine.Auth0Enabled)
             {
-                throw new ApplicationException("This endpoint is only available when using Auth0.");
+                return NotFound();
             }
+            var user = await GetCurrentUserOrThrow();
+            var model = new ConnectAccountModel()
+            {
+                LocalPicture = user.Avatar.LargeUrl,
+                ReturnUrl = returnUrl,
+                RemotePicture = User.GetClaim(HoodClaimTypes.RemotePicture)
+            };
+            return View(model);
+        }
+        [HttpPost]
+        [Authorize(Policies.AccountNotConnected)]
+        [Route("account/auth/connect-confirm")]
+        public async Task<IActionResult> ConnectAccountConfirm(string returnUrl)
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                return NotFound();
+            }
+            try
+            {
+                if (!User.IsEmailConfirmed())
+                {
+                    // tell the user they need to confirm their email, then try again. Restart flow.
+                    return RedirectToAction(nameof(ConfirmRequired));
+                }
+
+                // connect the accounts.             
+                var user = await GetCurrentUserOrThrow();
+                var linkedUser = await _account.GetUserByAuth0Id(User.GetUserId());
+                if (linkedUser != null)
+                {
+                    throw new Exception("This account is already connected to an account.");
+                }
+                var authService = new Auth0Service();
+                var newAuthUser = await authService.CreateLocalAuth0User(User.GetUserId(), user);
+                if (newAuthUser == null)
+                {
+                    throw new Exception("There was a problem connecting your account, please try again.");
+                }
+
+                User.RemoveClaim(HoodClaimTypes.AccountNotConnected);
+                User.AddOrUpdateClaim(HoodClaimTypes.Active, "true");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+
+                return RedirectToAction(nameof(ConnectAccountComplete), new { returnUrl });
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Could not connect the account: " + ex.Message;
+                MessageType = AlertType.Danger;
+                return RedirectToAction(nameof(ConnectAccount));
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("account/auth/connected")]
+        public async Task<IActionResult> ConnectAccountComplete(string returnUrl)
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                return NotFound();
+            }
+            var user = await GetCurrentUserOrThrow();
+            var model = new ConnectAccountModel()
+            {
+                LocalPicture = user.Avatar.LargeUrl,
+                ReturnUrl = returnUrl,
+                RemotePicture = User.GetClaim(HoodClaimTypes.RemotePicture)
+            };
+            return View(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("account/auth/disconnect")]
+        public async Task<IActionResult> DisconnectAccount(string accountId)
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                return NotFound();
+            }
+            var user = await GetCurrentUserOrThrow();
+            var accountToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.Id == accountId);
+            var model = new DisconnectAccountModel()
+            {
+                LocalPicture = user.Avatar.LargeUrl,
+                AccountId = accountId,
+                RemotePicture = accountToDisconnect.PictureUrl
+            };
+            return View(model);
+        }
+        [HttpPost]
+        [Authorize]
+        [Route("account/auth/disconnect-confirm")]
+        public async Task<IActionResult> DisconnectAccountConfirm(DisconnectAccountModel model)
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                return NotFound();
+            }
+            try
+            {
+                if (model.AccountId == User.GetUserId())
+                {
+                    throw new Exception("You cannot delete the account you are currently using to sign in.");
+                }
+
+                // connect the accounts.             
+                var user = await GetCurrentUserOrThrow();
+                var linkedUser = await _account.GetUserByAuth0Id(model.AccountId);
+                if (linkedUser == null)
+                {
+                    throw new Exception("The remote account could not be located.");
+                }
+                var authService = new Auth0Service();
+                if (Engine.Settings.Account.DeleteRemoteAccounts)
+                {
+                    await authService.DeleteUser(model.AccountId);
+                }
+                await authService.DeleteLocalAuth0User(model.AccountId);
+
+                return RedirectToAction(nameof(DisconnectAccountComplete));
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Could not disconnect the account: " + ex.Message;
+                MessageType = AlertType.Danger;
+                return RedirectToAction(nameof(DisconnectAccount), new { accountId = model.AccountId });
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("account/auth/disconnected")]
+        public async Task<IActionResult> DisconnectAccountComplete()
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                return NotFound();
+            }
+            var user = await GetCurrentUserOrThrow();
             return View();
         }
         #endregion
@@ -361,23 +503,18 @@ namespace Hood.Controllers
         #endregion
 
         #region Confirm Email
-
         [HttpGet]
         [Authorize]
-        [Route("account/confirm/required")]
-        public virtual IActionResult ConfirmRequired(ConfirmRequiredModel model)
+        [Route("account/email/confirm-required")]
+        public virtual IActionResult ConfirmRequired()
         {
-            if (Engine.Auth0Enabled)
-            {
-                return View("ConfirmRequiredAuth0");
-            }
-            return View(model);
+            return View(new ConfirmRequiredModel());
         }
 
         [HttpGet]
-        [AllowAnonymous]
+        [Authorize]
         [DisableForAuth0]
-        [Route("account/confirm")]
+        [Route("account/email/confirm")]
         public virtual async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
             if (userId == null || code == null)
@@ -413,21 +550,33 @@ namespace Hood.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        [DisableForAuth0]
-        [Route("account/confirm/resend")]
+        [Authorize]
+        [Route("account/email/resend-confirmation")]
         public virtual async Task<IActionResult> ResendConfirm()
         {
-            ApplicationUser user = await GetCurrentUserOrThrow();
-            await _account.SendVerificationEmail(user);
-            return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
+            try
+            {
+                ApplicationUser user = await GetCurrentUserOrThrow();
+                await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
+                SaveMessage = $"Email verification has been resent.";
+                MessageType = AlertType.Success;
+
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = $"Error sending an email verification: {ex.Message}";
+                MessageType = AlertType.Danger;
+                await _logService.AddExceptionAsync<ManageController>($"Error when sending an email verification.", ex);
+            }
+
+            return RedirectToAction(nameof(ConfirmRequired));
         }
 
         #endregion
 
         #region Change Password
         [HttpGet]
-        [Authorize(Hood.Identity.Policies.Active)]
+        [Authorize(Policies.Active)]
         [Route("account/manage/change-password")]
         public virtual IActionResult ChangePassword()
         {
@@ -440,7 +589,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [DisableForAuth0]
-        [Authorize(Hood.Identity.Policies.Active)]
+        [Authorize(Policies.Active)]
         [ValidateAntiForgeryToken]
         [Route("account/manage/change-password")]
         public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
@@ -591,7 +740,7 @@ namespace Hood.Controllers
 
                 if (Engine.Auth0Enabled)
                 {
-                    return RedirectToAction(nameof(SignOut));
+                    return RedirectToAction(nameof(SignOut), new { returnUrl = Url.Action(nameof(Deleted)) });
                 }
                 else
                 {

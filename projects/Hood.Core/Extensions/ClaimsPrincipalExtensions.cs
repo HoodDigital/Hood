@@ -13,6 +13,10 @@ namespace Hood.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
+        public static bool HasClaim(this ClaimsPrincipal principal, string claimName)
+        {
+            return principal.GetClaim(claimName) != null;
+        }
         public static string GetClaim(this ClaimsPrincipal principal, string claimName)
         {
             var identity = (ClaimsIdentity)principal.Identity;

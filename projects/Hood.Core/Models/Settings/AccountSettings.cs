@@ -13,7 +13,7 @@ namespace Hood.Models
     [Serializable]
     public class AccountSettings : SaveableModel
     {
-        [Display(Name = "Magic Link Login", Description = "Allow users to log in with a magic link, this can also be used to create accounts, they will be asked for name when logging in for the first time.")]
+        [Display(Name = "Magic Link Login", Description = "Allow users to log in with a magic link via Auth0, they will be asked for name when logging in for the first time. Only available when using Auth0.")]
         public bool MagicLinkLogin { get; set; }
 
         [Display(Name = "Registration Open", Description = "Disabling registration will prevent users signing up to your site, you will have to add users manually.")]
@@ -21,6 +21,9 @@ namespace Hood.Models
 
         [Display(Name = "Allow Remote Signups", Description = "Users who create an account via Auth0 without an account, will have an account created automatically and be forwarded to the account profile completion page.")]
         public bool AllowRemoteSignups { get; set; }
+
+        [Display(Name = "Delete Remote Accounts", Description = "Remove users from the Auth0 system when they are removed from this site when remote accounts are disconnected or when local accounts are deleted.")]
+        public bool DeleteRemoteAccounts { get; set; }
 
 
         [Display(Name = "Send a Welcome Email", Description = "This will send a formatted welcome email to new account holders.")]

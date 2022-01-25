@@ -206,7 +206,7 @@ namespace Hood.Development.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("EmailVeriried")
+                    b.Property<bool>("EmailVerified")
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
@@ -949,6 +949,9 @@ namespace Hood.Development.Migrations
                     b.Property<bool>("Anonymous")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Auth0UsersJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("AvatarJson")
                         .HasColumnType("nvarchar(max)");
 
@@ -1010,8 +1013,7 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RolesJson")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Roles");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");

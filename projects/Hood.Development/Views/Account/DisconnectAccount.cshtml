@@ -1,0 +1,32 @@
+@model DisconnectAccountModel
+@{
+    ViewData["Title"] = "Disconnect your account";
+}
+@if (Model.SaveMessage.IsSet())
+{
+    <alert type="@Model.MessageType">@Model.SaveMessage</alert>
+}
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <div class="d-flex align-items-center my-4">
+        <div>
+            <fixedImage src="@Model.RemotePicture" class="img-sm ms-3 rounded" />
+        </div>
+        <div class="flex-fill">
+            <i class="fa fa-times-circle fa-2x text-danger mx-3"></i>
+        </div>
+        <div>
+            <fixedImage src="@Model.LocalPicture" class="img-sm me-3 rounded" />
+        </div>
+    </div>
+    <p>
+        Are you sure you want to disconnect this account from this site?
+    </p>
+    <div>
+        <form asp-action="DisconnectAccountConfirm" method="post" class="form-group">
+            <input type="hidden" asp-for="AccountId" />
+        <a class="btn btn-outline-dark" asp-action="Index" asp-controller="Manage">Back</a>
+            <button class="btn btn-info" type="submit">Disconnect</button>
+        </form>
+    </div>
+</div>

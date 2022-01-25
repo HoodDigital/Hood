@@ -7,7 +7,8 @@ namespace Hood.Identity
         public const string Anonymous = "https://schemas.hooddigital.com/hoodcms/anonymous";
         public const string LocalUserId = "https://schemas.hooddigital.com/hoodcms/auth-nameidentifier";        
         public const string IsImpersonating = "https://schemas.hooddigital.com/hoodcms/is-impersonating";       
-        public const string OriginalUserId = "https://schemas.hooddigital.com/hoodcms/original-user-id";        
+        public const string OriginalUserId = "https://schemas.hooddigital.com/hoodcms/original-user-id";       
+        public const string RemotePicture = "https://schemas.hooddigital.com/hoodcms/remote-picture";        
         public const string UserName = "name";
         public const string Picture = "picture";
         public const string Nickname = "nickname";

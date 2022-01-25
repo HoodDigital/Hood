@@ -114,7 +114,7 @@ namespace Hood.Controllers
         }
         protected async Task<ApplicationUser> GetCurrentUserOrThrow()
         {
-            var user = await _account.GetUserByEmailAsync(User.Identity.Name);
+            var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
             if (user == null)
             {
                 throw new ApplicationException($"Unable to load user with email '{User.Identity.Name}'.");

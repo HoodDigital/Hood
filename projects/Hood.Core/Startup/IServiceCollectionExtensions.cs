@@ -269,20 +269,33 @@ namespace Hood.Startup
                     {
                         OnTicketReceived = async e =>
                         {
+                            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
                             var auth0Service = new Auth0Service();
                             var user = await auth0Service.GetLocalUserForSignIn(e);
                             if (user == null)
                             {
                                 // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                                var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
                                 var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "signup-disabled" });
                                 e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
                                 e.HandleResponse();
                                 return;
                             }
 
+                            // Set the remote avatar on a local claim, in case the local overrides it. 
+                            if (e.Principal.HasClaim(HoodClaimTypes.Picture))
+                            {
+                                e.Principal.AddOrUpdateClaim(HoodClaimTypes.RemotePicture, e.Principal.GetClaim(HoodClaimTypes.Picture));
+                            }
+
                             e.Principal.SetUserClaims(user);
                             await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+
+                            if (e.Principal.HasClaim(HoodClaimTypes.AccountNotConnected))
+                            {
+                                e.Response.Redirect(linkGenerator.GetPathByAction("ConnectAccount", "Account", new { e.ReturnUri }));
+                                e.HandleResponse();
+                                return;
+                            }
                         },
 
                         OnAuthenticationFailed = e =>

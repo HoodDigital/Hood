@@ -70,8 +70,9 @@ namespace Hood.Services
                     LastName = authUser.LastName,
                     DisplayName = authUser.DisplayName,
                     PhoneNumber = authUser.PhoneNumber,
-                    EmailConfirmed = authUser.EmailVeriried,
-                    Active = authUser.EmailVeriried,
+                    EmailConfirmed = authUser.EmailVerified,
+                    Active = authUser.EmailVerified,
+                    Avatar = authUser.PictureUrl.IsSet() ? new MediaObject(authUser.PictureUrl) : null,
                     CreatedOn = DateTime.UtcNow,
                     LastLogOn = DateTime.UtcNow,
                     LastLoginLocation = authUser.LastLoginIp,
@@ -79,7 +80,7 @@ namespace Hood.Services
                 };
                 await repo.CreateAsync(user, null);
 
-                await CreateAuth0User(e.Principal.GetUserId(), user);
+                await CreateLocalAuth0User(e.Principal.GetUserId(), user);
 
                 if (user.Active)
                 {
@@ -102,7 +103,14 @@ namespace Hood.Services
         #endregion
 
         #region Data CRUD
-        private async Task<Auth0User> CreateAuth0User(string authUserId, ApplicationUser user)
+        public async Task  GetLocalAuth0User(string userId)
+        {
+            var db = Engine.Services.Resolve<HoodDbContext>();
+            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.Id == userId);
+            db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await db.SaveChangesAsync();
+        }
+        public async Task<Auth0User> CreateLocalAuth0User(string authUserId, ApplicationUser user)
         {
             var newAuthUser = await GetUserById(authUserId);
             var db = Engine.Services.Resolve<HoodDbContext>();
@@ -110,6 +118,19 @@ namespace Hood.Services
             db.Add(newAuthUser);
             await db.SaveChangesAsync();
             return newAuthUser;
+        }
+        public async Task DeleteLocalAuth0User(string userId)
+        {
+            var db = Engine.Services.Resolve<HoodDbContext>();
+            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.Id == userId);
+            db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            await db.SaveChangesAsync();
+        }
+        public async Task UpdateLocalAuth0User(Auth0User user)
+        {
+            var db = Engine.Services.Resolve<HoodDbContext>();
+            db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            await db.SaveChangesAsync();
         }
         #endregion
 
@@ -140,7 +161,7 @@ namespace Hood.Services
             request.AddHeader("authorization", token.ToAuthHeader());
             if (body != null)
             {
-                request.AddJsonBody(body);
+                request.AddParameter("application/json", body.ToJson(), ParameterType.RequestBody);
             }
             if (parameters != null)
             {
@@ -210,6 +231,7 @@ namespace Hood.Services
             return null;
         }
 
+
         public async Task DeleteUser(string userId)
         {
             await CallApi($"api/v2/users/{userId}", Method.DELETE);
@@ -223,5 +245,18 @@ namespace Hood.Services
             return JsonConvert.DeserializeObject<List<Auth0Role>>(response.Content);
         }
         #endregion
+
+        #region Auth0 API - Email Validation
+        public async Task<Auth0TicketResponse> GetEmailVerificationTicket(string accountId, string returnUrl)
+        {
+            var response = await CallApi("api/v2/tickets/email-verification", Method.POST, body: new
+            {
+                result_url = returnUrl,
+                user_id = accountId
+            });
+            return JsonConvert.DeserializeObject<Auth0TicketResponse>(response.Content);
+        }
+        #endregion
+
     }
 }

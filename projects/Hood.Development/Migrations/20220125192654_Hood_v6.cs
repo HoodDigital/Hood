@@ -37,7 +37,7 @@ namespace Hood.Development.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmailVeriried = table.Column<bool>(type: "bit", nullable: false),
+                    EmailVerified = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneVerified = table.Column<bool>(type: "bit", nullable: false),

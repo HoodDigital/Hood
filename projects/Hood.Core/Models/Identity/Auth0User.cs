@@ -36,7 +36,7 @@ namespace Hood.Models
         [JsonProperty("email")]
         public string Email { get; set; }
         [JsonProperty("email_verified")]
-        public bool EmailVeriried { get; set; }
+        public bool EmailVerified { get; set; }
         [JsonProperty("username")]
         public string UserName { get; set; }
         [JsonProperty("phone_number")]

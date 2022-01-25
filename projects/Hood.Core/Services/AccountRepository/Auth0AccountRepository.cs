@@ -52,15 +52,18 @@ namespace Hood.Services
         {
             // go through all the auth0 accounts and remove them from the system.
             var accounts = await _db.Auth0Users.Where(u => u.UserId == userId).ToListAsync();
+            var auth0Service = new Auth0Service();
             foreach (var account in accounts)
             {
                 //remove from auth0
-                var auth0Service = new Auth0Service();
-                await auth0Service.DeleteUser(account.Id);
+                if (Engine.Settings.Account.DeleteRemoteAccounts)
+                {
+                    await auth0Service.DeleteUser(account.Id);
+                }
                 _db.Entry(account).State = EntityState.Deleted;
             }
             await _db.SaveChangesAsync();
-            
+
             var user = await PrepareUserForDelete(userId, adminUser);
 
             _db.Auth0Users.Where(l => l.UserId == userId).ForEach(f => _db.Entry(f).State = EntityState.Deleted);
@@ -71,9 +74,18 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
 
         }
-        public override Task SendVerificationEmail(ApplicationUser user)
+        public override async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
         {
-            throw new ApplicationException("This feature is disabled when using Auth0.");
+            // get the users' current connected account.
+            // send a verification email on the whattheolddowntheold.
+            var authService = new Auth0Service();
+            var ticket = await authService.GetEmailVerificationTicket(userId, returnUrl);
+            var callbackUrl = ticket.Ticket;
+            var verifyModel = new VerifyEmailModel(localUser, callbackUrl)
+            {
+                SendToRecipient = true
+            };
+            await _mailService.ProcessAndSend(verifyModel);
         }
         public override Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword)
         {

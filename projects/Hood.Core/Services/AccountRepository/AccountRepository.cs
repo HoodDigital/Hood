@@ -193,11 +193,11 @@ namespace Hood.Services
                 throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
             }
         }
-        public virtual async Task SendVerificationEmail(ApplicationUser user)
+        public virtual async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
         {
-            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = _linkGenerator.GetUriByAction(_contextAccessor.HttpContext, "ConfirmEmail", "Account", new { userId = user.Id, code });
-            var verifyModel = new VerifyEmailModel(user, callbackUrl)
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(localUser);
+            var callbackUrl = _linkGenerator.GetUriByAction(_contextAccessor.HttpContext, "ConfirmEmail", "Account", new { userId = localUser.Id, code, returnUrl });
+            var verifyModel = new VerifyEmailModel(localUser, callbackUrl)
             {
                 SendToRecipient = true
             };

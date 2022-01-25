@@ -1,6 +1,6 @@
 @model ConnectAccountModel
 @{
-    ViewData["Title"] = "Finish connecting your account";
+    ViewData["Title"] = "Account connected";
 }
 <div class="header">
     <h2>@ViewData["Title"]</h2>
@@ -9,18 +9,16 @@
             <fixedImage src="@Model.RemotePicture" class="img-sm ms-3 rounded" />
         </div>
         <div class="flex-fill">
-            <i class="fa fa-arrow-right fa-2x mx-3"></i>
+            <i class="fa fa-check-circle fa-2x text-success mx-3"></i>
         </div>
         <div>
             <fixedImage src="@Model.LocalPicture" class="img-sm me-3 rounded" />
         </div>
     </div>
     <p>
-        Looks like this email address already exists, would you like to connect this new account to the existing local account?
+        The account is now connected, click below to continue to your new account.
     </p>
     <div>
-        <form asp-action="ConnectAccountConfirm" method="post" class="form-group">
-            <button class="btn btn-info" type="submit">Connect</button>
-        </form>
+        <a class="btn btn-info" asp-action="Index" asp-controller="Manage">Manage Account</a>
     </div>
 </div>
