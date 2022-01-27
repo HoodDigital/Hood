@@ -190,64 +190,69 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Hood.Models.Auth0User", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Blocked")
+                    b.Property<bool?>("Blocked")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("EmailVerified")
+                    b.Property<bool?>("EmailVerified")
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastLogin")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastLoginIp")
+                    b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastIpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastLogin")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("LoginCount")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("LastPasswordReset")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("LocalUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Locale")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LoginsCount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NickName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PhoneVerified")
+                    b.Property<bool?>("PhoneVerified")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PictureUrl")
+                    b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("LocalUserId");
 
                     b.ToTable("AspNetAuth0Users");
                 });
@@ -1171,7 +1176,8 @@ namespace Hood.Development.Migrations
                 {
                     b.HasOne("Hood.Models.ApplicationUser", "User")
                         .WithMany("ConnectedAuth0Accounts")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("LocalUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });

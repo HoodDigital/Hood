@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Auth0.ManagementApi.Models;
 using Hood.Entities;
+using Hood.Extensions;
 using Newtonsoft.Json;
 
 namespace Hood.Models
@@ -19,57 +21,20 @@ namespace Hood.Models
         public int Length { get; set; }
         [JsonProperty("total")]
         public int Total { get; set; }
-
     }
-    public class Auth0User : BaseEntity<string>
+    public class Auth0User : Auth0.ManagementApi.Models.User
     {
-        [JsonProperty("user_id")]
-        [Key]
-        public override string Id { get; set; }
+        public Auth0User()
+        {}
+        
+        public Auth0User(User user)
+        {
+            user.CopyProperties(this);
+        }
 
         [JsonIgnore]
-        public string UserId { get; set; }
+        public string LocalUserId { get; set; }
         [JsonIgnore]
         public ApplicationUser User { get; set; }
-
-
-        [JsonProperty("email")]
-        public string Email { get; set; }
-        [JsonProperty("email_verified")]
-        public bool EmailVerified { get; set; }
-        [JsonProperty("username")]
-        public string UserName { get; set; }
-        [JsonProperty("phone_number")]
-        public string PhoneNumber { get; set; }
-        [JsonProperty("phone_verified")]
-        public bool PhoneVerified { get; set; }
-        [JsonProperty("created_at")]
-        public DateTime CreatedAt { get; set; }
-        [JsonProperty("updated_at")]
-        public DateTime UpdatedAt { get; set; }
-        [JsonProperty("app_metadata")]
-        [NotMapped]
-        public Dictionary<string, string> AppMetadata { get; set; }
-        [JsonProperty("user_metadata")]
-        [NotMapped]
-        public Dictionary<string, string> UserMetadata { get; set; }
-        [JsonProperty("picture")]
-        public string PictureUrl { get; set; }
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        [JsonProperty("nickname")]
-        public string DisplayName { get; set; }
-        [JsonProperty("last_ip")]
-        public string LastLoginIp { get; set; }
-        [JsonProperty("last_login")]
-        public DateTime LastLogin { get; set; }
-        [JsonProperty("logins_count")]
-        public int LoginCount { get; set; }
-        [JsonProperty("blocked")]
-        public bool Blocked { get; set; }
-        [JsonProperty("given_name")]
-        public string FirstName { get; set; }
-        [JsonProperty("family_name")]
-        public string LastName { get; set; }
     }
 }

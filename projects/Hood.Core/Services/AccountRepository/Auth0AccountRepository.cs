@@ -19,23 +19,10 @@ namespace Hood.Services
         public Auth0AccountRepository() : base()
         { }
 
-        #region Helpers        
-        protected override IQueryable<ApplicationUser> UserQuery
-        {
-            get
-            {
-                IQueryable<ApplicationUser> query = _db.Users
-                    .Include(u => u.ConnectedAuth0Accounts)
-                    .Include(u => u.Addresses);
-                return query;
-            }
-        }
-        #endregion
-
         #region Account stuff         
         public override async Task<ApplicationUser> GetUserByAuth0Id(string userId)
         {
-            var auth0user = await _db.Auth0Users.Include(au => au.User).SingleOrDefaultAsync(au => au.Id == userId);
+            var auth0user = await _db.Auth0Users.Include(au => au.User).SingleOrDefaultAsync(au => au.UserId == userId);
             if (auth0user != null)
             {
                 return auth0user.User;
@@ -44,29 +31,28 @@ namespace Hood.Services
         }
         public override async Task UpdateUserAsync(ApplicationUser user)
         {
-#warning Auth0 - UpdateUserAsync - send relevant changes to Auth0
             _db.Entry(user).State = EntityState.Modified;
             await _db.SaveChangesAsync();
         }
-        public override async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
+        public override async Task DeleteUserAsync(string localUserId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
             // go through all the auth0 accounts and remove them from the system.
-            var accounts = await _db.Auth0Users.Where(u => u.UserId == userId).ToListAsync();
+            var accounts = await _db.Auth0Users.Where(u => u.LocalUserId == localUserId).ToListAsync();
             var auth0Service = new Auth0Service();
             foreach (var account in accounts)
             {
                 //remove from auth0
                 if (Engine.Settings.Account.DeleteRemoteAccounts)
                 {
-                    await auth0Service.DeleteUser(account.Id);
+                    await auth0Service.DeleteUser(account.UserId);
                 }
                 _db.Entry(account).State = EntityState.Deleted;
             }
             await _db.SaveChangesAsync();
 
-            var user = await PrepareUserForDelete(userId, adminUser);
+            var user = await PrepareUserForDelete(localUserId, adminUser);
 
-            _db.Auth0Users.Where(l => l.UserId == userId).ForEach(f => _db.Entry(f).State = EntityState.Deleted);
+            _db.Auth0Users.Where(l => l.LocalUserId == localUserId).ForEach(f => _db.Entry(f).State = EntityState.Deleted);
             await _db.SaveChangesAsync();
 
             // now delete the user
@@ -80,8 +66,7 @@ namespace Hood.Services
             // send a verification email on the whattheolddowntheold.
             var authService = new Auth0Service();
             var ticket = await authService.GetEmailVerificationTicket(userId, returnUrl);
-            var callbackUrl = ticket.Ticket;
-            var verifyModel = new VerifyEmailModel(localUser, callbackUrl)
+            var verifyModel = new VerifyEmailModel(localUser, ticket.Value)
             {
                 SendToRecipient = true
             };
@@ -122,12 +107,10 @@ namespace Hood.Services
         #region Profiles 
         public override Task SetEmailAsync(ApplicationUser modelToUpdate, string email)
         {
-#warning Auth0 - SetEmailAsync
             throw new NotImplementedException();
         }
         public override Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber)
         {
-#warning Auth0 - SetPhoneNumberAsync
             throw new NotImplementedException();
         }
         #endregion

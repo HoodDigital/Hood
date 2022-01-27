@@ -38,6 +38,7 @@ namespace Hood.Services
             get
             {
                 IQueryable<ApplicationUser> query = _db.Users
+                    .Include(u => u.ConnectedAuth0Accounts)
                     .Include(u => u.Addresses);
                 return query;
             }

@@ -9,7 +9,7 @@
     <p>We'll email you a magic link to sign in.</p>
     <p>Already have an account?<br />Click here to <a asp-action="Login">log in</a>.</p>
 </div>
-<form asp-controller="Account" asp-action="MagicRegisterGenerate" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" id="register-magic" role="form">
+<form asp-controller="Account" asp-action="MagicRegister" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" id="register-magic" role="form">
     @Html.RenderHoneypotField()
     <recaptcha action="login" />
     <div class="d-grid gap-2">

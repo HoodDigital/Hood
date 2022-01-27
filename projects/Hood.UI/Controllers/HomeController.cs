@@ -28,9 +28,9 @@ namespace Hood.Controllers
         [Route("/")]
         public virtual async Task<IActionResult> Index()
         {
-            // var service = new Auth0Service();
+            var service = new Auth0Service();
             // var roles = await service.GetRoles();
-            // var users = await service.GetUsers("admin");
+            var users = await service.GetUsers("admin");
             // var user = await service.GetUserByEmail("admin@hooddigital.com");            
 
             if (User.Identity.IsAuthenticated) {

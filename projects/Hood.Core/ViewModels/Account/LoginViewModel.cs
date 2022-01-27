@@ -6,20 +6,21 @@ namespace Hood.ViewModels
     {
         [Required]
         [EmailAddress]
-        public string Username { get; set; }
+        public virtual string Username { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public virtual string Password { get; set; }
 
         [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        public virtual bool RememberMe { get; set; }
     }
 
     public class MagicLoginViewModel : SpamPreventionModel
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public virtual string Email { get; set; }
+        public virtual string ReturnUrl { get; set; }
     }
 }

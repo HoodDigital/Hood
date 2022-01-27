@@ -4,13 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
 using System.Web.Helpers;
+using Hood.BaseTypes;
 using Hood.Core;
 using Hood.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
-    public class SpamPreventionModel : IValidatableObject
+    public class SpamPreventionModel : SaveableModel, IValidatableObject
     {
         public SpamPreventionModel()
         { }

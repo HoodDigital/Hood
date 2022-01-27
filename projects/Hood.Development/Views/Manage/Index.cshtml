@@ -104,14 +104,17 @@
                         <div class="card p-2 mb-2">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
-                                    <fixedImage class="img img-xs" src="@role.PictureUrl"></fixedImage>
+                                    <fixedImage class="img img-xs" src="@role.Picture"></fixedImage>
                                 </div>
                                 <div class="flex-fill">
                                     <div><strong>@role.Email</strong></div>
-                                    <div>Created: @role.CreatedAt.ToDisplay()</div>
+                                    @if (role.CreatedAt.HasValue)
+                                    {                                        
+                                        <div>Created: @role.CreatedAt.Value.ToDisplay()</div>
+                                    }
                                 </div>
                                 <div class="">
-                                    <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@role.Id">Disconnect</a>
+                                    <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@role.UserId">Disconnect</a>
                                 </div>
                             </div>
                         </div>
@@ -172,14 +175,14 @@
             <div role="tabpanel" class="tab-pane" id="avatar">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <fixedImage src="@User.GetAvatar()" class="img-md rounded @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
+                        <fixedImage src="@User.GetAvatar()" class="img-md rounded @string.Format("avatar-{0}", Model.LocalUserId) mb-0"></fixedImage>
                     </div>
                     <div class="col">
                         <h4 class="media-heading">Change your profile image</h4>
                         <p>You can set your own profile image, click the upload button below to begin.</p>
                         <p>
-                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })"
-                                data-preview="@string.Format(".avatar-{0}", Model.UserId)">
+                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.LocalUserId })"
+                                data-preview="@string.Format(".avatar-{0}", Model.LocalUserId)">
                                 Upload
                             </button>
                         </p>

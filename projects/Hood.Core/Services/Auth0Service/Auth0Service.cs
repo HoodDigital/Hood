@@ -5,6 +5,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Auth0.ManagementApi;
+using Auth0.ManagementApi.Models;
+using Auth0.ManagementApi.Paging;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Identity;
@@ -68,15 +71,15 @@ namespace Hood.Services
                     Email = authUser.Email,
                     FirstName = authUser.FirstName,
                     LastName = authUser.LastName,
-                    DisplayName = authUser.DisplayName,
+                    DisplayName = authUser.NickName,
                     PhoneNumber = authUser.PhoneNumber,
-                    EmailConfirmed = authUser.EmailVerified,
-                    Active = authUser.EmailVerified,
-                    Avatar = authUser.PictureUrl.IsSet() ? new MediaObject(authUser.PictureUrl) : null,
+                    EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
+                    Active = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
+                    Avatar = authUser.Picture.IsSet() ? new MediaObject(authUser.Picture) : null,
                     CreatedOn = DateTime.UtcNow,
                     LastLogOn = DateTime.UtcNow,
-                    LastLoginLocation = authUser.LastLoginIp,
-                    LastLoginIP = authUser.LastLoginIp
+                    LastLoginLocation = authUser.LastIpAddress,
+                    LastLoginIP = authUser.LastIpAddress
                 };
                 await repo.CreateAsync(user, null);
 
@@ -98,15 +101,13 @@ namespace Hood.Services
 
             return user;
         }
-
-
         #endregion
 
         #region Data CRUD
-        public async Task  GetLocalAuth0User(string userId)
+        public async Task GetLocalAuth0User(string userId)
         {
             var db = Engine.Services.Resolve<HoodDbContext>();
-            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.Id == userId);
+            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.UserId == userId);
             db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await db.SaveChangesAsync();
         }
@@ -114,7 +115,7 @@ namespace Hood.Services
         {
             var newAuthUser = await GetUserById(authUserId);
             var db = Engine.Services.Resolve<HoodDbContext>();
-            newAuthUser.UserId = user.Id;
+            newAuthUser.LocalUserId = user.Id;
             db.Add(newAuthUser);
             await db.SaveChangesAsync();
             return newAuthUser;
@@ -122,7 +123,7 @@ namespace Hood.Services
         public async Task DeleteLocalAuth0User(string userId)
         {
             var db = Engine.Services.Resolve<HoodDbContext>();
-            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.Id == userId);
+            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.UserId == userId);
             db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await db.SaveChangesAsync();
         }
@@ -135,6 +136,11 @@ namespace Hood.Services
         #endregion
 
         #region Auth0 API - Helpers
+        public async Task<ManagementApiClient> GetClientAsync()
+        {
+            var token = await GetTokenAsync();
+            return new ManagementApiClient(token.Token, new Uri($"https://{Engine.Auth0Configuration.Domain}/api/v2"));
+        }
         private async Task<AuthToken> GetTokenAsync()
         {
             var client = new RestClient($"https://{Engine.Auth0Configuration.Domain}/oauth/token");
@@ -152,109 +158,96 @@ namespace Hood.Services
             IRestResponse response = await client.ExecuteAsync(request);
             return JsonConvert.DeserializeObject<AuthToken>(response.Content);
         }
-
-        private async Task<IRestResponse> CallApi(string path, Method method = Method.GET, object body = null, List<Parameter> parameters = null)
-        {
-            var client = new RestClient($"https://{Engine.Auth0Configuration.Domain}/");
-            var request = new RestRequest(path, method);
-            var token = await GetTokenAsync();
-            request.AddHeader("authorization", token.ToAuthHeader());
-            if (body != null)
-            {
-                request.AddParameter("application/json", body.ToJson(), ParameterType.RequestBody);
-            }
-            if (parameters != null)
-            {
-                parameters.ForEach(p => request.AddParameter(p));
-            }
-            var response = await client.ExecuteAsync(request);
-
-            switch (response.StatusCode)
-            {
-                case System.Net.HttpStatusCode.OK:
-                case System.Net.HttpStatusCode.Created:
-                case System.Net.HttpStatusCode.Accepted:
-                case System.Net.HttpStatusCode.NonAuthoritativeInformation:
-                case System.Net.HttpStatusCode.NoContent:
-                case System.Net.HttpStatusCode.ResetContent:
-                case System.Net.HttpStatusCode.PartialContent:
-                case System.Net.HttpStatusCode.MultiStatus:
-                case System.Net.HttpStatusCode.AlreadyReported:
-                    return response;
-                default:
-                    throw new Exception($"Remote Auth0 service returned a {response.StatusCode.ToString().CamelCaseToString().ToLower()} status from https://{Engine.Auth0Configuration.Domain}/{path}.");
-            }
-        }
         #endregion
 
         #region Auth0 API - Users
-        public async Task<PagedList<Auth0User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
+        public async Task<System.Collections.Generic.IPagedList<Auth0User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
         {
-            var response = await CallApi("api/v2/users?include_totals=true", parameters: new List<Parameter>
+            var client = await GetClientAsync();
+            var request = new GetUsersRequest()
             {
-                new Parameter("page", page, ParameterType.QueryString),
-                new Parameter("per_page", pageSize, ParameterType.QueryString),
-                new Parameter("q", search, ParameterType.QueryString)
-            });
-            var userList = JsonConvert.DeserializeObject<Auth0UserList>(response.Content);
-            var pagedList = new PagedList<Auth0User>()
+                Query = search
+            };
+            var users = await client.Users.GetAllAsync(request, new PaginationInfo(page, pageSize, true));
+            var pagedList = new System.Collections.Generic.PagedList<Auth0User>()
             {
-                List = userList.Users,
-                TotalCount = userList.Total,
+                List = users.Select(u => new Auth0User(u)).ToList(),
+                TotalCount = users.Paging.Total,
                 Search = search,
                 PageIndex = page,
                 PageSize = pageSize,
-                TotalPages = pageSize == 0 ? 0 : (int)(userList.Total / pageSize) + 1
+                TotalPages = pageSize == 0 ? 0 : (int)(users.Paging.Total / pageSize) + 1
             };
             return pagedList;
         }
-
         public async Task<Auth0User> GetUserById(string userId)
         {
-            var response = await CallApi($"api/v2/users/{userId}");
-            var user = JsonConvert.DeserializeObject<Auth0User>(response.Content);
-            return user;
+            var client = await GetClientAsync();
+            var user = await client.Users.GetAsync(userId);
+            return new Auth0User(user);
         }
-
-        public async Task<Auth0User> GetUserByEmail(string email = "")
+        public async Task<System.Collections.Generic.IList<Auth0User>> GetUserByEmail(string email)
         {
-            var response = await CallApi("api/v2/users-by-email", parameters: new List<Parameter>
+            if (!email.IsSet())
             {
-                new Parameter("email", email.ToLower(), ParameterType.QueryString)
-            });
-            var users = JsonConvert.DeserializeObject<List<Auth0User>>(response.Content);
-            if (users.Count == 1)
-            {
-                return users.SingleOrDefault();
+                return null;
             }
-
-            return null;
+            var client = await GetClientAsync();
+            var users = await client.Users.GetUsersByEmailAsync(email);
+            return users.Select(u => new Auth0User(u)).ToList();
         }
-
-
+        public async Task<Auth0User> CreateUserWithPassword(ApplicationUser user, string password)
+        {
+            var client = await GetClientAsync();
+            var newUser = await client.Users.CreateAsync(new UserCreateRequest()
+            {
+                Connection = "Username-Password-Authentication",
+                Email = user.Email,
+                Password = password,
+                PhoneNumber = user.PhoneNumber,
+                VerifyEmail = false
+            });
+            return new Auth0User(newUser);
+        }
         public async Task DeleteUser(string userId)
         {
-            await CallApi($"api/v2/users/{userId}", Method.DELETE);
+            var client = await GetClientAsync();
+            await client.Users.DeleteAsync(userId);
         }
         #endregion
 
         #region Auth0 API - Roles
-        public async Task<List<Auth0Role>> GetRoles(string userId = null)
+        public async Task<System.Collections.Generic.IPagedList<Role>> GetRoles(string search, int page = 0, int pageSize = 50)
         {
-            var response = await CallApi("api/v2/roles");
-            return JsonConvert.DeserializeObject<List<Auth0Role>>(response.Content);
+            var client = await GetClientAsync();
+            var roles = await client.Roles.GetAllAsync(new GetRolesRequest()
+            {
+                NameFilter = search
+            }, new PaginationInfo(page, pageSize, true));
+
+            var pagedList = new System.Collections.Generic.PagedList<Role>()
+            {
+                List = roles.ToList(),
+                TotalCount = roles.Paging.Total,
+                Search = search,
+                PageIndex = page,
+                PageSize = pageSize,
+                TotalPages = pageSize == 0 ? 0 : (int)(roles.Paging.Total / pageSize) + 1
+            };
+            return pagedList;
         }
         #endregion
 
         #region Auth0 API - Email Validation
-        public async Task<Auth0TicketResponse> GetEmailVerificationTicket(string accountId, string returnUrl)
+        public async Task<Ticket> GetEmailVerificationTicket(string accountId, string returnUrl)
         {
-            var response = await CallApi("api/v2/tickets/email-verification", Method.POST, body: new
+            var client = await GetClientAsync();
+            var ticket = await client.Tickets.CreateEmailVerificationTicketAsync(new EmailVerificationTicketRequest()
             {
-                result_url = returnUrl,
-                user_id = accountId
+                ResultUrl = returnUrl,
+                UserId = accountId
             });
-            return JsonConvert.DeserializeObject<Auth0TicketResponse>(response.Content);
+            return ticket;
         }
         #endregion
 

@@ -24,5 +24,6 @@ namespace Hood.Identity
         public const string CookieDefaultName = "hoodcms";
 
         public const string ReturnUrlParameter = "returnurl";
+        public const string MagicLinkState = "hoodcms-magic-link-login";
     }
 }

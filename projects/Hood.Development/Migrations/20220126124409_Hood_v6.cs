@@ -34,40 +34,42 @@ namespace Hood.Development.Migrations
                 name: "AspNetAuth0Users",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LocalUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmailVerified = table.Column<bool>(type: "bit", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmailVerified = table.Column<bool>(type: "bit", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneVerified = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastLoginIp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LoginCount = table.Column<int>(type: "int", nullable: false),
-                    Blocked = table.Column<bool>(type: "bit", nullable: false),
+                    PhoneVerified = table.Column<bool>(type: "bit", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NickName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Picture = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Blocked = table.Column<bool>(type: "bit", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastIpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastPasswordReset = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Locale = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LoginsCount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetAuth0Users", x => x.Id);
+                    table.PrimaryKey("PK_AspNetAuth0Users", x => x.UserId);
                     table.ForeignKey(
-                        name: "FK_AspNetAuth0Users_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_AspNetAuth0Users_AspNetUsers_LocalUserId",
+                        column: x => x.LocalUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetAuth0Users_UserId",
+                name: "IX_AspNetAuth0Users_LocalUserId",
                 table: "AspNetAuth0Users",
-                column: "UserId");
+                column: "LocalUserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

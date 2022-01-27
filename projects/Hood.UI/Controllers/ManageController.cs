@@ -43,7 +43,7 @@ namespace Hood.Controllers
             ApplicationUser user = await GetCurrentUserOrThrow();
             var model = new UserViewModel
             {
-                UserId = user.Id,
+                LocalUserId = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,

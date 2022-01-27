@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Collections.Generic;
 using Hood.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Hood.Startup
 {
@@ -298,6 +299,36 @@ namespace Hood.Startup
                             }
                         },
 
+                        OnAccessDenied = e =>
+                        {
+                            return Task.CompletedTask;
+                        },
+
+                        OnTokenValidated = e =>
+                        {
+                            return Task.CompletedTask;
+                        },
+
+                        OnMessageReceived = e =>
+                        {
+                            // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.  v
+                            var formPost =e.ProtocolMessage.BuildFormPost();
+                            var returnUrl = e.ProtocolMessage.BuildRedirectUrl();
+                            e.Response.WriteAsync(formPost);
+                            e.HandleResponse();
+                            return Task.CompletedTask;
+                        },
+
+                        OnTokenResponseReceived = e =>
+                        {
+                            return Task.CompletedTask;
+                        },
+
+                        OnAuthorizationCodeReceived = e =>
+                        {
+                            return Task.CompletedTask;
+                        },
+
                         OnAuthenticationFailed = e =>
                         {
                             // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
@@ -310,11 +341,11 @@ namespace Hood.Startup
 
                         OnRemoteFailure = e =>
                         {
-                            // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
-                            var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-                            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "remote-failed" });
-                            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
-                            e.HandleResponse();
+                            // // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
+                            // var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+                            // var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = "remote-failed" });
+                            // e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                            // e.HandleResponse();
                             return Task.CompletedTask;
                         }
 
