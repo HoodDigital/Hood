@@ -1,4 +1,6 @@
 ﻿using Auth0.AspNetCore.Authentication;
+using Auth0.AuthenticationApi;
+using Auth0.AuthenticationApi.Models;
 using Hood.Attributes;
 using Hood.BaseTypes;
 using Hood.Core;
@@ -35,7 +37,7 @@ namespace Hood.Controllers
             : base()
         { }
 
-        #region Password Login
+        #region Login - Password 
 
         [HttpGet]
         [AllowAnonymous]
@@ -44,7 +46,15 @@ namespace Hood.Controllers
         {
             if (Engine.Auth0Enabled)
             {
-                return RedirectToAction(nameof(Authorize), new { returnUrl });
+                if (Engine.Settings.Account.MagicLinkLogin)
+                {
+                    return View(nameof(MagicLogin), new MagicLoginViewModel() { ReturnUrl = returnUrl });
+                }
+                else
+                {
+                    // redirect the user to the sign up endpoint... somehow.
+                    return RedirectToAction(nameof(Authorize), new { returnUrl, mode = "login" });
+                }
             }
             else
             {
@@ -55,7 +65,6 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/login")]
         public virtual async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
@@ -111,9 +120,65 @@ namespace Hood.Controllers
             return View(model);
         }
 
-        #endregion
+    #endregion
 
-        #region Password Registration
+        // #region Login - Magic Link
+        // [HttpPost]
+        // [AllowAnonymous]
+        // [ValidateAntiForgeryToken]
+        // [Route("account/login/link")]
+        // public virtual async Task<IActionResult> MagicLogin(MagicLoginViewModel model, string returnUrl = null)
+        // {
+        //     ViewData["ReturnUrl"] = returnUrl;
+        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
+        //     {
+        //         return RedirectToAction(nameof(Login), new { returnUrl });
+        //     }
+
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return View();
+        //     }
+
+        //     // check the user exists - if not ping to register page. 
+        //     var user = await _account.GetUserByEmailAsync(model.Email);
+        //     if (user == null)
+        //     {
+        //         SaveMessage = "You do not have an account yet, create an account here.";
+        //         MessageType = AlertType.Warning;
+        //         return RedirectToAction(nameof(Register), new { returnUrl });
+        //     }
+
+        //     var client = new AuthenticationApiClient(new Uri($"https://{Engine.Auth0Configuration.Domain}"));
+        //     var token = await client.StartPasswordlessEmailFlowAsync(new PasswordlessEmailRequest()
+        //     {
+        //         Email = model.Email,
+        //         ClientId = Engine.Auth0Configuration.ClientId,
+        //         ClientSecret = Engine.Auth0Configuration.ClientSecret,
+        //         AuthenticationParameters = new Dictionary<string, object> {
+        //             { "scope", "openid profile email" },
+        //             { "state", Constants.MagicLinkState },
+        //             { "return_uri", "https://localhost:5152/callback" }
+        //         }
+        //     });           
+            
+        //     await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme);
+        //     return RedirectToAction(nameof(MagicRegisterSent), new { returnUrl });
+        // }
+
+        // [AllowAnonymous]
+        // [Route("account/login/sent")]
+        // public virtual IActionResult MagicLoginSent(string returnUrl = null)
+        // {
+        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
+        //     {
+        //         return RedirectToAction(nameof(Login), new { returnUrl });
+        //     }
+        //     return View();
+        // }
+        //  #endregion
+
+        #region Registration - Password
 
         [HttpGet]
         [AllowAnonymous]
@@ -125,12 +190,28 @@ namespace Hood.Controllers
             {
                 return RedirectToAction(nameof(RegistrationClosed));
             }
-
+            if (Engine.Auth0Enabled)
+            {
+                if (Engine.Settings.Account.MagicLinkLogin)
+                {
+                    return View(nameof(MagicRegister), new MagicRegisterViewModel() { ReturnUrl = returnUrl });
+                }
+                else
+                {
+                    // redirect the user to the sign up endpoint... somehow.
+                    return RedirectToAction(nameof(Authorize), new { returnUrl, mode = "signup" });
+                }
+            }
+            if (Engine.Settings.Account.MagicLinkLogin)
+            {
+                throw new ApplicationException("Magic link login is not available unless you are using an Auth0 connection.");
+            }
             return View();
         }
 
         [HttpPost]
         [AllowAnonymous]
+        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/register")]
         public virtual async Task<IActionResult> Register(PasswordRegisterViewModel model, string returnUrl = null)
@@ -176,14 +257,7 @@ namespace Hood.Controllers
                 IdentityResult result = await _account.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    if (Engine.Settings.Account.RequireEmailConfirmation)
-                    {
-                        await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
-                    }
-                    else
-                    {
-                        await SendWelcomeEmail(user);
-                    }
+                    await SendWelcomeEmail(user);
 
                     user.Active = !Engine.Settings.Account.RequireEmailConfirmation;
                     user.EmailConfirmed = !Engine.Settings.Account.RequireEmailConfirmation;
@@ -193,22 +267,15 @@ namespace Hood.Controllers
 
                     await _account.UpdateUserAsync(user);
 
-                    if (Engine.Auth0Enabled)
-                    {
-#warning Auth0 - Register - sign in user and redirect to return url - does this need a roundtrip to Auth0?
-                        throw new NotImplementedException();
-                    }
-                    else
-                    {
-                        var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-                        await signInManager.SignInAsync(user, isPersistent: false);
-                    }
+                    var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                    await signInManager.SignInAsync(user, isPersistent: false);
+
 
                     if (Engine.Settings.Account.RequireEmailConfirmation)
                     {
+                        await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
                         return RedirectToAction(nameof(AccountController.ConfirmRequired), "Account");
                     }
-
                     return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);
@@ -217,8 +284,76 @@ namespace Hood.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
-
         #endregion
+
+        // #region Registration - Magic Link 
+        // [HttpPost]
+        // [AllowAnonymous]
+        // [ValidateAntiForgeryToken]
+        // [Route("account/register/link")]
+        // public virtual async Task<IActionResult> MagicRegister(MagicRegisterViewModel model, string returnUrl = null)
+        // {
+        //     ViewData["ReturnUrl"] = returnUrl;
+        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
+        //     {
+        //         return RedirectToAction(nameof(Register), new { returnUrl });
+        //     }
+
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return View();
+        //     }
+
+        //     // check the user exists - if not ping to register page. 
+        //     var user = await _account.GetUserByEmailAsync(model.Email);
+        //     if (user == null)
+        //     {
+
+        //         user = new ApplicationUser
+        //         {
+        //             UserName = model.Username.IsSet() ? model.Username : model.Email,
+        //             Email = model.Email,
+        //             FirstName = model.FirstName,
+        //             LastName = model.LastName,
+        //             DisplayName = model.DisplayName,
+        //             PhoneNumber = model.Phone,
+        //             JobTitle = model.JobTitle,
+        //             Anonymous = model.Anonymous,
+        //             CreatedOn = DateTime.UtcNow,
+        //             LastLogOn = DateTime.UtcNow,
+        //             LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
+        //             LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
+        //         };
+        //         var result = await _account.CreateAsync(user, null);
+        //         if (!result.Succeeded)
+        //         {
+        //             AddErrors(result);
+        //             return View();
+        //         }
+        //     }
+            
+        //     var client = new AuthenticationApiClient(new Uri($"https://{Engine.Auth0Configuration.Domain}"));
+        //     var token = await client.StartPasswordlessEmailFlowAsync(new PasswordlessEmailRequest()
+        //     {
+        //         Email = model.Email,
+        //         ClientId = Engine.Auth0Configuration.ClientId,
+        //         ClientSecret = Engine.Auth0Configuration.ClientSecret
+        //     });
+
+        //     return RedirectToAction(nameof(MagicRegisterSent), new { returnUrl });
+        // }
+
+        // [AllowAnonymous]
+        // [Route("account/register/sent")]
+        // public virtual IActionResult MagicRegisterSent(string returnUrl = null)
+        // {
+        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
+        //     {
+        //         return RedirectToAction(nameof(Register), new { returnUrl });
+        //     }
+        //     return View();
+        // }
+        // #endregion
 
         #region Logout
         [HttpPost]
@@ -242,21 +377,30 @@ namespace Hood.Controllers
         }
         #endregion
 
-        #region Auth0 
+        #region Auth0 - Sign in/out
         [HttpGet]
         [AllowAnonymous]
         [Route("account/authorize")]
-        public async Task Authorize(string returnUrl = "/")
+        public async Task Authorize(string returnUrl = "/", string mode = "login")
         {
             if (!Engine.Auth0Enabled)
             {
                 throw new ApplicationException("This endpoint is only available when using Auth0.");
             }
 
-            var authenticationProperties = new LoginAuthenticationPropertiesBuilder()
+            var authenticationPropertiesBuilder = new LoginAuthenticationPropertiesBuilder()
+                // .WithParameter("logo", "https://cdn.jsdelivr.net/npm/hoodcms@5.0.15/images/icons/file.png")
+                // .WithParameter("color", "black")
+                // .WithParameter("background", "orange")
+                .WithRedirectUri(returnUrl);
 
-                .WithRedirectUri(returnUrl)
-                .Build();
+
+            if (mode == "signup")
+            {
+                authenticationPropertiesBuilder = authenticationPropertiesBuilder.WithParameter("action", "signup");
+            }
+
+            var authenticationProperties = authenticationPropertiesBuilder.Build();
 
             await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme, authenticationProperties);
         }
@@ -305,7 +449,9 @@ namespace Hood.Controllers
             }
             return View();
         }
+        #endregion
 
+        #region Auth0 - Connect Account
         [HttpGet]
         [Authorize(Policies.AccountNotConnected)]
         [Route("account/auth/connect")]
@@ -318,7 +464,7 @@ namespace Hood.Controllers
             var user = await GetCurrentUserOrThrow();
             var model = new ConnectAccountModel()
             {
-                LocalPicture = user.Avatar.LargeUrl,
+                LocalPicture = user.GetAvatar(),
                 ReturnUrl = returnUrl,
                 RemotePicture = User.GetClaim(HoodClaimTypes.RemotePicture)
             };
@@ -387,7 +533,9 @@ namespace Hood.Controllers
             };
             return View(model);
         }
+        #endregion
 
+        #region Auth0 - Disconnect Account
         [HttpGet]
         [Authorize]
         [Route("account/auth/disconnect")]
@@ -398,12 +546,12 @@ namespace Hood.Controllers
                 return NotFound();
             }
             var user = await GetCurrentUserOrThrow();
-            var accountToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.Id == accountId);
+            var accountToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.UserId == accountId);
             var model = new DisconnectAccountModel()
             {
-                LocalPicture = user.Avatar.LargeUrl,
+                LocalPicture = user.GetAvatar(),
                 AccountId = accountId,
-                RemotePicture = accountToDisconnect.PictureUrl
+                RemotePicture = accountToDisconnect.Picture
             };
             return View(model);
         }
