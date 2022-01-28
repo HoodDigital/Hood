@@ -1,4 +1,5 @@
-﻿using Hood.Startup;
+﻿using System.Threading.Tasks;
+using Hood.Startup;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
@@ -6,12 +7,13 @@ namespace Hood.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            CreateHostBuilder(args)
-                .Build()
-                .LoadHood<ApplicationDbContext>()
-                .Run();
+            var builder = await CreateHostBuilder(args)
+                  .Build()
+                  .LoadHoodAsync<ApplicationDbContext>();
+                  
+            builder.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

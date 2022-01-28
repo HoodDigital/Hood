@@ -33,11 +33,16 @@ namespace Hood.Services
         #endregion
 
         #region Roles
-        Task<IList<IdentityRole>> GetAllRolesAsync();
+        Task<IPagedList<IdentityRole>> GetRolesAsync(IPagedList<IdentityRole> model = null);
         Task<IList<string>> GetRolesForUser(ApplicationUser user);
-        Task<IList<ApplicationUser>> GetUsersInRole(string roleName);
+        Task<IList<ApplicationUser>> GetUsersInRole(string role);
         Task<bool> RoleExistsAsync(string role);
-        Task CreateRoleAsync(IdentityRole identityRole);
+        Task<IdentityRole> GetRoleAsync(string role);
+        Task CreateRoleAsync(string role);
+        Task UpdateRoleAsync(string role, string newName);
+        Task DeleteRoleAsync(string role);
+        Task<IdentityResult> AddUserToRoleAsync(ApplicationUser user, string role);
+        Task<IdentityResult> RemoveUserFromRoleAsync(ApplicationUser user, string role);
         #endregion
 
         #region Addresses

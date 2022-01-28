@@ -5,6 +5,7 @@ using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -56,9 +57,7 @@ namespace Hood.Services
             await _db.SaveChangesAsync();
 
             // now delete the user
-            _db.Entry(user).State = EntityState.Deleted;
-            await _db.SaveChangesAsync();
-
+            await base.DeleteUserAsync(localUserId, adminUser);
         }
         public override async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
         {
@@ -86,57 +85,85 @@ namespace Hood.Services
         }
         public override async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
         {
-            try
-            {
-                _db.Users.Add(user);
-                await _db.SaveChangesAsync();
-                return IdentityResult.Success;
-            }
-            catch (Exception ex)
-            {
-                return IdentityResult.Failed(new List<IdentityError>() {
-                    new IdentityError() {
-                        Code = "CreateFailed",
-                        Description = "Could not create the user account on the data store: " + ex.Message
-                    }
-                }.ToArray());
-            }
+            return await base.CreateAsync(user, password);
         }
         #endregion
 
         #region Profiles 
-        public override Task SetEmailAsync(ApplicationUser modelToUpdate, string email)
+        public override async Task SetEmailAsync(ApplicationUser modelToUpdate, string email)
         {
-            throw new NotImplementedException();
+            await base.SetEmailAsync(modelToUpdate, email);
         }
-        public override Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber)
+        public override async Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber)
         {
-            throw new NotImplementedException();
+            await base.SetPhoneNumberAsync(modelToUpdate, phoneNumber);
         }
         #endregion
 
         #region Roles
-        public override Task<IList<ApplicationUser>> GetUsersInRole(string roleName)
+        public async override Task CreateRoleAsync(string role)
         {
-#warning Auth0 - GetUsersInRole
-            throw new NotImplementedException();
+            var authService = new Auth0Service();
+            await authService.GetOrCreateRoleAsync(role);
+            await base.CreateRoleAsync(role);
         }
-        public override Task<IList<string>> GetRolesForUser(ApplicationUser user)
+        public async override Task UpdateRoleAsync(string role, string newName)
         {
-#warning Auth0 - GetRolesForUser
-            throw new NotImplementedException();
+            var authService = new Auth0Service();
+            await authService.UpdateRole(role, newName);
+            await base.UpdateRoleAsync(role, newName);
         }
-        public override Task<bool> RoleExistsAsync(string role)
+        public async override Task DeleteRoleAsync(string role)
         {
-#warning Auth0 - RoleExistsAsync
-            throw new NotImplementedException();
+            if (Engine.Settings.Account.DeleteRemoteAccounts)
+            {
+                var authService = new Auth0Service();
+                await authService.DeleteRole(role);
+            }
+            await base.DeleteRoleAsync(role);
         }
-        public override Task CreateRoleAsync(IdentityRole identityRole)
+        public async override Task<IdentityResult> AddUserToRoleAsync(ApplicationUser user, string role)
         {
-#warning Auth0 - CreateRoleAsync
-            throw new NotImplementedException();
+            var authService = new Auth0Service();
+            var client = await authService.GetClientAsync();
+            if (user.ConnectedAuth0Accounts != null)
+            {
+                foreach (var account in user.ConnectedAuth0Accounts)
+                {
+                    var remoteRole = await authService.GetRoleAsync(role);
+                    if (remoteRole != null)
+                    {
+                        string[] roles = { remoteRole.Id };
+                        await client.Users.AssignRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
+                        {
+                            Roles = roles
+                        });
+                    }
+                }
+            }
+            return await base.AddUserToRoleAsync(user, role);
         }
-
+        public async override Task<IdentityResult> RemoveUserFromRoleAsync(ApplicationUser user, string role)
+        {
+            var authService = new Auth0Service();
+            var client = await authService.GetClientAsync();
+            if (user.ConnectedAuth0Accounts != null)
+            {
+                foreach (var account in user.ConnectedAuth0Accounts)
+                {
+                    var remoteRole = await authService.GetRoleAsync(role);
+                    if (remoteRole != null)
+                    {
+                        string[] roles = { remoteRole.Id };
+                        await client.Users.RemoveRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
+                        {
+                            Roles = roles
+                        });
+                    }
+                }
+            }
+            return await base.RemoveUserFromRoleAsync(user, role);
+        }
         #endregion
 
         #region Addresses

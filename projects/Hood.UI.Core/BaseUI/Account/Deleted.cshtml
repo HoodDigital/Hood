@@ -2,6 +2,13 @@
     ViewData["Title"] = "Account Deleted";
     ViewData["SubTitle"] = "Your account has now been deleted and your data removed from the site.";
 }
-<alert type="Info" size="Medium" icon="fa fa-info-circle">
-    Your account has been deleted.
-</alert>
+
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <p>
+        Your account has now been deleted and your data removed from the site.
+    </p>
+    <div class="d-grid gap-2">
+        <a class="btn btn-outline-dark" asp-action="Index" asp-controller="Home">Back to @Engine.Settings.Basic.FullTitle</a>
+    </div>
+</div>

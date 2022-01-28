@@ -46,15 +46,8 @@ namespace Hood.Controllers
         {
             if (Engine.Auth0Enabled)
             {
-                if (Engine.Settings.Account.MagicLinkLogin)
-                {
-                    return View(nameof(MagicLogin), new MagicLoginViewModel() { ReturnUrl = returnUrl });
-                }
-                else
-                {
-                    // redirect the user to the sign up endpoint... somehow.
-                    return RedirectToAction(nameof(Authorize), new { returnUrl, mode = "login" });
-                }
+                // redirect the user to the sign up endpoint... somehow.
+                return RedirectToAction(nameof(Authorize), new { returnUrl, mode = Engine.Settings.Account.MagicLinkLogin ? "passwordless" : "login" });
             }
             else
             {
@@ -65,6 +58,7 @@ namespace Hood.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [DisableForAuth0]
         [ValidateAntiForgeryToken]
         [Route("account/login")]
         public virtual async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
@@ -120,63 +114,7 @@ namespace Hood.Controllers
             return View(model);
         }
 
-    #endregion
-
-        // #region Login - Magic Link
-        // [HttpPost]
-        // [AllowAnonymous]
-        // [ValidateAntiForgeryToken]
-        // [Route("account/login/link")]
-        // public virtual async Task<IActionResult> MagicLogin(MagicLoginViewModel model, string returnUrl = null)
-        // {
-        //     ViewData["ReturnUrl"] = returnUrl;
-        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
-        //     {
-        //         return RedirectToAction(nameof(Login), new { returnUrl });
-        //     }
-
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return View();
-        //     }
-
-        //     // check the user exists - if not ping to register page. 
-        //     var user = await _account.GetUserByEmailAsync(model.Email);
-        //     if (user == null)
-        //     {
-        //         SaveMessage = "You do not have an account yet, create an account here.";
-        //         MessageType = AlertType.Warning;
-        //         return RedirectToAction(nameof(Register), new { returnUrl });
-        //     }
-
-        //     var client = new AuthenticationApiClient(new Uri($"https://{Engine.Auth0Configuration.Domain}"));
-        //     var token = await client.StartPasswordlessEmailFlowAsync(new PasswordlessEmailRequest()
-        //     {
-        //         Email = model.Email,
-        //         ClientId = Engine.Auth0Configuration.ClientId,
-        //         ClientSecret = Engine.Auth0Configuration.ClientSecret,
-        //         AuthenticationParameters = new Dictionary<string, object> {
-        //             { "scope", "openid profile email" },
-        //             { "state", Constants.MagicLinkState },
-        //             { "return_uri", "https://localhost:5152/callback" }
-        //         }
-        //     });           
-            
-        //     await HttpContext.ChallengeAsync(Auth0Constants.AuthenticationScheme);
-        //     return RedirectToAction(nameof(MagicRegisterSent), new { returnUrl });
-        // }
-
-        // [AllowAnonymous]
-        // [Route("account/login/sent")]
-        // public virtual IActionResult MagicLoginSent(string returnUrl = null)
-        // {
-        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
-        //     {
-        //         return RedirectToAction(nameof(Login), new { returnUrl });
-        //     }
-        //     return View();
-        // }
-        //  #endregion
+        #endregion
 
         #region Registration - Password
 
@@ -192,19 +130,8 @@ namespace Hood.Controllers
             }
             if (Engine.Auth0Enabled)
             {
-                if (Engine.Settings.Account.MagicLinkLogin)
-                {
-                    return View(nameof(MagicRegister), new MagicRegisterViewModel() { ReturnUrl = returnUrl });
-                }
-                else
-                {
-                    // redirect the user to the sign up endpoint... somehow.
-                    return RedirectToAction(nameof(Authorize), new { returnUrl, mode = "signup" });
-                }
-            }
-            if (Engine.Settings.Account.MagicLinkLogin)
-            {
-                throw new ApplicationException("Magic link login is not available unless you are using an Auth0 connection.");
+                // redirect the user to the sign up endpoint... somehow.
+                return RedirectToAction(nameof(Authorize), new { returnUrl, mode = Engine.Settings.Account.MagicLinkLogin ? "passwordless" : "signup" });
             }
             return View();
         }
@@ -286,75 +213,6 @@ namespace Hood.Controllers
         }
         #endregion
 
-        // #region Registration - Magic Link 
-        // [HttpPost]
-        // [AllowAnonymous]
-        // [ValidateAntiForgeryToken]
-        // [Route("account/register/link")]
-        // public virtual async Task<IActionResult> MagicRegister(MagicRegisterViewModel model, string returnUrl = null)
-        // {
-        //     ViewData["ReturnUrl"] = returnUrl;
-        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
-        //     {
-        //         return RedirectToAction(nameof(Register), new { returnUrl });
-        //     }
-
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return View();
-        //     }
-
-        //     // check the user exists - if not ping to register page. 
-        //     var user = await _account.GetUserByEmailAsync(model.Email);
-        //     if (user == null)
-        //     {
-
-        //         user = new ApplicationUser
-        //         {
-        //             UserName = model.Username.IsSet() ? model.Username : model.Email,
-        //             Email = model.Email,
-        //             FirstName = model.FirstName,
-        //             LastName = model.LastName,
-        //             DisplayName = model.DisplayName,
-        //             PhoneNumber = model.Phone,
-        //             JobTitle = model.JobTitle,
-        //             Anonymous = model.Anonymous,
-        //             CreatedOn = DateTime.UtcNow,
-        //             LastLogOn = DateTime.UtcNow,
-        //             LastLoginLocation = HttpContext.Connection.RemoteIpAddress.ToString(),
-        //             LastLoginIP = HttpContext.Connection.RemoteIpAddress.ToString()
-        //         };
-        //         var result = await _account.CreateAsync(user, null);
-        //         if (!result.Succeeded)
-        //         {
-        //             AddErrors(result);
-        //             return View();
-        //         }
-        //     }
-            
-        //     var client = new AuthenticationApiClient(new Uri($"https://{Engine.Auth0Configuration.Domain}"));
-        //     var token = await client.StartPasswordlessEmailFlowAsync(new PasswordlessEmailRequest()
-        //     {
-        //         Email = model.Email,
-        //         ClientId = Engine.Auth0Configuration.ClientId,
-        //         ClientSecret = Engine.Auth0Configuration.ClientSecret
-        //     });
-
-        //     return RedirectToAction(nameof(MagicRegisterSent), new { returnUrl });
-        // }
-
-        // [AllowAnonymous]
-        // [Route("account/register/sent")]
-        // public virtual IActionResult MagicRegisterSent(string returnUrl = null)
-        // {
-        //     if (!Engine.Auth0Enabled || !Engine.Settings.Account.MagicLinkLogin)
-        //     {
-        //         return RedirectToAction(nameof(Register), new { returnUrl });
-        //     }
-        //     return View();
-        // }
-        // #endregion
-
         #region Logout
         [HttpPost]
         [Authorize]
@@ -394,11 +252,7 @@ namespace Hood.Controllers
                 // .WithParameter("background", "orange")
                 .WithRedirectUri(returnUrl);
 
-
-            if (mode == "signup")
-            {
-                authenticationPropertiesBuilder = authenticationPropertiesBuilder.WithParameter("action", "signup");
-            }
+            authenticationPropertiesBuilder = authenticationPropertiesBuilder.WithParameter("action", mode);
 
             var authenticationProperties = authenticationPropertiesBuilder.Build();
 
@@ -438,13 +292,27 @@ namespace Hood.Controllers
             switch (r)
             {
                 case "signup-disabled":
-                    ViewData["Reason"] = "Sign up is not allowed at the moment.";
+                    ViewData["Reason"] = "Sign up is disabled on this site at the moment.";
                     break;
                 case "auth-failed":
-                    ViewData["Reason"] = "Authentication failed, likely just a loose wire. Please try again.";
+                    ViewData["allow-relog"] = true;
+                    ViewData["Reason"] = "Authentication failed, likely just a loose wire.";
+                    break;
+                case "state-failure":
+                    ViewData["allow-relog"] = true;
+                    ViewData["Reason"] = "Authentication failed, looks like you may be trying to log in with a different browser or device. Make sure you are using the same device to click your login link.";
                     break;
                 case "remote-failed":
-                    ViewData["Reason"] = "We could not sign you in due to a techical issue, likely just a loose wire. Please try again.";
+                    ViewData["allow-relog"] = true;
+                    ViewData["Reason"] = "We could not sign you in due to a techical issue, likely just a loose wire.";
+                    break;
+                case "account-creation-failed":
+                    ViewData["allow-relog"] = true;
+                    ViewData["Reason"] = "We could not create a local account due to a techical issue, likely just a loose wire.";
+                    break;
+                case "account-linking-failed":
+                    ViewData["allow-relog"] = true;
+                    ViewData["Reason"] = "We could not connect your login to a local account due to a techical issue, likely just a loose wire.";
                     break;
             }
             return View();

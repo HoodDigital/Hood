@@ -13,7 +13,7 @@ namespace Hood.Models
     [Serializable]
     public class AccountSettings : SaveableModel
     {
-        [Display(Name = "Magic Link Login", Description = "Allow users to log in with a magic link via Auth0, they will be asked for name when logging in for the first time. Only available when using Auth0.")]
+        [Display(Name = "Passwordless Login", Description = "Allow users to log in with a magic link via Auth0, passwordless must be enabled in your Auth0 tenant and application.")]
         public bool MagicLinkLogin { get; set; }
 
         [Display(Name = "Registration Open", Description = "Disabling registration will prevent users signing up to your site, you will have to add users manually.")]

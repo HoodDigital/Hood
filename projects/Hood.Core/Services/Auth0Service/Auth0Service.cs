@@ -23,86 +23,6 @@ namespace Hood.Services
 
     public class Auth0Service
     {
-
-        #region Login/Logout
-        public async Task<ApplicationUser> GetLocalUserForSignIn(TicketReceivedContext e)
-        {
-            // check if user exists - if so, and signups are allowed via remote, redirect to complete profile page.
-            var repo = Engine.Services.Resolve<IAccountRepository>();
-            var principal = e.Principal;
-            var userId = e.Principal.GetUserId();
-            var user = await repo.GetUserByAuth0Id(userId);
-            if (user != null)
-            {
-                // user exists and has auth0 account linked to it.
-                var emailVerifiedClaim = e.Principal.FindFirst("email_verified");
-                if (user.Active || (emailVerifiedClaim != null && emailVerifiedClaim.Value == "true"))
-                {
-                    var identity = (ClaimsIdentity)principal.Identity;
-                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
-                    await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
-                }
-                return user;
-
-            }
-            // check if the user has an account, via email                           
-            user = await repo.GetUserByEmailAsync(e.Principal.GetEmail());
-            if (user != null)
-            {
-                // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
-                var identity = (ClaimsIdentity)principal.Identity;
-                identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountNotConnected, "true"));
-                await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
-                return user;
-            }
-
-            if (Engine.Settings.Account.AllowRemoteSignups)
-            {
-                // user does not exist, create and send them to the complete signup page.
-                var authService = new Auth0Service();
-                var authUser = await authService.GetUserById(userId);
-                if (authUser == null)
-                {
-                    throw new ApplicationException("Something went wrong while authorizing your account.");
-                }
-                user = new ApplicationUser
-                {
-                    UserName = authUser.UserName.IsSet() ? authUser.UserName : authUser.Email,
-                    Email = authUser.Email,
-                    FirstName = authUser.FirstName,
-                    LastName = authUser.LastName,
-                    DisplayName = authUser.NickName,
-                    PhoneNumber = authUser.PhoneNumber,
-                    EmailConfirmed = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
-                    Active = authUser.EmailVerified.HasValue ? authUser.EmailVerified.Value : false,
-                    Avatar = authUser.Picture.IsSet() ? new MediaObject(authUser.Picture) : null,
-                    CreatedOn = DateTime.UtcNow,
-                    LastLogOn = DateTime.UtcNow,
-                    LastLoginLocation = authUser.LastIpAddress,
-                    LastLoginIP = authUser.LastIpAddress
-                };
-                await repo.CreateAsync(user, null);
-
-                await CreateLocalAuth0User(e.Principal.GetUserId(), user);
-
-                if (user.Active)
-                {
-                    var identity = (ClaimsIdentity)principal.Identity;
-                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
-                    await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
-                }
-
-                var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-                var returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { r = "new-account-connection" });
-                e.Response.Redirect(returnUrl);
-                e.HandleResponse();
-
-            }
-
-            return user;
-        }
-        #endregion
-
         #region Data CRUD
         public async Task GetLocalAuth0User(string userId)
         {
@@ -111,6 +31,8 @@ namespace Hood.Services
             db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await db.SaveChangesAsync();
         }
+
+
         public async Task<Auth0User> CreateLocalAuth0User(string authUserId, ApplicationUser user)
         {
             var newAuthUser = await GetUserById(authUserId);
@@ -217,6 +139,54 @@ namespace Hood.Services
         #endregion
 
         #region Auth0 API - Roles
+        public async Task<Role> GetRoleAsync(string role)
+        {
+            var roles = await GetRoles(role, 0, 100);
+            if (roles.List != null)
+            {
+                return roles.List.SingleOrDefault(r => r.Name.ToUpperInvariant() == role.ToUpperInvariant());
+            }
+            return null;
+        }
+        public async Task<Role> GetOrCreateRoleAsync(string role)
+        {
+            var newRole = await GetRoleAsync(role);
+            if (newRole == null)
+            {
+                var client = await GetClientAsync();
+                newRole = await client.Roles.CreateAsync(new RoleCreateRequest()
+                {
+                    Name = role,
+                    Description = role
+                });
+            }
+            return newRole;
+        }
+        public async Task<bool> RoleExistsAsync(string role)
+        {
+            return await GetRoleAsync(role) != null;
+        }
+        public async Task UpdateRole(string role, string newName)
+        {
+            var client = await GetClientAsync();
+            var remoteRole = await GetRoleAsync(role);
+            if (remoteRole != null)
+            {
+                remoteRole = await client.Roles.UpdateAsync(remoteRole.Id, new RoleUpdateRequest()
+                {
+                    Name = newName
+                });
+            }
+        }
+        internal async Task DeleteRole(string role)
+        {
+            var client = await GetClientAsync();
+            var remoteRole = await GetRoleAsync(role);
+            if (remoteRole != null)
+            {
+                await client.Roles.DeleteAsync(remoteRole.Id);
+            }
+        }
         public async Task<System.Collections.Generic.IPagedList<Role>> GetRoles(string search, int page = 0, int pageSize = 50)
         {
             var client = await GetClientAsync();

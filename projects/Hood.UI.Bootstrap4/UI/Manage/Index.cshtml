@@ -127,13 +127,13 @@
             <div role="tabpanel" class="tab-pane" id="avatar">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <fixedImage src="@Model.Profile.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
+                        <fixedImage src="@Model.Profile.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.LocalUserId) mb-0"></fixedImage>
                     </div>
                     <div class="col">
                         <h4 class="media-heading">Change your profile image</h4>
                         <p>You can set your own profile image, click the upload button below to begin.</p>
                         <p>
-                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })" data-preview="@string.Format(".avatar-{0}", Model.UserId)">
+                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.LocalUserId })" data-preview="@string.Format(".avatar-{0}", Model.LocalUserId)">
                                 Upload
                             </button>
                         </p>

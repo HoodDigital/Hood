@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Models
 {
@@ -27,7 +28,7 @@ namespace Hood.Models
         }
 
         // Identity
-        public DbSet<Address> Addresses { get; set; }    
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Auth0User> Auth0Users { get; set; }
 
         // Media
@@ -89,11 +90,11 @@ namespace Hood.Models
             return base.Set<TEntity>();
         }
 
-        public virtual void Seed()
+        public async virtual Task Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             try
             {
-                Option option = Options.FirstOrDefault();
+                Option option = await Options.FirstOrDefaultAsync();
             }
             catch (SqlException ex)
             {
@@ -117,63 +118,68 @@ namespace Hood.Models
                 throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
             }
 
-            if (!Engine.Auth0Enabled)
+            try
             {
-
-                #warning Auth0 - Setup roles??
-                // foreach (string role in Models.Roles.All)
-                // {
-                //     if (!roleManager.RoleExistsAsync(role).Result)
-                //     {
-                //         IdentityResult irAdmin = roleManager.CreateAsync(new IdentityRole(role)).Result;
-                //     }
-                // }
-
-                try
+                string ownerEmail = Engine.SiteOwnerEmail;
+                if (!Users.Any(u => u.UserName == ownerEmail))
                 {
-                    string ownerEmail = Engine.SiteOwnerEmail;
-                    if (!Users.Any(u => u.UserName == ownerEmail))
+                    ApplicationUser userToInsert = new ApplicationUser
                     {
-                        ApplicationUser userToInsert = new ApplicationUser
-                        {
-                            CompanyName = "",
-                            CreatedOn = DateTime.UtcNow,
-                            FirstName = "Website",
-                            LastName = "Administrator",
-                            EmailConfirmed = true,
-                            Anonymous = false,
-                            PhoneNumber = "",
-                            JobTitle = "Website Administrator",
-                            LastLogOn = DateTime.UtcNow,
-                            LastLoginIP = "127.0.0.1",
-                            LastLoginLocation = "UK",
-                            Email = ownerEmail,
-                            UserName = ownerEmail,
-                            Active = true
-                        };
-                        Users.Add(userToInsert);
-                        SaveChangesAsync();
+                        CompanyName = "",
+                        CreatedOn = DateTime.UtcNow,
+                        FirstName = "Website",
+                        LastName = "Administrator",
+                        EmailConfirmed = true,
+                        Anonymous = false,
+                        PhoneNumber = "",
+                        JobTitle = "Website Administrator",
+                        LastLogOn = DateTime.UtcNow,
+                        LastLoginIP = "127.0.0.1",
+                        LastLoginLocation = "UK",
+                        Email = ownerEmail,
+                        UserName = ownerEmail,
+                        Active = true
+                    };
+                    IdentityResult ir = await userManager.CreateAsync(userToInsert, "Password@123");
+                    if (!ir.Succeeded)
+                    {
+                        throw new StartupException("Could not create the admin user.", StartupError.AdminUserSetupError);
                     }
+                }
 
-                }
-                catch (Exception)
-                {
-                    throw new StartupException("An error occurred while loading or creating the admin user.", StartupError.AdminUserSetupError);
-                }
+            }
+            catch (Exception)
+            {
+                throw new StartupException("An error occurred while loading or creating the admin user.", StartupError.AdminUserSetupError);
             }
 
-            ApplicationUser siteAdmin = Users.SingleOrDefault(u => u.Email == Engine.SiteOwnerEmail);
-            #warning Auth0 - Check user admin account roles?
-            // if (userManager.SupportsUserRole)
-            // {
-            //     foreach (string role in Models.Roles.All)
-            //     {
-            //         if (!userManager.IsInRoleAsync(siteAdmin, role.ToUpper()).Result)
-            //         {
-            //             IdentityResult addToRole = userManager.AddToRoleAsync(siteAdmin, role).Result;
-            //         }
-            //     }
-            // }
+            ApplicationUser siteAdmin = await userManager.FindByEmailAsync(Engine.SiteOwnerEmail);
+            try
+            {
+                if (userManager.SupportsUserRole)
+                {
+                    foreach (string role in Models.Roles.All)
+                    {
+                        if (!roleManager.RoleExistsAsync(role).Result)
+                        {
+                            IdentityResult irAdmin = await roleManager.CreateAsync(new IdentityRole(role));
+                        }
+                        if (!userManager.IsInRoleAsync(siteAdmin, role.ToUpper()).Result)
+                        {
+                            IdentityResult addToRole = await userManager.AddToRoleAsync(siteAdmin, role);
+                        }
+                        if (Engine.Auth0Enabled)
+                        {
+                            Auth0Service auth0Service = new Auth0Service();
+                            var remoteRole = await auth0Service.GetOrCreateRoleAsync(role);      
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new StartupException("An error occurred syncing local roles with Auth0: " + ex.Message, StartupError.Auth0Issue);
+            }
 
             if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
             {
@@ -344,7 +350,7 @@ namespace Hood.Models
             if (Media.Any(o => o.DirectoryId == null))
             {
                 // Save any existing seeding, in case directories needed creating.
-                SaveChanges();
+                await SaveChangesAsync();
 
                 // Translate any un directoried images.
                 MediaDirectory defaultDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
@@ -408,7 +414,7 @@ namespace Hood.Models
                 option.Value = Engine.Version;
             }
 
-            SaveChanges();
+            await SaveChangesAsync();
         }
 
     }

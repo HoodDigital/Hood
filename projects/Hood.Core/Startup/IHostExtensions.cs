@@ -8,12 +8,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Startup
 {
     public static class IHostExtensions
     {
-        public static IHost LoadHood<TDbContext>(this IHost host)
+        public static async Task<IHost> LoadHoodAsync<TDbContext>(this IHost host)
             where TDbContext : HoodDbContext
         {
             using (IServiceScope scope = host.Services.CreateScope())
@@ -38,7 +39,9 @@ namespace Hood.Startup
                     if (Engine.Configuration.SeedOnStart)
                     {
                         // Seed the database
-                        db.Seed();
+                        UserManager<ApplicationUser> userManager = services.GetService<UserManager<ApplicationUser>>();
+                        RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
+                        await db.Seed(userManager, roleManager);
                     }
                     else
                     {

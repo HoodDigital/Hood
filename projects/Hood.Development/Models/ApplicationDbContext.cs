@@ -1,4 +1,5 @@
-﻿using Hood.Models;
+﻿using System.Threading.Tasks;
+using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,9 +21,9 @@ namespace Hood.Web
             base.OnModelCreating(builder);
         }
 
-        public override void Seed()
+        public async override Task Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            base.Seed();
+            await base.Seed(userManager, roleManager);
         }
     }
 }

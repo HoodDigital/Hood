@@ -106,6 +106,7 @@ namespace Hood.Extensions
         DatabaseConnectionFailed,
         AdminUserSetupError,
         DatabaseMediaError,
-        DatabaseViewsNotInstalled
+        DatabaseViewsNotInstalled,
+        Auth0Issue
     }
 }

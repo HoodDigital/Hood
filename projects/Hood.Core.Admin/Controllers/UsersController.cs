@@ -21,14 +21,9 @@ namespace Hood.Areas.Admin.Controllers
 {
     public abstract class BaseUsersController : BaseController
     {
-        protected readonly UserManager<ApplicationUser> _userManager;
-        protected readonly SignInManager<ApplicationUser> _signInManager;
         public BaseUsersController()
             : base()
-        {
-            _userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
-            _signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
-        }
+        { }
 
         [Route("admin/users/")]
         public virtual async Task<IActionResult> Index(UserListModel model)
@@ -43,13 +38,13 @@ namespace Hood.Areas.Admin.Controllers
             model = await _account.GetUserProfilesAsync(model) as UserListModel;
             return View(viewName, model);
         }
-
         #region Edit
         [Route("admin/users/{id}/edit/")]
         public virtual async Task<IActionResult> Edit(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id);
-            model.AllRoles = await _account.GetAllRolesAsync();
+            var roles = await _account.GetRolesAsync(new PagedList<IdentityRole> { PageIndex = 0, PageSize = int.MaxValue });
+            model.AllRoles = roles.List;
             return View(model);
         }
 
@@ -90,7 +85,7 @@ namespace Hood.Areas.Admin.Controllers
 
             }
 
-            model.AllRoles = await _account.GetAllRolesAsync();
+            model.AllRoles = (await _account.GetRolesAsync()).List;
             return View(model);
         }
 
@@ -130,7 +125,7 @@ namespace Hood.Areas.Admin.Controllers
                     CreatedOn = DateTime.UtcNow,
                     Note = $"User created via admin panel by {User.Identity.Name}."
                 });
-                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await _account.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
                 {
                     return new Response(result.Errors);
@@ -140,7 +135,7 @@ namespace Hood.Areas.Admin.Controllers
                 {
                     user.EmailConfirmed = true;
                     user.Active = true;
-                    await _userManager.UpdateAsync(user);
+                    await _account.UpdateUserAsync(user);
                 }
                 else
                 {
@@ -173,8 +168,8 @@ namespace Hood.Areas.Admin.Controllers
                     catch (Exception)
                     {
                         // roll back!
-                        ApplicationUser deleteUser = await _userManager.FindByEmailAsync(model.Username);
-                        await _userManager.DeleteAsync(deleteUser);
+                        ApplicationUser deleteUser = await _account.GetUserByEmailAsync(model.Email);
+                        await _account.DeleteUserAsync(deleteUser.Id, User);
                         throw new Exception("There was a problem sending the email, ensure the site's email address and SendGrid settings are set up correctly before sending.");
                     }
                 }
@@ -195,7 +190,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
                 if (user == null)
                 {
                     throw new Exception($"The user Id {id} could not be found, therefore could not be deleted.");
@@ -211,7 +206,6 @@ namespace Hood.Areas.Admin.Controllers
             }
         }
         #endregion
-
 
         #region Media
         /// <summary>
@@ -287,14 +281,13 @@ namespace Hood.Areas.Admin.Controllers
         }
         #endregion
 
-
         #region MarkConfirmed
         [Route("admin/users/{id}/confirm-email/")]
         public virtual async Task<Response> MarkEmailConfirmed(string id)
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
                 if (user == null)
                 {
                     throw new Exception($"The user Id {id} could not be found, therefore could not be confirmed.");
@@ -311,7 +304,7 @@ namespace Hood.Areas.Admin.Controllers
                     CreatedOn = DateTime.UtcNow,
                     Note = $"User email marked as confirmed via admin panel by {User.Identity.Name}."
                 });
-                await _userManager.UpdateAsync(user);
+                await _account.UpdateUserAsync(user);
 
                 await _logService.AddLogAsync<BaseUsersController>($"The user account ({user.Email}) email confirmed via admin panel by {User.Identity.Name}", type: LogType.Warning);
                 return new Response(true, "Email confirmed successfully.");
@@ -321,39 +314,6 @@ namespace Hood.Areas.Admin.Controllers
                 return await ErrorResponseAsync<BaseUsersController>($"Error confirming email for user via the admin panel.", ex);
             }
         }
-
-        //[Route("admin/users/{id}/confirm-phone/")]
-        //public async Task<Response> MarkPhoneConfirmed(string id)
-        //{
-        //    try
-        //    {
-        //        ApplicationUser user = await _userManager.FindByIdAsync(id);
-        //        if (user == null)
-        //        {
-        //            throw new Exception($"The user Id {id} could not be found, therefore could not be confirmed.");
-        //        }
-
-        //        user.PhoneNumberConfirmed = true;
-        //        if (!user.Active)
-        //        {
-        //            user.Active = true;
-        //        }
-        //        user.AddUserNote(new UserNote()
-        //        {
-        //            CreatedBy = User.GetUserId(),
-        //            CreatedOn = DateTime.Now,
-        //            Note = $"User phone marked as confirmed via admin panel by {User.Identity.Name}."
-        //        });
-        //        await _userManager.UpdateAsync(user);
-
-        //        await _logService.AddLogAsync<UsersController>($"The user account ({user.Email}) phone confirmed via admin panel by {User.Identity.Name}", type: LogType.Warning);
-        //        return new Response(true, "Phone confirmed successfully.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return await ErrorResponseAsync<UsersController>($"Error confirming phone for user via the admin panel.", ex);
-        //    }
-        //}
         #endregion
 
         #region Notes 
@@ -416,8 +376,8 @@ namespace Hood.Areas.Admin.Controllers
         [HttpGet]
         public virtual async Task<JsonResult> GetRoles(string id)
         {
-            ApplicationUser user = await _userManager.FindByIdAsync(id);
-            IList<string> roles = await _userManager.GetRolesAsync(user);
+            ApplicationUser user = await _account.GetUserByIdAsync(id);
+            IList<string> roles = await _account.GetRolesForUser(user);
             return Json(new { success = true, roles });
         }
         [Route("admin/users/{id}/set-role/")]
@@ -426,21 +386,21 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
+                ApplicationUser user = await _account.GetUserByIdAsync(id);
                 if (!await _account.RoleExistsAsync(role))
                 {
-                    await _account.CreateRoleAsync(new IdentityRole(role));
+                    await _account.CreateRoleAsync(role);
                 }
 
                 IdentityResult result;
 
                 if (add)
                 {
-                    result = await _userManager.AddToRoleAsync(user, role);
+                    result = await _account.AddUserToRoleAsync(user, role);
                 }
                 else
                 {
-                    result = await _userManager.RemoveFromRoleAsync(user, role);
+                    result = await _account.RemoveUserFromRoleAsync(user, role);
                 }
 
                 if (result.Succeeded)
@@ -483,13 +443,19 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
+                if (Engine.Auth0Enabled)
+                {
+                    throw new ApplicationException("This feature is not supported by Hood CMS Auth0 yet.");
+                }
+
                 if (!id.IsSet())
                 {
                     throw new Exception("Cannot impersonate a user with no Id!");
                 }
 
-                ApplicationUser impersonatedUser = await _userManager.FindByIdAsync(id);
-                ClaimsPrincipal userPrincipal = await _signInManager.CreateUserPrincipalAsync(impersonatedUser);
+                SignInManager<ApplicationUser> signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                ApplicationUser impersonatedUser = await _account.GetUserByIdAsync(id);
+                ClaimsPrincipal userPrincipal = await signInManager.CreateUserPrincipalAsync(impersonatedUser);
 
                 userPrincipal.Identities.First().AddClaim(new Claim(HoodClaimTypes.OriginalUserId, User.GetLocalUserId()));
                 userPrincipal.Identities.First().AddClaim(new Claim(HoodClaimTypes.IsImpersonating, "true"));
@@ -500,10 +466,10 @@ namespace Hood.Areas.Admin.Controllers
                     CreatedOn = DateTime.UtcNow,
                     Note = $"User {impersonatedUser.UserName} was impersonated by {User.Identity.Name}."
                 });
-                await _userManager.UpdateAsync(impersonatedUser);
+                await _account.UpdateUserAsync(impersonatedUser);
 
                 // sign out the current user
-                await _signInManager.SignOutAsync();
+                await signInManager.SignOutAsync();
 
                 await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, userPrincipal); // <-- This has changed from the previous version.
 
@@ -517,6 +483,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             return RedirectToAction(nameof(Edit), new { id });
         }
+
         [AllowAnonymous]
         public virtual async Task<IActionResult> StopImpersonation()
         {
@@ -534,11 +501,11 @@ namespace Hood.Areas.Admin.Controllers
 
                 string originalUserId = User.FindFirst(HoodClaimTypes.OriginalUserId).Value;
 
-                ApplicationUser originalUser = await _userManager.FindByIdAsync(originalUserId);
+                ApplicationUser originalUser = await _account.GetUserByIdAsync(originalUserId);
 
-                await _signInManager.SignOutAsync();
-
-                await _signInManager.SignInAsync(originalUser, isPersistent: true);
+                SignInManager<ApplicationUser> signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                await signInManager.SignOutAsync();
+                await signInManager.SignInAsync(originalUser, isPersistent: true);
 
                 return RedirectToAction("Index", "Home", new { area = "" });
             }
@@ -559,9 +526,16 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(id);
-                string token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                IdentityResult result = await _userManager.ResetPasswordAsync(user, token, password);
+                if (Engine.Auth0Enabled)
+                {
+                    throw new ApplicationException("This feature is not supported by Hood CMS Auth0 yet.");
+                }
+
+                UserManager<ApplicationUser> userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
+                SignInManager<ApplicationUser> signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                ApplicationUser user = await userManager.FindByIdAsync(id);
+                string token = await userManager.GeneratePasswordResetTokenAsync(user);
+                IdentityResult result = await userManager.ResetPasswordAsync(user, token, password);
                 if (result.Succeeded)
                 {
                     user.AddUserNote(new UserNote()
@@ -570,7 +544,7 @@ namespace Hood.Areas.Admin.Controllers
                         CreatedOn = DateTime.UtcNow,
                         Note = $"User password reset via admin panel by {User.Identity.Name}."
                     });
-                    await _userManager.UpdateAsync(user);
+                    await userManager.UpdateAsync(user);
                     await _logService.AddLogAsync<BaseUsersController>($"The password has been reset by an admin for user with Id: {id}", type: LogType.Success);
                     return new Response(true, $"The user's password has been reset.");
                 }

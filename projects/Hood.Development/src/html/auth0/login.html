@@ -11,13 +11,13 @@
 <body>
 
     <!--[if IE 8]>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/ie8/0.2.5/ie8.js"></script>
-  <![endif]-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ie8/0.2.5/ie8.js"></script>
+    <![endif]-->
 
     <!--[if lte IE 9]>
-  <script src="https://cdn.auth0.com/js/base64.js"></script>
-  <script src="https://cdn.auth0.com/js/es5-shim.min.js"></script>
-  <![endif]-->
+    <script src="https://cdn.auth0.com/js/base64.js"></script>
+    <script src="https://cdn.auth0.com/js/es5-shim.min.js"></script>
+    <![endif]-->
 
     <script src="https://cdn.auth0.com/js/lock/11.32/lock.min.js"></script>
     <script>
@@ -39,15 +39,20 @@
         var logo = config.extraParams.logo || "https://cdn.jsdelivr.net/npm/hoodcms@5.0.15/images/hood-cms.png";
         var color = config.extraParams.color || colors.primary;
         var background = config.extraParams.background || colors.page_background;
+        var isPasswordless = config.extraParams && config.extraParams.action === "passwordless";
         var isSignup = config.extraParams && config.extraParams.action === "signup";
 
+        if (background) {
+            var css = `.auth0-lock.auth0-lock .auth0-lock-overlay { background: ${background} }`;
+            var style = document.createElement('style');
+            style.appendChild(document.createTextNode(css));
+            document.body.appendChild(style);
+        }
 
-        // Available Lock configuration options: https://auth0.com/docs/libraries/lock/v11/configuration
-        var lock = new Auth0Lock(config.clientID, config.auth0Domain, {
+        var baseOptions = {
             auth: {
                 redirectUrl: config.callbackURL,
-                responseType: (config.internalOptions || {}).response_type ||
-                    (config.callbackOnLocationHash ? 'token' : 'code'),
+                responseType: (config.internalOptions || {}).response_type || (config.callbackOnLocationHash ? 'token' : 'code'),
                 params: config.internalOptions
             },
             configurationBaseUrl: config.clientConfigurationBaseUrl,
@@ -55,7 +60,9 @@
                 __tenant: config.auth0Tenant,
                 __token_issuer: config.authorizationServer.issuer
             },
+
             assetsUrl: config.assetsUrl,
+
             allowedConnections: connection ? [connection] : null,
             rememberLastLogin: !prompt,
             language: language,
@@ -65,18 +72,26 @@
                 logo: logo ? logo : null,
                 primaryColor: color ? color : null
             },
-            prefill: loginHint ? { email: loginHint, username: loginHint } : null,
             closable: false,
+
+            prefill: loginHint ? { email: loginHint, username: loginHint } : null,
             defaultADUsernameFromEmailPrefix: false,
             initialScreen: isSignup ? "signUp" : "login"
-        });
+        };
 
-        if (background) {
-            var css = `.auth0-lock.auth0-lock .auth0-lock-overlay { background: ${background} }`;
-            var style = document.createElement('style');
-            style.appendChild(document.createTextNode(css));
-            document.body.appendChild(style);
+        if (isPasswordless) {
+
+            var lock = new Auth0LockPasswordless(config.clientID, config.auth0Domain, { ...baseOptions, ...{
+                passwordlessMethod: 'link'
+            }});
+        } else {
+            var lock = new Auth0Lock(config.clientID, config.auth0Domain, { ...baseOptions, ...{
+                prefill: loginHint ? { email: loginHint, username: loginHint } : null,
+                defaultADUsernameFromEmailPrefix: false,
+                initialScreen: isSignup ? "signUp" : "login"
+            }});
         }
+
 
         lock.show();
     </script>
