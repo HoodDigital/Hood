@@ -28,18 +28,6 @@ namespace Hood.Controllers
         [Route("/")]
         public virtual async Task<IActionResult> Index()
         {
-            var service = new Auth0Service();
-            // var roles = await service.GetRoles();
-            var users = await service.GetUsers("admin");
-            // var user = await service.GetUserByEmail("admin@hooddigital.com");     
-
-            var userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
-            var dood = await userManager.GetUsersInRoleAsync("Admin");       
-
-            if (User.Identity.IsAuthenticated) {
-                //do sommat
-            }
-
             BasicSettings basicSettings = Engine.Settings.Basic;
 
             if (basicSettings.Homepage.HasValue)

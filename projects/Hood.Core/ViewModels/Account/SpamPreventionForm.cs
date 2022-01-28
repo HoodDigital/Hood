@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
-using System.Web.Helpers;
 using Hood.BaseTypes;
 using Hood.Core;
 using Hood.Extensions;
+using Hood.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
@@ -30,6 +30,10 @@ namespace Hood.ViewModels
 
         [FromForm(Name = HashFieldName)]
         public string Hash { get; set; }
+        public const string SaltFieldName = "slt";
+
+        [FromForm(Name = SaltFieldName)]
+        public string Salt { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -41,7 +45,12 @@ namespace Hood.ViewModels
                 return failedResult;
             }
 
-            if (!Crypto.VerifyHashedPassword(this.Hash, this.Timestamp))
+            var hasher = new PasswordHasher(this.Salt);
+            hasher = hasher.HashPasswordWithSalt(this.Timestamp);
+            var hash = hasher.HashedPassword;
+            var salt = hasher.Base64Salt;
+
+            if (hash != this.Hash)
             {
                 return failedResult;
             }

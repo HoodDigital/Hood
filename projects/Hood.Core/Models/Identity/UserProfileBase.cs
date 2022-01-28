@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Hood.Models
 {
@@ -237,5 +238,13 @@ namespace Hood.Models
         #endregion
 
         public IList<Auth0User> ConnectedAuth0Accounts { get; set; }
+        public virtual Auth0User GetAccount(string userId)
+        {
+            if (ConnectedAuth0Accounts != null)
+            {
+                return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.UserId == userId);
+            }
+            return null;
+        }
     }
 }

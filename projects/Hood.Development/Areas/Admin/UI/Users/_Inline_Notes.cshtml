@@ -5,7 +5,7 @@
 @foreach (var note in Model.Notes)
 {
     <div class="p-3 border-bottom">
-        <div class="mb-0">@Html.Raw(note.Note.ToHtml())</div>
+        <div class="mb-0">@Html.Raw(note.Note.AddHtmlLineBreaks())</div>
         <div class="d-flex">
             <div class="flex-fill text-muted">
                 <small>@note.CreatedBy </small>

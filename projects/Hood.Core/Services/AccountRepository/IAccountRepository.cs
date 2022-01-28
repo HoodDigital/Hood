@@ -33,6 +33,7 @@ namespace Hood.Services
         #endregion
 
         #region Roles
+        bool SupportsRoles();
         Task<IPagedList<IdentityRole>> GetRolesAsync(IPagedList<IdentityRole> model = null);
         Task<IList<string>> GetRolesForUser(ApplicationUser user);
         Task<IList<ApplicationUser>> GetUsersInRole(string role);

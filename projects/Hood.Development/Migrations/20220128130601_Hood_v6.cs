@@ -36,6 +36,7 @@ namespace Hood.Development.Migrations
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     LocalUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ProviderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EmailVerified = table.Column<bool>(type: "bit", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),

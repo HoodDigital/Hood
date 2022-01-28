@@ -331,6 +331,22 @@
                         </h2>
                     }
                 </div>
+                @if (Model.Details != null)
+                {
+                    <div class="accordion-item border-0 mb-3">
+                        <h2 class="accordion-header" id="heading-viewsInstalled">
+                            <button class="accordion-button error collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-viewsInstalled" aria-expanded="false" aria-controls="collapse-viewsInstalled">
+                                <i class="fa fa-exclamation-triangle me-2"></i><strong>Detailed Error Information</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-viewsInstalled" class="accordion-collapse collapse" aria-labelledby="heading-viewsInstalled">
+                            <div class="accordion-body">
+                                <h6>@Model.Details.Message</h6>
+                                <div class="card p-3 overflow-scroll" style="white-space:nowrap;font-size:11px;min-height:500px;">@Html.Raw(Model.Details.StackTrace.EncodeHtml().AddHtmlLineBreaks())</div>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
         </div>
 

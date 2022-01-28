@@ -230,18 +230,18 @@ namespace Hood.Startup
                         e.Principal.SetUserClaims(user);
                         if (user.EmailConfirmed)
                         {
-                            e.Principal.AddOrUpdateClaim(HoodClaimTypes.EmailConfirmed, "true");
+                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.EmailConfirmed, "true");
                         }
                         if (user.Active || !Engine.Settings.Account.RequireEmailConfirmation)
                         {
-                            e.Principal.AddOrUpdateClaim(HoodClaimTypes.Active, "true");
+                            e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
                         }
                     }
                 };
             });
 
-            services.AddScoped<IAccountRepository, Auth0AccountRepository>();
-            services.AddScoped<IEmailSender, Auth0EmailSender>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddAuthorization(options =>
             {
@@ -291,6 +291,7 @@ namespace Hood.Startup
                                     identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
                                     await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                                 }
+                                await SetDefaultClaims(e, user);
                                 return;
 
                             }
@@ -302,7 +303,8 @@ namespace Hood.Startup
                                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
                                 var identity = (ClaimsIdentity)principal.Identity;
                                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountNotConnected, "true"));
-                                await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
+
+                                await SetDefaultClaims(e, user);
 
                                 e.Response.Redirect(linkGenerator.GetPathByAction("ConnectAccount", "Account", new { e.ReturnUri }));
                                 e.HandleResponse();
@@ -374,15 +376,7 @@ namespace Hood.Startup
                                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
                             }
 
-                            // Set the remote avatar on a local claim, in case the local overrides it. 
-                            if (e.Principal.HasClaim(HoodClaimTypes.Picture))
-                            {
-                                e.Principal.AddOrUpdateClaim(HoodClaimTypes.RemotePicture, e.Principal.GetClaim(HoodClaimTypes.Picture));
-                            }
-
-                            // Set the user claims locally
-                            e.Principal.SetUserClaims(user);
-                            await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+                            await SetDefaultClaims(e, user);
 
                             // Account setup complete, send user to manage profile with new-account-connection flag.
                             returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { r = "new-account-connection" });
@@ -475,6 +469,34 @@ namespace Hood.Startup
             return services;
 
         }
+
+        private static async Task SetDefaultClaims(TicketReceivedContext e, ApplicationUser user)
+        {
+            var authService = new Auth0Service();
+            var accountRepository = Engine.Services.Resolve<IAccountRepository>();
+            var remoteRoles = e.Principal.GetRoles();
+            var roles = await accountRepository.GetRolesForUser(user);
+            if (!roles.All(remoteRoles.Contains) || roles.Count != remoteRoles.Count)
+            {
+                // remote roles are out of sync... re-sync. 
+                foreach (var role in roles)
+                {
+                    await accountRepository.AddUserToRoleAsync(user, role);
+                    e.Principal.AddClaim(ClaimTypes.Role, role);
+                }
+            }
+
+            // Set the remote avatar on a local claim, in case the local overrides it. 
+            if (e.Principal.HasClaim(HoodClaimTypes.Picture))
+            {
+                e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.RemotePicture, e.Principal.GetClaimValue(HoodClaimTypes.Picture));
+            }
+
+            // Set the user claims locally
+            e.Principal.SetUserClaims(user);
+            await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+        }
+
         private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)
         {
             string cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : Constants.CookieDefaultName;

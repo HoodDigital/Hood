@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hood.Development.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220126124409_Hood_v6")]
+    [Migration("20220128130601_Hood_v6")]
     partial class Hood_v6
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -244,6 +244,9 @@ namespace Hood.Development.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProviderName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")

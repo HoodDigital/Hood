@@ -38,6 +38,14 @@ namespace Hood.Services
             var newAuthUser = await GetUserById(authUserId);
             var db = Engine.Services.Resolve<HoodDbContext>();
             newAuthUser.LocalUserId = user.Id;
+            if (newAuthUser.Identities.FirstOrDefault() != null)
+            {
+                newAuthUser.ProviderName = newAuthUser.Identities.FirstOrDefault().Provider;
+            }
+            else
+            {
+                newAuthUser.ProviderName = newAuthUser.UserId.Split('|')[0];
+            }
             db.Add(newAuthUser);
             await db.SaveChangesAsync();
             return newAuthUser;
@@ -123,7 +131,7 @@ namespace Hood.Services
             var client = await GetClientAsync();
             var newUser = await client.Users.CreateAsync(new UserCreateRequest()
             {
-                Connection = "Username-Password-Authentication",
+                Connection = Constants.UsernamePasswordConnectionName,
                 Email = user.Email,
                 Password = password,
                 PhoneNumber = user.PhoneNumber,

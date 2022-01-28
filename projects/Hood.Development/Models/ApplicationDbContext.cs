@@ -21,9 +21,9 @@ namespace Hood.Web
             base.OnModelCreating(builder);
         }
 
-        public async override Task Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public async override Task Seed()
         {
-            await base.Seed(userManager, roleManager);
+            await base.Seed();
         }
     }
 }

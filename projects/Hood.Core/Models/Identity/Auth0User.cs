@@ -25,8 +25,8 @@ namespace Hood.Models
     public class Auth0User : Auth0.ManagementApi.Models.User
     {
         public Auth0User()
-        {}
-        
+        { }
+
         public Auth0User(User user)
         {
             user.CopyProperties(this);
@@ -36,5 +36,25 @@ namespace Hood.Models
         public string LocalUserId { get; set; }
         [JsonIgnore]
         public ApplicationUser User { get; set; }
+        [JsonIgnore]
+        public string ProviderName { get; set; }
+        public string ToProviderString()
+        {
+            switch (ProviderName)
+            {
+                case "email":
+                    return "<i class='fa fa-envelope me-2'></i>Passwordless (E-Mail)";
+
+                case "google-oauth2":
+                    return "<i class='fab fa-google me-2'></i>Google";
+
+                case "auth0":
+                    return "<i class='fa fa-lock me-2'></i>Password";
+
+                default:
+                    return "<i class='fa fa-external-link me-2'></i>External";
+            }            
+        }
+
     }
 }

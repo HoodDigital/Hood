@@ -356,6 +356,10 @@ namespace Hood.Services
         #endregion
 
         #region Roles
+        public virtual bool SupportsRoles()
+        {
+            return UserManager.SupportsUserRole;
+        }
         public virtual async Task<IPagedList<IdentityRole>> GetRolesAsync(IPagedList<IdentityRole> model)
         {
             if (model == null)

@@ -4,6 +4,7 @@ using Hood.Models;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -35,13 +36,21 @@ namespace Hood.Startup
                     Engine.Services.MigrationNotApplied = false;
                     Engine.Services.AdminUserSetupError = false;
                     Engine.Services.DatabaseMediaTimeout = false;
-                    
+
                     if (Engine.Configuration.SeedOnStart)
                     {
+                        if (Engine.Configuration.ApplyMigrationsAutomatically && !db.AllMigrationsApplied())
+                        {
+                            // attempt to apply migrations. 
+                            db.Database.Migrate();
+                            
+                        }
+                        else if (!db.AllMigrationsApplied())
+                        {
+                            throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
+                        }
                         // Seed the database
-                        UserManager<ApplicationUser> userManager = services.GetService<UserManager<ApplicationUser>>();
-                        RoleManager<IdentityRole> roleManager = services.GetService<RoleManager<IdentityRole>>();
-                        await db.Seed(userManager, roleManager);
+                        await db.Seed();
                     }
                     else
                     {
@@ -57,13 +66,15 @@ namespace Hood.Startup
                     Engine.Services.DatabaseSeedFailed = false;
 
                 }
-                catch (StartupException)
+                catch (StartupException ex)
                 {
                     Engine.Services.DatabaseSeedFailed = true;
+                    Engine.Services.Details = ex.InnerException;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     Engine.Services.DatabaseSeedFailed = true;
+                    Engine.Services.Details = ex;
                 }
 
             }

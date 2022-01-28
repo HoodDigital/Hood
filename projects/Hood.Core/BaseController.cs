@@ -18,18 +18,19 @@ namespace Hood.Controllers
     public abstract class BaseController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
     {
         public BaseController()
-            :base()
+            : base()
         {
 
         }
     }
-    
+
     [Installed]
     public abstract class BaseController<TContext, TUser, TRole> : Controller
          where TContext : HoodDbContext
          where TUser : ApplicationUser
          where TRole : IdentityRole
     {
+        protected readonly UserManager<TUser> _userManager;
         protected readonly IAccountRepository _account;
         protected readonly IContentRepository _content;
         protected readonly ContentCategoryCache _contentCategoryCache;
@@ -56,9 +57,7 @@ namespace Hood.Controllers
 
         public BaseController()
         {
-            if (!Engine.Services.Installed) {
-                // throw here, send to install page.                
-            }
+            _userManager = Engine.Services.Resolve<UserManager<TUser>>();
             _content = Engine.Services.Resolve<IContentRepository>();
             _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
             _property = Engine.Services.Resolve<IPropertyRepository>();
@@ -117,7 +116,7 @@ namespace Hood.Controllers
             var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
             if (user == null)
             {
-                throw new ApplicationException($"Unable to load user with email '{User.Identity.Name}'.");
+                throw new ApplicationException($"Unable to load user with email '{User.GetEmail()}'.");
             }
             return user;
         }

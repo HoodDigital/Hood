@@ -334,7 +334,7 @@ namespace Hood.Controllers
             {
                 LocalPicture = user.GetAvatar(),
                 ReturnUrl = returnUrl,
-                RemotePicture = User.GetClaim(HoodClaimTypes.RemotePicture)
+                RemotePicture = User.GetClaimValue(HoodClaimTypes.RemotePicture)
             };
             return View(model);
         }
@@ -370,7 +370,7 @@ namespace Hood.Controllers
                 }
 
                 User.RemoveClaim(HoodClaimTypes.AccountNotConnected);
-                User.AddOrUpdateClaim(HoodClaimTypes.Active, "true");
+                User.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
 
                 return RedirectToAction(nameof(ConnectAccountComplete), new { returnUrl });
@@ -397,7 +397,7 @@ namespace Hood.Controllers
             {
                 LocalPicture = user.Avatar.LargeUrl,
                 ReturnUrl = returnUrl,
-                RemotePicture = User.GetClaim(HoodClaimTypes.RemotePicture)
+                RemotePicture = User.GetClaimValue(HoodClaimTypes.RemotePicture)
             };
             return View(model);
         }
@@ -593,7 +593,7 @@ namespace Hood.Controllers
         #region Change Password
         [HttpGet]
         [Authorize(Policies.Active)]
-        [Route("account/manage/change-password")]
+        [Route("account/change-password")]
         public virtual IActionResult ChangePassword()
         {
             if (Engine.Auth0Enabled)
@@ -607,7 +607,7 @@ namespace Hood.Controllers
         [DisableForAuth0]
         [Authorize(Policies.Active)]
         [ValidateAntiForgeryToken]
-        [Route("account/manage/change-password")]
+        [Route("account/change-password")]
         public virtual async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
@@ -635,6 +635,42 @@ namespace Hood.Controllers
 
             return RedirectToAction(nameof(ChangePassword));
         }
+
+        [HttpPost]
+        [Authorize(Policies.Active)]
+        [ValidateAntiForgeryToken]
+        [Route("account/change-password/sent")]
+        public virtual async Task<IActionResult> SendChangePasswordLinkAsync(ChangePasswordViewModel model)
+        {
+            var user = await GetCurrentUserOrThrow();
+            var auth0Service = new Auth0Service();
+            var client = await auth0Service.GetClientAsync();
+            // get currently signed in user.
+            Auth0User remoteUser = user.GetAccount(User.GetUserId());
+            if (remoteUser.ProviderName == Constants.AuthProviderName)
+            {
+                var ticket = client.Tickets.CreatePasswordChangeTicketAsync(new Auth0.ManagementApi.Models.PasswordChangeTicketRequest()
+                {
+                    UserId = remoteUser.UserId
+                });
+            }
+            else
+            {
+                switch (remoteUser.ProviderName)
+                {
+                    case "email":
+                        SaveMessage = "Could not send a password change as you are using a passwordless connection.";
+                        MessageType = AlertType.Warning;
+                        break;
+                    default:
+                        SaveMessage = "Could not send a password change as you are using an external login account. Please change your password there and then sign out and back in again to update your login security.";
+                        MessageType = AlertType.Warning;
+                        break;
+                }
+            }
+            return View(new ChangePasswordViewModel());
+        }
+
 
         #endregion
 

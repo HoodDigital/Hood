@@ -1,9 +1,5 @@
-﻿using Hood.Core;
-using Hood.Identity;
-using Hood.Interfaces;
+﻿using Hood.Identity;
 using Hood.Models;
-using Hood.Services;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +11,9 @@ namespace Hood.Extensions
     {
         public static bool HasClaim(this ClaimsPrincipal principal, string claimName)
         {
-            return principal.GetClaim(claimName) != null;
+            return principal.GetClaimValue(claimName) != null;
         }
-        public static string GetClaim(this ClaimsPrincipal principal, string claimName)
+        public static string GetClaimValue(this ClaimsPrincipal principal, string claimName)
         {
             var identity = (ClaimsIdentity)principal.Identity;
             var claim = identity.FindFirst(claimName);
@@ -33,7 +29,18 @@ namespace Hood.Extensions
             }
             return principal;
         }
-        public static ClaimsPrincipal AddOrUpdateClaim(this ClaimsPrincipal principal, string claimName, string value)
+        public static ClaimsPrincipal AddClaim(this ClaimsPrincipal principal, string claimName, string value)
+        {
+            var identity = (ClaimsIdentity)principal.Identity;
+            var claims = identity.FindAll(claimName);
+            var claimValues = claims.Select(r => r.Value).ToList();
+            if (!claimValues.Contains(value))
+            {
+                identity.AddClaim(new Claim(claimName, value));
+            }
+            return principal;
+        }
+        public static ClaimsPrincipal AddOrUpdateClaimValue(this ClaimsPrincipal principal, string claimName, string value)
         {
             var identity = (ClaimsIdentity)principal.Identity;
             var claim = identity.FindFirst(claimName);
@@ -52,48 +59,48 @@ namespace Hood.Extensions
             var userId = principal.GetUserId();
             if (user.Id != userId)
             {
-                principal.AddOrUpdateClaim(Identity.HoodClaimTypes.LocalUserId, user.Id);
+                principal.AddOrUpdateClaimValue(Identity.HoodClaimTypes.LocalUserId, user.Id);
             }
 
             // Make sure the User.Identity.Name is set to the user's email.
-            principal.AddOrUpdateClaim(HoodClaimTypes.UserName, user.Email);
+            principal.AddOrUpdateClaimValue(HoodClaimTypes.UserName, user.Email);
 
             // Set the picture -if one is set in the user, then add the url to picture claim.
             if (user.AvatarJson.IsSet())
             {
-                principal.AddOrUpdateClaim(HoodClaimTypes.Picture, user.Avatar.LargeUrl);
+                principal.AddOrUpdateClaimValue(HoodClaimTypes.Picture, user.Avatar.LargeUrl);
             }
 
             // Set name/displayname - if set in the local user overwrite the claims. 
             if (user.FirstName.IsSet())
             {
-                principal.AddOrUpdateClaim(ClaimTypes.GivenName, user.FirstName);
+                principal.AddOrUpdateClaimValue(ClaimTypes.GivenName, user.FirstName);
             }
 
             if (user.LastName.IsSet())
             {
-                principal.AddOrUpdateClaim(ClaimTypes.Surname, user.LastName);
+                principal.AddOrUpdateClaimValue(ClaimTypes.Surname, user.LastName);
             }
 
             principal.RemoveClaim(HoodClaimTypes.Nickname);
             if (user.DisplayName.IsSet())
             {
-                principal.AddOrUpdateClaim(HoodClaimTypes.Nickname, user.DisplayName);
+                principal.AddOrUpdateClaimValue(HoodClaimTypes.Nickname, user.DisplayName);
             }
 
-            principal.AddOrUpdateClaim(Identity.HoodClaimTypes.Anonymous, user.Anonymous.ToString());
+            principal.AddOrUpdateClaimValue(Identity.HoodClaimTypes.Anonymous, user.Anonymous.ToString());
         }
         public static string GetAvatar(this ClaimsPrincipal principal)
         {
-            return principal.GetClaim(HoodClaimTypes.Picture);
+            return principal.GetClaimValue(HoodClaimTypes.Picture);
         }
         public static bool IsEmailConfirmed(this ClaimsPrincipal principal)
         {
-            return principal.GetClaim(HoodClaimTypes.EmailConfirmed)?.ToLower() == "true";
+            return principal.GetClaimValue(HoodClaimTypes.EmailConfirmed)?.ToLower() == "true";
         }
         public static bool IsAnonymous(this ClaimsPrincipal principal)
         {
-            return principal.GetClaim(HoodClaimTypes.Anonymous)?.ToLower() == "true";
+            return principal.GetClaimValue(HoodClaimTypes.Anonymous)?.ToLower() == "true";
         }
         public static string ToDisplayName(this ClaimsPrincipal principal, bool allowAnonymous = true)
         {
@@ -102,9 +109,9 @@ namespace Hood.Extensions
                 throw new ArgumentNullException(nameof(principal));
             }
             bool anonymous = principal.IsAnonymous();
-            string displayName = principal.GetClaim(HoodClaimTypes.Nickname);
-            string firstName = principal.GetClaim(ClaimTypes.GivenName);
-            string lastName = principal.GetClaim(ClaimTypes.Surname);
+            string displayName = principal.GetClaimValue(HoodClaimTypes.Nickname);
+            string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
+            string lastName = principal.GetClaimValue(ClaimTypes.Surname);
 
             if (anonymous && allowAnonymous)
                 return "Anonymous";
@@ -129,10 +136,10 @@ namespace Hood.Extensions
                 throw new ArgumentNullException(nameof(principal));
             }
             bool anonymous = principal.IsAnonymous();
-            string displayName = principal.GetClaim(HoodClaimTypes.Nickname);
-            string firstName = principal.GetClaim(ClaimTypes.GivenName);
-            string lastName = principal.GetClaim(ClaimTypes.Surname);
-            string email = principal.GetClaim(ClaimTypes.Email);
+            string displayName = principal.GetClaimValue(HoodClaimTypes.Nickname);
+            string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
+            string lastName = principal.GetClaimValue(ClaimTypes.Surname);
+            string email = principal.GetClaimValue(ClaimTypes.Email);
 
             if (firstName.IsSet() && lastName.IsSet())
                 return firstName + " " + lastName;
@@ -167,11 +174,11 @@ namespace Hood.Extensions
         }
         public static bool RequiresConnection(this ClaimsPrincipal principal)
         {
-            return principal.GetClaim(HoodClaimTypes.AccountNotConnected) != null;
+            return principal.GetClaimValue(HoodClaimTypes.AccountNotConnected) != null;
         }
         public static bool IsActive(this ClaimsPrincipal principal)
         {
-            return principal.GetClaim(HoodClaimTypes.Active) != null;
+            return principal.GetClaimValue(HoodClaimTypes.Active) != null;
         }
         public static bool IsImpersonating(this ClaimsPrincipal principal)
         {

@@ -90,7 +90,15 @@ namespace Hood.Controllers
                 user = await GetCurrentUserOrThrow();
 
                 User.SetUserClaims(user);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+                if (Engine.Auth0Enabled)
+                {
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+                }
+                else
+                {
+                    var signInManager = Engine.Services.Resolve<SignInManager<ApplicationUser>>();
+                    await signInManager.SignInAsync(user, isPersistent: false);
+                }
 
                 SaveMessage = "Your profile has been updated.";
                 MessageType = AlertType.Success;
@@ -101,6 +109,7 @@ namespace Hood.Controllers
                 MessageType = AlertType.Danger;
             }
 
+            model.Accounts = user.ConnectedAuth0Accounts;
             return RedirectToAction(nameof(Index));
         }
 
