@@ -234,7 +234,7 @@ namespace Hood.Models
 
         #region View Model Stuff
         [NotMapped]
-        public IList<IdentityRole> AllRoles { get; set; }
+        public IList<ApplicationRole> AllRoles { get; set; }
         #endregion
 
         public IList<Auth0User> ConnectedAuth0Accounts { get; set; }

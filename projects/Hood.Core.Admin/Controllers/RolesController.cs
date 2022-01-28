@@ -26,14 +26,14 @@ namespace Hood.Areas.Admin.Controllers
         { }
 
         [Route("admin/roles/")]
-        public virtual async Task<IActionResult> Index(IPagedList<IdentityRole> model)
+        public virtual async Task<IActionResult> Index(IPagedList<ApplicationRole> model)
         {
             return await List(model, "Index");
         }
 
         [HttpGet]
         [Route("admin/roles/list/")]
-        public virtual async Task<IActionResult> List(IPagedList<IdentityRole> model, string viewName = "_List_Roles")
+        public virtual async Task<IActionResult> List(IPagedList<ApplicationRole> model, string viewName = "_List_Roles")
         {
             model = await _account.GetRolesAsync(model);
             return View(viewName, model);
@@ -69,7 +69,7 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                IdentityRole role = await _account.GetRoleAsync(id);
+                ApplicationRole role = await _account.GetRoleAsync(id);
                 if (role == null)
                 {
                     throw new Exception($"The role Id {id} could not be found, therefore could not be deleted.");

@@ -155,26 +155,43 @@ namespace Hood.Models
             }
 
             ApplicationUser siteAdmin = await Engine.AccountManager.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+            var auth0Service = new Auth0Service();
             try
             {
+                var roleManager = Engine.Services.Resolve<RoleManager<ApplicationRole>>();
+                var userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
                 if (Engine.AccountManager.SupportsRoles())
                 {
-                    // Check all required roles exist locally and are 
+                    // Check all required roles exist locally 
                     foreach (string role in Models.Roles.All)
                     {
-                        var roleManager = Engine.Services.Resolve<RoleManager<IdentityRole>>();
                         if (!await roleManager.RoleExistsAsync(role))
                         {
                             await Engine.AccountManager.CreateRoleAsync(role);
                         }
-                        await Engine.AccountManager.AddUserToRoleAsync(siteAdmin, role);
+                        else
+                        {
+                            // If it does exist locally, ensure it has a remote id linked to it.
+                            var localRole = await roleManager.FindByNameAsync(role);
+                            if (!localRole.RemoteId.IsSet())
+                            {
+                                await Engine.AccountManager.CreateRoleAsync(role);
+                            }
+                        }
                     }
                     var allRoles = await Engine.AccountManager.GetRolesAsync();
-                    var extraRoles = allRoles.List.Where(r => !Models.Roles.All.Any(rr => r.NormalizedName == rr.ToUpperInvariant()));
-                    foreach (var role in extraRoles)
+                    var requiredRoles = allRoles.List.Where(a => Models.Roles.All.Contains(a.Name));
+                    var extraRoles = allRoles.List.Where(a => !Models.Roles.All.Contains(a.Name));
+                    foreach (ApplicationRole extraLocalRole in extraRoles)
                     {
-                        await Engine.AccountManager.CreateRoleAsync(role.Name);
+                        // Ensure it has a remote id linked to it.
+                        if (!extraLocalRole.RemoteId.IsSet())
+                        {
+                            await Engine.AccountManager.CreateRoleAsync(extraLocalRole.Name);
+                        }
                     }
+                    // Make sure site admin is in all required roles.
+                    await Engine.AccountManager.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
                 }
             }
             catch (Exception ex)
@@ -185,7 +202,6 @@ namespace Hood.Models
             if (Engine.Auth0Enabled)
             {
                 // Check the rule is set to provide roles from Auth0
-                var auth0Service = new Auth0Service();
                 var client = await auth0Service.GetClientAsync();
                 var rules = await client.Rules.GetAllAsync(new Auth0.ManagementApi.Models.GetRulesRequest()
                 {

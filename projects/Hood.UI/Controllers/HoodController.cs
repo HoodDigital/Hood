@@ -19,7 +19,7 @@ namespace Hood.Controllers
         public HoodController() : base() { }
     }
 
-    public abstract class HoodController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class HoodController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
         public HoodController()

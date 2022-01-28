@@ -117,6 +117,7 @@ namespace Hood.Startup
             services.AddScoped<IPropertyRepository, PropertyRepository>();
             services.AddScoped<IContentRepository, ContentRepository>();
 
+            services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
             services.AddScoped<IPageBuilder, PageBuilder>();
             services.AddScoped<IMailService, MailService>();
@@ -193,7 +194,7 @@ namespace Hood.Startup
         }
         public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            services.AddIdentity<ApplicationUser, IdentityRole>(o =>
+            services.AddIdentity<ApplicationUser, ApplicationRole>(o =>
             {
                 // configure identity options
                 o.User.RequireUniqueEmail = true;
@@ -241,7 +242,6 @@ namespace Hood.Startup
             });
 
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IEmailSender, EmailSender>();
 
             services.AddAuthorization(options =>
             {
@@ -447,13 +447,12 @@ namespace Hood.Startup
 
             var identityBuilder = new IdentityBuilder(typeof(ApplicationUser), services);
 
-            identityBuilder.AddRoles<IdentityRole>();
-            identityBuilder.AddRoleStore<RoleStore<IdentityRole, HoodDbContext, string>>();
-            identityBuilder.AddUserStore<UserStore<ApplicationUser, IdentityRole, HoodDbContext, string>>();
+            identityBuilder.AddRoles<ApplicationRole>();
+            identityBuilder.AddRoleStore<RoleStore<ApplicationRole, HoodDbContext, string>>();
+            identityBuilder.AddUserStore<UserStore<ApplicationUser, ApplicationRole, HoodDbContext, string>>();
             identityBuilder.AddUserManager<UserManager<ApplicationUser>>();
 
             services.AddScoped<IAccountRepository, Auth0AccountRepository>();
-            services.AddScoped<IEmailSender, Auth0EmailSender>();
 
             services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
                 .Configure(options =>
@@ -475,15 +474,17 @@ namespace Hood.Startup
             var authService = new Auth0Service();
             var accountRepository = Engine.Services.Resolve<IAccountRepository>();
             var remoteRoles = e.Principal.GetRoles();
-            var roles = await accountRepository.GetRolesForUser(user);
-            if (!roles.All(remoteRoles.Contains) || roles.Count != remoteRoles.Count)
+            var localRoles = await accountRepository.GetRolesForUser(user);
+            if (!localRoles.Select(r => r.Name).All(remoteRoles.Contains) || localRoles.Count() != remoteRoles.Count)
             {
                 // remote roles are out of sync... re-sync. 
-                foreach (var role in roles)
+                var rolesToAdd = new List<ApplicationRole>();
+                foreach (var role in localRoles)
                 {
-                    await accountRepository.AddUserToRoleAsync(user, role);
-                    e.Principal.AddClaim(ClaimTypes.Role, role);
+                    rolesToAdd.Add(await accountRepository.GetRoleAsync(role.Name));
+                    e.Principal.AddClaim(ClaimTypes.Role, role.Name);
                 }
+                await accountRepository.AddUserToRolesAsync(user, rolesToAdd.ToArray());
             }
 
             // Set the remote avatar on a local claim, in case the local overrides it. 
@@ -669,7 +670,7 @@ namespace Hood.Startup
         private static IServiceCollection AddStores(this IServiceCollection services)
         {
             Type userType = typeof(ApplicationUser);
-            Type roleType = typeof(IdentityRole<string>);
+            Type roleType = typeof(ApplicationRole);
             Type contextType = typeof(HoodDbContext);
             Type keyType = typeof(string);
 
@@ -677,14 +678,14 @@ namespace Hood.Startup
             Type roleStoreType;
             var identityContext = typeof(HoodDbContext);
 
-            userStoreType = typeof(UserStore<ApplicationUser, IdentityRole<string>, HoodDbContext, string>);
-            roleStoreType = typeof(RoleStore<IdentityRole<string>, HoodDbContext, string>);
+            userStoreType = typeof(UserStore<ApplicationUser, ApplicationRole, HoodDbContext, string>);
+            roleStoreType = typeof(RoleStore<ApplicationRole, HoodDbContext, string>);
 
 
-            services.TryAddScoped(typeof(IRoleValidator<IdentityRole<string>>), typeof(RoleValidator<IdentityRole<string>>));
+            services.TryAddScoped(typeof(IRoleValidator<ApplicationRole>), typeof(RoleValidator<ApplicationRole>));
             services.TryAddScoped(typeof(IUserStore<>).MakeGenericType(userType), userStoreType);
             services.TryAddScoped(typeof(IRoleStore<>).MakeGenericType(roleType), roleStoreType);
-            services.TryAddScoped<RoleManager<IdentityRole<string>>>();
+            services.TryAddScoped<RoleManager<ApplicationRole>>();
             services.AddScoped(typeof(IUserClaimsPrincipalFactory<>).MakeGenericType(userType), typeof(UserClaimsPrincipalFactory<,>).MakeGenericType(userType, roleType));
 
             services.AddScoped(typeof(UserManager<>).MakeGenericType(userType), typeof(UserManager<ApplicationUser>));

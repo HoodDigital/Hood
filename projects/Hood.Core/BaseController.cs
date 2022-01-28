@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public abstract class BaseController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public abstract class BaseController : BaseController<HoodDbContext, ApplicationUser, ApplicationRole>
     {
         public BaseController()
             : base()
@@ -28,7 +28,7 @@ namespace Hood.Controllers
     public abstract class BaseController<TContext, TUser, TRole> : Controller
          where TContext : HoodDbContext
          where TUser : ApplicationUser
-         where TRole : IdentityRole
+         where TRole : ApplicationRole
     {
         protected readonly UserManager<TUser> _userManager;
         protected readonly IAccountRepository _account;

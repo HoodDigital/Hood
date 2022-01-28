@@ -30,6 +30,12 @@ namespace Hood.Development.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
+            migrationBuilder.AddColumn<string>(
+                name: "RemoteId",
+                table: "AspNetRoles",
+                type: "nvarchar(max)",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "AspNetAuth0Users",
                 columns: table => new
@@ -77,6 +83,10 @@ namespace Hood.Development.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AspNetAuth0Users");
+
+            migrationBuilder.DropColumn(
+                name: "RemoteId",
+                table: "AspNetRoles");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Slug",

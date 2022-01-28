@@ -21,7 +21,7 @@ namespace Hood.Controllers
     }
 
     [Authorize(Hood.Identity.Policies.Active)]
-    public abstract class AddressController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class AddressController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
         public AddressController()

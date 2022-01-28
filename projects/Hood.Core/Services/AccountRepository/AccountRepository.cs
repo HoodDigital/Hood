@@ -44,7 +44,7 @@ namespace Hood.Services
             }
         }
         private UserManager<ApplicationUser> UserManager => Engine.Services.Resolve<UserManager<ApplicationUser>>();
-        private RoleManager<IdentityRole> RoleManager => Engine.Services.Resolve<RoleManager<IdentityRole>>();
+        private RoleManager<ApplicationRole> RoleManager => Engine.Services.Resolve<RoleManager<ApplicationRole>>();
         #endregion
 
         #region Account stuff
@@ -360,11 +360,11 @@ namespace Hood.Services
         {
             return UserManager.SupportsUserRole;
         }
-        public virtual async Task<IPagedList<IdentityRole>> GetRolesAsync(IPagedList<IdentityRole> model)
+        public virtual async Task<IPagedList<ApplicationRole>> GetRolesAsync(IPagedList<ApplicationRole> model)
         {
             if (model == null)
             {
-                model = new PagedList<IdentityRole>() { PageIndex = 0, PageSize = 50 };
+                model = new PagedList<ApplicationRole>() { PageIndex = 0, PageSize = 50 };
             }
             var query = _db.Roles.AsQueryable();
 
@@ -390,46 +390,56 @@ namespace Hood.Services
 
             return model;
         }
-        public virtual async Task<IList<string>> GetRolesForUser(ApplicationUser user)
+
+        private DbSet<ApplicationUser> Users { get { return _db.Set<ApplicationUser>(); } }
+        private DbSet<ApplicationRole> Roles { get { return _db.Set<ApplicationRole>(); } }
+        private DbSet<IdentityUserRole<string>> UserRoles { get { return _db.Set<IdentityUserRole<string>>(); } }
+        public virtual async Task<IList<ApplicationRole>> GetRolesForUser(ApplicationUser user)
         {
-            return await UserManager.GetRolesAsync(user);
+            var userId = user.Id;
+            var query = from userRole in UserRoles
+                        join role in Roles on userRole.RoleId equals role.Id
+                        where userRole.UserId.Equals(userId)
+                        select role;
+            return await query.ToListAsync();
         }
-        public virtual async Task<IList<ApplicationUser>> GetUsersInRole(string role)
+        public virtual async Task<IList<ApplicationUser>> GetUsersInRole(string roleName)
         {
-            return await UserManager.GetUsersInRoleAsync(role);
+            var role = await GetRoleAsync(roleName);
+            if (role != null)
+            {
+                var query = from userrole in UserRoles
+                            join user in Users on userrole.UserId equals user.Id
+                            where userrole.RoleId.Equals(role.Id)
+                            select user;
+
+                return await query.ToListAsync();
+            }
+            return new List<ApplicationUser>();
         }
         public virtual async Task<bool> RoleExistsAsync(string role)
         {
             return await GetRoleAsync(role) != null;
         }
-        public virtual async Task<IdentityRole> GetRoleAsync(string role)
+        public virtual async Task<ApplicationRole> GetRoleAsync(string role)
         {
             return await _db.Roles.SingleOrDefaultAsync(r => r.NormalizedName == role.ToUpperInvariant());
         }
-        public virtual async Task CreateRoleAsync(string role)
+        public virtual async Task<ApplicationRole> CreateRoleAsync(string role)
         {
-            if (!await RoleExistsAsync(role))
+            var roleObject = await GetRoleAsync(role);
+            if (roleObject == null)
             {
-                _db.Roles.Add(new IdentityRole()
+                roleObject = new ApplicationRole()
                 {
                     Name = role,
                     NormalizedName = role.ToUpperInvariant(),
                     ConcurrencyStamp = Guid.NewGuid().ToString()
-                });
+                };
+                _db.Roles.Add(roleObject);
                 await _db.SaveChangesAsync();
             }
-        }
-        public virtual async Task UpdateRoleAsync(string role, string newName)
-        {
-            var identityRole = await GetRoleAsync(role);
-            if (identityRole != null)
-            {
-                identityRole.Name = newName;
-                identityRole.NormalizedName = newName.ToUpperInvariant();
-                identityRole.ConcurrencyStamp = Guid.NewGuid().ToString();
-                _db.Roles.Update(identityRole);
-                await _db.SaveChangesAsync();
-            }
+            return roleObject;
         }
         public virtual async Task DeleteRoleAsync(string role)
         {
@@ -437,13 +447,19 @@ namespace Hood.Services
             _db.Roles.Remove(identityRole);
             await _db.SaveChangesAsync();
         }
-        public virtual async Task<IdentityResult> AddUserToRoleAsync(ApplicationUser user, string role)
+        public virtual async Task AddUserToRolesAsync(ApplicationUser user, ApplicationRole[] roles)
         {
-            return await UserManager.AddToRoleAsync(user, role);
+            foreach (ApplicationRole role in roles)
+            {
+                await UserManager.AddToRoleAsync(user, role.Name);
+            }
         }
-        public virtual async Task<IdentityResult> RemoveUserFromRoleAsync(ApplicationUser user, string role)
+        public virtual async Task RemoveUserFromRolesAsync(ApplicationUser user, ApplicationRole[] roles)
         {
-            return await UserManager.RemoveFromRoleAsync(user, role);
+            foreach (ApplicationRole role in roles)
+            {
+                await UserManager.RemoveFromRoleAsync(user, role.Name);
+            }
         }
         #endregion
 

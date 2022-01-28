@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Auth0.ManagementApi;
 using Auth0.ManagementApi.Models;
 using Auth0.ManagementApi.Paging;
+using Hood.Caching;
 using Hood.Core;
 using Hood.Extensions;
 using Hood.Identity;
@@ -20,9 +21,14 @@ using RestSharp;
 
 namespace Hood.Services
 {
-
     public class Auth0Service
     {
+        protected IHoodCache _cache { get; set; }
+        public Auth0Service()
+        {
+            _cache = Engine.Services.Resolve<IHoodCache>();
+        }
+
         #region Data CRUD
         public async Task GetLocalAuth0User(string userId)
         {
@@ -147,44 +153,98 @@ namespace Hood.Services
         #endregion
 
         #region Auth0 API - Roles
-        public async Task<Role> GetRoleAsync(string role)
-        {
-            var roles = await GetRoles(role, 0, 100);
-            if (roles.List != null)
-            {
-                return roles.List.SingleOrDefault(r => r.Name.ToUpperInvariant() == role.ToUpperInvariant());
-            }
-            return null;
-        }
-        public async Task<Role> GetOrCreateRoleAsync(string role)
-        {
-            var newRole = await GetRoleAsync(role);
-            if (newRole == null)
-            {
-                var client = await GetClientAsync();
-                newRole = await client.Roles.CreateAsync(new RoleCreateRequest()
-                {
-                    Name = role,
-                    Description = role
-                });
-            }
-            return newRole;
-        }
-        public async Task<bool> RoleExistsAsync(string role)
-        {
-            return await GetRoleAsync(role) != null;
-        }
-        public async Task UpdateRole(string role, string newName)
+        public async Task<Auth0.ManagementApi.Paging.IPagedList<Role>> GetRolesAsync(string search = "", int page = 0, int pageSize = 50)
         {
             var client = await GetClientAsync();
-            var remoteRole = await GetRoleAsync(role);
+            var request = new GetRolesRequest()
+            {
+                NameFilter = search
+            };
+            return await client.Roles.GetAllAsync(request, new PaginationInfo(page, pageSize, true));
+        }
+        public async Task<Role> GetRoleAsync(string id)
+        {
+            var cacheKey = $"{Constants.Auth0RoleCacheName}.Id.{id}";
+            if (_cache.TryGetValue(cacheKey, out Role cachedObject))
+            {
+                return cachedObject;
+            }
+            var client = await GetClientAsync();
+            cachedObject = await client.Roles.GetAsync(id);
+            if (cachedObject != null)
+            {
+                _cache.Add(cacheKey, cachedObject);
+            }
+            return cachedObject;
+        }
+        public async Task<Role> GetRoleByNameAsync(string name)
+        {
+            var cacheKey = $"{Constants.Auth0RoleCacheName}.Name.{name}";
+            if (_cache.TryGetValue(cacheKey, out Role cachedObject))
+            {
+                return cachedObject;
+            }
+            // loop through any pages of search results and find our role.
+            int counter = 0;
+            var roles = await GetRolesAsync(name, counter);
+            while (cachedObject == null || (roles.Paging.Start + roles.Paging.Length) < roles.Paging.Total)
+            {
+                cachedObject = roles.SingleOrDefault(r => r.Name.ToUpperInvariant() == name.ToUpperInvariant());
+                if (cachedObject != null)
+                {
+                    _cache.Add(cacheKey, cachedObject);
+                }
+                roles = await GetRolesAsync(name, counter++);
+            }
+            return cachedObject;
+        }
+        public async Task<Role> CreateRoleAsync(ApplicationRole internalRole)
+        {
+            var client = await GetClientAsync();
+            Role newRole = null;
+            if (internalRole.RemoteId.IsSet())
+            {
+                newRole = await GetRoleAsync(internalRole.RemoteId);
+                if (newRole != null)
+                {
+                    return newRole;
+                }
+            }
+            try
+            {
+                newRole = await client.Roles.CreateAsync(new RoleCreateRequest()
+                {
+                    Name = internalRole.Name,
+                    Description = internalRole.Id
+                });
+            }
+            catch (Auth0.Core.Exceptions.ErrorApiException ex)
+            {
+                // already exists - try get by name.
+                if (ex.ApiError.Error == "Conflict")
+                {
+                    newRole = await GetRoleByNameAsync(internalRole.Name);
+                }
+            }
+
+            return newRole;
+        }
+        public async Task<bool> RoleExistsAsync(string id)
+        {
+            return await GetRoleAsync(id) != null;
+        }
+        public async Task<Role> UpdateRoleAsync(string id, string newName)
+        {
+            var remoteRole = await GetRoleAsync(id);
             if (remoteRole != null)
             {
-                remoteRole = await client.Roles.UpdateAsync(remoteRole.Id, new RoleUpdateRequest()
+                var client = await GetClientAsync();
+                remoteRole = await client.Roles.UpdateAsync(id, new RoleUpdateRequest()
                 {
                     Name = newName
                 });
             }
+            return remoteRole;
         }
         internal async Task DeleteRole(string role)
         {
@@ -195,24 +255,35 @@ namespace Hood.Services
                 await client.Roles.DeleteAsync(remoteRole.Id);
             }
         }
-        public async Task<System.Collections.Generic.IPagedList<Role>> GetRoles(string search, int page = 0, int pageSize = 50)
+        public async Task AddUserToRolesAsync(ApplicationUser user, ApplicationRole[] roles)
         {
             var client = await GetClientAsync();
-            var roles = await client.Roles.GetAllAsync(new GetRolesRequest()
+            if (user.ConnectedAuth0Accounts != null)
             {
-                NameFilter = search
-            }, new PaginationInfo(page, pageSize, true));
-
-            var pagedList = new System.Collections.Generic.PagedList<Role>()
+                foreach (var account in user.ConnectedAuth0Accounts)
+                {
+                    string[] roleIds = roles.Select(r => r.RemoteId).ToArray();
+                    await client.Users.AssignRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
+                    {
+                        Roles = roleIds
+                    });
+                }
+            }
+        }
+        public async Task RemoveUserFromRolesAsync(ApplicationUser user, ApplicationRole[] roles)
+        {
+            var client = await GetClientAsync();
+            if (user.ConnectedAuth0Accounts != null)
             {
-                List = roles.ToList(),
-                TotalCount = roles.Paging.Total,
-                Search = search,
-                PageIndex = page,
-                PageSize = pageSize,
-                TotalPages = pageSize == 0 ? 0 : (int)(roles.Paging.Total / pageSize) + 1
-            };
-            return pagedList;
+                foreach (var account in user.ConnectedAuth0Accounts)
+                {
+                    string[] roleIds = roles.Select(r => r.RemoteId).ToArray();
+                    await client.Users.RemoveRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
+                    {
+                        Roles = roleIds
+                    });
+                }
+            }
         }
         #endregion
 

@@ -20,7 +20,7 @@ namespace Hood.Controllers
         public HomeController() : base() { }
     }
 
-    public abstract class HomeController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class HomeController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
         public HomeController() : base() { }

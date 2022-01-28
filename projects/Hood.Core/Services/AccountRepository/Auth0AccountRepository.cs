@@ -101,17 +101,15 @@ namespace Hood.Services
         #endregion
 
         #region Roles
-        public async override Task CreateRoleAsync(string role)
+        public async override Task<ApplicationRole> CreateRoleAsync(string role)
         {
+            var internalRole = await base.CreateRoleAsync(role);
             var authService = new Auth0Service();
-            await authService.GetOrCreateRoleAsync(role);
-            await base.CreateRoleAsync(role);
-        }
-        public async override Task UpdateRoleAsync(string role, string newName)
-        {
-            var authService = new Auth0Service();
-            await authService.UpdateRole(role, newName);
-            await base.UpdateRoleAsync(role, newName);
+            var remoteRole = await authService.CreateRoleAsync(internalRole);
+            internalRole.RemoteId = remoteRole.Id;
+            _db.Roles.Update(internalRole);
+            await _db.SaveChangesAsync();
+            return internalRole;
         }
         public async override Task DeleteRoleAsync(string role)
         {
@@ -122,7 +120,7 @@ namespace Hood.Services
             }
             await base.DeleteRoleAsync(role);
         }
-        public async override Task<IdentityResult> AddUserToRoleAsync(ApplicationUser user, string role)
+        public async override Task AddUserToRolesAsync(ApplicationUser user, ApplicationRole[] roles)
         {
             var authService = new Auth0Service();
             var client = await authService.GetClientAsync();
@@ -130,20 +128,16 @@ namespace Hood.Services
             {
                 foreach (var account in user.ConnectedAuth0Accounts)
                 {
-                    var remoteRole = await authService.GetRoleAsync(role);
-                    if (remoteRole != null)
+                    string[] roleIds = roles.Select(r => r.RemoteId).ToArray();
+                    await client.Users.AssignRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
                     {
-                        string[] roles = { remoteRole.Id };
-                        await client.Users.AssignRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
-                        {
-                            Roles = roles
-                        });
-                    }
+                        Roles = roleIds
+                    });
                 }
             }
-            return await base.AddUserToRoleAsync(user, role);
+            await base.AddUserToRolesAsync(user, roles);
         }
-        public async override Task<IdentityResult> RemoveUserFromRoleAsync(ApplicationUser user, string role)
+        public async override Task RemoveUserFromRolesAsync(ApplicationUser user, ApplicationRole[] roles)
         {
             var authService = new Auth0Service();
             var client = await authService.GetClientAsync();
@@ -151,18 +145,14 @@ namespace Hood.Services
             {
                 foreach (var account in user.ConnectedAuth0Accounts)
                 {
-                    var remoteRole = await authService.GetRoleAsync(role);
-                    if (remoteRole != null)
+                    string[] roleIds = roles.Select(r => r.RemoteId).ToArray();
+                    await client.Users.RemoveRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
                     {
-                        string[] roles = { remoteRole.Id };
-                        await client.Users.RemoveRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
-                        {
-                            Roles = roles
-                        });
-                    }
+                        Roles = roleIds
+                    });
                 }
             }
-            return await base.RemoveUserFromRoleAsync(user, role);
+            await base.RemoveUserFromRolesAsync(user, roles);
         }
         #endregion
 

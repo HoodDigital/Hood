@@ -15,9 +15,9 @@ namespace Hood.Models
         public int RoleCount { get; set; }
         public string RolesJson { get; set; }
         [NotMapped]
-        public List<IdentityRole> Roles
+        public List<ApplicationRole> Roles
         {
-            get { return !RolesJson.IsSet() ? new List<IdentityRole>() : JsonConvert.DeserializeObject<List<IdentityRole>>(RolesJson); }
+            get { return !RolesJson.IsSet() ? new List<ApplicationRole>() : JsonConvert.DeserializeObject<List<ApplicationRole>>(RolesJson); }
             set { RolesJson = JsonConvert.SerializeObject(value); }
         }
         #endregion

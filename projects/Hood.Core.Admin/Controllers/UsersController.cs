@@ -43,7 +43,7 @@ namespace Hood.Areas.Admin.Controllers
         public virtual async Task<IActionResult> Edit(string id)
         {
             UserProfile model = await _account.GetProfileAsync(id);
-            var roles = await _account.GetRolesAsync(new PagedList<IdentityRole> { PageIndex = 0, PageSize = int.MaxValue });
+            var roles = await _account.GetRolesAsync(new PagedList<ApplicationRole> { PageIndex = 0, PageSize = int.MaxValue });
             model.AllRoles = roles.List;
             return View(model);
         }
@@ -377,7 +377,7 @@ namespace Hood.Areas.Admin.Controllers
         public virtual async Task<JsonResult> GetRoles(string id)
         {
             ApplicationUser user = await _account.GetUserByIdAsync(id);
-            IList<string> roles = await _account.GetRolesForUser(user);
+            IList<ApplicationRole> roles = await _account.GetRolesForUser(user);
             return Json(new { success = true, roles });
         }
         [Route("admin/users/{id}/set-role/")]
@@ -387,41 +387,34 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 ApplicationUser user = await _account.GetUserByIdAsync(id);
+                ApplicationRole applicationRole = await _account.GetRoleAsync(role);
                 if (!await _account.RoleExistsAsync(role))
                 {
                     await _account.CreateRoleAsync(role);
                 }
 
-                IdentityResult result;
+                var roles = new List<ApplicationRole>() {
+                    applicationRole
+                };
 
                 if (add)
                 {
-                    result = await _account.AddUserToRoleAsync(user, role);
+                    #warning Autho roles
+                    await _account.AddUserToRolesAsync(user, roles.ToArray());
                 }
                 else
                 {
-                    result = await _account.RemoveUserFromRoleAsync(user, role);
+                    #warning Autho roles
+                    await _account.RemoveUserFromRolesAsync(user, roles.ToArray());
                 }
 
-                if (result.Succeeded)
+                if (add)
                 {
-                    if (add)
-                    {
-                        return await SuccessResponseAsync<BaseUsersController>($"The user has been added the {role} role.");
-                    }
-                    else
-                    {
-                        return await SuccessResponseAsync<BaseUsersController>($"The user has been removed from the {role} role.");
-                    }
+                    return await SuccessResponseAsync<BaseUsersController>($"The user has been added the {role} role.");
                 }
                 else
                 {
-                    IdentityError error = result.Errors.FirstOrDefault();
-                    if (error != null)
-                    {
-                        throw new Exception(error.Description);
-                    }
-                    throw new Exception("The user manager could not save the role update to the database.");
+                    return await SuccessResponseAsync<BaseUsersController>($"The user has been removed from the {role} role.");
                 }
             }
             catch (Exception ex)

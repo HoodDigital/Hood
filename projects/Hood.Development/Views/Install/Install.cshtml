@@ -342,7 +342,7 @@
                         <div id="collapse-viewsInstalled" class="accordion-collapse collapse" aria-labelledby="heading-viewsInstalled">
                             <div class="accordion-body">
                                 <h6>@Model.Details.Message</h6>
-                                <div class="card p-3 overflow-scroll" style="white-space:nowrap;font-size:11px;min-height:500px;">@Html.Raw(Model.Details.StackTrace.EncodeHtml().AddHtmlLineBreaks())</div>
+                                <div class="card p-3 overflow-scroll" style="white-space:nowrap;font-size:11px;min-height:500px;">@Html.Raw(Model.Details.StackTrace.AddHtmlLineBreaks())</div>
                             </div>
                         </div>
                     </div>

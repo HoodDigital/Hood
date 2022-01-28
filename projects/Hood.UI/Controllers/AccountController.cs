@@ -30,7 +30,7 @@ namespace Hood.Controllers
         public AccountController() : base() { }
     }
 
-    public abstract class AccountController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class AccountController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
         public AccountController()
