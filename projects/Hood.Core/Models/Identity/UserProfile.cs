@@ -25,9 +25,9 @@ namespace Hood.Models
         #region Auth0 
         public string Auth0UsersJson { get; set; }
         [NotMapped]
-        public List<Auth0User> Auth0Users
+        public List<Auth0Identity> Auth0Users
         {
-            get { return !Auth0UsersJson.IsSet() ? new List<Auth0User>() : JsonConvert.DeserializeObject<List<Auth0User>>(Auth0UsersJson); }
+            get { return !Auth0UsersJson.IsSet() ? new List<Auth0Identity>() : JsonConvert.DeserializeObject<List<Auth0Identity>>(Auth0UsersJson); }
             set { Auth0UsersJson = JsonConvert.SerializeObject(value); }
         }
         #endregion

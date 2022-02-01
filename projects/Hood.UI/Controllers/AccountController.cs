@@ -1,6 +1,7 @@
 ﻿using Auth0.AspNetCore.Authentication;
 using Auth0.AuthenticationApi;
 using Auth0.AuthenticationApi.Models;
+using Auth0.Core.Exceptions;
 using Hood.Attributes;
 using Hood.BaseTypes;
 using Hood.Core;
@@ -283,7 +284,7 @@ namespace Hood.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("account/auth/failed")]
-        public IActionResult RemoteSigninFailed(string r)
+        public IActionResult RemoteSigninFailed(string r, string d)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -291,8 +292,15 @@ namespace Hood.Controllers
             }
             switch (r)
             {
-                case "signup-disabled":
-                    ViewData["Reason"] = "Sign up is disabled on this site at the moment.";
+                case "unauthorized":
+                    if (d.IsSet())
+                    {
+                        ViewData["Reason"] = "Unauthorized: " + d.ToTitleCase();
+                    }
+                    else
+                    {
+                        ViewData["Reason"] = "This account is not authorized.";
+                    }
                     break;
                 case "auth-failed":
                     ViewData["allow-relog"] = true;
@@ -336,6 +344,10 @@ namespace Hood.Controllers
                 ReturnUrl = returnUrl,
                 RemotePicture = User.GetClaimValue(HoodClaimTypes.RemotePicture)
             };
+            if (User.HasClaim(HoodClaimTypes.AccountLinkRequired))
+            {
+                return View("ConnectAccountLink", model);
+            }
             return View(model);
         }
         [HttpPost]
@@ -349,6 +361,11 @@ namespace Hood.Controllers
             }
             try
             {
+                if (User.HasClaim(HoodClaimTypes.AccountLinkRequired))
+                {
+                    return RedirectToAction(nameof(ConnectAccount), new { returnUrl });
+                }
+
                 if (!User.IsEmailConfirmed())
                 {
                     // tell the user they need to confirm their email, then try again. Restart flow.
@@ -362,8 +379,9 @@ namespace Hood.Controllers
                 {
                     throw new Exception("This account is already connected to an account.");
                 }
+
                 var authService = new Auth0Service();
-                var newAuthUser = await authService.CreateLocalAuth0User(User.GetUserId(), user);
+                var newAuthUser = await authService.CreateLocalAuthIdentity(User.GetUserId(), user, User.GetClaimValue(HoodClaimTypes.RemotePicture));
                 if (newAuthUser == null)
                 {
                     throw new Exception("There was a problem connecting your account, please try again.");
@@ -374,6 +392,111 @@ namespace Hood.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
 
                 return RedirectToAction(nameof(ConnectAccountComplete), new { returnUrl });
+            }
+            catch (Exception ex)
+            {
+                SaveMessage = "Could not connect the account: " + ex.Message;
+                MessageType = AlertType.Danger;
+                return RedirectToAction(nameof(ConnectAccount));
+            }
+        }
+        [HttpPost]
+
+        [Authorize(Policies.AccountNotConnected)]
+        [Route("account/auth/connect-link")]
+        public async Task<IActionResult> ConnectAccountLink(string returnUrl)
+        {
+            if (!Engine.Auth0Enabled)
+            {
+                return NotFound();
+            }
+            try
+            {
+                if (!User.HasClaim(HoodClaimTypes.AccountLinkRequired))
+                {
+                    return RedirectToAction(nameof(ConnectAccount), new { returnUrl });
+                }
+
+                if (!User.IsEmailConfirmed())
+                {
+                    // tell the user they need to confirm their email, then try again. Restart flow.
+                    return RedirectToAction(nameof(ConfirmRequired));
+                }
+
+                // connect the accounts.             
+                var user = await GetCurrentUserOrThrow();
+                var linkedUser = await _account.GetUserByAuth0Id(User.GetUserId());
+                if (linkedUser != null)
+                {
+                    throw new Exception("This account is already connected to an account.");
+                }
+
+                // get the user's other account....(s?)
+                if (user.ConnectedAuth0Accounts == null && user.ConnectedAuth0Accounts.Count() == 0)
+                {
+                    throw new Exception("Could not load an account to link.");
+                }
+
+                if (user.ConnectedAuth0Accounts.Count() > 1)
+                {
+                    // User has more than one account, this is awkward.
+                }
+
+                var authService = new Auth0Service();
+
+                try
+                {
+
+                    var primaryAccount = user.ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
+                    var fullAuthUserId = User.GetUserId();
+                    var authProviderName = fullAuthUserId.Split('|')[0];
+                    var authUserId = fullAuthUserId.Split('|')[1];
+                    var client = await authService.GetClientAsync();
+                    var response = await client.Users.LinkAccountAsync(primaryAccount.Id, new Auth0.ManagementApi.Models.UserAccountLinkRequest()
+                    {
+                        Provider = authProviderName,
+                        UserId = authUserId
+                    });
+
+                    // Success - remove link claim.
+                    User.RemoveClaim(HoodClaimTypes.AccountLinkRequired);
+                }
+                catch (ErrorApiException ex)
+                {
+                    if (ex.ApiError == null)
+                    {
+                        throw new Exception("Could not link the remote accounts: " + ex.Message);
+                    }
+                    switch (ex.ApiError.ErrorCode)
+                    {
+                        case "identity_conflict":
+                            if (ex.ApiError.ExtraData.ContainsKey("statusCode") && ex.ApiError.ExtraData["statusCode"] == "409")
+                            {
+                                // Account already linked, remove link claim and continue.
+                                User.RemoveClaim(HoodClaimTypes.AccountLinkRequired);
+                            }
+                            break;
+                        default:
+                            throw new Exception("Could not link the remote accounts: " + ex.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Could not link the remote accounts: " + ex.Message);
+                }
+
+                var newAuthUser = await authService.CreateLocalAuthIdentity(User.GetUserId(), user, User.GetClaimValue(HoodClaimTypes.RemotePicture));
+                if (newAuthUser == null)
+                {
+                    throw new Exception("There was a problem connecting your account, please try again.");
+                }
+
+                User.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+
+                // Round trip the user through authorize to ensure claims are up to date.
+                return RedirectToAction(nameof(ConnectAccountComplete), new { returnUrl });
+
             }
             catch (Exception ex)
             {
@@ -447,11 +570,28 @@ namespace Hood.Controllers
                     throw new Exception("The remote account could not be located.");
                 }
                 var authService = new Auth0Service();
+                var primaryAccount = user.ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
+                var identityToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.UserId == model.AccountId);
+                
                 if (Engine.Settings.Account.DeleteRemoteAccounts)
                 {
-                    await authService.DeleteUser(model.AccountId);
+                    // de-link the accounts.
+                    if (primaryAccount != null && identityToDisconnect != null)
+                    {
+                        try
+                        {
+                            var client = await authService.GetClientAsync();
+                            var response = await client.Users.UnlinkAccountAsync(primaryAccount.Id, identityToDisconnect.Provider, identityToDisconnect.Id);
+
+                        }
+                        catch (ErrorApiException ex)
+                        {
+                            throw new Exception("Could not unlink the remote accounts: " + ex.Message);
+                        }
+                    }
+                    await authService.DeleteUser(identityToDisconnect.Id);
                 }
-                await authService.DeleteLocalAuth0User(model.AccountId);
+                await authService.DeleteLocalAuthIdentity(identityToDisconnect.Id);
 
                 return RedirectToAction(nameof(DisconnectAccountComplete));
             }
@@ -646,8 +786,8 @@ namespace Hood.Controllers
             var auth0Service = new Auth0Service();
             var client = await auth0Service.GetClientAsync();
             // get currently signed in user.
-            Auth0User remoteUser = user.GetAccount(User.GetUserId());
-            if (remoteUser.ProviderName == Constants.AuthProviderName)
+            Auth0Identity remoteUser = user.GetAccount(User.GetUserId());
+            if (remoteUser.Provider == Constants.AuthProviderName)
             {
                 var ticket = client.Tickets.CreatePasswordChangeTicketAsync(new Auth0.ManagementApi.Models.PasswordChangeTicketRequest()
                 {
@@ -656,7 +796,7 @@ namespace Hood.Controllers
             }
             else
             {
-                switch (remoteUser.ProviderName)
+                switch (remoteUser.Provider)
                 {
                     case "email":
                         SaveMessage = "Could not send a password change as you are using a passwordless connection.";

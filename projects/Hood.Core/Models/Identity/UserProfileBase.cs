@@ -237,8 +237,8 @@ namespace Hood.Models
         public IList<ApplicationRole> AllRoles { get; set; }
         #endregion
 
-        public IList<Auth0User> ConnectedAuth0Accounts { get; set; }
-        public virtual Auth0User GetAccount(string userId)
+        public IList<Auth0Identity> ConnectedAuth0Accounts { get; set; }
+        public virtual Auth0Identity GetAccount(string userId)
         {
             if (ConnectedAuth0Accounts != null)
             {

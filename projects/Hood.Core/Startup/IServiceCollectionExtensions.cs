@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections;
 
 namespace Hood.Startup
 {
@@ -247,6 +248,7 @@ namespace Hood.Startup
             {
                 options.AddPolicy(Policies.Active, policy => policy.RequireClaim(Identity.HoodClaimTypes.Active));
                 options.AddPolicy(Policies.AccountNotConnected, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountNotConnected));
+                options.AddPolicy(Policies.AccountLinkRequired, policy => policy.RequireClaim(Identity.HoodClaimTypes.AccountLinkRequired));
             });
 
             return services;
@@ -291,9 +293,10 @@ namespace Hood.Startup
                                     identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
                                     await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                                 }
+
+                                await SyncLocalRoles(e, user);
                                 await SetDefaultClaims(e, user);
                                 return;
-
                             }
 
                             // check if the user has an account, via email, if so, the should be asked to link to this account                           
@@ -302,6 +305,17 @@ namespace Hood.Startup
                             {
                                 // user exists, but the current Auth0 signin method is not saved, force them into the connect account flow.
                                 var identity = (ClaimsIdentity)principal.Identity;
+
+                                if (user.ConnectedAuth0Accounts != null && user.ConnectedAuth0Accounts.Count() > 0)
+                                {
+                                    identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountLinkRequired, "true"));
+                                }
+                                else
+                                {
+                                    // This is a legacy account just send to the local account connect flow - 
+                                    // Email needs to be verified to attach to a local account.
+                                }
+
                                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.AccountNotConnected, "true"));
 
                                 await SetDefaultClaims(e, user);
@@ -367,7 +381,7 @@ namespace Hood.Startup
                             }
 
                             // User exists at this point, for sure, but no auth0 connection for it, create it now.
-                            await authService.CreateLocalAuth0User(e.Principal.GetUserId(), user);
+                            await authService.CreateLocalAuthIdentity(e.Principal.GetUserId(), user, authUser.Picture);
 
                             if (user.Active)
                             {
@@ -376,6 +390,7 @@ namespace Hood.Startup
                                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
                             }
 
+                            await SyncLocalRoles(e, user);
                             await SetDefaultClaims(e, user);
 
                             // Account setup complete, send user to manage profile with new-account-connection flag.
@@ -390,6 +405,16 @@ namespace Hood.Startup
                         },
 
                         OnTokenValidated = e =>
+                        {
+                            return Task.CompletedTask;
+                        },
+
+                        OnRedirectToIdentityProvider = e =>
+                        {
+                            return Task.CompletedTask;
+                        },
+
+                        OnRedirectToIdentityProviderForSignOut = e =>
                         {
                             return Task.CompletedTask;
                         },
@@ -423,13 +448,25 @@ namespace Hood.Startup
                         {
                             // // user has not been found, or created (signups disabled on this end) - signout and forward to failure page.
                             string reason = "remote-failed";
-                            if (e.Failure?.Message != null && e.Failure.Message.ToLower().Contains("message.state"))
+                            string description = "Sign in failed due to a remote error.";
+                            if (e.Failure == null || e.Failure.Data == null || e.Failure.Data.Count == 0)
                             {
-                                reason = "state-failure";
+                                if (e.Failure?.Message != null && e.Failure.Message.ToLower().Contains("message.state"))
+                                {
+                                    reason = "state-failure";
+                                }
+                            }
+                            else
+                            {
+                                var data = e.Failure.Data.Cast<DictionaryEntry>()
+                                                            .Where(de => de.Key is string && de.Value is string)
+                                                            .ToDictionary(de => (string)de.Key, de => (string)de.Value);
+                                if (data.ContainsKey("error")) { reason = data["error"]; }
+                                if (data.ContainsKey("error_description")) { description = data["error_description"]; }
                             }
                             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-                            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = reason });
-                            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl }));
+                            var returnUrl = linkGenerator.GetPathByAction("RemoteSigninFailed", "Account", new { r = reason, d = description });
+                            e.Response.Redirect(linkGenerator.GetPathByAction("SignOut", "Account", new { returnUrl, d = description }));
                             e.HandleResponse();
                             return Task.CompletedTask;
                         }
@@ -471,6 +508,20 @@ namespace Hood.Startup
 
         private static async Task SetDefaultClaims(TicketReceivedContext e, ApplicationUser user)
         {
+            // Set the remote avatar on a local claim, in case the local overrides it. 
+            if (e.Principal.HasClaim(HoodClaimTypes.Picture))
+            {
+                e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.RemotePicture, e.Principal.GetClaimValue(HoodClaimTypes.Picture));
+            }
+
+            // Set the user claims locally
+            e.Principal.SetUserClaims(user);
+            await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
+        }
+
+
+        private static async Task SyncLocalRoles(TicketReceivedContext e, ApplicationUser user)
+        {
             var authService = new Auth0Service();
             var accountRepository = Engine.Services.Resolve<IAccountRepository>();
             var remoteRoles = e.Principal.GetRoles();
@@ -481,21 +532,17 @@ namespace Hood.Startup
                 var rolesToAdd = new List<ApplicationRole>();
                 foreach (var role in localRoles)
                 {
-                    rolesToAdd.Add(await accountRepository.GetRoleAsync(role.Name));
+                    if (!remoteRoles.Contains(role.Name))
+                    {
+                        rolesToAdd.Add(await accountRepository.GetRoleAsync(role.Name));
+                    }
                     e.Principal.AddClaim(ClaimTypes.Role, role.Name);
                 }
-                await accountRepository.AddUserToRolesAsync(user, rolesToAdd.ToArray());
+                if (rolesToAdd.Count > 0)
+                {
+                    await accountRepository.AddUserToRolesAsync(user, rolesToAdd.ToArray());
+                }
             }
-
-            // Set the remote avatar on a local claim, in case the local overrides it. 
-            if (e.Principal.HasClaim(HoodClaimTypes.Picture))
-            {
-                e.Principal.AddOrUpdateClaimValue(HoodClaimTypes.RemotePicture, e.Principal.GetClaimValue(HoodClaimTypes.Picture));
-            }
-
-            // Set the user claims locally
-            e.Principal.SetUserClaims(user);
-            await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
         }
 
         private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)

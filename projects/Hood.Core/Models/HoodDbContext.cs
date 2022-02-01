@@ -31,7 +31,7 @@ namespace Hood.Models
 
         // Identity
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<Auth0User> Auth0Users { get; set; }
+        public DbSet<Auth0Identity> Auth0Users { get; set; }
 
         // Media
         public DbSet<MediaObject> Media { get; set; }

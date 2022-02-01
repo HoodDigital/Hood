@@ -98,23 +98,28 @@
                 }
                 @if (accounts.Count > 0)
                 {
-                    <p>Your account can be accessed with the following external accounts:</p>
-                    @foreach (var role in accounts)
+                    <p>Your account can be accessed with the following methods:</p>
+                    @foreach (var account in accounts)
                     {
                         <div class="card p-2 mb-2">
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
-                                    <fixedImage class="img img-xs" src="@role.Picture"></fixedImage>
+                                    <fixedImage class="img img-xs" src="@account.Picture"></fixedImage>
                                 </div>
                                 <div class="flex-fill">
-                                    <div><strong>@role.Email</strong></div>
-                                    @if (role.CreatedAt.HasValue)
-                                    {                                        
-                                        <div>Created: @role.CreatedAt.Value.ToDisplay()</div>
+                                    <div>
+                                        <strong>@account.Email</strong>
+                                    </div>
+                                    @if (account.CreatedAt.HasValue)
+                                    {
+                                        <div>Created: @account.CreatedAt.Value.ToDisplay()</div>
                                     }
                                 </div>
-                                <div class="">
-                                    <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@role.UserId">Disconnect</a>
+                                <div>
+                                    <span class="badge bg-dark">@Html.Raw(account.ToProviderString())</span>
+                                </div>
+                                <div class="ms-2">
+                                    <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.UserId">Disconnect</a>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +133,7 @@
                 }
             </div>
             <div role="tabpanel" class="tab-pane" id="roles"> @{
-                var roles = User.GetRoles();
+                    var roles = User.GetRoles();
                 }
                 @if (roles.Count > 0)
                 {

@@ -30,40 +30,46 @@ namespace Hood.Services
         }
 
         #region Data CRUD
-        public async Task GetLocalAuth0User(string userId)
+        public async Task GetLocalAuthIdentity(string userId)
         {
             var db = Engine.Services.Resolve<HoodDbContext>();
             var userToRemove = db.Auth0Users.SingleOrDefault(u => u.UserId == userId);
             db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await db.SaveChangesAsync();
         }
-
-
-        public async Task<Auth0User> CreateLocalAuth0User(string authUserId, ApplicationUser user)
+        public async Task<Auth0Identity> CreateLocalAuthIdentity(string fullAuthUserId, ApplicationUser user, string picture)
         {
-            var newAuthUser = await GetUserById(authUserId);
-            var db = Engine.Services.Resolve<HoodDbContext>();
-            newAuthUser.LocalUserId = user.Id;
-            if (newAuthUser.Identities.FirstOrDefault() != null)
+            var authProviderName = fullAuthUserId.Split('|')[0];
+            var authUserId = fullAuthUserId.Split('|')[1];
+
+            var primaryIdentity = user.ConnectedAuth0Accounts.SingleOrDefault(i => i.IsPrimary);
+            var newAuthUser = await GetUserById(primaryIdentity.Id);      
+
+            var identity = newAuthUser.Identities.SingleOrDefault(i => i.UserId == authUserId);
+            var newIdentity = new Auth0Identity(identity);
+
+            if (user.ConnectedAuth0Accounts == null || user.ConnectedAuth0Accounts.Count == 0)
             {
-                newAuthUser.ProviderName = newAuthUser.Identities.FirstOrDefault().Provider;
+                newIdentity.IsPrimary = true;
             }
-            else
-            {
-                newAuthUser.ProviderName = newAuthUser.UserId.Split('|')[0];
-            }
-            db.Add(newAuthUser);
+
+            newIdentity.Id = fullAuthUserId;
+            newIdentity.LocalUserId = user.Id;
+            newIdentity.Picture = picture;
+
+            var db = Engine.Services.Resolve<HoodDbContext>();      
+            db.Add(newIdentity);
             await db.SaveChangesAsync();
-            return newAuthUser;
+            return newIdentity;
         }
-        public async Task DeleteLocalAuth0User(string userId)
+        public async Task DeleteLocalAuthIdentity(string id)
         {
             var db = Engine.Services.Resolve<HoodDbContext>();
-            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.UserId == userId);
+            var userToRemove = db.Auth0Users.SingleOrDefault(u => u.Id == id);
             db.Entry(userToRemove).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
             await db.SaveChangesAsync();
         }
-        public async Task UpdateLocalAuth0User(Auth0User user)
+        public async Task UpdateLocalAuthIdentity(Auth0Identity user)
         {
             var db = Engine.Services.Resolve<HoodDbContext>();
             db.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
@@ -97,7 +103,7 @@ namespace Hood.Services
         #endregion
 
         #region Auth0 API - Users
-        public async Task<System.Collections.Generic.IPagedList<Auth0User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
+        public async Task<System.Collections.Generic.IPagedList<User>> GetUsers(string search = "", int page = 0, int pageSize = 50)
         {
             var client = await GetClientAsync();
             var request = new GetUsersRequest()
@@ -105,9 +111,9 @@ namespace Hood.Services
                 Query = search
             };
             var users = await client.Users.GetAllAsync(request, new PaginationInfo(page, pageSize, true));
-            var pagedList = new System.Collections.Generic.PagedList<Auth0User>()
+            var pagedList = new System.Collections.Generic.PagedList<User>()
             {
-                List = users.Select(u => new Auth0User(u)).ToList(),
+                List = users.ToList(),
                 TotalCount = users.Paging.Total,
                 Search = search,
                 PageIndex = page,
@@ -116,13 +122,13 @@ namespace Hood.Services
             };
             return pagedList;
         }
-        public async Task<Auth0User> GetUserById(string userId)
+        public async Task<User> GetUserById(string userId)
         {
             var client = await GetClientAsync();
             var user = await client.Users.GetAsync(userId);
-            return new Auth0User(user);
+            return user;
         }
-        public async Task<System.Collections.Generic.IList<Auth0User>> GetUserByEmail(string email)
+        public async Task<System.Collections.Generic.IList<User>> GetUserByEmail(string email)
         {
             if (!email.IsSet())
             {
@@ -130,9 +136,9 @@ namespace Hood.Services
             }
             var client = await GetClientAsync();
             var users = await client.Users.GetUsersByEmailAsync(email);
-            return users.Select(u => new Auth0User(u)).ToList();
+            return users.ToList();
         }
-        public async Task<Auth0User> CreateUserWithPassword(ApplicationUser user, string password)
+        public async Task<User> CreateUserWithPassword(ApplicationUser user, string password)
         {
             var client = await GetClientAsync();
             var newUser = await client.Users.CreateAsync(new UserCreateRequest()
@@ -143,7 +149,7 @@ namespace Hood.Services
                 PhoneNumber = user.PhoneNumber,
                 VerifyEmail = false
             });
-            return new Auth0User(newUser);
+            return newUser;
         }
         public async Task DeleteUser(string userId)
         {

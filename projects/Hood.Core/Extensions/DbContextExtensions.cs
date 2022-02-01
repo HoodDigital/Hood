@@ -13,14 +13,13 @@ namespace Hood.Extensions
         public static void CreateHoodModels(this ModelBuilder builder)
         {
             // Identity
-            builder.Entity<Auth0User>().ToTable("AspNetAuth0Users");
-            builder.Entity<Auth0User>().HasKey(au => au.UserId);
-            builder.Entity<Auth0User>().Ignore(au => au.Identities);
-            builder.Entity<Auth0User>().Ignore(au => au.ProviderAttributes);            
-            builder.Entity<Auth0User>().Ignore(au => au.Multifactor);              
-            builder.Entity<Auth0User>().Ignore(au => au.AppMetadata);              
-            builder.Entity<Auth0User>().Ignore(au => au.UserMetadata);            
-            builder.Entity<Auth0User>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.LocalUserId).OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Auth0Identity>().ToTable("AspNetAuth0Identities");
+            builder.Entity<Auth0Identity>().Ignore(au => au.ProfileData);         
+            builder.Entity<Auth0Identity>().Ignore(au => au.AccessToken);         
+            builder.Entity<Auth0Identity>().Ignore(au => au.AccessTokenSecret);    
+            builder.Entity<Auth0Identity>().Ignore(au => au.ExpiresIn);          
+            builder.Entity<Auth0Identity>().Ignore(au => au.RefreshToken);           
+            builder.Entity<Auth0Identity>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.LocalUserId).OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Option>().ToTable("HoodOptions");
             builder.Entity<Log>().ToTable("HoodLogs");

@@ -45,7 +45,7 @@ namespace Hood.Services
                 //remove from auth0
                 if (Engine.Settings.Account.DeleteRemoteAccounts)
                 {
-                    await auth0Service.DeleteUser(account.UserId);
+                    await auth0Service.DeleteUser(account.Id);
                 }
                 _db.Entry(account).State = EntityState.Deleted;
             }

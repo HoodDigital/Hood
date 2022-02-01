@@ -9,52 +9,61 @@ using Newtonsoft.Json;
 
 namespace Hood.Models
 {
-    public class Auth0UserList
+    public class Auth0Identity : Auth0.ManagementApi.Models.Identity
     {
-        [JsonProperty("users")]
-        public List<Auth0User> Users { get; set; }
-        [JsonProperty("start")]
-        public int Start { get; set; }
-        [JsonProperty("limit")]
-        public int Limit { get; set; }
-        [JsonProperty("length")]
-        public int Length { get; set; }
-        [JsonProperty("total")]
-        public int Total { get; set; }
-    }
-    public class Auth0User : Auth0.ManagementApi.Models.User
-    {
-        public Auth0User()
+        public Auth0Identity()
         { }
 
-        public Auth0User(User user)
+        public Auth0Identity(Auth0.ManagementApi.Models.Identity identity)
         {
-            user.CopyProperties(this);
+            identity.CopyProperties(this);
         }
-
+        [Key]
+        [JsonIgnore]
+        public string Id { get; set; }
         [JsonIgnore]
         public string LocalUserId { get; set; }
         [JsonIgnore]
         public ApplicationUser User { get; set; }
         [JsonIgnore]
-        public string ProviderName { get; set; }
-        public string ToProviderString()
+        public bool IsPrimary { get; set; }
+        public string Picture { get; set; }
+
+        public string ToProviderIcon()
         {
-            switch (ProviderName)
+            switch (Provider)
             {
                 case "email":
-                    return "<i class='fa fa-envelope me-2'></i>Passwordless (E-Mail)";
+                    return "<i class='fa fa-envelope me-2'></i>";
 
                 case "google-oauth2":
-                    return "<i class='fab fa-google me-2'></i>Google";
+                    return "<i class='fab fa-google me-2'></i>";
 
                 case "auth0":
-                    return "<i class='fa fa-lock me-2'></i>Password";
+                    return "<i class='fa fa-lock me-2'></i>";
 
                 default:
-                    return "<i class='fa fa-external-link me-2'></i>External";
-            }            
+                    return "<i class='fa fa-external-link me-2'></i>Extenal";
+            }
         }
+        public string ToProviderString()
+        {
+            switch (Provider)
+            {
+                case "email":
+                    return "Passwordless (E-Mail)";
+
+                case "google-oauth2":
+                    return "Google";
+
+                case "auth0":
+                    return "Password";
+
+                default:
+                    return "External";
+            }
+        }
+
 
     }
 }

@@ -30,9 +30,9 @@ SELECT
 		SELECT 
 			*
 		FROM 
-			AspNetAuth0Users
+			AspNetAuth0Identities
 		WHERE 
-			AspNetAuth0Users.UserId = AspNetUsers.Id
+			AspNetAuth0Identities.UserId = AspNetUsers.Id
 		FOR JSON AUTO
 	) AS Auth0UsersJson,
 	(

@@ -399,12 +399,10 @@ namespace Hood.Areas.Admin.Controllers
 
                 if (add)
                 {
-                    #warning Autho roles
                     await _account.AddUserToRolesAsync(user, roles.ToArray());
                 }
                 else
                 {
-                    #warning Autho roles
                     await _account.RemoveUserFromRolesAsync(user, roles.ToArray());
                 }
 

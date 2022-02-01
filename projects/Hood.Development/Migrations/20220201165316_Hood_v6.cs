@@ -37,36 +37,23 @@ namespace Hood.Development.Migrations
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "AspNetAuth0Users",
+                name: "AspNetAuth0Identities",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     LocalUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ProviderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EmailVerified = table.Column<bool>(type: "bit", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneVerified = table.Column<bool>(type: "bit", nullable: true),
-                    UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NickName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPrimary = table.Column<bool>(type: "bit", nullable: false),
                     Picture = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Blocked = table.Column<bool>(type: "bit", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastIpAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    LastPasswordReset = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Locale = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LoginsCount = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Connection = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsSocial = table.Column<bool>(type: "bit", nullable: true),
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AspNetAuth0Users", x => x.UserId);
+                    table.PrimaryKey("PK_AspNetAuth0Identities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetAuth0Users_AspNetUsers_LocalUserId",
+                        name: "FK_AspNetAuth0Identities_AspNetUsers_LocalUserId",
                         column: x => x.LocalUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -74,15 +61,15 @@ namespace Hood.Development.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetAuth0Users_LocalUserId",
-                table: "AspNetAuth0Users",
+                name: "IX_AspNetAuth0Identities_LocalUserId",
+                table: "AspNetAuth0Identities",
                 column: "LocalUserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AspNetAuth0Users");
+                name: "AspNetAuth0Identities");
 
             migrationBuilder.DropColumn(
                 name: "RemoteId",
