@@ -397,14 +397,35 @@ namespace Hood.Areas.Admin.Controllers
                     applicationRole
                 };
 
+                var auth0Service = new Auth0Service();
                 if (add)
                 {
                     await _account.AddUserToRolesAsync(user, roles.ToArray());
+                    if (Engine.Auth0Enabled)
+                    {
+                        await auth0Service.AddUserToRolesAsync(user, roles.ToArray());
+                    }
                 }
                 else
                 {
                     await _account.RemoveUserFromRolesAsync(user, roles.ToArray());
+                    if (Engine.Auth0Enabled)
+                    {
+                        await auth0Service.RemoveUserFromRolesAsync(user, roles.ToArray());
+                    }
                 }
+
+                if (Engine.Auth0Enabled)
+                {
+                    // sync remote roles.
+                    var primaryAccount = user.GetPrimaryIdentity();
+                    if (primaryAccount != null)
+                    {
+                        var remoteRoles = (await auth0Service.GetRolesAsync(primaryAccount.Id)).Select(r => r.Name).ToList();
+                        await auth0Service.SyncLocalRoles(user, remoteRoles);
+                    }
+                }
+
 
                 if (add)
                 {

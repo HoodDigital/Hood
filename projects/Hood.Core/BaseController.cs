@@ -82,12 +82,14 @@ namespace Hood.Controllers
         {
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
+            SaveMessage = null;
             return base.View(model);
         }
         protected ViewResult View(string viewName, ISaveableModel model)
         {
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
+            SaveMessage = null;
             return base.View(viewName, model);
         }
 

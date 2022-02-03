@@ -13,7 +13,6 @@ namespace Hood.Services
         Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
         Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true);
         Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
-        Task<ApplicationUser> GetUserByAuth0Id(string userId);
         Task<UserProfile> GetUserProfileByIdAsync(string id);
         Task UpdateUserAsync(ApplicationUser user);
         Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser);

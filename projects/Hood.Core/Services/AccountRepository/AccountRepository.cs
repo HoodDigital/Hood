@@ -86,10 +86,6 @@ namespace Hood.Services
 
             return await query.SingleOrDefaultAsync(u => u.Email == email);
         }
-        public virtual Task<ApplicationUser> GetUserByAuth0Id(string userId)
-        {
-            throw new ApplicationException("This feature is disabled when using not Auth0.");
-        }
         public virtual async Task UpdateUserAsync(ApplicationUser user)
         {
             _db.Update(user);

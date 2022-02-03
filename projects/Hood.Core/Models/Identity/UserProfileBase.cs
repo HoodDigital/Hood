@@ -238,13 +238,14 @@ namespace Hood.Models
         #endregion
 
         public IList<Auth0Identity> ConnectedAuth0Accounts { get; set; }
-        public virtual Auth0Identity GetAccount(string userId)
+
+        public Auth0Identity GetPrimaryIdentity()
         {
-            if (ConnectedAuth0Accounts != null)
+            if (ConnectedAuth0Accounts == null || ConnectedAuth0Accounts.Count == 0)
             {
-                return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.UserId == userId);
+                return null;
             }
-            return null;
+            return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
         }
     }
 }

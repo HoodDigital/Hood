@@ -115,10 +115,17 @@
                                     {
                                         <span class="badge bg-info ms-3">Primary</span>
                                     }
+                                    @if (User.GetUserId() == account.Id)
+                                    {
+                                        <span class="badge bg-warning ms-3">In use</span>
+                                    }
                                 </div>
-                                <div class="ms-2">
-                                    <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.UserId">Disconnect</a>
-                                </div>
+                                @if (!account.IsPrimary && User.GetUserId() != account.Id)
+                                {
+                                    <div class="ms-2">
+                                        <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.UserId">Disconnect</a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }

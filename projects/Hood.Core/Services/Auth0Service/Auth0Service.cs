@@ -16,6 +16,7 @@ using Hood.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -24,12 +25,32 @@ namespace Hood.Services
     public class Auth0Service
     {
         protected IHoodCache _cache { get; set; }
+        protected HoodDbContext _db { get; set; }
         public Auth0Service()
         {
             _cache = Engine.Services.Resolve<IHoodCache>();
+            _db = Engine.Services.Resolve<HoodDbContext>();
         }
 
         #region Data CRUD
+        public async Task<ApplicationUser> GetUserByAuth0UserId(string userId)
+        {
+            var auth0user = await _db.Auth0Users.Include(au => au.User).SingleOrDefaultAsync(au => au.UserId == userId);
+            if (auth0user != null)
+            {
+                return auth0user.User;
+            }
+            return null;
+        }
+        public async Task<ApplicationUser> GetUserByAuth0Id(string id)
+        {
+            var auth0user = await _db.Auth0Users.Include(au => au.User).SingleOrDefaultAsync(au => au.Id == id);
+            if (auth0user != null)
+            {
+                return auth0user.User;
+            }
+            return null;
+        }
         public async Task GetLocalAuthIdentity(string userId)
         {
             var db = Engine.Services.Resolve<HoodDbContext>();
@@ -41,14 +62,35 @@ namespace Hood.Services
         {
             var authProviderName = fullAuthUserId.Split('|')[0];
             var authUserId = fullAuthUserId.Split('|')[1];
+            User newAuthUser = null;
+            try
+            {
+                newAuthUser = await GetUserById(fullAuthUserId);
+            }
+            catch (Auth0.Core.Exceptions.ErrorApiException ex)
+            {
+            }
 
-            var primaryIdentity = user.ConnectedAuth0Accounts.SingleOrDefault(i => i.IsPrimary);
-            var newAuthUser = await GetUserById(primaryIdentity.Id);      
+            var primaryIdentity = user.GetPrimaryIdentity();
+            if (newAuthUser == null && primaryIdentity != null)
+            {
+                newAuthUser = await GetUserById(primaryIdentity.Id);
+            }
+
+            if (newAuthUser == null)
+            {
+                throw new Exception("Could not find the user on the remote service.");
+            }
 
             var identity = newAuthUser.Identities.SingleOrDefault(i => i.UserId == authUserId);
+            if (identity == null)
+            {
+                throw new Exception("Could not find the identity on the remote user profile.");
+            }
+
             var newIdentity = new Auth0Identity(identity);
 
-            if (user.ConnectedAuth0Accounts == null || user.ConnectedAuth0Accounts.Count == 0)
+            if (primaryIdentity == null)
             {
                 newIdentity.IsPrimary = true;
             }
@@ -57,7 +99,7 @@ namespace Hood.Services
             newIdentity.LocalUserId = user.Id;
             newIdentity.Picture = picture;
 
-            var db = Engine.Services.Resolve<HoodDbContext>();      
+            var db = Engine.Services.Resolve<HoodDbContext>();
             db.Add(newIdentity);
             await db.SaveChangesAsync();
             return newIdentity;
@@ -85,6 +127,12 @@ namespace Hood.Services
         }
         private async Task<AuthToken> GetTokenAsync()
         {
+            var cacheKey = $"{typeof(AuthToken)}";
+            if (_cache.TryGetValue(cacheKey, out AuthToken cachedObject))
+            {
+                return cachedObject;
+            }
+
             var client = new RestClient($"https://{Engine.Auth0Configuration.Domain}/oauth/token");
             var request = new RestRequest(Method.POST);
             client.Timeout = -1;
@@ -98,7 +146,13 @@ namespace Hood.Services
             };
             request.AddParameter("application/json", requestTokenParam.ToJson(), ParameterType.RequestBody);
             IRestResponse response = await client.ExecuteAsync(request);
-            return JsonConvert.DeserializeObject<AuthToken>(response.Content);
+            cachedObject = JsonConvert.DeserializeObject<AuthToken>(response.Content);
+
+            if (cachedObject != null)
+            {
+                _cache.Add(cacheKey, cachedObject, new TimeSpan(0, 5, 0));
+            }
+            return cachedObject;
         }
         #endregion
 
@@ -167,6 +221,11 @@ namespace Hood.Services
                 NameFilter = search
             };
             return await client.Roles.GetAllAsync(request, new PaginationInfo(page, pageSize, true));
+        }
+        public async Task<Auth0.ManagementApi.Paging.IPagedList<Role>> GetRolesByUserAsync(string userId, int page = 0, int pageSize = 50)
+        {
+            var client = await GetClientAsync();
+            return await client.Users.GetRolesAsync(userId, new PaginationInfo(page, pageSize, true));
         }
         public async Task<Role> GetRoleAsync(string id)
         {
@@ -266,10 +325,11 @@ namespace Hood.Services
             var client = await GetClientAsync();
             if (user.ConnectedAuth0Accounts != null)
             {
-                foreach (var account in user.ConnectedAuth0Accounts)
+                var account = user.GetPrimaryIdentity();
+                if (account != null)
                 {
                     string[] roleIds = roles.Select(r => r.RemoteId).ToArray();
-                    await client.Users.AssignRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
+                    await client.Users.AssignRolesAsync(account.Id, new Auth0.ManagementApi.Models.AssignRolesRequest
                     {
                         Roles = roleIds
                     });
@@ -281,13 +341,51 @@ namespace Hood.Services
             var client = await GetClientAsync();
             if (user.ConnectedAuth0Accounts != null)
             {
-                foreach (var account in user.ConnectedAuth0Accounts)
+                var account = user.GetPrimaryIdentity();
+                if (account != null)
                 {
                     string[] roleIds = roles.Select(r => r.RemoteId).ToArray();
-                    await client.Users.RemoveRolesAsync(account.UserId, new Auth0.ManagementApi.Models.AssignRolesRequest
+                    await client.Users.RemoveRolesAsync(account.Id, new Auth0.ManagementApi.Models.AssignRolesRequest
                     {
                         Roles = roleIds
                     });
+                }
+            }
+        }
+        public async Task SyncLocalRoles(ApplicationUser user, List<string> remoteRoles)
+        {
+            var accountRepository = Engine.Services.Resolve<IAccountRepository>();
+            var localRoles = await accountRepository.GetRolesForUser(user);
+            if (!localRoles.Select(r => r.Name).All(remoteRoles.Contains) || localRoles.Count() != remoteRoles.Count)
+            {
+                // remote roles are out of sync... re-sync. 
+                var extraLocalRoles = new List<ApplicationRole>();
+                foreach (var role in localRoles)
+                {
+                    if (!remoteRoles.Contains(role.Name))
+                    {
+                        extraLocalRoles.Add(await accountRepository.GetRoleAsync(role.Name));
+                    }
+                }
+
+                var extraRemoteRoles = new List<ApplicationRole>();
+                foreach (var role in remoteRoles)
+                {
+                    if (!localRoles.Any(r => r.NormalizedName == role.ToUpperInvariant()))
+                    {
+                        extraRemoteRoles.Add(await accountRepository.GetRoleAsync(role));
+                    }
+                }
+
+                // Add any remote roles that are missing from the local user.
+                if (extraRemoteRoles.Count > 0)
+                {
+                    await accountRepository.AddUserToRolesAsync(user, extraRemoteRoles.ToArray());
+                }
+                // Remove any local roles that are on the local user that are not on the remote.
+                if (extraLocalRoles.Count > 0)
+                {
+                    await accountRepository.RemoveUserFromRolesAsync(user, extraRemoteRoles.ToArray());
                 }
             }
         }

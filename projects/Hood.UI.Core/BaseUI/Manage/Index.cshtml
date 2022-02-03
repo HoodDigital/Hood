@@ -106,17 +106,15 @@
                                 <div class="me-3">
                                     <fixedImage class="img img-xs" src="@account.Picture"></fixedImage>
                                 </div>
-                                <div class="flex-fill">
-                                    <div>
-                                        <strong>@account.Email</strong>
-                                    </div>
-                                    @if (account.CreatedAt.HasValue)
-                                    {
-                                        <div>Created: @account.CreatedAt.Value.ToDisplay()</div>
-                                    }
+                                <div class="mx-3">
+                                    <span class="h4 m-0">@Html.Raw(account.ToProviderIcon())</span>
                                 </div>
-                                <div>
-                                    <span class="badge bg-dark">@Html.Raw(account.ToProviderString())</span>
+                                <div class="flex-fill">
+                                    <strong>@account.ToProviderString()</strong>
+                                    @if (account.IsPrimary)
+                                    {
+                                        <span class="badge bg-info ms-3">Primary</span>
+                                    }
                                 </div>
                                 <div class="ms-2">
                                     <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.UserId">Disconnect</a>

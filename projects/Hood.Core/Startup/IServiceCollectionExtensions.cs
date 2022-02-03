@@ -274,15 +274,15 @@ namespace Hood.Startup
                     {
                         OnTicketReceived = async e =>
                         {
+                            var authService = new Auth0Service();                            
                             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
-                            var auth0Service = new Auth0Service();
                             var repo = Engine.Services.Resolve<IAccountRepository>();
                             var principal = e.Principal;
                             var userId = e.Principal.GetUserId();
                             var returnUrl = e.ReturnUri;
 
                             // Check if user exists and is linked to this Auth0 account
-                            var user = await repo.GetUserByAuth0Id(userId);
+                            var user = await authService.GetUserByAuth0Id(userId);
                             if (user != null)
                             {
                                 // user exists and has auth0 account linked to it.
@@ -294,7 +294,7 @@ namespace Hood.Startup
                                     await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, e.Properties);
                                 }
 
-                                await SyncLocalRoles(e, user);
+                                await authService.SyncLocalRoles(user, e.Principal.GetRoles());
                                 await SetDefaultClaims(e, user);
                                 return;
                             }
@@ -336,7 +336,6 @@ namespace Hood.Startup
                             }
 
                             // user does not exist, signups are allowed, so create and send them to the complete signup page.
-                            var authService = new Auth0Service();
                             var authUser = await authService.GetUserById(userId);
                             if (authUser == null)
                             {
@@ -359,7 +358,7 @@ namespace Hood.Startup
                                 LastLoginIP = authUser.LastIpAddress
                             };
                             var keygen = new KeyGenerator();
-                            var password = keygen.Generate(16);
+                            var password = keygen.Generate("llnlslLLlslsnsnllsll");
                             var result = await repo.CreateAsync(user, password);
                             if (!result.Succeeded)
                             {
@@ -390,7 +389,7 @@ namespace Hood.Startup
                                 identity.AddClaim(new Claim(Identity.HoodClaimTypes.Active, "true"));
                             }
 
-                            await SyncLocalRoles(e, user);
+                            await authService.SyncLocalRoles(user, e.Principal.GetRoles());
                             await SetDefaultClaims(e, user);
 
                             // Account setup complete, send user to manage profile with new-account-connection flag.
@@ -517,32 +516,6 @@ namespace Hood.Startup
             // Set the user claims locally
             e.Principal.SetUserClaims(user);
             await e.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, e.Principal, e.Properties);
-        }
-
-
-        private static async Task SyncLocalRoles(TicketReceivedContext e, ApplicationUser user)
-        {
-            var authService = new Auth0Service();
-            var accountRepository = Engine.Services.Resolve<IAccountRepository>();
-            var remoteRoles = e.Principal.GetRoles();
-            var localRoles = await accountRepository.GetRolesForUser(user);
-            if (!localRoles.Select(r => r.Name).All(remoteRoles.Contains) || localRoles.Count() != remoteRoles.Count)
-            {
-                // remote roles are out of sync... re-sync. 
-                var rolesToAdd = new List<ApplicationRole>();
-                foreach (var role in localRoles)
-                {
-                    if (!remoteRoles.Contains(role.Name))
-                    {
-                        rolesToAdd.Add(await accountRepository.GetRoleAsync(role.Name));
-                    }
-                    e.Principal.AddClaim(ClaimTypes.Role, role.Name);
-                }
-                if (rolesToAdd.Count > 0)
-                {
-                    await accountRepository.AddUserToRolesAsync(user, rolesToAdd.ToArray());
-                }
-            }
         }
 
         private static void SetAuthenticationCookieDefaults(IConfiguration config, CookieAuthenticationOptions options)

@@ -192,6 +192,10 @@ namespace Hood.Models
                     }
                     // Make sure site admin is in all required roles.
                     await Engine.AccountManager.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
+                    if (Engine.Auth0Enabled)
+                    {
+                        await auth0Service.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
+                    }
                 }
             }
             catch (Exception ex)

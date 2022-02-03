@@ -372,15 +372,16 @@ namespace Hood.Controllers
                     return RedirectToAction(nameof(ConfirmRequired));
                 }
 
-                // connect the accounts.             
+                // connect the accounts.       
+                var authService = new Auth0Service();
+
                 var user = await GetCurrentUserOrThrow();
-                var linkedUser = await _account.GetUserByAuth0Id(User.GetUserId());
+                var linkedUser = await authService.GetUserByAuth0UserId(User.GetUserId());
                 if (linkedUser != null)
                 {
                     throw new Exception("This account is already connected to an account.");
                 }
 
-                var authService = new Auth0Service();
                 var newAuthUser = await authService.CreateLocalAuthIdentity(User.GetUserId(), user, User.GetClaimValue(HoodClaimTypes.RemotePicture));
                 if (newAuthUser == null)
                 {
@@ -412,6 +413,7 @@ namespace Hood.Controllers
             }
             try
             {
+                var authService = new Auth0Service();
                 if (!User.HasClaim(HoodClaimTypes.AccountLinkRequired))
                 {
                     return RedirectToAction(nameof(ConnectAccount), new { returnUrl });
@@ -425,29 +427,21 @@ namespace Hood.Controllers
 
                 // connect the accounts.             
                 var user = await GetCurrentUserOrThrow();
-                var linkedUser = await _account.GetUserByAuth0Id(User.GetUserId());
+                var linkedUser = await authService.GetUserByAuth0UserId(User.GetUserId());
                 if (linkedUser != null)
                 {
                     throw new Exception("This account is already connected to an account.");
                 }
 
                 // get the user's other account....(s?)
-                if (user.ConnectedAuth0Accounts == null && user.ConnectedAuth0Accounts.Count() == 0)
+                var primaryAccount = user.GetPrimaryIdentity();
+                if (primaryAccount == null)
                 {
-                    throw new Exception("Could not load an account to link.");
+                    throw new Exception("Could not load a primary account to link.");
                 }
-
-                if (user.ConnectedAuth0Accounts.Count() > 1)
-                {
-                    // User has more than one account, this is awkward.
-                }
-
-                var authService = new Auth0Service();
 
                 try
                 {
-
-                    var primaryAccount = user.ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
                     var fullAuthUserId = User.GetUserId();
                     var authProviderName = fullAuthUserId.Split('|')[0];
                     var authUserId = fullAuthUserId.Split('|')[1];
@@ -562,33 +556,46 @@ namespace Hood.Controllers
                     throw new Exception("You cannot delete the account you are currently using to sign in.");
                 }
 
-                // connect the accounts.             
+                // connect the accounts.     
+                var authService = new Auth0Service();        
                 var user = await GetCurrentUserOrThrow();
-                var linkedUser = await _account.GetUserByAuth0Id(model.AccountId);
+                var linkedUser = await authService.GetUserByAuth0UserId(model.AccountId);
                 if (linkedUser == null)
                 {
-                    throw new Exception("The remote account could not be located.");
+                    throw new Exception("Your remote sign in method could not be located.");
                 }
-                var authService = new Auth0Service();
-                var primaryAccount = user.ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
+                var primaryAccount = user.GetPrimaryIdentity();
+                if (primaryAccount == null)
+                {
+                    throw new Exception("Could not load your primary sign in method.");
+                }
+
                 var identityToDisconnect = user.ConnectedAuth0Accounts.SingleOrDefault(a => a.UserId == model.AccountId);
-                
+                if (identityToDisconnect == null)
+                {
+                    throw new Exception("Could not load your sign in method to remove.");
+                }
+                if (primaryAccount.Id == identityToDisconnect.Id)
+                {
+                    throw new Exception("You cannot remove your primary sign in method.");
+                }
+                if (identityToDisconnect.Id == User.GetUserId())
+                {
+                    throw new Exception("You cannot remove your current sign in method.");
+                }
                 if (Engine.Settings.Account.DeleteRemoteAccounts)
                 {
                     // de-link the accounts.
-                    if (primaryAccount != null && identityToDisconnect != null)
+                    try
                     {
-                        try
-                        {
-                            var client = await authService.GetClientAsync();
-                            var response = await client.Users.UnlinkAccountAsync(primaryAccount.Id, identityToDisconnect.Provider, identityToDisconnect.Id);
-
-                        }
-                        catch (ErrorApiException ex)
-                        {
-                            throw new Exception("Could not unlink the remote accounts: " + ex.Message);
-                        }
+                        var client = await authService.GetClientAsync();
+                        var response = await client.Users.UnlinkAccountAsync(primaryAccount.Id, identityToDisconnect.Provider, identityToDisconnect.UserId);
                     }
+                    catch (ErrorApiException ex)
+                    {
+                        throw new Exception("Could not unlink your remote accounts: " + ex.Message);
+                    }
+
                     await authService.DeleteUser(identityToDisconnect.Id);
                 }
                 await authService.DeleteLocalAuthIdentity(identityToDisconnect.Id);
@@ -597,7 +604,7 @@ namespace Hood.Controllers
             }
             catch (Exception ex)
             {
-                SaveMessage = "Could not disconnect the account: " + ex.Message;
+                SaveMessage = ex.Message;
                 MessageType = AlertType.Danger;
                 return RedirectToAction(nameof(DisconnectAccount), new { accountId = model.AccountId });
             }
@@ -780,13 +787,20 @@ namespace Hood.Controllers
         [Authorize(Policies.Active)]
         [ValidateAntiForgeryToken]
         [Route("account/change-password/sent")]
-        public virtual async Task<IActionResult> SendChangePasswordLinkAsync(ChangePasswordViewModel model)
+        public virtual async Task<IActionResult> ChangePasswordSentAsync(ChangePasswordViewModel model)
         {
             var user = await GetCurrentUserOrThrow();
             var auth0Service = new Auth0Service();
             var client = await auth0Service.GetClientAsync();
             // get currently signed in user.
-            Auth0Identity remoteUser = user.GetAccount(User.GetUserId());
+            var userId = User.GetUserId();
+            Auth0Identity remoteUser = user.ConnectedAuth0Accounts.SingleOrDefault(ca => ca.Id == userId);
+            if (remoteUser == null)
+            {
+                SaveMessage = "Could not send a password change as you are using a passwordless connection.";
+                MessageType = AlertType.Warning;
+                return View(new ChangePasswordViewModel());
+            }
             if (remoteUser.Provider == Constants.AuthProviderName)
             {
                 var ticket = client.Tickets.CreatePasswordChangeTicketAsync(new Auth0.ManagementApi.Models.PasswordChangeTicketRequest()

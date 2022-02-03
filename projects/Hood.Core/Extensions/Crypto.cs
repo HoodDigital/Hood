@@ -30,6 +30,7 @@ namespace Hood.Services
         }
         private void DecodeSalt(string base64Salt)
         {
+            Base64Salt = base64Salt;
             Salt = Convert.FromBase64String(base64Salt);
         }
 
