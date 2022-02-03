@@ -1,8 +1,9 @@
-﻿using Hood.Models;
+﻿using System.Threading.Tasks;
+using Hood.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Hood.Models
+namespace Hood.Web
 {
     public class ApplicationDbContext : HoodDbContext
     {
@@ -20,9 +21,9 @@ namespace Hood.Models
             base.OnModelCreating(builder);
         }
 
-        public override void Seed()
+        public async override Task Seed()
         {
-            base.Seed();
+            await base.Seed();
         }
     }
 }
