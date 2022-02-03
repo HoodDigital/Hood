@@ -162,11 +162,11 @@ namespace Hood.Areas.Admin.Controllers
             try
             {
                 model.AllowComments = true;
-                model.AuthorId = Engine.Account.Id;
+                model.AuthorId = User.GetLocalUserId();
                 model.Body = "";
-                model.CreatedBy = Engine.Account.UserName;
+                model.CreatedBy = User.Identity.Name;
                 model.CreatedOn = DateTime.UtcNow;
-                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.UtcNow;
                 model.Public = true;
                 model.ShareCount = 0;
@@ -592,7 +592,7 @@ namespace Hood.Areas.Admin.Controllers
 
             model.Type = Engine.Settings.Content.GetContentType(model.ContentType);
 
-            var editors = await _userManager.GetUsersInRoleAsync("Editor");
+            var editors = await _account.GetUsersInRole("Editor");
             model.Authors = editors.Select(u => new UserProfile()
             {
                 UserName = u.UserName,

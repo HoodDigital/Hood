@@ -128,21 +128,11 @@ namespace Hood.Services
 
                 _media = new MediaManager(_env, _config);
 
-                UserManager<ApplicationUser> userManager = context.RequestServices.GetService<UserManager<ApplicationUser>>();
-                User = userManager.FindByNameAsync("PropertyImporter").Result;
+
+                User = _db.Users.SingleOrDefault(u => u.Email == Engine.SiteOwnerEmail);
                 if (User == null)
                 {
-                    IdentityResult identityResult = userManager.CreateAsync(new ApplicationUser() { UserName = "PropertyImporter", Email = "importer@domain.con" }, Guid.NewGuid().ToString()).Result;
-                    if (!identityResult.Succeeded)
-                    {
-                        throw new Exception("Could not load the PropertyImporter user account.");
-                    }
-
-                    User = userManager.FindByNameAsync("PropertyImporter").Result;
-                    if (User == null)
-                    {
-                        throw new Exception("Could not load the PropertyImporter user account.");
-                    }
+                    throw new Exception("Could not load the site admin account to use for importing.");
                 }
 
                 MediaDirectory propertyDirectory = _db.MediaDirectories.SingleOrDefault(md => md.Slug == MediaManager.PropertyDirectorySlug && md.Type == DirectoryType.System);

@@ -176,8 +176,8 @@ namespace Hood.Areas.Admin.Controllers
         }
         protected virtual async Task<PropertyListing> LoadAgents(PropertyListing listing)
         {
-            IList<ApplicationUser> admins = await _userManager.GetUsersInRoleAsync("Admin");
-            IList<ApplicationUser> editors = await _userManager.GetUsersInRoleAsync("Editor");
+            IList<ApplicationUser> admins = await _account.GetUsersInRole("Admin");
+            IList<ApplicationUser> editors = await _account.GetUsersInRole("Editor");
             listing.AvailableAgents = editors.Concat(admins).Distinct().OrderBy(u => u.FirstName).ThenBy(u => u.Email).ToList();
             return listing;
         }
@@ -191,7 +191,7 @@ namespace Hood.Areas.Admin.Controllers
             PropertyListing model = new PropertyListing()
             {
                 PublishDate = DateTime.UtcNow,
-                AgentId = User.GetUserId()
+                AgentId = User.GetLocalUserId()
             };
             return View("_Blade_Property", model);
         }
@@ -201,10 +201,10 @@ namespace Hood.Areas.Admin.Controllers
         {
             try
             {
-                model.AgentId = Engine.Account.Id;
-                model.CreatedBy = Engine.Account.UserName;
+                model.AgentId = User.GetLocalUserId();
+                model.CreatedBy = User.Identity.Name;
                 model.CreatedOn = DateTime.UtcNow;
-                model.LastEditedBy = Engine.Account.UserName;
+                model.LastEditedBy = User.Identity.Name;
                 model.LastEditedOn = DateTime.UtcNow;
                 model.Confidential = false;
                 model.Featured = false;

@@ -8,10 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Hood.Models
 {
-    public abstract class UserProfileBase : IdentityUser, IUserProfile
+    public abstract class UserProfileBase : IdentityUser, IUserProfile, IName
     {
 
         #region LogOn Information
@@ -27,9 +28,6 @@ namespace Hood.Models
         public virtual string Latitude { get; set; }
         [ProtectedPersonalData]
         public virtual string Longitude { get; set; }
-        [NotMapped]
-        [JsonIgnore]
-        public List<UserAccessCode> AccessCodes { get; set; }
         #endregion
 
         #region IName 
@@ -55,12 +53,12 @@ namespace Hood.Models
         [ProtectedPersonalData]
         [Display(Name = "Display name")]
         public virtual string DisplayName { get; set; }
-  
-        
+
+
         public virtual string ToAdminName()
         {
-            if (this.ToFullName().IsSet())
-                return this.ToFullName();
+            if (this.ToInternalName().IsSet())
+                return this.ToInternalName();
             if (UserName.IsSet())
                 return UserName;
             if (Email.IsSet())
@@ -97,6 +95,14 @@ namespace Hood.Models
         {
             get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.Blank; }
             set { AvatarJson = JsonConvert.SerializeObject(value); }
+        }
+        public virtual string GetAvatar()
+        {
+            if (AvatarJson.IsSet())
+            {
+                return Avatar.LargeUrl;
+            }
+            return MediaBase.BlankAvatar.LargeUrl;
         }
         #endregion
 
@@ -200,21 +206,21 @@ namespace Hood.Models
         #endregion
 
         #region Notes 
-       
+
         [NotMapped]
         public virtual List<UserNote> Notes
         {
             get { return this[nameof(Notes)] != null ? JsonConvert.DeserializeObject<List<UserNote>>(this[nameof(Notes)]) : new List<UserNote>(); }
             set { this[nameof(Notes)] = JsonConvert.SerializeObject(value); }
         }
-   
+
         public virtual void AddUserNote(UserNote note)
         {
             var notes = this.Notes;
             notes.Add(note);
             this.Notes = notes;
         }
-  
+
         #endregion
 
         #region ISaveableModel
@@ -228,8 +234,18 @@ namespace Hood.Models
 
         #region View Model Stuff
         [NotMapped]
-        public IList<IdentityRole> AllRoles { get; set; }
+        public IList<ApplicationRole> AllRoles { get; set; }
         #endregion
 
+        public IList<Auth0Identity> ConnectedAuth0Accounts { get; set; }
+
+        public Auth0Identity GetPrimaryIdentity()
+        {
+            if (ConnectedAuth0Accounts == null || ConnectedAuth0Accounts.Count == 0)
+            {
+                return null;
+            }
+            return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
+        }
     }
 }

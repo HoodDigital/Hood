@@ -9,7 +9,7 @@ namespace Hood.ViewModels
 {
     public class UserViewModel : SaveableModel, ISaveableModel
     {
-        public string UserId { get; set; }
+        public string LocalUserId { get; set; }
 
         public string Username { get; set; }
 
@@ -29,7 +29,8 @@ namespace Hood.ViewModels
 
         public IMediaObject Avatar { get; set; }
 
-        public IList<string> Roles { get; set; }
-        public IList<IdentityRole> AllRoles { get; set; }
+        public IList<ApplicationRole> AllRoles { get; set; }
+        public bool NewAccount { get; set; }
+        public IList<Auth0Identity> Accounts { get; set; }
     }
 }

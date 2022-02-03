@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 namespace Hood.Controllers
 {
 
-    [Authorize]
-    public abstract class AddressController : HomeController<HoodDbContext>
+    [Authorize(Hood.Identity.Policies.Active)]
+    public abstract class AddressController : AddressController<HoodDbContext>
     {
         public AddressController() : base() { }
     }
 
-    [Authorize]
-    public abstract class AddressController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    [Authorize(Hood.Identity.Policies.Active)]
+    public abstract class AddressController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
         public AddressController()
@@ -40,9 +40,9 @@ namespace Hood.Controllers
                 addresses = addresses.Where(a => a.UserId == model.UserId);
             }
             else
-            {
-                model.UserProfile = Engine.Account;
-                addresses = addresses.Where(a => a.UserId == Engine.Account.Id);
+            {                
+                model.UserProfile = await _account.GetUserProfileByIdAsync(User.GetLocalUserId());
+                addresses = addresses.Where(a => a.UserId == User.GetLocalUserId());
             }
 
             if (!string.IsNullOrEmpty(model.Search))
@@ -84,7 +84,7 @@ namespace Hood.Controllers
         public ActionResult Create(string userId)
         {
             if (!userId.IsSet())
-                userId = _userManager.GetUserId(User);
+                userId = User.GetLocalUserId();
             Address add = new Address() { UserId = userId };
             return View(add);
         }
@@ -110,7 +110,7 @@ namespace Hood.Controllers
                     }
                 }
 
-                var user = await _account.GetCurrentUserAsync(false);
+                var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
                 address.UserId = user.Id;
                 user.Addresses.Add(address);
                 await _account.UpdateUserAsync(user);
@@ -186,7 +186,7 @@ namespace Hood.Controllers
         {
             try
             {
-                string userId = _userManager.GetUserId(User);
+                string userId = User.GetLocalUserId();
                 await _account.SetBillingAddressAsync(userId, id);
                 return new Response(true, $"The billing address has been updated.");
             }
@@ -201,7 +201,7 @@ namespace Hood.Controllers
         {
             try
             {
-                string userId = _userManager.GetUserId(User);
+                string userId = User.GetLocalUserId();
                 await _account.SetDeliveryAddressAsync(userId, id);
                 return new Response(true, $"The delivery address has been updated.");
             }

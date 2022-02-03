@@ -21,7 +21,7 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://localhost:5152",
+                "ASPNETCORE_URLS": "https://localhost:5152",
                 "Hood:BypassCDN": "true"
             },
             "sourceFileMap": {
@@ -48,7 +48,7 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Production",
-                "ASPNETCORE_URLS": "http://localhost:5152",
+                "ASPNETCORE_URLS": "https://localhost:5152",
                 "Hood:BypassCDN": "true"
             },
             "sourceFileMap": {

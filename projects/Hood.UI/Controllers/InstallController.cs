@@ -34,7 +34,8 @@ namespace Hood.Controllers
                 MigrationNotApplied = Engine.Services.MigrationNotApplied,
                 DatabaseMediaTimeout = Engine.Services.DatabaseMediaTimeout,
                 ViewsInstalled = Engine.Services.ViewsInstalled,
-                AdminUserSetupError = Engine.Services.AdminUserSetupError
+                AdminUserSetupError = Engine.Services.AdminUserSetupError,
+                Details = Engine.Services.Details
             };
             return View(model);
         }

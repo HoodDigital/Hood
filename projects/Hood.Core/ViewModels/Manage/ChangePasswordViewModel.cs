@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Hood.BaseTypes;
 
 namespace Hood.ViewModels
 {
-    public class ChangePasswordViewModel
+    public class ChangePasswordViewModel : SaveableModel
     {
         [Required]
         [DataType(DataType.Password)]
@@ -20,6 +21,5 @@ namespace Hood.ViewModels
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
-        public string StatusMessage { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Hood.Models;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,32 +17,38 @@ namespace Hood.Services
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly HoodDbContext _db;
-        private readonly IHttpContextAccessor _contextAccessor;
-        private readonly UserManager<ApplicationUser> _userManager;
+        protected readonly HoodDbContext _db;
+        protected readonly IHttpContextAccessor _contextAccessor;
+        protected readonly LinkGenerator _linkGenerator;
+        protected readonly IMailService _mailService;
+        protected readonly IEmailSender _emailSender;
 
-        public AccountRepository(
-            HoodDbContext db,
-            IHttpContextAccessor context,
-            UserManager<ApplicationUser> userManager)
+        public AccountRepository()
         {
-            _db = db;
-            _contextAccessor = context;
-            _userManager = userManager;
+            _db = Engine.Services.Resolve<HoodDbContext>();
+            _contextAccessor = Engine.Services.Resolve<IHttpContextAccessor>();
+            _linkGenerator = Engine.Services.Resolve<LinkGenerator>();
+            _mailService = Engine.Services.Resolve<IMailService>();
+            _emailSender = Engine.Services.Resolve<IEmailSender>();
         }
 
-        #region User Get/Update/Delete
-        private IQueryable<ApplicationUser> UserQuery
+        #region Helpers 
+        protected virtual IQueryable<ApplicationUser> UserQuery
         {
             get
             {
                 IQueryable<ApplicationUser> query = _db.Users
-                    .Include(u => u.Addresses)
-                    .Include(u => u.AccessCodes);
+                    .Include(u => u.ConnectedAuth0Accounts)
+                    .Include(u => u.Addresses);
                 return query;
             }
         }
-        public async Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true)
+        private UserManager<ApplicationUser> UserManager => Engine.Services.Resolve<UserManager<ApplicationUser>>();
+        private RoleManager<ApplicationRole> RoleManager => Engine.Services.Resolve<RoleManager<ApplicationRole>>();
+        #endregion
+
+        #region Account stuff
+        public virtual async Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true)
         {
             if (!id.IsSet())
             {
@@ -56,7 +63,7 @@ namespace Hood.Services
 
             return await query.SingleOrDefaultAsync(u => u.Id == id);
         }
-        public async Task<UserProfile> GetUserProfileByIdAsync(string id)
+        public virtual async Task<UserProfile> GetUserProfileByIdAsync(string id)
         {
             if (!id.IsSet())
             {
@@ -64,7 +71,7 @@ namespace Hood.Services
             }
             return await _db.UserProfiles.SingleOrDefaultAsync(u => u.Id == id);
         }
-        public async Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true)
+        public virtual async Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true)
         {
             if (!email.IsSet())
             {
@@ -79,23 +86,36 @@ namespace Hood.Services
 
             return await query.SingleOrDefaultAsync(u => u.Email == email);
         }
-        public async Task<ApplicationUser> GetCurrentUserAsync(bool track = true)
-        {
-            if (_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
-            {
-                return await GetUserByIdAsync(_userManager.GetUserId(_contextAccessor.HttpContext.User), track);
-            }
-            else
-            {
-                return null;
-            }
-        }
-        public async Task UpdateUserAsync(ApplicationUser user)
+        public virtual async Task UpdateUserAsync(ApplicationUser user)
         {
             _db.Update(user);
-            await _db.SaveChangesAsync();           
+            await _db.SaveChangesAsync();
         }
-        public async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
+        public virtual async Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
+        {
+            var user = await PrepareUserForDelete(userId, adminUser);
+
+            IList<UserLoginInfo> logins = await UserManager.GetLoginsAsync(user);
+            foreach (UserLoginInfo li in logins)
+            {
+                await UserManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
+            }
+
+            IList<string> roles = await UserManager.GetRolesAsync(user);
+            foreach (string role in roles)
+            {
+                await UserManager.RemoveFromRoleAsync(user, role);
+            }
+
+            IList<System.Security.Claims.Claim> claims = await UserManager.GetClaimsAsync(user);
+            foreach (System.Security.Claims.Claim claim in claims)
+            {
+                await UserManager.RemoveClaimAsync(user, claim);
+            }
+
+            await UserManager.DeleteAsync(user);
+        }
+        protected virtual async Task<ApplicationUser> PrepareUserForDelete(string userId, System.Security.Claims.ClaimsPrincipal adminUser)
         {
             ApplicationUser user = await _db.Users
                 .Include(u => u.Content)
@@ -109,46 +129,27 @@ namespace Hood.Services
             }
 
             ApplicationUser siteOwner = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Email == Engine.Configuration.SuperAdminEmail);
-            if (siteOwner == null) 
+            if (siteOwner == null)
             {
                 throw new Exception("Could not load the owner account, check your settings, the owner is set via an environment variable and cannot be changed from the admin area.");
             }
 
-            if (adminUser.IsInRole("SuperAdmin") || adminUser.IsInRole("Admin") || adminUser.GetUserId() == user.Id)
-            {
-                IList<UserLoginInfo> logins = await _userManager.GetLoginsAsync(user);
-                foreach (UserLoginInfo li in logins)
-                {
-                    await _userManager.RemoveLoginAsync(user, li.LoginProvider, li.ProviderKey);
-                }
-
-                IList<string> roles = await _userManager.GetRolesAsync(user);
-                foreach (string role in roles)
-                {
-                    await _userManager.RemoveFromRoleAsync(user, role);
-                }
-
-                IList<System.Security.Claims.Claim> claims = await _userManager.GetClaimsAsync(user);
-                foreach (System.Security.Claims.Claim claim in claims)
-                {
-                    await _userManager.RemoveClaimAsync(user, claim);
-                }
-
-                // Set any site content as owned by the site owner, instead of the user.
-                user.Content.ForEach(c => c.AuthorId = siteOwner.Id);
-                user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
-
-                _db.Logs.Where(l => l.UserId == userId).ForEach(f => f.UserId = siteOwner.Id);
-
-                await _db.SaveChangesAsync();
-                await _userManager.DeleteAsync(user);
-            }
-            else
+            if (!adminUser.IsAdminOrBetter() && adminUser.GetLocalUserId() != user.Id)
             {
                 throw new Exception("You do not have permission to delete this user.");
             }
+
+            // Set any site content as owned by the site owner, instead of the user.
+            user.Content.ForEach(c => c.AuthorId = siteOwner.Id);
+            user.Properties.ForEach(p => p.AgentId = siteOwner.Id);
+
+            _db.Logs.Where(l => l.UserId == userId).ForEach(f => f.UserId = siteOwner.Id);
+
+            await _db.SaveChangesAsync();
+
+            return user;
         }
-        public async Task<MediaDirectory> GetDirectoryAsync(string id)
+        public virtual async Task<MediaDirectory> GetDirectoryAsync(string id)
         {
             MediaDirectory directory = await _db.MediaDirectories.SingleOrDefaultAsync(md => md.OwnerId == id && md.Type == DirectoryType.User);
             if (directory == null)
@@ -173,13 +174,71 @@ namespace Hood.Services
             }
             return directory;
         }
+        public virtual async Task SetEmailAsync(ApplicationUser modelToUpdate, string email)
+        {
+            IdentityResult setEmailResult = await UserManager.SetEmailAsync(modelToUpdate, email);
+            if (!setEmailResult.Succeeded)
+            {
+                throw new Exception(setEmailResult.Errors.FirstOrDefault().Description);
+            }
+        }
+        public virtual async Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string phoneNumber)
+        {
+            IdentityResult setPhoneResult = await UserManager.SetPhoneNumberAsync(modelToUpdate, phoneNumber);
+            if (!setPhoneResult.Succeeded)
+            {
+                throw new Exception(setPhoneResult.Errors.FirstOrDefault().Description);
+            }
+        }
+        public virtual async Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl)
+        {
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(localUser);
+            var callbackUrl = _linkGenerator.GetUriByAction(_contextAccessor.HttpContext, "ConfirmEmail", "Account", new { userId = localUser.Id, code, returnUrl });
+            var verifyModel = new VerifyEmailModel(localUser, callbackUrl)
+            {
+                SendToRecipient = true
+            };
+            await _mailService.ProcessAndSend(verifyModel);
+        }
+        public virtual async Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword)
+        {
+            return await UserManager.ChangePasswordAsync(user, oldPassword, newPassword);
+        }
+        public virtual async Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string code, string password)
+        {
+            return await UserManager.ResetPasswordAsync(user, code, password);
+        }
+        public virtual async Task SendPasswordResetToken(ApplicationUser user)
+        {
+            string code = await UserManager.GeneratePasswordResetTokenAsync(user);
+            string callbackUrl = _linkGenerator.GetUriByAction(_contextAccessor.HttpContext, "ResetPassword", "Account", new { userId = user.Id, code });
+
+            MailObject message = new MailObject()
+            {
+                To = new SendGrid.Helpers.Mail.EmailAddress(user.Email),
+                PreHeader = "Reset your password.",
+                Subject = "Reset your password."
+            };
+            message.AddParagraph($"Please reset your password by clicking here:");
+            message.AddCallToAction("Reset your password", callbackUrl);
+            message.Template = MailSettings.WarningTemplate;
+            await _emailSender.SendEmailAsync(message);
+        }
+        public virtual async Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        {
+            return await UserManager.CreateAsync(user, password);
+        }
+        public virtual async Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code)
+        {
+            return await UserManager.ConfirmEmailAsync(user, code);
+        }
         #endregion
 
         #region Profiles 
-        public async Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null)
+        public virtual async Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null)
         {
-            if (query == null) 
-            {                            
+            if (query == null)
+            {
                 query = _db.UserProfiles.AsQueryable();
             }
 
@@ -204,23 +263,28 @@ namespace Hood.Services
                 );
             }
 
-            if (model.Active) {
+            if (model.Active)
+            {
                 query = query.Where(q => q.Active);
-            }            
+            }
 
-            if (model.Inactive) {
+            if (model.Inactive)
+            {
                 query = query.Where(q => !q.Active);
-            }            
-            
-            if (model.PhoneUnconfirmed) {                
+            }
+
+            if (model.PhoneUnconfirmed)
+            {
                 query = query.Where(q => !q.PhoneNumberConfirmed);
-            }            
-            
-            if (model.EmailUnconfirmed) {                
+            }
+
+            if (model.EmailUnconfirmed)
+            {
                 query = query.Where(q => !q.EmailConfirmed);
             }
 
-            if (model.Unused) {                
+            if (model.Unused)
+            {
                 query = query.Where(q => q.LastLoginLocation == null || q.LastLoginLocation == null || q.LastLogOn == DateTime.MinValue);
             }
 
@@ -258,16 +322,12 @@ namespace Hood.Services
 
             return model;
         }
-        public async Task<UserProfile> GetProfileAsync(string id)
+        public virtual async Task<UserProfile> GetProfileAsync(string id)
         {
             UserProfile profile = await _db.UserProfiles.FirstOrDefaultAsync(u => u.Id == id);
             return profile;
         }
-        public async Task<List<UserAccessCode>> GetAccessCodesAsync(string id)
-        {
-            return await _db.AccessCodes.Where(u => u.UserId == id).ToListAsync();
-        }
-        public async Task UpdateProfileAsync(UserProfile user)
+        public virtual async Task UpdateProfileAsync(UserProfile user)
         {
             ApplicationUser userToUpdate = await _db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
 
@@ -292,29 +352,130 @@ namespace Hood.Services
         #endregion
 
         #region Roles
-        public async Task<IList<IdentityRole>> GetAllRolesAsync()
+        public virtual bool SupportsRoles()
         {
-            return await _db.Roles.ToListAsync();
+            return UserManager.SupportsUserRole;
+        }
+        public virtual async Task<IPagedList<ApplicationRole>> GetRolesAsync(IPagedList<ApplicationRole> model)
+        {
+            if (model == null)
+            {
+                model = new PagedList<ApplicationRole>() { PageIndex = 0, PageSize = 50 };
+            }
+            var query = _db.Roles.AsQueryable();
+
+            if (!string.IsNullOrEmpty(model.Search))
+            {
+                query = query.Where(u => u.Name.Contains(model.Search));
+            }
+
+            switch (model.Order)
+            {
+                case "Name":
+                    query = query.OrderBy(n => n.Name);
+                    break;
+                case "NameDesc":
+                    query = query.OrderByDescending(n => n.Name);
+                    break;
+                default:
+                    query = query.OrderBy(n => n.Name);
+                    break;
+            }
+
+            await model.ReloadAsync(query);
+
+            return model;
+        }
+
+        private DbSet<ApplicationUser> Users { get { return _db.Set<ApplicationUser>(); } }
+        private DbSet<ApplicationRole> Roles { get { return _db.Set<ApplicationRole>(); } }
+        private DbSet<IdentityUserRole<string>> UserRoles { get { return _db.Set<IdentityUserRole<string>>(); } }
+        public virtual async Task<IList<ApplicationRole>> GetRolesForUser(ApplicationUser user)
+        {
+            var userId = user.Id;
+            var query = from userRole in UserRoles
+                        join role in Roles on userRole.RoleId equals role.Id
+                        where userRole.UserId.Equals(userId)
+                        select role;
+            return await query.ToListAsync();
+        }
+        public virtual async Task<IList<ApplicationUser>> GetUsersInRole(string roleName)
+        {
+            var role = await GetRoleAsync(roleName);
+            if (role != null)
+            {
+                var query = from userrole in UserRoles
+                            join user in Users on userrole.UserId equals user.Id
+                            where userrole.RoleId.Equals(role.Id)
+                            select user;
+
+                return await query.ToListAsync();
+            }
+            return new List<ApplicationUser>();
+        }
+        public virtual async Task<bool> RoleExistsAsync(string role)
+        {
+            return await GetRoleAsync(role) != null;
+        }
+        public virtual async Task<ApplicationRole> GetRoleAsync(string role)
+        {
+            return await _db.Roles.SingleOrDefaultAsync(r => r.NormalizedName == role.ToUpperInvariant());
+        }
+        public virtual async Task<ApplicationRole> CreateRoleAsync(string role)
+        {
+            var roleObject = await GetRoleAsync(role);
+            if (roleObject == null)
+            {
+                roleObject = new ApplicationRole()
+                {
+                    Name = role,
+                    NormalizedName = role.ToUpperInvariant(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
+                };
+                _db.Roles.Add(roleObject);
+                await _db.SaveChangesAsync();
+            }
+            return roleObject;
+        }
+        public virtual async Task DeleteRoleAsync(string role)
+        {
+            var identityRole = await GetRoleAsync(role);
+            _db.Roles.Remove(identityRole);
+            await _db.SaveChangesAsync();
+        }
+        public virtual async Task AddUserToRolesAsync(ApplicationUser user, ApplicationRole[] roles)
+        {
+            foreach (ApplicationRole role in roles)
+            {
+                await UserManager.AddToRoleAsync(user, role.Name);
+            }
+        }
+        public virtual async Task RemoveUserFromRolesAsync(ApplicationUser user, ApplicationRole[] roles)
+        {
+            foreach (ApplicationRole role in roles)
+            {
+                await UserManager.RemoveFromRoleAsync(user, role.Name);
+            }
         }
         #endregion
 
         #region Addresses
-        public async Task<Models.Address> GetAddressByIdAsync(int id)
+        public virtual async Task<Models.Address> GetAddressByIdAsync(int id)
         {
             return await _db.Addresses.Where(a => a.Id == id).FirstOrDefaultAsync();
         }
-        public async Task DeleteAddressAsync(int id)
+        public virtual async Task DeleteAddressAsync(int id)
         {
             Models.Address address = await GetAddressByIdAsync(id);
             _db.Entry(address).State = EntityState.Deleted;
             await _db.SaveChangesAsync();
         }
-        public async Task UpdateAddressAsync(Models.Address address)
+        public virtual async Task UpdateAddressAsync(Models.Address address)
         {
             _db.Update(address);
             await _db.SaveChangesAsync();
         }
-        public async Task SetBillingAddressAsync(string userId, int id)
+        public virtual async Task SetBillingAddressAsync(string userId, int id)
         {
             ApplicationUser user = await GetUserByIdAsync(userId);
             Models.Address add = user.Addresses.SingleOrDefault(a => a.Id == id);
@@ -325,7 +486,7 @@ namespace Hood.Services
 
             await UpdateUserAsync(user);
         }
-        public async Task SetDeliveryAddressAsync(string userId, int id)
+        public virtual async Task SetDeliveryAddressAsync(string userId, int id)
         {
             ApplicationUser user = await GetUserByIdAsync(userId);
             Models.Address add = user.Addresses.SingleOrDefault(a => a.Id == id);
@@ -339,10 +500,10 @@ namespace Hood.Services
         #endregion
 
         #region Statistics
-        public async Task<UserStatistics> GetStatisticsAsync()
+        public virtual async Task<UserStatistics> GetStatisticsAsync()
         {
             int totalUsers = await _db.Users.CountAsync();
-            int totalAdmins = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
+            int totalAdmins = (await GetUsersInRole("Admin")).Count;
             var data = await _db.Users.Where(p => p.CreatedOn >= DateTime.Now.AddYears(-1)).Select(c => new { date = c.CreatedOn.Date, month = c.CreatedOn.Month }).ToListAsync();
 
             var createdByDate = data.GroupBy(p => p.date).Select(g => new { name = g.Key, count = g.Count() });
@@ -369,21 +530,5 @@ namespace Hood.Services
         }
         #endregion
 
-    }
-
-    public class UserStatistics
-    {
-        public UserStatistics(int totalUsers, int totalAdmins, List<KeyValuePair<string, int>> days, List<KeyValuePair<string, int>> months)
-        {
-            TotalUsers = totalUsers;
-            TotalAdmins = totalAdmins;
-            Days = days;
-            Months = months;
-        }
-
-        public int TotalUsers { get; }
-        public int TotalAdmins { get; }
-        public List<KeyValuePair<string, int>> Days { get; }
-        public List<KeyValuePair<string, int>> Months { get; }
     }
 }

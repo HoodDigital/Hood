@@ -15,6 +15,6 @@
     }
     @if (Model.Error != null)
     {
-        @Html.Raw(@Model.Error.Message.ToHtml())
+        @Html.Raw(@Model.Error.Message.AddHtmlLineBreaks())
     }
 </div>

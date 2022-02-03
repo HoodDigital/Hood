@@ -10,7 +10,7 @@
             <div class="row no-gutters align-items-center">
                 <div class="col-auto">
                     <a asp-action="Edit" asp-route-id="@user.Id">
-                        <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@user.ToFullName()"></fixedImage>
+                        <fixedImage src="@user.Avatar.ThumbUrl" class="img img-circle img-sm m-2 mr-4" alt="@user.ToInternalName()"></fixedImage>
                     </a>
                 </div>
                 <div class="col">

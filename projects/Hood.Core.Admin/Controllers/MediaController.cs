@@ -150,7 +150,7 @@ namespace Hood.Areas.Admin.Controllers
             }
             else
             {
-                return _directoryManager.UserDirectories(User.GetUserId());
+                return _directoryManager.UserDirectories(User.GetLocalUserId());
             }
         }
 
@@ -174,7 +174,7 @@ namespace Hood.Areas.Admin.Controllers
                         throw new Exception("You cannot create directories outside the user folders folders.");
                     }
 
-                    if (parentDirectory.OwnerId != User.GetUserId())
+                    if (parentDirectory.OwnerId != User.GetLocalUserId())
                     {
                         throw new Exception("You cannot create directories outside your own folder.");
                     }
@@ -217,12 +217,12 @@ namespace Hood.Areas.Admin.Controllers
                     throw new Exception("You cannot create directories outside the user folders folders.");
                 }
 
-                if (!User.IsEditorOrBetter() && parentDirectory.OwnerId != User.GetUserId())
+                if (!User.IsEditorOrBetter() && parentDirectory.OwnerId != User.GetLocalUserId())
                 {
                     throw new Exception("You cannot create directories outside your own folder.");
                 }
 
-                model.OwnerId = User.GetUserId();
+                model.OwnerId = User.GetLocalUserId();
                 model.Type = DirectoryType.Site;
                 model.Slug = model.DisplayName.ToSeoUrl();
 
@@ -496,7 +496,7 @@ namespace Hood.Areas.Admin.Controllers
                     throw new Exception($"The directory with id {directoryId} could not be found.");
                 }
 
-                if (directory.OwnerId != User.GetUserId())
+                if (directory.OwnerId != User.GetLocalUserId())
                 {
                     if (User.IsAdminOrBetter())
                     {

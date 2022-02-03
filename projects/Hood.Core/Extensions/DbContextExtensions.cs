@@ -13,14 +13,20 @@ namespace Hood.Extensions
         public static void CreateHoodModels(this ModelBuilder builder)
         {
             // Identity
+            builder.Entity<Auth0Identity>().ToTable("AspNetAuth0Identities");
+            builder.Entity<Auth0Identity>().Ignore(au => au.ProfileData);         
+            builder.Entity<Auth0Identity>().Ignore(au => au.AccessToken);         
+            builder.Entity<Auth0Identity>().Ignore(au => au.AccessTokenSecret);    
+            builder.Entity<Auth0Identity>().Ignore(au => au.ExpiresIn);          
+            builder.Entity<Auth0Identity>().Ignore(au => au.RefreshToken);           
+            builder.Entity<Auth0Identity>().HasOne(m => m.User).WithMany(m => m.ConnectedAuth0Accounts).HasForeignKey(m => m.LocalUserId).OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Option>().ToTable("HoodOptions");
             builder.Entity<Log>().ToTable("HoodLogs");
             builder.Entity<Address>().ToTable("HoodAddresses");
-            builder.Entity<UserAccessCode>().ToTable("AspNetUserAccessCodes");
             builder.Entity<Address>().Property(a => a.Latitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().Property(a => a.Longitude).HasDefaultValueSql("0.0");
             builder.Entity<Address>().HasOne(up => up.User).WithMany(add => add.Addresses).HasForeignKey(au => au.UserId);
-            builder.Entity<UserAccessCode>().HasOne(up => up.User).WithMany(add => add.AccessCodes).HasForeignKey(au => au.UserId).OnDelete(DeleteBehavior.Cascade);
 
             // Media
             builder.Entity<MediaObject>().ToTable("HoodMedia");
@@ -70,7 +76,6 @@ namespace Hood.Extensions
             builder.Entity<PropertyFloorplan>().Property(b => b.Path).HasColumnName("Directory");
 
             builder.Entity<UserProfile>().HasNoKey().ToView("HoodUserProfiles");
-            builder.Entity<UserProfile>().HasNoKey().Property(b => b.RolesJson).HasColumnName("Roles");
         }
     }
 }

@@ -32,6 +32,9 @@ namespace Hood.Core
                     !AdminUserSetupError;
             }
         }
+
+        public Exception Details { get; set; }
+
         private IServiceProvider _serviceProvider { get; set; }
         public virtual IServiceProvider ServiceProvider => _serviceProvider;
 

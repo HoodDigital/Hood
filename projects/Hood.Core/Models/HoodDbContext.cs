@@ -3,6 +3,7 @@ using Hood.Entities;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
@@ -11,7 +12,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hood.Models
 {
@@ -19,7 +22,7 @@ namespace Hood.Models
     /// In order to use the Hood functionality on the site, you must call the 'void Configure(DbContextOptionsBuilder optionsBuilder)' function in the OnConfiguring() method, and then call the 'void CreateModels(ModelBuilder builder)' function in the OnModelCreating() method.
     /// </summary>
     /// <param name="optionsBuilder"></param>
-    public class HoodDbContext : IdentityDbContext<ApplicationUser>, IHoodDbContext
+    public class HoodDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IHoodDbContext
     {
         public HoodDbContext(DbContextOptions<HoodDbContext> options)
             : base(options)
@@ -27,8 +30,10 @@ namespace Hood.Models
         }
 
         // Identity
-        public DbSet<UserAccessCode> AccessCodes { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Auth0Identity> Auth0Users { get; set; }
+
+        // Media
         public DbSet<MediaObject> Media { get; set; }
         public DbSet<MediaDirectory> MediaDirectories { get; set; }
 
@@ -39,7 +44,7 @@ namespace Hood.Models
         // Content
         public DbSet<Content> Content { get; set; }
         public DbSet<ContentMeta> ContentMetadata { get; set; }
-        public DbSet<ContentMedia> ContentMedia{ get; set; }
+        public DbSet<ContentMedia> ContentMedia { get; set; }
         public DbSet<ContentCategory> ContentCategories { get; set; }
 
 
@@ -52,8 +57,10 @@ namespace Hood.Models
         // Logs
         public DbSet<Log> Logs { get; set; }
 
-        // Views
+
+        // Auth0
         public DbSet<UserProfile> UserProfiles { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -85,39 +92,22 @@ namespace Hood.Models
             return base.Set<TEntity>();
         }
 
-        public virtual void Seed(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public async virtual Task Seed()
         {
             try
             {
-                Option option = Options.FirstOrDefault();
+                Option option = await Options.FirstOrDefaultAsync();
             }
             catch (SqlException ex)
             {
                 if (ex.Message.Contains("Login failed for user") || ex.Message.Contains("permission was denied"))
                 {
-                    throw new StartupException("There was a problem connecting to the database.", StartupError.DatabaseConnectionFailed);
+                    throw new StartupException("There was a problem connecting to the database.", ex, StartupError.DatabaseConnectionFailed);
                 }
                 else if (ex.Message.Contains("Invalid object name"))
                 {
-                    if (!AllMigrationsApplied())
-                    {
-                        throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
-                    }
 
-                    throw new StartupException("There are migrations missing.", StartupError.MigrationMissing);
-                }
-            }
-
-            if (!AllMigrationsApplied())
-            {
-                throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
-            }
-
-            foreach (string role in Models.Roles.All)
-            {
-                if (!roleManager.RoleExistsAsync(role).Result)
-                {
-                    IdentityResult irAdmin = roleManager.CreateAsync(new IdentityRole(role)).Result;
+                    throw new StartupException("There are migrations missing.", ex, StartupError.MigrationMissing);
                 }
             }
 
@@ -143,29 +133,110 @@ namespace Hood.Models
                         UserName = ownerEmail,
                         Active = true
                     };
-                    IdentityResult ir = userManager.CreateAsync(userToInsert, "Password@123").Result;
-                    if (!ir.Succeeded)
+                    var keygen = new KeyGenerator();
+                    var password = keygen.Generate(16);
+                    IdentityResult ir = await Engine.AccountManager.CreateAsync(userToInsert, password);
+
+                    var tempPasswordFile = Engine.Services.Resolve<IWebHostEnvironment>().ContentRootPath + "/temp.txt";
+                    if (File.Exists(tempPasswordFile))
                     {
-                        throw new StartupException("Could not create the admin user.", StartupError.AdminUserSetupError);
+                        File.Delete(tempPasswordFile);
+                    }
+                    using (StreamWriter file = new(tempPasswordFile))
+                    {
+                        await file.WriteLineAsync(password);
                     }
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new StartupException("An error occurred while loading or creating the admin user.", StartupError.AdminUserSetupError);
+                throw new StartupException("An error occurred while loading or creating the admin user.", ex, StartupError.AdminUserSetupError);
             }
 
-            ApplicationUser siteAdmin = userManager.FindByEmailAsync(Engine.SiteOwnerEmail).Result;
-            if (userManager.SupportsUserRole)
+            ApplicationUser siteAdmin = await Engine.AccountManager.GetUserByEmailAsync(Engine.SiteOwnerEmail);
+            var auth0Service = new Auth0Service();
+            try
             {
-                foreach (string role in Models.Roles.All)
+                var roleManager = Engine.Services.Resolve<RoleManager<ApplicationRole>>();
+                var userManager = Engine.Services.Resolve<UserManager<ApplicationUser>>();
+                if (Engine.AccountManager.SupportsRoles())
                 {
-                    if (!userManager.IsInRoleAsync(siteAdmin, role.ToUpper()).Result)
+                    // Check all required roles exist locally 
+                    foreach (string role in Models.Roles.All)
                     {
-                        IdentityResult addToRole = userManager.AddToRoleAsync(siteAdmin, role).Result;
+                        if (!await roleManager.RoleExistsAsync(role))
+                        {
+                            await Engine.AccountManager.CreateRoleAsync(role);
+                        }
+                        else
+                        {
+                            // If it does exist locally, ensure it has a remote id linked to it.
+                            var localRole = await roleManager.FindByNameAsync(role);
+                            if (!localRole.RemoteId.IsSet())
+                            {
+                                await Engine.AccountManager.CreateRoleAsync(role);
+                            }
+                        }
+                    }
+                    var allRoles = await Engine.AccountManager.GetRolesAsync();
+                    var requiredRoles = allRoles.List.Where(a => Models.Roles.All.Contains(a.Name));
+                    var extraRoles = allRoles.List.Where(a => !Models.Roles.All.Contains(a.Name));
+                    foreach (ApplicationRole extraLocalRole in extraRoles)
+                    {
+                        // Ensure it has a remote id linked to it.
+                        if (!extraLocalRole.RemoteId.IsSet())
+                        {
+                            await Engine.AccountManager.CreateRoleAsync(extraLocalRole.Name);
+                        }
+                    }
+                    // Make sure site admin is in all required roles.
+                    await Engine.AccountManager.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
+                    if (Engine.Auth0Enabled)
+                    {
+                        await auth0Service.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new StartupException("An error occurred syncing local roles with Auth0.", ex, StartupError.Auth0Issue);
+            }
+
+            if (Engine.Auth0Enabled)
+            {
+                // Check the rule is set to provide roles from Auth0
+                var client = await auth0Service.GetClientAsync();
+                var rules = await client.Rules.GetAllAsync(new Auth0.ManagementApi.Models.GetRulesRequest()
+                {
+                    Stage = "login_success"
+                });
+                var roleRule = rules.SingleOrDefault(r => r.Name == Hood.Identity.Constants.AddRoleClaimsRuleName);
+                if (roleRule != null)
+                {
+                    await client.Rules.DeleteAsync(roleRule.Id);
+                }
+                var roleScript = @"
+function (user, context, callback) {
+    const role_namespace = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+    if (context.authorization !== null) {
+        if (context.authorization.roles !== null) {
+            context.idToken[role_namespace] = context.authorization.roles;
+        } else {
+            console.log('context.authorization.roles is null');
+        }
+    } else {
+        console.log('context.authorization is null');
+    }
+    return callback(null, user, context);
+}";
+                await client.Rules.CreateAsync(new Auth0.ManagementApi.Models.RuleCreateRequest()
+                {
+                    Script = roleScript,
+                    Name = Hood.Identity.Constants.AddRoleClaimsRuleName,
+                    Enabled = true,
+                    Stage = "login_success"
+                });
             }
 
             if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
@@ -337,7 +408,7 @@ namespace Hood.Models
             if (Media.Any(o => o.DirectoryId == null))
             {
                 // Save any existing seeding, in case directories needed creating.
-                SaveChanges();
+                await SaveChangesAsync();
 
                 // Translate any un directoried images.
                 MediaDirectory defaultDir = MediaDirectories.AsNoTracking().SingleOrDefault(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System);
@@ -370,15 +441,15 @@ namespace Hood.Models
 
                     }
                 }
-                catch (SqlException)
+                catch (SqlException ex)
                 {
-                    throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaError);
+                    throw new StartupException("Error updating the media entries.", ex, StartupError.DatabaseMediaError);
                 }
-                catch (DbUpdateException dbEx)
+                catch (DbUpdateException ex)
                 {
-                    if (dbEx.InnerException != null && dbEx.InnerException.Message.Contains("Timeout"))
+                    if (ex.InnerException != null && ex.InnerException.Message.Contains("Timeout"))
                     {
-                        throw new StartupException("Error updating the media entries.", StartupError.DatabaseMediaError);
+                        throw new StartupException("Error updating the media entries.", ex, StartupError.DatabaseMediaError);
                     }
                 }
             }
@@ -401,7 +472,7 @@ namespace Hood.Models
                 option.Value = Engine.Version;
             }
 
-            SaveChanges();
+            await SaveChangesAsync();
         }
 
     }

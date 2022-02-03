@@ -1,4 +1,5 @@
-﻿using Hood.Interfaces;
+﻿using System;
+using Hood.Interfaces;
 
 namespace Hood.ViewModels
 {
@@ -30,5 +31,6 @@ namespace Hood.ViewModels
             }
         }
 
+        public Exception Details { get; set; }
     }
 }

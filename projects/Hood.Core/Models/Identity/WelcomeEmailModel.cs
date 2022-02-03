@@ -25,7 +25,7 @@ namespace Hood.Models
         {
             get
             {
-                return new EmailAddress(User.Email, User.ToFullName());
+                return new EmailAddress(User.Email, User.ToInternalName());
             }
         }
 

@@ -24,3 +24,6 @@ package-lock.json
 
 # Ignore local settings files, apart from the base settings
 appsettings.*.json
+
+# Ignore temp password file, if exists
+temp.txt

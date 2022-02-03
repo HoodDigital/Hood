@@ -12,19 +12,25 @@
         <div>
             @if (User.Identity.IsAuthenticated)
             {
-                <button class="btn btn-outline-dark btn-sm me-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#account-menu">
+                <button class="btn btn-sm me-2" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#account-menu">
                     <i class="fas fa-user-alt me-1"></i> Account
                 </button>
                 <partial name="_Header_Menu_Account" />
             }
             else
             {
-                <a class="btn btn-outline-dark btn-sm me-2" asp-action="Login" asp-controller="Account">
+                <a class="btn btn-sm me-2" asp-action="Login" asp-controller="Account">
                     <i class="fas fa-user-alt me-1"></i> Sign in
                 </a>
+                @if (Engine.Settings.Account.EnableRegistration)
+                {
+                    <a class="btn btn-sm me-2" asp-action="Register" asp-controller="Account">
+                        <i class="fas fa-user-plus me-1"></i> Sign up
+                    </a>
+                }
             }
-            <button class="btn btn-outline-dark btn-sm" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#mobile-menu">
-                <i class="fas fa-ellipsis-h mt-1 mb-1"></i>
+            <button class="btn btn-sm" type="button" aria-label="Toggle navigation" data-bs-toggle="modal" href="#mobile-menu">
+                <i class="fas fa-bars fa-2x mt-1 mb-1"></i>
             </button>
             <partial name="_Header_Menu_Mobile" />
         </div>

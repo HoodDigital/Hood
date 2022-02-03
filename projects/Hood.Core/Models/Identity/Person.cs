@@ -21,7 +21,7 @@ namespace Hood.Models
         public string Email { get; set; }
 
         [Display(Name = "Contact Name")]
-        public string ContactName { get => this.ToFullName(); set { } }
+        public string ContactName { get => this.ToInternalName(); set { } }
         public string Number { get; set; }
         [Display(Name = "Address 1")]
         public string Address1 { get; set; }
