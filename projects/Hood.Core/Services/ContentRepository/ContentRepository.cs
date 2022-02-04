@@ -352,7 +352,7 @@ namespace Hood.Services
 
             if (!_cache.TryGetValue(cacheKey, out ContentModel content))
             {
-                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "DateDesc", Status = ContentStatus.Published });
+                content = await GetContentAsync(new ContentModel() { Type = type, Category = category, PageSize = pageSize, Order = "PublishDesc", Status = ContentStatus.Published });
                 _cache.Add(cacheKey, content, TimeSpan.FromMinutes(5));
             }
             return content;
