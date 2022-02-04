@@ -23,23 +23,6 @@ namespace Hood.Areas.Admin.Controllers
             return View();
         }
 
-        [Route("admin/debug")]
-        [Authorize(Roles = "SuperUser")]
-        public virtual async Task<IActionResult> Debug()
-        {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
-            user.AddUserNote(new UserNote()
-            {
-                Id = Guid.NewGuid(),
-                CreatedBy = user.Id,
-                CreatedOn = DateTime.UtcNow,
-                Note = "This account was loaded and checked via the debug page."
-            });
-            await _userManager.UpdateAsync(user);
-
-            return View();
-        }
-
         [Route("admin/stats/")]
         public virtual async Task<IActionResult> StatsAsync()
         {

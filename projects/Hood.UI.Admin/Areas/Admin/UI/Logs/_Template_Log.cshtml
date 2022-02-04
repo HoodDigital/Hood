@@ -136,7 +136,7 @@
                             <label>User</label>
                             <p>
                                 <a asp-action="Edit" asp-controller="Users" asp-route-id="@Model.User.Id">
-                                    @Model.User.ToFullName()
+                                    @Model.User.ToInternalName()
                                 </a>
                             </p>
                         </div>
@@ -186,7 +186,7 @@
                             {
                                 <h5>Object Json</h5>
                                 <div class="code-viewer p-2 bg-gray auto text-white mb-3" style="font-family:monospace;">
-                                    @Html.Raw(Model.ErrorLogDetail.ObjectJson.ToHtml())
+                                    @Html.Raw(Model.ErrorLogDetail.ObjectJson.AddHtmlLineBreaks())
                                 </div>
                             }
                         }
@@ -195,7 +195,7 @@
                             <div class="form-group">
                                 <label>Detail</label>
                                 <div class="code-viewer p-2 bg-gray text-white" style="font-family:monospace;">
-                                    @Html.Raw(Model.Detail.ToHtml())
+                                    @Html.Raw(Model.Detail.AddHtmlLineBreaks())
                                 </div>
                             </div>
                         }

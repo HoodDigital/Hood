@@ -17,7 +17,7 @@ namespace Hood.Controllers
     }
 
     [Route("error")]
-    public abstract class ErrorController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class ErrorController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
 

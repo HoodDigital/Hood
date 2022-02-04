@@ -10,29 +10,43 @@ namespace Hood.Services
     public interface IAccountRepository
     {
         #region Account stuff
-        Task<ApplicationUser> GetCurrentUserAsync(bool track = true);
+        Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
         Task<ApplicationUser> GetUserByIdAsync(string id, bool track = true);
         Task<ApplicationUser> GetUserByEmailAsync(string email, bool track = true);
         Task<UserProfile> GetUserProfileByIdAsync(string id);
         Task UpdateUserAsync(ApplicationUser user);
         Task DeleteUserAsync(string userId, System.Security.Claims.ClaimsPrincipal adminUser);
-        Task<List<UserAccessCode>> GetAccessCodesAsync(string id);
         Task<MediaDirectory> GetDirectoryAsync(string id);
+        Task SetEmailAsync(ApplicationUser modelToUpdate, string email);
+        Task SetPhoneNumberAsync(ApplicationUser modelToUpdate, string email);
+        Task SendVerificationEmail(ApplicationUser localUser, string userId, string returnUrl);
+        Task<IdentityResult> ChangePassword(ApplicationUser user, string oldPassword, string newPassword);
+        Task<IdentityResult> ConfirmEmailAsync(ApplicationUser user, string code);
+        Task<IdentityResult> ResetPasswordAsync(ApplicationUser user, string code, string password);
         #endregion
 
         #region Profiles
         Task<UserListModel> GetUserProfilesAsync(UserListModel model, IQueryable<UserProfile> query = null);
         Task<UserProfile> GetProfileAsync(string id);
         Task UpdateProfileAsync(UserProfile user);
-        #endregion        
-        
+        #endregion
+
         #region Roles
-        Task<IList<IdentityRole>> GetAllRolesAsync();
+        bool SupportsRoles();
+        Task<IPagedList<ApplicationRole>> GetRolesAsync(IPagedList<ApplicationRole> model = null);
+        Task<IList<ApplicationRole>> GetRolesForUser(ApplicationUser user);
+        Task<IList<ApplicationUser>> GetUsersInRole(string role);
+        Task<bool> RoleExistsAsync(string role);
+        Task<ApplicationRole> GetRoleAsync(string role);
+        Task<ApplicationRole> CreateRoleAsync(string role);
+        Task DeleteRoleAsync(string role);
+        Task AddUserToRolesAsync(ApplicationUser user, ApplicationRole[] roles);
+        Task RemoveUserFromRolesAsync(ApplicationUser user, ApplicationRole[] roles);
         #endregion
 
         #region Addresses
-        Task DeleteAddressAsync(int id);
         Task<Models.Address> GetAddressByIdAsync(int id);
+        Task DeleteAddressAsync(int id);
         Task UpdateAddressAsync(Models.Address address);
         Task SetBillingAddressAsync(string userId, int id);
         Task SetDeliveryAddressAsync(string userId, int id);
@@ -40,6 +54,7 @@ namespace Hood.Services
 
         #region Statistics
         Task<UserStatistics> GetStatisticsAsync();
+        Task SendPasswordResetToken(ApplicationUser user);
         #endregion
     }
 }

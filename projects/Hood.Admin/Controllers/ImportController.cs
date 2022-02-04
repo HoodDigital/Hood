@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "SuperUser,Admin")]
+    [Authorize(Hood.Identity.Policies.Active, Roles = "SuperUser,Admin")]
 
     public class ImportController : BaseImportController
     {

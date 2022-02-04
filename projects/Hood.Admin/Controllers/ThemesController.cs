@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Hood.Identity;
 
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "SuperUser,Admin")]
+    [Authorize(Hood.Identity.Policies.Active, Roles = "SuperUser,Admin")]
     public class ThemesController : BaseThemesController
     {
         public ThemesController()

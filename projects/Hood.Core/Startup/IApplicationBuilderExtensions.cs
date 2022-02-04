@@ -113,7 +113,7 @@ namespace Hood.Startup
                         var profile = context.UserProfiles.FirstOrDefault();
                         Engine.Services.ViewsInstalled = true;
                     }
-                    catch (Microsoft.Data.SqlClient.SqlException)
+                    catch (Microsoft.Data.SqlClient.SqlException ex)
                     {
                         throw new StartupException("Database views are not installed.", StartupError.DatabaseViewsNotInstalled);
                     }

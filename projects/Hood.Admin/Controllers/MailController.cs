@@ -13,7 +13,7 @@ using Hood.Models;
 namespace Hood.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles="SuperUser,Admin")]
+    [Authorize(Hood.Identity.Policies.Active, Roles="SuperUser,Admin")]
 
     public class MailController : BaseMailController
     {

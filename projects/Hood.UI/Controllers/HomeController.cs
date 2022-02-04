@@ -2,6 +2,7 @@
 using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
+using Hood.Services;
 using Hood.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,7 @@ namespace Hood.Controllers
         public HomeController() : base() { }
     }
 
-    public abstract class HomeController<TContext> : BaseController<TContext, ApplicationUser, IdentityRole>
+    public abstract class HomeController<TContext> : BaseController<TContext, ApplicationUser, ApplicationRole>
          where TContext : HoodDbContext
     {
         public HomeController() : base() { }
@@ -27,7 +28,6 @@ namespace Hood.Controllers
         [Route("/")]
         public virtual async Task<IActionResult> Index()
         {
-
             BasicSettings basicSettings = Engine.Settings.Basic;
 
             if (basicSettings.Homepage.HasValue)

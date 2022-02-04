@@ -1,5 +1,6 @@
 @model UserViewModel
 @{
+    Layout = "_Layout_Account";
     ViewData["Title"] = "Update your profile";
     ViewData["SubTitle"] = "This is the user profile page, update your profile and add images, social media links and a Bio. These can be used in templates around the site.";
     ViewData.AddActivePage(ManageNavPages.Index);
@@ -8,25 +9,35 @@
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
-<nav class="nav nav-tabs nav-justified" role="tablist">
-    <a class="nav-item nav-link active" href="#basics" aria-controls="password" role="tab" data-bs-toggle="tab">Basic Details</a>
-    <a class="nav-item nav-link" href="#roles" aria-controls="socials" role="tab" data-bs-toggle="tab">Roles</a>
+@if (Model.NewAccount)
+{
+    <alert type="Info" size="Epic">
+        <h2>Welcome to your new account!</h2>
+        <p>You can customise your profile here. Click below to dismiss this message.</p>
+        <p><a class="btn btn-info" asp-action="Index">Dismiss</a></p>
+    </alert>
+}
+<nav class="nav nav-tabs" role="tablist">
+    <a class="nav-item nav-link active ms-3" href="#basics" aria-controls="password" role="tab" data-bs-toggle="tab">Basic Details</a>
+    <a class="nav-item nav-link" href="#accounts" aria-controls="accounts" role="tab" data-bs-toggle="tab">Accounts</a>
+    <a class="nav-item nav-link" href="#roles" aria-controls="roles" role="tab" data-bs-toggle="tab">Roles</a>
     <a class="nav-item nav-link" href="#socials" aria-controls="socials" role="tab" data-bs-toggle="tab">Socials</a>
     <a class="nav-item nav-link" href="#avatar" aria-controls="avatar" role="tab" data-bs-toggle="tab">Avatar</a>
     <a class="nav-item nav-link" href="#bio" aria-controls="bio" role="tab" data-bs-toggle="tab">Bio</a>
 </nav>
-<form method="post">
+<form method="post" class="card rounded-0 border-top-0 p-5 shadow">
 
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="tabs">
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="basics">
-                <div class="form-group">
+
+                <div class="mb-3">
                     <label asp-for="Username"></label>
                     <input asp-for="Username" class="form-control" disabled />
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Email"></label>
                     @if (Model.IsEmailConfirmed)
                     {
@@ -42,38 +53,38 @@
                         <div class="input-group">
                             <input asp-for="Email">
                             <div class="input-group-append">
-                                <a class="btn btn-outline-secondary" asp-action="SendVerificationEmail">Button</a>
+                                <a class="btn btn-outline-secondary" asp-action="SendVerificationEmail">Request Verification Email</a>
                             </div>
                         </div>
                     }
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="PhoneNumber"></label>
                     <input type="text" class="form-control" asp-for="PhoneNumber">
                     <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.DisplayName"></label>
                     <input type="text" class="form-control" asp-for="Profile.DisplayName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.FirstName"></label>
                     <input type="text" class="form-control" asp-for="Profile.FirstName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.LastName"></label>
                     <input type="text" class="form-control" asp-for="Profile.LastName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.JobTitle"></label>
                     <input type="text" class="form-control" asp-for="Profile.JobTitle">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.CompanyName"></label>
                     <input type="text" class="form-control" asp-for="Profile.CompanyName">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <div class="custom-control custom-checkbox">
                         <input asp-for="Profile.Anonymous" class="custom-control-input">
                         <label asp-for="Profile.Anonymous" class="custom-control-label"></label>
@@ -81,13 +92,56 @@
                     <small asp-for="Profile.Anonymous"></small>
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane" id="roles">
-                @if (Model.Roles.Count > 0)
+            <div role="tabpanel" class="tab-pane" id="accounts">
+                @{
+                    var accounts = Model.Accounts;
+                }
+                @if (accounts.Count > 0)
+                {
+                    <p>Your account can be accessed with the following methods:</p>
+                    @foreach (var account in accounts)
+                    {
+                        <div class="card p-2 mb-2">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <fixedImage class="img img-xs" src="@account.Picture"></fixedImage>
+                                </div>
+                                <div class="mx-3">
+                                    <span class="h4 m-0">@Html.Raw(account.ToProviderIcon())</span>
+                                </div>
+                                <div class="flex-fill">
+                                    <strong>@account.ToProviderString()</strong>
+                                    @if (account.IsPrimary)
+                                    {
+                                        <span class="badge bg-info ms-3">Primary</span>
+                                    }
+                                </div>
+                                @if (!account.IsPrimary && User.GetUserId() != account.Id)
+                                {
+                                    <div class="ms-2">
+                                        <a class="btn btn-sm btn-danger" asp-action="DisconnectAccount" asp-controller="Account" asp-route-accountId="@account.UserId">Disconnect</a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        Your account has no connected external accounts.
+                    </div>
+                }
+            </div>
+            <div role="tabpanel" class="tab-pane" id="roles"> @{
+                    var roles = User.GetRoles();
+                }
+                @if (roles.Count > 0)
                 {
                     <p>Your account has been assigned the following roles:</p>
-                    @foreach (var role in Model.Roles)
+                    @foreach (var role in roles)
                     {
-                        <p><i class="fa fa-check-circle mr-2"></i>@role.CamelCaseToString()</p>
+                        <p><i class="fa fa-check-circle me-3"></i>@role.CamelCaseToString()</p>
                     }
                 }
                 else
@@ -99,27 +153,27 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="socials">
                 <h4>Social Media Accounts</h4>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Facebook"></label>
                     <input type="text" class="form-control" asp-for="Profile.Facebook">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Instagram"></label>
                     <input type="text" class="form-control" asp-for="Profile.Instagram">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.LinkedIn"></label>
                     <input type="text" class="form-control" asp-for="Profile.LinkedIn">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Twitter"></label>
                     <input type="text" class="form-control" asp-for="Profile.Twitter">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.TwitterHandle"></label>
                     <input type="text" class="form-control" asp-for="Profile.TwitterHandle">
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.WebsiteUrl"></label>
                     <input type="text" class="form-control" asp-for="Profile.WebsiteUrl">
                 </div>
@@ -127,13 +181,14 @@
             <div role="tabpanel" class="tab-pane" id="avatar">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <fixedImage src="@Model.Profile.Avatar?.SmallUrl" class="img-sm @string.Format("avatar-{0}", Model.UserId) mb-0"></fixedImage>
+                        <fixedImage src="@User.GetAvatar()" class="img-md rounded @string.Format("avatar-{0}", Model.LocalUserId) mb-0"></fixedImage>
                     </div>
                     <div class="col">
                         <h4 class="media-heading">Change your profile image</h4>
                         <p>You can set your own profile image, click the upload button below to begin.</p>
                         <p>
-                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.UserId })" data-preview="@string.Format(".avatar-{0}", Model.UserId)">
+                            <button class="btn btn-primary image-uploader" type="button" data-json="#AvatarJson" id="avatar-upload" data-url="@Url.Action("UploadAvatar", new { userId = Model.LocalUserId })"
+                                data-preview="@string.Format(".avatar-{0}", Model.LocalUserId)">
                                 Upload
                             </button>
                         </p>
@@ -144,13 +199,12 @@
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane" id="bio">
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Profile.Bio"></label>
                     <textarea type="text" class="form-control" asp-for="Profile.Bio" rows="10"></textarea>
                 </div>
             </div>
         </div>
     </div>
-    <hr class="m-b-lg" />
-    <button type="submit" class="btn btn-success">Save Profile</button>
+    <button type="submit" class="btn btn-success mt-5">Save Profile</button>
 </form>

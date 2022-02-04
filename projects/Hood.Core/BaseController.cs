@@ -1,6 +1,7 @@
 ﻿using Hood.Caching;
 using Hood.Core;
 using Hood.Enums;
+using Hood.Extensions;
 using Hood.Filters;
 using Hood.Interfaces;
 using Hood.Models;
@@ -14,24 +15,22 @@ using System.Threading.Tasks;
 
 namespace Hood.Controllers
 {
-    public abstract class BaseController : BaseController<HoodDbContext, ApplicationUser, IdentityRole>
+    public abstract class BaseController : BaseController<HoodDbContext, ApplicationUser, ApplicationRole>
     {
         public BaseController()
-            :base()
+            : base()
         {
 
         }
     }
-    
+
     [Installed]
     public abstract class BaseController<TContext, TUser, TRole> : Controller
          where TContext : HoodDbContext
          where TUser : ApplicationUser
-         where TRole : IdentityRole
+         where TRole : ApplicationRole
     {
         protected readonly UserManager<TUser> _userManager;
-        protected readonly SignInManager<TUser> _signInManager;
-        protected readonly RoleManager<TRole> _roleManager;
         protected readonly IAccountRepository _account;
         protected readonly IContentRepository _content;
         protected readonly ContentCategoryCache _contentCategoryCache;
@@ -58,13 +57,7 @@ namespace Hood.Controllers
 
         public BaseController()
         {
-            if (!Engine.Services.Installed) {
-                // throw here, send to install page.
-                
-            }
             _userManager = Engine.Services.Resolve<UserManager<TUser>>();
-            _signInManager = Engine.Services.Resolve<SignInManager<TUser>>();
-            _roleManager = Engine.Services.Resolve<RoleManager<TRole>>();
             _content = Engine.Services.Resolve<IContentRepository>();
             _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
             _property = Engine.Services.Resolve<IPropertyRepository>();
@@ -85,38 +78,49 @@ namespace Hood.Controllers
             _recaptcha = Engine.Services.Resolve<IRecaptchaService>();
         }
 
-        public ViewResult View(ISaveableModel model)
+        protected ViewResult View(ISaveableModel model)
         {
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
+            SaveMessage = null;
             return base.View(model);
         }
-        public ViewResult View(string viewName, ISaveableModel model)
+        protected ViewResult View(string viewName, ISaveableModel model)
         {
             model.MessageType = MessageType;
             model.SaveMessage = SaveMessage;
+            SaveMessage = null;
             return base.View(viewName, model);
         }
 
-        public async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
+        protected async Task<Response> SuccessResponseAsync<TSource>(string successMessage, string title = null)
         {
             await _logService.AddLogAsync<TSource>(successMessage, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
-        public async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
+        protected async Task<Response> SuccessResponseAsync<TSource>(string successMessage, object logObject, string title = null)
         {
             await _logService.AddLogAsync<TSource>(successMessage, logObject, type: LogType.Success);
             return new Response(true, successMessage, title);
         }
-        public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
+        protected async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex)
         {
             await _logService.AddExceptionAsync<TSource>(errorMessage, ex);
             return new Response(ex, errorMessage);
         }
-        public async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
+        protected async Task<Response> ErrorResponseAsync<TSource>(string errorMessage, Exception ex, object logObject)
         {
             await _logService.AddExceptionAsync<TSource>(errorMessage, logObject, ex);
             return new Response(ex, errorMessage);
+        }
+        protected async Task<ApplicationUser> GetCurrentUserOrThrow()
+        {
+            var user = await _account.GetUserByIdAsync(User.GetLocalUserId());
+            if (user == null)
+            {
+                throw new ApplicationException($"Unable to load user with email '{User.GetEmail()}'.");
+            }
+            return user;
         }
 
     }

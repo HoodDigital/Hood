@@ -41,6 +41,7 @@ namespace Hood.ViewModels
         [Required]
         [Display(Name = "Last Name")]
         public override string LastName { get; set; }
+               
     }
 
     public class RegisterViewModel : SpamPreventionModel, IName, IAddress, IPerson
@@ -80,7 +81,7 @@ namespace Hood.ViewModels
         public virtual string JobTitle { get; set; }
 
         [Display(Name = "Contact Name")]
-        public virtual string ContactName { get => this.ToFullName(); set { } }
+        public virtual string ContactName { get => this.ToInternalName(); set { } }
 
         public virtual string Number { get; set; }
 
@@ -101,5 +102,6 @@ namespace Hood.ViewModels
         public virtual double Latitude { get; set; }
 
         public virtual double Longitude { get; set; }
+        public virtual string ReturnUrl { get; set; }
     }
 }

@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace Hood.Core
 {
@@ -72,12 +73,37 @@ namespace Hood.Core
 
             return null;
         }
+        public static bool Auth0Enabled
+        {
+            get
+            {
+                if (Auth0Configuration.ClientId.IsSet() && Auth0Configuration.Domain.IsSet())
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
 
         public static HoodConfiguration Configuration
         {
             get
             {
                 var config = Services.Resolve<IOptions<HoodConfiguration>>();
+                if (config != null)
+                {
+                    return config.Value;
+                }
+                else
+                    return null;
+            }
+        }
+
+        public static Auth0Configuration Auth0Configuration
+        {
+            get
+            {
+                var config = Services.Resolve<IOptions<Auth0Configuration>>();
                 if (config != null)
                 {
                     return config.Value;
@@ -119,19 +145,20 @@ namespace Hood.Core
         /// <summary>
         /// Gets the current user's account, from context, cache or datastore.
         /// </summary>
-        public static UserProfile Account
+        public static ClaimsPrincipal Account
         {
             get
             {
                 try
                 {
                     var _contextAccessor = Services.Resolve<IHttpContextAccessor>();
+
                     if (_contextAccessor == null ||
                         _contextAccessor.HttpContext == null ||
-                        _contextAccessor.HttpContext.User == null ||
-                        !_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                        _contextAccessor.HttpContext.Session == null)
                         return null;
-                    return _contextAccessor.HttpContext.User.GetUserProfile();
+
+                    return _contextAccessor.HttpContext.User;
                 }
                 catch (SqlException)
                 {

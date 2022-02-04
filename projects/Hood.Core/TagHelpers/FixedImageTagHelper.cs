@@ -45,7 +45,7 @@ namespace Hood.TagHelpers
                 if (Engine.Settings.Media.NoImage.IsSet())
                     url = Engine.Settings.Media.NoImage;
                 else
-                    url = "/hood/images/no-image.jpg";
+                    url = "https://cdn.jsdelivr.net/npm/hoodcms/images/no-image.jpg";
 
             if (Fallback.IsSet())
                 url = Fallback;

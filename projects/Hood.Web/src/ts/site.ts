@@ -1,23 +1,15 @@
-import { Alerts, BaseSite } from "hoodcms";
+import { Alerts, HoodApi } from "hoodcms";
 
-export class Site extends BaseSite {
+export class Site extends HoodApi {
 
     constructor() {
         super();
+        this.initialise();
     }
 
     initialise() {
         super.initialise();
-    }
-
-    override onLoad() {
-        super.onLoad();
-
         Alerts.success('Hood CMS is loaded! Customise your TS code in /src/ts/site.ts!');
-    }
-
-    override onResize() {
-        super.onResize();
     }
 }
 

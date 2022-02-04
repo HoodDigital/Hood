@@ -45,9 +45,23 @@
                 </div>
                 <div class="mb-3">
                     <div class="form-check form-switch">
+                        <input asp-for="AllowRemoteSignups" class="form-check-input">
+                        <label asp-for="AllowRemoteSignups" class="form-check-label d-block"></label>
+                        <small asp-for="AllowRemoteSignups"></small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
                         <input asp-for="MagicLinkLogin" class="form-check-input">
                         <label asp-for="MagicLinkLogin" class="form-check-label d-block"></label>
                         <small asp-for="MagicLinkLogin"></small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input asp-for="DeleteRemoteAccounts" class="form-check-input">
+                        <label asp-for="DeleteRemoteAccounts" class="form-check-label d-block"></label>
+                        <small asp-for="DeleteRemoteAccounts"></small>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,6 @@
-﻿namespace Hood.Interfaces
+﻿using System;
+
+namespace Hood.Interfaces
 {
     public interface IInstallSettings
     {
@@ -10,5 +12,6 @@
         bool AdminUserSetupError { get; set; }
         bool DatabaseMediaTimeout { get; set; }
         bool Installed { get; }
+        Exception Details { get; set; }
     }
 }

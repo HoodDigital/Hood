@@ -15,8 +15,8 @@ namespace Hood.Development.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("ProductVersion", "5.0.10")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Hood.Models.Address", b =>
@@ -78,6 +78,36 @@ namespace Hood.Development.Migrations
                     b.ToTable("HoodAddresses");
                 });
 
+            modelBuilder.Entity("Hood.Models.ApplicationRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("RemoteId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles");
+                });
+
             modelBuilder.Entity("Hood.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -112,8 +142,8 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -146,12 +176,12 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -169,8 +199,8 @@ namespace Hood.Development.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("UserVars")
                         .HasColumnType("nvarchar(max)");
@@ -178,14 +208,47 @@ namespace Hood.Development.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
+                        .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex")
+                        .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Hood.Models.Auth0Identity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Connection")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsSocial")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LocalUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocalUserId");
+
+                    b.ToTable("AspNetAuth0Identities");
                 });
 
             modelBuilder.Entity("Hood.Models.Content", b =>
@@ -277,20 +340,22 @@ namespace Hood.Development.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("ContentCategoryId")
                         .HasColumnType("int")
+                        .HasColumnName("ContentCategoryId")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ContentType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DisplayName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ParentCategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Slug")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -353,8 +418,8 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Directory");
 
                     b.Property<string>("SmallUrl")
                         .HasColumnType("nvarchar(max)");
@@ -504,8 +569,8 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Directory");
 
                     b.Property<string>("SmallUrl")
                         .HasColumnType("nvarchar(max)");
@@ -574,8 +639,8 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Directory");
 
                     b.Property<int>("PropertyId")
                         .HasColumnType("int");
@@ -823,8 +888,8 @@ namespace Hood.Development.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Path")
-                        .HasColumnName("Directory")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Directory");
 
                     b.Property<int>("PropertyId")
                         .HasColumnType("int");
@@ -875,63 +940,90 @@ namespace Hood.Development.Migrations
                     b.ToTable("HoodPropertyMetadata");
                 });
 
-            modelBuilder.Entity("Hood.Models.UserAccessCode", b =>
+            modelBuilder.Entity("Hood.Models.UserProfile", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateUsed")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Expiry")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Used")
+                    b.Property<bool>("Active")
                         .HasColumnType("bit");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<bool>("Anonymous")
+                        .HasColumnType("bit");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserAccessCodes");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
+                    b.Property<string>("Auth0UsersJson")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                    b.Property<string>("AvatarJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("NormalizedName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                    b.Property<string>("BillingAddressJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
 
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                    b.Property<string>("DeliveryAddressJson")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("AspNetRoles");
+                    b.Property<string>("DisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastLogOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastLoginIP")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastLoginLocation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Latitude")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Longitude")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RoleCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RoleIds")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RolesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserVars")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToView("HoodUserProfiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1043,6 +1135,18 @@ namespace Hood.Development.Migrations
                     b.HasOne("Hood.Models.ApplicationUser", "User")
                         .WithMany("Addresses")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Hood.Models.Auth0Identity", b =>
+                {
+                    b.HasOne("Hood.Models.ApplicationUser", "User")
+                        .WithMany("ConnectedAuth0Accounts")
+                        .HasForeignKey("LocalUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Hood.Models.Content", b =>
@@ -1050,6 +1154,8 @@ namespace Hood.Development.Migrations
                     b.HasOne("Hood.Models.ApplicationUser", "Author")
                         .WithMany("Content")
                         .HasForeignKey("AuthorId");
+
+                    b.Navigation("Author");
                 });
 
             modelBuilder.Entity("Hood.Models.ContentCategory", b =>
@@ -1057,6 +1163,8 @@ namespace Hood.Development.Migrations
                     b.HasOne("Hood.Models.ContentCategory", "ParentCategory")
                         .WithMany("Children")
                         .HasForeignKey("ParentCategoryId");
+
+                    b.Navigation("ParentCategory");
                 });
 
             modelBuilder.Entity("Hood.Models.ContentCategoryJoin", b =>
@@ -1072,6 +1180,10 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("ContentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("Hood.Models.ContentMedia", b =>
@@ -1081,6 +1193,8 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("ContentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("Hood.Models.ContentMeta", b =>
@@ -1090,6 +1204,8 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("ContentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("Hood.Models.Log", b =>
@@ -1097,6 +1213,8 @@ namespace Hood.Development.Migrations
                     b.HasOne("Hood.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Hood.Models.MediaDirectory", b =>
@@ -1105,6 +1223,8 @@ namespace Hood.Development.Migrations
                         .WithMany("Children")
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("Hood.Models.MediaObject", b =>
@@ -1113,6 +1233,8 @@ namespace Hood.Development.Migrations
                         .WithMany("Media")
                         .HasForeignKey("DirectoryId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Directory");
                 });
 
             modelBuilder.Entity("Hood.Models.PropertyFloorplan", b =>
@@ -1122,6 +1244,8 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("Hood.Models.PropertyListing", b =>
@@ -1129,6 +1253,8 @@ namespace Hood.Development.Migrations
                     b.HasOne("Hood.Models.ApplicationUser", "Agent")
                         .WithMany("Properties")
                         .HasForeignKey("AgentId");
+
+                    b.Navigation("Agent");
                 });
 
             modelBuilder.Entity("Hood.Models.PropertyMedia", b =>
@@ -1138,6 +1264,8 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("Hood.Models.PropertyMeta", b =>
@@ -1147,19 +1275,13 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("Hood.Models.UserAccessCode", b =>
-                {
-                    b.HasOne("Hood.Models.ApplicationUser", "User")
-                        .WithMany("AccessCodes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Hood.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1186,7 +1308,7 @@ namespace Hood.Development.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Hood.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1206,6 +1328,49 @@ namespace Hood.Development.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Hood.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("ConnectedAuth0Accounts");
+
+                    b.Navigation("Content");
+
+                    b.Navigation("Properties");
+                });
+
+            modelBuilder.Entity("Hood.Models.Content", b =>
+                {
+                    b.Navigation("Categories");
+
+                    b.Navigation("Media");
+
+                    b.Navigation("Metadata");
+                });
+
+            modelBuilder.Entity("Hood.Models.ContentCategory", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("Content");
+                });
+
+            modelBuilder.Entity("Hood.Models.MediaDirectory", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("Media");
+                });
+
+            modelBuilder.Entity("Hood.Models.PropertyListing", b =>
+                {
+                    b.Navigation("FloorPlans");
+
+                    b.Navigation("Media");
+
+                    b.Navigation("Metadata");
                 });
 #pragma warning restore 612, 618
         }

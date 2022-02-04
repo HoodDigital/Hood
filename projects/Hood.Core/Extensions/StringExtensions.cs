@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+using Hood.Core;
 
 namespace Hood.Extensions
 {
@@ -142,13 +144,18 @@ namespace Hood.Extensions
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        public static string ToHtml(this string str)
+        public static string AddHtmlLineBreaks(this string str)
         {
             if (!str.IsSet())
             {
                 return str;
             }
             return str.Replace(Environment.NewLine, "<br />").Replace("\r\n", "<br />").Replace("\r", "<br />").Replace("\n", "<br />");
+        }
+        public static string EncodeHtml(this string content)
+        {
+            string encoded = HtmlEncoder.Default.Encode(content);
+            return encoded;
         }
 
         public static bool IsNullOrEmpty(this string str)

@@ -68,33 +68,6 @@ namespace Hood.Areas.Admin.Controllers
             return RedirectToAction("Mail", "Settings");
         }
 
-        [Route("hood/test-email-full/")]
-        public virtual IActionResult Terms()
-        {
-            var mailSettings = Engine.Settings.Mail;
-            var mail = GetDemoMail();
-
-            mail.Subject = "Testing basic email sends";
-            mail.To = _emailSender.GetSiteFromEmail();
-            _emailSender.SendEmailAsync(mail);
-            _emailSender.NotifyRoleAsync(mail, "Admin");
-            EmailAddress[] emails = { mail.To };
-            _emailSender.SendEmailAsync(emails, "Basic Email send", "<h1>basic email test</h1>", "basic email test");
-            _emailSender.NotifyRoleAsync("Admin", "Basic Email send", "<h1>basic email test</h1>", "basic email test");
-
-            mail.Subject = "Testing FROM parameter";
-
-            var from = new EmailAddress() { Email = "george@hooddigital.com", Name = "HoodCMS Test From" };
-            mail.Template = Models.MailSettings.DangerTemplate;
-
-            _emailSender.SendEmailAsync(mail, from);
-            _emailSender.NotifyRoleAsync(mail, "Admin", from);
-            _emailSender.SendEmailAsync(emails, "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
-            _emailSender.NotifyRoleAsync("Admin", "Testing FROM parameter - BASIC", "<h1>basic email test</h1>", "basic email test", from);
-
-            return View();
-        }
-
         protected virtual MailObject GetDemoMail()
         {
             MailObject mail = new MailObject()
