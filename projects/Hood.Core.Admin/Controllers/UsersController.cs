@@ -421,8 +421,9 @@ namespace Hood.Areas.Admin.Controllers
                     var primaryAccount = user.GetPrimaryIdentity();
                     if (primaryAccount != null)
                     {
-                        var remoteRoles = (await auth0Service.GetRolesAsync(primaryAccount.Id)).Select(r => r.Name).ToList();
-                        await auth0Service.SyncLocalRoles(user, remoteRoles);
+                        var remoteRoles = await auth0Service.GetRolesByUserAsync(primaryAccount.Id);
+                        var remoteRoleNames = remoteRoles.Select(r => r.Name).ToList();
+                        await auth0Service.SyncLocalRoles(user, remoteRoleNames);
                     }
                 }
 

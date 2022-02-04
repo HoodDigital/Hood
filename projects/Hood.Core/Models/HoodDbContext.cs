@@ -6,6 +6,7 @@ using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -155,7 +156,6 @@ namespace Hood.Models
             }
 
             ApplicationUser siteAdmin = await Engine.AccountManager.GetUserByEmailAsync(Engine.SiteOwnerEmail);
-            var auth0Service = new Auth0Service();
             try
             {
                 var roleManager = Engine.Services.Resolve<RoleManager<ApplicationRole>>();
@@ -179,23 +179,6 @@ namespace Hood.Models
                             }
                         }
                     }
-                    var allRoles = await Engine.AccountManager.GetRolesAsync();
-                    var requiredRoles = allRoles.List.Where(a => Models.Roles.All.Contains(a.Name));
-                    var extraRoles = allRoles.List.Where(a => !Models.Roles.All.Contains(a.Name));
-                    foreach (ApplicationRole extraLocalRole in extraRoles)
-                    {
-                        // Ensure it has a remote id linked to it.
-                        if (!extraLocalRole.RemoteId.IsSet())
-                        {
-                            await Engine.AccountManager.CreateRoleAsync(extraLocalRole.Name);
-                        }
-                    }
-                    // Make sure site admin is in all required roles.
-                    await Engine.AccountManager.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
-                    if (Engine.Auth0Enabled)
-                    {
-                        await auth0Service.AddUserToRolesAsync(siteAdmin, requiredRoles.ToArray());
-                    }
                 }
             }
             catch (Exception ex)
@@ -203,45 +186,13 @@ namespace Hood.Models
                 throw new StartupException("An error occurred syncing local roles with Auth0.", ex, StartupError.Auth0Issue);
             }
 
-            if (Engine.Auth0Enabled)
-            {
-                // Check the rule is set to provide roles from Auth0
-                var client = await auth0Service.GetClientAsync();
-                var rules = await client.Rules.GetAllAsync(new Auth0.ManagementApi.Models.GetRulesRequest()
-                {
-                    Stage = "login_success"
-                });
-                var roleRule = rules.SingleOrDefault(r => r.Name == Hood.Identity.Constants.AddRoleClaimsRuleName);
-                if (roleRule != null)
-                {
-                    await client.Rules.DeleteAsync(roleRule.Id);
-                }
-                var roleScript = @"
-function (user, context, callback) {
-    const role_namespace = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
-    if (context.authorization !== null) {
-        if (context.authorization.roles !== null) {
-            context.idToken[role_namespace] = context.authorization.roles;
-        } else {
-            console.log('context.authorization.roles is null');
-        }
-    } else {
-        console.log('context.authorization is null');
-    }
-    return callback(null, user, context);
-}";
-                await client.Rules.CreateAsync(new Auth0.ManagementApi.Models.RuleCreateRequest()
-                {
-                    Script = roleScript,
-                    Name = Hood.Identity.Constants.AddRoleClaimsRuleName,
-                    Enabled = true,
-                    Stage = "login_success"
-                });
-            }
-
             if (!Options.Any(o => o.Id == "Hood.Settings.SiteOwner"))
             {
-                Options.Add(new Option { Id = "Hood.Settings.SiteOwner", Value = siteAdmin.Id });
+                Options.Add(new Option
+                {
+                    Id = "Hood.Settings.SiteOwner",
+                    Value = siteAdmin.Id
+                });
             }
 
             if (!MediaDirectories.Any(o => o.Slug == MediaManager.SiteDirectorySlug && o.Type == DirectoryType.System))

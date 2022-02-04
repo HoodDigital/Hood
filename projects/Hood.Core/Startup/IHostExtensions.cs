@@ -37,7 +37,7 @@ namespace Hood.Startup
                     Engine.Services.AdminUserSetupError = false;
                     Engine.Services.DatabaseMediaTimeout = false;
 
-                    if (Engine.Configuration.SeedOnStart)
+                    if (Engine.Configuration.InitializeOnStartup)
                     {
                         if (Engine.Configuration.ApplyMigrationsAutomatically && !db.AllMigrationsApplied())
                         {

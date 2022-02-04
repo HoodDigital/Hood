@@ -40,5 +40,11 @@ namespace Hood.Controllers
             return View(model);
         }
 
+        [Route("/install/ready")]
+        public IActionResult Initialized()
+        {
+            return View();
+        }
+
     }
 }

@@ -115,10 +115,6 @@
                                     {
                                         <span class="badge bg-info ms-3">Primary</span>
                                     }
-                                    @if (User.GetUserId() == account.Id)
-                                    {
-                                        <span class="badge bg-warning ms-3">In use</span>
-                                    }
                                 </div>
                                 @if (!account.IsPrimary && User.GetUserId() != account.Id)
                                 {
