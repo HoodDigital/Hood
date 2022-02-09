@@ -23,3 +23,17 @@ export * from './core/Validator'
 export * from './extensions/jqueryExtensions'
 export * from './extensions/numberExtensions'
 export * from './extensions/stringExtensions'
+
+// Extendables for admin area
+export * from './admin/ContentController'
+export * from './admin/ContentTypeController'
+export * from './admin/HomeController'
+export * from './admin/LogsController'
+export * from './admin/MediaController'
+export * from './admin/PropertyController'
+export * from './admin/PropertyImporter'
+export * from './admin/ThemesController'
+export * from './admin/UsersController'
+
+// Extendables for app
+export * from './app/PropertyService'

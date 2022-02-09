@@ -46,7 +46,7 @@ export class DataList {
 
         this.element = element;
         this.element.hoodDataList = this;
-        if (typeof(element) == 'undefined' || element == null) {
+        if (typeof (element) == 'undefined' || element == null) {
             Alerts.log('Could not DataList to element, element does not exist.', 'error');
             return;
         }
@@ -54,9 +54,32 @@ export class DataList {
         this.options = { ...this.options, ...options };
 
         if ($(this.element).hasClass('query')) {
-            let pageUrl = $(this.element).data('url') + window.location.search;
-            $(this.element).attr('data-url', pageUrl);
-            $(this.element).data('url', pageUrl);
+
+            let r = new RegExp('^(?:[a-z]+:)?//', 'i');
+            let pageUrl: URL = null;
+            if (r.test(this.element.dataset.url)) {
+                pageUrl = new URL(this.element.dataset.url);
+            } else {
+                pageUrl = new URL(window.location.origin + this.element.dataset.url);
+            }
+            if ('URLSearchParams' in window) {
+                var searchParams = new URLSearchParams(window.location.search);
+                var urlParams = new URLSearchParams(pageUrl.search);
+                searchParams.forEach((value, key, parent) => {
+                    urlParams.set(key, value);
+                });
+                if (urlParams.get("page") == "0") {
+                    urlParams.set("page", "1");
+                }
+                pageUrl.search = urlParams.toString();
+            } else {
+                pageUrl.search = window.location.search;
+            }
+
+            let url = pageUrl.pathname + pageUrl.search;
+            $(this.element).attr('data-url', url);
+            $(this.element).data('url', url);
+
         }
 
         if (!$(this.element).hasClass('refresh-only')) {
