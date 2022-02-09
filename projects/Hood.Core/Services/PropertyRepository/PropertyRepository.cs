@@ -71,6 +71,11 @@ namespace Hood.Services
                 properties = properties.Where(n => n.Agent.UserName == model.Agent);
             }
 
+            if (model.Location.IsSet())
+            {
+                properties = properties.Where(n => n.Address2 == model.Location);
+            }
+
             if (model.PlanningType.IsSet())
             {
                 properties = properties.Where(n => n.Planning == model.PlanningType);
@@ -196,14 +201,17 @@ namespace Hood.Services
                 }
             }
 
-            model.Locations = (await properties.ToListAsync()).Select(p => new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(), p.Url, p.FeaturedImage.Url)).ToList();
-            model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
             model.AvailableTypes = await _db.Properties.Select(p => p.ListingType).Distinct().ToListAsync();
             model.AvailableStatuses = await _db.Properties.Select(p => p.LeaseStatus).Distinct().ToListAsync();
             model.AvailablePlanningTypes = await _db.Properties.Select(p => p.Planning).Distinct().ToListAsync();
             model.PlanningTypes = Engine.Settings.Property.GetPlanningTypes();
 
             await model.ReloadAsync(properties);
+            if (model.List != null)
+            {
+                model.Locations = model.List.Select(p => new MapMarker(p, p.Title, p.QuickInfo, p.Id.ToString(), p.Url, p.FeaturedImage.Url)).ToList();
+                model.CentrePoint = GeoCalculations.GetCentralGeoCoordinate(model.Locations.Select(p => new GeoCoordinate(p.Latitude, p.Longitude)));
+            }
             return model;
         }
         public async Task<List<MapMarker>> GetLocationsAsync(PropertyListModel filters)
@@ -468,7 +476,7 @@ namespace Hood.Services
                 publishMonths.Add(new KeyValuePair<string, int>(dt.ToString("MMMM, yyyy"), count));
             }
 
-            return new PropertyStatistics (totalProperties, totalPublished, days, months, publishDays, publishMonths);
+            return new PropertyStatistics(totalProperties, totalPublished, days, months, publishDays, publishMonths);
         }
         #endregion
     }

@@ -1,11 +1,10 @@
 /// <reference types="google.maps" />
 
-import { HoodApi } from "./core/HoodApi";
-import { PropertyController } from './app/PropertyController';
+import { HoodApi, PropertyService } from ".";
 
 export class App extends HoodApi {
-    property: PropertyController;
-    
+    property: PropertyService;
+
     constructor() {
         super();
 
@@ -13,7 +12,7 @@ export class App extends HoodApi {
         this.initialise();
 
         // Initialise the property controllers.
-        this.property = new PropertyController();
+        this.property = new PropertyService();
     }
 
 }

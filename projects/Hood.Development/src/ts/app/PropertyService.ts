@@ -11,8 +11,44 @@ declare global {
     }
 }
 
-export class PropertyController {
-    constructor() {
+export interface PropertyServiceOptions {
+
+    listElementId?: string;
+    mapListElementId?: string;
+    mapElementId?: string;
+    
+    /**
+     * Called before the data is fetched.
+     */
+    onListLoad?: (sender?: HTMLElement) => void;
+
+    /**
+     * Called before the fetched HTML is rendered to the list. Must return the data back to datalist to render.
+     */
+    onListRender?: (html: string, sender?: HTMLElement) => string;
+    /**
+     * Called before the data is fetched.
+     */
+    onMapLoad?: (data: string, sender?: HTMLElement) => void;
+
+    /**
+     * Called before the fetched HTML is rendered to the list. Must return the data back to datalist to render.
+     */
+    onMapRender?: (sender?: HTMLElement) => string;
+
+}
+
+export class PropertyService {
+    options: PropertyServiceOptions = {
+        listElementId: 'property-list',
+        mapListElementId: 'property-map-list',
+        mapElementId: 'property-map'
+    };
+
+    constructor(options?: PropertyServiceOptions) {
+
+        this.options = { ...this.options, ...options };
+
         this.initList();
     }
 
@@ -27,14 +63,24 @@ export class PropertyController {
 
     initList() {
 
-        this.element = document.getElementById('property-list');
+        this.element = document.getElementById(this.options.listElementId);
         if (!this.element) {
             return;
         }
 
         this.list = new DataList(this.element, {
-            onComplete: function (this: PropertyController, data: string, sender: HTMLElement = null) {
+            onLoad: function (this: PropertyService, sender: HTMLElement = null) {
 
+                if (this.options.onListLoad) {
+                    this.options.onListLoad(sender);
+                }
+
+            }.bind(this),
+            onComplete: function (this: PropertyService, data: string, sender: HTMLElement = null) {
+
+                if (this.options.onListRender) {
+                    this.options.onListRender(data, sender);
+                }
                 Alerts.log('Finished loading property list.', 'info');
 
             }.bind(this)
@@ -44,14 +90,17 @@ export class PropertyController {
 
     initMapList() {
 
-        this.mapListElement = document.getElementById('property-map-list');
+        this.mapListElement = document.getElementById(this.options.mapListElementId);
         if (!this.mapElement) {
             return;
         }
 
         this.mapList = new DataList(this.mapListElement, {
-            onComplete: function (this: PropertyController, data: string, sender: HTMLElement = null) {
+            onComplete: function (this: PropertyService, data: string, sender: HTMLElement = null) {
 
+                if (this.options.onMapLoad) {
+                    this.options.onMapLoad(data, sender);
+                }
                 Alerts.log('Finished loading map list.', 'info');
                 this.reloadMarkers();
 
@@ -59,9 +108,9 @@ export class PropertyController {
         });
     }
 
-    initMap(mapElementId: string = 'property-map') {
+    initMap() {
 
-        this.mapElement = document.getElementById(mapElementId);
+        this.mapElement = document.getElementById(this.options.mapElementId);
         if (!this.mapElement) {
             return;
         }
@@ -74,7 +123,7 @@ export class PropertyController {
             scrollwheel: false
         });
 
-        $(window).resize(function (this: PropertyController) {
+        $(window).resize(function (this: PropertyService) {
             google.maps.event.trigger(this.map, 'resize');
         }.bind(this));
 
@@ -104,7 +153,7 @@ export class PropertyController {
 
         var locations = $("#property-map-locations").data('locations');
 
-        locations.map(function (this: PropertyController, location: any, i: number) {
+        locations.map(function (this: PropertyService, location: any, i: number) {
 
             let marker = new google.maps.Marker({
                 position: new google.maps.LatLng(+location.Latitude, +location.Longitude),
@@ -112,13 +161,9 @@ export class PropertyController {
                 optimized: true // makes SVG icons work in IE
             });
 
-
-
-            //marker.setIcon({
-            //    url: '/images/marker.png',
-            //    size: new google.maps.Size(30, 41),
-            //    scaledSize: new google.maps.Size(30, 41)
-            //});
+            if (this.mapElement.dataset.marker) {
+                marker.setIcon(this.mapElement.dataset.marker);
+            }
 
             marker.info = `<div class="card border-0" style="max-width:300px">
     <div style="background-image:url(${location.ImageUrl})" class="rounded img-full img img-wide"></div>
@@ -131,20 +176,27 @@ export class PropertyController {
     </div>
 </div>`;
 
-            google.maps.event.addListener(marker, 'click', function (this: google.maps.Marker) {
-
+            marker.addListener("click", () => {
                 if (infowindow) {
                     infowindow.close();
                 }
                 infowindow = new google.maps.InfoWindow({
-                    content: this.info
+                    content: marker.info
                 });
-                infowindow.open(map, this);
-
-            }.bind(this));
+                infowindow.open({
+                    anchor: marker,
+                    map,
+                    shouldFocus: false,
+                });
+            });
 
             this.markers.push(marker);
 
         }.bind(this));
+
+
+        if (this.options.onMapRender) {
+            this.options.onMapRender();
+        }
     }
 }
