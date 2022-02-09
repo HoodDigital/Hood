@@ -428,6 +428,7 @@ namespace Hood.Services
             {
                 roleObject = new ApplicationRole()
                 {
+                    Id = Guid.NewGuid().ToString(),
                     Name = role,
                     NormalizedName = role.ToUpperInvariant(),
                     ConcurrencyStamp = Guid.NewGuid().ToString()
