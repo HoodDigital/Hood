@@ -68,7 +68,7 @@ namespace Hood.Services
             {
                 newAuthUser = await GetUserById(fullAuthUserId);
             }
-            catch (Auth0.Core.Exceptions.ErrorApiException ex)
+            catch (Auth0.Core.Exceptions.ErrorApiException)
             {
             }
 
