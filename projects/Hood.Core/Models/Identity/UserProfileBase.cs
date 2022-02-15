@@ -249,7 +249,7 @@ namespace Hood.Models
             }
             return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
         }
-
+            
         public bool UpdateFromPrincipal(ClaimsPrincipal principal)
         {
             bool changed = false;
@@ -272,6 +272,13 @@ namespace Hood.Models
             if (!this.PhoneNumber.IsSet() && mobile.IsSet())
             {
                 this.PhoneNumber = mobile;
+                changed = true;
+            }
+
+            bool emailConfirmed = principal.IsEmailConfirmed();
+            if (!this.EmailConfirmed && emailConfirmed)
+            {
+                this.EmailConfirmed = emailConfirmed;
                 changed = true;
             }
 
