@@ -5,6 +5,7 @@ using Hood.Identity;
 using Hood.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -95,7 +96,7 @@ namespace Hood.Models
         [NotMapped]
         public virtual IMediaObject Avatar
         {
-            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.Blank; }
+            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.BlankAvatar; }
             set { AvatarJson = JsonConvert.SerializeObject(value); }
         }
         public virtual string GetAvatar()
@@ -113,8 +114,23 @@ namespace Hood.Models
         [NotMapped]
         public virtual Dictionary<string, string> Metadata
         {
-            get { return UserVars.IsSet() ? JsonConvert.DeserializeObject<Dictionary<string, string>>(UserVars) : new Dictionary<string, string>(); }
-            set { UserVars = JsonConvert.SerializeObject(value); }
+            get { return UserVars.IsSet() ? JsonConvert.DeserializeObject<Dictionary<string, string>>(UserVars, new JsonSerializerSettings()
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new DefaultNamingStrategy()
+                    }
+                }) : new Dictionary<string, string>(); }
+            set
+            {
+                UserVars = JsonConvert.SerializeObject(value, new JsonSerializerSettings()
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new DefaultNamingStrategy()
+                    }
+                });
+            }
         }
         public virtual string this[string key]
         {
@@ -249,7 +265,7 @@ namespace Hood.Models
             }
             return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
         }
-            
+
         public bool UpdateFromPrincipal(ClaimsPrincipal principal)
         {
             bool changed = false;
@@ -279,6 +295,13 @@ namespace Hood.Models
             if (!this.EmailConfirmed && emailConfirmed)
             {
                 this.EmailConfirmed = emailConfirmed;
+                changed = true;
+            }
+
+            string avatar = principal.GetAvatar();
+            if (!this.AvatarJson.IsSet() && avatar.IsSet())
+            {
+                this.Avatar = new MediaObject(avatar);
                 changed = true;
             }
 
