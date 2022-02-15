@@ -11,9 +11,8 @@ namespace Hood.Models
         public List<Content> Content { get; set; }
         [JsonIgnore]
         public List<PropertyListing> Properties { get; set; }
+
         #endregion
-
-
     }
 
 

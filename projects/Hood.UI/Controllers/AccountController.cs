@@ -388,6 +388,12 @@ namespace Hood.Controllers
                     throw new Exception("There was a problem connecting your account, please try again.");
                 }
 
+                // Update local account profile from remote account info - if set and not set etc etc.
+                if (user.UpdateFromPrincipal(User))
+                {
+                    await _account.UpdateUserAsync(user);
+                }
+
                 User.RemoveClaim(HoodClaimTypes.AccountNotConnected);
                 User.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
@@ -557,7 +563,7 @@ namespace Hood.Controllers
                 }
 
                 // connect the accounts.     
-                var authService = new Auth0Service();        
+                var authService = new Auth0Service();
                 var user = await GetCurrentUserOrThrow();
                 var linkedUser = await authService.GetUserByAuth0UserId(model.AccountId);
                 if (linkedUser == null)
