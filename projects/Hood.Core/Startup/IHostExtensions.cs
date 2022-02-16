@@ -1,4 +1,5 @@
 ﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Models;
 using Hood.Services;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,19 +25,18 @@ namespace Hood.Startup
                 IServiceProvider services = scope.ServiceProvider;
                 // Get the database from the services provider
                 TDbContext db = scope.ServiceProvider.GetService<TDbContext>();
-
                 try
                 {
+
                     if (db == null)
                     {
                         throw new StartupException("No database connection could be established.", StartupError.DatabaseConnectionFailed);
                     }
 
-                    Engine.Services.DatabaseConnectionFailed = false;
-                    Engine.Services.DatabaseMigrationsMissing = false;
-                    Engine.Services.MigrationNotApplied = false;
-                    Engine.Services.AdminUserSetupError = false;
-                    Engine.Services.DatabaseMediaTimeout = false;
+                    if (!db.AllMigrationsApplied())
+                    {
+                        throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
+                    }
 
                     if (Engine.Configuration.InitializeOnStartup)
                     {
@@ -43,39 +44,32 @@ namespace Hood.Startup
                         {
                             // attempt to apply migrations. 
                             db.Database.Migrate();
-                            
-                        }
-                        else if (!db.AllMigrationsApplied())
-                        {
-                            throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
+
                         }
                         // Seed the database
                         await db.Seed();
                     }
                     else
                     {
-                        // Ensure the database is seeded, or throw issue.
-                        if (!db.Options.Any(o => o.Id == "Hood.Version"))
+                        try
                         {
-                            // No version set in the database... this means unseeded.
-                            throw new Exception("Database is not initialised.");
+                            // Ensure the database is seeded, or throw issue.
+                            if (!db.Options.Any(o => o.Id == "Hood.Version"))
+                            {
+                                // No version set in the database... this means unseeded.
+                                throw new StartupException("Database is not initialised.", StartupError.DatabaseNotSeeded);
+                            }
+                        }
+                        catch (Microsoft.Data.SqlClient.SqlException sqlException)
+                        {
+                            throw new StartupException("Failed to connect to the database in startup procedure.", sqlException, StartupError.DatabaseConnectionFailed);
                         }
                     }
 
 
-                    Engine.Services.DatabaseSeedFailed = false;
-
                 }
-                catch (StartupException ex)
-                {
-                    Engine.Services.DatabaseSeedFailed = true;
-                    Engine.Services.Details = ex.InnerException;
-                }
-                catch (Exception ex)
-                {
-                    Engine.Services.DatabaseSeedFailed = true;
-                    Engine.Services.Details = ex;
-                }
+                catch (StartupException)
+                { }
 
             }
             return host;

@@ -25,13 +25,11 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Collections.Generic;
 using Hood.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections;
+using Hood.Enums;
 
 namespace Hood.Startup
 {
@@ -47,26 +45,30 @@ namespace Hood.Startup
             services.Configure<HoodConfiguration>(config.GetSection("Hood"));
             services.Configure<Auth0Configuration>(config.GetSection("Identity:Auth0"));
 
-            if (!config.IsDatabaseConnected())
-            {
-                throw new StartupException("No database connected.", StartupError.DatabaseConnectionFailed);
-            }
-
-            services.ConfigureHoodDatabase<TContext>(config);
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
             services.ConfigureHoodServices();
 
-            services.ConfigureCache(config);
+            try
+            {
+                if (!config.IsDatabaseConnected())
+                {
+                    throw new StartupException("Database connection string is not configured.", StartupError.NoConnectionString);
+                }
+                services.ConfigureHoodDatabase<TContext>(config);
+                services.ConfigureHoodDatabaseDependentServices();
+                if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
+                {
+                    services.ConfigureAuth0(config);
+                }
+                else
+                {
+                    services.ConfigureAuthentication(config);
+                }
 
-            if (config.IsConfigured("Identity:Auth0:Domain") && config.IsConfigured("Identity:Auth0:ClientId"))
-            {
-                services.ConfigureAuth0(config);
             }
-            else
-            {
-                services.ConfigureAuthentication(config);
-            }
+            catch (StartupException) { }
+
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            services.ConfigureCache(config);
 
             services.ConfigureViewEngine(config);
             services.ConfigureAntiForgery(config);
@@ -101,12 +103,25 @@ namespace Hood.Startup
 
         public static IServiceCollection ConfigureHoodServices(this IServiceCollection services)
         {
+
             // Register singletons.
             services.AddSingleton<IFTPService, FTPService>();
-            services.AddSingleton<IPropertyImporter, BlmFileImporter>();
-            services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
             services.AddSingleton<IThemesService, ThemesService>();
             services.AddSingleton<IAddressService, AddressService>();
+
+            // Register scoped.
+            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
+            services.AddScoped<IPageBuilder, PageBuilder>();
+            services.AddScoped<IRecaptchaService, RecaptchaService>();
+
+            return services;
+        }
+        public static IServiceCollection ConfigureHoodDatabaseDependentServices(this IServiceCollection services)
+        {
+
+            // Register singletons.
+            services.AddSingleton<IPropertyImporter, BlmFileImporter>();
+            services.AddSingleton<IMediaRefreshService, MediaRefreshService>();
             services.AddSingleton<IDirectoryManager, DirectoryManager>();
             services.AddSingleton<IMediaManager, MediaManager>();
             services.AddSingleton<ILogService, LogService>();
@@ -119,11 +134,8 @@ namespace Hood.Startup
             services.AddScoped<IContentRepository, ContentRepository>();
 
             services.AddScoped<IEmailSender, EmailSender>();
-            services.AddScoped<IRazorViewRenderer, RazorViewRenderer>();
-            services.AddScoped<IPageBuilder, PageBuilder>();
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<ISmsSender, SmsSender>();
-            services.AddScoped<IRecaptchaService, RecaptchaService>();
 
             return services;
         }
@@ -254,11 +266,6 @@ namespace Hood.Startup
             return services;
         }
 
-        private static int SignInManager<T>()
-        {
-            throw new NotImplementedException();
-        }
-
         public static IServiceCollection ConfigureAuth0(this IServiceCollection services, IConfiguration config)
         {
             services.ConfigureSameSiteNoneCookies();
@@ -274,7 +281,7 @@ namespace Hood.Startup
                     {
                         OnTicketReceived = async e =>
                         {
-                            var authService = new Auth0Service();                            
+                            var authService = new Auth0Service();
                             var linkGenerator = Engine.Services.Resolve<LinkGenerator>();
                             var repo = Engine.Services.Resolve<IAccountRepository>();
                             var principal = e.Principal;
@@ -565,12 +572,10 @@ namespace Hood.Startup
                 if (int.TryParse(config["Session:Timeout"], out sessionTimeout))
                 {
                     options.IdleTimeout = TimeSpan.FromMinutes(sessionTimeout);
-                    options.Cookie.Expiration = TimeSpan.FromMinutes(sessionTimeout);
                 }
                 else
                 {
                     options.IdleTimeout = TimeSpan.FromMinutes(60);
-                    options.Cookie.Expiration = TimeSpan.FromMinutes(60);
                 }
             });
             return services;

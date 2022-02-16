@@ -1,4 +1,5 @@
 ﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Extensions;
 using Hood.Interfaces;
 using Hood.Models;
@@ -57,7 +58,7 @@ namespace Hood.Startup
             var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             UrlHelpers.Configure(httpContextAccessor);
 
-            if (config.IsDatabaseConfigured())
+            if (config.IsDatabaseConnected())
             {
                 app.UseAuthentication();
                 app.UseAuthorization();
@@ -106,12 +107,13 @@ namespace Hood.Startup
         {
             try
             {
-                if (config.IsDatabaseConfigured()) {
-                    var context = Engine.Services.Resolve<HoodDbContext>();
+
+                if (config.IsDatabaseConnected())
+                {
                     try
                     {
+                        var context = Engine.Services.Resolve<HoodDbContext>();
                         var profile = context.UserProfiles.FirstOrDefault();
-                        Engine.Services.ViewsInstalled = true;
                     }
                     catch (Microsoft.Data.SqlClient.SqlException ex)
                     {

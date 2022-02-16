@@ -1,0 +1,114 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": "Hood.Development (Development)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-dev",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net5.0/Hood.Development.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/projects/Hood.Development/",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "https://localhost:5152",
+                "Hood:BypassCDN": "true"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/projects/Hood.Development/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": "Hood.Development (Production)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-dev",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/projects/Hood.Development/bin/Debug/net5.0/Hood.Development.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/projects/Hood.Development/",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Production",
+                "ASPNETCORE_URLS": "https://localhost:5152",
+                "Hood:BypassCDN": "true"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/projects/Hood.Development/Views"
+            }
+        },
+        
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": "Hood.Web (Development)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-web",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/projects/Hood.Web/bin/Debug/net5.0/Hood.Web.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/projects/Hood.Web/",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "https://localhost:5153",
+                "Hood:BypassCDN": "true"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/projects/Hood.Web/Views"
+            }
+        },
+        {
+            // Use IntelliSense to find out which attributes exist for C# debugging
+            // Use hover for the description of the existing attributes
+            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+            "name": "Hood.Web (Production)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-web",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/projects/Hood.Web/bin/Debug/net5.0/Hood.Web.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/projects/Hood.Web/",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Production",
+                "ASPNETCORE_URLS": "https://localhost:5153",
+                "Hood:BypassCDN": "true"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/projects/Hood.Web/Views"
+            }
+        }
+    ]
+}

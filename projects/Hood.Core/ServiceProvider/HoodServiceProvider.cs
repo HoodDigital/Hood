@@ -1,4 +1,6 @@
-﻿using Hood.Interfaces;
+﻿using Hood.Enums;
+using Hood.Extensions;
+using Hood.Interfaces;
 using Hood.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,24 +15,27 @@ namespace Hood.Core
 {
     class HoodServiceProvider : IHoodServiceProvider
     {
-        public bool DatabaseConnectionFailed { get; set; } = true;
-        public bool DatabaseMigrationsMissing { get; set; } = true;
-        public bool DatabaseSeedFailed { get; set; } = true;
-        public bool MigrationNotApplied { get; set; } = true;
-        public bool ViewsInstalled { get; set; } = false;
-        public bool AdminUserSetupError { get; set; } = true;
-        public bool DatabaseMediaTimeout { get; set; } = false;
+        public HoodServiceProvider()
+        {
+            StartupExceptions = new List<StartupException>();
+        }
+
+        public List<StartupException> StartupExceptions { get; set; }
         public bool Installed
         {
             get
             {
-                return ViewsInstalled &&
-                    !DatabaseConnectionFailed &&
-                    !DatabaseMigrationsMissing &&
-                    !DatabaseSeedFailed &&
-                    !MigrationNotApplied &&
-                    !AdminUserSetupError;
+                return !StartupExceptions.Any();
             }
+        }
+
+        public List<StartupException> GetStartupExceptionsByType(StartupError type)
+        {
+            if (StartupExceptions == null)
+            {
+                return null;
+            }
+            return StartupExceptions.Where(st => st.Error == type).ToList();
         }
 
         public Exception Details { get; set; }

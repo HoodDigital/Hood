@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Hood.Enums;
+using Hood.Extensions;
 using Hood.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,8 +13,13 @@ namespace Hood.Core
     /// Classes implementing this interface can serve as a portal for the various services composing the Nop engine. 
     /// Edit functionality, modules and implementations access most Nop functionality through this interface.
     /// </summary>
-    public interface IHoodServiceProvider : IInstallSettings
+    public interface IHoodServiceProvider
     {
+        List<StartupException> StartupExceptions { get; set; }
+
+        bool Installed { get; }
+
+        List<StartupException> GetStartupExceptionsByType(StartupError type);
 
         /// <summary>
         /// Initialize engine
