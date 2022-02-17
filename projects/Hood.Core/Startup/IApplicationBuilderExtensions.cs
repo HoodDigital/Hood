@@ -1,6 +1,7 @@
 ﻿using Hood.Core;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Identity;
 using Hood.Interfaces;
 using Hood.Models;
 using Hood.Services;
@@ -43,11 +44,12 @@ namespace Hood.Startup
             provider.Mappings[".webmanifest"] = "text/json";
             app.UseStaticFiles(new StaticFileOptions()
             {
+                HttpsCompression = Microsoft.AspNetCore.Http.Features.HttpsCompressionMode.Compress,
                 ContentTypeProvider = provider,
                 OnPrepareResponse =
                     ctx =>
                     {
-                        ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
+                        ctx.Context.Response.Headers["Cache-Control"] = "max-age=600";
                     }
             });
 
@@ -63,7 +65,7 @@ namespace Hood.Startup
                 app.UseAuthentication();
                 app.UseAuthorization();
 
-                var cookieName = config["Cookies:Name"].IsSet() ? config["Cookies:Name"] : "Hood";
+                var cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
 
                 var builder = new CookieBuilder() { Name = $".{cookieName}.Session" };
                 builder.Expiration = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
