@@ -184,7 +184,7 @@ namespace Hood.Identity
             await SetDefaultClaims(e, user);
 
             // Account setup complete, send user to manage profile with new-account-connection flag.
-            returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { r = "new-account-connection" });
+            returnUrl = linkGenerator.GetPathByAction("Index", "Manage", new { returnUrl = e.ReturnUri, created = true });
             e.Response.Redirect(returnUrl);
             e.HandleResponse();
         }

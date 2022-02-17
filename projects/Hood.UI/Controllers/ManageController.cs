@@ -38,7 +38,7 @@ namespace Hood.Controllers
 
         [HttpGet]
         [Route("account/manage")]
-        public virtual async Task<IActionResult> Index(string r)
+        public virtual async Task<IActionResult> Index(string returnUrl, bool created = false)
         {
             ApplicationUser user = await GetCurrentUserOrThrow();
             var model = new UserViewModel
@@ -52,7 +52,8 @@ namespace Hood.Controllers
                 Avatar = user.Avatar,
                 Profile = await _account.GetUserProfileByIdAsync(user.Id),
                 Accounts = user.ConnectedAuth0Accounts,
-                NewAccount = r == "new-account-connection"
+                ReturnUrl = returnUrl,
+                NewAccountCreated = created
             };
             return View(model);
         }
@@ -60,7 +61,7 @@ namespace Hood.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("account/manage")]
-        public virtual async Task<IActionResult> Index(UserViewModel model)
+        public virtual async Task<IActionResult> Index(UserViewModel model, string returnUrl, bool created = false)
         {
             ApplicationUser user = await GetCurrentUserOrThrow();
             try
@@ -102,15 +103,19 @@ namespace Hood.Controllers
 
                 SaveMessage = "Your profile has been updated.";
                 MessageType = AlertType.Success;
+                return RedirectToAction(nameof(Index));
+
             }
             catch (Exception ex)
             {
                 SaveMessage = "Something went wrong: " + ex.Message;
                 MessageType = AlertType.Danger;
+                model.Accounts = user.ConnectedAuth0Accounts;
+                model.ReturnUrl = returnUrl;
+                model.NewAccountCreated = created;
+                return View(model);
             }
 
-            model.Accounts = user.ConnectedAuth0Accounts;
-            return RedirectToAction(nameof(Index));
         }
 
         [Route("account/manage/avatar")]
