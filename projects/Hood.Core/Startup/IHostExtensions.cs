@@ -33,13 +33,12 @@ namespace Hood.Startup
                         throw new StartupException("No database connection could be established.", StartupError.DatabaseConnectionFailed);
                     }
 
-                    if (!db.AllMigrationsApplied())
-                    {
-                        throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
-                    }
-
                     if (Engine.Configuration.InitializeOnStartup)
                     {
+                        if (!db.AllMigrationsApplied())
+                        {
+                            throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
+                        }
                         if (Engine.Configuration.ApplyMigrationsAutomatically && !db.AllMigrationsApplied())
                         {
                             // attempt to apply migrations. 
@@ -57,12 +56,12 @@ namespace Hood.Startup
                             if (!db.Options.Any(o => o.Id == "Hood.Version"))
                             {
                                 // No version set in the database... this means unseeded.
-                                throw new StartupException("Database is not initialised.", StartupError.DatabaseNotSeeded);
+                                throw new StartupException("Database is not initialised. Could not get version from database. Ensure database is up to date with migrations and seeding.", StartupError.DatabaseNotSeeded);
                             }
                         }
                         catch (Microsoft.Data.SqlClient.SqlException sqlException)
                         {
-                            throw new StartupException("Failed to connect to the database in startup procedure.", sqlException, StartupError.DatabaseConnectionFailed);
+                            throw new StartupException("Failed to connect to the database in startup procedure. Ensure database is up to date with migrations and seeding.", sqlException, StartupError.DatabaseConnectionFailed);
                         }
                     }
 

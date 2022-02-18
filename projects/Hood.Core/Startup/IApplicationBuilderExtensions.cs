@@ -119,7 +119,7 @@ namespace Hood.Startup
                     }
                     catch (Microsoft.Data.SqlClient.SqlException ex)
                     {
-                        throw new StartupException("Database views are not installed.", StartupError.DatabaseViewsNotInstalled);
+                        throw new StartupException("Database views are not installed.", ex, StartupError.DatabaseViewsNotInstalled);
                     }
                 }
             }
