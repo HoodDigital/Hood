@@ -9,12 +9,20 @@
 {
     <alert type="@Model.MessageType" size="Medium" icon="fa-save">@Model.SaveMessage</alert>
 }
-@if (Model.NewAccount)
+@if (Model.NewAccountCreated)
 {
     <alert type="Info" size="Epic">
         <h2>Welcome to your new account!</h2>
-        <p>You can customise your profile here. Click below to dismiss this message.</p>
-        <p><a class="btn btn-info" asp-action="Index">Dismiss</a></p>
+        <p>
+            You can customise your profile below.            
+        </p>
+        <p>
+            <a class="btn btn-info" asp-action="Index">Dismiss</a>
+            @if (Model.ReturnUrl.IsSet())
+            {                
+                <a class="btn btn-info" href="@Model.ReturnUrl">Continue</a>
+            }
+        </p>
     </alert>
 }
 <nav class="nav nav-tabs" role="tablist">

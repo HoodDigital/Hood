@@ -1,14 +1,17 @@
 ﻿using Hood.Attributes;
 using Hood.Enums;
 using Hood.Extensions;
+using Hood.Identity;
 using Hood.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Hood.Models
 {
@@ -93,7 +96,7 @@ namespace Hood.Models
         [NotMapped]
         public virtual IMediaObject Avatar
         {
-            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.Blank; }
+            get { return AvatarJson.IsSet() ? JsonConvert.DeserializeObject<MediaObject>(AvatarJson) : MediaObject.BlankAvatar; }
             set { AvatarJson = JsonConvert.SerializeObject(value); }
         }
         public virtual string GetAvatar()
@@ -111,8 +114,23 @@ namespace Hood.Models
         [NotMapped]
         public virtual Dictionary<string, string> Metadata
         {
-            get { return UserVars.IsSet() ? JsonConvert.DeserializeObject<Dictionary<string, string>>(UserVars) : new Dictionary<string, string>(); }
-            set { UserVars = JsonConvert.SerializeObject(value); }
+            get { return UserVars.IsSet() ? JsonConvert.DeserializeObject<Dictionary<string, string>>(UserVars, new JsonSerializerSettings()
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new DefaultNamingStrategy()
+                    }
+                }) : new Dictionary<string, string>(); }
+            set
+            {
+                UserVars = JsonConvert.SerializeObject(value, new JsonSerializerSettings()
+                {
+                    ContractResolver = new DefaultContractResolver
+                    {
+                        NamingStrategy = new DefaultNamingStrategy()
+                    }
+                });
+            }
         }
         public virtual string this[string key]
         {
@@ -246,6 +264,48 @@ namespace Hood.Models
                 return null;
             }
             return ConnectedAuth0Accounts.SingleOrDefault(ca => ca.IsPrimary);
+        }
+
+        public bool UpdateFromPrincipal(ClaimsPrincipal principal)
+        {
+            bool changed = false;
+
+            string firstName = principal.GetClaimValue(ClaimTypes.GivenName);
+            if (!this.FirstName.IsSet() && firstName.IsSet())
+            {
+                this.FirstName = firstName;
+                changed = true;
+            }
+
+            string lastName = principal.GetClaimValue(ClaimTypes.Surname);
+            if (!this.LastName.IsSet() && lastName.IsSet())
+            {
+                this.LastName = lastName;
+                changed = true;
+            }
+
+            string mobile = principal.GetClaimValue(ClaimTypes.MobilePhone);
+            if (!this.PhoneNumber.IsSet() && mobile.IsSet())
+            {
+                this.PhoneNumber = mobile;
+                changed = true;
+            }
+
+            bool emailConfirmed = principal.IsEmailConfirmed();
+            if (!this.EmailConfirmed && emailConfirmed)
+            {
+                this.EmailConfirmed = emailConfirmed;
+                changed = true;
+            }
+
+            string avatar = principal.GetAvatar();
+            if (!this.AvatarJson.IsSet() && avatar.IsSet())
+            {
+                this.Avatar = new MediaObject(avatar);
+                changed = true;
+            }
+
+            return changed;
         }
     }
 }

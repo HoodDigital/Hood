@@ -83,7 +83,7 @@ namespace Hood.Controllers
                 Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    ApplicationUser user = await _account.GetUserByEmailAsync(model.Username);
+                    ApplicationUser user = await _userManager.FindByNameAsync(model.Username);
                     if (Engine.Settings.Account.RequireEmailConfirmation && !user.EmailConfirmed)
                     {
                         await _account.SendVerificationEmail(user, User.GetUserId(), Url.AbsoluteAction("Login", "Account"));
@@ -240,7 +240,7 @@ namespace Hood.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("account/authorize")]
-        public async Task Authorize(string returnUrl = "/", string mode = "login")
+        public virtual async Task Authorize(string returnUrl = "/", string mode = "login")
         {
             if (!Engine.Auth0Enabled)
             {
@@ -263,7 +263,7 @@ namespace Hood.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("account/auth/signout")]
-        public async Task SignOut(string returnUrl = "/")
+        public virtual async Task SignOut(string returnUrl = "/")
         {
             if (!Engine.Auth0Enabled)
             {
@@ -284,7 +284,7 @@ namespace Hood.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("account/auth/failed")]
-        public IActionResult RemoteSigninFailed(string r, string d)
+        public virtual IActionResult RemoteSigninFailed(string r, string d)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -331,7 +331,7 @@ namespace Hood.Controllers
         [HttpGet]
         [Authorize(Policies.AccountNotConnected)]
         [Route("account/auth/connect")]
-        public async Task<IActionResult> ConnectAccount(string returnUrl)
+        public virtual async Task<IActionResult> ConnectAccount(string returnUrl)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -353,7 +353,7 @@ namespace Hood.Controllers
         [HttpPost]
         [Authorize(Policies.AccountNotConnected)]
         [Route("account/auth/connect-confirm")]
-        public async Task<IActionResult> ConnectAccountConfirm(string returnUrl)
+        public virtual async Task<IActionResult> ConnectAccountConfirm(string returnUrl)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -388,6 +388,12 @@ namespace Hood.Controllers
                     throw new Exception("There was a problem connecting your account, please try again.");
                 }
 
+                // Update local account profile from remote account info - if set and not set etc etc.
+                if (user.UpdateFromPrincipal(User))
+                {
+                    await _account.UpdateUserAsync(user);
+                }
+
                 User.RemoveClaim(HoodClaimTypes.AccountNotConnected);
                 User.AddOrUpdateClaimValue(HoodClaimTypes.Active, "true");
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
@@ -405,7 +411,7 @@ namespace Hood.Controllers
 
         [Authorize(Policies.AccountNotConnected)]
         [Route("account/auth/connect-link")]
-        public async Task<IActionResult> ConnectAccountLink(string returnUrl)
+        public virtual async Task<IActionResult> ConnectAccountLink(string returnUrl)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -503,7 +509,7 @@ namespace Hood.Controllers
         [HttpGet]
         [Authorize]
         [Route("account/auth/connected")]
-        public async Task<IActionResult> ConnectAccountComplete(string returnUrl)
+        public virtual async Task<IActionResult> ConnectAccountComplete(string returnUrl)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -524,7 +530,7 @@ namespace Hood.Controllers
         [HttpGet]
         [Authorize]
         [Route("account/auth/disconnect")]
-        public async Task<IActionResult> DisconnectAccount(string accountId)
+        public virtual async Task<IActionResult> DisconnectAccount(string accountId)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -543,7 +549,7 @@ namespace Hood.Controllers
         [HttpPost]
         [Authorize]
         [Route("account/auth/disconnect-confirm")]
-        public async Task<IActionResult> DisconnectAccountConfirm(DisconnectAccountModel model)
+        public virtual async Task<IActionResult> DisconnectAccountConfirm(DisconnectAccountModel model)
         {
             if (!Engine.Auth0Enabled)
             {
@@ -557,7 +563,7 @@ namespace Hood.Controllers
                 }
 
                 // connect the accounts.     
-                var authService = new Auth0Service();        
+                var authService = new Auth0Service();
                 var user = await GetCurrentUserOrThrow();
                 var linkedUser = await authService.GetUserByAuth0UserId(model.AccountId);
                 if (linkedUser == null)
@@ -613,7 +619,7 @@ namespace Hood.Controllers
         [HttpGet]
         [Authorize]
         [Route("account/auth/disconnected")]
-        public async Task<IActionResult> DisconnectAccountComplete()
+        public virtual async Task<IActionResult> DisconnectAccountComplete()
         {
             if (!Engine.Auth0Enabled)
             {
@@ -976,7 +982,7 @@ namespace Hood.Controllers
 
         #region Helpers
 
-        protected async Task SendWelcomeEmail(ApplicationUser user)
+        protected virtual async Task SendWelcomeEmail(ApplicationUser user)
         {
             string loginLink = Url.Action("Login", "Account", null, protocol: HttpContext.Request.Scheme);
             WelcomeEmailModel welcomeModel = new WelcomeEmailModel(user, loginLink)
@@ -987,7 +993,7 @@ namespace Hood.Controllers
             await _mailService.ProcessAndSend(welcomeModel);
         }
 
-        protected void AddErrors(IdentityResult result)
+        protected virtual void AddErrors(IdentityResult result)
         {
             foreach (IdentityError error in result.Errors)
             {
@@ -995,7 +1001,7 @@ namespace Hood.Controllers
             }
         }
 
-        protected IActionResult RedirectToLocal(string returnUrl)
+        protected virtual IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
             {
@@ -1007,7 +1013,7 @@ namespace Hood.Controllers
             }
         }
 
-        protected IActionResult RedirectWithReturnUrl(string url, string returnUrl)
+        protected virtual IActionResult RedirectWithReturnUrl(string url, string returnUrl)
         {
             if (returnUrl != null)
             {

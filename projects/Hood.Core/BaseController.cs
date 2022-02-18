@@ -57,25 +57,28 @@ namespace Hood.Controllers
 
         public BaseController()
         {
-            _userManager = Engine.Services.Resolve<UserManager<TUser>>();
-            _content = Engine.Services.Resolve<IContentRepository>();
-            _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
-            _property = Engine.Services.Resolve<IPropertyRepository>();
-            _account = Engine.Services.Resolve<IAccountRepository>();
-            _db = Engine.Services.Resolve<TContext>();
-            _emailSender = Engine.Services.Resolve<IEmailSender>();
-            _mailService = Engine.Services.Resolve<IMailService>();
-            _smsSender = Engine.Services.Resolve<ISmsSender>();
-            _logService = Engine.Services.Resolve<ILogService>();
-            _config = Engine.Services.Resolve<IConfiguration>();
-            _env = Engine.Services.Resolve<IWebHostEnvironment>();
-            _cache = Engine.Services.Resolve<IHoodCache>();
-            _address = Engine.Services.Resolve<IAddressService>();
-            _eventService = Engine.Services.Resolve<IEventsService>();
-            _directoryManager = Engine.Services.Resolve<IDirectoryManager>();
-            _themeService = Engine.Services.Resolve<IThemesService>();
-            _media = Engine.Services.Resolve<IMediaManager>();
-            _recaptcha = Engine.Services.Resolve<IRecaptchaService>();
+            if (Engine.Services.Installed)
+            {
+                _userManager = Engine.Services.Resolve<UserManager<TUser>>();
+                _content = Engine.Services.Resolve<IContentRepository>();
+                _contentCategoryCache = Engine.Services.Resolve<ContentCategoryCache>();
+                _property = Engine.Services.Resolve<IPropertyRepository>();
+                _account = Engine.Services.Resolve<IAccountRepository>();
+                _db = Engine.Services.Resolve<TContext>();
+                _emailSender = Engine.Services.Resolve<IEmailSender>();
+                _mailService = Engine.Services.Resolve<IMailService>();
+                _smsSender = Engine.Services.Resolve<ISmsSender>();
+                _logService = Engine.Services.Resolve<ILogService>();
+                _config = Engine.Services.Resolve<IConfiguration>();
+                _env = Engine.Services.Resolve<IWebHostEnvironment>();
+                _cache = Engine.Services.Resolve<IHoodCache>();
+                _address = Engine.Services.Resolve<IAddressService>();
+                _eventService = Engine.Services.Resolve<IEventsService>();
+                _directoryManager = Engine.Services.Resolve<IDirectoryManager>();
+                _themeService = Engine.Services.Resolve<IThemesService>();
+                _media = Engine.Services.Resolve<IMediaManager>();
+                _recaptcha = Engine.Services.Resolve<IRecaptchaService>();
+            }
         }
 
         protected ViewResult View(ISaveableModel model)

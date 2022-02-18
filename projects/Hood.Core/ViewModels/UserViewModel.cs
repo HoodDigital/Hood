@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using Hood.Interfaces;
 using Hood.BaseTypes;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Hood.ViewModels
 {
@@ -30,7 +31,12 @@ namespace Hood.ViewModels
         public IMediaObject Avatar { get; set; }
 
         public IList<ApplicationRole> AllRoles { get; set; }
-        public bool NewAccount { get; set; }
+
+        [FromQuery(Name = "created")]
+        public bool NewAccountCreated { get; set; }
         public IList<Auth0Identity> Accounts { get; set; }
+
+        [FromQuery(Name = "returnUrl")]
+        public string ReturnUrl { get; set; }
     }
 }

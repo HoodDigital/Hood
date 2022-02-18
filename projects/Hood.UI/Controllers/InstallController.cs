@@ -21,23 +21,11 @@ namespace Hood.Controllers
         [Route("/install")]
         public IActionResult Install()
         {
-            if (Engine.Services.Installed && !User.IsAdminOrBetter())
+            if (Engine.Services.Installed)
             {
                 return RedirectToAction("Index", "Home");
             }
-            var model = new InstallModel()
-            {
-                DatabaseConfigured = _config.IsDatabaseConnected(),
-                DatabaseConnectionFailed = Engine.Services.DatabaseConnectionFailed,
-                DatabaseSeedFailed = Engine.Services.DatabaseSeedFailed,
-                DatabaseMigrationsMissing = Engine.Services.DatabaseMigrationsMissing,
-                MigrationNotApplied = Engine.Services.MigrationNotApplied,
-                DatabaseMediaTimeout = Engine.Services.DatabaseMediaTimeout,
-                ViewsInstalled = Engine.Services.ViewsInstalled,
-                AdminUserSetupError = Engine.Services.AdminUserSetupError,
-                Details = Engine.Services.Details
-            };
-            return View(model);
+            return View();
         }
 
         [Route("/install/ready")]

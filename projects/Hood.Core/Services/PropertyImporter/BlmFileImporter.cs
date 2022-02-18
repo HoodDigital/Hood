@@ -128,7 +128,7 @@ namespace Hood.Services
 
                 _media = new MediaManager(_env, _config);
 
-
+                
                 User = _db.Users.SingleOrDefault(u => u.Email == Engine.SiteOwnerEmail);
                 if (User == null)
                 {
@@ -1053,28 +1053,21 @@ namespace Hood.Services
             property.Planning = "C3";
 
             // Update the PropertyListing object.
-            property.Additional = "";
             property.Number = data["ADDRESS_1"];
             property.Address1 = data["ADDRESS_2"];
             property.Address2 = data.ContainsKey("ADDRESS_3") ? data["ADDRESS_3"] : "";
             property.AgentId = User.Id;
             property.AllowComments = false;
             property.AgentInfo = data.ContainsKey("ADMINISTRATION_FEE") ? data["ADMINISTRATION_FEE"] : "";
-            property.Areas = "";
             property.City = data.ContainsKey("TOWN") ? data["TOWN"] : "";
             property.Confidential = false;
-            property.ContactName = "";
             property.Country = "United Kingdom";
-            property.County = "";
             property.Description = data["DESCRIPTION"];
             property.Postcode = data["POSTCODE1"] + " " + data["POSTCODE2"];
             property.Public = true;
-            property.PublishDate = DateTime.UtcNow;
+            property.PublishDate = DateTime.Now;
             property.ShareCount = 0;
             property.ShortDescription = data["SUMMARY"];
-            property.Size = "";
-            property.SystemNotes = "";
-            property.Tags = "";
             property.Title = data.ContainsKey("DISPLAY_ADDRESS") ? data["DISPLAY_ADDRESS"] : property.Address1;
             property.Views = 0;
 

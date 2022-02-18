@@ -60,7 +60,7 @@
                     Advanced options for administration of the site.
                 </alert>
                 <ul class="list-group settings-list clear-list m-t">
-                    @if (_config.IsDatabaseConfigured())
+                    @if (_config.IsDatabaseConnected())
                     {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span class="col-5"><i class="fa fa-check-circle me-2 text-success"></i>DataSource</span>
