@@ -1,9 +1,10 @@
 ﻿/// <reference types="google.maps" />
 
-import { Response, Validator } from "..";
+import { Response } from "./Response";
 import { Alerts } from "./Alerts";
 import { Handlers } from "./Handlers";
 import { Uploader } from "./Uploader";
+import { Validator } from "./Validator";
 
 declare global {
     interface Hood {

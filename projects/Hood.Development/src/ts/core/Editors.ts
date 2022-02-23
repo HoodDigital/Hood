@@ -122,10 +122,10 @@ export class Editors {
         this.currentEditor = $('#' + editor.id);
         if (this.currentEditor.data('hoodMediaList')) {
 
-            editor.addButton('hoodimage', {
+            editor.ui.registry.addButton('hoodimage', {
                 text: 'Insert image...',
-                icon: false,
-                onclick: function (this: Editors, e: any) {
+                icon: 'image',
+                onAction: function (this: Editors, e: any) {
 
                     this.mediaModal = new ModalController({
 

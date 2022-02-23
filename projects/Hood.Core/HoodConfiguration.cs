@@ -15,8 +15,17 @@ namespace Hood.Core
         public bool ApplyMigrationsAutomatically { get; set; }
         public LogLevel LogLevel { get; set; }
         public bool BypassCDN { get; set; }
-    }    
-    
+        public Integrations Integrations { get; set; }
+    }
+
+    public class Integrations
+    {
+        public Integrations()
+        {
+        }
+        public string TinyMCE { get; set; }
+    }
+
     public class Auth0Configuration
     {
         public Auth0Configuration()

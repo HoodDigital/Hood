@@ -12,9 +12,10 @@
         <small asp-for="Title"></small>
     </div>
     <div class="mb-3">
-        <label asp-for="ShortDescription" class="form-label fw-bold"></label>
-        <textarea asp-for="ShortDescription" class="tinymce-simple"></textarea>
-        <small asp-for="ShortDescription"></small>
+        <label asp-for="Description" class="form-label fw-bold"></label>
+        <textarea asp-for="Description" class="tinymce-full-content"
+                  data-hood-media-list="@Url.Action("Action", "Media", new { doAction = MediaWindowAction.Insert })"></textarea>
+        <small asp-for="Description"></small>
     </div>
     <div class="form-floating mb-3">
         <input asp-for="Reference" type="text" class="form-control" />
