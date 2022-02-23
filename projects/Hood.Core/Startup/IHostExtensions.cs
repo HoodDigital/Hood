@@ -35,15 +35,14 @@ namespace Hood.Startup
 
                     if (Engine.Configuration.InitializeOnStartup)
                     {
-                        if (!db.AllMigrationsApplied())
-                        {
-                            throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
-                        }
                         if (Engine.Configuration.ApplyMigrationsAutomatically && !db.AllMigrationsApplied())
                         {
                             // attempt to apply migrations. 
                             db.Database.Migrate();
-
+                        } 
+                        else if (!db.AllMigrationsApplied())
+                        {
+                            throw new StartupException("There are migrations that are not applied to the database.", StartupError.MigrationNotApplied);
                         }
                         // Seed the database
                         await db.Seed();
