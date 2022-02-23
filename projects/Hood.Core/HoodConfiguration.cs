@@ -8,6 +8,7 @@ namespace Hood.Core
         public HoodConfiguration()
         {
             InitializeOnStartup = false;
+            Integrations = new Integrations();
         }
 
         public string SuperAdminEmail { get; set; }
@@ -22,6 +23,7 @@ namespace Hood.Core
     {
         public Integrations()
         {
+            TinyMCE = "no-api-key";
         }
         public string TinyMCE { get; set; }
     }
