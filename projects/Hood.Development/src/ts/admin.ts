@@ -13,11 +13,12 @@ import { ContentTypeController } from './admin/ContentTypeController';
 import { LogsController } from './admin/LogsController';
 import { PropertyImporter } from './admin/PropertyImporter';
 import { HoodApi } from './core/HoodApi';
-import { ColorPickers, Editors } from './index';
+import { ColorPickers, Editors, MediaModal } from './index';
 
 class Admin extends HoodApi {
     editors: Editors = new Editors();
     colorPickers: ColorPickers = new ColorPickers();
+    mediaModal: MediaModal = new MediaModal();
 
     home: HomeController;
     media: MediaController;
