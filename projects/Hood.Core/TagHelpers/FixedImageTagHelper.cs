@@ -1,5 +1,6 @@
 ﻿using Hood.Core;
 using Hood.Extensions;
+using Hood.Models;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace Hood.TagHelpers
@@ -45,7 +46,7 @@ namespace Hood.TagHelpers
                 if (Engine.Settings.Media.NoImage.IsSet())
                     url = Engine.Settings.Media.NoImage;
                 else
-                    url = "/hood/images/no-image.jpg";
+                    url = MediaObject.NoImageUrl;
 
             if (Fallback.IsSet())
                 url = Fallback;
