@@ -141,12 +141,7 @@ export default commandLineArgs => {
             sourcemap: sourcemaps,
             compact: compact
         },
-        external: [
-            'jQuery',
-            'bootstrap',
-            'sweetalert2',
-            'dropzone'
-        ],
+        external: external,
         plugins: plugins
     },
     {

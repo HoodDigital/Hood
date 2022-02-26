@@ -1,4 +1,5 @@
-﻿using Hood.Enums;
+﻿using Hood.Core;
+using Hood.Enums;
 using Hood.Interfaces;
 using Hood.Models;
 using System;
@@ -35,22 +36,22 @@ namespace Hood.Extensions
                     output = mediaObject.SmallUrl;
                     break;
                 case GenericFileType.Excel:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/excel.png";
+                    return Engine.Resource("/images/icons/excel.png");
                 case GenericFileType.PDF:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/pdf.png";
+                    return Engine.Resource("/images/icons/pdf.png");
                 case GenericFileType.PowerPoint:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/powerpoint.png";
+                    return Engine.Resource("/images/icons/powerpoint.png");
                 case GenericFileType.Word:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/word.png";
+                    return Engine.Resource("/images/icons/word.png");
                 case GenericFileType.Photoshop:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/photoshop.png";
+                    return Engine.Resource("/images/icons/photoshop.png");
                 case GenericFileType.Audio:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/audio.png";
+                    return Engine.Resource("/images/icons/audio.png");
                 case GenericFileType.Video:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/video.png";
+                    return Engine.Resource("/images/icons/video.png");
                 case GenericFileType.Unknown:
                 default:
-                    return "https://cdn.jsdelivr.net/npm/hoodcms@5.0.0-rc3/images/icons/file.png";
+                    return Engine.Resource("/images/icons/file.png");
             }
             if (!output.IsSet())
             {

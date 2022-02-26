@@ -8,6 +8,7 @@ namespace Hood.Core
         public HoodConfiguration()
         {
             InitializeOnStartup = false;
+            Integrations = new Integrations();
         }
 
         public string SuperAdminEmail { get; set; }
@@ -15,8 +16,18 @@ namespace Hood.Core
         public bool ApplyMigrationsAutomatically { get; set; }
         public LogLevel LogLevel { get; set; }
         public bool BypassCDN { get; set; }
-    }    
-    
+        public Integrations Integrations { get; set; }
+    }
+
+    public class Integrations
+    {
+        public Integrations()
+        {
+            TinyMCE = "no-api-key";
+        }
+        public string TinyMCE { get; set; }
+    }
+
     public class Auth0Configuration
     {
         public Auth0Configuration()

@@ -158,7 +158,7 @@ namespace Hood.Models
         /// Detailed HTML description of the property.
         /// </summary>
         [FormUpdatable]
-        [Display(Name = "Short Description", Description = "A quick description, used in listings and at the top of listing pages in default templates..")]
+        [Display(Name = "Full Description", Description = "Full description, can include images and lots of detail.")]
         public string Description { get; set; }
         /// <summary>
         /// (Optional) Additional information about the property in general. 
