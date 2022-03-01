@@ -319,6 +319,7 @@ namespace Hood.Startup
 
             options.Cookie.Name = $"{cookieName}_auth";
             options.Cookie.HttpOnly = true;
+            options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
 
             options.AccessDeniedPath = config["Identity:AccessDeniedPath"].IsSet() ? config["Identity:AccessDeniedPath"] : "/account/access-denied";
             options.LoginPath = config["Identity:LoginPath"].IsSet() ? config["Identity:LoginPath"] : "/account/login";
