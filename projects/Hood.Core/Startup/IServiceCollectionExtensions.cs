@@ -190,7 +190,7 @@ namespace Hood.Startup
         public static IServiceCollection ConfigureCookies(this IServiceCollection services, IConfiguration config)
         {
             string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
-            bool consentRequired = config.GetValue("Cookies:ConsentRequired", true);
+            bool consentRequired = config.GetValue("Identity:Cookies:ConsentRequired", true);
 
             services.Configure<CookiePolicyOptions>(options =>
             {
