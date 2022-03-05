@@ -184,6 +184,7 @@ namespace Hood.Startup
             services.AddAntiforgery(options =>
             {
                 options.Cookie.Name = $"{cookieName}_af";
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
             });
             return services;
         }
@@ -198,6 +199,7 @@ namespace Hood.Startup
                 options.CheckConsentNeeded = context => consentRequired;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.ConsentCookie.Name = $"{cookieName}_consent";
+                options.ConsentCookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
             });
             return services;
         }
@@ -227,6 +229,7 @@ namespace Hood.Startup
 
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(config.GetValue("Session:Timeout", 60));
                 options.SlidingExpiration = true;
 
@@ -348,9 +351,12 @@ namespace Hood.Startup
         {
 
             string cookieName = config["Identity:Cookies:Name"].IsSet() ? config["Identity:Cookies:Name"] : Constants.CookieDefaultName;
-            services.Configure<CookieTempDataProviderOptions>(options =>
-                options.Cookie.Name = $"{cookieName}_td"
-            );
+            services.Configure<CookieTempDataProviderOptions>(options => {
+                options.Cookie.IsEssential = true;
+                options.Cookie.Name = $"{cookieName}_td";
+                options.Cookie.HttpOnly = true;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+            });
 
             int sessionTimeout = 60;
             services.AddSession(options =>
@@ -358,6 +364,8 @@ namespace Hood.Startup
                 options.Cookie.IsEssential = true;
                 options.Cookie.Name = $"{cookieName}_session";
                 options.Cookie.HttpOnly = true;
+                options.Cookie.Domain = config["Identity:Cookies:Domain"].IsSet() ? config["Identity:Cookies:Domain"] : null;
+
                 if (int.TryParse(config["Session:Timeout"], out sessionTimeout))
                 {
                     options.IdleTimeout = TimeSpan.FromMinutes(sessionTimeout);
